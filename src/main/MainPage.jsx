@@ -6,7 +6,6 @@ import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
-import StatusCard from '../common/components/StatusCard';
 import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
@@ -14,6 +13,7 @@ import useFilter from './useFilter';
 import MainMap from './MainMap';
 import { useAttributePreference } from '../common/util/preferences';
 import FloatingDeviceList from '../components/FloatingDeviceList';
+import FloatingStatusCard from '../components/FloatingStatusCard';
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -123,14 +123,9 @@ const MainPage = () => {
         setFilterMap={setFilterMap}
       />
       
-      {selectedDeviceId && (
-        <StatusCard
-          deviceId={selectedDeviceId}
-          position={selectedPosition}
-          onClose={() => dispatch(devicesActions.selectId(null))}
-          desktopPadding={theme.dimensions.drawerWidthDesktop}
-        />
-      )}
+      {/* Floating Status Card */}
+      <FloatingStatusCard />
+      
     </div>
   );
 };

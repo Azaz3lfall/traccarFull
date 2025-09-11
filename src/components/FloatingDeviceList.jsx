@@ -9,8 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 // import { FixedSizeList } from 'react-window';
 import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useAttributePreference } from '../common/util/preferences';
-import { formatPercentage, formatStatus } from '../common/util/formatter';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { formatPercentage, formatStatus, formatSpeed, formatDistance, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
@@ -64,6 +64,10 @@ const FloatingDeviceList = ({
   const groupsDropdownRef = useRef(null);
   
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
+  const deviceSecondary = useAttributePreference('deviceSecondary', '');
+  const speedUnit = useAttributePreference('speedUnit');
+  const distanceUnit = useAttributePreference('distanceUnit');
+  const coordinateFormat = usePreference('coordinateFormat');
   
   const deviceStatusCount = useCallback((status) => Object.values(devices).filter((d) => d.status === status).length, [devices]);
 
@@ -243,7 +247,7 @@ const FloatingDeviceList = ({
                       marginTop: '8px'
                     }}>
                       <Gauge style={{ width: '10px', height: '10px' }} />
-                      <span>{position.speed ? Math.round(position.speed * 3.6) : 0} km/h</span>
+                      <span>{position.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}</span>
                     </div>
                   )}
                 </div>
@@ -384,7 +388,9 @@ const FloatingDeviceList = ({
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
                   }}>
-                    {position?.address || formatLastUpdate(device)}
+                    {position?.address || (position?.latitude && position?.longitude ? 
+                      `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` : 
+                      formatLastUpdate(device))}
                   </p>
                 </div>
               </div>
@@ -422,22 +428,21 @@ const FloatingDeviceList = ({
     selectedDeviceId: selectedDeviceId
   }), [filteredDevices, positions, selectedDeviceId]);
   
-  // Don't render on mobile if device is selected
-  if (isMobile && !showOnMobile) {
-    return null;
-  }
-
   return (
-    <motion.div
-      initial={{ x: -400, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+    <AnimatePresence mode="wait">
+      {!(isMobile && !showOnMobile) && (
+        <motion.div
+          key="floating-device-list"
+          initial={{ x: -400, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -400, opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
       style={{
         position: 'fixed',
-        top: isMobile ? '0px' : '16px',
-        left: isMobile ? '0px' : '16px',
-        width: isMobile ? '100vw' : '360px',
-        height: isMobile ? '100vh' : 'calc(100vh - 32px)',
+        top: isMobile ? '0px' : '8px',
+        left: isMobile ? '0px' : '8px',
+        width: isMobile ? '100vw' : '310px',
+        height: isMobile ? '100vh' : 'calc(100vh - 16px)',
         zIndex: 9999,
         pointerEvents: 'auto'
       }}
@@ -447,8 +452,8 @@ const FloatingDeviceList = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'white',
-        borderRadius: isMobile ? '0px' : '16px',
-        boxShadow: isMobile ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        borderRadius: isMobile ? '0px' : (selectedDeviceId ? '16px 0px 0px 16px' : '16px'),
+        boxShadow: isMobile ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
         border: 'none'
       }}>
         {/* Header */}
@@ -961,6 +966,8 @@ const FloatingDeviceList = ({
         {/* Removed Footer with Add Device Button */}
       </Card>
     </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
