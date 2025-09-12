@@ -83,7 +83,7 @@ const MapView = ({ children, selectedMapStyle }) => {
     const style = document.createElement('style');
     style.textContent = `
       .maplibregl-ctrl-top-right .maplibregl-ctrl-group:first-child {
-        margin-top: 200px !important;
+        margin-top: 300px !important;
       }
       
       /* Re-style map control buttons - keep original shape, change colors only */
