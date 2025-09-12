@@ -2,7 +2,8 @@ import React, {
   useState,
   useRef,
   useMemo,
-  useCallback
+  useCallback,
+  useEffect
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,6 +53,11 @@ const FloatingDeviceList = ({
   const t = useTranslation();
   const colors = useThemeColors();
   
+  // Force re-render when colors change
+  useEffect(() => {
+    setForceUpdate(prev => prev + 1);
+  }, [colors.background, colors.surface, colors.text, colors.border]);
+  
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
@@ -62,6 +68,7 @@ const FloatingDeviceList = ({
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const filterButtonRef = useRef(null);
   const filterPopupRef = useRef(null);
   const sortDropdownRef = useRef(null);
@@ -468,10 +475,11 @@ const FloatingDeviceList = ({
       return {
         ...virtualItem,
         device,
-        colors // Include colors in each item to force re-render
+        colors, // Include colors in each item to force re-render
+        forceUpdate // Include forceUpdate to trigger re-render
       };
     });
-  }, [virtualizer, filteredDevices, colors]);
+  }, [virtualizer, filteredDevices, colors, forceUpdate]);
 
   // Debug logging
   console.log('Virtualizer debug:', {
