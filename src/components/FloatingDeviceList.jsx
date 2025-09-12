@@ -241,11 +241,30 @@ const FloatingDeviceList = ({
             }
           }}
           onMouseLeave={(e) => {
+            // Force reset hover state
+            e.target.style.backgroundColor = isSelected ? colors.surface : colors.surface;
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+          }}
+          onMouseDown={(e) => {
             if (!isSelected) {
-              e.target.style.backgroundColor = colors.surface;
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+              e.target.style.backgroundColor = colors.hover;
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
             }
+          }}
+          onMouseUp={(e) => {
+            if (!isSelected) {
+              e.target.style.backgroundColor = colors.hover;
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            }
+          }}
+          onBlur={(e) => {
+            // Reset on blur as well
+            e.target.style.backgroundColor = isSelected ? colors.surface : colors.surface;
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
           }}
         >
           <Card 
