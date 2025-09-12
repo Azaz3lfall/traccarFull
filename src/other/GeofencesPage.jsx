@@ -9,11 +9,9 @@ import { makeStyles } from 'tss-react/mui';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useNavigate } from 'react-router-dom';
 import MapView from '../map/core/MapView';
-import MapCurrentLocation from '../map/MapCurrentLocation';
 import MapGeofenceEdit from '../map/draw/MapGeofenceEdit';
 import GeofencesList from './GeofencesList';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import MapGeocoder from '../map/geocoder/MapGeocoder';
 import { errorsActions } from '../store';
 import MapScale from '../map/MapScale';
 import BackIcon from '../common/components/BackIcon';
@@ -119,8 +117,6 @@ const GeofencesPage = () => {
             <MapGeofenceEdit selectedGeofenceId={selectedGeofenceId} />
           </MapView>
           <MapScale />
-          <MapCurrentLocation />
-          <MapGeocoder />
         </div>
       </div>
     </div>

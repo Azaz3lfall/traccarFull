@@ -9,9 +9,7 @@ import { useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import { useNavigate } from 'react-router-dom';
 import MapView from '../map/core/MapView';
-import MapCurrentLocation from '../map/MapCurrentLocation';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import MapGeocoder from '../map/geocoder/MapGeocoder';
 import SelectField from '../common/components/SelectField';
 import { devicesActions } from '../store';
 import MapPositions from '../map/MapPositions';
@@ -132,8 +130,6 @@ const EmulatorPage = () => {
             />
           </MapView>
           <MapScale />
-          <MapCurrentLocation />
-          <MapGeocoder />
         </div>
       </div>
     </div>

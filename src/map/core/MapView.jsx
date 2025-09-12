@@ -74,103 +74,34 @@ const MapView = ({ children, selectedMapStyle }) => {
 
   useEffect(() => {
     const attribution = new maplibregl.AttributionControl({ compact: true });
-    const navigation = new maplibregl.NavigationControl();
     map.addControl(attribution, theme.direction === 'rtl' ? 'bottom-left' : 'bottom-right');
-    map.addControl(navigation, theme.direction === 'rtl' ? 'top-left' : 'top-right');
     
-    // Add CSS to give only the first navigation control more margin-top to avoid overlap with custom control bar
-    // and re-style all map controls to match the control bar buttons
+    // Style attribution control to match our theme
     const style = document.createElement('style');
     style.textContent = `
-      .maplibregl-ctrl-top-right .maplibregl-ctrl-group:first-child {
-        margin-top: 300px !important;
-      }
-      
-      /* Re-style map control buttons - keep original shape, change colors only */
-      .maplibregl-ctrl-group button {
+      /* Attribution control styling */
+      .maplibregl-ctrl-attrib {
         background-color: #1F2937 !important;
-        border-color: #374151 !important;
-        transition: all 0.2s !important;
-      }
-      
-      .maplibregl-ctrl-group button:hover {
-        background-color: #374151 !important;
-        border-color: #4B5563 !important;
-      }
-      
-      .maplibregl-ctrl-group button:active {
-        background-color: #4B5563 !important;
-      }
-      
-      /* Style control icons - make them white/visible - target only icon elements */
-      .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
-        filter: brightness(0) invert(1) !important;
-      }
-      
-      /* Target search button icon specifically */
-      .maplibregl-ctrl-geocoder .maplibregl-ctrl-geocoder--pin-right button .maplibregl-ctrl-icon {
-        filter: brightness(0) invert(1) !important;
-      }
-      
-      /* Target all possible icon elements in buttons */
-      .maplibregl-ctrl button .maplibregl-ctrl-icon,
-      .maplibregl-ctrl button svg,
-      .maplibregl-ctrl button img {
-        filter: brightness(0) invert(1) !important;
-      }
-      
-      /* Style the control group container */
-      .maplibregl-ctrl-group {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-      }
-      
-      /* Fix search button specifically */
-      .maplibregl-ctrl-geocoder {
-        background-color: #1F2937 !important;
-        border: 1px solid #374151 !important;
-        color: white !important;
-      }
-      
-      .maplibregl-ctrl-geocoder .maplibregl-ctrl-geocoder--input {
-        color: white !important;
-        background-color: transparent !important;
-      }
-      
-      .maplibregl-ctrl-geocoder .maplibregl-ctrl-geocoder--input::placeholder {
         color: #9CA3AF !important;
-      }
-      
-      .maplibregl-ctrl-geocoder .maplibregl-ctrl-geocoder--pin-right button {
-        background-color: transparent !important;
-        color: white !important;
-      }
-      
-      /* Fix map switcher/selector text */
-      .maplibregl-style-list button {
-        background-color: #1F2937 !important;
-        color: white !important;
         border: 1px solid #374151 !important;
+        border-radius: 4px !important;
+        font-size: 11px !important;
+        padding: 4px 8px !important;
       }
       
-      .maplibregl-style-list button:hover {
-        background-color: #374151 !important;
+      .maplibregl-ctrl-attrib a {
+        color: #3B82F6 !important;
+        text-decoration: none !important;
       }
       
-      .maplibregl-style-list button.active {
-        background-color: #4B5563 !important;
-        color: white !important;
-      }
-      
-      .maplibregl-style-list button + button {
-        border-top: 1px solid #374151 !important;
+      .maplibregl-ctrl-attrib a:hover {
+        color: #60A5FA !important;
+        text-decoration: underline !important;
       }
     `;
     document.head.appendChild(style);
     
     return () => {
-      map.removeControl(navigation);
       map.removeControl(attribution);
       document.head.removeChild(style);
     };
