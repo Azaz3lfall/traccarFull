@@ -1,4 +1,4 @@
-hinther translatiAll"te import React, {
+import React, {
   useState,
   useRef,
   useMemo,

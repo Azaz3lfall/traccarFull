@@ -2596,7 +2596,7 @@ const MainPage = () => {
                   backgroundColor: '#F9FAFB',
                   border: '1px solid #D1D5DB',
                   borderRadius: '8px',
-                  color: colors.menuText,
+                  color: colors.text,
                   fontSize: '14px',
                   outline: 'none',
                   paddingRight: isSearching ? '40px' : '16px'
@@ -2652,7 +2652,7 @@ const MainPage = () => {
                     }}
                   >
                     <div style={{
-                      color: colors.menuText,
+                      color: colors.text,
                       fontSize: '14px',
                       fontWeight: '500',
                       marginBottom: '4px',
@@ -2950,7 +2950,7 @@ const MainPage = () => {
             {/* Server Information */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: colors.menuText,
+                color: colors.text,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2968,7 +2968,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
-                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -2976,7 +2976,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
-                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -2984,7 +2984,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
-                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
             </div>
