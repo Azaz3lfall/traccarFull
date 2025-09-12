@@ -461,10 +461,17 @@ const FloatingDeviceList = ({
     overscan: 5,
   });
 
-  // Create a key that changes when colors change to force re-render
-  const virtualizerKey = useMemo(() => {
-    return `virtualizer-${filteredDevices.length}-${colors.background}-${colors.surface}-${colors.text}`;
-  }, [filteredDevices.length, colors.background, colors.surface, colors.text]);
+  // Force re-render when colors change by using colors in the virtualizer items
+  const virtualizerItems = useMemo(() => {
+    return virtualizer.getVirtualItems().map((virtualItem) => {
+      const device = filteredDevices[virtualItem.index];
+      return {
+        ...virtualItem,
+        device,
+        colors // Include colors in each item to force re-render
+      };
+    });
+  }, [virtualizer, filteredDevices, colors]);
 
   // Debug logging
   console.log('Virtualizer debug:', {
@@ -994,15 +1001,14 @@ const FloatingDeviceList = ({
               }}
             >
               <div
-                key={virtualizerKey}
                 style={{
                   height: `${virtualizer.getTotalSize()}px`,
                   width: '100%',
                   position: 'relative',
                 }}
               >
-                {virtualizer.getVirtualItems().map((virtualItem) => {
-                  const device = filteredDevices[virtualItem.index];
+                {virtualizerItems.map((virtualItem) => {
+                  const device = virtualItem.device;
                   return (
                     <div
                       key={`device-${device.id || 'unknown'}-${virtualItem.index}`}
