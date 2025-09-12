@@ -57,6 +57,11 @@ const FloatingDeviceList = ({
   useEffect(() => {
     setForceUpdate(prev => prev + 1);
   }, [colors.background, colors.surface, colors.text, colors.border]);
+
+  // Create a key that changes when theme changes to force virtualizer re-mount
+  const virtualizerContainerKey = useMemo(() => {
+    return `virtualizer-${forceUpdate}-${colors.background}-${colors.surface}-${colors.text}`;
+  }, [forceUpdate, colors.background, colors.surface, colors.text]);
   
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
@@ -999,6 +1004,7 @@ const FloatingDeviceList = ({
         >
           {filteredDevices && Array.isArray(filteredDevices) && filteredDevices.length > 0 ? (
             <div 
+              key={virtualizerContainerKey}
               ref={parentRef}
               style={{ 
                 height: !desktop ? 'calc(100vh - 80px)' : '100%', 
@@ -1009,6 +1015,7 @@ const FloatingDeviceList = ({
               }}
             >
               <div
+                key={virtualizerContainerKey}
                 style={{
                   height: `${virtualizer.getTotalSize()}px`,
                   width: '100%',
