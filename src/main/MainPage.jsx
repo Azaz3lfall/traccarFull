@@ -25,7 +25,8 @@ import {
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FolderIcon from '@mui/icons-material/Folder';
 import PersonIcon from '@mui/icons-material/Person';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -45,6 +46,10 @@ import {
   useRestriction 
 } from '../common/util/permissions';
 import useFeatures from '../common/util/useFeatures';
+import { formatTime, formatNotificationTitle } from '../common/util/formatter';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { eventsActions } from '../store';
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -87,6 +92,34 @@ const MainPage = () => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [isDeviceListVisible, setIsDeviceListVisible] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showEventsPopover, setShowEventsPopover] = useState(false);
+  const [eventsButtonRef, setEventsButtonRef] = useState(null);
+  
+  // Logout handlers
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    window.location.href = '/login';
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  // Clear all events handler
+  const clearAllEvents = () => {
+    dispatch(eventsActions.deleteAll());
+    setShowEventsPopover(false);
+  };
+
+  // Handle event card click - select device and close popover
+  const handleEventClick = (event) => {
+    if (event.deviceId) {
+      dispatch(devicesActions.selectId(event.deviceId));
+      setShowEventsPopover(false);
+    }
+  };
+
   
   // Translation and permissions
   const t = useTranslation();
@@ -100,6 +133,45 @@ const MainPage = () => {
   const user = useSelector((state) => state.session.user);
   const supportLink = useSelector((state) => state.session.server.attributes.support);
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
+  
+  // Events data for notification badge
+  const events = useSelector((state) => state.events.items);
+  const eventsCount = events ? events.length : 0;
+  
+  // Get user initials for avatar
+  const getUserInitials = (user) => {
+    if (!user || !user.name) return 'U';
+    return user.name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2); // Max 2 letters
+  };
+
+  // Format event type using Traccar's formatter
+  const formatEventType = (event) => {
+    return formatNotificationTitle(t, {
+      type: event.type,
+      attributes: {
+        alarms: event.attributes?.alarm,
+      },
+    });
+  };
+
+  // Get device name from deviceId
+  const getDeviceName = (deviceId) => {
+    if (!deviceId || !devices) return 'Unknown Device';
+    const device = devices[deviceId];
+    return device?.name || 'Unknown Device';
+  };
+
+  // Get address from event's device position (since events don't have direct position data)
+  const getAddress = (event) => {
+    if (!event?.deviceId || !positions) return null;
+    const position = positions[event.deviceId];
+    return position?.address || null;
+  };
 
   // Clean up tooltips when menu state changes
   useEffect(() => {
@@ -110,10 +182,28 @@ const MainPage = () => {
     });
   }, [isMenuExpanded]);
 
+  // Close events popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showEventsPopover && eventsButtonRef && !eventsButtonRef.contains(event.target)) {
+        setShowEventsPopover(false);
+      }
+    };
+
+    if (showEventsPopover) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEventsPopover, eventsButtonRef]);
+
   const mapOnSelect = useAttributePreference('mapOnSelect', true);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
+  const devices = useSelector((state) => state.devices.items);
   const [filteredPositions, setFilteredPositions] = useState([]);
   const selectedPosition = filteredPositions.find((position) => selectedDeviceId && position.deviceId === selectedDeviceId);
 
@@ -129,7 +219,6 @@ const MainPage = () => {
 
   const [eventsOpen, setEventsOpen] = useState(false);
 
-  const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
 
   const onMapClick = useCallback(() => {
     dispatch(devicesActions.selectId(null));
@@ -524,7 +613,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <NotificationsIcon style={{ fontSize: 18, color: 'white' }} />
+              <NotificationsOutlinedIcon style={{ fontSize: 18, color: 'white' }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -1443,7 +1532,7 @@ const MainPage = () => {
           onClick={() => {
             const tooltip = document.getElementById('menu-tooltip-logout');
             if (tooltip) tooltip.remove();
-            window.location.href = '/login';
+            setShowLogoutModal(true);
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#374151';
@@ -1515,6 +1604,345 @@ const MainPage = () => {
       
       {/* Floating Status Card */}
       <FloatingStatusCard desktop={desktop} isMenuExpanded={isMenuExpanded} isDeviceListVisible={isDeviceListVisible} />
+      
+      {/* Top Right Control Bar */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        width: '100px',
+        height: '50px',
+        backgroundColor: '#1F2937',
+        borderRadius: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        padding: '0 8px',
+        zIndex: 9999,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+      }}>
+        <button 
+          ref={setEventsButtonRef}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none'
+          }}
+          onClick={() => setShowEventsPopover(!showEventsPopover)}>
+          <NotificationsOutlinedIcon style={{ fontSize: 18 }} />
+          {eventsCount > 0 && (
+            <motion.div
+              key={eventsCount} // This will trigger re-animation when count changes
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              style={{
+                position: 'absolute',
+                top: '-2px',
+                right: '-2px',
+                backgroundColor: eventsCount > 0 ? '#EF4444' : '#6B7280',
+                color: 'white',
+                borderRadius: '50%',
+                minWidth: '18px',
+                height: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                fontWeight: '600',
+                padding: '0 4px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                zIndex: 1
+              }}>
+              {eventsCount > 99 ? '99+' : eventsCount}
+            </motion.div>
+          )}
+        </button>
+        <button style={{
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          border: 'none',
+          backgroundColor: 'transparent',
+          color: 'white',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          outline: 'none'
+        }}>
+          <Avatar style={{ width: '28px', height: '28px' }}>
+            {user?.attributes?.avatar && (
+              <AvatarImage src={user.attributes.avatar} alt="User" />
+            )}
+            <AvatarFallback style={{ 
+              backgroundColor: '#6B7280', 
+              color: 'white', 
+              fontSize: '13px',
+              fontWeight: '500'
+            }}>
+              {getUserInitials(user)}
+            </AvatarFallback>
+          </Avatar>
+        </button>
+      </div>
+      
+      {/* Events Popover */}
+      <AnimatePresence>
+        {showEventsPopover && eventsButtonRef && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{
+              position: 'fixed',
+              top: '70px', // Fixed position below the control bar
+              right: '20px', // Aligned with control bar
+              width: '300px',
+              maxHeight: '400px',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+              border: '1px solid #E5E7EB',
+              zIndex: 10001,
+              overflow: 'hidden'
+            }}>
+          {/* Popover Header */}
+          <div style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid #F3F4F6',
+            backgroundColor: 'white'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1F2937',
+                lineHeight: '1.3'
+              }}>
+{t('reportEvents')} ({eventsCount})
+              </h3>
+              <button
+                onClick={clearAllEvents}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#EF4444',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#FEE2E2';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+                title="Clear all events"
+              >
+                <DeleteOutlineIcon style={{ fontSize: 16 }} />
+              </button>
+            </div>
+          </div>
+          
+          {/* Events List */}
+          <div style={{
+            maxHeight: '320px',
+            overflowY: 'auto'
+          }}>
+            {eventsCount === 0 ? (
+              <div style={{
+                padding: '24px',
+                textAlign: 'center',
+                color: '#6B7280'
+              }}>
+                No events available
+              </div>
+            ) : (
+              events.map((event, index) => (
+                <div
+                  key={event.id || index}
+                  style={{
+                    padding: '12px 16px',
+                    borderBottom: index < events.length - 1 ? '1px solid #F3F4F6' : 'none',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onClick={() => handleEventClick(event)}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#F9FAFB';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {/* Device Name - Header */}
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#6B7280',
+                    marginBottom: '4px'
+                  }}>
+                    {getDeviceName(event.deviceId)}
+                  </div>
+                  
+                  {/* Address - Second Line */}
+                  {getAddress(event) && (
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#9CA3AF',
+                      marginBottom: '4px',
+                      fontStyle: 'italic',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {getAddress(event)}
+                    </div>
+                  )}
+                  
+                  {/* Event Type and Time - Third Line */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    fontSize: '12px',
+                    color: '#9CA3AF'
+                  }}>
+                    <span style={{ fontWeight: '500' }}>
+                      {formatEventType(event)}
+                    </span>
+                    <span>
+                      {formatTime(event.eventTime, 'seconds')}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onClick={cancelLogout}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                padding: '20px',
+                maxWidth: '400px',
+                width: '90%',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p style={{
+                margin: '0 0 20px 0',
+                fontSize: '16px',
+                color: '#374151',
+                lineHeight: '1.5'
+              }}>
+                {t('sharedConfirmLogout')}
+              </p>
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end'
+              }}>
+                <button
+                  onClick={cancelLogout}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '6px',
+                    backgroundColor: 'white',
+                    color: '#374151',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#F9FAFB';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'white';
+                  }}
+                >
+                  {t('sharedCancel')}
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  style={{
+                    padding: '8px 16px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    backgroundColor: '#EF4444',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#DC2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#EF4444';
+                  }}
+                >
+                  {t('loginLogout')}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
     </div>
   );

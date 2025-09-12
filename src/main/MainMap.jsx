@@ -16,18 +16,12 @@ import MapPositions from '../map/MapPositions';
 import MapOverlay from '../map/overlay/MapOverlay';
 import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapScale from '../map/MapScale';
-import MapNotification from '../map/notification/MapNotification';
-import useFeatures from '../common/util/useFeatures';
 
-const MainMap = ({ filteredPositions, selectedPosition, onEventsClick, onMapClick }) => {
+const MainMap = ({ filteredPositions, selectedPosition, onMapClick }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-
-  const eventsAvailable = useSelector((state) => !!state.events.items.length);
-
-  const features = useFeatures();
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
@@ -62,9 +56,6 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick, onMapClic
       <MapScale />
       <MapCurrentLocation />
       <MapGeocoder />
-      {!features.disableEvents && (
-        <MapNotification enabled={eventsAvailable} onClick={onEventsClick} />
-      )}
       {desktop && (
         <MapPadding start={parseInt(theme.dimensions.drawerWidthDesktop, 10) + parseInt(theme.spacing(1.5), 10)} />
       )}
