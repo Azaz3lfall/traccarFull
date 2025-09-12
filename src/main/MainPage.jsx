@@ -1,7 +1,6 @@
 import {
   useState, useCallback, useEffect,
 } from 'react';
-import { Paper } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -11,14 +10,10 @@ import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
-import { useAttributePreference } from '../common/util/preferences';
 import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
 import { 
-  Grid3X3, 
   Truck, 
-  Map, 
-  Settings, 
   PieChart, 
   ChevronRight,
   ChevronLeft
@@ -198,8 +193,6 @@ const MainPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showEventsPopover, eventsButtonRef]);
-
-  const mapOnSelect = useAttributePreference('mapOnSelect', true);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
