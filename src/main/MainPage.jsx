@@ -1761,8 +1761,8 @@ const MainPage = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               position: 'fixed',
-              top: '60px', // Fixed position below the control bar
-              right: '20px', // Aligned with control bar (8px + 12px for popover offset)
+              top: eventsButtonRef ? eventsButtonRef.getBoundingClientRect().top + 'px' : '60px', // Align with events button top
+              right: '50px', // 8px control bar + 30px offset + 12px popover margin
               width: '300px',
               maxHeight: '400px',
               backgroundColor: 'white',
@@ -1909,8 +1909,8 @@ const MainPage = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               position: 'fixed',
-              top: '60px', // Fixed position below the control bar
-              right: '20px', // Aligned with control bar (8px + 12px for popover offset)
+              top: mapSwitcherRef ? mapSwitcherRef.getBoundingClientRect().top + 'px' : '60px', // Align with map switcher button top
+              right: '50px', // 8px control bar + 30px offset + 12px popover margin
               width: '280px',
               maxHeight: '300px',
               backgroundColor: 'white',
