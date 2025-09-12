@@ -453,13 +453,15 @@ const FloatingDeviceList = ({
     );
   }
 
-  // TanStack Virtual setup
-  const virtualizer = useVirtualizer({
-    count: filteredDevices.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 105, // Estimated height of each device row (no overlapping)
-    overscan: 5,
-  });
+  // TanStack Virtual setup - wrapped in useMemo to re-render when colors change
+  const virtualizer = useMemo(() => {
+    return useVirtualizer({
+      count: filteredDevices.length,
+      getScrollElement: () => parentRef.current,
+      estimateSize: () => 105, // Estimated height of each device row (no overlapping)
+      overscan: 5,
+    });
+  }, [filteredDevices.length, colors]);
 
   // Debug logging
   console.log('Virtualizer debug:', {
