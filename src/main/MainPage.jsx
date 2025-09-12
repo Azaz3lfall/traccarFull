@@ -485,7 +485,7 @@ const MainPage = () => {
           left: '8px',
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
-          backgroundColor: colors.surface,
+          backgroundColor: colors.menuSurface,
           borderRadius: (isDeviceListVisible || selectedDeviceId) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
@@ -494,8 +494,8 @@ const MainPage = () => {
           gap: '0px',
           transition: 'width 0.3s ease, border-radius 0.3s ease',
           overflow: 'hidden',
-          border: `1px solid ${colors.border}`,
-          boxShadow: `0 4px 12px ${colors.shadow}`
+          border: `1px solid ${colors.menuBorder}`,
+          boxShadow: `0 4px 12px ${colors.menuShadow}`
         }}>
           {/* Toggle Menu Button - First Option */}
           <div style={{
@@ -513,12 +513,12 @@ const MainPage = () => {
             setIsMenuExpanded(!isMenuExpanded);
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = colors.hover;
+            e.currentTarget.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}>
-            {isMenuExpanded ? <ChevronLeft size={18} color={colors.text} /> : <ChevronRight size={18} color={colors.text} />}
+            {isMenuExpanded ? <ChevronLeft size={18} color={colors.menuText} /> : <ChevronRight size={18} color={colors.menuText} />}
           </div>
           
           {/* Device List Toggle Button */}
@@ -540,7 +540,7 @@ const MainPage = () => {
             setIsDeviceListVisible(!isDeviceListVisible);
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = colors.hover;
+            e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -551,8 +551,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: ${colors.surface};
-                color: ${colors.text};
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -560,8 +560,8 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px ${colors.shadow};
-                border: 1px solid ${colors.border};
+                box-shadow: 0 4px 12px ${colors.menuShadow};
+                border: 1px solid ${colors.menuBorder};
               `;
               document.body.appendChild(tooltip);
             }
@@ -573,11 +573,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <Truck size={18} color={isDeviceListVisible ? colors.text : colors.textSecondary} />
+            <Truck size={18} color={isDeviceListVisible ? colors.menuText : colors.menuTextSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: isDeviceListVisible ? colors.text : colors.textSecondary,
+                color: isDeviceListVisible ? colors.menuText : colors.menuTextSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -640,11 +640,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PieChart size={18} color={colors.text} />
+              <PieChart size={18} color={colors.menuText} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -707,11 +707,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <CreateIcon style={{ fontSize: 18, color: colors.text }} />
+            <CreateIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -773,11 +773,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <SettingsIcon style={{ fontSize: 18, color: colors.text }} />
+            <SettingsIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -840,11 +840,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.text }} />
+              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -908,11 +908,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.text }} />
+              <PersonIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -976,11 +976,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <SmartphoneIcon style={{ fontSize: 18, color: colors.text }} />
+              <SmartphoneIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1044,11 +1044,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <FolderIcon style={{ fontSize: 18, color: colors.text }} />
+              <FolderIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1112,11 +1112,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.text }} />
+              <PersonIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1180,11 +1180,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <TodayIcon style={{ fontSize: 18, color: colors.text }} />
+              <TodayIcon style={{ fontSize: 18, color: colors.menuText }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1248,11 +1248,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.text }} />
+              <StorageIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1316,11 +1316,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <BuildIcon style={{ fontSize: 18, color: colors.text }} />
+              <BuildIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1384,11 +1384,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PublishIcon style={{ fontSize: 18, color: colors.text }} />
+              <PublishIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1452,11 +1452,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PaymentIcon style={{ fontSize: 18, color: colors.text }} />
+              <PaymentIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1520,11 +1520,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <HelpIcon style={{ fontSize: 18, color: colors.text }} />
+              <HelpIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1588,11 +1588,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <CampaignIcon style={{ fontSize: 18, color: colors.text }} />
+              <CampaignIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1656,11 +1656,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.text }} />
+              <StorageIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1724,11 +1724,11 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PeopleIcon style={{ fontSize: 18, color: colors.text }} />
+              <PeopleIcon style={{ fontSize: 18, color: colors.menuText }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1839,7 +1839,7 @@ const MainPage = () => {
         right: '8px', // 8px from right edge
         width: '50px',
         height: 'auto',
-        backgroundColor: colors.surface,
+        backgroundColor: colors.menuSurface,
         borderRadius: '16px',
         display: 'flex',
         flexDirection: 'column',
@@ -1847,8 +1847,8 @@ const MainPage = () => {
         justifyContent: 'flex-start',
         padding: '8px 0',
         zIndex: 9999,
-        boxShadow: `0 4px 12px ${colors.shadow}`,
-        border: `1px solid ${colors.border}`,
+        boxShadow: `0 4px 12px ${colors.menuShadow}`,
+        border: `1px solid ${colors.menuBorder}`,
         gap: '8px'
       }}>
         <button 
@@ -1859,7 +1859,7 @@ const MainPage = () => {
             borderRadius: '50%',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -1869,19 +1869,19 @@ const MainPage = () => {
           }}
           onClick={() => setShowUserPopover(!showUserPopover)}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
             e.target.style.outline = 'none';
             e.target.style.boxShadow = 'none';
           }}
@@ -1895,8 +1895,8 @@ const MainPage = () => {
               <AvatarImage src={user.attributes.avatar} alt="User" />
             )}
             <AvatarFallback style={{ 
-              backgroundColor: colors.textSecondary, 
-              color: colors.text, 
+              backgroundColor: colors.avatarBackground, 
+              color: colors.menuText, 
               fontSize: '13px',
               fontWeight: '500'
             }}>
@@ -1912,7 +1912,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -1928,19 +1928,19 @@ const MainPage = () => {
           }}
           onClick={() => setShowEventsPopover(!showEventsPopover)}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -1957,7 +1957,7 @@ const MainPage = () => {
                 top: '-2px',
                 right: '-2px',
                 backgroundColor: eventsCount > 0 ? '#EF4444' : '#6B7280',
-                color: colors.text,
+                color: colors.badgeText,
                 borderRadius: '50%',
                 minWidth: '18px',
                 height: '18px',
@@ -1982,7 +1982,7 @@ const MainPage = () => {
             borderRadius: '8px',
           border: 'none',
           backgroundColor: 'transparent',
-          color: colors.text,
+          color: colors.menuText,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -1998,19 +1998,19 @@ const MainPage = () => {
           }}
           onClick={() => setShowMapSwitcher(!showMapSwitcher)}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2034,7 +2034,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-              color: colors.text, 
+              color: colors.menuText, 
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2050,19 +2050,19 @@ const MainPage = () => {
           }}
           onClick={handleZoomIn}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2078,7 +2078,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2094,19 +2094,19 @@ const MainPage = () => {
           }}
           onClick={handleZoomOut}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2122,7 +2122,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2138,19 +2138,19 @@ const MainPage = () => {
           }}
           onClick={handleResetBearing}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2193,7 +2193,7 @@ const MainPage = () => {
           onClick={isGeolocationEnabled ? handleMyLocation : undefined}
           onMouseEnter={(e) => {
             if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.hover;
+              e.target.style.backgroundColor = colors.menuHover;
             }
           }}
           onMouseLeave={(e) => {
@@ -2203,17 +2203,17 @@ const MainPage = () => {
           }}
           onMouseDown={(e) => {
             if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.hover;
+              e.target.style.backgroundColor = colors.menuHover;
             }
           }}
           onMouseUp={(e) => {
             if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.hover;
+              e.target.style.backgroundColor = colors.menuHover;
             }
           }}
           onFocus={(e) => {
             if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.hover;
+              e.target.style.backgroundColor = colors.menuHover;
             }
           }}
           onBlur={(e) => {
@@ -2238,7 +2238,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2254,19 +2254,19 @@ const MainPage = () => {
           }}
           onClick={() => setShowSearch(!showSearch)}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2283,7 +2283,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.text,
+            color: colors.menuText,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2299,19 +2299,19 @@ const MainPage = () => {
           }}
           onClick={() => setShowLanguagePopover(!showLanguagePopover)}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = colors.hover;
+            e.target.style.backgroundColor = colors.menuHover;
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
@@ -2362,7 +2362,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: colors.text,
+                color: colors.menuText,
                 lineHeight: '1.3'
               }}>
 {t('reportEvents')} ({eventsCount})
@@ -2404,7 +2404,7 @@ const MainPage = () => {
               <div style={{
                 padding: '24px',
                 textAlign: 'center',
-                color: colors.textSecondary
+                color: colors.menuTextSecondary
               }}>
                 No events available
               </div>
@@ -2430,7 +2430,7 @@ const MainPage = () => {
                   <div style={{
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: colors.textSecondary,
+                    color: colors.menuTextSecondary,
                     marginBottom: '4px'
                   }}>
                     {getDeviceName(event.deviceId)}
@@ -2505,7 +2505,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: colors.text,
+                color: colors.menuText,
                 lineHeight: '1.3'
               }}>
                 {t('mapTitle')}
@@ -2596,7 +2596,7 @@ const MainPage = () => {
                   backgroundColor: '#F9FAFB',
                   border: '1px solid #D1D5DB',
                   borderRadius: '8px',
-                  color: colors.text,
+                  color: colors.menuText,
                   fontSize: '14px',
                   outline: 'none',
                   paddingRight: isSearching ? '40px' : '16px'
@@ -2652,7 +2652,7 @@ const MainPage = () => {
                     }}
                   >
                     <div style={{
-                      color: colors.text,
+                      color: colors.menuText,
                       fontSize: '14px',
                       fontWeight: '500',
                       marginBottom: '4px',
@@ -2663,7 +2663,7 @@ const MainPage = () => {
                       {result.properties?.name || result.properties?.display_name?.split(',')[0]}
                     </div>
                     <div style={{
-                      color: colors.textSecondary,
+                      color: colors.menuTextSecondary,
                       fontSize: '12px',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -2681,7 +2681,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: colors.textSecondary,
+                color: colors.menuTextSecondary,
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
@@ -2694,7 +2694,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: colors.textSecondary,
+                color: colors.menuTextSecondary,
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
@@ -2772,7 +2772,7 @@ const MainPage = () => {
                   </Box>
                   <span style={{
                     fontSize: '13px',
-                    color: colors.text,
+                    color: colors.menuText,
                     fontWeight: language === lang.code ? '500' : '400'
                   }}>
                     {lang.name}
@@ -2824,14 +2824,14 @@ const MainPage = () => {
                   width: '48px', 
                   height: '48px', 
                   marginRight: '12px',
-                  backgroundColor: '#6B7280'
+                  backgroundColor: colors.avatarBackground
                 }}>
                   {user?.attributes?.avatar && (
                     <AvatarImage src={user.attributes.avatar} alt="User" />
                   )}
                   <AvatarFallback style={{ 
-                    backgroundColor: colors.textSecondary, 
-                    color: colors.text, 
+                    backgroundColor: colors.avatarBackground, 
+                    color: colors.menuText, 
                     fontSize: '18px',
                     fontWeight: '500'
                   }}>
@@ -2840,7 +2840,7 @@ const MainPage = () => {
                 </Avatar>
                 <div>
                   <h3 style={{
-                    color: colors.text,
+                    color: colors.menuText,
                     fontSize: '16px',
                     fontWeight: '600',
                     margin: '0 0 4px 0'
@@ -2848,7 +2848,7 @@ const MainPage = () => {
                     {user?.name || t('sharedName')}
                   </h3>
                   <p style={{
-                    color: colors.textSecondary,
+                    color: colors.menuTextSecondary,
                     fontSize: '14px',
                     margin: '0'
                   }}>
@@ -2866,7 +2866,7 @@ const MainPage = () => {
                   borderRadius: '8px',
                   border: 'none',
                   backgroundColor: 'transparent',
-                  color: colors.text,
+                  color: colors.menuText,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -2875,28 +2875,28 @@ const MainPage = () => {
                   outline: 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.menuHover;
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
                 }}
                 onMouseDown={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.menuHover;
                 }}
                 onMouseUp={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.menuHover;
                 }}
                 onFocus={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.menuHover;
                 }}
                 onBlur={(e) => {
                   e.target.style.backgroundColor = 'transparent';
                 }}
               >
                 {currentTheme === 'light' ? (
-                  <Moon size={20} color={colors.text} />
+                  <Moon size={20} color={colors.menuText} />
                 ) : (
-                  <Sun size={20} color={colors.text} />
+                  <Sun size={20} color={colors.menuText} />
                 )}
               </button>
             </div>
@@ -2904,7 +2904,7 @@ const MainPage = () => {
             {/* User Details */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2921,15 +2921,15 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>ID:</span>
-                  <span style={{ color: colors.text, fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>ID:</span>
+                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('userAdmin')}:</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('userAdmin')}:</span>
                   <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.administrator ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2939,7 +2939,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>Manager:</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>Manager:</span>
                   <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.manager ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2950,7 +2950,7 @@ const MainPage = () => {
             {/* Server Information */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: colors.text,
+                color: colors.menuText,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2967,24 +2967,24 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
-                  <span style={{ color: colors.text, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
+                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
-                  <span style={{ color: colors.text, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
+                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
-                  <span style={{ color: colors.text, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
+                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
+                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
             </div>
@@ -3008,7 +3008,7 @@ const MainPage = () => {
                     width: '100%',
                     padding: '10px 16px',
                     backgroundColor: '#3B82F6',
-                    color: colors.text,
+                    color: colors.menuText,
                     border: 'none',
                     borderRadius: '6px',
                     fontSize: '13px',
@@ -3046,7 +3046,7 @@ const MainPage = () => {
                     flex: 1,
                     padding: '10px 16px',
                     backgroundColor: '#F3F4F6',
-                    color: colors.text,
+                    color: colors.menuText,
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     fontSize: '13px',
@@ -3135,7 +3135,7 @@ const MainPage = () => {
               <p style={{
                 margin: '0 0 20px 0',
                 fontSize: '16px',
-                color: colors.text,
+                color: colors.menuText,
                 lineHeight: '1.5'
               }}>
                 {t('confirmQuit')}
@@ -3152,7 +3152,7 @@ const MainPage = () => {
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     backgroundColor: '#F3F4F6',
-                    color: colors.text,
+                    color: colors.menuText,
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',

@@ -17,6 +17,17 @@ const themes = {
       border: '#374151',
       hover: '#374151',
       shadow: 'rgba(0, 0, 0, 0.3)',
+      // Menu and control bar specific colors (always dark)
+      menuSurface: '#1F2937',
+      menuText: '#F9FAFB',
+      menuTextSecondary: '#9CA3AF',
+      menuHover: '#374151',
+      menuBorder: '#374151',
+      menuShadow: 'rgba(0, 0, 0, 0.3)',
+      // Avatar specific colors
+      avatarBackground: '#FFFFFF',
+      // Badge specific colors
+      badgeText: '#FFFFFF',
     }
   },
   light: {
@@ -31,6 +42,17 @@ const themes = {
       border: '#E5E7EB',
       hover: '#F3F4F6',
       shadow: 'rgba(0, 0, 0, 0.15)',
+      // Menu and control bar specific colors (always dark)
+      menuSurface: '#1F2937',
+      menuText: '#F9FAFB',
+      menuTextSecondary: '#9CA3AF',
+      menuHover: '#374151',
+      menuBorder: '#374151',
+      menuShadow: 'rgba(0, 0, 0, 0.3)',
+      // Avatar specific colors
+      avatarBackground: '#FFFFFF',
+      // Badge specific colors
+      badgeText: '#FFFFFF',
     }
   }
 };
