@@ -108,6 +108,8 @@ const MainPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showUserPopover, setShowUserPopover] = useState(false);
+  const [userRef, setUserRef] = useState(null);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -307,6 +309,7 @@ const MainPage = () => {
   
   // User and server data
   const user = useSelector((state) => state.session.user);
+  const server = useSelector((state) => state.session.server);
   const supportLink = useSelector((state) => state.session.server.attributes.support);
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
   
@@ -386,16 +389,19 @@ const MainPage = () => {
       if (showSearch && searchRef && !searchRef.contains(event.target)) {
         setShowSearch(false);
       }
+      if (showUserPopover && userRef && !userRef.contains(event.target)) {
+        setShowUserPopover(false);
+      }
     };
 
-    if (showEventsPopover || showMapSwitcher || showSearch) {
+    if (showEventsPopover || showMapSwitcher || showSearch || showUserPopover) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef]);
+  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef, showUserPopover, userRef]);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -1819,42 +1825,45 @@ const MainPage = () => {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         gap: '8px'
       }}>
-        <button style={{
-          width: '34px',
-          height: '34px',
-          borderRadius: '50%',
-          border: 'none',
-          backgroundColor: 'transparent',
-          color: 'white',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          outline: 'none',
-          transition: 'all 0.2s'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = '#374151';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-        }}
-        onMouseDown={(e) => {
-          e.target.style.backgroundColor = '#374151';
-        }}
-        onMouseUp={(e) => {
-          e.target.style.backgroundColor = '#374151';
-        }}
-        onFocus={(e) => {
-          e.target.style.backgroundColor = '#374151';
-          e.target.style.outline = 'none';
-          e.target.style.boxShadow = 'none';
-        }}
-        onBlur={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-          e.target.style.outline = 'none';
-          e.target.style.boxShadow = 'none';
-        }}>
+        <button 
+          ref={setUserRef}
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '50%',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            outline: 'none',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => setShowUserPopover(!showUserPopover)}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}>
           <Avatar style={{ width: '28px', height: '28px', userSelect: 'none', pointerEvents: 'none' }}>
             {user?.attributes?.avatar && (
               <AvatarImage src={user.attributes.avatar} alt="User" />
@@ -2615,6 +2624,223 @@ const MainPage = () => {
                 No results found
               </div>
             )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* User Popover */}
+      <AnimatePresence>
+        {showUserPopover && userRef && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              right: '65px',
+              top: userRef.getBoundingClientRect().top,
+              width: '320px',
+              backgroundColor: '#1F2937',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              zIndex: 10000,
+              padding: '20px',
+              border: '1px solid #374151'
+            }}
+          >
+            {/* User Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '16px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #374151'
+            }}>
+              <Avatar style={{ 
+                width: '48px', 
+                height: '48px', 
+                marginRight: '12px',
+                backgroundColor: '#6B7280'
+              }}>
+                {user?.attributes?.avatar && (
+                  <AvatarImage src={user.attributes.avatar} alt="User" />
+                )}
+                <AvatarFallback style={{ 
+                  backgroundColor: '#6B7280', 
+                  color: 'white', 
+                  fontSize: '18px',
+                  fontWeight: '500'
+                }}>
+                  {getUserInitials(user)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  margin: '0 0 4px 0'
+                }}>
+                  {user?.name || 'User'}
+                </h3>
+                <p style={{
+                  color: '#9CA3AF',
+                  fontSize: '14px',
+                  margin: '0'
+                }}>
+                  {user?.email || 'No email'}
+                </p>
+              </div>
+            </div>
+            
+            {/* User Details */}
+            <div style={{ marginBottom: '16px' }}>
+              <h4 style={{
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                margin: '0 0 8px 0'
+              }}>
+                User Information
+              </h4>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>ID:</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{user?.id || 'N/A'}</span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Admin:</span>
+                  <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
+                    {user?.administrator ? 'Yes' : 'No'}
+                  </span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Manager:</span>
+                  <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
+                    {user?.manager ? 'Yes' : 'No'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Server Information */}
+            <div style={{ marginBottom: '16px' }}>
+              <h4 style={{
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                margin: '0 0 8px 0'
+              }}>
+                Server Information
+              </h4>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Version:</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{server?.version || 'N/A'}</span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Devices:</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Positions:</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              marginTop: '16px'
+            }}>
+              <button
+                onClick={() => {
+                  setShowUserPopover(false);
+                  window.location.href = `/settings/user/${user.id}`;
+                }}
+                style={{
+                  flex: 1,
+                  padding: '8px 16px',
+                  backgroundColor: '#374151',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#4B5563';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#374151';
+                }}
+              >
+                Settings
+              </button>
+              <button
+                onClick={() => {
+                  setShowUserPopover(false);
+                  setShowLogoutModal(true);
+                }}
+                style={{
+                  flex: 1,
+                  padding: '8px 16px',
+                  backgroundColor: '#EF4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#DC2626';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#EF4444';
+                }}
+              >
+                Logout
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
