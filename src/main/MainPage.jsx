@@ -2576,19 +2576,19 @@ const MainPage = () => {
                       padding: '12px 16px',
                       textAlign: 'left',
                       fontSize: '14px',
-                      color: selectedMapStyle === style.id ? '#1F2937' : '#374151',
-                      backgroundColor: selectedMapStyle === style.id ? '#F3F4F6' : 'transparent',
+                      color: selectedMapStyle === style.id ? colors.text : colors.textSecondary,
+                      backgroundColor: selectedMapStyle === style.id ? colors.hover : 'transparent',
                       border: 'none',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       transition: 'all 0.2s',
-                      borderBottom: index < mapStyles.filter(s => s.available && activeMapStyles.includes(s.id)).length - 1 ? '1px solid #F3F4F6' : 'none'
+                      borderBottom: index < mapStyles.filter(s => s.available && activeMapStyles.includes(s.id)).length - 1 ? `1px solid ${colors.border}` : 'none'
                     }}
                     onMouseEnter={(e) => {
                       if (selectedMapStyle !== style.id) {
-                        e.target.style.backgroundColor = '#F9FAFB';
+                        e.target.style.backgroundColor = colors.hover;
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -2792,7 +2792,7 @@ const MainPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     padding: '8px 12px',
-                    backgroundColor: language === lang.code ? '#F3F4F6' : 'transparent',
+                    backgroundColor: language === lang.code ? colors.hover : 'transparent',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -2802,7 +2802,7 @@ const MainPage = () => {
                   }}
                   onMouseEnter={(e) => {
                     if (language !== lang.code) {
-                      e.target.style.backgroundColor = '#F9FAFB';
+                      e.target.style.backgroundColor = colors.hover;
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -3155,9 +3155,9 @@ const MainPage = () => {
                   onClick={cancelLogout}
                   style={{
                     padding: '8px 16px',
-                    border: '1px solid #D1D5DB',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: '6px',
-                    backgroundColor: '#F3F4F6',
+                    backgroundColor: colors.secondary,
                     color: colors.text,
                     fontSize: '14px',
                     fontWeight: '500',
@@ -3165,10 +3165,10 @@ const MainPage = () => {
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#E5E7EB';
+                    e.target.style.backgroundColor = colors.hover;
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#F3F4F6';
+                    e.target.style.backgroundColor = colors.secondary;
                   }}
                 >
                   {t('sharedCancel')}

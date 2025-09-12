@@ -295,7 +295,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     <h3 style={{
                       fontSize: '18px',
                       fontWeight: '700',
-                      color: '#111827',
+                      color: colors.text,
                       margin: 0,
                       lineHeight: '1.2',
                       flex: 1
@@ -338,7 +338,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   <h3 style={{
                     fontSize: '20px',
                     fontWeight: '700',
-                    color: '#111827',
+                    color: colors.text,
                     margin: 0,
                     lineHeight: '1.2'
                   }}>
@@ -953,13 +953,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#E5E7EB';
+                    e.target.style.backgroundColor = colors.hover;
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#F3F4F6';
+                    e.target.style.backgroundColor = colors.secondary;
                   }}
                 >
-                  <X size={16} color="#6B7280" />
+                  <X size={16} color={colors.textSecondary} />
                 </button>
               </div>
 
@@ -985,9 +985,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     
                     {/* Position Properties Table */}
                     <div style={{
-                      backgroundColor: 'white',
+                      backgroundColor: colors.surface,
                       borderRadius: '8px',
-                      border: '1px solid #E5E7EB',
+                      border: `1px solid ${colors.border}`,
                       overflow: 'hidden',
                       width: '100%',
                       boxSizing: 'border-box'
@@ -1293,7 +1293,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                         width: '24px',
                         height: '24px',
                         borderRadius: '4px',
-                        border: '1px solid #D1D5DB',
+                        border: `1px solid ${colors.border}`,
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
@@ -1302,15 +1302,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                         transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#F9FAFB';
-                        e.target.style.borderColor = '#9CA3AF';
+                        e.target.style.backgroundColor = colors.hover;
+                        e.target.style.borderColor = colors.border;
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor = 'transparent';
-                        e.target.style.borderColor = '#D1D5DB';
+                        e.target.style.borderColor = colors.border;
                       }}
                     >
-                      <X size={14} color="#6B7280" />
+                      <X size={14} color={colors.textSecondary} />
                     </button>
                   </div>
                   <input
