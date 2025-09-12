@@ -1833,24 +1833,32 @@ const MainPage = () => {
       <FloatingStatusCard desktop={desktop} isMenuExpanded={isMenuExpanded} isDeviceListVisible={isDeviceListVisible} />
       
       {/* Vertical Control Bar - Left of Device List */}
-      <div style={{
-        position: 'fixed',
-        top: '8px',
-        right: '8px', // 8px from right edge
-        width: '50px',
-        height: 'auto',
-        backgroundColor: colors.menuSurface,
-        borderRadius: '16px',
-        display: desktop || selectedDeviceId ? 'flex' : 'none', // Hide on mobile when no device selected
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        padding: '8px 0',
-        zIndex: 9999,
-        boxShadow: `0 4px 12px ${colors.menuShadow}`,
-        border: `1px solid ${colors.menuBorder}`,
-        gap: '8px'
-      }}>
+      <AnimatePresence>
+        {(desktop || selectedDeviceId) && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.8, x: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            style={{
+              position: 'fixed',
+              top: '8px',
+              right: '8px', // 8px from right edge
+              width: '50px',
+              height: 'auto',
+              backgroundColor: colors.menuSurface,
+              borderRadius: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              padding: '8px 0',
+              zIndex: 9999,
+              boxShadow: `0 4px 12px ${colors.menuShadow}`,
+              border: `1px solid ${colors.menuBorder}`,
+              gap: '8px'
+            }}
+          >
         <button 
           ref={setUserRef}
           style={{
@@ -2372,7 +2380,9 @@ const MainPage = () => {
             <Sun size={18} color={colors.menuText} />
           )}
         </button>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Events Popover */}
       <AnimatePresence>
