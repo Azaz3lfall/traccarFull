@@ -1668,7 +1668,7 @@ const MainPage = () => {
         onBlur={(e) => {
           e.target.style.backgroundColor = 'transparent';
         }}>
-          <Avatar style={{ width: '28px', height: '28px' }}>
+          <Avatar style={{ width: '28px', height: '28px', userSelect: 'none', pointerEvents: 'none' }}>
             {user?.attributes?.avatar && (
               <AvatarImage src={user.attributes.avatar} alt="User" />
             )}
@@ -1697,7 +1697,11 @@ const MainPage = () => {
             justifyContent: 'center',
             position: 'relative',
             outline: 'none',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
           }}
           onClick={() => setShowEventsPopover(!showEventsPopover)}
           onMouseEnter={(e) => {
@@ -1718,7 +1722,7 @@ const MainPage = () => {
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}>
-          <NotificationsOutlinedIcon style={{ fontSize: 22 }} />
+          <NotificationsOutlinedIcon style={{ fontSize: 22, userSelect: 'none', pointerEvents: 'none' }} />
           {eventsCount > 0 && (
             <motion.div
               key={eventsCount} // This will trigger re-animation when count changes
@@ -1762,7 +1766,11 @@ const MainPage = () => {
             justifyContent: 'center',
             position: 'relative',
             outline: 'none',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
           }}
           onClick={() => setShowMapSwitcher(!showMapSwitcher)}
           onMouseEnter={(e) => {
@@ -1783,7 +1791,7 @@ const MainPage = () => {
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}>
-          <Map style={{ fontSize: 18 }} />
+          <Map style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
       </div>
       
