@@ -7,6 +7,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
 import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
+import useMapStyles from '../map/core/useMapStyles';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
@@ -16,7 +18,8 @@ import {
   Truck, 
   PieChart, 
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Map
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -90,6 +93,8 @@ const MainPage = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showEventsPopover, setShowEventsPopover] = useState(false);
   const [eventsButtonRef, setEventsButtonRef] = useState(null);
+  const [showMapSwitcher, setShowMapSwitcher] = useState(false);
+  const [mapSwitcherRef, setMapSwitcherRef] = useState(null);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -113,6 +118,17 @@ const MainPage = () => {
       dispatch(devicesActions.selectId(event.deviceId));
       setShowEventsPopover(false);
     }
+  };
+
+  // Map switcher handlers
+  const mapStyles = useMapStyles();
+  const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,locationIqDark,openFreeMap');
+  const [selectedMapStyle, setSelectedMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'locationIqStreets'));
+  
+  const handleMapStyleChange = (styleId) => {
+    setSelectedMapStyle(styleId);
+    setShowMapSwitcher(false);
+    // The map will automatically update through the MapView component
   };
 
   
@@ -177,22 +193,25 @@ const MainPage = () => {
     });
   }, [isMenuExpanded]);
 
-  // Close events popover when clicking outside
+  // Close events popover and map switcher when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showEventsPopover && eventsButtonRef && !eventsButtonRef.contains(event.target)) {
         setShowEventsPopover(false);
       }
+      if (showMapSwitcher && mapSwitcherRef && !mapSwitcherRef.contains(event.target)) {
+        setShowMapSwitcher(false);
+      }
     };
 
-    if (showEventsPopover) {
+    if (showEventsPopover || showMapSwitcher) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showEventsPopover, eventsButtonRef]);
+  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef]);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -1601,7 +1620,7 @@ const MainPage = () => {
         position: 'fixed',
         top: '10px',
         right: '10px',
-        width: '100px',
+        width: '140px',
         height: '50px',
         backgroundColor: '#1F2937',
         borderRadius: '16px',
@@ -1657,6 +1676,25 @@ const MainPage = () => {
               {eventsCount > 99 ? '99+' : eventsCount}
             </motion.div>
           )}
+        </button>
+        <button 
+          ref={setMapSwitcherRef}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none'
+          }}
+          onClick={() => setShowMapSwitcher(!showMapSwitcher)}>
+          <Map style={{ fontSize: 18 }} />
         </button>
         <button style={{
           width: '36px',
@@ -1831,6 +1869,94 @@ const MainPage = () => {
               ))
             )}
           </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Map Switcher Dropdown */}
+      <AnimatePresence>
+        {showMapSwitcher && mapSwitcherRef && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{
+              position: 'fixed',
+              top: '70px', // Fixed position below the control bar
+              right: '20px', // Aligned with control bar
+              width: '280px',
+              maxHeight: '300px',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+              border: '1px solid #E5E7EB',
+              zIndex: 10001,
+              overflow: 'hidden'
+            }}>
+            {/* Map Switcher Header */}
+            <div style={{
+              padding: '12px 16px',
+              borderBottom: '1px solid #F3F4F6',
+              backgroundColor: 'white'
+            }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1F2937',
+                lineHeight: '1.3'
+              }}>
+                {t('mapTitle')}
+              </h3>
+            </div>
+            
+            {/* Map Styles List */}
+            <div style={{
+              maxHeight: '240px',
+              overflowY: 'auto'
+            }}>
+              {mapStyles
+                .filter((style) => style.available && activeMapStyles.includes(style.id))
+                .map((style, index) => (
+                  <button
+                    key={style.id}
+                    onClick={() => handleMapStyleChange(style.id)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      color: selectedMapStyle === style.id ? '#1F2937' : '#374151',
+                      backgroundColor: selectedMapStyle === style.id ? '#F3F4F6' : 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      transition: 'all 0.2s',
+                      borderBottom: index < mapStyles.filter(s => s.available && activeMapStyles.includes(s.id)).length - 1 ? '1px solid #F3F4F6' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedMapStyle !== style.id) {
+                        e.target.style.backgroundColor = '#F9FAFB';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedMapStyle !== style.id) {
+                        e.target.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                  >
+                    <span style={{ fontWeight: selectedMapStyle === style.id ? '600' : '400' }}>
+                      {style.title}
+                    </span>
+                    {selectedMapStyle === style.id && (
+                      <Check size={16} color="#10B981" />
+                    )}
+                  </button>
+                ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
