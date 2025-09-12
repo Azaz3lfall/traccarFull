@@ -1694,7 +1694,7 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
           }}>
-          <NotificationsOutlinedIcon style={{ fontSize: 20 }} />
+          <NotificationsOutlinedIcon style={{ fontSize: 22 }} />
           {eventsCount > 0 && (
             <motion.div
               key={eventsCount} // This will trigger re-animation when count changes
