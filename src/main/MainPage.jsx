@@ -1636,6 +1636,40 @@ const MainPage = () => {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         gap: '8px'
       }}>
+        <button style={{
+          width: '34px',
+          height: '34px',
+          borderRadius: '50%',
+          border: 'none',
+          backgroundColor: 'transparent',
+          color: 'white',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          outline: 'none',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#374151';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = 'transparent';
+        }}>
+          <Avatar style={{ width: '28px', height: '28px' }}>
+            {user?.attributes?.avatar && (
+              <AvatarImage src={user.attributes.avatar} alt="User" />
+            )}
+            <AvatarFallback style={{ 
+              backgroundColor: '#6B7280', 
+              color: 'white', 
+              fontSize: '13px',
+              fontWeight: '500'
+            }}>
+              {getUserInitials(user)}
+            </AvatarFallback>
+          </Avatar>
+        </button>
         <button 
           ref={setEventsButtonRef}
           style={{
@@ -1714,40 +1748,6 @@ const MainPage = () => {
             e.target.style.backgroundColor = 'transparent';
           }}>
           <Map style={{ fontSize: 18 }} />
-        </button>
-        <button style={{
-          width: '34px',
-          height: '34px',
-          borderRadius: '50%',
-          border: 'none',
-          backgroundColor: 'transparent',
-          color: 'white',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          outline: 'none',
-          transition: 'all 0.2s'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = '#374151';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-        }}>
-          <Avatar style={{ width: '28px', height: '28px' }}>
-            {user?.attributes?.avatar && (
-              <AvatarImage src={user.attributes.avatar} alt="User" />
-            )}
-            <AvatarFallback style={{ 
-              backgroundColor: '#6B7280', 
-              color: 'white', 
-              fontSize: '13px',
-              fontWeight: '500'
-            }}>
-              {getUserInitials(user)}
-            </AvatarFallback>
-          </Avatar>
         </button>
       </div>
       
