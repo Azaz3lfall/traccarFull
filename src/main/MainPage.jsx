@@ -2682,14 +2682,14 @@ const MainPage = () => {
                   fontWeight: '600',
                   margin: '0 0 4px 0'
                 }}>
-                  {user?.name || t('sharedUser')}
+                  {user?.name || t('sharedName')}
                 </h3>
                 <p style={{
                   color: '#9CA3AF',
                   fontSize: '14px',
                   margin: '0'
                 }}>
-                  {user?.email || t('sharedNoEmail')}
+                  {user?.email || t('userEmail')}
                 </p>
               </div>
             </div>
@@ -2702,7 +2702,7 @@ const MainPage = () => {
                 fontWeight: '600',
                 margin: '0 0 8px 0'
               }}>
-                {t('sharedUserInformation')}
+                {t('settingsUser')}
               </h4>
               <div style={{
                 display: 'flex',
@@ -2722,7 +2722,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedAdministrator')}:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('userAdmin')}:</span>
                   <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.administrator ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2732,7 +2732,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedManager')}:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Manager:</span>
                   <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.manager ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2748,7 +2748,7 @@ const MainPage = () => {
                 fontWeight: '600',
                 margin: '0 0 8px 0'
               }}>
-                {t('sharedServerInformation')}
+                {t('settingsServer')}
               </h4>
               <div style={{
                 display: 'flex',
@@ -2760,7 +2760,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedVersion')}:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
                   <span style={{ color: 'white', fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
@@ -2776,7 +2776,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedPositions')}:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('reportPositions')}:</span>
                   <span style={{ color: 'white', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
