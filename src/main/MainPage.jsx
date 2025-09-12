@@ -9,6 +9,7 @@ import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import useMapStyles from '../map/core/useMapStyles';
+import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
@@ -136,13 +137,15 @@ const MainPage = () => {
 
   // Zoom handlers
   const handleZoomIn = () => {
-    // This will be implemented to zoom the map
-    console.log('Zoom In');
+    if (map) {
+      map.zoomIn();
+    }
   };
 
   const handleZoomOut = () => {
-    // This will be implemented to zoom the map
-    console.log('Zoom Out');
+    if (map) {
+      map.zoomOut();
+    }
   };
 
   
