@@ -24,7 +24,8 @@ import {
   Check,
   Plus,
   Minus,
-  Compass
+  Compass,
+  MapPin
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -153,6 +154,34 @@ const MainPage = () => {
   const handleResetBearing = () => {
     if (map) {
       map.setBearing(0);
+    }
+  };
+
+  // My Location handler
+  const handleMyLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (map) {
+            map.easeTo({
+              center: [position.coords.longitude, position.coords.latitude],
+              zoom: Math.max(map.getZoom(), 15),
+              duration: 1000
+            });
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          // You could show a toast notification here
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 60000
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
     }
   };
 
@@ -1962,6 +1991,58 @@ const MainPage = () => {
             e.target.style.backgroundColor = 'transparent';
           }}>
           <Compass style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
+        </button>
+        
+        {/* Another Separator */}
+        <div style={{
+          width: '24px',
+          height: '1px',
+          backgroundColor: '#4B5563',
+          margin: '4px 0'
+        }} />
+        
+        {/* My Location Button */}
+        <button 
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={handleMyLocation}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
+          <MapPin style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
       </div>
       
