@@ -583,7 +583,9 @@ const FloatingDeviceList = ({
                 paddingRight: '40px',
                 height: '40px',
                 borderRadius: '8px',
+                backgroundColor: colors.secondary,
                 border: `1px solid ${colors.border}`,
+                color: colors.text,
                 fontSize: '14px',
                 outline: 'none',
                 boxShadow: 'none'
