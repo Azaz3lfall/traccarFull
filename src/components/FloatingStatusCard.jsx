@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useDeviceReadonly } from '../common/util/permissions';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
@@ -33,6 +34,7 @@ dayjs.extend(relativeTime);
 const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) => {
   const dispatch = useDispatch();
   const t = useTranslation();
+  const colors = useThemeColors();
   
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const devices = useSelector((state) => state.devices.items);
@@ -910,20 +912,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.3 }}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: colors.surface,
                 borderRadius: '8px',
                 width: '90vw',
                 maxWidth: '800px',
                 maxHeight: '70vh',
                 overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                boxShadow: colors.shadow
               }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <div style={{
                 padding: '20px',
-                borderBottom: '1px solid #E5E7EB',
+                borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
@@ -932,7 +934,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   margin: 0,
                   fontSize: '20px',
                   fontWeight: '600',
-                  color: '#111827'
+                  color: colors.text
                 }}>
                   {device?.name} {t('sharedDetails')}
                 </h2>
@@ -1021,18 +1023,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               gridTemplateColumns: '20% 20% 60%',
                               gap: '16px',
                               padding: '8px 16px',
-                              borderBottom: '1px solid #E5E7EB',
+                              borderBottom: `1px solid ${colors.border}`,
                               fontSize: '12px',
                               lineHeight: '1.4',
                               minHeight: '32px'
                             }}>
-                              <div style={{ color: '#6B7280', fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                              <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
                                 {property}
                               </div>
-                              <div style={{ color: '#111827', fontWeight: '500', display: 'flex', alignItems: 'center' }}>
+                              <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[property]?.name || property}
                               </div>
-                              <div style={{ color: '#111827', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
+                              <div style={{ color: colors.text, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
                                 <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (property === 'totalDistance' || property === 'hours') ? '4px' : '16px' }}>
                                   {property === 'fixTime' || property === 'deviceTime' || property === 'serverTime' ? 
                                     formatTime(value, 'seconds') :
@@ -1117,18 +1119,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               gridTemplateColumns: '20% 20% 60%',
                               gap: '16px',
                               padding: '8px 16px',
-                              borderBottom: '1px solid #E5E7EB',
+                              borderBottom: `1px solid ${colors.border}`,
                               fontSize: '12px',
                               lineHeight: '1.4',
                               minHeight: '32px'
                             }}>
-                              <div style={{ color: '#6B7280', fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                              <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
                                 {attribute}
                               </div>
-                              <div style={{ color: '#111827', fontWeight: '500', display: 'flex', alignItems: 'center' }}>
+                              <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[attribute]?.name || attribute}
                               </div>
-                              <div style={{ color: '#111827', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
+                              <div style={{ color: colors.text, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
                                 <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (attribute === 'totalDistance' || attribute === 'hours') ? '4px' : '16px' }}>
                                   {attribute === 'fixTime' || attribute === 'deviceTime' || attribute === 'serverTime' ? 
                                     formatTime(value, 'seconds') :
@@ -1215,10 +1217,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     padding: '40px 20px',
                     gap: '16px'
                   }}>
-                    <p style={{
+                    <p                     style={{
                       margin: 0,
                       fontSize: '16px',
-                      color: '#6B7280'
+                      color: colors.textSecondary
                     }}>
                       {t('sharedNoData')}
                     </p>
@@ -1258,12 +1260,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.3 }}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: colors.surface,
                 borderRadius: '8px',
                 width: '400px',
                 maxWidth: '90vw',
                 overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                boxShadow: colors.shadow
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1277,10 +1279,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     justifyContent: 'space-between',
                     marginBottom: '8px'
                   }}>
-                    <label style={{
+                    <label                     style={{
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#374151',
+                      color: colors.text,
                       margin: 0
                     }}>
                       {editField === 'hours' ? t('positionHours') : `${t('deviceTotalDistance')} (${distanceUnitString(distanceUnit, t)})`}
@@ -1347,9 +1349,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     style={{
                       padding: '10px 20px',
                       borderRadius: '8px',
-                      border: '1px solid #9CA3AF',
-                      backgroundColor: 'white',
-                      color: '#9CA3AF',
+                      border: `1px solid ${colors.border}`,
+                      backgroundColor: colors.surface,
+                      color: colors.text,
                       fontSize: '14px',
                       fontWeight: '500',
                       cursor: isSaving ? 'not-allowed' : 'pointer',
@@ -1375,9 +1377,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     style={{
                       padding: '10px 20px',
                       borderRadius: '8px',
-                      border: isSaving ? '1px solid #9CA3AF' : '1px solid #065F46',
-                      backgroundColor: isSaving ? '#9CA3AF' : '#D1FAE5',
-                      color: isSaving ? 'white' : '#065F46',
+                      border: isSaving ? `1px solid ${colors.border}` : '1px solid #065F46',
+                      backgroundColor: isSaving ? colors.secondary : '#D1FAE5',
+                      color: isSaving ? colors.text : '#065F46',
                       fontSize: '14px',
                       fontWeight: '500',
                       cursor: isSaving ? 'not-allowed' : 'pointer',
