@@ -2682,14 +2682,14 @@ const MainPage = () => {
                   fontWeight: '600',
                   margin: '0 0 4px 0'
                 }}>
-                  {user?.name || 'User'}
+                  {user?.name || t('sharedUser')}
                 </h3>
                 <p style={{
                   color: '#9CA3AF',
                   fontSize: '14px',
                   margin: '0'
                 }}>
-                  {user?.email || 'No email'}
+                  {user?.email || t('sharedNoEmail')}
                 </p>
               </div>
             </div>
@@ -2702,7 +2702,7 @@ const MainPage = () => {
                 fontWeight: '600',
                 margin: '0 0 8px 0'
               }}>
-                User Information
+                {t('sharedUserInformation')}
               </h4>
               <div style={{
                 display: 'flex',
@@ -2715,16 +2715,16 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: '#9CA3AF', fontSize: '12px' }}>ID:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{user?.id || 'N/A'}</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Admin:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedAdministrator')}:</span>
                   <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
-                    {user?.administrator ? 'Yes' : 'No'}
+                    {user?.administrator ? t('sharedYes') : t('sharedNo')}
                   </span>
                 </div>
                 <div style={{
@@ -2732,9 +2732,9 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Manager:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedManager')}:</span>
                   <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
-                    {user?.manager ? 'Yes' : 'No'}
+                    {user?.manager ? t('sharedYes') : t('sharedNo')}
                   </span>
                 </div>
               </div>
@@ -2748,7 +2748,7 @@ const MainPage = () => {
                 fontWeight: '600',
                 margin: '0 0 8px 0'
               }}>
-                Server Information
+                {t('sharedServerInformation')}
               </h4>
               <div style={{
                 display: 'flex',
@@ -2760,15 +2760,15 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Version:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{server?.version || 'N/A'}</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedVersion')}:</span>
+                  <span style={{ color: 'white', fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Devices:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('deviceTitle')}:</span>
                   <span style={{ color: 'white', fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
@@ -2776,7 +2776,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Positions:</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('sharedPositions')}:</span>
                   <span style={{ color: 'white', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
@@ -2785,6 +2785,7 @@ const MainPage = () => {
             {/* Action Buttons */}
             <div style={{
               display: 'flex',
+              flexDirection: 'column',
               gap: '8px',
               marginTop: '16px'
             }}>
@@ -2794,13 +2795,13 @@ const MainPage = () => {
                   window.location.href = `/settings/user/${user.id}`;
                 }}
                 style={{
-                  flex: 1,
-                  padding: '8px 16px',
+                  width: '100%',
+                  padding: '10px 16px',
                   backgroundColor: '#374151',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: '500',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s'
@@ -2812,7 +2813,41 @@ const MainPage = () => {
                   e.target.style.backgroundColor = '#374151';
                 }}
               >
-                Settings
+                {t('settingsUser')}
+              </button>
+              <button
+                onClick={() => {
+                  setShowUserPopover(false);
+                  if (billingLink) {
+                    window.open(billingLink, '_blank');
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  backgroundColor: '#1E40AF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  opacity: billingLink ? 1 : 0.5
+                }}
+                disabled={!billingLink}
+                onMouseEnter={(e) => {
+                  if (billingLink) {
+                    e.target.style.backgroundColor = '#1D4ED8';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (billingLink) {
+                    e.target.style.backgroundColor = '#1E40AF';
+                  }
+                }}
+              >
+                {t('userBilling')}
               </button>
               <button
                 onClick={() => {
@@ -2820,13 +2855,13 @@ const MainPage = () => {
                   setShowLogoutModal(true);
                 }}
                 style={{
-                  flex: 1,
-                  padding: '8px 16px',
+                  width: '100%',
+                  padding: '10px 16px',
                   backgroundColor: '#EF4444',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: '500',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s'
@@ -2838,9 +2873,9 @@ const MainPage = () => {
                   e.target.style.backgroundColor = '#EF4444';
                 }}
               >
-                Logout
+                {t('loginLogout')}
               </button>
-            </div>
+          </div>
           </motion.div>
         )}
       </AnimatePresence>
