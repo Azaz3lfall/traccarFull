@@ -44,7 +44,14 @@ import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { useTranslation } from '../common/components/LocalizationProvider';
+import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
+import ReactCountryFlag from 'react-country-flag';
+import { 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  Box 
+} from '@mui/material';
 import { 
   useAdministrator, 
   useManager, 
@@ -306,6 +313,14 @@ const MainPage = () => {
   const manager = useManager();
   const features = useFeatures();
   const disableReports = useRestriction('disableReports');
+  
+  // Language functionality
+  const { languages, language, setLocalLanguage } = useLocalization();
+  const languageList = Object.entries(languages).map((values) => ({ 
+    code: values[0], 
+    country: values[1].country, 
+    name: values[1].name 
+  }));
   
   // User and server data
   const user = useSelector((state) => state.session.user);
@@ -2657,6 +2672,7 @@ const MainPage = () => {
               paddingBottom: '16px',
               borderBottom: '1px solid #E5E7EB'
             }}>
+              {/* Avatar Column */}
               <Avatar style={{ 
                 width: '48px', 
                 height: '48px', 
@@ -2675,7 +2691,9 @@ const MainPage = () => {
                   {getUserInitials(user)}
                 </AvatarFallback>
               </Avatar>
-              <div>
+              
+              {/* Name/Email Column */}
+              <div style={{ flex: 1 }}>
                 <h3 style={{
                   color: '#1F2937',
                   fontSize: '16px',
@@ -2691,6 +2709,43 @@ const MainPage = () => {
                 }}>
                   {user?.email || t('userEmail')}
                 </p>
+              </div>
+              
+              {/* Language Selector Column */}
+              <div style={{ marginLeft: '12px' }}>
+                <FormControl size="small" style={{ minWidth: '120px' }}>
+                  <Select
+                    value={language}
+                    onChange={(e) => setLocalLanguage(e.target.value)}
+                    style={{
+                      fontSize: '12px',
+                      height: '32px',
+                      backgroundColor: '#F9FAFB',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '6px'
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: '200px',
+                          backgroundColor: 'white',
+                          border: '1px solid #E5E7EB',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                        }
+                      }
+                    }}
+                  >
+                    {languageList.map((lang) => (
+                      <MenuItem key={lang.code} value={lang.code} style={{ fontSize: '12px', padding: '8px 12px' }}>
+                        <Box component="span" sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                          <ReactCountryFlag countryCode={lang.country} svg style={{ width: '16px', height: '12px' }} />
+                        </Box>
+                        {lang.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             </div>
             
