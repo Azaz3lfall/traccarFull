@@ -101,6 +101,7 @@ const MainPage = () => {
   const [eventsButtonRef, setEventsButtonRef] = useState(null);
   const [showMapSwitcher, setShowMapSwitcher] = useState(false);
   const [mapSwitcherRef, setMapSwitcherRef] = useState(null);
+  const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(true);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -157,8 +158,33 @@ const MainPage = () => {
     }
   };
 
+  // Check geolocation permission on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          setIsGeolocationEnabled(true);
+        },
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            setIsGeolocationEnabled(false);
+          }
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 1000,
+          maximumAge: 60000
+        }
+      );
+    } else {
+      setIsGeolocationEnabled(false);
+    }
+  }, []);
+
   // My Location handler
   const handleMyLocation = () => {
+    if (!isGeolocationEnabled) return;
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -172,7 +198,9 @@ const MainPage = () => {
         },
         (error) => {
           console.error('Error getting location:', error);
-          // You could show a toast notification here
+          if (error.code === error.PERMISSION_DENIED) {
+            setIsGeolocationEnabled(false);
+          }
         },
         {
           enableHighAccuracy: true,
@@ -182,6 +210,7 @@ const MainPage = () => {
       );
     } else {
       console.error('Geolocation is not supported by this browser.');
+      setIsGeolocationEnabled(false);
     }
   };
 
@@ -2003,14 +2032,15 @@ const MainPage = () => {
         
         {/* My Location Button */}
         <button 
+          disabled={!isGeolocationEnabled}
           style={{
             width: '34px',
             height: '34px',
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: 'white',
-            cursor: 'pointer',
+            color: isGeolocationEnabled ? 'white' : '#6B7280',
+            cursor: isGeolocationEnabled ? 'pointer' : 'not-allowed',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -2021,28 +2051,46 @@ const MainPage = () => {
             WebkitUserSelect: 'none',
             MozUserSelect: 'none',
             msUserSelect: 'none',
-            boxShadow: 'none !important'
+            boxShadow: 'none !important',
+            opacity: isGeolocationEnabled ? 1 : 0.5
           }}
-          onClick={handleMyLocation}
+          onClick={isGeolocationEnabled ? handleMyLocation : undefined}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#374151';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = '#374151';
+            }
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = 'transparent';
+            }
           }}
           onMouseDown={(e) => {
-            e.target.style.backgroundColor = '#374151';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = '#374151';
+            }
           }}
           onMouseUp={(e) => {
-            e.target.style.backgroundColor = '#374151';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = '#374151';
+            }
           }}
           onFocus={(e) => {
-            e.target.style.backgroundColor = '#374151';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = '#374151';
+            }
           }}
           onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
+            if (isGeolocationEnabled) {
+              e.target.style.backgroundColor = 'transparent';
+            }
           }}>
-          <MapPin style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
+          <MapPin style={{ 
+            fontSize: 18, 
+            userSelect: 'none', 
+            pointerEvents: 'none',
+            color: isGeolocationEnabled ? 'white' : '#6B7280'
+          }} />
         </button>
       </div>
       
