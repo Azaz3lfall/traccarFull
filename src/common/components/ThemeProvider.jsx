@@ -25,7 +25,8 @@ const themes = {
       menuBorder: '#374151',
       menuShadow: 'rgba(0, 0, 0, 0.3)',
       // Avatar specific colors
-      avatarBackground: '#FFFFFF',
+      avatarBackground: '#6B7280',
+      avatarText: '#FFFFFF',
       // Badge specific colors
       badgeText: '#FFFFFF',
     }
@@ -50,7 +51,8 @@ const themes = {
       menuBorder: '#374151',
       menuShadow: 'rgba(0, 0, 0, 0.3)',
       // Avatar specific colors
-      avatarBackground: '#FFFFFF',
+      avatarBackground: '#6B7280',
+      avatarText: '#FFFFFF',
       // Badge specific colors
       badgeText: '#FFFFFF',
     }

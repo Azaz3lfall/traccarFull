@@ -573,11 +573,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <Truck size={18} color={isDeviceListVisible ? colors.menuText : colors.menuTextSecondary} />
+            <Truck size={18} color={isDeviceListVisible ? colors.menuText : colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: isDeviceListVisible ? colors.menuText : colors.menuTextSecondary,
+                color: isDeviceListVisible ? colors.menuText : colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1896,7 +1896,7 @@ const MainPage = () => {
             )}
             <AvatarFallback style={{ 
               backgroundColor: colors.avatarBackground, 
-              color: colors.menuText, 
+              color: colors.avatarText, 
               fontSize: '13px',
               fontWeight: '500'
             }}>
@@ -2362,7 +2362,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: colors.menuText,
+                color: colors.text,
                 lineHeight: '1.3'
               }}>
 {t('reportEvents')} ({eventsCount})
@@ -2404,7 +2404,7 @@ const MainPage = () => {
               <div style={{
                 padding: '24px',
                 textAlign: 'center',
-                color: colors.menuTextSecondary
+                color: colors.textSecondary
               }}>
                 No events available
               </div>
@@ -2430,7 +2430,7 @@ const MainPage = () => {
                   <div style={{
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: colors.menuTextSecondary,
+                    color: colors.textSecondary,
                     marginBottom: '4px'
                   }}>
                     {getDeviceName(event.deviceId)}
@@ -2505,7 +2505,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: colors.menuText,
+                color: colors.text,
                 lineHeight: '1.3'
               }}>
                 {t('mapTitle')}
@@ -2663,7 +2663,7 @@ const MainPage = () => {
                       {result.properties?.name || result.properties?.display_name?.split(',')[0]}
                     </div>
                     <div style={{
-                      color: colors.menuTextSecondary,
+                      color: colors.textSecondary,
                       fontSize: '12px',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -2681,7 +2681,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: colors.menuTextSecondary,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
@@ -2694,7 +2694,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: colors.menuTextSecondary,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
@@ -2772,7 +2772,7 @@ const MainPage = () => {
                   </Box>
                   <span style={{
                     fontSize: '13px',
-                    color: colors.menuText,
+                    color: colors.text,
                     fontWeight: language === lang.code ? '500' : '400'
                   }}>
                     {lang.name}
@@ -2831,7 +2831,7 @@ const MainPage = () => {
                   )}
                   <AvatarFallback style={{ 
                     backgroundColor: colors.avatarBackground, 
-                    color: colors.menuText, 
+                    color: colors.avatarText, 
                     fontSize: '18px',
                     fontWeight: '500'
                   }}>
@@ -2840,7 +2840,7 @@ const MainPage = () => {
                 </Avatar>
                 <div>
                   <h3 style={{
-                    color: colors.menuText,
+                    color: colors.text,
                     fontSize: '16px',
                     fontWeight: '600',
                     margin: '0 0 4px 0'
@@ -2848,7 +2848,7 @@ const MainPage = () => {
                     {user?.name || t('sharedName')}
                   </h3>
                   <p style={{
-                    color: colors.menuTextSecondary,
+                    color: colors.textSecondary,
                     fontSize: '14px',
                     margin: '0'
                   }}>
@@ -2866,7 +2866,7 @@ const MainPage = () => {
                   borderRadius: '8px',
                   border: 'none',
                   backgroundColor: 'transparent',
-                  color: colors.menuText,
+                  color: colors.text,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -2894,9 +2894,9 @@ const MainPage = () => {
                 }}
               >
                 {currentTheme === 'light' ? (
-                  <Moon size={20} color={colors.menuText} />
+                  <Moon size={20} color={colors.text} />
                 ) : (
-                  <Sun size={20} color={colors.menuText} />
+                  <Sun size={20} color={colors.text} />
                 )}
               </button>
             </div>
@@ -2904,7 +2904,7 @@ const MainPage = () => {
             {/* User Details */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: colors.menuText,
+                color: colors.text,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2921,15 +2921,15 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>ID:</span>
-                  <span style={{ color: colors.menuText, fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>ID:</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('userAdmin')}:</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('userAdmin')}:</span>
                   <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.administrator ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2939,7 +2939,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>Manager:</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>Manager:</span>
                   <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.manager ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2967,7 +2967,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
                   <span style={{ color: colors.menuText, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
@@ -2975,7 +2975,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
                   <span style={{ color: colors.menuText, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
@@ -2983,7 +2983,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: colors.menuTextSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
+                  <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
                   <span style={{ color: colors.menuText, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
@@ -3135,7 +3135,7 @@ const MainPage = () => {
               <p style={{
                 margin: '0 0 20px 0',
                 fontSize: '16px',
-                color: colors.menuText,
+                color: colors.text,
                 lineHeight: '1.5'
               }}>
                 {t('confirmQuit')}
@@ -3152,7 +3152,7 @@ const MainPage = () => {
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     backgroundColor: '#F3F4F6',
-                    color: colors.menuText,
+                    color: colors.text,
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',
