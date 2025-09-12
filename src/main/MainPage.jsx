@@ -2324,6 +2324,54 @@ const MainPage = () => {
             />
           </Box>
         </button>
+        
+        {/* Theme Switcher Button */}
+        <button
+          onClick={() => setLocalTheme(currentTheme === 'light' ? 'dark' : 'light')}
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: colors.menuText,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = colors.menuHover;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = colors.menuHover;
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = colors.menuHover;
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = colors.menuHover;
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
+          {currentTheme === 'light' ? (
+            <Moon size={18} color={colors.menuText} />
+          ) : (
+            <Sun size={18} color={colors.menuText} />
+          )}
+        </button>
       </div>
       
       {/* Events Popover */}
@@ -2857,48 +2905,6 @@ const MainPage = () => {
                 </div>
               </div>
               
-              {/* Theme Toggle Button */}
-              <button
-                onClick={() => setLocalTheme(currentTheme === 'light' ? 'dark' : 'light')}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: 'transparent',
-                  color: colors.text,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s',
-                  outline: 'none'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.menuHover;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                }}
-                onMouseDown={(e) => {
-                  e.target.style.backgroundColor = colors.menuHover;
-                }}
-                onMouseUp={(e) => {
-                  e.target.style.backgroundColor = colors.menuHover;
-                }}
-                onFocus={(e) => {
-                  e.target.style.backgroundColor = colors.menuHover;
-                }}
-                onBlur={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                }}
-              >
-                {currentTheme === 'light' ? (
-                  <Moon size={20} color={colors.text} />
-                ) : (
-                  <Sun size={20} color={colors.text} />
-                )}
-              </button>
             </div>
             
             {/* User Details */}
