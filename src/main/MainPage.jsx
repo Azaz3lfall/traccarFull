@@ -2478,6 +2478,7 @@ const MainPage = () => {
                 <div style={{
                   position: 'absolute',
                   right: '12px',
+                  top: 'calc(50% - 8px)',
                   width: '16px',
                   height: '16px',
                   border: '2px solid #D1D5DB',
