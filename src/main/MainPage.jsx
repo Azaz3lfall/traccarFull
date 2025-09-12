@@ -2883,7 +2883,7 @@ const MainPage = () => {
                   {t('loginLogout')}
                 </button>
               </div>
-            </div>
+          </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -2928,10 +2928,10 @@ const MainPage = () => {
               <p style={{
                 margin: '0 0 20px 0',
                 fontSize: '16px',
-                color: '#374151',
+                color: '#1F2937',
                 lineHeight: '1.5'
               }}>
-                {t('sharedConfirmLogout')}
+                {t('confirmQuit')}
               </p>
               <div style={{
                 display: 'flex',
@@ -2944,18 +2944,18 @@ const MainPage = () => {
                     padding: '8px 16px',
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
-                    backgroundColor: 'white',
-                    color: '#374151',
+                    backgroundColor: '#F3F4F6',
+                    color: '#1F2937',
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#F9FAFB';
+                    e.target.style.backgroundColor = '#E5E7EB';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'white';
+                    e.target.style.backgroundColor = '#F3F4F6';
                   }}
                 >
                   {t('sharedCancel')}
@@ -2964,20 +2964,20 @@ const MainPage = () => {
                   onClick={confirmLogout}
                   style={{
                     padding: '8px 16px',
-                    border: 'none',
+                    border: '1px solid #FECACA',
                     borderRadius: '6px',
-                    backgroundColor: '#EF4444',
-                    color: 'white',
+                    backgroundColor: '#FEF2F2',
+                    color: '#DC2626',
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#DC2626';
+                    e.target.style.backgroundColor = '#FEE2E2';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#EF4444';
+                    e.target.style.backgroundColor = '#FEF2F2';
                   }}
                 >
                   {t('loginLogout')}
