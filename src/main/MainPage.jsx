@@ -19,7 +19,8 @@ import {
   PieChart, 
   ChevronRight,
   ChevronLeft,
-  Map
+  Map,
+  Check
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
