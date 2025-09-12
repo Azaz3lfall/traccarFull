@@ -1310,8 +1310,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     style={{
                       width: '100%',
                       padding: '12px',
+                      backgroundColor: colors.secondary,
                       border: `1px solid ${colors.border}`,
                       borderRadius: '8px',
+                      color: colors.text,
                       fontSize: '16px',
                       outline: 'none',
                       transition: 'border-color 0.2s'
