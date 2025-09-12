@@ -2641,12 +2641,12 @@ const MainPage = () => {
               right: '65px',
               top: userRef.getBoundingClientRect().top,
               width: '320px',
-              backgroundColor: '#1F2937',
+              backgroundColor: 'white',
               borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
               zIndex: 10000,
               padding: '20px',
-              border: '1px solid #374151'
+              border: '1px solid #E5E7EB'
             }}
           >
             {/* User Header */}
@@ -2655,7 +2655,7 @@ const MainPage = () => {
               alignItems: 'center',
               marginBottom: '16px',
               paddingBottom: '16px',
-              borderBottom: '1px solid #374151'
+              borderBottom: '1px solid #E5E7EB'
             }}>
               <Avatar style={{ 
                 width: '48px', 
@@ -2677,7 +2677,7 @@ const MainPage = () => {
               </Avatar>
               <div>
                 <h3 style={{
-                  color: 'white',
+                  color: '#1F2937',
                   fontSize: '16px',
                   fontWeight: '600',
                   margin: '0 0 4px 0'
@@ -2685,7 +2685,7 @@ const MainPage = () => {
                   {user?.name || t('sharedName')}
                 </h3>
                 <p style={{
-                  color: '#9CA3AF',
+                  color: '#6B7280',
                   fontSize: '14px',
                   margin: '0'
                 }}>
@@ -2697,7 +2697,7 @@ const MainPage = () => {
             {/* User Details */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: 'white',
+                color: '#1F2937',
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2714,15 +2714,15 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>ID:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>ID:</span>
+                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('userAdmin')}:</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>{t('userAdmin')}:</span>
                   <span style={{ color: user?.administrator ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.administrator ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2732,7 +2732,7 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>Manager:</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>Manager:</span>
                   <span style={{ color: user?.manager ? '#10B981' : '#EF4444', fontSize: '12px' }}>
                     {user?.manager ? t('sharedYes') : t('sharedNo')}
                   </span>
@@ -2743,7 +2743,7 @@ const MainPage = () => {
             {/* Server Information */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: 'white',
+                color: '#1F2937',
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2760,24 +2760,24 @@ const MainPage = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
+                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('deviceTitle')}:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>{t('deviceTitle')}:</span>
+                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span style={{ color: '#9CA3AF', fontSize: '12px' }}>{t('reportPositions')}:</span>
-                  <span style={{ color: 'white', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
+                  <span style={{ color: '#6B7280', fontSize: '12px' }}>{t('reportPositions')}:</span>
+                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
             </div>
@@ -2797,19 +2797,19 @@ const MainPage = () => {
                     window.open(billingLink, '_blank');
                   }
                 }}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  backgroundColor: '#1E40AF',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                  opacity: billingLink ? 1 : 0.5
-                }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 16px',
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    opacity: billingLink ? 1 : 0.5
+                  }}
                 disabled={!billingLink}
                 onMouseEnter={(e) => {
                   if (billingLink) {
@@ -2838,9 +2838,9 @@ const MainPage = () => {
                   style={{
                     flex: 1,
                     padding: '10px 16px',
-                    backgroundColor: '#374151',
-                    color: 'white',
-                    border: 'none',
+                    backgroundColor: '#F3F4F6',
+                    color: '#1F2937',
+                    border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: '500',
@@ -2848,10 +2848,10 @@ const MainPage = () => {
                     transition: 'background-color 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#4B5563';
+                    e.target.style.backgroundColor = '#E5E7EB';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#374151';
+                    e.target.style.backgroundColor = '#F3F4F6';
                   }}
                 >
                   {t('settingsUser')}
@@ -2864,9 +2864,9 @@ const MainPage = () => {
                   style={{
                     flex: 1,
                     padding: '10px 16px',
-                    backgroundColor: '#EF4444',
-                    color: 'white',
-                    border: 'none',
+                    backgroundColor: '#FEF2F2',
+                    color: '#DC2626',
+                    border: '1px solid #FECACA',
                     borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: '500',
@@ -2874,10 +2874,10 @@ const MainPage = () => {
                     transition: 'background-color 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#DC2626';
+                    e.target.style.backgroundColor = '#FEE2E2';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#EF4444';
+                    e.target.style.backgroundColor = '#FEF2F2';
                   }}
                 >
                   {t('loginLogout')}
