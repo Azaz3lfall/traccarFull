@@ -222,7 +222,7 @@ const MainPage = () => {
 
   // Search functionality
   const searchAddresses = async (query) => {
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 5) {
       setSearchResults([]);
       return;
     }
@@ -266,11 +266,20 @@ const MainPage = () => {
     const query = e.target.value;
     setSearchQuery(query);
     
-    // Debounce search
+    // Clear previous timeout
     clearTimeout(window.searchTimeout);
-    window.searchTimeout = setTimeout(() => {
-      searchAddresses(query);
-    }, 300);
+    
+    // Only search if query has at least 5 characters
+    if (query.trim().length >= 5) {
+      // Debounce search with 800ms delay
+      window.searchTimeout = setTimeout(() => {
+        searchAddresses(query);
+      }, 800);
+    } else {
+      // Clear results if less than 5 characters
+      setSearchResults([]);
+      setIsSearching(false);
+    }
   };
 
   // Handle search result selection
@@ -2492,7 +2501,7 @@ const MainPage = () => {
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Search for places..."
+                placeholder="Search for places... (min 5 chars)"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 style={{
@@ -2578,8 +2587,21 @@ const MainPage = () => {
               </div>
             )}
             
+            {/* Character Count Message */}
+            {searchQuery && searchQuery.trim().length > 0 && searchQuery.trim().length < 5 && (
+              <div style={{
+                marginTop: '12px',
+                padding: '12px',
+                color: '#9CA3AF',
+                fontSize: '14px',
+                textAlign: 'center'
+              }}>
+                Type at least 5 characters to search
+              </div>
+            )}
+            
             {/* No Results */}
-            {searchQuery && searchResults.length === 0 && !isSearching && (
+            {searchQuery && searchQuery.trim().length >= 5 && searchResults.length === 0 && !isSearching && (
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
