@@ -25,7 +25,8 @@ import {
   Plus,
   Minus,
   Compass,
-  MapPin
+  MapPin,
+  Search
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -102,6 +103,11 @@ const MainPage = () => {
   const [showMapSwitcher, setShowMapSwitcher] = useState(false);
   const [mapSwitcherRef, setMapSwitcherRef] = useState(null);
   const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchRef, setSearchRef] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -214,6 +220,73 @@ const MainPage = () => {
     }
   };
 
+  // Search functionality
+  const searchAddresses = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const request = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=5`;
+      const response = await fetch(request);
+      const geojson = await response.json();
+      
+      const results = geojson.features.map((feature) => {
+        const center = [
+          feature.bbox[0] + (feature.bbox[2] - feature.bbox[0]) / 2,
+          feature.bbox[1] + (feature.bbox[3] - feature.bbox[1]) / 2,
+        ];
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center,
+          },
+          place_name: feature.properties.display_name,
+          properties: feature.properties,
+          text: feature.properties.display_name,
+          place_type: ['place'],
+          center,
+        };
+      });
+      
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    // Debounce search
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+      searchAddresses(query);
+    }, 300);
+  };
+
+  // Handle search result selection
+  const handleSearchResultClick = (result) => {
+    if (map && result.center) {
+      map.easeTo({
+        center: result.center,
+        zoom: Math.max(map.getZoom(), 15),
+        duration: 1000
+      });
+    }
+    setShowSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
   
   // Translation and permissions
   const t = useTranslation();
@@ -276,6 +349,22 @@ const MainPage = () => {
     });
   }, [isMenuExpanded]);
 
+  // Add CSS animation for loading spinner
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   // Close events popover and map switcher when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -285,16 +374,19 @@ const MainPage = () => {
       if (showMapSwitcher && mapSwitcherRef && !mapSwitcherRef.contains(event.target)) {
         setShowMapSwitcher(false);
       }
+      if (showSearch && searchRef && !searchRef.contains(event.target)) {
+        setShowSearch(false);
+      }
     };
 
-    if (showEventsPopover || showMapSwitcher) {
+    if (showEventsPopover || showMapSwitcher || showSearch) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef]);
+  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef]);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -1844,13 +1936,13 @@ const MainPage = () => {
             width: '34px',
             height: '34px',
             borderRadius: '8px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: 'white',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+          border: 'none',
+          backgroundColor: 'transparent',
+          color: 'white',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
             position: 'relative',
             outline: 'none !important',
             transition: 'all 0.2s',
@@ -1898,7 +1990,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: 'white',
+              color: 'white', 
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2091,6 +2183,51 @@ const MainPage = () => {
             pointerEvents: 'none',
             color: isGeolocationEnabled ? 'white' : '#6B7280'
           }} />
+        </button>
+        
+        {/* Search Button */}
+        <button 
+          ref={setSearchRef}
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={() => setShowSearch(!showSearch)}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
+          <Search style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
       </div>
       
@@ -2325,7 +2462,134 @@ const MainPage = () => {
                     )}
                   </button>
                 ))}
+          </div>
+        </motion.div>
+      )}
+      </AnimatePresence>
+      
+      {/* Search Popover */}
+      <AnimatePresence>
+        {showSearch && searchRef && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              right: '65px',
+              top: searchRef.getBoundingClientRect().top,
+              width: '320px',
+              backgroundColor: '#1F2937',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              zIndex: 10000,
+              padding: '16px',
+              border: '1px solid #374151'
+            }}
+          >
+            {/* Search Input */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search for places..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#374151',
+                  border: '1px solid #4B5563',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '14px',
+                  outline: 'none',
+                  paddingRight: isSearching ? '40px' : '16px'
+                }}
+                autoFocus
+              />
+              {isSearching && (
+                <div style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid #6B7280',
+                  borderTop: '2px solid #3B82F6',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+              )}
             </div>
+            
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div style={{
+                marginTop: '12px',
+                maxHeight: '200px',
+                overflowY: 'auto'
+              }}>
+                {searchResults.map((result, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSearchResultClick(result)}
+                    style={{
+                      padding: '12px',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      marginBottom: '4px',
+                      backgroundColor: 'transparent',
+                      transition: 'background-color 0.2s',
+                      border: '1px solid transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#374151';
+                      e.target.style.borderColor = '#4B5563';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.borderColor = 'transparent';
+                    }}
+                  >
+                    <div style={{
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      marginBottom: '4px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {result.properties?.name || result.properties?.display_name?.split(',')[0]}
+                    </div>
+                    <div style={{
+                      color: '#9CA3AF',
+                      fontSize: '12px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {result.properties?.display_name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* No Results */}
+            {searchQuery && searchResults.length === 0 && !isSearching && (
+              <div style={{
+                marginTop: '12px',
+                padding: '12px',
+                color: '#9CA3AF',
+                fontSize: '14px',
+                textAlign: 'center'
+              }}>
+                No results found
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
