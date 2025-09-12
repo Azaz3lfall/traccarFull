@@ -219,34 +219,43 @@ const FloatingDeviceList = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            backgroundColor: colors.surface,
+            borderRadius: '12px',
+            border: isSelected ? '2px solid #3B82F6' : `1px solid ${colors.border}`,
+            boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            margin: '0',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box'
+          }}
+          onClick={(e) => handleDeviceClick(device.id, e)}
+          onMouseEnter={(e) => {
+            if (!isSelected) {
+              e.target.style.backgroundColor = colors.hover;
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSelected) {
+              e.target.style.backgroundColor = colors.surface;
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+            }
+          }}
         >
           <Card 
             style={{
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              backgroundColor: colors.surface,
-              borderRadius: '12px',
-              border: isSelected ? '2px solid #3B82F6' : `1px solid ${colors.border}`,
-              boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              backgroundColor: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
               margin: '0',
               width: '100%',
               maxWidth: '100%',
               boxSizing: 'border-box'
-            }}
-            onClick={(e) => handleDeviceClick(device.id, e)}
-            onMouseEnter={(e) => {
-              if (!isSelected) {
-                e.target.style.backgroundColor = colors.hover;
-                e.target.style.transform = 'translateY(-1px)';
-                e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isSelected) {
-                e.target.style.backgroundColor = colors.surface;
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
-              }
             }}
           >
             <div style={{ padding: '8px 0px 4px 0px' }}>
@@ -445,7 +454,7 @@ const FloatingDeviceList = ({
         </motion.div>
       </div>
     );
-  }, [devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
+  }, [colors, devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
   // Note: Data is now passed directly to List component for better performance
   
   // Don't render anything if we don't have proper data
