@@ -2455,7 +2455,7 @@ const MainPage = () => {
             }}
           >
             {/* Search Input */}
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 type="text"
                 placeholder="Search for places... (min 5 chars)"
@@ -2478,8 +2478,6 @@ const MainPage = () => {
                 <div style={{
                   position: 'absolute',
                   right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
                   width: '16px',
                   height: '16px',
                   border: '2px solid #D1D5DB',
