@@ -1310,7 +1310,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     style={{
                       width: '100%',
                       padding: '12px',
-                      border: 'none',
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '8px',
                       fontSize: '16px',
                       outline: 'none',
@@ -1320,7 +1320,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       e.target.style.borderColor = '#3B82F6';
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#D1D5DB';
+                      e.target.style.borderColor = colors.border;
                     }}
                     step={editField === 'hours' ? '0.1' : '0.01'}
                     min="0"
