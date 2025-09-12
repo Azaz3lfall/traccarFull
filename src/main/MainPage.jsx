@@ -2462,13 +2462,13 @@ const MainPage = () => {
                   key={event.id || index}
                   style={{
                     padding: '12px 16px',
-                    borderBottom: index < events.length - 1 ? '1px solid #F3F4F6' : 'none',
+                    borderBottom: index < events.length - 1 ? `1px solid ${colors.border}` : 'none',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s'
                   }}
                   onClick={() => handleEventClick(event)}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#F9FAFB';
+                    e.target.style.backgroundColor = colors.hover;
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = 'transparent';
@@ -3166,9 +3166,11 @@ const MainPage = () => {
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = colors.hover;
+                    e.target.style.color = colors.text;
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = colors.secondary;
+                    e.target.style.color = colors.text;
                   }}
                 >
                   {t('sharedCancel')}

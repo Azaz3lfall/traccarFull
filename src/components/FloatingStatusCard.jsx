@@ -1290,11 +1290,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     <button
                       onClick={() => setShowEditModal(false)}
                       style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '4px',
-                        border: `1px solid ${colors.border}`,
-                        backgroundColor: 'transparent',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: colors.secondary,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -1303,14 +1303,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.backgroundColor = colors.hover;
-                        e.target.style.borderColor = colors.border;
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.borderColor = colors.border;
+                        e.target.style.backgroundColor = colors.secondary;
                       }}
                     >
-                      <X size={14} color={colors.textSecondary} />
+                      <X size={16} color={colors.textSecondary} />
                     </button>
                   </div>
                   <input
