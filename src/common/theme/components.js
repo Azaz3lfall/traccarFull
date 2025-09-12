@@ -30,6 +30,11 @@ export default {
         horizontal: 'center',
       },
     },
+    styleOverrides: {
+      root: {
+        zIndex: 10002, // Higher than our control bar components (10001)
+      },
+    },
   },
   MuiTooltip: {
     defaultProps: {
