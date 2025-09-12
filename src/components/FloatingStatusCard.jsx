@@ -245,7 +245,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     alignItems: 'center',
                     justifyContent: 'center',
                     overflow: 'hidden',
-                    border: '2px solid #E5E7EB'
+                    border: '1px solid #E5E7EB'
                   }}>
                     <img 
                       style={{ 
@@ -472,7 +472,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  border: '2px solid #10B981',
+                  border: '1px solid #10B981',
                   borderRadius: '4px',
                   position: 'relative'
                 }}>
@@ -515,7 +515,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  border: '2px solid #EF4444',
+                  border: '1px solid #EF4444',
                   borderRadius: '4px',
                   position: 'relative'
                 }}>
@@ -688,7 +688,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  border: '2px solid #6B7280',
+                  border: '1px solid #6B7280',
                   borderRadius: '50%',
                   position: 'relative'
                 }}>
@@ -769,14 +769,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             padding: '16px',
             overflow: 'auto'
           }}>
-            {/* Horizontal Line - Desktop only */}
-            {desktop && (
-              <div style={{
-                height: '1px',
-                backgroundColor: colors.border,
-                marginBottom: '16px'
-              }} />
-            )}
             
             {/* Position Attributes */}
             {position && (
@@ -791,10 +783,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       padding: '8px 0',
-                      borderBottom: '1px solid #F3F4F6'
+                      borderBottom: `1px solid ${colors.border}`
                     }}>
                       <span style={{
-                        fontSize: '14px',
+                        fontSize: '12px',
                         color: colors.textSecondary,
                         fontWeight: '500'
                       }}>
@@ -806,7 +798,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                         gap: '8px'
                       }}>
                         <span style={{
-                          fontSize: '14px',
+                          fontSize: '12px',
                           color: colors.text
                         }}>
                           {key === 'fixTime' || key === 'deviceTime' || key === 'serverTime' ? 
@@ -846,7 +838,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               width: '22px',
                               height: '22px',
                               borderRadius: '4px',
-                              border: '1px solid #D1D5DB',
+                              border: 'none',
                               backgroundColor: 'transparent',
                               cursor: 'pointer',
                               display: 'flex',
@@ -1075,7 +1067,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                     width: '22px',
                                     height: '22px',
                                     borderRadius: '4px',
-                                    border: '1px solid #D1D5DB',
+                                    border: 'none',
                                     backgroundColor: 'transparent',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -1171,7 +1163,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                     width: '22px',
                                     height: '22px',
                                     borderRadius: '4px',
-                                    border: '1px solid #D1D5DB',
+                                    border: 'none',
                                     backgroundColor: 'transparent',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -1318,7 +1310,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     style={{
                       width: '100%',
                       padding: '12px',
-                      border: '1px solid #D1D5DB',
+                      border: 'none',
                       borderRadius: '8px',
                       fontSize: '16px',
                       outline: 'none',
