@@ -222,6 +222,20 @@ const FloatingDeviceList = ({
               boxSizing: 'border-box'
             }}
             onClick={(e) => handleDeviceClick(device.id, e)}
+            onMouseEnter={(e) => {
+              if (!isSelected) {
+                e.target.style.backgroundColor = colors.hover;
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSelected) {
+                e.target.style.backgroundColor = colors.surface;
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+              }
+            }}
           >
             <div style={{ padding: '8px 0px 4px 0px' }}>
               <div style={{
@@ -240,7 +254,7 @@ const FloatingDeviceList = ({
                     width: '40px',
                     height: '40px',
                     borderRadius: '50%',
-                    backgroundColor: '#F3F4F6',
+                    backgroundColor: colors.secondary,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -514,7 +528,7 @@ const FloatingDeviceList = ({
                 paddingRight: '40px',
                 height: '40px',
                 borderRadius: '8px',
-                border: '1px solid #D1D5DB',
+                border: `1px solid ${colors.border}`,
                 fontSize: '14px',
                 outline: 'none',
                 boxShadow: 'none'
@@ -522,7 +536,7 @@ const FloatingDeviceList = ({
               onFocus={(e) => {
                 e.target.style.outline = 'none';
                 e.target.style.boxShadow = 'none';
-                e.target.style.borderColor = '#D1D5DB';
+                e.target.style.borderColor = colors.border;
               }}
             />
             <button
@@ -587,7 +601,7 @@ const FloatingDeviceList = ({
                     <label style={{
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#374151'
+                      color: colors.text
                     }}>{t('deviceStatus')}</label>
                     {filter.statuses.length > 0 && (
                       <button
@@ -703,7 +717,7 @@ const FloatingDeviceList = ({
                     <label style={{
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#374151'
+                      color: colors.text
                     }}>{t('settingsGroups')}</label>
                     {filter.groups.length > 0 && (
                       <button
@@ -922,7 +936,7 @@ const FloatingDeviceList = ({
                   alignItems: 'center', 
                   gap: '8px',
                   padding: '16px 0 8px 0',
-                  borderTop: '1px solid #E5E7EB',
+                  borderTop: `1px solid ${colors.border}`,
                   marginTop: '8px'
                 }}>
                   <input
