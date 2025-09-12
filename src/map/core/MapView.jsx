@@ -6,7 +6,6 @@ import React, {
   useMemo,
 } from 'react';
 import { useTheme } from '@mui/material';
-import { SwitcherControl } from '../switcher/switcher';
 import { useAttributePreference, usePreference } from '../../common/util/preferences';
 import usePersistedState, { savePersistedState } from '../../common/util/usePersistedState';
 import { mapImages } from './preloadImages';
@@ -66,23 +65,6 @@ const MapView = ({ children, selectedMapStyle }) => {
   const mapboxAccessToken = useAttributePreference('mapboxAccessToken');
   const maxZoom = useAttributePreference('web.maxZoom');
 
-  const switcher = useMemo(() => new SwitcherControl(
-    () => updateReadyValue(false),
-    (styleId) => savePersistedState('selectedMapStyle', styleId),
-    () => {
-      map.once('styledata', () => {
-        const waiting = () => {
-          if (!map.loaded()) {
-            setTimeout(waiting, 33);
-          } else {
-            initMap();
-            updateReadyValue(true);
-          }
-        };
-        waiting();
-      });
-    },
-  ), []);
 
   useEffectAsync(async () => {
     if (theme.direction === 'rtl') {
@@ -95,7 +77,6 @@ const MapView = ({ children, selectedMapStyle }) => {
     const navigation = new maplibregl.NavigationControl();
     map.addControl(attribution, theme.direction === 'rtl' ? 'bottom-left' : 'bottom-right');
     map.addControl(navigation, theme.direction === 'rtl' ? 'top-left' : 'top-right');
-    map.addControl(switcher, theme.direction === 'rtl' ? 'top-left' : 'top-right');
     
     // Add CSS to give only the first navigation control more margin-top to avoid overlap with custom control bar
     // and re-style all map controls to match the control bar buttons
@@ -189,12 +170,11 @@ const MapView = ({ children, selectedMapStyle }) => {
     document.head.appendChild(style);
     
     return () => {
-      map.removeControl(switcher);
       map.removeControl(navigation);
       map.removeControl(attribution);
       document.head.removeChild(style);
     };
-  }, [theme.direction, switcher]);
+  }, [theme.direction]);
 
   useEffect(() => {
     if (maxZoom) {
@@ -206,18 +186,33 @@ const MapView = ({ children, selectedMapStyle }) => {
     maplibregl.accessToken = mapboxAccessToken;
   }, [mapboxAccessToken]);
 
-  useEffect(() => {
-    const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
-    const styles = filteredStyles.length ? filteredStyles : mapStyles.filter((s) => s.id === 'osm');
-    switcher.updateStyles(styles, defaultMapStyle);
-  }, [mapStyles, defaultMapStyle, activeMapStyles, switcher]);
-
   // Handle external map style changes from props
   useEffect(() => {
-    if (selectedMapStyle && selectedMapStyle !== defaultMapStyle) {
-      switcher.switchToStyle(selectedMapStyle);
+    if (selectedMapStyle && map) {
+      const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
+      const selectedStyle = filteredStyles.find((s) => s.id === selectedMapStyle);
+      
+      if (selectedStyle && selectedStyle.style) {
+        updateReadyValue(false);
+        map.setStyle(selectedStyle.style, { diff: false });
+        if (selectedStyle.transformRequest) {
+          map.setTransformRequest(selectedStyle.transformRequest);
+        }
+        
+        map.once('styledata', () => {
+          const waiting = () => {
+            if (!map.loaded()) {
+              setTimeout(waiting, 33);
+            } else {
+              initMap();
+              updateReadyValue(true);
+            }
+          };
+          waiting();
+        });
+      }
     }
-  }, [selectedMapStyle, defaultMapStyle, switcher]);
+  }, [selectedMapStyle, map, mapStyles, activeMapStyles]);
 
   useEffect(() => {
     const listener = (ready) => setMapReady(ready);
