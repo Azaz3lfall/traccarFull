@@ -117,6 +117,8 @@ const MainPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showUserPopover, setShowUserPopover] = useState(false);
   const [userRef, setUserRef] = useState(null);
+  const [showLanguagePopover, setShowLanguagePopover] = useState(false);
+  const [languageRef, setLanguageRef] = useState(null);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -404,19 +406,22 @@ const MainPage = () => {
       if (showSearch && searchRef && !searchRef.contains(event.target)) {
         setShowSearch(false);
       }
+      if (showLanguagePopover && languageRef && !languageRef.contains(event.target)) {
+        setShowLanguagePopover(false);
+      }
       if (showUserPopover && userRef && !userRef.contains(event.target)) {
         setShowUserPopover(false);
       }
     };
 
-    if (showEventsPopover || showMapSwitcher || showSearch || showUserPopover) {
+    if (showEventsPopover || showMapSwitcher || showSearch || showLanguagePopover || showUserPopover) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef, showUserPopover, userRef]);
+  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef, showLanguagePopover, languageRef, showUserPopover, userRef]);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -2262,6 +2267,57 @@ const MainPage = () => {
           }}>
           <Search style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
+        
+        {/* Language Button */}
+        <button 
+          ref={setLanguageRef}
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={() => setShowLanguagePopover(!showLanguagePopover)}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
+          <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+            <ReactCountryFlag 
+              countryCode={languageList.find(lang => lang.code === language)?.country || 'US'} 
+              svg 
+              style={{ width: '18px', height: '14px' }} 
+            />
+          </Box>
+        </button>
       </div>
       
       {/* Events Popover */}
@@ -2643,6 +2699,90 @@ const MainPage = () => {
         )}
       </AnimatePresence>
       
+      {/* Language Popover */}
+      <AnimatePresence>
+        {showLanguagePopover && languageRef && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              right: '65px',
+              top: languageRef.getBoundingClientRect().top,
+              width: '200px',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+              zIndex: 10000,
+              padding: '12px',
+              border: '1px solid #E5E7EB',
+              maxHeight: '300px',
+              overflowY: 'auto'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              {languageList.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setLocalLanguage(lang.code);
+                    setShowLanguagePopover(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '8px 12px',
+                    backgroundColor: language === lang.code ? '#F3F4F6' : 'transparent',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    textAlign: 'left',
+                    width: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (language !== lang.code) {
+                      e.target.style.backgroundColor = '#F9FAFB';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (language !== lang.code) {
+                      e.target.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  <Box component="span" sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                    <ReactCountryFlag 
+                      countryCode={lang.country} 
+                      svg 
+                      style={{ width: '16px', height: '12px' }} 
+                    />
+                  </Box>
+                  <span style={{
+                    fontSize: '13px',
+                    color: '#1F2937',
+                    fontWeight: language === lang.code ? '500' : '400'
+                  }}>
+                    {lang.name}
+                  </span>
+                  {language === lang.code && (
+                    <Box component="span" sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+                      <Check style={{ width: '14px', height: '14px', color: '#10B981' }} />
+                    </Box>
+                  )}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* User Popover */}
       <AnimatePresence>
         {showUserPopover && userRef && (
@@ -2672,7 +2812,6 @@ const MainPage = () => {
               paddingBottom: '16px',
               borderBottom: '1px solid #E5E7EB'
             }}>
-              {/* Avatar Column */}
               <Avatar style={{ 
                 width: '48px', 
                 height: '48px', 
@@ -2691,9 +2830,7 @@ const MainPage = () => {
                   {getUserInitials(user)}
                 </AvatarFallback>
               </Avatar>
-              
-              {/* Name/Email Column */}
-              <div style={{ flex: 1 }}>
+              <div>
                 <h3 style={{
                   color: '#1F2937',
                   fontSize: '16px',
@@ -2709,43 +2846,6 @@ const MainPage = () => {
                 }}>
                   {user?.email || t('userEmail')}
                 </p>
-              </div>
-              
-              {/* Language Selector Column */}
-              <div style={{ marginLeft: '12px' }}>
-                <FormControl size="small" style={{ minWidth: '120px' }}>
-                  <Select
-                    value={language}
-                    onChange={(e) => setLocalLanguage(e.target.value)}
-                    style={{
-                      fontSize: '12px',
-                      height: '32px',
-                      backgroundColor: '#F9FAFB',
-                      border: '1px solid #D1D5DB',
-                      borderRadius: '6px'
-                    }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: '200px',
-                          backgroundColor: 'white',
-                          border: '1px solid #E5E7EB',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                        }
-                      }
-                    }}
-                  >
-                    {languageList.map((lang) => (
-                      <MenuItem key={lang.code} value={lang.code} style={{ fontSize: '12px', padding: '8px 12px' }}>
-                        <Box component="span" sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                          <ReactCountryFlag countryCode={lang.country} svg style={{ width: '16px', height: '12px' }} />
-                        </Box>
-                        {lang.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
               </div>
             </div>
             
