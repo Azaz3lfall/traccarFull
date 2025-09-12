@@ -40,7 +40,8 @@ const FloatingDeviceList = ({
   filterSort, 
   setFilterSort, 
   filterMap, 
-  setFilterMap 
+  setFilterMap,
+  desktop
 }) => {
   console.log('FloatingDeviceList rendering', { filteredDevices: filteredDevices?.length });
   
@@ -52,7 +53,6 @@ const FloatingDeviceList = ({
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   
   const [showFilters, setShowFilters] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -156,27 +156,21 @@ const FloatingDeviceList = ({
       }
     };
 
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
     document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('resize', handleResize);
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('resize', handleResize);
     };
   }, [showFilters]);
 
   // Hide device list on mobile when device is selected
   React.useEffect(() => {
-    if (isMobile && selectedDeviceId) {
+    if (!desktop && selectedDeviceId) {
       setShowOnMobile(false);
-    } else if (isMobile && !selectedDeviceId) {
+    } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
     }
-  }, [isMobile, selectedDeviceId]);
+  }, [!desktop, selectedDeviceId]);
   
 
   // Memoized device row component for virtualized rendering
@@ -276,53 +270,53 @@ const FloatingDeviceList = ({
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: isMobile ? '6px' : '4px',
+                      gap: !desktop ? '6px' : '4px',
                       flexWrap: 'wrap',
                       justifyContent: 'flex-end',
-                      minWidth: isMobile ? '80px' : '60px',
+                      minWidth: !desktop ? '80px' : '60px',
                       paddingRight: '8px'
                     }}>
                       {/* Alarm */}
                       <div style={{
-                        width: isMobile ? '20px' : '16px',
-                        height: isMobile ? '20px' : '16px',
+                        width: !desktop ? '20px' : '16px',
+                        height: !desktop ? '20px' : '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <AlertTriangle style={{ 
-                          width: isMobile ? '18px' : '16px', 
-                          height: isMobile ? '18px' : '16px', 
+                          width: !desktop ? '18px' : '16px', 
+                          height: !desktop ? '18px' : '16px', 
                           color: position?.attributes?.alarm ? '#EF4444' : '#D1D5DB' 
                         }} />
                       </div>
                       
                       {/* Ignition */}
                       <div style={{
-                        width: isMobile ? '20px' : '16px',
-                        height: isMobile ? '20px' : '16px',
+                        width: !desktop ? '20px' : '16px',
+                        height: !desktop ? '20px' : '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <EngineIcon style={{ 
-                          width: isMobile ? '18px' : '16px', 
-                          height: isMobile ? '18px' : '16px', 
+                          width: !desktop ? '18px' : '16px', 
+                          height: !desktop ? '18px' : '16px', 
                           color: position?.attributes?.ignition ? '#10B981' : '#D1D5DB' 
                         }} />
                       </div>
                       
                       {/* Motion */}
                       <div style={{
-                        width: isMobile ? '20px' : '16px',
-                        height: isMobile ? '20px' : '16px',
+                        width: !desktop ? '20px' : '16px',
+                        height: !desktop ? '20px' : '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <div style={{
-                          width: isMobile ? '10px' : '8px',
-                          height: isMobile ? '10px' : '8px',
+                          width: !desktop ? '10px' : '8px',
+                          height: !desktop ? '10px' : '8px',
                           borderRadius: '50%',
                           backgroundColor: position?.attributes?.motion ? '#3B82F6' : '#D1D5DB'
                         }} />
@@ -330,15 +324,15 @@ const FloatingDeviceList = ({
                       
                       {/* Door */}
                       <div style={{
-                        width: isMobile ? '20px' : '16px',
-                        height: isMobile ? '20px' : '16px',
+                        width: !desktop ? '20px' : '16px',
+                        height: !desktop ? '20px' : '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <div style={{
-                          width: isMobile ? '14px' : '12px',
-                          height: isMobile ? '10px' : '8px',
+                          width: !desktop ? '14px' : '12px',
+                          height: !desktop ? '10px' : '8px',
                           border: `2px solid ${position?.attributes?.door ? '#10B981' : '#D1D5DB'}`,
                           borderRadius: '2px',
                           position: 'relative'
@@ -347,8 +341,8 @@ const FloatingDeviceList = ({
                             position: 'absolute',
                             top: '-2px',
                             right: '-2px',
-                            width: isMobile ? '5px' : '4px',
-                            height: isMobile ? '5px' : '4px',
+                            width: !desktop ? '5px' : '4px',
+                            height: !desktop ? '5px' : '4px',
                             backgroundColor: position?.attributes?.door ? '#10B981' : '#D1D5DB',
                             borderRadius: '50%'
                           }} />
@@ -430,7 +424,7 @@ const FloatingDeviceList = ({
   
   return (
     <AnimatePresence mode="wait">
-      {!(isMobile && !showOnMobile) && (
+      {!(!desktop && !showOnMobile) && (
         <motion.div
           key="floating-device-list"
           initial={{ x: -400, opacity: 0 }}
@@ -439,10 +433,10 @@ const FloatingDeviceList = ({
           transition={{ duration: 0.5, ease: "easeOut" }}
       style={{
         position: 'fixed',
-        top: isMobile ? '0px' : '8px',
-        left: isMobile ? '0px' : '8px',
-        width: isMobile ? '100vw' : '310px',
-        height: isMobile ? '100vh' : 'calc(100vh - 16px)',
+        top: !desktop ? '0px' : '8px',
+        left: !desktop ? '0px' : '63px',
+        width: !desktop ? '100vw' : '310px',
+        height: !desktop ? '100vh' : 'calc(100vh - 16px)',
         zIndex: 9999,
         pointerEvents: 'auto'
       }}
@@ -452,8 +446,8 @@ const FloatingDeviceList = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'white',
-        borderRadius: isMobile ? '0px' : (selectedDeviceId ? '16px 0px 0px 16px' : '16px'),
-        boxShadow: isMobile ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: !desktop ? '0px' : (selectedDeviceId ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
+        boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
         border: 'none'
       }}>
         {/* Header */}
@@ -531,10 +525,10 @@ const FloatingDeviceList = ({
               style={{
                 position: 'fixed',
                 top: filterButtonRef.current ? filterButtonRef.current.getBoundingClientRect().bottom + 8 : 0,
-                right: isMobile ? '16px' : (filterButtonRef.current ? window.innerWidth - filterButtonRef.current.getBoundingClientRect().right : 0),
-                left: isMobile ? '16px' : 'auto',
-                width: isMobile ? 'calc(100vw - 32px)' : '300px',
-                maxWidth: isMobile ? '400px' : '300px',
+                right: !desktop ? '16px' : (filterButtonRef.current ? window.innerWidth - filterButtonRef.current.getBoundingClientRect().right : 0),
+                left: !desktop ? '16px' : 'auto',
+                width: !desktop ? 'calc(100vw - 32px)' : '300px',
+                maxWidth: !desktop ? '400px' : '300px',
                 backgroundColor: 'white',
                 borderRadius: '8px',
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
@@ -934,7 +928,7 @@ const FloatingDeviceList = ({
         >
           {filteredDevices.length > 0 ? (
             <div style={{ 
-              height: isMobile ? 'calc(100vh - 80px)' : '400px', 
+              height: !desktop ? 'calc(100vh - 80px)' : '400px', 
               overflowY: 'auto',
               width: '100%',
               padding: '0px 16px 0px 16px'

@@ -29,7 +29,7 @@ import { Card } from './ui/card';
 
 dayjs.extend(relativeTime);
 
-const FloatingStatusCard = () => {
+const FloatingStatusCard = ({ desktop }) => {
   const dispatch = useDispatch();
   const t = useTranslation();
   
@@ -39,7 +39,6 @@ const FloatingStatusCard = () => {
   const groups = useSelector((state) => state.groups.items);
   
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -65,15 +64,6 @@ const FloatingStatusCard = () => {
   const position = selectedDeviceId ? positions[selectedDeviceId] : null;
   const group = device?.groupId ? groups[device.groupId] : null;
   
-  // Update mobile state on resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   
   const formatLastUpdate = useCallback((device) => {
     if (device.status === 'online' || !device.lastUpdate) {
@@ -176,16 +166,16 @@ const FloatingStatusCard = () => {
       {selectedDeviceId && device && (
         <motion.div
           key={selectedDeviceId}
-          initial={{ x: isMobile ? 0 : -400, y: isMobile ? 100 : 0, opacity: 0 }}
+          initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
-          exit={{ x: isMobile ? 0 : -400, y: isMobile ? 100 : 0, opacity: 0 }}
+          exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: 'fixed',
-          top: isMobile ? '16px' : '8px',
-          left: isMobile ? '16px' : '315px',
-          width: isMobile ? 'calc(100vw - 32px)' : '290px',
-          height: isMobile ? '20vh' : 'calc(100vh - 16px)',
+          top: !desktop ? '16px' : '8px',
+          left: !desktop ? '16px' : '370px',
+          width: !desktop ? 'calc(100vw - 32px)' : '290px',
+          height: !desktop ? '20vh' : 'calc(100vh - 16px)',
           zIndex: 9998,
           pointerEvents: 'auto'
         }}
@@ -194,10 +184,10 @@ const FloatingStatusCard = () => {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: isMobile ? '16px' : '0px 16px 16px 0px',
+          borderRadius: !desktop ? '16px' : '0px 16px 16px 0px',
           backgroundColor: 'white',
           border: '1px solid #E5E7EB',
-          boxShadow: isMobile ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
+          boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
           overflow: 'hidden'
         }}>
           {/* Header */}
