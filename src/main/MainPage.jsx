@@ -2340,18 +2340,18 @@ const MainPage = () => {
               right: '65px', // 8px control bar + 30px offset + 15px additional + 12px popover margin
               width: '300px',
               maxHeight: '400px',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-              border: '1px solid #E5E7EB',
+              boxShadow: colors.shadow,
+              border: `1px solid ${colors.border}`,
               zIndex: 10001,
               overflow: 'hidden'
             }}>
           {/* Popover Header */}
           <div style={{
             padding: '12px 16px',
-            borderBottom: '1px solid #F3F4F6',
-            backgroundColor: 'white'
+            borderBottom: `1px solid ${colors.border}`,
+            backgroundColor: colors.surface
           }}>
             <div style={{
               display: 'flex',
@@ -2488,18 +2488,18 @@ const MainPage = () => {
               right: '65px', // 8px control bar + 30px offset + 15px additional + 12px popover margin
               width: '280px',
               maxHeight: '300px',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-              border: '1px solid #E5E7EB',
+              boxShadow: colors.shadow,
+              border: `1px solid ${colors.border}`,
               zIndex: 10001,
               overflow: 'hidden'
             }}>
             {/* Map Switcher Header */}
             <div style={{
               padding: '12px 16px',
-              borderBottom: '1px solid #F3F4F6',
-              backgroundColor: 'white'
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: colors.surface
             }}>
               <h3 style={{
                 margin: 0,
@@ -2575,12 +2575,12 @@ const MainPage = () => {
               right: '65px',
               top: searchRef.getBoundingClientRect().top,
               width: '320px',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+              boxShadow: colors.shadow,
               zIndex: 10000,
               padding: '16px',
-              border: '1px solid #E5E7EB'
+              border: `1px solid ${colors.border}`
             }}
           >
             {/* Search Input */}
@@ -2593,8 +2593,8 @@ const MainPage = () => {
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  backgroundColor: '#F9FAFB',
-                  border: '1px solid #D1D5DB',
+                  backgroundColor: colors.secondary,
+                  border: `1px solid ${colors.border}`,
                   borderRadius: '8px',
                   color: colors.text,
                   fontSize: '14px',
@@ -2643,8 +2643,8 @@ const MainPage = () => {
                       border: '1px solid transparent'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#F3F4F6';
-                      e.target.style.borderColor = '#D1D5DB';
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.borderColor = colors.border;
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.backgroundColor = 'transparent';
@@ -2718,12 +2718,12 @@ const MainPage = () => {
               right: '65px',
               top: languageRef.getBoundingClientRect().top,
               width: '200px',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+              boxShadow: colors.shadow,
               zIndex: 10000,
               padding: '12px',
-              border: '1px solid #E5E7EB',
+              border: `1px solid ${colors.border}`,
               maxHeight: '300px',
               overflowY: 'auto'
             }}
@@ -3045,9 +3045,9 @@ const MainPage = () => {
                   style={{
                     flex: 1,
                     padding: '10px 16px',
-                    backgroundColor: '#F3F4F6',
+                    backgroundColor: colors.secondary,
                     color: colors.text,
-                    border: '1px solid #D1D5DB',
+                    border: `1px solid ${colors.border}`,
                     borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: '500',
@@ -3055,10 +3055,10 @@ const MainPage = () => {
                     transition: 'background-color 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#E5E7EB';
+                    e.target.style.backgroundColor = colors.hover;
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#F3F4F6';
+                    e.target.style.backgroundColor = colors.secondary;
                   }}
                 >
                   {t('settingsUser')}
@@ -3123,7 +3123,7 @@ const MainPage = () => {
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.3 }}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: colors.surface,
                 borderRadius: '8px',
                 padding: '20px',
                 maxWidth: '400px',
