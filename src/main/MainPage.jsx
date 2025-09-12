@@ -46,12 +46,7 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
 import ReactCountryFlag from 'react-country-flag';
-import { 
-  Select, 
-  MenuItem, 
-  FormControl, 
-  Box 
-} from '@mui/material';
+import { Box } from '@mui/material';
 import { 
   useAdministrator, 
   useManager, 
@@ -540,7 +535,7 @@ const MainPage = () => {
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-              tooltip.textContent = isDeviceListVisible ? 'Hide Device List' : 'Show Device List';
+              tooltip.textContent = t('showHideDevices');
               tooltip.id = 'menu-tooltip-device-list';
               tooltip.style.cssText = `
                 position: fixed;
@@ -578,7 +573,7 @@ const MainPage = () => {
                 whiteSpace: 'nowrap',
                 lineHeight: '1.6'
               }}>
-                {isDeviceListVisible ? 'Hide Devices' : 'Show Devices'}
+                {t('showHideDevices')}
               </span>
             )}
           </div>
