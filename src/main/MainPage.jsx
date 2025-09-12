@@ -2789,7 +2789,43 @@ const MainPage = () => {
               gap: '8px',
               marginTop: '16px'
             }}>
-              {/* Account and Logout on same line */}
+              {/* Billing full width at top */}
+              <button
+                onClick={() => {
+                  setShowUserPopover(false);
+                  if (billingLink) {
+                    window.open(billingLink, '_blank');
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  backgroundColor: '#1E40AF',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  opacity: billingLink ? 1 : 0.5
+                }}
+                disabled={!billingLink}
+                onMouseEnter={(e) => {
+                  if (billingLink) {
+                    e.target.style.backgroundColor = '#1D4ED8';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (billingLink) {
+                    e.target.style.backgroundColor = '#1E40AF';
+                  }
+                }}
+              >
+                {t('userBilling')}
+              </button>
+              
+              {/* Account and Logout on same line below */}
               <div style={{
                 display: 'flex',
                 gap: '8px'
@@ -2847,42 +2883,6 @@ const MainPage = () => {
                   {t('loginLogout')}
                 </button>
               </div>
-              
-              {/* Billing full width below */}
-              <button
-                onClick={() => {
-                  setShowUserPopover(false);
-                  if (billingLink) {
-                    window.open(billingLink, '_blank');
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  backgroundColor: '#1E40AF',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                  opacity: billingLink ? 1 : 0.5
-                }}
-                disabled={!billingLink}
-                onMouseEnter={(e) => {
-                  if (billingLink) {
-                    e.target.style.backgroundColor = '#1D4ED8';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (billingLink) {
-                    e.target.style.backgroundColor = '#1E40AF';
-                  }
-                }}
-              >
-                {t('userBilling')}
-              </button>
             </div>
           </motion.div>
         )}
