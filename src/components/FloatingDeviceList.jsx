@@ -1,4 +1,4 @@
-import React, {
+hinther translatiAll"te import React, {
   useState,
   useRef,
   useMemo,
@@ -625,7 +625,7 @@ const FloatingDeviceList = ({
                   >
                     <span>
                       {filter.statuses.length === 0 
-                        ? 'All' 
+                        ? t('allItems') 
                         : filter.statuses.length === 1 
                           ? t(`deviceStatus${filter.statuses[0].charAt(0).toUpperCase() + filter.statuses[0].slice(1)}`)
                           : filter.statuses.map(status => t(`deviceStatus${status.charAt(0).toUpperCase() + status.slice(1)}`)).join(', ')
@@ -741,7 +741,7 @@ const FloatingDeviceList = ({
                   >
                     <span>
                       {filter.groups.length === 0 
-                        ? 'All' 
+                        ? t('allItems') 
                         : filter.groups.length === 1 
                           ? groups[filter.groups[0]]?.name || 'Selected'
                           : filter.groups.map(id => groups[id]?.name).filter(Boolean).join(', ')
