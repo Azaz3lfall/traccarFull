@@ -1348,7 +1348,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       padding: '10px 20px',
                       borderRadius: '8px',
                       border: `1px solid ${colors.border}`,
-                      backgroundColor: colors.surface,
+                      backgroundColor: colors.secondary,
                       color: colors.text,
                       fontSize: '14px',
                       fontWeight: '500',
@@ -1358,12 +1358,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     }}
                     onMouseEnter={(e) => {
                       if (!isSaving) {
-                        e.target.style.backgroundColor = '#F9FAFB';
+                        e.target.style.backgroundColor = colors.hover;
+                        e.target.style.color = colors.text;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isSaving) {
-                        e.target.style.backgroundColor = 'white';
+                        e.target.style.backgroundColor = colors.secondary;
+                        e.target.style.color = colors.text;
                       }
                     }}
                   >
