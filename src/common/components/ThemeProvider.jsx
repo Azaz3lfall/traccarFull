@@ -60,10 +60,7 @@ const themes = {
 };
 
 const getDefaultTheme = () => {
-  // Check if user has a system preference for dark mode
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
+  // Default to light theme, user can switch manually
   return 'light';
 };
 
