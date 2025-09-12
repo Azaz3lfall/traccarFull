@@ -2485,10 +2485,7 @@ const MainPage = () => {
                   border: '2px solid #D1D5DB',
                   borderTop: '2px solid #3B82F6',
                   borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  animation: 'spin 1s linear infinite'
                 }} />
               )}
             </div>
