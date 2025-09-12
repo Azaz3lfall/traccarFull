@@ -1762,7 +1762,7 @@ const MainPage = () => {
             style={{
               position: 'fixed',
               top: eventsButtonRef ? eventsButtonRef.getBoundingClientRect().top + 'px' : '60px', // Align with events button top
-              right: '50px', // 8px control bar + 30px offset + 12px popover margin
+              right: '65px', // 8px control bar + 30px offset + 15px additional + 12px popover margin
               width: '300px',
               maxHeight: '400px',
               backgroundColor: 'white',
@@ -1910,7 +1910,7 @@ const MainPage = () => {
             style={{
               position: 'fixed',
               top: mapSwitcherRef ? mapSwitcherRef.getBoundingClientRect().top + 'px' : '60px', // Align with map switcher button top
-              right: '50px', // 8px control bar + 30px offset + 12px popover margin
+              right: '65px', // 8px control bar + 30px offset + 15px additional + 12px popover margin
               width: '280px',
               maxHeight: '300px',
               backgroundColor: 'white',
