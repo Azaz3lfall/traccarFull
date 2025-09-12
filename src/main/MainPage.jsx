@@ -233,7 +233,6 @@ const MainPage = () => {
         <MainMap
           filteredPositions={filteredPositions}
           selectedPosition={selectedPosition}
-          onEventsClick={onEventsClick}
           onMapClick={onMapClick}
         />
       )}
@@ -244,7 +243,6 @@ const MainPage = () => {
               <MainMap
                 filteredPositions={filteredPositions}
                 selectedPosition={selectedPosition}
-                onEventsClick={onEventsClick}
                 onMapClick={onMapClick}
               />
             </div>
