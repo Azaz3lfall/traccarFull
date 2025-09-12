@@ -45,6 +45,7 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
+import { useTheme, useThemeColors } from '../common/components/ThemeProvider';
 import ReactCountryFlag from 'react-country-flag';
 import { Box } from '@mui/material';
 import { 
@@ -319,6 +320,10 @@ const MainPage = () => {
     name: values[1].name 
   }));
   
+  // Theme functionality
+  const { themes, theme, setLocalTheme } = useTheme();
+  const colors = useThemeColors();
+  
   // User and server data
   const user = useSelector((state) => state.session.user);
   const server = useSelector((state) => state.session.server);
@@ -478,7 +483,7 @@ const MainPage = () => {
           left: '8px',
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
-          backgroundColor: '#1F2937',
+          backgroundColor: colors.surface,
           borderRadius: (isDeviceListVisible || selectedDeviceId) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
@@ -486,7 +491,9 @@ const MainPage = () => {
           padding: '16px 0',
           gap: '0px',
           transition: 'width 0.3s ease, border-radius 0.3s ease',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          border: `1px solid ${colors.border}`,
+          boxShadow: `0 4px 12px ${colors.shadow}`
         }}>
           {/* Toggle Menu Button - First Option */}
           <div style={{
@@ -504,12 +511,12 @@ const MainPage = () => {
             setIsMenuExpanded(!isMenuExpanded);
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#374151';
+            e.currentTarget.style.backgroundColor = colors.hover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}>
-            {isMenuExpanded ? <ChevronLeft size={18} color="white" /> : <ChevronRight size={18} color="white" />}
+            {isMenuExpanded ? <ChevronLeft size={18} color={colors.text} /> : <ChevronRight size={18} color={colors.text} />}
           </div>
           
           {/* Device List Toggle Button */}
@@ -531,7 +538,7 @@ const MainPage = () => {
             setIsDeviceListVisible(!isDeviceListVisible);
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#374151';
+            e.currentTarget.style.backgroundColor = colors.hover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -542,8 +549,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.surface};
+                color: ${colors.text};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -551,7 +558,8 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: 0 4px 12px ${colors.shadow};
+                border: 1px solid ${colors.border};
               `;
               document.body.appendChild(tooltip);
             }
@@ -563,11 +571,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <Truck size={18} color={isDeviceListVisible ? "white" : "#6B7280"} />
+            <Truck size={18} color={isDeviceListVisible ? colors.text : colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: isDeviceListVisible ? 'white' : '#6B7280',
+                color: isDeviceListVisible ? colors.text : colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1829,7 +1837,7 @@ const MainPage = () => {
         right: '8px', // 8px from right edge
         width: '50px',
         height: 'auto',
-        backgroundColor: '#1F2937',
+        backgroundColor: colors.surface,
         borderRadius: '16px',
         display: 'flex',
         flexDirection: 'column',
@@ -1837,7 +1845,8 @@ const MainPage = () => {
         justifyContent: 'flex-start',
         padding: '8px 0',
         zIndex: 9999,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        boxShadow: `0 4px 12px ${colors.shadow}`,
+        border: `1px solid ${colors.border}`,
         gap: '8px'
       }}>
         <button 

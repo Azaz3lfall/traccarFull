@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
 import store from './store';
 import { LocalizationProvider } from './common/components/LocalizationProvider';
+import { ThemeProvider } from './common/components/ThemeProvider';
 import ErrorHandler from './common/components/ErrorHandler';
 import Navigation from './Navigation';
 import preloadImages from './map/core/preloadImages';
@@ -20,18 +21,20 @@ root.render(
   <ErrorBoundary>
     <Provider store={store}>
       <LocalizationProvider>
-        <StyledEngineProvider injectFirst>
-          <AppThemeProvider>
-            <CssBaseline />
-            <ServerProvider>
-              <BrowserRouter>
-                <Navigation />
-              </BrowserRouter>
-              <ErrorHandler />
-              <NativeInterface />
-            </ServerProvider>
-          </AppThemeProvider>
-        </StyledEngineProvider>
+        <ThemeProvider>
+          <StyledEngineProvider injectFirst>
+            <AppThemeProvider>
+              <CssBaseline />
+              <ServerProvider>
+                <BrowserRouter>
+                  <Navigation />
+                </BrowserRouter>
+                <ErrorHandler />
+                <NativeInterface />
+              </ServerProvider>
+            </AppThemeProvider>
+          </StyledEngineProvider>
+        </ThemeProvider>
       </LocalizationProvider>
     </Provider>
   </ErrorBoundary>,
