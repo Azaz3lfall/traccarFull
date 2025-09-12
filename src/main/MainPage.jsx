@@ -1655,6 +1655,12 @@ const MainPage = () => {
         }}
         onMouseLeave={(e) => {
           e.target.style.backgroundColor = 'transparent';
+        }}
+        onMouseDown={(e) => {
+          e.target.style.backgroundColor = '#374151';
+        }}
+        onMouseUp={(e) => {
+          e.target.style.backgroundColor = '#374151';
         }}>
           <Avatar style={{ width: '28px', height: '28px' }}>
             {user?.attributes?.avatar && (
@@ -1693,6 +1699,12 @@ const MainPage = () => {
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
           }}>
           <NotificationsOutlinedIcon style={{ fontSize: 22 }} />
           {eventsCount > 0 && (
@@ -1746,6 +1758,12 @@ const MainPage = () => {
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
           }}>
           <Map style={{ fontSize: 18 }} />
         </button>
