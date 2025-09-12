@@ -30,7 +30,7 @@ import { Card } from './ui/card';
 
 dayjs.extend(relativeTime);
 
-const FloatingStatusCard = ({ desktop }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) => {
   const dispatch = useDispatch();
   const t = useTranslation();
   
@@ -175,18 +175,19 @@ const FloatingStatusCard = ({ desktop }) => {
           position: 'fixed',
           top: !desktop ? 'auto' : '8px',
           bottom: !desktop ? '0px' : 'auto',
-          left: !desktop ? '0px' : '370px',
+          left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '290px',
           height: !desktop ? '50vh' : 'calc(100vh - 16px)',
           zIndex: 9998,
-          pointerEvents: 'auto'
+          pointerEvents: 'auto',
+          transition: 'left 0.3s ease'
         }}
       >
         <Card style={{
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 16px 16px 0px',
+          borderRadius: !desktop ? '16px 16px 0px 0px' : (isDeviceListVisible ? '0px 16px 16px 0px' : '0px 16px 16px 0px'),
           backgroundColor: 'white',
           border: '1px solid #E5E7EB',
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',

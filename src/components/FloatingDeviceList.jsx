@@ -41,7 +41,9 @@ const FloatingDeviceList = ({
   setFilterSort, 
   filterMap, 
   setFilterMap,
-  desktop
+  desktop,
+  isMenuExpanded,
+  isVisible
 }) => {
   console.log('FloatingDeviceList rendering', { filteredDevices: filteredDevices?.length });
   
@@ -456,21 +458,22 @@ const FloatingDeviceList = ({
   
   return (
     <AnimatePresence mode="wait">
-      {!(!desktop && !showOnMobile) && (
+      {!(!desktop && !showOnMobile) && isVisible && (
         <motion.div
           key="floating-device-list"
           initial={{ x: -400, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
       style={{
         position: 'fixed',
         top: !desktop ? '0px' : '8px',
-        left: !desktop ? '0px' : '63px',
+        left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
         width: !desktop ? '100vw' : '310px',
         height: !desktop ? '100vh' : 'calc(100vh - 16px)',
         zIndex: 9999,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        transition: 'left 0.3s ease'
       }}
     >
       <Card style={{
