@@ -22,6 +22,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
   Loader2,
   Settings
 } from 'lucide-react';
@@ -165,17 +166,18 @@ const FloatingStatusCard = ({ desktop }) => {
     <AnimatePresence mode="wait">
       {selectedDeviceId && device && (
         <motion.div
-          key={selectedDeviceId}
+          key={`status-card-${selectedDeviceId}`}
           initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
           exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: 'fixed',
-          top: !desktop ? '16px' : '8px',
-          left: !desktop ? '16px' : '370px',
-          width: !desktop ? 'calc(100vw - 32px)' : '290px',
-          height: !desktop ? '20vh' : 'calc(100vh - 16px)',
+          top: !desktop ? 'auto' : '8px',
+          bottom: !desktop ? '0px' : 'auto',
+          left: !desktop ? '0px' : '370px',
+          width: !desktop ? '100vw' : '290px',
+          height: !desktop ? '50vh' : 'calc(100vh - 16px)',
           zIndex: 9998,
           pointerEvents: 'auto'
         }}
@@ -184,30 +186,162 @@ const FloatingStatusCard = ({ desktop }) => {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: !desktop ? '16px' : '0px 16px 16px 0px',
+          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 16px 16px 0px',
           backgroundColor: 'white',
           border: '1px solid #E5E7EB',
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}>
+          {/* Back Button */}
+          <button
+            onClick={() => dispatch(devicesActions.selectId(null))}
+            style={{
+              position: 'absolute',
+              top: !desktop ? '8px' : '12px',
+              left: !desktop ? '2px' : '12px',
+              zIndex: 10,
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+            }}
+          >
+            <ChevronLeft size={20} color="#6B7280" />
+          </button>
+          
           {/* Header */}
           <div style={{
             padding: '20px',
             borderBottom: '1px solid #E5E7EB',
             backgroundColor: 'white'
           }}>
-            {/* Device Name */}
-            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-              <h3 style={{
-                fontSize: '20px',
-                fontWeight: '700',
-                color: '#111827',
-                margin: 0,
-                lineHeight: '1.2'
-              }}>
-                {device[devicePrimary]}
-              </h3>
-            </div>
+            {!desktop ? (
+              /* Mobile Layout - 2 Columns */
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                {/* Column 1: Picture and Speed */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', minWidth: '80px' }}>
+                  {/* Device Image */}
+                  <div style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F3F4F6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    border: '2px solid #E5E7EB'
+                  }}>
+                    <img 
+                      style={{ 
+                        width: '60px', 
+                        height: '60px', 
+                        objectFit: 'cover', 
+                        borderRadius: '50%',
+                        display: device.attributes?.deviceImage ? 'block' : 'none'
+                      }} 
+                      src={device.attributes?.deviceImage ? `/api/media/${device.uniqueId}/${device.attributes.deviceImage}` : ''} 
+                      alt=""
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    <div style={{
+                      width: '60px',
+                      height: '60px',
+                      display: device.attributes?.deviceImage ? 'none' : 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: '#E5E7EB',
+                      borderRadius: '50%'
+                    }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 16L8.586 11.414C9.367 10.633 10.633 10.633 11.414 11.414L16 16M14 14L15.586 12.414C16.367 11.633 17.633 11.633 18.414 12.414L20 14M14 8H14.01M6 20H18C19.105 20 20 19.105 20 18V6C20 4.895 19.105 4 18 4H6C4.895 4 4 4.895 4 6V18C4 19.105 4.895 20 6 20Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {/* Speed */}
+                  {position && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Gauge size={12} color="#6B7280" />
+                      <span style={{ fontSize: '11px', color: '#6B7280', fontWeight: '500' }}>
+                        {position.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Column 2: Device Name, Status, Address */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {/* Device Name and Status on same line */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827',
+                      margin: 0,
+                      lineHeight: '1.2',
+                      flex: 1
+                    }}>
+                      {device[devicePrimary]}
+                    </h3>
+                    
+                    {/* Status */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: getStatusColor(device.status)
+                      }} />
+                      <span style={{ fontSize: '12px', color: '#9CA3AF', fontWeight: '500' }}>
+                        {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6B7280',
+                    margin: 0,
+                    lineHeight: '1.4'
+                  }}>
+                    {position?.address || (position?.latitude && position?.longitude ?
+                      `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` :
+                      t('sharedNoData'))}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* Desktop Layout - Original */
+              <>
+                {/* Device Name */}
+                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                  <h3 style={{
+                    fontSize: '20px',
+                    fontWeight: '700',
+                    color: '#111827',
+                    margin: 0,
+                    lineHeight: '1.2'
+                  }}>
+                    {device[devicePrimary]}
+                  </h3>
+                </div>
 
             {/* Device Image */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
@@ -296,6 +430,8 @@ const FloatingStatusCard = ({ desktop }) => {
                   t('sharedNoData'))}
               </p>
             </div>
+              </>
+            )}
             
             {/* Action Buttons */}
             <div style={{ 
@@ -303,7 +439,8 @@ const FloatingStatusCard = ({ desktop }) => {
               alignItems: 'center', 
               justifyContent: 'space-between',
               gap: '8px',
-              width: '100%'
+              width: '100%',
+              marginTop: !desktop ? '12px' : '0px'
             }}>
               {/* Button 1 - Lock/Unlock (Green) */}
               <button
@@ -629,22 +766,24 @@ const FloatingStatusCard = ({ desktop }) => {
             padding: '16px',
             overflow: 'auto'
           }}>
-            {/* Horizontal Line */}
-            <div style={{
-              height: '1px',
-              backgroundColor: '#E5E7EB',
-              marginBottom: '16px'
-            }} />
+            {/* Horizontal Line - Desktop only */}
+            {desktop && (
+              <div style={{
+                height: '1px',
+                backgroundColor: '#E5E7EB',
+                marginBottom: '16px'
+              }} />
+            )}
             
             {/* Position Attributes */}
             {position && (
               <div style={{ marginBottom: '16px' }}>
-                {positionItems.split(',').filter((key) => key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key) => {
+                {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
                   const attributeName = positionAttributes[key]?.name || key;
                   const value = position.hasOwnProperty(key) ? position[key] : position.attributes[key];
                   
                   return (
-                    <div key={key} style={{
+                    <div key={`position-${key || 'empty'}-${index}`} style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -873,10 +1012,10 @@ const FloatingStatusCard = ({ desktop }) => {
                       
                       <div style={{ maxHeight: '300px', overflowY: 'auto', overflowX: 'hidden' }}>
                         {/* Position Properties */}
-                        {Object.getOwnPropertyNames(detailedPosition).filter((it) => it !== 'attributes').map((property) => {
+                        {Object.getOwnPropertyNames(detailedPosition).filter((it) => it && it !== 'attributes').map((property, propIndex) => {
                           const value = detailedPosition[property];
                           return (
-                            <div key={property} style={{
+                            <div key={`property-${property || 'empty'}-${propIndex}`} style={{
                               display: 'grid',
                               gridTemplateColumns: '20% 20% 60%',
                               gap: '16px',
@@ -922,6 +1061,8 @@ const FloatingStatusCard = ({ desktop }) => {
                                     value || t('sharedUnknown') :
                                   value !== null && value !== undefined && typeof value === 'number' ? 
                                     formatNumber(value, 2) :
+                                  value !== null && value !== undefined && typeof value === 'object' ? 
+                                    JSON.stringify(value) :
                                     value || t('sharedUnknown')}
                               </div>
                               {!deviceReadonly && (property === 'totalDistance' || property === 'hours') && (
@@ -967,10 +1108,10 @@ const FloatingStatusCard = ({ desktop }) => {
                         })}
                         
                         {/* Position Attributes */}
-                        {Object.getOwnPropertyNames(detailedPosition.attributes).map((attribute) => {
+                        {Object.getOwnPropertyNames(detailedPosition.attributes).filter((attr) => attr).map((attribute, attrIndex) => {
                           const value = detailedPosition.attributes[attribute];
                           return (
-                            <div key={attribute} style={{
+                            <div key={`attribute-${attribute || 'empty'}-${attrIndex}`} style={{
                               display: 'grid',
                               gridTemplateColumns: '20% 20% 60%',
                               gap: '16px',
@@ -1016,6 +1157,8 @@ const FloatingStatusCard = ({ desktop }) => {
                                     value || t('sharedUnknown') :
                                   value !== null && value !== undefined && typeof value === 'number' ? 
                                     formatNumber(value, 2) :
+                                  value !== null && value !== undefined && typeof value === 'object' ? 
+                                    JSON.stringify(value) :
                                     value || t('sharedUnknown')}
                               </div>
                               {!deviceReadonly && (attribute === 'totalDistance' || attribute === 'hours') && (

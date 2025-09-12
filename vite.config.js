@@ -11,6 +11,7 @@ export default defineConfig(() => {
   
   return {
     server: {
+      allowedHosts: ['cloud.absmultipla.com.br', "75768c9e2b08.ngrok-free.app"],
       port: 3000,
       proxy: {
         '/api/socket': WS_BASE_URL,

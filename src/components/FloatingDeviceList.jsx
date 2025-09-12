@@ -6,7 +6,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-// import { FixedSizeList } from 'react-window';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
@@ -48,8 +48,8 @@ const FloatingDeviceList = ({
   const dispatch = useDispatch();
   const t = useTranslation();
   
-  const groups = useSelector((state) => state.groups.items);
-  const devices = useSelector((state) => state.devices.items);
+  const groups = useSelector((state) => state.groups.items || {});
+  const devices = useSelector((state) => state.devices.items || {});
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   
   const [showFilters, setShowFilters] = useState(false);
@@ -57,11 +57,21 @@ const FloatingDeviceList = ({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const filterButtonRef = useRef(null);
   const filterPopupRef = useRef(null);
   const sortDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
   const groupsDropdownRef = useRef(null);
+  const parentRef = useRef(null);
+  
+  // Handle window resize for proper virtualization height
+  React.useEffect(() => {
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   const deviceSecondary = useAttributePreference('deviceSecondary', '');
@@ -69,7 +79,12 @@ const FloatingDeviceList = ({
   const distanceUnit = useAttributePreference('distanceUnit');
   const coordinateFormat = usePreference('coordinateFormat');
   
-  const deviceStatusCount = useCallback((status) => Object.values(devices).filter((d) => d.status === status).length, [devices]);
+  const deviceStatusCount = useCallback((status) => {
+    if (!devices || typeof devices !== 'object' || devices === null) {
+      return 0;
+    }
+    return Object.values(devices).filter((d) => d.status === status).length;
+  }, [devices]);
 
   // Multi-select helpers
   const toggleStatus = useCallback((status) => {
@@ -175,10 +190,14 @@ const FloatingDeviceList = ({
 
   // Memoized device row component for virtualized rendering
   const DeviceRow = useCallback(({ index, style, data }) => {
+    if (!data || !data.devices || !Array.isArray(data.devices) || index >= data.devices.length || !data.devices[index]) {
+      return <div style={style} />;
+    }
+  
     const device = data.devices[index];
-    const position = data.positions.find(p => p.deviceId === device.id);
+    const position = data.positions?.find(p => p.deviceId === device.id) || null;
     const isSelected = data.selectedDeviceId === device.id;
-    
+  
     return (
       <div style={style}>
         <motion.div
@@ -193,20 +212,19 @@ const FloatingDeviceList = ({
               borderRadius: '12px',
               border: isSelected ? '2px solid #3B82F6' : '1px solid #E5E7EB',
               boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-              margin: '4px 0 8px 0',
+              margin: '0',
               width: '100%',
               maxWidth: '100%',
               boxSizing: 'border-box'
             }}
             onClick={(e) => handleDeviceClick(device.id, e)}
           >
-            <div style={{ padding: '12px 0px 12px 0px' }}>
+            <div style={{ padding: '8px 0px 4px 0px' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '12px'
+                gap: '4px'
               }}>
-                {/* Device Icon with Speed */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -225,28 +243,22 @@ const FloatingDeviceList = ({
                   }}>
                     <img 
                       style={{ width: '24px', height: '24px' }} 
-                      src={mapIcons[mapIconKey(device.category)]} 
+                      src={mapIcons[mapIconKey(device.category)] || ''} 
                       alt="" 
                     />
                   </div>
-                  
-                  {/* Speed below icon */}
-                  {position && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '2px',
-                      fontSize: '10px',
-                      color: '#6B7280',
-                      marginTop: '8px'
-                    }}>
-                      <Gauge style={{ width: '10px', height: '10px' }} />
-                      <span>{position.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}</span>
-                    </div>
-                  )}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2px',
+                    fontSize: '10px',
+                    color: '#6B7280',
+                    marginTop: '8px'
+                  }}>
+                    <Gauge style={{ width: '10px', height: '10px' }} />
+                    <span>{position?.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}</span>
+                  </div>
                 </div>
-                
-                {/* Device Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
                     display: 'flex',
@@ -255,7 +267,7 @@ const FloatingDeviceList = ({
                     marginBottom: '4px'
                   }}>
                     <h3 style={{
-                      fontSize: '16px',
+                      fontSize: '12px',
                       fontWeight: '600',
                       color: '#6B7280',
                       margin: 0,
@@ -263,10 +275,8 @@ const FloatingDeviceList = ({
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
                     }}>
-                      {device[devicePrimary]}
+                      {device[devicePrimary] || 'Unknown'}
                     </h3>
-                    
-                    {/* Sensor Icons - Always visible */}
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
@@ -276,7 +286,6 @@ const FloatingDeviceList = ({
                       minWidth: !desktop ? '80px' : '60px',
                       paddingRight: '8px'
                     }}>
-                      {/* Alarm */}
                       <div style={{
                         width: !desktop ? '20px' : '16px',
                         height: !desktop ? '20px' : '16px',
@@ -290,8 +299,6 @@ const FloatingDeviceList = ({
                           color: position?.attributes?.alarm ? '#EF4444' : '#D1D5DB' 
                         }} />
                       </div>
-                      
-                      {/* Ignition */}
                       <div style={{
                         width: !desktop ? '20px' : '16px',
                         height: !desktop ? '20px' : '16px',
@@ -305,8 +312,6 @@ const FloatingDeviceList = ({
                           color: position?.attributes?.ignition ? '#10B981' : '#D1D5DB' 
                         }} />
                       </div>
-                      
-                      {/* Motion */}
                       <div style={{
                         width: !desktop ? '20px' : '16px',
                         height: !desktop ? '20px' : '16px',
@@ -321,8 +326,6 @@ const FloatingDeviceList = ({
                           backgroundColor: position?.attributes?.motion ? '#3B82F6' : '#D1D5DB'
                         }} />
                       </div>
-                      
-                      {/* Door */}
                       <div style={{
                         width: !desktop ? '20px' : '16px',
                         height: !desktop ? '20px' : '16px',
@@ -350,8 +353,6 @@ const FloatingDeviceList = ({
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Status Dot and Text - Below device name */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -362,7 +363,7 @@ const FloatingDeviceList = ({
                       width: '8px',
                       height: '8px',
                       borderRadius: '50%',
-                      backgroundColor: getStatusColor(device.status)
+                      backgroundColor: getStatusColor(device.status || 'unknown')
                     }} />
                     <span style={{
                       fontSize: '12px',
@@ -370,26 +371,28 @@ const FloatingDeviceList = ({
                       color: '#374151',
                       textTransform: 'capitalize'
                     }}>
-                      {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
+                      {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
                     </span>
                   </div>
-                  
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#6B7280',
-                    margin: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {position?.address || (position?.latitude && position?.longitude ? 
-                      `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` : 
-                      formatLastUpdate(device))}
-                  </p>
                 </div>
               </div>
-              
-              {/* Additional Info */}
+              <div style={{
+                paddingLeft: '8px',
+                paddingRight: '8px'
+              }}>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6B7280',
+                  margin: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {position?.address || (position?.latitude && position?.longitude ? 
+                    `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` : 
+                    t('sharedNoData'))}
+                </p>
+              </div>
               {position && position.attributes?.batteryLevel && (
                 <div style={{
                   marginTop: '12px',
@@ -400,7 +403,6 @@ const FloatingDeviceList = ({
                   color: '#6B7280'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {/* Battery */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {getBatteryIcon(position.attributes.batteryLevel)}
                       <span>{formatPercentage(position.attributes.batteryLevel)}</span>
@@ -413,14 +415,44 @@ const FloatingDeviceList = ({
         </motion.div>
       </div>
     );
-  }, [devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey]);
+  }, [devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
+  // Note: Data is now passed directly to List component for better performance
+  
+  // Don't render anything if we don't have proper data
+  if (!filteredDevices || !Array.isArray(filteredDevices)) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '200px',
+        color: '#6B7280'
+      }}>
+        <Search style={{ width: '32px', height: '32px', marginBottom: '8px' }} />
+        <p style={{ fontSize: '14px', margin: 0 }}>Loading devices...</p>
+      </div>
+    );
+  }
 
-  // Memoized data for virtualized list
-  const listData = useMemo(() => ({
-    devices: filteredDevices,
-    positions: positions,
-    selectedDeviceId: selectedDeviceId
-  }), [filteredDevices, positions, selectedDeviceId]);
+  // TanStack Virtual setup
+  const virtualizer = useVirtualizer({
+    count: filteredDevices.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 105, // Estimated height of each device row (no overlapping)
+    overscan: 5,
+  });
+
+  // Debug logging
+  console.log('Virtualizer debug:', {
+    totalSize: virtualizer.getTotalSize(),
+    virtualItems: virtualizer.getVirtualItems().map(item => ({
+      index: item.index,
+      start: item.start,
+      size: item.size,
+      end: item.end
+    }))
+  });
   
   return (
     <AnimatePresence mode="wait">
@@ -926,21 +958,53 @@ const FloatingDeviceList = ({
           }}
           onClick={handleContainerClick}
         >
-          {filteredDevices.length > 0 ? (
-            <div style={{ 
-              height: !desktop ? 'calc(100vh - 80px)' : '400px', 
-              overflowY: 'auto',
-              width: '100%',
-              padding: '0px 16px 0px 16px'
-            }}>
-              {filteredDevices.map((device, index) => (
-                <DeviceRow 
-                  key={device.id} 
-                  index={index} 
-                  style={{}} 
-                  data={listData} 
-                />
-              ))}
+          {filteredDevices && Array.isArray(filteredDevices) && filteredDevices.length > 0 ? (
+            <div 
+              ref={parentRef}
+              style={{ 
+                height: !desktop ? 'calc(100vh - 80px)' : '100%', 
+                overflowY: 'auto',
+                width: '100%',
+                flex: 1,
+                padding: '0px 16px 0px 16px'
+              }}
+            >
+              <div
+                style={{
+                  height: `${virtualizer.getTotalSize()}px`,
+                  width: '100%',
+                  position: 'relative',
+                }}
+              >
+                {virtualizer.getVirtualItems().map((virtualItem) => {
+                  const device = filteredDevices[virtualItem.index];
+                  return (
+                    <div
+                      key={`device-${device.id || 'unknown'}-${virtualItem.index}`}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: `${virtualItem.size}px`,
+                        transform: `translateY(${virtualItem.start}px)`,
+                        padding: '0',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      <DeviceRow 
+                        index={virtualItem.index} 
+                        style={{}} 
+                        data={{
+                          devices: filteredDevices,
+                          positions: positions || [],
+                          selectedDeviceId: selectedDeviceId
+                        }} 
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div style={{
