@@ -229,7 +229,8 @@ const FloatingDeviceList = ({
             margin: '0',
             width: '100%',
             maxWidth: '100%',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            overflow: 'hidden'
           }}
           onClick={(e) => handleDeviceClick(device.id, e)}
           onMouseEnter={(e) => {
@@ -255,7 +256,8 @@ const FloatingDeviceList = ({
               margin: '0',
               width: '100%',
               maxWidth: '100%',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              overflow: 'hidden'
             }}
           >
             <div style={{ padding: '8px 0px 4px 0px', pointerEvents: 'none' }}>
