@@ -23,7 +23,8 @@ import {
   Map,
   Check,
   Plus,
-  Minus
+  Minus,
+  Compass
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -145,6 +146,13 @@ const MainPage = () => {
   const handleZoomOut = () => {
     if (map) {
       map.zoomOut();
+    }
+  };
+
+  // Reset bearing handler
+  const handleResetBearing = () => {
+    if (map) {
+      map.setBearing(0);
     }
   };
 
@@ -1830,7 +1838,7 @@ const MainPage = () => {
             width: '34px',
             height: '34px',
             borderRadius: '8px',
-            border: 'none !important',
+            border: 'none',
             backgroundColor: 'transparent',
             color: 'white',
             cursor: 'pointer',
@@ -1861,13 +1869,9 @@ const MainPage = () => {
           }}
           onFocus={(e) => {
             e.target.style.backgroundColor = '#374151';
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
           }}>
           <Plus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
@@ -1878,7 +1882,7 @@ const MainPage = () => {
             width: '34px',
             height: '34px',
             borderRadius: '8px',
-            border: 'none !important',
+            border: 'none',
             backgroundColor: 'transparent',
             color: 'white',
             cursor: 'pointer',
@@ -1909,15 +1913,55 @@ const MainPage = () => {
           }}
           onFocus={(e) => {
             e.target.style.backgroundColor = '#374151';
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
           }}
           onBlur={(e) => {
             e.target.style.backgroundColor = 'transparent';
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
           }}>
           <Minus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
+        </button>
+        
+        {/* Reset Bearing Button */}
+        <button 
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={handleResetBearing}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
+          <Compass style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
       </div>
       
