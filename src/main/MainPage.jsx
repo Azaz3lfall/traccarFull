@@ -2474,13 +2474,14 @@ const MainPage = () => {
                     e.target.style.backgroundColor = 'transparent';
                   }}
                 >
-                  {/* Device Name - Header */}
-                  <div style={{
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: colors.textSecondary,
-                    marginBottom: '4px'
-                  }}>
+                  <div style={{ pointerEvents: 'none' }}>
+                    {/* Device Name - Header */}
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.textSecondary,
+                      marginBottom: '4px'
+                    }}>
                     {getDeviceName(event.deviceId)}
                   </div>
                   
@@ -2513,6 +2514,7 @@ const MainPage = () => {
                     <span>
                       {formatTime(event.eventTime, 'seconds')}
                     </span>
+                  </div>
                   </div>
                 </div>
               ))
@@ -2699,15 +2701,16 @@ const MainPage = () => {
                       e.target.style.borderColor = 'transparent';
                     }}
                   >
-                    <div style={{
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: '4px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}>
+                    <div style={{ pointerEvents: 'none' }}>
+                      <div style={{
+                        color: colors.text,
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        marginBottom: '4px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
                       {result.properties?.name || result.properties?.display_name?.split(',')[0]}
                     </div>
                     <div style={{
@@ -2718,6 +2721,7 @@ const MainPage = () => {
                       textOverflow: 'ellipsis'
                     }}>
                       {result.properties?.display_name}
+                    </div>
                     </div>
                   </div>
                 ))}

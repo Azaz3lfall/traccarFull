@@ -258,7 +258,7 @@ const FloatingDeviceList = ({
               boxSizing: 'border-box'
             }}
           >
-            <div style={{ padding: '8px 0px 4px 0px' }}>
+            <div style={{ padding: '8px 0px 4px 0px', pointerEvents: 'none' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
