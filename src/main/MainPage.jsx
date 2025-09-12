@@ -26,7 +26,9 @@ import {
   Minus,
   Compass,
   MapPin,
-  Search
+  Search,
+  Sun,
+  Moon
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -2360,7 +2362,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#1F2937',
+                color: colors.text,
                 lineHeight: '1.3'
               }}>
 {t('reportEvents')} ({eventsCount})
@@ -2503,7 +2505,7 @@ const MainPage = () => {
                 margin: 0,
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#1F2937',
+                color: colors.text,
                 lineHeight: '1.3'
               }}>
                 {t('mapTitle')}
@@ -2594,7 +2596,7 @@ const MainPage = () => {
                   backgroundColor: '#F9FAFB',
                   border: '1px solid #D1D5DB',
                   borderRadius: '8px',
-                  color: '#1F2937',
+                  color: colors.text,
                   fontSize: '14px',
                   outline: 'none',
                   paddingRight: isSearching ? '40px' : '16px'
@@ -2650,7 +2652,7 @@ const MainPage = () => {
                     }}
                   >
                     <div style={{
-                      color: '#1F2937',
+                      color: colors.text,
                       fontSize: '14px',
                       fontWeight: '500',
                       marginBottom: '4px',
@@ -2770,7 +2772,7 @@ const MainPage = () => {
                   </Box>
                   <span style={{
                     fontSize: '13px',
-                    color: '#1F2937',
+                    color: colors.text,
                     fontWeight: language === lang.code ? '500' : '400'
                   }}>
                     {lang.name}
@@ -2800,63 +2802,109 @@ const MainPage = () => {
               right: '65px',
               top: userRef.getBoundingClientRect().top,
               width: '320px',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+              boxShadow: `0 8px 32px ${colors.shadow}`,
               zIndex: 10000,
               padding: '20px',
-              border: '1px solid #E5E7EB'
+              border: `1px solid ${colors.border}`
             }}
           >
             {/* User Header */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
               marginBottom: '16px',
               paddingBottom: '16px',
-              borderBottom: '1px solid #E5E7EB'
+              borderBottom: `1px solid ${colors.border}`
             }}>
-              <Avatar style={{ 
-                width: '48px', 
-                height: '48px', 
-                marginRight: '12px',
-                backgroundColor: '#6B7280'
-              }}>
-                {user?.attributes?.avatar && (
-                  <AvatarImage src={user.attributes.avatar} alt="User" />
-                )}
-                <AvatarFallback style={{ 
-                  backgroundColor: colors.textSecondary, 
-                  color: colors.text, 
-                  fontSize: '18px',
-                  fontWeight: '500'
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  marginRight: '12px',
+                  backgroundColor: '#6B7280'
                 }}>
-                  {getUserInitials(user)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 style={{
-                  color: '#1F2937',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  margin: '0 0 4px 0'
-                }}>
-                  {user?.name || t('sharedName')}
-                </h3>
-                <p style={{
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  margin: '0'
-                }}>
-                  {user?.email || t('userEmail')}
-                </p>
+                  {user?.attributes?.avatar && (
+                    <AvatarImage src={user.attributes.avatar} alt="User" />
+                  )}
+                  <AvatarFallback style={{ 
+                    backgroundColor: colors.textSecondary, 
+                    color: colors.text, 
+                    fontSize: '18px',
+                    fontWeight: '500'
+                  }}>
+                    {getUserInitials(user)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 style={{
+                    color: colors.text,
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    margin: '0 0 4px 0'
+                  }}>
+                    {user?.name || t('sharedName')}
+                  </h3>
+                  <p style={{
+                    color: colors.textSecondary,
+                    fontSize: '14px',
+                    margin: '0'
+                  }}>
+                    {user?.email || t('userEmail')}
+                  </p>
+                </div>
               </div>
+              
+              {/* Theme Toggle Button */}
+              <button
+                onClick={() => setLocalTheme(currentTheme === 'light' ? 'dark' : 'light')}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: colors.text,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s',
+                  outline: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+                onMouseDown={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                }}
+                onMouseUp={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                }}
+                onFocus={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                }}
+                onBlur={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+              >
+                {currentTheme === 'light' ? (
+                  <Moon size={20} color={colors.text} />
+                ) : (
+                  <Sun size={20} color={colors.text} />
+                )}
+              </button>
             </div>
             
             {/* User Details */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: '#1F2937',
+                color: colors.text,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2874,7 +2922,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>ID:</span>
-                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{user?.id || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -2902,7 +2950,7 @@ const MainPage = () => {
             {/* Server Information */}
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{
-                color: '#1F2937',
+                color: colors.text,
                 fontSize: '14px',
                 fontWeight: '600',
                 margin: '0 0 8px 0'
@@ -2920,7 +2968,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('settingsServerVersion')}:</span>
-                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{server?.version || t('sharedN/A')}</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -2928,7 +2976,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('deviceTitle')}:</span>
-                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{devices ? Object.keys(devices).length : 0}</span>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -2936,7 +2984,7 @@ const MainPage = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{t('reportPositions')}:</span>
-                  <span style={{ color: '#1F2937', fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
+                  <span style={{ color: colors.text, fontSize: '12px' }}>{positions ? Object.keys(positions).length : 0}</span>
                 </div>
               </div>
             </div>
@@ -2998,7 +3046,7 @@ const MainPage = () => {
                     flex: 1,
                     padding: '10px 16px',
                     backgroundColor: '#F3F4F6',
-                    color: '#1F2937',
+                    color: colors.text,
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     fontSize: '13px',
@@ -3087,7 +3135,7 @@ const MainPage = () => {
               <p style={{
                 margin: '0 0 20px 0',
                 fontSize: '16px',
-                color: '#1F2937',
+                color: colors.text,
                 lineHeight: '1.5'
               }}>
                 {t('confirmQuit')}
@@ -3104,7 +3152,7 @@ const MainPage = () => {
                     border: '1px solid #D1D5DB',
                     borderRadius: '6px',
                     backgroundColor: '#F3F4F6',
-                    color: '#1F2937',
+                    color: colors.text,
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',
