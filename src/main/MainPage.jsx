@@ -2789,32 +2789,66 @@ const MainPage = () => {
               gap: '8px',
               marginTop: '16px'
             }}>
-              <button
-                onClick={() => {
-                  setShowUserPopover(false);
-                  window.location.href = `/settings/user/${user.id}`;
-                }}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  backgroundColor: '#374151',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#4B5563';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#374151';
-                }}
-              >
-                {t('settingsUser')}
-              </button>
+              {/* Account and Logout on same line */}
+              <div style={{
+                display: 'flex',
+                gap: '8px'
+              }}>
+                <button
+                  onClick={() => {
+                    setShowUserPopover(false);
+                    window.location.href = `/settings/user/${user.id}`;
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    backgroundColor: '#374151',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#4B5563';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#374151';
+                  }}
+                >
+                  {t('settingsUser')}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUserPopover(false);
+                    setShowLogoutModal(true);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    backgroundColor: '#EF4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#DC2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#EF4444';
+                  }}
+                >
+                  {t('loginLogout')}
+                </button>
+              </div>
+              
+              {/* Billing full width below */}
               <button
                 onClick={() => {
                   setShowUserPopover(false);
@@ -2849,33 +2883,7 @@ const MainPage = () => {
               >
                 {t('userBilling')}
               </button>
-              <button
-                onClick={() => {
-                  setShowUserPopover(false);
-                  setShowLogoutModal(true);
-                }}
-                style={{
-                  width: '100%',
-                  padding: '10px 16px',
-                  backgroundColor: '#EF4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#DC2626';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#EF4444';
-                }}
-              >
-                {t('loginLogout')}
-              </button>
-          </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
