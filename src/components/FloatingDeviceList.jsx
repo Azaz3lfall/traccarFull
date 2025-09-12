@@ -53,16 +53,6 @@ const FloatingDeviceList = ({
   const t = useTranslation();
   const colors = useThemeColors();
   
-  // Force re-render when colors change
-  useEffect(() => {
-    setForceUpdate(prev => prev + 1);
-  }, [colors.background, colors.surface, colors.text, colors.border]);
-
-  // Create a key that changes when theme changes to force virtualizer re-mount
-  const virtualizerContainerKey = useMemo(() => {
-    return `virtualizer-${forceUpdate}-${colors.background}-${colors.surface}-${colors.text}`;
-  }, [forceUpdate, colors.background, colors.surface, colors.text]);
-  
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
@@ -74,6 +64,16 @@ const FloatingDeviceList = ({
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [forceUpdate, setForceUpdate] = useState(0);
+  
+  // Force re-render when colors change
+  useEffect(() => {
+    setForceUpdate(prev => prev + 1);
+  }, [colors.background, colors.surface, colors.text, colors.border]);
+
+  // Create a key that changes when theme changes to force virtualizer re-mount
+  const virtualizerContainerKey = useMemo(() => {
+    return `virtualizer-${forceUpdate}-${colors.background}-${colors.surface}-${colors.text}`;
+  }, [forceUpdate, colors.background, colors.surface, colors.text]);
   const filterButtonRef = useRef(null);
   const filterPopupRef = useRef(null);
   const sortDropdownRef = useRef(null);
