@@ -212,6 +212,34 @@ const MapView = ({ children }) => {
     switcher.updateStyles(styles, defaultMapStyle);
   }, [mapStyles, defaultMapStyle, activeMapStyles, switcher]);
 
+  // Apply map style changes directly to the map
+  useEffect(() => {
+    if (map && defaultMapStyle) {
+      const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
+      const selectedStyle = filteredStyles.find((s) => s.id === defaultMapStyle);
+      
+      if (selectedStyle && selectedStyle.style) {
+        updateReadyValue(false);
+        map.setStyle(selectedStyle.style, { diff: false });
+        if (selectedStyle.transformRequest) {
+          map.setTransformRequest(selectedStyle.transformRequest);
+        }
+        
+        map.once('styledata', () => {
+          const waiting = () => {
+            if (!map.loaded()) {
+              setTimeout(waiting, 33);
+            } else {
+              initMap();
+              updateReadyValue(true);
+            }
+          };
+          waiting();
+        });
+      }
+    }
+  }, [defaultMapStyle, map, mapStyles, activeMapStyles]);
+
   useEffect(() => {
     const listener = (ready) => setMapReady(ready);
     addReadyListener(listener);
