@@ -190,8 +190,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
           display: 'flex',
           flexDirection: 'column',
           borderRadius: !desktop ? '16px 16px 0px 0px' : (isDeviceListVisible ? '0px 16px 16px 0px' : '0px 16px 16px 0px'),
-          backgroundColor: 'white',
-          border: '1px solid #E5E7EB',
+          backgroundColor: colors.surface,
+          border: `1px solid ${colors.border}`,
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
           overflow: 'hidden',
           position: 'relative'
@@ -221,14 +221,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               e.target.style.transform = 'scale(1)';
             }}
           >
-            <ChevronLeft size={20} color="#6B7280" />
+            <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
           
           {/* Header */}
           <div style={{
             padding: '20px',
-            borderBottom: '1px solid #E5E7EB',
-            backgroundColor: 'white'
+            borderBottom: `1px solid ${colors.border}`,
+            backgroundColor: colors.surface
           }}>
             {!desktop ? (
               /* Mobile Layout - 2 Columns */
@@ -240,7 +240,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     width: '60px',
                     height: '60px',
                     borderRadius: '50%',
-                    backgroundColor: '#F3F4F6',
+                    backgroundColor: colors.secondary,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -280,8 +280,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   {/* Speed */}
                   {position && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Gauge size={12} color="#6B7280" />
-                      <span style={{ fontSize: '11px', color: '#6B7280', fontWeight: '500' }}>
+                      <Gauge size={12} color={colors.textSecondary} />
+                      <span style={{ fontSize: '11px', color: colors.textSecondary, fontWeight: '500' }}>
                         {position.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}
                       </span>
                     </div>
@@ -311,7 +311,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                         borderRadius: '50%',
                         backgroundColor: getStatusColor(device.status)
                       }} />
-                      <span style={{ fontSize: '12px', color: '#9CA3AF', fontWeight: '500' }}>
+                      <span style={{ fontSize: '12px', color: colors.textSecondary, fontWeight: '500' }}>
                         {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
                       </span>
                     </div>
@@ -320,7 +320,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   {/* Address */}
                   <p style={{
                     fontSize: '12px',
-                    color: '#6B7280',
+                    color: colors.textSecondary,
                     margin: 0,
                     lineHeight: '1.4'
                   }}>
@@ -352,7 +352,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 width: '120px',
                 height: '120px',
                 borderRadius: '50%',
-                backgroundColor: '#F3F4F6',
+                        backgroundColor: colors.secondary,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -402,7 +402,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       borderRadius: '50%',
                       backgroundColor: getStatusColor(device.status)
                     }} />
-                    <span style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                    <span style={{ fontSize: '12px', color: colors.textSecondary }}>
                       {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
                     </span>
                   </div>
@@ -410,8 +410,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   {/* Speed */}
                   {position && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Gauge size={14} color="#6B7280" />
-                      <span style={{ fontSize: '12px', color: '#6B7280' }}>
+                      <Gauge size={14} color={colors.textSecondary} />
+                      <span style={{ fontSize: '12px', color: colors.textSecondary }}>
                         {position.speed ? formatSpeed(position.speed, speedUnit, t) : formatSpeed(0, speedUnit, t)}
                       </span>
                     </div>
@@ -424,7 +424,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             <div style={{ textAlign: 'left', marginBottom: '16px' }}>
               <p style={{
                 fontSize: '12px',
-                color: '#6B7280',
+                color: colors.textSecondary,
                 margin: 0,
                 lineHeight: '1.4'
               }}>
@@ -452,7 +452,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -461,11 +461,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -495,7 +495,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -504,11 +504,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -538,7 +538,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -547,11 +547,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -590,7 +590,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -599,11 +599,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -668,7 +668,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -677,11 +677,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -714,7 +714,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   height: '40px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: '#F3F4F6',
+                  backgroundColor: colors.secondary,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -723,11 +723,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#E5E7EB';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#F3F4F6';
+                  e.target.style.backgroundColor = colors.secondary;
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
@@ -773,7 +773,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             {desktop && (
               <div style={{
                 height: '1px',
-                backgroundColor: '#E5E7EB',
+                backgroundColor: colors.border,
                 marginBottom: '16px'
               }} />
             )}
@@ -795,7 +795,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     }}>
                       <span style={{
                         fontSize: '14px',
-                        color: '#6B7280',
+                        color: colors.textSecondary,
                         fontWeight: '500'
                       }}>
                         {attributeName}
@@ -807,7 +807,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       }}>
                         <span style={{
                           fontSize: '14px',
-                          color: '#374151'
+                          color: colors.text
                         }}>
                           {key === 'fixTime' || key === 'deviceTime' || key === 'serverTime' ? 
                             formatTime(value, 'seconds') :
@@ -856,21 +856,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               padding: '2px'
                             }}
                             onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = '#F3F4F6';
-                              e.target.style.borderColor = '#9CA3AF';
+                              e.target.style.backgroundColor = colors.secondary;
+                              e.target.style.borderColor = colors.border;
                             }}
                             onMouseLeave={(e) => {
                               e.target.style.backgroundColor = 'transparent';
-                              e.target.style.borderColor = '#D1D5DB';
+                              e.target.style.borderColor = colors.border;
                             }}
                             onMouseDown={(e) => {
-                              e.target.style.backgroundColor = '#E5E7EB';
+                              e.target.style.backgroundColor = colors.hover;
                             }}
                             onMouseUp={(e) => {
-                              e.target.style.backgroundColor = '#F3F4F6';
+                              e.target.style.backgroundColor = colors.secondary;
                             }}
                           >
-                            <Settings size={14} color="#6B7280" />
+                            <Settings size={14} color={colors.textSecondary} />
                           </button>
                         )}
                       </div>
@@ -945,7 +945,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     height: '32px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: '#F3F4F6',
+                    backgroundColor: colors.secondary,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -978,7 +978,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     padding: '40px 20px',
                     gap: '16px'
                   }}>
-                    <Loader2 size={32} color="#6B7280" style={{ animation: 'spin 1s linear infinite' }} />
+                    <Loader2 size={32} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
                   </div>
                 ) : detailedPosition ? (
                   <div>
@@ -993,9 +993,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       boxSizing: 'border-box'
                     }}>
                       <div style={{
-                        backgroundColor: '#F3F4F6',
+                        backgroundColor: colors.secondary,
                         padding: '12px 16px',
-                        borderBottom: '1px solid #E5E7EB'
+                        borderBottom: `1px solid ${colors.border}`
                       }}>
                         <div style={{
                           display: 'grid',
@@ -1003,7 +1003,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                           gap: '16px',
                           fontSize: '11px',
                           fontWeight: '600',
-                          color: '#6B7280',
+                          color: colors.textSecondary,
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em'
                         }}>
@@ -1088,21 +1088,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                     padding: '2px'
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = '#F3F4F6';
-                                    e.target.style.borderColor = '#9CA3AF';
+                                    e.target.style.backgroundColor = colors.secondary;
+                                    e.target.style.borderColor = colors.border;
                                   }}
                                   onMouseLeave={(e) => {
                                     e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.borderColor = '#D1D5DB';
+                                    e.target.style.borderColor = colors.border;
                                   }}
                                   onMouseDown={(e) => {
-                                    e.target.style.backgroundColor = '#E5E7EB';
+                                    e.target.style.backgroundColor = colors.hover;
                                   }}
                                   onMouseUp={(e) => {
-                                    e.target.style.backgroundColor = '#F3F4F6';
+                                    e.target.style.backgroundColor = colors.secondary;
                                   }}
                                 >
-                                  <Settings size={14} color="#6B7280" />
+                                  <Settings size={14} color={colors.textSecondary} />
                                 </button>
                               )}
                             </div>
@@ -1184,21 +1184,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                     padding: '2px'
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = '#F3F4F6';
-                                    e.target.style.borderColor = '#9CA3AF';
+                                    e.target.style.backgroundColor = colors.secondary;
+                                    e.target.style.borderColor = colors.border;
                                   }}
                                   onMouseLeave={(e) => {
                                     e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.borderColor = '#D1D5DB';
+                                    e.target.style.borderColor = colors.border;
                                   }}
                                   onMouseDown={(e) => {
-                                    e.target.style.backgroundColor = '#E5E7EB';
+                                    e.target.style.backgroundColor = colors.hover;
                                   }}
                                   onMouseUp={(e) => {
-                                    e.target.style.backgroundColor = '#F3F4F6';
+                                    e.target.style.backgroundColor = colors.secondary;
                                   }}
                                 >
-                                  <Settings size={14} color="#6B7280" />
+                                  <Settings size={14} color={colors.textSecondary} />
                                 </button>
                               )}
                             </div>
