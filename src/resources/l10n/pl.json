@@ -195,6 +195,8 @@
     "userTermsPrompt": "Klikając Akceptuj, zgadzasz się z naszymi Warunkami Korzystania i potwierdzasz, że przeczytałeś naszą Politykę Prywatności",
     "userTermsAccepted": "Warunki Zaakceptowane",
     "userBilling": "Rozliczenie",
+    "confirmQuit": "Czy na pewno chcesz się wylogować?",
+    "showHideDevices": "Pokaż Listę Urządzeń",
     "loginTitle": "Login",
     "loginLanguage": "Język",
     "loginReset": "Zresetuj hasło",
