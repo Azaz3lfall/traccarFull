@@ -453,15 +453,18 @@ const FloatingDeviceList = ({
     );
   }
 
-  // TanStack Virtual setup - wrapped in useMemo to re-render when colors change
-  const virtualizer = useMemo(() => {
-    return useVirtualizer({
-      count: filteredDevices.length,
-      getScrollElement: () => parentRef.current,
-      estimateSize: () => 105, // Estimated height of each device row (no overlapping)
-      overscan: 5,
-    });
-  }, [filteredDevices.length, colors]);
+  // TanStack Virtual setup
+  const virtualizer = useVirtualizer({
+    count: filteredDevices.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 105, // Estimated height of each device row (no overlapping)
+    overscan: 5,
+  });
+
+  // Create a key that changes when colors change to force re-render
+  const virtualizerKey = useMemo(() => {
+    return `virtualizer-${filteredDevices.length}-${colors.background}-${colors.surface}-${colors.text}`;
+  }, [filteredDevices.length, colors.background, colors.surface, colors.text]);
 
   // Debug logging
   console.log('Virtualizer debug:', {
@@ -991,6 +994,7 @@ const FloatingDeviceList = ({
               }}
             >
               <div
+                key={virtualizerKey}
                 style={{
                   height: `${virtualizer.getTotalSize()}px`,
                   width: '100%',
