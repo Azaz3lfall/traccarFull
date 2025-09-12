@@ -1618,27 +1618,29 @@ const MainPage = () => {
       {/* Floating Status Card */}
       <FloatingStatusCard desktop={desktop} isMenuExpanded={isMenuExpanded} isDeviceListVisible={isDeviceListVisible} />
       
-      {/* Top Right Control Bar */}
+      {/* Vertical Control Bar - Left of Device List */}
       <div style={{
         position: 'fixed',
-        top: '10px',
-        right: '10px',
-        width: '140px',
-        height: '50px',
+        top: '8px',
+        right: !desktop ? '8px' : (isMenuExpanded ? '520px' : '383px'), // Left of device list
+        width: '50px',
+        height: 'auto',
         backgroundColor: '#1F2937',
         borderRadius: '16px',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-around',
-        padding: '0 8px',
+        justifyContent: 'flex-start',
+        padding: '8px 0',
         zIndex: 9999,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        gap: '8px'
       }}>
         <button 
           ref={setEventsButtonRef}
           style={{
-            width: '32px',
-            height: '32px',
+            width: '34px',
+            height: '34px',
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
@@ -1648,9 +1650,16 @@ const MainPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            outline: 'none'
+            outline: 'none',
+            transition: 'all 0.2s'
           }}
-          onClick={() => setShowEventsPopover(!showEventsPopover)}>
+          onClick={() => setShowEventsPopover(!showEventsPopover)}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
           <NotificationsOutlinedIcon style={{ fontSize: 18 }} />
           {eventsCount > 0 && (
             <motion.div
@@ -1683,8 +1692,8 @@ const MainPage = () => {
         <button 
           ref={setMapSwitcherRef}
           style={{
-            width: '32px',
-            height: '32px',
+            width: '34px',
+            height: '34px',
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
@@ -1694,14 +1703,21 @@ const MainPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            outline: 'none'
+            outline: 'none',
+            transition: 'all 0.2s'
           }}
-          onClick={() => setShowMapSwitcher(!showMapSwitcher)}>
+          onClick={() => setShowMapSwitcher(!showMapSwitcher)}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}>
           <Map style={{ fontSize: 18 }} />
         </button>
         <button style={{
-          width: '36px',
-          height: '36px',
+          width: '34px',
+          height: '34px',
           borderRadius: '50%',
           border: 'none',
           backgroundColor: 'transparent',
@@ -1710,7 +1726,14 @@ const MainPage = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          outline: 'none'
+          outline: 'none',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#374151';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = 'transparent';
         }}>
           <Avatar style={{ width: '28px', height: '28px' }}>
             {user?.attributes?.avatar && (
@@ -1738,8 +1761,8 @@ const MainPage = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               position: 'fixed',
-              top: '70px', // Fixed position below the control bar
-              right: '20px', // Aligned with control bar
+              top: '60px', // Fixed position below the control bar
+              right: !desktop ? '20px' : (isMenuExpanded ? '530px' : '393px'), // Aligned with control bar
               width: '300px',
               maxHeight: '400px',
               backgroundColor: 'white',
@@ -1886,8 +1909,8 @@ const MainPage = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               position: 'fixed',
-              top: '70px', // Fixed position below the control bar
-              right: '20px', // Aligned with control bar
+              top: '60px', // Fixed position below the control bar
+              right: !desktop ? '20px' : (isMenuExpanded ? '530px' : '393px'), // Aligned with control bar
               width: '280px',
               maxHeight: '300px',
               backgroundColor: 'white',
