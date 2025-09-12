@@ -247,6 +247,7 @@ const MainPage = () => {
           filteredPositions={filteredPositions}
           selectedPosition={selectedPosition}
           onMapClick={onMapClick}
+          selectedMapStyle={selectedMapStyle}
         />
       )}
       <div className={classes.sidebar}>
@@ -257,6 +258,7 @@ const MainPage = () => {
                 filteredPositions={filteredPositions}
                 selectedPosition={selectedPosition}
                 onMapClick={onMapClick}
+                selectedMapStyle={selectedMapStyle}
               />
             </div>
           )}

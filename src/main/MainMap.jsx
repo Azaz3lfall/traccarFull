@@ -17,7 +17,7 @@ import MapOverlay from '../map/overlay/MapOverlay';
 import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapScale from '../map/MapScale';
 
-const MainMap = ({ filteredPositions, selectedPosition, onMapClick }) => {
+const MainMap = ({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -38,7 +38,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onMapClick }) => {
 
   return (
     <>
-      <MapView onClick={handleMapClick}>
+      <MapView onClick={handleMapClick} selectedMapStyle={selectedMapStyle}>
         <MapOverlay />
         <MapGeofence />
         <MapAccuracy positions={filteredPositions} />

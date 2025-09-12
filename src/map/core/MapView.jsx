@@ -53,7 +53,7 @@ const initMap = async () => {
   }
 };
 
-const MapView = ({ children }) => {
+const MapView = ({ children, selectedMapStyle }) => {
   const theme = useTheme();
 
   const containerEl = useRef(null);
@@ -212,33 +212,12 @@ const MapView = ({ children }) => {
     switcher.updateStyles(styles, defaultMapStyle);
   }, [mapStyles, defaultMapStyle, activeMapStyles, switcher]);
 
-  // Apply map style changes directly to the map
+  // Handle external map style changes from props
   useEffect(() => {
-    if (map && defaultMapStyle) {
-      const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
-      const selectedStyle = filteredStyles.find((s) => s.id === defaultMapStyle);
-      
-      if (selectedStyle && selectedStyle.style) {
-        updateReadyValue(false);
-        map.setStyle(selectedStyle.style, { diff: false });
-        if (selectedStyle.transformRequest) {
-          map.setTransformRequest(selectedStyle.transformRequest);
-        }
-        
-        map.once('styledata', () => {
-          const waiting = () => {
-            if (!map.loaded()) {
-              setTimeout(waiting, 33);
-            } else {
-              initMap();
-              updateReadyValue(true);
-            }
-          };
-          waiting();
-        });
-      }
+    if (selectedMapStyle && selectedMapStyle !== defaultMapStyle) {
+      switcher.switchToStyle(selectedMapStyle);
     }
-  }, [defaultMapStyle, map, mapStyles, activeMapStyles]);
+  }, [selectedMapStyle, defaultMapStyle, switcher]);
 
   useEffect(() => {
     const listener = (ready) => setMapReady(ready);

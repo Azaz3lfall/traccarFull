@@ -120,4 +120,12 @@ export class SwitcherControl {
       this.styleButton.style.display = 'block';
     }
   }
+
+  // Method to programmatically switch to a specific style
+  switchToStyle(styleId) {
+    const styleElement = this.mapStyleContainer.querySelector(`[data-id="${styleId}"]`);
+    if (styleElement && !styleElement.classList.contains('active')) {
+      this.onSelectStyle(styleElement);
+    }
+  }
 }
