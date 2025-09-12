@@ -271,10 +271,10 @@ const MainPage = () => {
     
     // Only search if query has at least 5 characters
     if (query.trim().length >= 5) {
-      // Debounce search with 800ms delay
+      // Debounce search with 500ms delay
       window.searchTimeout = setTimeout(() => {
         searchAddresses(query);
-      }, 800);
+      }, 500);
     } else {
       // Clear results if less than 5 characters
       setSearchResults([]);
@@ -2528,7 +2528,10 @@ const MainPage = () => {
                   border: '2px solid #6B7280',
                   borderTop: '2px solid #3B82F6',
                   borderRadius: '50%',
-                  animation: 'spin 1s linear infinite'
+                  animation: 'spin 1s linear infinite',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }} />
               )}
             </div>
