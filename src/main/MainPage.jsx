@@ -24,8 +24,6 @@ import {
   Check,
   Plus,
   Minus,
-  Compass,
-  MapPin,
   Search,
   Sun,
   Moon
@@ -107,7 +105,6 @@ const MainPage = () => {
   const [eventsButtonRef, setEventsButtonRef] = useState(null);
   const [showMapSwitcher, setShowMapSwitcher] = useState(false);
   const [mapSwitcherRef, setMapSwitcherRef] = useState(null);
-  const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
   const [searchRef, setSearchRef] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,69 +160,6 @@ const MainPage = () => {
   const handleZoomOut = () => {
     if (map) {
       map.zoomOut();
-    }
-  };
-
-  // Reset bearing handler
-  const handleResetBearing = () => {
-    if (map) {
-      map.setBearing(0);
-    }
-  };
-
-  // Check geolocation permission on mount
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          setIsGeolocationEnabled(true);
-        },
-        (error) => {
-          if (error.code === error.PERMISSION_DENIED) {
-            setIsGeolocationEnabled(false);
-          }
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 1000,
-          maximumAge: 60000
-        }
-      );
-    } else {
-      setIsGeolocationEnabled(false);
-    }
-  }, []);
-
-  // My Location handler
-  const handleMyLocation = () => {
-    if (!isGeolocationEnabled) return;
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (map) {
-            map.easeTo({
-              center: [position.coords.longitude, position.coords.latitude],
-              zoom: Math.max(map.getZoom(), 15),
-              duration: 1000
-            });
-          }
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          if (error.code === error.PERMISSION_DENIED) {
-            setIsGeolocationEnabled(false);
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 60000
-        }
-      );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
-      setIsGeolocationEnabled(false);
     }
   };
 
@@ -1841,19 +1775,19 @@ const MainPage = () => {
             exit={{ opacity: 0, scale: 0.8, x: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
-              position: 'fixed',
+        position: 'fixed',
               top: '8px',
               right: '8px', // 8px from right edge
               width: '50px',
               height: 'auto',
               backgroundColor: colors.menuSurface,
-              borderRadius: '16px',
-              display: 'flex',
+        borderRadius: '16px',
+        display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+        alignItems: 'center',
               justifyContent: 'flex-start',
               padding: '8px 0',
-              zIndex: 9999,
+        zIndex: 9999,
               boxShadow: `0 4px 12px ${colors.menuShadow}`,
               border: `1px solid ${colors.menuBorder}`,
               gap: '8px'
@@ -2026,14 +1960,6 @@ const MainPage = () => {
           <Map style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
         
-        {/* Separator */}
-        <div style={{
-          width: '24px',
-          height: '1px',
-          backgroundColor: '#4B5563',
-          margin: '4px 0'
-        }} />
-        
         {/* Zoom In Button */}
         <button 
           style={{
@@ -2042,7 +1968,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-              color: colors.menuText, 
+            color: colors.menuText, 
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2120,121 +2046,6 @@ const MainPage = () => {
             e.target.style.backgroundColor = 'transparent';
           }}>
           <Minus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
-        </button>
-        
-        {/* Reset Bearing Button */}
-        <button 
-          style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: colors.menuText,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            outline: 'none !important',
-            transition: 'all 0.2s',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            boxShadow: 'none !important'
-          }}
-          onClick={handleResetBearing}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
-          <Compass style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
-        </button>
-        
-        {/* Another Separator */}
-        <div style={{
-          width: '24px',
-          height: '1px',
-          backgroundColor: '#4B5563',
-          margin: '4px 0'
-        }} />
-        
-        {/* My Location Button */}
-        <button 
-          disabled={!isGeolocationEnabled}
-          style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: isGeolocationEnabled ? colors.text : colors.textSecondary,
-            cursor: isGeolocationEnabled ? 'pointer' : 'not-allowed',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            outline: 'none !important',
-            transition: 'all 0.2s',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            boxShadow: 'none !important',
-            opacity: isGeolocationEnabled ? 1 : 0.5
-          }}
-          onClick={isGeolocationEnabled ? handleMyLocation : undefined}
-          onMouseEnter={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.menuHover;
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = 'transparent';
-            }
-          }}
-          onMouseDown={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.menuHover;
-            }
-          }}
-          onMouseUp={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.menuHover;
-            }
-          }}
-          onFocus={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = colors.menuHover;
-            }
-          }}
-          onBlur={(e) => {
-            if (isGeolocationEnabled) {
-              e.target.style.backgroundColor = 'transparent';
-            }
-          }}>
-          <MapPin style={{ 
-            fontSize: 18, 
-            userSelect: 'none', 
-            pointerEvents: 'none',
-            color: isGeolocationEnabled ? colors.text : colors.textSecondary
-          }} />
         </button>
         
         {/* Search Button */}
@@ -2485,13 +2296,13 @@ const MainPage = () => {
                   }}
                 >
                   <div style={{ pointerEvents: 'none' }}>
-                    {/* Device Name - Header */}
-                    <div style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
+                  {/* Device Name - Header */}
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
                       color: colors.textSecondary,
-                      marginBottom: '4px'
-                    }}>
+                    marginBottom: '4px'
+                  }}>
                     {getDeviceName(event.deviceId)}
                   </div>
                   
