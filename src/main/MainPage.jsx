@@ -20,7 +20,9 @@ import {
   ChevronRight,
   ChevronLeft,
   Map,
-  Check
+  Check,
+  Plus,
+  Minus
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
@@ -130,6 +132,17 @@ const MainPage = () => {
     setSelectedMapStyle(styleId);
     setShowMapSwitcher(false);
     // The map will automatically update through the MapView component
+  };
+
+  // Zoom handlers
+  const handleZoomIn = () => {
+    // This will be implemented to zoom the map
+    console.log('Zoom In');
+  };
+
+  const handleZoomOut = () => {
+    // This will be implemented to zoom the map
+    console.log('Zoom Out');
   };
 
   
@@ -1664,9 +1677,13 @@ const MainPage = () => {
         }}
         onFocus={(e) => {
           e.target.style.backgroundColor = '#374151';
+          e.target.style.outline = 'none';
+          e.target.style.boxShadow = 'none';
         }}
         onBlur={(e) => {
           e.target.style.backgroundColor = 'transparent';
+          e.target.style.outline = 'none';
+          e.target.style.boxShadow = 'none';
         }}>
           <Avatar style={{ width: '28px', height: '28px', userSelect: 'none', pointerEvents: 'none' }}>
             {user?.attributes?.avatar && (
@@ -1696,12 +1713,13 @@ const MainPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            outline: 'none',
+            outline: 'none !important',
             transition: 'all 0.2s',
             userSelect: 'none',
             WebkitUserSelect: 'none',
             MozUserSelect: 'none',
-            msUserSelect: 'none'
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
           }}
           onClick={() => setShowEventsPopover(!showEventsPopover)}
           onMouseEnter={(e) => {
@@ -1765,12 +1783,13 @@ const MainPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            outline: 'none',
+            outline: 'none !important',
             transition: 'all 0.2s',
             userSelect: 'none',
             WebkitUserSelect: 'none',
             MozUserSelect: 'none',
-            msUserSelect: 'none'
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
           }}
           onClick={() => setShowMapSwitcher(!showMapSwitcher)}
           onMouseEnter={(e) => {
@@ -1792,6 +1811,110 @@ const MainPage = () => {
             e.target.style.backgroundColor = 'transparent';
           }}>
           <Map style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
+        </button>
+        
+        {/* Separator */}
+        <div style={{
+          width: '24px',
+          height: '1px',
+          backgroundColor: '#4B5563',
+          margin: '4px 0'
+        }} />
+        
+        {/* Zoom In Button */}
+        <button 
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none !important',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={handleZoomIn}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}>
+          <Plus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
+        </button>
+        
+        {/* Zoom Out Button */}
+        <button 
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none !important',
+            backgroundColor: 'transparent',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          onClick={handleZoomOut}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onMouseDown={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onMouseUp={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.outline = 'none';
+            e.target.style.boxShadow = 'none';
+          }}>
+          <Minus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
       </div>
       
