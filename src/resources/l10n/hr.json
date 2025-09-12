@@ -195,6 +195,7 @@
     "userTermsPrompt": "Prihvaćanjem pristajete na naše Opće uvjete poslovanja i da ste pročitali politiku privatnosti",
     "userTermsAccepted": "Uvjeti prihvaćeni",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Prijava",
     "loginLanguage": "Jezik",
     "loginReset": "Ponovo postavi lozinku",

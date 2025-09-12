@@ -195,6 +195,7 @@
     "userTermsPrompt": "點擊“接受”，即表示您同意我們的服務條款，並確認您已閱讀我們的隱私權政策。",
     "userTermsAccepted": "接受條款",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "登入",
     "loginLanguage": "語言",
     "loginReset": "密碼重設",

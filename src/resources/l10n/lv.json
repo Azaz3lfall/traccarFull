@@ -195,6 +195,7 @@
     "userTermsPrompt": "Noklikšķinot uz “Pieņemt”, jūs piekrītat mūsu Pakalpojumu sniegšanas noteikumiem un apstiprināt, ka esat izlasījis mūsu Privātuma politiku.",
     "userTermsAccepted": "Noteikumi pieņemti",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Lietotājvārds",
     "loginLanguage": "Valoda",
     "loginReset": "Atiestatīt paroli",

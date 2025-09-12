@@ -195,6 +195,7 @@
     "userTermsPrompt": "Ao clicar em Aceitar, concorda com os nossos Termos de Serviço e confirma que leu a nossa Política de Privacidade.",
     "userTermsAccepted": "Termos Aceites",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Entrar",
     "loginLanguage": "Idioma",
     "loginReset": "Redefinir Password",

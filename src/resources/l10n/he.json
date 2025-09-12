@@ -195,6 +195,7 @@
     "userTermsPrompt": "בלחיצה על אישור, הנך מסכים לתנאי השירות שלנו ומאשר שקראת את מדיניות הפרטיות שלנו.",
     "userTermsAccepted": "התנאי השימוש התקבלו",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "כניסה",
     "loginLanguage": "שפה",
     "loginReset": "איפוס סיסמה",

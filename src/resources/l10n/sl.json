@@ -195,6 +195,7 @@
     "userTermsPrompt": "S klikom na gumb Sprejmi se strinjate z našimi Pogoji uporabe storitev in potrjujete, da ste prebrali Pravilnik o zasebnosti.",
     "userTermsAccepted": "Pogoji sprejeti",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Prijava",
     "loginLanguage": "Jezik",
     "loginReset": "Ponastavi geslo",

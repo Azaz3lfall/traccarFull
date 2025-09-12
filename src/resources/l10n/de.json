@@ -195,6 +195,7 @@
     "userTermsPrompt": "Durch den Klick auf „Akzeptieren“ erklären Sie sich mit unseren Nutzungsbedingungen und der Datenschutzerklärung einverstanden.",
     "userTermsAccepted": "Nutzungsbedingungen akzeptiert",
     "userBilling": "Billing",
+    "confirmQuit": "Möchten Sie sich wirklich abmelden?",
     "loginTitle": "Anmeldung",
     "loginLanguage": "Sprache",
     "loginReset": "Passwort zurücksetzen",

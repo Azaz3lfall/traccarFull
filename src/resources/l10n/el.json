@@ -195,6 +195,7 @@
     "userTermsPrompt": "Πατώντας Αποδοχή, αποδέχεστε τους Όρους Παροχής Υπηρεσιών μας και επιβεβαιώνετε ότι έχετε διαβάσει την Πολιτική Απορρήτου μας",
     "userTermsAccepted": "Οι όροι έγιναν αποδεκτοί",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Σύνδεση",
     "loginLanguage": "Γλώσσα",
     "loginReset": "Επαναφορά κωδικού",

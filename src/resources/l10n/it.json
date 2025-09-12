@@ -195,6 +195,7 @@
     "userTermsPrompt": "Facendo clic su Accetto, accetti i nostri Termini di servizio e confermi di aver letto la nostra Informativa sulla privacy.",
     "userTermsAccepted": "Termini Accettati",
     "userBilling": "Billing",
+    "confirmQuit": "Vuoi davvero disconnetterti?",
     "loginTitle": "Accesso",
     "loginLanguage": "Lingua",
     "loginReset": "Resetta Password",

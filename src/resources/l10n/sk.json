@@ -195,6 +195,7 @@
     "userTermsPrompt": "Kliknutím na tlačidlo \"Súhlasím\" súhlasíte s našimi zmluvnými podmienkami a potvrdzujete, že ste si prečítali naše zásady ochrany osobných údajov.",
     "userTermsAccepted": "Podmienky prijaté",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Prihlásenie",
     "loginLanguage": "Jazyk",
     "loginReset": "Obnoviť heslo",

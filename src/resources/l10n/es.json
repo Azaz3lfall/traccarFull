@@ -195,6 +195,7 @@
     "userTermsPrompt": "Al hacer clic en Aceptar, aceptas nuestras Condiciones del Servicio y confirmas que has leído nuestra Política de Privacidad",
     "userTermsAccepted": "Condiciones Aceptadas",
     "userBilling": "Facturación",
+    "confirmQuit": "¿Realmente quieres cerrar sesión?",
     "loginTitle": "Iniciar sesión",
     "loginLanguage": "Idioma",
     "loginReset": "Reiniciar contraseña",

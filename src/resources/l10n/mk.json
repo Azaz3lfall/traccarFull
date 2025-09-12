@@ -195,6 +195,7 @@
     "userTermsPrompt": "При кликнување на копчето Прифати, Вие се согласувате на нашите услови за користење, и потврдувате дека ја имате прочитано нашата Политика на приватност",
     "userTermsAccepted": "Условите се прифатени",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Најава",
     "loginLanguage": "Јазик",
     "loginReset": "Ресетирај лозинка",

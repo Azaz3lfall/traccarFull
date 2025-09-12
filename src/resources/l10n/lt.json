@@ -195,6 +195,7 @@
     "userTermsPrompt": "Nuspausdami Sutinku, sutinkate su paslaugos teikimo taisyklėmis ir privatumo politika.",
     "userTermsAccepted": "Sąlygos priimtos",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Prisijungimas",
     "loginLanguage": "Kalba",
     "loginReset": "Atstatyti slaptažodį",

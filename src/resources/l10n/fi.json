@@ -195,6 +195,7 @@
     "userTermsPrompt": "Klikkaamalla hyväksyt käyttöehdot ja vahvistat lukeneesi tietosuojakäytännön.",
     "userTermsAccepted": "Ehdot hyväksytty",
     "userBilling": "Billing",
+    "confirmQuit": "Do you really want to logout?",
     "loginTitle": "Kirjaudu",
     "loginLanguage": "Kieli",
     "loginReset": "Nollaa salasana",

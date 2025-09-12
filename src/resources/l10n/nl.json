@@ -195,6 +195,7 @@
     "userTermsPrompt": "Door op 'accepteren' te klikken, stem je in met de Algemene voorwaarden (Terms of service). Je bevestigt ook dat je instemt met ons Privacy voorwaarden (Privacy Policy).  ",
     "userTermsAccepted": "Voorwaarden geaccepteerd",
     "userBilling": "Billing",
+    "confirmQuit": "Wil je echt uitloggen?",
     "loginTitle": "Inloggen",
     "loginLanguage": "Taal",
     "loginReset": "Wachtwoord herstellen",

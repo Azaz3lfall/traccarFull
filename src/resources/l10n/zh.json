@@ -195,6 +195,7 @@
     "userTermsPrompt": "点击“接受”，表示您同意我们的服务条款，并确认您已阅读我们的隐私政策。",
     "userTermsAccepted": "接受条款",
     "userBilling": "Billing",
+    "confirmQuit": "您确定要退出吗？",
     "loginTitle": "登录",
     "loginLanguage": "语言",
     "loginReset": "密码重设",
