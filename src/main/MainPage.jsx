@@ -2564,12 +2564,12 @@ const MainPage = () => {
               right: '65px',
               top: searchRef.getBoundingClientRect().top,
               width: '320px',
-              backgroundColor: '#1F2937',
+              backgroundColor: 'white',
               borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
               zIndex: 10000,
               padding: '16px',
-              border: '1px solid #374151'
+              border: '1px solid #E5E7EB'
             }}
           >
             {/* Search Input */}
@@ -2582,10 +2582,10 @@ const MainPage = () => {
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  backgroundColor: '#374151',
-                  border: '1px solid #4B5563',
+                  backgroundColor: '#F9FAFB',
+                  border: '1px solid #D1D5DB',
                   borderRadius: '8px',
-                  color: 'white',
+                  color: '#1F2937',
                   fontSize: '14px',
                   outline: 'none',
                   paddingRight: isSearching ? '40px' : '16px'
@@ -2600,7 +2600,7 @@ const MainPage = () => {
                   transform: 'translateY(-50%)',
                   width: '16px',
                   height: '16px',
-                  border: '2px solid #6B7280',
+                  border: '2px solid #D1D5DB',
                   borderTop: '2px solid #3B82F6',
                   borderRadius: '50%',
                   animation: 'spin 1s linear infinite',
@@ -2632,8 +2632,8 @@ const MainPage = () => {
                       border: '1px solid transparent'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#374151';
-                      e.target.style.borderColor = '#4B5563';
+                      e.target.style.backgroundColor = '#F3F4F6';
+                      e.target.style.borderColor = '#D1D5DB';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.backgroundColor = 'transparent';
@@ -2641,7 +2641,7 @@ const MainPage = () => {
                     }}
                   >
                     <div style={{
-                      color: 'white',
+                      color: '#1F2937',
                       fontSize: '14px',
                       fontWeight: '500',
                       marginBottom: '4px',
@@ -2652,7 +2652,7 @@ const MainPage = () => {
                       {result.properties?.name || result.properties?.display_name?.split(',')[0]}
                     </div>
                     <div style={{
-                      color: '#9CA3AF',
+                      color: '#6B7280',
                       fontSize: '12px',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -2670,7 +2670,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: '#9CA3AF',
+                color: '#6B7280',
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
@@ -2683,7 +2683,7 @@ const MainPage = () => {
               <div style={{
                 marginTop: '12px',
                 padding: '12px',
-                color: '#9CA3AF',
+                color: '#6B7280',
                 fontSize: '14px',
                 textAlign: 'center'
               }}>
