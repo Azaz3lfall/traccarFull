@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { formatPercentage, formatStatus, formatSpeed, formatDistance, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
@@ -49,6 +50,7 @@ const FloatingDeviceList = ({
   
   const dispatch = useDispatch();
   const t = useTranslation();
+  const colors = useThemeColors();
   
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
@@ -210,9 +212,9 @@ const FloatingDeviceList = ({
             style={{
               cursor: 'pointer',
               transition: 'all 0.2s',
-              backgroundColor: 'white',
+              backgroundColor: colors.surface,
               borderRadius: '12px',
-              border: isSelected ? '2px solid #3B82F6' : '1px solid #E5E7EB',
+              border: isSelected ? '2px solid #3B82F6' : `1px solid ${colors.border}`,
               boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
               margin: '0',
               width: '100%',
@@ -254,7 +256,7 @@ const FloatingDeviceList = ({
                     alignItems: 'center',
                     gap: '2px',
                     fontSize: '10px',
-                    color: '#6B7280',
+                    color: colors.textSecondary,
                     marginTop: '8px'
                   }}>
                     <Gauge style={{ width: '10px', height: '10px' }} />
@@ -271,7 +273,7 @@ const FloatingDeviceList = ({
                     <h3 style={{
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#6B7280',
+                      color: colors.textSecondary,
                       margin: 0,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -370,7 +372,7 @@ const FloatingDeviceList = ({
                     <span style={{
                       fontSize: '12px',
                       fontWeight: '500',
-                      color: '#374151',
+                      color: colors.text,
                       textTransform: 'capitalize'
                     }}>
                       {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
@@ -384,7 +386,7 @@ const FloatingDeviceList = ({
               }}>
                 <p style={{
                   fontSize: '12px',
-                  color: '#6B7280',
+                  color: colors.textSecondary,
                   margin: 0,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -402,7 +404,7 @@ const FloatingDeviceList = ({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   fontSize: '12px',
-                  color: '#6B7280'
+                  color: colors.textSecondary
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -429,7 +431,7 @@ const FloatingDeviceList = ({
         alignItems: 'center',
         justifyContent: 'center',
         height: '200px',
-        color: '#6B7280'
+        color: colors.textSecondary
       }}>
         <Search style={{ width: '32px', height: '32px', marginBottom: '8px' }} />
         <p style={{ fontSize: '14px', margin: 0 }}>Loading devices...</p>
@@ -480,7 +482,7 @@ const FloatingDeviceList = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'white',
+        backgroundColor: colors.surface,
         borderRadius: !desktop ? '0px' : (selectedDeviceId ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
         boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
         border: 'none'
@@ -501,7 +503,7 @@ const FloatingDeviceList = ({
               transform: 'translateY(-50%)',
               width: '16px',
               height: '16px',
-              color: '#9CA3AF'
+              color: colors.textSecondary
             }} />
             <Input
               placeholder={t('sharedEnterValue')}
@@ -543,7 +545,7 @@ const FloatingDeviceList = ({
               }}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter style={{ width: '16px', height: '16px', color: '#D1D5DB' }} />
+              <Filter style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
             </button>
           </div>
         </div>
@@ -564,10 +566,10 @@ const FloatingDeviceList = ({
                 left: !desktop ? '16px' : 'auto',
                 width: !desktop ? 'calc(100vw - 32px)' : '300px',
                 maxWidth: !desktop ? '400px' : '300px',
-                backgroundColor: 'white',
+                backgroundColor: colors.surface,
                 borderRadius: '8px',
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                border: '1px solid #E5E7EB',
+                border: `1px solid ${colors.border}`,
                 padding: '16px',
                 zIndex: 10000,
                 pointerEvents: 'auto'
@@ -593,7 +595,7 @@ const FloatingDeviceList = ({
                         onClick={() => setFilter({ ...filter, statuses: [] })}
                         style={{
                           fontSize: '12px',
-                          color: '#6B7280',
+                          color: colors.textSecondary,
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
@@ -611,11 +613,11 @@ const FloatingDeviceList = ({
                       width: '100%',
                       height: '40px',
                       padding: '8px 12px',
-                      border: '1px solid #D1D5DB',
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '6px',
-                      backgroundColor: 'white',
+                      backgroundColor: colors.surface,
                       fontSize: '14px',
-                      color: '#374151',
+                      color: colors.text,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -636,7 +638,7 @@ const FloatingDeviceList = ({
                       style={{ 
                         transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease',
-                        color: '#6B7280'
+                        color: colors.textSecondary
                       }} 
                     />
                   </button>
@@ -653,8 +655,8 @@ const FloatingDeviceList = ({
                           top: '100%',
                           left: 0,
                           right: 0,
-                          backgroundColor: 'white',
-                          border: '1px solid #D1D5DB',
+                          backgroundColor: colors.surface,
+                          border: `1px solid ${colors.border}`,
                           borderRadius: '6px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           zIndex: 10001,
@@ -670,8 +672,8 @@ const FloatingDeviceList = ({
                               padding: '8px 12px',
                               textAlign: 'left',
                               fontSize: '14px',
-                              color: '#374151',
-                              backgroundColor: filter.statuses.includes(status) ? '#F3F4F6' : 'transparent',
+                              color: colors.text,
+                              backgroundColor: filter.statuses.includes(status) ? colors.hover : 'transparent',
                               border: 'none',
                               cursor: 'pointer',
                               display: 'flex',
@@ -709,7 +711,7 @@ const FloatingDeviceList = ({
                         onClick={() => setFilter({ ...filter, groups: [] })}
                         style={{
                           fontSize: '12px',
-                          color: '#6B7280',
+                          color: colors.textSecondary,
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
@@ -727,11 +729,11 @@ const FloatingDeviceList = ({
                       width: '100%',
                       height: '40px',
                       padding: '8px 12px',
-                      border: '1px solid #D1D5DB',
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '6px',
-                      backgroundColor: 'white',
+                      backgroundColor: colors.surface,
                       fontSize: '14px',
-                      color: '#374151',
+                      color: colors.text,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -752,7 +754,7 @@ const FloatingDeviceList = ({
                       style={{ 
                         transform: showGroupsDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease',
-                        color: '#6B7280'
+                        color: colors.textSecondary
                       }} 
                     />
                   </button>
@@ -769,8 +771,8 @@ const FloatingDeviceList = ({
                           top: '100%',
                           left: 0,
                           right: 0,
-                          backgroundColor: 'white',
-                          border: '1px solid #D1D5DB',
+                          backgroundColor: colors.surface,
+                          border: `1px solid ${colors.border}`,
                           borderRadius: '6px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           zIndex: 10001,
@@ -788,8 +790,8 @@ const FloatingDeviceList = ({
                               padding: '8px 12px',
                               textAlign: 'left',
                               fontSize: '14px',
-                              color: '#374151',
-                              backgroundColor: filter.groups.includes(group.id) ? '#F3F4F6' : 'transparent',
+                              color: colors.text,
+                              backgroundColor: filter.groups.includes(group.id) ? colors.hover : 'transparent',
                               border: 'none',
                               cursor: 'pointer',
                               display: 'flex',
@@ -811,7 +813,7 @@ const FloatingDeviceList = ({
                     <label style={{
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#374151',
+                      color: colors.text,
                       marginBottom: '8px',
                       display: 'block'
                     }}>{t('sharedSortBy')}</label>
@@ -822,11 +824,11 @@ const FloatingDeviceList = ({
                       width: '100%',
                       height: '40px',
                       padding: '8px 12px',
-                      border: '1px solid #D1D5DB',
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '6px',
-                      backgroundColor: 'white',
+                      backgroundColor: colors.surface,
                       fontSize: '14px',
-                      color: '#374151',
+                      color: colors.text,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -840,7 +842,7 @@ const FloatingDeviceList = ({
                       style={{ 
                         transform: showSortDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.2s ease',
-                        color: '#6B7280'
+                        color: colors.textSecondary
                       }} 
                     />
                   </button>
@@ -857,8 +859,8 @@ const FloatingDeviceList = ({
                           top: '100%',
                           left: 0,
                           right: 0,
-                          backgroundColor: 'white',
-                          border: '1px solid #D1D5DB',
+                          backgroundColor: colors.surface,
+                          border: `1px solid ${colors.border}`,
                           borderRadius: '6px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           zIndex: 10001,
@@ -875,8 +877,8 @@ const FloatingDeviceList = ({
                             padding: '8px 12px',
                             textAlign: 'left',
                             fontSize: '14px',
-                            color: '#374151',
-                            backgroundColor: filterSort === 'name' ? '#F3F4F6' : 'transparent',
+                            color: colors.text,
+                            backgroundColor: filterSort === 'name' ? colors.hover : 'transparent',
                             border: 'none',
                             cursor: 'pointer',
                             display: 'flex',
@@ -897,8 +899,8 @@ const FloatingDeviceList = ({
                             padding: '8px 12px',
                             textAlign: 'left',
                             fontSize: '14px',
-                            color: '#374151',
-                            backgroundColor: filterSort === 'lastUpdate' ? '#F3F4F6' : 'transparent',
+                            color: colors.text,
+                            backgroundColor: filterSort === 'lastUpdate' ? colors.hover : 'transparent',
                             border: 'none',
                             cursor: 'pointer',
                             display: 'flex',
@@ -1016,7 +1018,7 @@ const FloatingDeviceList = ({
               alignItems: 'center',
               justifyContent: 'center',
               height: '128px',
-              color: '#6B7280'
+              color: colors.textSecondary
             }}>
               <Search style={{ width: '32px', height: '32px', marginBottom: '8px' }} />
               <p style={{ fontSize: '14px', margin: 0 }}>{t('sharedNoDevicesFound')}</p>
