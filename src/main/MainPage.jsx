@@ -1661,6 +1661,12 @@ const MainPage = () => {
         }}
         onMouseUp={(e) => {
           e.target.style.backgroundColor = '#374151';
+        }}
+        onFocus={(e) => {
+          e.target.style.backgroundColor = '#374151';
+        }}
+        onBlur={(e) => {
+          e.target.style.backgroundColor = 'transparent';
         }}>
           <Avatar style={{ width: '28px', height: '28px' }}>
             {user?.attributes?.avatar && (
@@ -1705,6 +1711,12 @@ const MainPage = () => {
           }}
           onMouseUp={(e) => {
             e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
           }}>
           <NotificationsOutlinedIcon style={{ fontSize: 22 }} />
           {eventsCount > 0 && (
@@ -1764,6 +1776,12 @@ const MainPage = () => {
           }}
           onMouseUp={(e) => {
             e.target.style.backgroundColor = '#374151';
+          }}
+          onFocus={(e) => {
+            e.target.style.backgroundColor = '#374151';
+          }}
+          onBlur={(e) => {
+            e.target.style.backgroundColor = 'transparent';
           }}>
           <Map style={{ fontSize: 18 }} />
         </button>
