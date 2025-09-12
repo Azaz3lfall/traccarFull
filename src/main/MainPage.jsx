@@ -1841,7 +1841,7 @@ const MainPage = () => {
         height: 'auto',
         backgroundColor: colors.menuSurface,
         borderRadius: '16px',
-        display: 'flex',
+        display: desktop || selectedDeviceId ? 'flex' : 'none', // Hide on mobile when no device selected
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
