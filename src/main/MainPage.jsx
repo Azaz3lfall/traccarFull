@@ -1622,7 +1622,7 @@ const MainPage = () => {
       <div style={{
         position: 'fixed',
         top: '8px',
-        right: !desktop ? '8px' : (isMenuExpanded ? '520px' : '383px'), // Left of device list
+        right: !desktop ? '8px' : (isMenuExpanded ? '200px' : '63px'), // Same distance as device list from left
         width: '50px',
         height: 'auto',
         backgroundColor: '#1F2937',
@@ -1762,7 +1762,7 @@ const MainPage = () => {
             style={{
               position: 'fixed',
               top: '60px', // Fixed position below the control bar
-              right: !desktop ? '20px' : (isMenuExpanded ? '530px' : '393px'), // Aligned with control bar
+              right: !desktop ? '20px' : (isMenuExpanded ? '210px' : '73px'), // Aligned with control bar
               width: '300px',
               maxHeight: '400px',
               backgroundColor: 'white',
@@ -1910,7 +1910,7 @@ const MainPage = () => {
             style={{
               position: 'fixed',
               top: '60px', // Fixed position below the control bar
-              right: !desktop ? '20px' : (isMenuExpanded ? '530px' : '393px'), // Aligned with control bar
+              right: !desktop ? '20px' : (isMenuExpanded ? '210px' : '73px'), // Aligned with control bar
               width: '280px',
               maxHeight: '300px',
               backgroundColor: 'white',
