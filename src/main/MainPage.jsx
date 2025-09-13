@@ -463,7 +463,7 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}>
-            {isMenuExpanded ? <ChevronLeft size={18} color={colors.menuText} /> : <ChevronRight size={18} color={colors.menuText} />}
+            {isMenuExpanded ? <ChevronLeft size={18} color={colors.textSecondary} /> : <ChevronRight size={18} color={colors.textSecondary} />}
           </div>
           
           {/* Device List Toggle Button */}
@@ -585,11 +585,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PieChart size={18} color={colors.menuText} />
+              <PieChart size={18} color={colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -656,7 +656,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -722,7 +722,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -789,7 +789,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -857,7 +857,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -925,7 +925,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -993,7 +993,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1061,7 +1061,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1129,7 +1129,7 @@ const MainPage = () => {
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: colors.menuText,
+                color: colors.textSecondary,
                 fontSize: '14px',
                   fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -1197,7 +1197,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1265,7 +1265,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1333,7 +1333,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1401,7 +1401,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1469,7 +1469,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1537,7 +1537,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1605,7 +1605,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -1673,7 +1673,7 @@ const MainPage = () => {
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
-                  color: colors.menuText,
+                  color: colors.textSecondary,
                   fontSize: '14px',
                   fontWeight: '400',
                   whiteSpace: 'nowrap',
@@ -2202,9 +2202,9 @@ const MainPage = () => {
             e.target.style.backgroundColor = 'transparent';
           }}>
           {currentTheme === 'light' ? (
-            <Moon size={18} color={colors.menuText} />
+            <Moon size={18} color={colors.textSecondary} />
           ) : (
-            <Sun size={18} color={colors.menuText} />
+            <Sun size={18} color={colors.textSecondary} />
           )}
         </button>
           </motion.div>
