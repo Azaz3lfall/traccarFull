@@ -518,11 +518,11 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <Truck size={18} color={isDeviceListVisible ? colors.menuText : colors.textSecondary} />
+            <Truck size={18} color={colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
-                color: isDeviceListVisible ? colors.menuText : colors.textSecondary,
+                color: colors.textSecondary,
                 fontSize: '14px',
                 fontWeight: '400',
                 whiteSpace: 'nowrap',
@@ -652,7 +652,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <CreateIcon style={{ fontSize: 18, color: colors.menuText }} />
+            <CreateIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -718,7 +718,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <SettingsIcon style={{ fontSize: 18, color: colors.menuText }} />
+            <SettingsIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -785,7 +785,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -853,7 +853,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <PersonIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -921,7 +921,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <SmartphoneIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <SmartphoneIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -989,7 +989,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <FolderIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <FolderIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -1057,7 +1057,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <PersonIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -1125,7 +1125,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <TodayIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <TodayIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -1193,7 +1193,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <StorageIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1261,7 +1261,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <BuildIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <BuildIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1329,7 +1329,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PublishIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <PublishIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1397,7 +1397,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PaymentIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1465,7 +1465,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <HelpIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <HelpIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1533,7 +1533,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <CampaignIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <CampaignIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1601,7 +1601,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <StorageIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1669,7 +1669,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PeopleIcon style={{ fontSize: 18, color: colors.menuText }} />
+              <PeopleIcon style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -1812,7 +1812,7 @@ const MainPage = () => {
             borderRadius: '50%',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -1866,7 +1866,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -1937,7 +1937,7 @@ const MainPage = () => {
             borderRadius: '8px',
           border: 'none',
           backgroundColor: 'transparent',
-          color: colors.menuText,
+          color: colors.textSecondary,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -1981,7 +1981,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText, 
+            color: colors.textSecondary, 
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2025,7 +2025,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2071,7 +2071,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2117,7 +2117,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -2169,7 +2169,7 @@ const MainPage = () => {
             borderRadius: '8px',
             border: 'none',
             backgroundColor: 'transparent',
-            color: colors.menuText,
+            color: colors.textSecondary,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
