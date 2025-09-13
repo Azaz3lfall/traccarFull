@@ -2626,8 +2626,20 @@ const MainPage = () => {
                 <button
                   key={lang.code}
                   onClick={() => {
-                    setLocalLanguage(lang.code);
-                    setShowLanguagePopover(false);
+                    // Add smooth transition to prevent screen blink
+                    document.documentElement.style.transition = 'opacity 0.1s ease-in-out';
+                    document.documentElement.style.opacity = '0.8';
+                    
+                    setTimeout(() => {
+                      setLocalLanguage(lang.code);
+                      setShowLanguagePopover(false);
+                      
+                      // Restore opacity after language change
+                      setTimeout(() => {
+                        document.documentElement.style.opacity = '1';
+                        document.documentElement.style.transition = '';
+                      }, 150);
+                    }, 50);
                   }}
                   style={{
                     display: 'flex',

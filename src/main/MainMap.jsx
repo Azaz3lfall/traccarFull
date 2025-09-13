@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, memo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ import MapPositions from '../map/MapPositions';
 import MapOverlay from '../map/overlay/MapOverlay';
 import MapScale from '../map/MapScale';
 
-const MainMap = ({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle }) => {
+const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -57,6 +57,6 @@ const MainMap = ({ filteredPositions, selectedPosition, onMapClick, selectedMapS
       )}
     </>
   );
-};
+});
 
 export default MainMap;
