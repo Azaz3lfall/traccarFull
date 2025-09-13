@@ -271,7 +271,7 @@ const RegisterPage = () => {
           onClick={() => navigate('/login')}
           style={{
             position: 'absolute',
-            top: '20px',
+            bottom: '20px',
             left: '20px',
             zIndex: 30,
             width: '40px',
