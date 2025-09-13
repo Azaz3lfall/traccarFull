@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Card,
-  CardContent,
   TextField,
   Button,
   Table,
@@ -23,10 +22,9 @@ import {
   Chip,
   Avatar,
   Typography,
-  Box,
   InputAdornment,
-  Tooltip,
   CircularProgress,
+  Pagination,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -42,7 +40,7 @@ import {
   CheckCircle as CheckIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { useCatch, useEffectAsync } from '../reactHelper';
+import { useCatch } from '../reactHelper';
 import { formatBoolean, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
@@ -53,11 +51,9 @@ const UsersModal = ({ open, onClose }) => {
   const t = useTranslation();
   const colors = useThemeColors();
   const manager = useManager();
+  const queryClient = useQueryClient();
 
   // State management
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showTemporary, setShowTemporary] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -66,43 +62,39 @@ const UsersModal = ({ open, onClose }) => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [editDialog, setEditDialog] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
 
-  // Load users when modal opens
-  useEffect(() => {
-    if (open) {
-      loadUsers();
-    }
-  }, [open]);
-
-  // Load users
-  const loadUsers = useCatch(async () => {
-    setLoading(true);
-    try {
+  // Fetch users with TanStack Query
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['users', { excludeAttributes: true }],
+    queryFn: async () => {
       const response = await fetchOrThrow('/api/users?excludeAttributes=true');
-      const userData = await response.json();
-      setUsers(userData);
-    } catch (error) {
-      console.error('Failed to load users:', error);
-    } finally {
-      setLoading(false);
-    }
+      return response.json();
+    },
+    enabled: open, // Only fetch when modal is open
   });
 
   // Filter users based on search and temporary status
+  const filteredUsers = users.filter(user => {
+    const matchesTemporary = showTemporary || !user.temporary;
+    const matchesSearch = !searchKeyword || 
+      (user.name && user.name.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+      (user.email && user.email.toLowerCase().includes(searchKeyword.toLowerCase()));
+    return matchesTemporary && matchesSearch;
+  });
+
+  // Reset to page 1 when search changes
   useEffect(() => {
-    let filtered = users.filter(user => 
-      showTemporary || !user.temporary
-    );
+    setPage(1);
+  }, [searchKeyword, showTemporary]);
 
-    if (searchKeyword) {
-      filtered = filtered.filter(user =>
-        user.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchKeyword.toLowerCase())
-      );
-    }
-
-    setFilteredUsers(filtered);
-  }, [users, searchKeyword, showTemporary]);
+  // Pagination
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  const paginatedUsers = filteredUsers.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
   // Handle user login
   const handleLogin = useCatch(async (userId) => {
@@ -130,39 +122,66 @@ const UsersModal = ({ open, onClose }) => {
   };
 
   // Confirm delete
-  const confirmDelete = useCatch(async () => {
+  const confirmDelete = () => {
     if (userToDelete) {
-      await fetchOrThrow(`/api/users/${userToDelete.id}`, { method: 'DELETE' });
-      setUsers(users.filter(u => u.id !== userToDelete.id));
+      deleteUserMutation.mutate(userToDelete.id);
+    }
+  };
+
+  // Mutations
+  const createUserMutation = useMutation({
+    mutationFn: async (userData) => {
+      const response = await fetchOrThrow('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setEditDialog(false);
+      setEditingUser(null);
+    },
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ id, userData }) => {
+      const response = await fetchOrThrow(`/api/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setEditDialog(false);
+      setEditingUser(null);
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId) => {
+      await fetchOrThrow(`/api/users/${userId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
       setDeleteDialog(false);
       setUserToDelete(null);
-    }
+    },
   });
 
   // Handle save user
-  const handleSaveUser = useCatch(async () => {
+  const handleSaveUser = () => {
     if (!editingUser) return;
 
-    const url = editingUser.id ? `/api/users/${editingUser.id}` : '/api/users';
-    const method = editingUser.id ? 'PUT' : 'POST';
-
-    const response = await fetchOrThrow(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingUser),
-    });
-
-    const savedUser = await response.json();
-    
     if (editingUser.id) {
-      setUsers(users.map(u => u.id === savedUser.id ? savedUser : u));
+      updateUserMutation.mutate({ id: editingUser.id, userData: editingUser });
     } else {
-      setUsers([...users, savedUser]);
+      createUserMutation.mutate(editingUser);
     }
-
-    setEditDialog(false);
-    setEditingUser(null);
-  });
+  };
 
   // Menu actions
   const actions = [
@@ -193,11 +212,6 @@ const UsersModal = ({ open, onClose }) => {
     },
   ];
 
-  const getStatusColor = (user) => {
-    if (user.disabled) return colors.error;
-    if (user.administrator) return colors.primary;
-    return colors.success;
-  };
 
   const getStatusIcon = (user) => {
     if (user.disabled) return <BlockIcon />;
@@ -224,7 +238,7 @@ const UsersModal = ({ open, onClose }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 10000,
+          zIndex: 10001,
           padding: '20px',
         }}
         onClick={onClose}
@@ -237,9 +251,8 @@ const UsersModal = ({ open, onClose }) => {
           style={{
             backgroundColor: colors.surface,
             borderRadius: '12px',
-            width: '100%',
-            maxWidth: '1000px',
-            maxHeight: '90vh',
+            width: '95vw',
+            height: '95vh',
             overflow: 'hidden',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             display: 'flex',
@@ -257,11 +270,8 @@ const UsersModal = ({ open, onClose }) => {
             background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
           }}>
             <div>
-              <Typography variant="h5" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+              <Typography variant="h5" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.1 }}>
                 {t('settingsUsers')}
-              </Typography>
-              <Typography variant="body2" style={{ color: colors.textSecondary, marginTop: '4px' }}>
-                {t('settingsUsersDescription') || 'Manage user accounts and permissions'}
               </Typography>
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -359,21 +369,32 @@ const UsersModal = ({ open, onClose }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {loading ? (
+                  {isLoading ? (
                     <TableRow>
                       <TableCell colSpan={6} align="center" style={{ padding: '40px' }}>
-                        <CircularProgress style={{ color: colors.primary }} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                          <CircularProgress style={{ color: colors.primary }} size={40} />
+                          <Typography style={{ color: colors.textSecondary, lineHeight: 1.1 }}>
+                            {t('sharedLoading')}...
+                          </Typography>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ) : filteredUsers.length === 0 ? (
+                  ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.textSecondary }}>
+                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.error, lineHeight: 1.1 }}>
+                        {t('sharedError')}: {error.message}
+                      </TableCell>
+                    </TableRow>
+                  ) : paginatedUsers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.textSecondary, lineHeight: 1.1 }}>
                         {t('sharedNoData')}
                       </TableCell>
                     </TableRow>
                   ) : (
                     <AnimatePresence>
-                      {filteredUsers.map((user, index) => (
+                      {paginatedUsers.map((user, index) => (
                         <motion.tr
                           key={user.id}
                           initial={{ opacity: 0, y: 20 }}
@@ -395,7 +416,7 @@ const UsersModal = ({ open, onClose }) => {
                                 <PersonIcon fontSize="small" />
                               </Avatar>
                               <div>
-                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
+                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.1 }}>
                                   {user.name || t('sharedUnknown')}
                                 </Typography>
                                 {user.temporary && (
@@ -413,7 +434,7 @@ const UsersModal = ({ open, onClose }) => {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.text }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 1.1 }}>
                             {user.email || '-'}
                           </TableCell>
                           <TableCell>
@@ -438,7 +459,7 @@ const UsersModal = ({ open, onClose }) => {
                               }}
                             />
                           </TableCell>
-                          <TableCell style={{ color: colors.text }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 1.1 }}>
                             {user.expirationTime ? formatTime(user.expirationTime, 'date') : '-'}
                           </TableCell>
                           <TableCell align="center">
@@ -461,17 +482,85 @@ const UsersModal = ({ open, onClose }) => {
             </TableContainer>
           </div>
 
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{
+              padding: '16px 24px',
+              borderTop: `1px solid ${colors.border}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px',
+            }}>
+              <Typography style={{ color: colors.textSecondary, fontSize: '14px', lineHeight: 1.1 }}>
+                {page} / {totalPages} ({filteredUsers.length} {t('settingsUsers')})
+              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setPage(1)}
+                  disabled={page === 1}
+                  style={{
+                    color: colors.text,
+                    borderColor: colors.border,
+                    minWidth: '32px',
+                    height: '32px',
+                    padding: '4px 8px',
+                  }}
+                >
+                  ««
+                </Button>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={(event, value) => setPage(value)}
+                  color="primary"
+                  size="small"
+                  showFirstButton={false}
+                  showLastButton={false}
+                  style={{
+                    '& .MuiPaginationItem-root': {
+                      color: colors.text,
+                      '&.Mui-selected': {
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                      },
+                    },
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setPage(totalPages)}
+                  disabled={page === totalPages}
+                  style={{
+                    color: colors.text,
+                    borderColor: colors.border,
+                    minWidth: '32px',
+                    height: '32px',
+                    padding: '4px 8px',
+                  }}
+                >
+                  »»
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Actions Menu */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
+            style={{ zIndex: 10002 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
                 borderRadius: '8px',
                 minWidth: '160px',
+                zIndex: 10002,
               },
             }}
           >
@@ -493,11 +582,13 @@ const UsersModal = ({ open, onClose }) => {
           <Dialog
             open={deleteDialog}
             onClose={() => setDeleteDialog(false)}
+            style={{ zIndex: 10003 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
                 borderRadius: '12px',
+                zIndex: 10003,
               },
             }}
           >
@@ -531,11 +622,13 @@ const UsersModal = ({ open, onClose }) => {
             onClose={() => setEditDialog(false)}
             maxWidth="sm"
             fullWidth
+            style={{ zIndex: 10003 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
                 borderRadius: '12px',
+                zIndex: 10003,
               },
             }}
           >
