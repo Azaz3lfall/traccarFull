@@ -38,14 +38,14 @@ import {
   AdminPanelSettings as AdminIcon,
   Block as BlockIcon,
   CheckCircle as CheckIcon,
-  Close as CloseIcon,
+  ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors } from '../common/components/ThemeProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 
@@ -57,8 +57,13 @@ const FloatingUsersPopover = ({
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
+  const { theme } = useTheme();
   const manager = useManager();
   const queryClient = useQueryClient();
+
+  // Zebra striping colors
+  const lightThemeZebra = '#f8f9fa';
+  const darkThemeZebra = '#353e4b';
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -70,7 +75,7 @@ const FloatingUsersPopover = ({
   const [editDialog, setEditDialog] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(15);
 
   // Fetch users with TanStack Query
   const { data: users = [], isLoading, error } = useQuery({
@@ -257,8 +262,15 @@ const FloatingUsersPopover = ({
             alignItems: 'center',
             background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
           }}>
-            <div>
-              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.3 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <IconButton
+                onClick={onClose}
+                size="small"
+                style={{ color: colors.textSecondary }}
+              >
+                <ChevronLeftIcon fontSize="small" />
+              </IconButton>
+              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
                 {t('settingsUsers')}
               </Typography>
             </div>
@@ -281,13 +293,6 @@ const FloatingUsersPopover = ({
               >
                 {t('sharedAdd')}
               </Button>
-              <IconButton
-                onClick={onClose}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
             </div>
           </div>
 
@@ -387,8 +392,7 @@ const FloatingUsersPopover = ({
                         <TableRow
                           key={user.id}
                           style={{ 
-                            borderBottom: `1px solid ${colors.border}`,
-                            backgroundColor: index % 2 === 0 ? colors.surface : (colors.background === '#000000' || colors.background === '#121212' || colors.surface === '#1e1e1e' ? '#404040' : '#f8f9fa')
+                            backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >
@@ -405,7 +409,7 @@ const FloatingUsersPopover = ({
                                 <PersonIcon fontSize="small" />
                               </Avatar>
                               <div>
-                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.3, fontSize: '11px' }}>
+                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
                                   {user.name || t('sharedUnknown')}
                                 </Typography>
                                 {user.temporary && (
@@ -423,7 +427,7 @@ const FloatingUsersPopover = ({
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.text, lineHeight: 1.3, fontSize: '11px' }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
                             {user.email || '-'}
                           </TableCell>
                           <TableCell>
