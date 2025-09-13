@@ -39,6 +39,8 @@ import {
   Block as BlockIcon,
   CheckCircle as CheckIcon,
   Close as CloseIcon,
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean, formatTime } from '../common/util/formatter';
@@ -270,7 +272,7 @@ const UsersModal = ({ open, onClose }) => {
             background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
           }}>
             <div>
-              <Typography variant="h5" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.1 }}>
+              <Typography variant="h5" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 0.8 }}>
                 {t('settingsUsers')}
               </Typography>
             </div>
@@ -348,22 +350,22 @@ const UsersModal = ({ open, onClose }) => {
               <Table>
                 <TableHead>
                   <TableRow style={{ backgroundColor: colors.surface }}>
-                    <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('sharedName')}
                     </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('userEmail')}
                     </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('userAdmin')}
                     </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('sharedStatus')}
                     </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('userExpirationTime')}
                     </TableCell>
-                    <TableCell align="center" style={{ color: colors.text, fontWeight: '600' }}>
+                    <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '8px 16px' }}>
                       {t('sharedActions')}
                     </TableCell>
                   </TableRow>
@@ -374,7 +376,7 @@ const UsersModal = ({ open, onClose }) => {
                       <TableCell colSpan={6} align="center" style={{ padding: '40px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                           <CircularProgress style={{ color: colors.primary }} size={40} />
-                          <Typography style={{ color: colors.textSecondary, lineHeight: 1.1 }}>
+                          <Typography style={{ color: colors.textSecondary, lineHeight: 0.8 }}>
                             {t('sharedLoading')}...
                           </Typography>
                         </div>
@@ -382,41 +384,38 @@ const UsersModal = ({ open, onClose }) => {
                     </TableRow>
                   ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.error, lineHeight: 1.1 }}>
+                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.error, lineHeight: 0.8 }}>
                         {t('sharedError')}: {error.message}
                       </TableCell>
                     </TableRow>
                   ) : paginatedUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.textSecondary, lineHeight: 1.1 }}>
+                      <TableCell colSpan={6} align="center" style={{ padding: '40px', color: colors.textSecondary, lineHeight: 0.8 }}>
                         {t('sharedNoData')}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    <AnimatePresence>
+                    <>
                       {paginatedUsers.map((user, index) => (
-                        <motion.tr
+                        <TableRow
                           key={user.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.2, delay: index * 0.05 }}
                           style={{ borderBottom: `1px solid ${colors.border}` }}
+                          sx={{ '& .MuiTableCell-root': { padding: '8px 16px' } }}
                         >
                           <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Avatar
                                 style={{
                                   backgroundColor: colors.primary,
                                   color: colors.text,
-                                  width: '32px',
-                                  height: '32px',
+                                  width: '28px',
+                                  height: '28px',
                                 }}
                               >
                                 <PersonIcon fontSize="small" />
                               </Avatar>
                               <div>
-                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.1 }}>
+                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 0.8 }}>
                                   {user.name || t('sharedUnknown')}
                                 </Typography>
                                 {user.temporary && (
@@ -434,7 +433,7 @@ const UsersModal = ({ open, onClose }) => {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.text, lineHeight: 1.1 }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 0.8 }}>
                             {user.email || '-'}
                           </TableCell>
                           <TableCell>
@@ -459,7 +458,7 @@ const UsersModal = ({ open, onClose }) => {
                               }}
                             />
                           </TableCell>
-                          <TableCell style={{ color: colors.text, lineHeight: 1.1 }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 0.8 }}>
                             {user.expirationTime ? formatTime(user.expirationTime, 'date') : '-'}
                           </TableCell>
                           <TableCell align="center">
@@ -473,9 +472,9 @@ const UsersModal = ({ open, onClose }) => {
                               <MoreVertIcon />
                             </IconButton>
                           </TableCell>
-                        </motion.tr>
+                        </TableRow>
                       ))}
-                    </AnimatePresence>
+                    </>
                   )}
                 </TableBody>
               </Table>
@@ -492,25 +491,22 @@ const UsersModal = ({ open, onClose }) => {
               alignItems: 'center',
               gap: '16px',
             }}>
-              <Typography style={{ color: colors.textSecondary, fontSize: '14px', lineHeight: 1.1 }}>
+              <Typography style={{ color: colors.textSecondary, fontSize: '14px', lineHeight: 0.8 }}>
                 {page} / {totalPages} ({filteredUsers.length} {t('settingsUsers')})
               </Typography>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Button
-                  variant="outlined"
-                  size="small"
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <IconButton
                   onClick={() => setPage(1)}
                   disabled={page === 1}
+                  size="small"
                   style={{
                     color: colors.text,
-                    borderColor: colors.border,
-                    minWidth: '32px',
+                    width: '32px',
                     height: '32px',
-                    padding: '4px 8px',
                   }}
                 >
-                  ««
-                </Button>
+                  <FirstPageIcon fontSize="small" />
+                </IconButton>
                 <Pagination
                   count={totalPages}
                   page={page}
@@ -529,21 +525,18 @@ const UsersModal = ({ open, onClose }) => {
                     },
                   }}
                 />
-                <Button
-                  variant="outlined"
-                  size="small"
+                <IconButton
                   onClick={() => setPage(totalPages)}
                   disabled={page === totalPages}
+                  size="small"
                   style={{
                     color: colors.text,
-                    borderColor: colors.border,
-                    minWidth: '32px',
+                    width: '32px',
                     height: '32px',
-                    padding: '4px 8px',
                   }}
                 >
-                  »»
-                </Button>
+                  <LastPageIcon fontSize="small" />
+                </IconButton>
               </div>
             </div>
           )}
