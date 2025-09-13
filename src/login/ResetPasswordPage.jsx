@@ -166,7 +166,6 @@ const ResetPasswordPage = () => {
     },
     inputContainer: {
       position: 'relative',
-      width: '100%',
     },
     input: {
       width: '100%',
@@ -409,16 +408,16 @@ const ResetPasswordPage = () => {
         {!token ? (
           <div style={styles.inputContainer}>
             <label style={styles.label}>{t('userEmail')}</label>
-            <Mail 
-              size={16} 
-              style={{ 
-                position: 'absolute', 
-                left: '12px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
+            <Mail
+              size={16}
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
                 color: colors.textSecondary,
                 zIndex: 1
-              }} 
+              }}
             />
             <input
               type="email"
@@ -433,16 +432,16 @@ const ResetPasswordPage = () => {
         ) : (
           <div style={styles.inputContainer}>
             <label style={styles.label}>{t('userPassword')}</label>
-            <Key 
-              size={16} 
-              style={{ 
-                position: 'absolute', 
-                left: '12px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
+            <Key
+              size={16}
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '52%',
+                transform: 'translateY(-50%)',
                 color: colors.textSecondary,
                 zIndex: 1
-              }} 
+              }}
             />
             <input
               type="password"
