@@ -101,6 +101,25 @@ const FloatingUsersPopover = ({
     setPage(1);
   }, [searchKeyword, showTemporary]);
 
+  // Cleanup effect when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clear query cache when component unmounts
+      queryClient.removeQueries(['users']);
+      
+      // Reset all state when component unmounts
+      setSearchKeyword('');
+      setShowTemporary(false);
+      setSelectedUser(null);
+      setAnchorEl(null);
+      setDeleteDialog(false);
+      setUserToDelete(null);
+      setEditDialog(false);
+      setEditingUser(null);
+      setPage(1);
+    };
+  }, [queryClient]);
+
   // Pagination
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
   const paginatedUsers = filteredUsers.slice(
@@ -264,7 +283,24 @@ const FloatingUsersPopover = ({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <IconButton
-                onClick={onClose}
+                onClick={() => {
+                  // Invalidate and clear query cache to ensure fresh data on next open
+                  queryClient.invalidateQueries(['users']);
+                  queryClient.removeQueries(['users']);
+                  
+                  // Reset all state to ensure clean unmount
+                  setSearchKeyword('');
+                  setShowTemporary(false);
+                  setSelectedUser(null);
+                  setAnchorEl(null);
+                  setDeleteDialog(false);
+                  setUserToDelete(null);
+                  setEditDialog(false);
+                  setEditingUser(null);
+                  setPage(1);
+                  // Close the component
+                  onClose();
+                }}
                 size="small"
                 style={{ color: colors.textSecondary }}
               >
@@ -340,55 +376,88 @@ const FloatingUsersPopover = ({
           </div>
 
           {/* Users Table */}
-          <div style={{ flex: 1, overflow: 'auto' }}>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow style={{ backgroundColor: colors.surface }}>
-                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                      {t('sharedName')}
-                    </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                      {t('userEmail')}
-                    </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                      {t('userAdmin')}
-                    </TableCell>
-                    <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                      {t('sharedStatus')}
-                    </TableCell>
-                    <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                      {t('sharedActions')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center" style={{ padding: '20px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                          <CircularProgress style={{ color: colors.primary }} size={24} />
-                          <Typography style={{ color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
-                            {t('sharedLoading')}...
-                          </Typography>
-                        </div>
+          <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+            {isLoading ? (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.surface,
+                zIndex: 10
+              }}>
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '120px',
+                  height: '120px',
+                  backgroundColor: colors.surface,
+                  borderRadius: '50%',
+                  boxShadow: `0 4px 12px ${colors.border}20`
+                }}>
+                  <CircularProgress 
+                    style={{ 
+                      color: theme === 'dark' ? '#ffffff' : '#000000',
+                      position: 'absolute'
+                    }} 
+                    size={100}
+                    thickness={4}
+                  />
+                </div>
+                <Typography style={{ 
+                  color: colors.textSecondary, 
+                  lineHeight: 1.2, 
+                  fontSize: '14px',
+                  marginTop: '12px'
+                }}>
+                  {t('sharedLoading')}...
+                </Typography>
+              </div>
+            ) : (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow style={{ backgroundColor: colors.surface }}>
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('sharedName')}
+                      </TableCell>
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('userEmail')}
+                      </TableCell>
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('userAdmin')}
+                      </TableCell>
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('sharedStatus')}
+                      </TableCell>
+                      <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('sharedActions')}
                       </TableCell>
                     </TableRow>
-                  ) : error ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.error, lineHeight: 0.8, fontSize: '12px' }}>
-                        {t('sharedError')}: {error.message}
-                      </TableCell>
-                    </TableRow>
-                  ) : paginatedUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
-                        {t('sharedNoData')}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <>
-                      {paginatedUsers.map((user, index) => (
+                  </TableHead>
+                  <TableBody>
+                    {error ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.error, lineHeight: 0.8, fontSize: '12px' }}>
+                          {t('sharedError')}: {error.message}
+                        </TableCell>
+                      </TableRow>
+                    ) : paginatedUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
+                          {t('sharedNoData')}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {paginatedUsers.map((user, index) => (
                         <TableRow
                           key={user.id}
                           style={{ 
@@ -475,6 +544,7 @@ const FloatingUsersPopover = ({
                 </TableBody>
               </Table>
             </TableContainer>
+            )}
           </div>
 
           {/* Pagination */}

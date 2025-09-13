@@ -435,7 +435,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
