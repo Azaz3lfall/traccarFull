@@ -353,20 +353,27 @@ const LoginPage = () => {
         </button>
       </div>
             <LoginLayout>
-              {/* Spacer div to match register page back button space */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  left: '20px',
-                  width: '40px',
-                  height: '40px',
-                  zIndex: 1,
-                  pointerEvents: 'none',
-                }}
-              />
-              
-              <div className="flex flex-col w-full" style={{ gap: '20px' }}>
+              <motion.div
+                initial={{ opacity: 0, x: 30, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -30, scale: 0.98 }}
+                transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
+                style={{ width: '100%', height: '100%' }}
+              >
+                {/* Spacer div to match register page back button space */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    width: '40px',
+                    height: '40px',
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                  }}
+                />
+                
+                <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!openIdForced && (
           <>
             <div className="w-full">
@@ -689,6 +696,7 @@ const LoginPage = () => {
             </button>
           </div>
         )}
+              </motion.div>
       </LoginLayout>
       
       {/* Language Popover */}

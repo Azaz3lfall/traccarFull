@@ -207,31 +207,20 @@ const ResetPasswordPage = () => {
   const styles = getStyles(colors);
 
   return (
-    <LoginLayout>
-      {/* Back Button */}
-      <button
-        style={styles.backButton}
-        onClick={() => navigate('/login')}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = colors.hover;
-          e.target.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = colors.surface;
-          e.target.style.transform = 'translateY(0)';
-        }}
-      >
-        <ChevronLeft size={20} />
-      </button>
-
-      {/* Control Bar */}
-      <div style={styles.options}>
+    <>
+      <div style={{
+        ...styles.options,
+        // Force theme colors for debugging
+        backgroundColor: colors.menuSurface,
+        border: `1px solid ${colors.menuBorder}`,
+        boxShadow: colors.menuShadow,
+      }}>
         {nativeEnvironment && changeEnabled && (
-          <button
+          <button 
             data-control-button
             style={styles.iconButton}
             onClick={() => navigate('/change-server')}
-            title={`${t('settingsServer')}: ${window.location.hostname}`}
+              title={`${t('settingsServer')}: ${window.location.hostname}`}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = colors.menuHover;
             }}
@@ -255,7 +244,7 @@ const ResetPasswordPage = () => {
           </button>
         )}
         {!nativeEnvironment && (
-          <button
+          <button 
             data-control-button
             style={styles.iconButton}
             onClick={() => {/* QR Code functionality */}}
@@ -398,7 +387,24 @@ const ResetPasswordPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Form Content */}
+      <LoginLayout>
+        {/* Back Button */}
+        <button
+          style={styles.backButton}
+          onClick={() => navigate('/login')}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = colors.hover;
+            e.target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = colors.surface;
+            e.target.style.transform = 'translateY(0)';
+          }}
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        {/* Form Content */}
       <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!token ? (
           <div style={styles.inputContainer}>
@@ -480,7 +486,8 @@ const ResetPasswordPage = () => {
           {!token ? t('loginResetSuccess') : t('loginUpdateSuccess')}
         </div>
       )}
-    </LoginLayout>
+      </LoginLayout>
+    </>
   );
 };
 

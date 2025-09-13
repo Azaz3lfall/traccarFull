@@ -36,6 +36,7 @@ import StatisticsPage from './reports/StatisticsPage';
 import LoginPage from './login/LoginPage';
 import RegisterPage from './login/RegisterPage';
 import ResetPasswordPage from './login/ResetPasswordPage';
+import AuthTransition from './login/AuthTransition';
 import GeofencesPage from './other/GeofencesPage';
 import GeofencePage from './settings/GeofencePage';
 import { useEffectAsync } from './reactHelper';
@@ -112,9 +113,9 @@ const Navigation = () => {
   }
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/login" element={<AuthTransition><LoginPage /></AuthTransition>} />
+      <Route path="/register" element={<AuthTransition><RegisterPage /></AuthTransition>} />
+      <Route path="/reset-password" element={<AuthTransition><ResetPasswordPage /></AuthTransition>} />
       <Route path="/change-server" element={<ChangeServerPage />} />
       <Route path="/" element={<App />}>
         <Route index element={<MainPage />} />
