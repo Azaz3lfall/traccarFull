@@ -8,6 +8,7 @@ import CombinedReportPage from './reports/CombinedReportPage';
 import PositionsReportPage from './reports/PositionsReportPage';
 import ServerPage from './settings/ServerPage';
 import UsersPage from './settings/UsersPage';
+import CustomUsersPage from './settings/CustomUsersPage';
 import DevicePage from './settings/DevicePage';
 import UserPage from './settings/UserPage';
 import NotificationsPage from './settings/NotificationsPage';
@@ -164,6 +165,7 @@ const Navigation = () => {
           <Route path="preferences" element={<PreferencesPage />} />
           <Route path="server" element={<ServerPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="custom-users" element={<CustomUsersPage />} />
           <Route path="user/:id/connections" element={<UserConnectionsPage />} />
           <Route path="user/:id" element={<UserPage />} />
           <Route path="user" element={<UserPage />} />

@@ -15,6 +15,7 @@ import useFilter from './useFilter';
 import MainMap from './MainMap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
+import UsersModal from './UsersModal';
 import { 
   Truck, 
   PieChart, 
@@ -114,6 +115,7 @@ const MainPage = () => {
   const [userRef, setUserRef] = useState(null);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
+  const [showUsersModal, setShowUsersModal] = useState(false);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -1634,7 +1636,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-users');
               if (tooltip) tooltip.remove();
-              window.location.href = '/settings/users';
+              setShowUsersModal(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3039,6 +3041,12 @@ const MainPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Users Management Modal */}
+      <UsersModal 
+        open={showUsersModal} 
+        onClose={() => setShowUsersModal(false)} 
+      />
       
     </div>
   );
