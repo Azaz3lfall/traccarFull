@@ -6,6 +6,7 @@ import ReactCountryFlag from 'react-country-flag';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/button';
 import LoginLayout from './LoginLayout';
+import LogoImage from './LogoImage';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
 import { snackBarDurationShortMs } from '../common/util/duration';
 import { useEffectAsync } from '../reactHelper';
@@ -307,6 +308,11 @@ const RegisterPage = () => {
           transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
           style={{ width: '100%', height: '100%' }}
         >
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <LogoImage color={colors.primary} />
+          </div>
+          
           <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         <div className="w-full">
           <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>

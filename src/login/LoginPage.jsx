@@ -11,6 +11,7 @@ import { sessionActions } from '../store';
 import { useLocalization, useTranslation } from '../common/components/LocalizationProvider';
 import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
 import LoginLayout from './LoginLayout';
+import LogoImage from './LogoImage';
 import usePersistedState from '../common/util/usePersistedState';
 import {
   generateLoginToken, handleLoginTokenListeners, nativeEnvironment, nativePostMessage,
@@ -372,6 +373,11 @@ const LoginPage = () => {
                     pointerEvents: 'none',
                   }}
                 />
+                
+                {/* Logo */}
+                <div className="flex justify-center mb-8">
+                  <LogoImage color={colors.primary} />
+                </div>
                 
                 <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!openIdForced && (
