@@ -564,8 +564,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -573,7 +573,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -631,8 +631,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -640,7 +640,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -697,8 +697,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -706,7 +706,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -764,8 +764,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -773,7 +773,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -841,7 +841,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -900,8 +900,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -909,7 +909,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -968,8 +968,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -977,7 +977,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -1036,8 +1036,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -1045,7 +1045,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -1104,8 +1104,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -1113,7 +1113,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }
@@ -1181,7 +1181,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1249,7 +1249,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1317,7 +1317,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1385,7 +1385,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1453,7 +1453,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1521,7 +1521,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1589,7 +1589,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1657,7 +1657,7 @@ const MainPage = () => {
                   white-space: nowrap;
                   z-index: 10001;
                   pointer-events: none;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  box-shadow: ${colors.menuShadow};
                 `;
                 document.body.appendChild(tooltip);
               }
@@ -1718,8 +1718,8 @@ const MainPage = () => {
                 left: ${rect.right + 8}px;
                 top: ${rect.top + rect.height / 2}px;
                 transform: translateY(-50%);
-                background: #1F2937;
-                color: white;
+                background: ${colors.menuSurface};
+                color: ${colors.menuText};
                 padding: 6px 10px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -1727,7 +1727,7 @@ const MainPage = () => {
                 white-space: nowrap;
                 z-index: 10001;
                 pointer-events: none;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                box-shadow: ${colors.menuShadow};
               `;
               document.body.appendChild(tooltip);
             }

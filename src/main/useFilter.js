@@ -21,12 +21,6 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       .filter((device) => !filter.statuses.length || filter.statuses.includes(device.status))
       .filter((device) => !filter.groups.length || deviceGroups(device).some((id) => filter.groups.includes(id)))
       .filter((device) => {
-        // Only show devices that contain "hive" in name or model
-        const lowerCaseName = (device.name || '').toLowerCase();
-        const lowerCaseModel = (device.model || '').toLowerCase();
-        return lowerCaseName.includes('hive') || lowerCaseModel.includes('hive');
-      })
-      .filter((device) => {
         const lowerCaseKeyword = keyword.toLowerCase();
         return [device.name, device.uniqueId, device.phone, device.model, device.contact].some((s) => s && s.toLowerCase().includes(lowerCaseKeyword));
       });
