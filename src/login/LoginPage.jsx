@@ -355,27 +355,15 @@ const LoginPage = () => {
       </div>
             <LoginLayout>
               <motion.div
-                initial={{ opacity: 0, x: 30, scale: 0.98 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -30, scale: 0.98 }}
+                key="login"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
                 style={{ width: '100%', height: '100%' }}
               >
-                {/* Spacer div to match register page back button space */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '20px',
-                    left: '20px',
-                    width: '40px',
-                    height: '40px',
-                    zIndex: 1,
-                    pointerEvents: 'none',
-                  }}
-                />
-                
                 {/* Logo */}
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center" style={{ marginTop: '20px', marginBottom: '30px' }}>
                   <LogoImage color={colors.primary} />
                 </div>
                 
