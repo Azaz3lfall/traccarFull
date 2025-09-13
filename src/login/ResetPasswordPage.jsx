@@ -7,9 +7,8 @@ import LoginLayout from './LoginLayout';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { snackBarDurationShortMs } from '../common/util/duration';
 import fetchOrThrow from '../common/util/fetchOrThrow';
-import { useThemeColors } from '../common/components/ThemeProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useLocalization } from '../common/components/LocalizationProvider';
-import { useCustomTheme } from '../common/components/ThemeProvider';
 import { Button } from '../components/ui/button';
 
 const ResetPasswordPage = () => {
@@ -17,7 +16,7 @@ const ResetPasswordPage = () => {
   const t = useTranslation();
   const colors = useThemeColors();
   const { language, setLanguage } = useLocalization();
-  const { currentTheme, setLocalTheme } = useCustomTheme();
+  const { theme: currentTheme, setLocalTheme } = useTheme();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('passwordReset');
