@@ -15,6 +15,7 @@ import useFilter from './useFilter';
 import MainMap from './MainMap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
+import FloatingUsersPopover from '../components/FloatingUsersPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -116,6 +117,7 @@ const MainPage = () => {
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
   const [showUsersModal, setShowUsersModal] = useState(false);
+  const [showUsersPopover, setShowUsersPopover] = useState(false);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -259,7 +261,7 @@ const MainPage = () => {
   }));
   
   // Theme functionality
-  const { themes, theme: currentTheme, setLocalTheme } = useCustomTheme();
+  const { theme: currentTheme, setLocalTheme } = useCustomTheme();
   const colors = useThemeColors();
 
   // Reset button hover states when theme changes
@@ -1636,7 +1638,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-users');
               if (tooltip) tooltip.remove();
-              setShowUsersModal(true);
+              setShowUsersPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3046,6 +3048,14 @@ const MainPage = () => {
       <UsersModal 
         open={showUsersModal} 
         onClose={() => setShowUsersModal(false)} 
+      />
+      
+      {/* Users Management Popover */}
+      <FloatingUsersPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showUsersPopover}
+        onClose={() => setShowUsersPopover(false)}
       />
       
     </div>
