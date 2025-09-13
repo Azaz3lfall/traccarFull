@@ -171,7 +171,7 @@ const ResetPasswordPage = () => {
     input: {
       width: '100%',
       padding: '12px 16px 12px 40px',
-      backgroundColor: colors.secondary,
+      backgroundColor: colors.surface,
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       color: colors.text,
@@ -224,14 +224,19 @@ const ResetPasswordPage = () => {
         <ChevronLeft size={20} />
       </button>
 
-      {/* Control Bar */}
-      <div style={styles.options}>
+      <div style={{
+        ...styles.options,
+        // Force theme colors for debugging
+        backgroundColor: colors.menuSurface,
+        border: `1px solid ${colors.menuBorder}`,
+        boxShadow: colors.menuShadow,
+      }}>
         {nativeEnvironment && changeEnabled && (
-          <button
+          <button 
             data-control-button
             style={styles.iconButton}
             onClick={() => navigate('/change-server')}
-            title={`${t('settingsServer')}: ${window.location.hostname}`}
+              title={`${t('settingsServer')}: ${window.location.hostname}`}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = colors.menuHover;
             }}
@@ -255,7 +260,7 @@ const ResetPasswordPage = () => {
           </button>
         )}
         {!nativeEnvironment && (
-          <button
+          <button 
             data-control-button
             style={styles.iconButton}
             onClick={() => {/* QR Code functionality */}}

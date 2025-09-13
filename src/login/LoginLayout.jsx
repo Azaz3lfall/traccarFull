@@ -33,7 +33,7 @@ const LoginLayout = ({ children }) => {
           
           <CardContent className="p-0 flex flex-col items-center justify-center h-full" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
             {/* Logo */}
-            <div className="relative z-10" style={{ marginTop: '40px', marginBottom: '40px' }}>
+            <div className="relative z-10" style={{ marginTop: '20px', marginBottom: '40px' }}>
               <LogoImage color={colors.primary} />
             </div>
             
