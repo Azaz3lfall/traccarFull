@@ -24,7 +24,7 @@ const LoginLayout = ({ children }) => {
           borderColor: colors.border,
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)',
           borderRadius: '16px',
-          height: '610px',
+          height: '540px',
         }}>
           {/* Top gradient border */}
           <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{
@@ -33,7 +33,7 @@ const LoginLayout = ({ children }) => {
           
           <CardContent className="p-0 flex flex-col items-center justify-center h-full" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
             {/* Logo */}
-            <div className="relative z-10" style={{ marginTop: '0px', marginBottom: '40px' }}>
+            <div className="relative z-10" style={{ marginTop: '40px', marginBottom: '40px' }}>
               <LogoImage color={colors.primary} />
             </div>
             

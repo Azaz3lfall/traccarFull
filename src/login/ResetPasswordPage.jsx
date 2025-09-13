@@ -166,6 +166,7 @@ const ResetPasswordPage = () => {
     },
     inputContainer: {
       position: 'relative',
+      width: '100%',
     },
     input: {
       width: '100%',
@@ -206,20 +207,31 @@ const ResetPasswordPage = () => {
   const styles = getStyles(colors);
 
   return (
-    <>
-      <div style={{
-        ...styles.options,
-        // Force theme colors for debugging
-        backgroundColor: colors.menuSurface,
-        border: `1px solid ${colors.menuBorder}`,
-        boxShadow: colors.menuShadow,
-      }}>
+    <LoginLayout>
+      {/* Back Button */}
+      <button
+        style={styles.backButton}
+        onClick={() => navigate('/login')}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = colors.hover;
+          e.target.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = colors.surface;
+          e.target.style.transform = 'translateY(0)';
+        }}
+      >
+        <ChevronLeft size={20} />
+      </button>
+
+      {/* Control Bar */}
+      <div style={styles.options}>
         {nativeEnvironment && changeEnabled && (
-          <button 
+          <button
             data-control-button
             style={styles.iconButton}
             onClick={() => navigate('/change-server')}
-              title={`${t('settingsServer')}: ${window.location.hostname}`}
+            title={`${t('settingsServer')}: ${window.location.hostname}`}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = colors.menuHover;
             }}
@@ -243,7 +255,7 @@ const ResetPasswordPage = () => {
           </button>
         )}
         {!nativeEnvironment && (
-          <button 
+          <button
             data-control-button
             style={styles.iconButton}
             onClick={() => {/* QR Code functionality */}}
@@ -386,39 +398,12 @@ const ResetPasswordPage = () => {
         )}
       </AnimatePresence>
 
-      <LoginLayout>
-        {/* Back Button */}
-        <button
-          style={styles.backButton}
-          onClick={() => navigate('/login')}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
-            e.target.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = colors.surface;
-            e.target.style.transform = 'translateY(0)';
-          }}
-        >
-          <ChevronLeft size={20} />
-        </button>
-
-        {/* Form Content */}
+      {/* Form Content */}
       <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!token ? (
           <div style={styles.inputContainer}>
             <label style={styles.label}>{t('userEmail')}</label>
-            <Mail
-              size={16}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: colors.textSecondary,
-                zIndex: 1
-              }}
-            />
+            <Mail style={styles.inputIcon} />
             <input
               type="email"
               name="email"
@@ -432,17 +417,7 @@ const ResetPasswordPage = () => {
         ) : (
           <div style={styles.inputContainer}>
             <label style={styles.label}>{t('userPassword')}</label>
-            <Key
-              size={16}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '52%',
-                transform: 'translateY(-50%)',
-                color: colors.textSecondary,
-                zIndex: 1
-              }}
-            />
+            <Key style={styles.inputIcon} />
             <input
               type="password"
               name="password"
@@ -505,8 +480,7 @@ const ResetPasswordPage = () => {
           {!token ? t('loginResetSuccess') : t('loginUpdateSuccess')}
         </div>
       )}
-      </LoginLayout>
-    </>
+    </LoginLayout>
   );
 };
 

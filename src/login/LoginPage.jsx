@@ -68,110 +68,29 @@ const getStyles = (colors) => ({
   },
   inputContainer: {
     position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    padding: '12px 16px 12px 40px',
-    border: `1px solid ${colors.border}`,
-    borderRadius: '8px',
-    backgroundColor: colors.surface,
-    color: colors.text,
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border-color 0.2s, box-shadow 0.2s',
-  },
-  inputFocused: {
-    borderColor: colors.primary,
-    boxShadow: `0 0 0 2px ${colors.primary}20`,
-  },
-  icon: {
-    position: 'absolute',
-    left: '12px',
-    color: colors.textSecondary,
-    zIndex: 1,
   },
   passwordToggle: {
     position: 'absolute',
     right: '12px',
-    color: colors.textSecondary,
-    cursor: 'pointer',
-    zIndex: 1,
+    top: '50%',
+    transform: 'translateY(-50%)',
     background: 'none',
     border: 'none',
-    padding: '4px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '8px',
-    color: colors.text,
-    fontSize: '14px',
-    fontWeight: '500',
-  },
-  error: {
-    color: colors.error,
-    fontSize: '14px',
-    marginTop: '8px',
-    textAlign: 'center',
-  },
-  announcement: {
-    backgroundColor: colors.infoBackground,
-    color: colors.infoText,
-    padding: '12px 16px',
-    borderRadius: '8px',
-    marginBottom: '16px',
-    fontSize: '14px',
-    textAlign: 'center',
-    border: `1px solid ${colors.infoBorder}`,
-  },
-  qrContainer: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2000,
-  },
-  qrContent: {
-    backgroundColor: colors.surface,
-    padding: '24px',
-    borderRadius: '12px',
-    textAlign: 'center',
-    maxWidth: '300px',
-    width: '90%',
-  },
-  languagePopover: {
-    position: 'absolute',
-    top: '50px',
-    right: '0',
-    backgroundColor: colors.menuSurface,
-    border: `1px solid ${colors.menuBorder}`,
-    borderRadius: '8px',
-    boxShadow: colors.menuShadow,
-    padding: '8px',
-    minWidth: '200px',
-    zIndex: 1001,
-  },
-  languageItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '8px 12px',
+    color: colors.menuTextSecondary,
     cursor: 'pointer',
-    borderRadius: '4px',
-    color: colors.menuText,
-    fontSize: '14px',
+    fontSize: '16px',
   },
-  languageItemHover: {
-    backgroundColor: colors.menuHover,
+  errorMessage: {
+    color: '#EF4444',
+    fontSize: '14px',
+    textAlign: 'center',
+  },
+  link: {
+    background: 'none',
+    border: 'none',
+    color: '#3B82F6',
+    cursor: 'pointer',
+    fontSize: '14px',
   },
 });
 
@@ -179,25 +98,25 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const t = useTranslation();
-  const colors = useThemeColors();
+
   const { languages, language, setLocalLanguage } = useLocalization();
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
+  const colors = useThemeColors();
+  
+  const styles = getStyles(colors);
+  const languageList = Object.entries(languages).map((values) => ({ code: values[0], country: values[1].country, name: values[1].name }));
 
-  const [email, setEmail] = usePersistedState('email', '');
+  const [failed, setFailed] = useState(false);
+
+  const [email, setEmail] = usePersistedState('loginEmail', '');
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [showQr, setShowQr] = useState(false);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
 
-  const languageList = Object.entries(languages).map((values) => ({ 
-    code: values[0], 
-    country: values[1].country, 
-    name: values[1].name 
-  }));
-
+  const registrationEnabled = useSelector((state) => state.session.server.registration);
   const languageEnabled = useSelector((state) => {
     const attributes = state.session.server.attributes;
     return !attributes.language && !attributes['ui.disableLoginLanguage'];
@@ -211,128 +130,56 @@ const LoginPage = () => {
   const [announcementShown, setAnnouncementShown] = useState(false);
   const announcement = useSelector((state) => state.session.server.announcement);
 
-  const handleThemeToggle = () => {
-    setLocalTheme(currentTheme === 'light' ? 'dark' : 'light');
+  const handlePasswordLogin = async (event) => {
+    event.preventDefault();
+    setFailed(false);
+    try {
+      const query = `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+      const response = await fetch('/api/session', {
+        method: 'POST',
+        body: new URLSearchParams(code.length ? `${query}&code=${code}` : query),
+      });
+      if (response.ok) {
+        const user = await response.json();
+        generateLoginToken();
+        dispatch(sessionActions.updateUser(user));
+        const target = window.sessionStorage.getItem('postLogin') || '/';
+        window.sessionStorage.removeItem('postLogin');
+        navigate(target, { replace: true });
+      } else if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'TOTP') {
+        setCodeEnabled(true);
+      } else {
+        throw Error(await response.text());
+      }
+    } catch {
+      setFailed(true);
+      setPassword('');
+    }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-
+  const handleTokenLogin = async (token) => {
     try {
-      const response = await fetchOrThrow('/api/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(sessionActions.updateServer(data));
-        navigate('/');
-      } else {
-        const data = await response.json();
-        setError(data.message || t('loginFailed'));
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    const response = await fetchOrThrow(`/api/session?token=${encodeURIComponent(token)}`);
+    const user = await response.json();
+    dispatch(sessionActions.updateUser(user));
+    navigate('/');
+    } catch (error) {
+      console.error('Token login error:', error);
     }
   };
 
   const handleOpenIdLogin = () => {
-    if (nativeEnvironment) {
-      nativePostMessage('openIdLogin');
-    } else {
-      window.location.href = '/api/openid/login';
-    }
+    document.location = '/api/session/openid/auth';
   };
 
-  const handleQrLogin = () => {
-    if (nativeEnvironment) {
-      nativePostMessage('qrLogin');
-    } else {
-      setShowQr(true);
-    }
+  const handleThemeToggle = () => {
+    setLocalTheme(currentTheme === 'light' ? 'dark' : 'light');
   };
 
-  const handleCodeLogin = () => {
-    if (nativeEnvironment) {
-      nativePostMessage('codeLogin');
-    } else {
-      setCodeEnabled(true);
-    }
-  };
-
-  const handleCodeSubmit = async (code) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetchOrThrow('/api/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(sessionActions.updateServer(data));
-        navigate('/');
-      } else {
-        const data = await response.json();
-        setError(data.message || t('loginFailed'));
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQrSubmit = async (qrData) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetchOrThrow('/api/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ qr: qrData }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(sessionActions.updateServer(data));
-        navigate('/');
-      } else {
-        const data = await response.json();
-        setError(data.message || t('loginFailed'));
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => nativePostMessage('authentication'), []);
 
   useEffect(() => {
-    const listener = (event) => {
-      if (event.data.type === 'loginToken') {
-        handleCodeSubmit(event.data.token);
-      }
-    };
+    const listener = (token) => handleTokenLogin(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);
   }, []);
@@ -351,7 +198,10 @@ const LoginPage = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    if (showLanguagePopover) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -367,8 +217,6 @@ const LoginPage = () => {
       }
     });
   }, [currentTheme]);
-
-  const styles = getStyles(colors);
 
   return (
     <>
@@ -521,240 +369,326 @@ const LoginPage = () => {
               <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!openIdForced && (
           <>
-            {error && (
-              <div style={styles.error}>
-                {error}
-              </div>
-            )}
-
-            {announcement && !announcementShown && (
-              <div style={styles.announcement}>
-                <p>{announcement}</p>
-                <button
-                  onClick={() => setAnnouncementShown(true)}
+            <div className="w-full">
+              <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
+                {t('userEmail')}
+              </label>
+              <div style={styles.inputContainer}>
+                <User 
+                  size={16} 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '12px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)', 
+                    color: colors.textSecondary,
+                    zIndex: 1
+                  }} 
+                />
+                <input
+                  type="email"
+                name="email"
+                value={email}
+                autoComplete="email"
+                autoFocus={!email}
+                onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   style={{
-                    color: colors.primary,
-                    textDecoration: 'underline',
+                    width: '100%',
+                    padding: '12px 16px 12px 40px',
+                    backgroundColor: colors.secondary,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    color: colors.text,
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    margin: 0
+                  }}
+                />
+              </div>
+            </div>
+            <div className="w-full">
+              <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
+                {t('userPassword')}
+              </label>
+              <div style={styles.inputContainer}>
+                <Key 
+                  size={16} 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '12px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)', 
+                    color: colors.textSecondary,
+                    zIndex: 1
+                  }} 
+                />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={password}
+              autoComplete="current-password"
+              autoFocus={!!email}
+              onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 40px',
+                    backgroundColor: colors.secondary,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    color: colors.text,
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    margin: 0
+                  }}
+                />
+                <button
+                  type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
                     background: 'none',
                     border: 'none',
+                    color: colors.menuTextSecondary,
                     cursor: 'pointer',
-                    fontSize: '12px',
-                    marginTop: '4px',
+                    fontSize: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '24px',
+                    height: '24px',
+                    zIndex: 1
                   }}
                 >
-                  {t('dismiss')}
+                  {showPassword ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
                 </button>
               </div>
+            </div>
+            {codeEnabled && (
+              <div className="w-full">
+                <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
+                  {t('loginTotpCode')}
+                </label>
+                <input
+                  type="number"
+                name="code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                  placeholder="Enter TOTP code"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    backgroundColor: colors.secondary,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    color: colors.text,
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    margin: 0
+                  }}
+                />
+              </div>
             )}
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={styles.label}>
-                  {t('userEmail')}
-                </label>
-                <div style={styles.inputContainer}>
-                  <User size={18} style={styles.icon} />
-                  <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin"
-                    style={styles.input}
-                    required
-                  />
-                </div>
+            {failed && (
+              <div style={styles.errorMessage}>
+                Invalid username or password
               </div>
-
-              <div>
-                <label style={styles.label}>
-                  {t('userPassword')}
-                </label>
-                <div style={styles.inputContainer}>
-                  <Key size={18} style={styles.icon} />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('userPassword')}
-                    style={styles.input}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={styles.passwordToggle}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
+            )}
+            <Button
+              onClick={handlePasswordLogin}
+              type="submit"
+              disabled={!email || !password || (codeEnabled && !code)}
+              className="w-full mt-5"
+              style={{
+                backgroundColor: colors.primary,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: '500',
+                height: '48px',
+                transition: 'all 0.2s ease',
+                boxShadow: colors.shadow,
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = colors.primary;
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = colors.shadow;
+              }}
+            >
+              {t('loginLogin')}
+            </Button>
+          </>
+        )}
+        {openIdEnabled && (
+          <Button
+            onClick={() => handleOpenIdLogin()}
+            className="w-full mt-5"
+            style={{
+              backgroundColor: colors.secondary,
+              color: colors.text,
+              border: `1px solid ${colors.border}`,
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontSize: '16px',
+              fontWeight: '500',
+              height: '48px',
+              transition: 'all 0.2s ease',
+              boxShadow: colors.shadow,
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = colors.hover;
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = colors.secondary;
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = colors.shadow;
+            }}
+          >
+            {t('loginOpenId')}
+          </Button>
+        )}
+        {!openIdForced && (
+          <div style={{ ...styles.extraContainer, marginBottom: '40px' }}>
+            {registrationEnabled && (
               <Button
-                type="submit"
-                disabled={loading}
+                variant="ghost"
+                onClick={() => navigate('/register')}
+                className="text-sm font-medium"
                 style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: colors.primary,
-                  color: colors.primaryText,
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.6 : 1,
-                  transition: 'opacity 0.2s',
-                }}
-              >
-                {loading ? t('loginLoading') : t('loginLogin')}
-              </Button>
-            </form>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {openIdEnabled && (
-                <Button
-                  onClick={handleOpenIdLogin}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: 'transparent',
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  {t('loginOpenId')}
-                </Button>
-              )}
-
-              {!nativeEnvironment && (
-                <Button
-                  onClick={handleQrLogin}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: 'transparent',
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  {t('loginQr')}
-                </Button>
-              )}
-
-              <Button
-                onClick={handleCodeLogin}
-                style={{
-                  width: '100%',
-                  padding: '12px',
+                  color: '#3B82F6',
                   backgroundColor: 'transparent',
-                  color: colors.text,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
+                  e.target.style.color = '#2563EB';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
-                }}
-              >
-                {t('loginCode')}
-              </Button>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <button
-                onClick={() => navigate('/register')}
-                style={{
-                  color: colors.primary,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  textDecoration: 'underline',
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.opacity = '0.8';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.opacity = '1';
+                  e.target.style.color = '#3B82F6';
                 }}
               >
                 {t('loginRegister')}
-              </button>
-            </div>
-
-            {emailEnabled && (
-              <div style={{ textAlign: 'center' }}>
-                <button
-                  onClick={() => navigate('/reset-password')}
-                  style={{
-                    color: colors.textSecondary,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    textDecoration: 'underline',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.opacity = '0.8';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.opacity = '1';
-                  }}
-                >
-                  {t('loginForgot')}
-                </button>
-              </div>
+              </Button>
             )}
-          </>
-        )}
-
-        {openIdForced && (
-          <div style={{ textAlign: 'center' }}>
-            <Button
-              onClick={handleOpenIdLogin}
-              style={{
-                width: '100%',
-                padding: '12px',
-                backgroundColor: colors.primary,
-                color: colors.primaryText,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'pointer',
-              }}
-            >
-              {t('loginOpenId')}
-            </Button>
+            {emailEnabled && (
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/reset-password')}
+                className="text-sm font-medium"
+                style={{
+                  color: '#3B82F6',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.color = '#2563EB';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = '#3B82F6';
+                }}
+              >
+                {t('loginReset')}
+              </Button>
+            )}
           </div>
         )}
-              </div>
+      </div>
+        {showQr && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000
+          }}>
+            <div style={{
+              backgroundColor: '#1F2937',
+              padding: '24px',
+              borderRadius: '12px',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ color: '#F9FAFB', marginBottom: '16px' }}>QR Code</h3>
+              <p style={{ color: '#9CA3AF', marginBottom: '16px' }}>QR Code functionality would go here</p>
+              <button
+                onClick={() => setShowQr(false)}
+                style={{
+                  background: '#3B82F6',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+        {announcement && !announcementShown && (
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '20px',
+            right: '20px',
+            backgroundColor: '#1F2937',
+            color: '#F9FAFB',
+            padding: '16px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            zIndex: 10000
+          }}>
+            <span>{announcement}</span>
+            <button
+              onClick={() => setAnnouncementShown(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#9CA3AF',
+                cursor: 'pointer',
+                fontSize: '20px'
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
       </LoginLayout>
       
       {/* Language Popover */}
@@ -770,12 +704,17 @@ const LoginPage = () => {
               top: '50px',
               right: '8px',
               backgroundColor: colors.menuSurface,
-              border: `1px solid ${colors.menuBorder}`,
-              borderRadius: '8px',
+              borderRadius: '12px',
               boxShadow: colors.menuShadow,
+              border: `1px solid ${colors.menuBorder}`,
               padding: '8px',
-              minWidth: '200px',
-              zIndex: 1001,
+              zIndex: 1000,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              minWidth: '180px',
+              maxHeight: '300px',
+              overflowY: 'auto',
             }}
           >
             {languageList.map((lang) => (
@@ -790,78 +729,39 @@ const LoginPage = () => {
                   alignItems: 'center',
                   gap: '8px',
                   padding: '8px 12px',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
+                  borderRadius: '8px',
+                  backgroundColor: language === lang.code ? colors.menuHover : 'transparent',
                   color: colors.menuText,
-                  fontSize: '14px',
-                  width: '100%',
-                  textAlign: 'left',
-                  background: 'none',
                   border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background-color 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.menuHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
+                  if (language !== lang.code) {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
                 <ReactCountryFlag
                   countryCode={lang.country}
                   svg
                   style={{
-                    width: '1.2em',
-                    height: '1.2em',
+                    width: '1.5em',
+                    height: '1.5em',
                     borderRadius: '4px',
                     boxShadow: '0 0 3px rgba(0,0,0,0.3)'
                   }}
                 />
-                {lang.name}
+                <span>{lang.name}</span>
+                {language === lang.code && (
+                  <span style={{ marginLeft: 'auto', color: colors.menuText }}>✔</span>
+                )}
               </button>
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* QR Code Modal */}
-      <AnimatePresence>
-        {showQr && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={styles.qrContainer}
-            onClick={() => setShowQr(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              style={styles.qrContent}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 style={{ marginBottom: '16px', color: colors.text }}>
-                {t('loginQr')}
-              </h3>
-              <p style={{ color: colors.textSecondary, marginBottom: '16px' }}>
-                {t('loginQrDescription')}
-              </p>
-              <button
-                onClick={() => setShowQr(false)}
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                  background: 'none',
-                  border: 'none',
-                  color: colors.textSecondary,
-                  cursor: 'pointer',
-                  fontSize: '20px'
-                }}
-              >
-                ×
-              </button>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
