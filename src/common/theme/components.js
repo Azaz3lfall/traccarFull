@@ -36,6 +36,24 @@ export default {
       },
     },
   },
+  MuiAlert: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundColor: theme.palette.mode === 'dark' ? '#1F2937' : '#FFFFFF',
+        color: theme.palette.mode === 'dark' ? '#F9FAFB' : '#1F2937',
+        border: theme.palette.mode === 'dark' ? '1px solid #374151' : '1px solid #E5E7EB',
+        borderRadius: '8px',
+        boxShadow: theme.palette.mode === 'dark' 
+          ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
+          : '0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+      }),
+      filled: ({ theme }) => ({
+        backgroundColor: theme.palette.mode === 'dark' ? '#1F2937' : '#FFFFFF',
+        color: theme.palette.mode === 'dark' ? '#F9FAFB' : '#1F2937',
+        border: theme.palette.mode === 'dark' ? '1px solid #374151' : '1px solid #E5E7EB',
+      }),
+    },
+  },
   MuiTooltip: {
     defaultProps: {
       enterDelay: 500,
