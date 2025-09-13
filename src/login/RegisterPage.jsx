@@ -265,6 +265,41 @@ const RegisterPage = () => {
       </div>
 
       <LoginLayout>
+        {/* Back button outside animation */}
+        {!server.newServer && (
+        <button
+          onClick={() => navigate('/login')}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '20px',
+            zIndex: 30,
+            width: '40px',
+            height: '40px',
+            borderRadius: '8px',
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            color: colors.text,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = colors.hover;
+            e.target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = colors.surface;
+            e.target.style.transform = 'translateY(0)';
+          }}
+        >
+          <ChevronLeft size={20} />
+        </button>
+      )}
+        
         <motion.div
           initial={{ opacity: 0, x: -30, scale: 0.98 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -272,40 +307,6 @@ const RegisterPage = () => {
           transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
           style={{ width: '100%', height: '100%' }}
         >
-          {/* Back button inside the login box */}
-          {!server.newServer && (
-          <button
-            onClick={() => navigate('/login')}
-            style={{
-              position: 'absolute',
-              bottom: '20px',
-              left: '20px',
-              zIndex: 30,
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              backgroundColor: colors.surface,
-              border: `1px solid ${colors.border}`,
-              color: colors.text,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = colors.hover;
-              e.target.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = colors.surface;
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
           <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         <div className="w-full">
           <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
