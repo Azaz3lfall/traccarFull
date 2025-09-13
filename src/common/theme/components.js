@@ -7,7 +7,7 @@ export default {
   MuiOutlinedInput: {
     styleOverrides: {
       root: ({ theme }) => ({
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.palette.mode === 'dark' ? '#374151' : '#FFFFFF',
       }),
     },
   },

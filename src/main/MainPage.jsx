@@ -259,6 +259,17 @@ const MainPage = () => {
   // Theme functionality
   const { themes, theme: currentTheme, setLocalTheme } = useCustomTheme();
   const colors = useThemeColors();
+
+  // Reset button hover states when theme changes
+  useEffect(() => {
+    // Reset all control bar buttons to transparent background
+    const buttons = document.querySelectorAll('[data-control-button]');
+    buttons.forEach(button => {
+      if (button) {
+        button.style.backgroundColor = 'transparent';
+      }
+    });
+  }, [currentTheme]);
   
   // User and server data
   const user = useSelector((state) => state.session.user);
@@ -542,7 +553,7 @@ const MainPage = () => {
               window.location.href = '/reports/combined';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -608,8 +619,8 @@ const MainPage = () => {
             if (tooltip) tooltip.remove();
             window.location.href = '/geofences';
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#374151';
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -674,8 +685,8 @@ const MainPage = () => {
             if (tooltip) tooltip.remove();
             window.location.href = '/settings/preferences';
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#374151';
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -742,7 +753,7 @@ const MainPage = () => {
               window.location.href = '/settings/notifications';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -810,7 +821,7 @@ const MainPage = () => {
               window.location.href = `/settings/user/${user.id}`;
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -878,7 +889,7 @@ const MainPage = () => {
               window.location.href = '/settings/devices';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -946,7 +957,7 @@ const MainPage = () => {
               window.location.href = '/settings/groups';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -1014,7 +1025,7 @@ const MainPage = () => {
               window.location.href = '/settings/drivers';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -1082,7 +1093,7 @@ const MainPage = () => {
               window.location.href = '/settings/calendars';
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -1150,7 +1161,7 @@ const MainPage = () => {
               window.location.href = '/settings/attributes';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1218,7 +1229,7 @@ const MainPage = () => {
               window.location.href = '/settings/maintenances';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1286,7 +1297,7 @@ const MainPage = () => {
               window.location.href = '/settings/commands';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1354,7 +1365,7 @@ const MainPage = () => {
               window.open(billingLink, '_blank');
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1422,7 +1433,7 @@ const MainPage = () => {
               window.open(supportLink, '_blank');
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1490,7 +1501,7 @@ const MainPage = () => {
               window.location.href = '/settings/announcement';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1558,7 +1569,7 @@ const MainPage = () => {
               window.location.href = '/settings/server';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1626,7 +1637,7 @@ const MainPage = () => {
               window.location.href = '/settings/users';
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#374151';
+              e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
@@ -1695,8 +1706,8 @@ const MainPage = () => {
             if (tooltip) tooltip.remove();
             setShowLogoutModal(true);
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#374151';
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
@@ -1847,6 +1858,7 @@ const MainPage = () => {
           </Avatar>
         </button>
         <button 
+          data-control-button
           ref={setEventsButtonRef}
           style={{
             width: '34px',
@@ -1917,6 +1929,7 @@ const MainPage = () => {
           )}
         </button>
         <button 
+          data-control-button
           ref={setMapSwitcherRef}
           style={{
             width: '34px',
@@ -2050,6 +2063,7 @@ const MainPage = () => {
         
         {/* Search Button */}
         <button 
+          data-control-button
           ref={setSearchRef}
           style={{
             width: '34px',
@@ -2095,6 +2109,7 @@ const MainPage = () => {
         
         {/* Language Button */}
         <button 
+          data-control-button
           ref={setLanguageRef}
           style={{
             width: '34px',
@@ -2146,6 +2161,7 @@ const MainPage = () => {
         
         {/* Theme Switcher Button */}
         <button
+          data-control-button
           onClick={() => setLocalTheme(currentTheme === 'light' ? 'dark' : 'light')}
           style={{
             width: '34px',
@@ -2662,10 +2678,10 @@ const MainPage = () => {
       <AnimatePresence>
         {showUserPopover && userRef && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             style={{
               position: 'fixed',
               right: '65px',

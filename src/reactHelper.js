@@ -24,7 +24,7 @@ export const useEffectAsync = (effect, deps) => {
         result();
       }
     };
-  }, [...deps, dispatch]);
+  }, deps);
 };
 
 export const useCatch = (method) => {

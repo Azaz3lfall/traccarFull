@@ -1,59 +1,49 @@
-import { useMediaQuery, Paper } from '@mui/material';
-import { makeStyles } from 'tss-react/mui';
-import { useTheme } from '@mui/material/styles';
 import LogoImage from './LogoImage';
-
-const useStyles = makeStyles()((theme) => ({
-  root: {
-    display: 'flex',
-    height: '100%',
-  },
-  sidebar: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: theme.palette.primary.main,
-    paddingBottom: theme.spacing(5),
-    width: theme.dimensions.sidebarWidth,
-    [theme.breakpoints.down('lg')]: {
-      width: theme.dimensions.sidebarWidthTablet,
-    },
-    [theme.breakpoints.down('sm')]: {
-      width: '0px',
-    },
-  },
-  paper: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-    boxShadow: '-2px 0px 16px rgba(0, 0, 0, 0.25)',
-    [theme.breakpoints.up('lg')]: {
-      padding: theme.spacing(0, 25, 0, 0),
-    },
-  },
-  form: {
-    maxWidth: theme.spacing(52),
-    padding: theme.spacing(5),
-    width: '100%',
-  },
-}));
+import { useThemeColors } from '../common/components/ThemeProvider';
+import { Card, CardContent } from '../components/ui/card';
 
 const LoginLayout = ({ children }) => {
-  const { classes } = useStyles();
-  const theme = useTheme();
+  const colors = useThemeColors();
 
   return (
-    <main className={classes.root}>
-      <div className={classes.sidebar}>
-        {!useMediaQuery(theme.breakpoints.down('lg')) && <LogoImage color={theme.palette.secondary.contrastText} />}
+    <main 
+      className="min-h-screen flex flex-col relative" 
+      style={{
+        backgroundImage: `linear-gradient(${colors.overlay || 'rgba(15, 23, 42, 0.85)'}, ${colors.overlay || 'rgba(15, 23, 42, 0.85)'}), url(/images/truck-fleet.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#1F2937',
+      }}
+    >
+      
+      {/* Form Container */}
+      <div className="flex-1 flex flex-col justify-center items-center relative z-20 p-5">
+        <Card className="w-full max-w-[400px] relative overflow-hidden" style={{
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+          borderRadius: '16px',
+          height: '540px',
+        }}>
+          {/* Top gradient border */}
+          <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{
+            background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
+          }} />
+          
+          <CardContent className="p-0 flex flex-col items-center justify-center h-full" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
+            {/* Logo */}
+            <div className="relative z-10" style={{ marginTop: '40px', marginBottom: '40px' }}>
+              <LogoImage color={colors.primary} />
+            </div>
+            
+            {/* Form Content - Full Width with 30px padding */}
+            <div className="w-full px-[30px] pb-8">
+              {children}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-      <Paper className={classes.paper}>
-        <form className={classes.form}>
-          {children}
-        </form>
-      </Paper>
     </main>
   );
 };

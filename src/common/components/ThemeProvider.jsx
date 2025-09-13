@@ -29,6 +29,8 @@ const themes = {
       avatarText: '#FFFFFF',
       // Badge specific colors
       badgeText: '#FFFFFF',
+      // Overlay color for login background
+      overlay: 'rgba(15, 23, 42, 0.85)',
     }
   },
   light: {
@@ -43,18 +45,20 @@ const themes = {
       border: '#E5E7EB',
       hover: '#F3F4F6',
       shadow: 'rgba(0, 0, 0, 0.15)',
-      // Menu and control bar specific colors (always dark)
-      menuSurface: '#1F2937',
-      menuText: '#F9FAFB',
-      menuTextSecondary: '#9CA3AF',
-      menuHover: '#374151',
-      menuBorder: '#374151',
-      menuShadow: 'rgba(0, 0, 0, 0.3)',
+      // Menu and control bar specific colors (light theme)
+      menuSurface: '#FFFFFF',
+      menuText: '#1F2937',
+      menuTextSecondary: '#6B7280',
+      menuHover: '#F3F4F6',
+      menuBorder: '#E5E7EB',
+      menuShadow: 'rgba(0, 0, 0, 0.15)',
       // Avatar specific colors
       avatarBackground: '#6B7280',
       avatarText: '#FFFFFF',
       // Badge specific colors
       badgeText: '#FFFFFF',
+      // Overlay color for login background (lighter for light theme)
+      overlay: 'rgba(15, 23, 42, 0.6)',
     }
   }
 };
