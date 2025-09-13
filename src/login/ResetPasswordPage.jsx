@@ -171,7 +171,7 @@ const ResetPasswordPage = () => {
     input: {
       width: '100%',
       padding: '12px 16px 12px 40px',
-      backgroundColor: colors.surface,
+      backgroundColor: colors.secondary,
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       color: colors.text,
@@ -207,23 +207,7 @@ const ResetPasswordPage = () => {
   const styles = getStyles(colors);
 
   return (
-    <LoginLayout>
-      {/* Back Button */}
-      <button
-        style={styles.backButton}
-        onClick={() => navigate('/login')}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = colors.hover;
-          e.target.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = colors.surface;
-          e.target.style.transform = 'translateY(0)';
-        }}
-      >
-        <ChevronLeft size={20} />
-      </button>
-
+    <>
       <div style={{
         ...styles.options,
         // Force theme colors for debugging
@@ -403,7 +387,24 @@ const ResetPasswordPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Form Content */}
+      <LoginLayout>
+        {/* Back Button */}
+        <button
+          style={styles.backButton}
+          onClick={() => navigate('/login')}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = colors.hover;
+            e.target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = colors.surface;
+            e.target.style.transform = 'translateY(0)';
+          }}
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        {/* Form Content */}
       <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         {!token ? (
           <div style={styles.inputContainer}>
@@ -485,7 +486,8 @@ const ResetPasswordPage = () => {
           {!token ? t('loginResetSuccess') : t('loginUpdateSuccess')}
         </div>
       )}
-    </LoginLayout>
+      </LoginLayout>
+    </>
   );
 };
 
