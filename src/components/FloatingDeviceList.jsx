@@ -601,7 +601,7 @@ const FloatingDeviceList = ({
               type="button"
               style={{
                 position: 'absolute',
-                right: '4px',
+                right: '8px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 width: '32px',
@@ -633,10 +633,10 @@ const FloatingDeviceList = ({
               style={{
                 position: 'fixed',
                 top: filterButtonRef.current ? filterButtonRef.current.getBoundingClientRect().bottom + 8 : 0,
-                right: !desktop ? '16px' : (filterButtonRef.current ? window.innerWidth - filterButtonRef.current.getBoundingClientRect().right : 0),
-                left: !desktop ? '16px' : 'auto',
-                width: !desktop ? 'calc(100vw - 32px)' : '300px',
-                maxWidth: !desktop ? '400px' : '300px',
+                right: !desktop ? '16px' : (filterButtonRef.current ? window.innerWidth - filterButtonRef.current.getBoundingClientRect().right - 10 : 0),
+                left: !desktop ? '24px' : (filterButtonRef.current ? filterButtonRef.current.getBoundingClientRect().left + 10 : 10),
+                width: !desktop ? 'calc(100vw - 32px)' : '292px',
+                maxWidth: !desktop ? '400px' : '292px',
                 backgroundColor: colors.surface,
                 borderRadius: '8px',
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
@@ -1010,7 +1010,7 @@ const FloatingDeviceList = ({
                   />
                   <label htmlFor="filterMap" style={{
                     fontSize: '14px',
-                    color: '#374151',
+                    color: colors.text,
                     cursor: 'pointer',
                     margin: 0,
                     fontWeight: '500'

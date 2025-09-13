@@ -310,15 +310,12 @@ const RegisterPage = () => {
           style={{ width: '100%', height: '100%' }}
         >
           {/* Logo */}
-          <div className="flex justify-center" style={{ marginTop: '20px', marginBottom: '30px' }}>
+          <div className="flex justify-center" style={{ marginTop: '20px', marginBottom: '100px' }}>
             <LogoImage color={colors.primary} />
           </div>
           
           <div className="flex flex-col w-full" style={{ gap: '20px' }}>
         <div className="w-full">
-          <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-            {t('sharedName')}
-          </label>
           <div style={styles.inputContainer}>
             <User
               size={16}
@@ -338,7 +335,7 @@ const RegisterPage = () => {
               autoComplete="name"
               autoFocus
               onChange={(event) => setName(event.target.value)}
-              placeholder="Enter your name"
+              placeholder={t('sharedName')}
               style={{
                 width: '100%',
                 padding: '12px 16px 12px 40px',
@@ -355,9 +352,6 @@ const RegisterPage = () => {
           </div>
         </div>
         <div className="w-full">
-          <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-            {t('userEmail')}
-          </label>
           <div style={styles.inputContainer}>
             <Mail
               size={16}
@@ -371,12 +365,12 @@ const RegisterPage = () => {
               }}
             />
             <input
-              type="email"
+              type="text"
               name="email"
               value={email}
               autoComplete="email"
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="Enter your email"
+              placeholder={t('userEmail')}
               style={{
                 width: '100%',
                 padding: '12px 16px 12px 40px',
@@ -393,9 +387,6 @@ const RegisterPage = () => {
           </div>
         </div>
         <div className="w-full">
-          <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-            {t('userPassword')}
-          </label>
           <div style={styles.inputContainer}>
             <Key
               size={16}
@@ -414,7 +405,7 @@ const RegisterPage = () => {
               value={password}
               autoComplete="new-password"
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter your password"
+              placeholder={t('userPassword')}
               style={{
                 width: '100%',
                 padding: '12px 16px 12px 40px',

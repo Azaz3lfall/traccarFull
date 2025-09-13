@@ -24,7 +24,7 @@ const LoginLayout = ({ children }) => {
           borderColor: colors.border,
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)',
           borderRadius: '16px',
-          height: '650px',
+          height: '600px',
         }}>
           {/* Top gradient border */}
           <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{

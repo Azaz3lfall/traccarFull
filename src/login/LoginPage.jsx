@@ -95,6 +95,21 @@ const getStyles = (colors) => ({
   },
 });
 
+// Add CSS animation for spinner
+const spinnerStyle = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+// Inject the CSS
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = spinnerStyle;
+  document.head.appendChild(style);
+}
+
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -129,11 +144,13 @@ const LoginPage = () => {
   const [codeEnabled, setCodeEnabled] = useState(false);
 
   const [announcementShown, setAnnouncementShown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const announcement = useSelector((state) => state.session.server.announcement);
 
   const handlePasswordLogin = async (event) => {
     event.preventDefault();
     setFailed(false);
+    setIsLoading(true);
     try {
       const query = `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
       const response = await fetch('/api/session', {
@@ -149,12 +166,14 @@ const LoginPage = () => {
         navigate(target, { replace: true });
       } else if (response.status === 401 && response.headers.get('WWW-Authenticate') === 'TOTP') {
         setCodeEnabled(true);
+        setIsLoading(false);
       } else {
         throw Error(await response.text());
       }
     } catch {
       setFailed(true);
       setPassword('');
+      setIsLoading(false);
     }
   };
 
@@ -363,7 +382,7 @@ const LoginPage = () => {
                 style={{ width: '100%', height: '100%' }}
               >
                 {/* Logo */}
-                <div className="flex justify-center" style={{ marginTop: '20px', marginBottom: '30px' }}>
+                <div className="flex justify-center" style={{ marginTop: '20px', marginBottom: '100px' }}>
                   <LogoImage color={colors.primary} />
                 </div>
                 
@@ -371,9 +390,6 @@ const LoginPage = () => {
         {!openIdForced && (
           <>
             <div className="w-full">
-              <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-                {t('userEmail')}
-              </label>
               <div style={styles.inputContainer}>
                 <User 
                   size={16} 
@@ -387,13 +403,13 @@ const LoginPage = () => {
                   }} 
                 />
                 <input
-                  type="email"
+                  type="text"
                 name="email"
                 value={email}
                 autoComplete="email"
                 autoFocus={!email}
                 onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder={t('userEmail')}
                   style={{
                     width: '100%',
                     padding: '12px 16px 12px 40px',
@@ -410,9 +426,6 @@ const LoginPage = () => {
               </div>
             </div>
             <div className="w-full">
-              <label style={{ display: 'block', marginBottom: '8px', color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-                {t('userPassword')}
-              </label>
               <div style={styles.inputContainer}>
                 <Key 
                   size={16} 
@@ -432,7 +445,7 @@ const LoginPage = () => {
               autoComplete="current-password"
               autoFocus={!!email}
               onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t('userPassword')}
                   style={{
                     width: '100%',
                     padding: '12px 40px 12px 40px',
@@ -503,13 +516,13 @@ const LoginPage = () => {
             )}
             {failed && (
               <div style={styles.errorMessage}>
-                Invalid username or password
+                {t('loginFailed')}
               </div>
             )}
             <Button
               onClick={handlePasswordLogin}
               type="submit"
-              disabled={!email || !password || (codeEnabled && !code)}
+              disabled={!email || !password || (codeEnabled && !code) || isLoading}
               className="w-full mt-5"
               style={{
                 backgroundColor: colors.primary,
@@ -522,19 +535,38 @@ const LoginPage = () => {
                 height: '48px',
                 transition: 'all 0.2s ease',
                 boxShadow: colors.shadow,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = colors.hover;
-                e.target.style.transform = 'translateY(-1px)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                if (!isLoading) {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                }
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = colors.primary;
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = colors.shadow;
+                if (!isLoading) {
+                  e.target.style.backgroundColor = colors.primary;
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = colors.shadow;
+                }
               }}
             >
-              {t('loginLogin')}
+              {isLoading ? (
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: `2px solid ${colors.text}20`,
+                  borderTop: `2px solid ${colors.text}`,
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }} />
+              ) : (
+                t('loginLogin')
+              )}
             </Button>
           </>
         )}
