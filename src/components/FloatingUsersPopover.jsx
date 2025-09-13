@@ -231,7 +231,7 @@ const FloatingUsersPopover = ({
           position: 'fixed',
           top: !desktop ? '0px' : '8px',
           left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
-          width: !desktop ? '100vw' : `calc(90vw - ${isMenuExpanded ? '200px' : '63px'})`,
+          width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
           height: !desktop ? '100vh' : 'calc(100vh - 16px)',
           zIndex: 9999,
           pointerEvents: 'auto',
@@ -258,7 +258,7 @@ const FloatingUsersPopover = ({
             background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
           }}>
             <div>
-              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 0.8 }}>
+              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.3 }}>
                 {t('settingsUsers')}
               </Typography>
             </div>
@@ -383,11 +383,14 @@ const FloatingUsersPopover = ({
                     </TableRow>
                   ) : (
                     <>
-                      {paginatedUsers.map((user) => (
+                      {paginatedUsers.map((user, index) => (
                         <TableRow
                           key={user.id}
-                          style={{ borderBottom: `1px solid ${colors.border}` }}
-                          sx={{ '& .MuiTableCell-root': { padding: '4px 12px' } }}
+                          style={{ 
+                            borderBottom: `1px solid ${colors.border}`,
+                            backgroundColor: index % 2 === 0 ? colors.surface : (colors.background === '#000000' || colors.background === '#121212' || colors.surface === '#1e1e1e' ? '#404040' : '#f8f9fa')
+                          }}
+                          sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >
                           <TableCell>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -402,7 +405,7 @@ const FloatingUsersPopover = ({
                                 <PersonIcon fontSize="small" />
                               </Avatar>
                               <div>
-                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 0.8, fontSize: '11px' }}>
+                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.3, fontSize: '11px' }}>
                                   {user.name || t('sharedUnknown')}
                                 </Typography>
                                 {user.temporary && (
@@ -420,7 +423,7 @@ const FloatingUsersPopover = ({
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.text, lineHeight: 0.8, fontSize: '11px' }}>
+                          <TableCell style={{ color: colors.text, lineHeight: 1.3, fontSize: '11px' }}>
                             {user.email || '-'}
                           </TableCell>
                           <TableCell>
