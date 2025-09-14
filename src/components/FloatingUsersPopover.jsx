@@ -1109,7 +1109,7 @@ const FloatingUsersPopover = ({
                   </Box>
                   </>
                 )}
-                </div>
+              </div>
 
                 {/* Drawer Footer */}
                 <div style={{
@@ -1201,9 +1201,9 @@ const FloatingUsersPopover = ({
                     </Typography>
                     <IconButton
                       onClick={() => setConnectionsDialog(false)}
-                      size="small"
-                      style={{ color: colors.textSecondary }}
-                    >
+                size="small"
+                style={{ color: colors.textSecondary }}
+              >
                       <ChevronLeftIcon fontSize="small" />
                     </IconButton>
                   </div>
@@ -1227,6 +1227,7 @@ const FloatingUsersPopover = ({
                           keyLink="deviceId"
                           titleGetter={(it) => `${it.name} (${it.uniqueId})`}
                           label={t('deviceTitle')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/groups?all=true"
@@ -1235,6 +1236,7 @@ const FloatingUsersPopover = ({
                           keyBase="userId"
                           keyLink="groupId"
                           label={t('settingsGroups')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/geofences?all=true"
@@ -1243,6 +1245,7 @@ const FloatingUsersPopover = ({
                           keyBase="userId"
                           keyLink="geofenceId"
                           label={t('sharedGeofences')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/notifications?all=true"
@@ -1252,6 +1255,7 @@ const FloatingUsersPopover = ({
                           keyLink="notificationId"
                           titleGetter={(it) => formatNotificationTitle(t, it, true)}
                           label={t('sharedNotifications')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/calendars?all=true"
@@ -1260,6 +1264,7 @@ const FloatingUsersPopover = ({
                           keyBase="userId"
                           keyLink="calendarId"
                           label={t('sharedCalendars')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/users?all=true&excludeAttributes=true"
@@ -1268,6 +1273,7 @@ const FloatingUsersPopover = ({
                           keyBase="userId"
                           keyLink="managedUserId"
                           label={t('settingsUsers')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/attributes/computed?all=true"
@@ -1277,6 +1283,7 @@ const FloatingUsersPopover = ({
                           keyLink="attributeId"
                           titleGetter={(it) => it.description}
                           label={t('sharedComputedAttributes')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/drivers?all=true"
@@ -1286,6 +1293,7 @@ const FloatingUsersPopover = ({
                           keyLink="driverId"
                           titleGetter={(it) => `${it.name} (${it.uniqueId})`}
                           label={t('sharedDrivers')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/commands?all=true"
@@ -1295,6 +1303,7 @@ const FloatingUsersPopover = ({
                           keyLink="commandId"
                           titleGetter={(it) => it.description}
                           label={t('sharedSavedCommands')}
+                          zIndex={50000}
                         />
                         <LinkField
                           endpointAll="/api/maintenance?all=true"
@@ -1303,6 +1312,7 @@ const FloatingUsersPopover = ({
                           keyBase="userId"
                           keyLink="maintenanceId"
                           label={t('sharedMaintenance')}
+                          zIndex={50000}
                         />
                       </>
                     )}
