@@ -17,6 +17,7 @@ import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
 import FloatingUsersPopover from '../components/FloatingUsersPopover';
 import FloatingCommandsPopover from '../components/FloatingCommandsPopover';
+import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -153,6 +154,7 @@ const MainPage = () => {
   const [showUsersPopover, setShowUsersPopover] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
   const [showCommandsPopover, setShowCommandsPopover] = useState(false);
+  const [showMaintenancePopover, setShowMaintenancePopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -1478,7 +1480,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-maintenance');
               if (tooltip) tooltip.remove();
-              window.location.href = '/settings/maintenances';
+              setShowMaintenancePopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3329,6 +3331,14 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={showCommandsPopover}
         onClose={() => setShowCommandsPopover(false)}
+      />
+      
+      {/* Maintenance Management Popover */}
+      <FloatingMaintenancePopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showMaintenancePopover}
+        onClose={() => setShowMaintenancePopover(false)}
       />
       
       {/* Server Settings Drawer */}
