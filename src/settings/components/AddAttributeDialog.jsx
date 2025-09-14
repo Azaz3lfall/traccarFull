@@ -159,19 +159,10 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
                 backgroundColor: theme.palette.background.paper,
                 mt: 0.5,
                 '&::-webkit-scrollbar': {
-                  width: '6px',
+                  display: 'none',
                 },
-                '&::-webkit-scrollbar-track': {
-                  background: theme.palette.grey[100],
-                  borderRadius: '3px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: theme.palette.grey[400],
-                  borderRadius: '3px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                  background: theme.palette.grey[600],
-                },
+                scrollbarWidth: 'none', // Firefox
+                msOverflowStyle: 'none', // IE and Edge
               })}
               style={{
                 top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
