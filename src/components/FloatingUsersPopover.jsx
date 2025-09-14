@@ -58,7 +58,10 @@ import { useManager, useAdministrator, useRestriction } from '../common/util/per
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import useUserAttributes from '../common/attributes/useUserAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
+import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
+import useServerAttributes from '../common/attributes/useServerAttributes';
 import useMapStyles from '../map/core/useMapStyles';
+import { map } from '../map/core/MapView';
 import SelectField from '../common/components/SelectField';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import LinkField from '../common/components/LinkField';
@@ -77,10 +80,12 @@ const FloatingUsersPopover = ({
   const admin = useAdministrator();
   const fixedEmail = useRestriction('fixedEmail');
   const queryClient = useQueryClient();
-
-  // Additional hooks for comprehensive CRUD
-  const mapStyles = useMapStyles();
+  
+  // Server attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
+  const commonDeviceAttributes = useCommonDeviceAttributes(t);
+  const serverAttributes = useServerAttributes(t);
+  const mapStyles = useMapStyles();
   const userAttributes = useUserAttributes(t);
 
   // Zebra striping colors
@@ -101,6 +106,9 @@ const FloatingUsersPopover = ({
   const [activeTab, setActiveTab] = useState(0);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedUserForConnections, setSelectedUserForConnections] = useState(null);
+  const [serverDialog, setServerDialog] = useState(false);
+  const [serverData, setServerData] = useState(null);
+  const [activeServerTab, setActiveServerTab] = useState(0);
   
 
   // Fetch users with TanStack Query
@@ -164,6 +172,20 @@ const FloatingUsersPopover = ({
     setSelectedUserForConnections(user);
     setConnectionsDialog(true);
     setAnchorEl(null);
+  };
+
+  // Handle server settings
+  const handleServer = async () => {
+    try {
+      const response = await fetch('/api/server');
+      const server = await response.json();
+      setServerData(server);
+      setServerDialog(true);
+      setActiveServerTab(0);
+      setAnchorEl(null);
+    } catch (error) {
+      console.error('Failed to fetch server data:', error);
+    }
   };
 
   // Handle edit user
@@ -268,6 +290,7 @@ const FloatingUsersPopover = ({
       handler: handleDelete,
     },
   ];
+
 
   const getStatusIcon = (user) => {
     if (user.disabled) return <BlockIcon />;
@@ -1317,6 +1340,465 @@ const FloatingUsersPopover = ({
                         />
                       </>
                     )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Server Settings Drawer */}
+          <AnimatePresence>
+            {serverDialog && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setServerDialog(false)}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 9999,
+                  }}
+                />
+                
+                {/* Server Drawer */}
+                <motion.div
+                  initial={{ x: '100%', opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: '100%', opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    width: '500px',
+                    height: '100vh',
+                    backgroundColor: colors.surface,
+                    borderLeft: `1px solid ${colors.border}`,
+                    zIndex: 10000,
+                    boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  {/* Drawer Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    backgroundColor: colors.surface,
+                  }}>
+                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                      {t('settingsServer')}
+                    </Typography>
+                    <IconButton
+                      onClick={() => setServerDialog(false)}
+                      size="small"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      <ChevronLeftIcon fontSize="small" />
+                    </IconButton>
+                  </div>
+
+                  {/* Drawer Content */}
+                  <div style={{ 
+                    flex: 1, 
+                    overflow: 'auto', 
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    paddingBottom: '200px'
+                  }}>
+                    {serverData && (
+                      <>
+                        {/* Server Tabs */}
+                        <Tabs
+                          value={activeServerTab}
+                          onChange={(e, newValue) => setActiveServerTab(newValue)}
+                          sx={{
+                            borderBottom: `1px solid ${colors.border}`,
+                            marginBottom: '16px',
+                            '& .MuiTabs-indicator': {
+                              backgroundColor: colors.primary,
+                              height: '3px',
+                              borderRadius: '2px',
+                            },
+                            '& .MuiTab-root': {
+                              color: colors.textSecondary,
+                              fontSize: '14px',
+                              fontWeight: '500',
+                              textTransform: 'none',
+                              minHeight: '48px',
+                              padding: '8px 16px',
+                              '&.Mui-selected': {
+                                color: colors.primary,
+                                fontWeight: '600',
+                                backgroundColor: 'transparent',
+                              },
+                              '&:hover': {
+                                color: colors.primary,
+                                backgroundColor: `${colors.primary}10`,
+                              },
+                              '&.Mui-selected:hover': {
+                                color: colors.primary,
+                                backgroundColor: `${colors.primary}15`,
+                              },
+                            },
+                          }}
+                        >
+                          <Tab label={t('sharedPreferences')} />
+                          <Tab label={t('sharedLocation')} />
+                          <Tab label={t('sharedPermissions')} />
+                          <Tab label={t('sharedFile')} />
+                          <Tab label={t('sharedAttributes')} />
+                        </Tabs>
+
+                        {/* Preferences Tab */}
+                        {activeServerTab === 0 && (
+                          <Box sx={{ paddingTop: '16px' }}>
+                            <TextField
+                              fullWidth
+                              value={serverData.mapUrl || ''}
+                              onChange={(event) => setServerData({ ...serverData, mapUrl: event.target.value })}
+                              label={t('mapCustomLabel')}
+                              margin="normal"
+                            />
+                            <TextField
+                              fullWidth
+                              value={serverData.overlayUrl || ''}
+                              onChange={(event) => setServerData({ ...serverData, overlayUrl: event.target.value })}
+                              label={t('mapOverlayCustom')}
+                              margin="normal"
+                            />
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('mapDefault')}</InputLabel>
+                              <Select
+                                label={t('mapDefault')}
+                                value={serverData.map || 'locationIqStreets'}
+                                onChange={(e) => setServerData({ ...serverData, map: e.target.value })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                {mapStyles.filter((style) => style.available).map((style) => (
+                                  <MenuItem key={style.id} value={style.id}>
+                                    <Typography component="span">{style.title}</Typography>
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('settingsCoordinateFormat')}</InputLabel>
+                              <Select
+                                label={t('settingsCoordinateFormat')}
+                                value={serverData.coordinateFormat || 'dd'}
+                                onChange={(event) => setServerData({ ...serverData, coordinateFormat: event.target.value })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                <MenuItem value="dd">{t('sharedDecimalDegrees')}</MenuItem>
+                                <MenuItem value="ddm">{t('sharedDegreesDecimalMinutes')}</MenuItem>
+                                <MenuItem value="dms">{t('sharedDegreesMinutesSeconds')}</MenuItem>
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('settingsSpeedUnit')}</InputLabel>
+                              <Select
+                                label={t('settingsSpeedUnit')}
+                                value={serverData.attributes?.speedUnit || 'kn'}
+                                onChange={(e) => setServerData({ 
+                                  ...serverData, 
+                                  attributes: { ...serverData.attributes, speedUnit: e.target.value } 
+                                })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                <MenuItem value="kn">{t('sharedKn')}</MenuItem>
+                                <MenuItem value="kmh">{t('sharedKmh')}</MenuItem>
+                                <MenuItem value="mph">{t('sharedMph')}</MenuItem>
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('settingsDistanceUnit')}</InputLabel>
+                              <Select
+                                label={t('settingsDistanceUnit')}
+                                value={serverData.attributes?.distanceUnit || 'km'}
+                                onChange={(e) => setServerData({ 
+                                  ...serverData, 
+                                  attributes: { ...serverData.attributes, distanceUnit: e.target.value } 
+                                })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                <MenuItem value="km">{t('sharedKm')}</MenuItem>
+                                <MenuItem value="mi">{t('sharedMi')}</MenuItem>
+                                <MenuItem value="nmi">{t('sharedNmi')}</MenuItem>
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('settingsAltitudeUnit')}</InputLabel>
+                              <Select
+                                label={t('settingsAltitudeUnit')}
+                                value={serverData.attributes?.altitudeUnit || 'm'}
+                                onChange={(e) => setServerData({ 
+                                  ...serverData, 
+                                  attributes: { ...serverData.attributes, altitudeUnit: e.target.value } 
+                                })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                <MenuItem value="m">{t('sharedMeters')}</MenuItem>
+                                <MenuItem value="ft">{t('sharedFeet')}</MenuItem>
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('settingsVolumeUnit')}</InputLabel>
+                              <Select
+                                label={t('settingsVolumeUnit')}
+                                value={serverData.attributes?.volumeUnit || 'ltr'}
+                                onChange={(e) => setServerData({ 
+                                  ...serverData, 
+                                  attributes: { ...serverData.attributes, volumeUnit: e.target.value } 
+                                })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10002 }
+                                }}
+                              >
+                                <MenuItem value="ltr">{t('sharedLiter')}</MenuItem>
+                                <MenuItem value="usGal">{t('sharedUsGallon')}</MenuItem>
+                                <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
+                              </Select>
+                            </FormControl>
+                            <SelectField
+                              value={serverData.attributes?.timezone}
+                              onChange={(e) => setServerData({ 
+                                ...serverData, 
+                                attributes: { ...serverData.attributes, timezone: e.target.value } 
+                              })}
+                              endpoint="/api/server/timezones"
+                              keyGetter={(it) => it}
+                              titleGetter={(it) => it}
+                              label={t('sharedTimezone')}
+                            />
+                            <TextField
+                              fullWidth
+                              value={serverData.poiLayer || ''}
+                              onChange={(event) => setServerData({ ...serverData, poiLayer: event.target.value })}
+                              label={t('mapPoiLayer')}
+                              margin="normal"
+                            />
+                            <TextField
+                              fullWidth
+                              value={serverData.announcement || ''}
+                              onChange={(event) => setServerData({ ...serverData, announcement: event.target.value })}
+                              label={t('serverAnnouncement')}
+                              margin="normal"
+                            />
+                            <FormGroup>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.forceSettings} 
+                                    onChange={(event) => setServerData({ ...serverData, forceSettings: event.target.checked })} 
+                                  />
+                                }
+                                label={t('serverForceSettings')}
+                              />
+                            </FormGroup>
+                          </Box>
+                        )}
+
+                        {/* Location Tab */}
+                        {activeServerTab === 1 && (
+                          <Box sx={{ paddingTop: '16px' }}>
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={serverData.latitude || 0}
+                              onChange={(event) => setServerData({ ...serverData, latitude: Number(event.target.value) })}
+                              label={t('positionLatitude')}
+                              margin="normal"
+                            />
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={serverData.longitude || 0}
+                              onChange={(event) => setServerData({ ...serverData, longitude: Number(event.target.value) })}
+                              label={t('positionLongitude')}
+                              margin="normal"
+                            />
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={serverData.zoom || 0}
+                              onChange={(event) => setServerData({ ...serverData, zoom: Number(event.target.value) })}
+                              label={t('serverZoom')}
+                              margin="normal"
+                            />
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => {
+                                const { lng, lat } = map.getCenter();
+                                setServerData({
+                                  ...serverData,
+                                  latitude: Number(lat.toFixed(6)),
+                                  longitude: Number(lng.toFixed(6)),
+                                  zoom: Number(map.getZoom().toFixed(1)),
+                                });
+                              }}
+                              style={{ marginTop: '16px' }}
+                            >
+                              {t('mapCurrentLocation')}
+                            </Button>
+                          </Box>
+                        )}
+
+                        {/* Permissions Tab */}
+                        {activeServerTab === 2 && (
+                          <Box sx={{ paddingTop: '16px' }}>
+                            <FormGroup>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.registration} 
+                                    onChange={(event) => setServerData({ ...serverData, registration: event.target.checked })} 
+                                  />
+                                }
+                                label={t('serverRegistration')}
+                              />
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.readonly} 
+                                    onChange={(event) => setServerData({ ...serverData, readonly: event.target.checked })} 
+                                  />
+                                }
+                                label={t('serverReadonly')}
+                              />
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.deviceReadonly} 
+                                    onChange={(event) => setServerData({ ...serverData, deviceReadonly: event.target.checked })} 
+                                  />
+                                }
+                                label={t('userDeviceReadonly')}
+                              />
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.limitCommands} 
+                                    onChange={(event) => setServerData({ ...serverData, limitCommands: event.target.checked })} 
+                                  />
+                                }
+                                label={t('userLimitCommands')}
+                              />
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.disableReports} 
+                                    onChange={(event) => setServerData({ ...serverData, disableReports: event.target.checked })} 
+                                  />
+                                }
+                                label={t('userDisableReports')}
+                              />
+                              <FormControlLabel
+                                control={
+                                  <Checkbox 
+                                    checked={serverData.fixedEmail} 
+                                    onChange={(e) => setServerData({ ...serverData, fixedEmail: e.target.checked })} 
+                                  />
+                                }
+                                label={t('userFixedEmail')}
+                              />
+                            </FormGroup>
+                          </Box>
+                        )}
+
+                        {/* File Tab */}
+                        {activeServerTab === 3 && (
+                          <Box sx={{ paddingTop: '16px' }}>
+                            <Typography variant="body2" color="textSecondary" style={{ marginBottom: '16px' }}>
+                              {t('sharedSelectFile')}
+                            </Typography>
+                            {/* File upload would go here - MuiFileInput component */}
+                          </Box>
+                        )}
+
+                        {/* Attributes Tab */}
+                        {activeServerTab === 4 && (
+                          <Box sx={{ paddingTop: '16px' }}>
+                            <EditAttributesAccordion
+                              attributes={serverData.attributes}
+                              setAttributes={(attributes) => setServerData({ ...serverData, attributes })}
+                              definitions={{ ...commonUserAttributes, ...commonDeviceAttributes, ...serverAttributes }}
+                            />
+                          </Box>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  {/* Drawer Footer */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderTop: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'flex-end',
+                    backgroundColor: colors.surface,
+                  }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setServerDialog(false)}
+                      style={{
+                        borderColor: colors.border,
+                        color: colors.text,
+                      }}
+                    >
+                      {t('sharedCancel')}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={async () => {
+                        try {
+                          await fetchOrThrow('/api/server', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(serverData),
+                          });
+                          setServerDialog(false);
+                        } catch (error) {
+                          console.error('Failed to save server settings:', error);
+                        }
+                      }}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: 'white',
+                      }}
+                    >
+                      {t('sharedSave')}
+                    </Button>
                   </div>
                 </motion.div>
               </>
