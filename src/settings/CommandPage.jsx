@@ -13,7 +13,7 @@ const CommandPage = () => {
   const { classes } = useSettingsStyles();
   const t = useTranslation();
 
-  const [item, setItem] = useState();
+  const [item, setItem] = useState({});
 
   const validate = () => item && item.type;
 
@@ -26,23 +26,21 @@ const CommandPage = () => {
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'sharedSavedCommand']}
     >
-      {item && (
-        <Accordion defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1">
-              {t('sharedRequired')}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails className={classes.details}>
-            <TextField
-              value={item.description || ''}
-              onChange={(event) => setItem({ ...item, description: event.target.value })}
-              label={t('sharedDescription')}
-            />
-            <BaseCommandView item={item} setItem={setItem} />
-          </AccordionDetails>
-        </Accordion>
-      )}
+      <Accordion defaultExpanded>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="subtitle1">
+            {t('sharedRequired')}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails className={classes.details}>
+          <TextField
+            value={item.description || ''}
+            onChange={(event) => setItem({ ...item, description: event.target.value })}
+            label={t('sharedDescription')}
+          />
+          <BaseCommandView item={item} setItem={setItem} />
+        </AccordionDetails>
+      </Accordion>
     </EditItemView>
   );
 };

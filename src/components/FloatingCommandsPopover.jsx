@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useEffectAsync } from '../reactHelper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -56,6 +57,9 @@ const FloatingCommandsPopover = ({
   isVisible, 
   onClose 
 }) => {
+  console.log('=== FloatingCommandsPopover RENDER ===');
+  console.log('Props:', { desktop, isMenuExpanded, isVisible, onClose });
+  
   const t = useTranslation();
   const colors = useThemeColors();
   const { theme } = useTheme();
@@ -78,7 +82,13 @@ const FloatingCommandsPopover = ({
   const [activeTab, setActiveTab] = useState(0);
   const [commandTypes, setCommandTypes] = useState([]);
 
+  console.log('FloatingCommandsPopover state:', { commandTypes, editDialog, isVisible });
+
+  // Test if we can execute code after state declarations
+  console.log('=== TEST: Code execution after state ===');
+
   // Fetch commands with TanStack Query
+  console.log('=== TEST: Before useQuery ===');
   const { data: commands = [], isLoading, error } = useQuery({
     queryKey: ['commands'],
     queryFn: async () => {
@@ -87,23 +97,44 @@ const FloatingCommandsPopover = ({
     },
     enabled: isVisible, // Only fetch when popover is visible
   });
+  console.log('=== TEST: After useQuery ===');
 
-  // Fetch command types
-  useEffect(() => {
-    const fetchCommandTypes = async () => {
-      try {
-        const response = await fetchOrThrow('/api/commands/types');
-        const types = await response.json();
-        // Ensure we have an array of strings
-        const validTypes = Array.isArray(types) ? types.filter(type => typeof type === 'string' && type.length > 0) : [];
-        setCommandTypes(validTypes);
-      } catch (error) {
-        console.error('Failed to load command types:', error);
-        setCommandTypes([]);
-      }
-    };
-    fetchCommandTypes();
-  }, []);
+  // Fetch command types when popover is visible
+  useEffectAsync(async () => {
+    if (!isVisible) return;
+    
+    console.log('=== FloatingCommandsPopover: Loading command types (isVisible=true) ===');
+    try {
+      console.log('Fetching from /api/commands/types...');
+      const response = await fetchOrThrow('/api/commands/types');
+      console.log('API response:', response);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      const types = await response.json();
+      console.log('Raw types from API:', types);
+      console.log('Types array:', Array.isArray(types));
+      console.log('Types length:', types.length);
+      
+      // The API returns objects with {type: "value"}, we need to extract the type values
+      const validTypes = Array.isArray(types) 
+        ? types.map(item => item.type).filter(type => typeof type === 'string' && type.length > 0)
+        : [];
+      console.log('Valid types after processing:', validTypes);
+      console.log('Valid types length:', validTypes.length);
+      
+      setCommandTypes(validTypes);
+      console.log('Command types set in state');
+    } catch (error) {
+      console.error('=== FloatingCommandsPopover: Failed to load command types ===', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      setCommandTypes([]);
+    }
+  }, [isVisible]);
 
   // Filter commands based on search
   const filteredCommands = commands.filter(command => {
@@ -678,11 +709,16 @@ const FloatingCommandsPopover = ({
                             },
                           }}
                         >
-                          {commandTypes.length > 0 ? commandTypes.map((type) => (
-                            <MenuItem key={type} value={type} style={{ color: colors.text }}>
-                              {t(prefixString('command', String(type || '')))}
-                            </MenuItem>
-                          )) : (
+                          {console.log('FloatingCommandsPopover Select - commandTypes:', commandTypes)}
+                          {console.log('FloatingCommandsPopover Select - commandTypes.length:', commandTypes.length)}
+                          {commandTypes.length > 0 ? commandTypes.map((type) => {
+                            console.log('Rendering MenuItem for type:', type);
+                            return (
+                              <MenuItem key={type} value={type} style={{ color: colors.text }}>
+                                {t(prefixString('command', String(type || '')))}
+                              </MenuItem>
+                            );
+                          }) : (
                             <MenuItem disabled style={{ color: colors.textSecondary }}>
                               {t('sharedNoData')}
                             </MenuItem>

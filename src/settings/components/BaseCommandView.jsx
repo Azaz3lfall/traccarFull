@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Autocomplete,
   Checkbox,
   FormControlLabel,
   MenuItem,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  CircularProgress,
+  Box,
 } from '@mui/material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useRestriction } from '../../common/util/permissions';
@@ -20,8 +24,10 @@ const BaseCommandView = ({
   setItem,
   includeSaved = false,
   savedId,
-  setSavedId,
 }) => {
+  console.log('=== BaseCommandView RENDER ===');
+  console.log('Props received:', { deviceId, item, includeSaved, savedId });
+  
   const t = useTranslation();
   const limitCommands = useRestriction('limitCommands');
 
@@ -31,24 +37,78 @@ const BaseCommandView = ({
 
   const [attributes, setAttributes] = useState([]);
   const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffectAsync(async () => {
-    if (includeSaved) {
-      const savedResponse = await fetchOrThrow(`/api/commands/send?deviceId=${deviceId}`);
-      const saved = await savedResponse.json();
-      let combined = saved.map((it) => ({ ...it, optionType: 'saved', key: `saved-${it.id}` }));
-      if (!limitCommands) {
-        const typesResponse = await fetchOrThrow(`/api/commands/types?${new URLSearchParams({ deviceId }).toString()}`);
+    console.log('=== BaseCommandView useEffectAsync START ===');
+    console.log('Props:', { includeSaved, deviceId, limitCommands });
+    console.log('Current options state:', options);
+    console.log('Current loading state:', loading);
+    
+    setLoading(true);
+    try {
+      if (includeSaved) {
+        console.log('Loading saved commands with deviceId:', deviceId);
+        const savedResponse = await fetchOrThrow(`/api/commands/send?deviceId=${deviceId}`);
+        const saved = await savedResponse.json();
+        console.log('Saved commands response:', saved);
+        let combined = saved.map((it) => ({ ...it, optionType: 'saved', key: `saved-${it.id}` }));
+        if (!limitCommands) {
+          console.log('Loading command types with deviceId:', deviceId);
+          const typesResponse = await fetchOrThrow(`/api/commands/types?${new URLSearchParams({ deviceId }).toString()}`);
+          const types = await typesResponse.json();
+          console.log('Command types from API (with deviceId):', types);
+          combined = combined.concat(types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` })));
+        }
+        console.log('Combined options (includeSaved):', combined);
+        setOptions(combined);
+      } else {
+        console.log('Loading command types from /api/commands/types (no deviceId)');
+        
+        // Test with a simple fetch first
+        try {
+          console.log('Testing simple fetch...');
+          const testResponse = await fetch('/api/commands/types');
+          console.log('Test response status:', testResponse.status);
+          console.log('Test response ok:', testResponse.ok);
+          
+          if (!testResponse.ok) {
+            throw new Error(`HTTP ${testResponse.status}: ${testResponse.statusText}`);
+          }
+          
+          const testData = await testResponse.json();
+          console.log('Test data:', testData);
+        } catch (testError) {
+          console.error('Test fetch failed:', testError);
+        }
+        
+        const typesResponse = await fetchOrThrow('/api/commands/types');
+        console.log('Raw API response:', typesResponse);
+        console.log('Response status:', typesResponse.status);
+        console.log('Response ok:', typesResponse.ok);
+        
         const types = await typesResponse.json();
-        combined = combined.concat(types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` })));
+        console.log('Command types from API (no deviceId):', types);
+        console.log('Types array length:', types.length);
+        
+        const mappedTypes = types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` }));
+        console.log('Mapped types:', mappedTypes);
+        console.log('Setting options to:', mappedTypes);
+        setOptions(mappedTypes);
       }
-      setOptions(combined);
-    } else {
-      const typesResponse = await fetchOrThrow('/api/commands/types');
-      const types = await typesResponse.json();
-      setOptions(types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` })));
+    } catch (error) {
+      console.error('=== ERROR loading command types ===', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    } finally {
+      console.log('Setting loading to false');
+      setLoading(false);
+      console.log('=== BaseCommandView useEffectAsync END ===');
     }
-  }, [deviceId, includeSaved, limitCommands]);
+  }, []); // Simplified dependency array like CommandsPage
 
   useEffect(() => {
     if (item && item.type) {
@@ -58,61 +118,80 @@ const BaseCommandView = ({
     }
   }, [availableAttributes, item]);
 
-  const handleSelect = (_, value) => {
-    if (value?.optionType === 'saved') {
-      setSavedId?.(value.id);
-      setItem({});
-    } else if (value?.type) {
-      setSavedId?.(0);
-      const defaults = {};
-      availableAttributes[value.type]?.forEach((attribute) => {
-        switch (attribute.type) {
-          case 'boolean':
-            defaults[attribute.key] = false;
-            break;
-          case 'number':
-            defaults[attribute.key] = 0;
-            break;
-          default:
-            defaults[attribute.key] = '';
-            break;
-        }
-      });
-      setItem({ ...item, type: value.type, attributes: defaults });
+
+  console.log('BaseCommandView render - options:', options);
+  console.log('BaseCommandView render - item:', item);
+  console.log('BaseCommandView render - includeSaved:', includeSaved);
+  console.log('BaseCommandView render - loading:', loading);
+
+  // Get available command types
+  const commandTypes = options.filter(option => option.optionType === 'type');
+  console.log('Command types for Select:', commandTypes);
+
+  // Ensure the current value is valid
+  const currentValue = item.type || '';
+  const isValidValue = !currentValue || commandTypes.some(option => option.type === currentValue);
+  console.log('Current value:', currentValue, 'Is valid:', isValidValue);
+
+  // Use empty string if value is invalid or still loading
+  const selectValue = (loading || !isValidValue) ? '' : currentValue;
+
+  // Restore the original value once data is loaded and value becomes valid
+  useEffect(() => {
+    if (!loading && currentValue && isValidValue && item.type !== currentValue) {
+      console.log('Restoring original value after data load:', currentValue);
+      setItem({ ...item, type: currentValue });
     }
-  };
+  }, [loading, currentValue, isValidValue]);
 
   return (
     <>
-      <Autocomplete
-        size="small"
-        options={options}
-        groupBy={
-          includeSaved
-            ? (option) => option.optionType === 'saved' ? t('sharedSavedCommands') : t('sharedType')
-            : null
-        }
-        getOptionLabel={(option) =>
-          option.optionType === 'saved'
-            ? option.description
-            : t(prefixString('command', option.type))
-        }
-        renderOption={(props, option) => (
-          <MenuItem {...props} key={option.key} value={option.key}>
-            {option.optionType === 'saved'
-              ? option.description
-              : t(prefixString('command', option.type))}
-          </MenuItem>
-        )}
-        isOptionEqualToValue={(option, value) => option.key === value.key}
-        value={
-          savedId
-            ? options.find((it) => it.optionType === 'saved' && it.id === savedId) || null
-            : options.find((it) => it.optionType === 'type' && it.type === item.type) || null
-        }
-        onChange={handleSelect}
-        renderInput={(params) => <TextField {...params} label={t('sharedType')} />}
-      />
+      <FormControl fullWidth size="small">
+        <InputLabel>{t('sharedType')}</InputLabel>
+        <Select
+          value={selectValue}
+          onChange={(e) => {
+            const selectedType = e.target.value;
+            console.log('Selected type:', selectedType);
+            if (selectedType) {
+              const defaults = {};
+              availableAttributes[selectedType]?.forEach((attribute) => {
+                switch (attribute.type) {
+                  case 'boolean':
+                    defaults[attribute.key] = false;
+                    break;
+                  case 'number':
+                    defaults[attribute.key] = 0;
+                    break;
+                  default:
+                    defaults[attribute.key] = '';
+                    break;
+                }
+              });
+              setItem({ ...item, type: selectedType, attributes: defaults });
+            } else {
+              setItem({ ...item, type: '', attributes: {} });
+            }
+          }}
+          label={t('sharedType')}
+          disabled={loading}
+        >
+          {loading ? (
+            <MenuItem disabled>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CircularProgress size={16} />
+                Loading...
+              </Box>
+            </MenuItem>
+          ) : (
+            commandTypes.map((option) => (
+              <MenuItem key={option.key} value={option.type}>
+                {t(prefixString('command', option.type))}
+              </MenuItem>
+            ))
+          )}
+        </Select>
+      </FormControl>
       {(!includeSaved || !savedId) &&
         attributes.map(({ key, name, type }) => {
           if (type === 'boolean') {
