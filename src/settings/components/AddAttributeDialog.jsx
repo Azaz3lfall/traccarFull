@@ -59,8 +59,20 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
               }
             }}
             MenuProps={{
-              style: { zIndex: 99999 },
-              disablePortal: false
+              style: { 
+                zIndex: 99999,
+                maxHeight: '200px'
+              },
+              disablePortal: false,
+              anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'left',
+              },
+              transformOrigin: {
+                vertical: 'top',
+                horizontal: 'left',
+              },
+              getContentAnchorEl: null
             }}
           >
             {options.map((option) => (
