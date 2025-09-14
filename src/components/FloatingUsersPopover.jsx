@@ -713,32 +713,78 @@ const FloatingUsersPopover = ({
             </DialogActions>
           </Dialog>
 
-          {/* Edit User Dialog - Exact copy of UserPage.jsx */}
-          <Dialog
-            open={editDialog}
-            onClose={() => setEditDialog(false)}
-            maxWidth="md"
-            fullWidth
-            disablePortal={false}
-            style={{ zIndex: 10000 }}
-            PaperProps={{
-              style: {
-                backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
-                borderRadius: '12px',
-                zIndex: 10000,
-                maxHeight: '90vh',
-              },
-            }}
-            MenuProps={{
-              disablePortal: false,
-              style: { zIndex: 10001 }
-            }}
-          >
-            <DialogTitle style={{ color: colors.text, fontSize: '16px', fontWeight: '600' }}>
-              {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
-            </DialogTitle>
-            <DialogContent style={{ padding: '0 24px', maxHeight: '70vh', overflowY: 'auto' }}>
+          {/* Edit User Drawer - Slides in from right */}
+          <AnimatePresence>
+            {editDialog && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 9999,
+                  }}
+                  onClick={() => setEditDialog(false)}
+                />
+                
+                {/* Drawer */}
+                <motion.div
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  right: 0,
+                  width: '500px',
+                  height: '100vh',
+                  backgroundColor: colors.surface,
+                  borderLeft: `1px solid ${colors.border}`,
+                  zIndex: 10000,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+                }}
+              >
+                {/* Drawer Header */}
+                <div style={{
+                  padding: '20px 24px',
+                  borderBottom: `1px solid ${colors.border}`,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+                }}>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                    {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
+                  </Typography>
+                  <IconButton
+                    onClick={() => setEditDialog(false)}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                </div>
+
+                {/* Drawer Content */}
+                <div style={{ 
+                  flex: 1, 
+                  overflow: 'auto', 
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}>
               {editingUser && (
                 <>
                   <Accordion defaultExpanded>
@@ -1001,30 +1047,43 @@ const FloatingUsersPopover = ({
                     focusAttribute={null}
                     zIndex={10003}
                   />
-                </>
-              )}
-            </DialogContent>
-            <DialogActions style={{ padding: '16px 24px', borderTop: `1px solid ${colors.border}` }}>
-              <Button
-                onClick={() => setEditDialog(false)}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                {t('sharedCancel')}
-              </Button>
-              <Button
-                onClick={handleSaveUser}
-                disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password)}
-                size="small"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                }}
-              >
-                {t('sharedSave')}
-              </Button>
-            </DialogActions>
-          </Dialog>
+                  </>
+                )}
+                </div>
+
+                {/* Drawer Footer */}
+                <div style={{
+                  padding: '20px 24px',
+                  borderTop: `1px solid ${colors.border}`,
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: '12px',
+                  background: colors.surface,
+                }}>
+                  <Button
+                    onClick={() => setEditDialog(false)}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    {t('sharedCancel')}
+                  </Button>
+                  <Button
+                    onClick={handleSaveUser}
+                    disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password)}
+                    size="small"
+                    variant="contained"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.text,
+                    }}
+                  >
+                    {t('sharedSave')}
+                  </Button>
+                </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
 
         </div>
