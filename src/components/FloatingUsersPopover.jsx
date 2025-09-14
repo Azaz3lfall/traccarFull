@@ -801,19 +801,28 @@ const FloatingUsersPopover = ({
                     }}
                     sx={{
                       '& .MuiTab-root': {
-                        color: colors.textSecondary,
+                        color: '#666666',
                         fontSize: '12px',
                         fontWeight: '500',
                         textTransform: 'none',
                         minHeight: '40px',
                         padding: '8px 16px',
                         '&.Mui-selected': {
-                          color: colors.primary,
+                          color: '#1976d2',
                           fontWeight: '600',
+                          backgroundColor: 'transparent',
+                        },
+                        '&:hover': {
+                          color: '#1976d2',
+                          backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        },
+                        '&.Mui-selected:hover': {
+                          color: '#1976d2',
+                          backgroundColor: 'rgba(25, 118, 210, 0.15)',
                         },
                       },
                       '& .MuiTabs-indicator': {
-                        backgroundColor: colors.primary,
+                        backgroundColor: '#1976d2',
                         height: '2px',
                       },
                     }}
