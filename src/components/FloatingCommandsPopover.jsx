@@ -719,11 +719,19 @@ const FloatingCommandsPopover = ({
                               ...editingCommand,
                               textChannel: e.target.checked
                             })}
-                            style={{ color: colors.primary }}
+                            sx={{
+                              color: colors.text,
+                              '&.Mui-checked': {
+                                color: colors.text,
+                              },
+                              '&.MuiCheckbox-root': {
+                                color: colors.text,
+                              }
+                            }}
                           />
                         }
                         label={t('commandSendSms')}
-                        style={{ color: colors.text }}
+                        sx={{ color: colors.text }}
                       />
                     </div>
                   </div>

@@ -23,7 +23,6 @@ import { useRestriction } from '../common/util/permissions';
 import useSettingsStyles from './common/useSettingsStyles';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useThemeColors } from '../common/components/ThemeProvider';
-import useCommandAttributes from '../common/attributes/useCommandAttributes';
 
 const CommandsPage = () => {
   const { classes } = useSettingsStyles();
@@ -40,7 +39,6 @@ const CommandsPage = () => {
   const [saving, setSaving] = useState(false);
   const limitCommands = useRestriction('limitCommands');
 
-  const availableAttributes = useCommandAttributes(t);
 
   useEffectAsync(async () => {
     setLoading(true);
@@ -263,9 +261,19 @@ const CommandsPage = () => {
                             <Checkbox
                               checked={editingCommand.textChannel || false}
                               onChange={(e) => setEditingCommand({ ...editingCommand, textChannel: e.target.checked })}
+                              sx={{
+                                color: colors.text,
+                                '&.Mui-checked': {
+                                  color: colors.text,
+                                },
+                                '&.MuiCheckbox-root': {
+                                  color: colors.text,
+                                }
+                              }}
                             />
                           }
                           label={t('commandSendSms')}
+                          sx={{ color: colors.text }}
                         />
                       </AccordionDetails>
                     </Accordion>

@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
@@ -28,6 +29,7 @@ const CommandDevicePage = () => {
   const navigate = useNavigate();
   const { classes } = useSettingsStyles();
   const t = useTranslation();
+  const colors = useThemeColors();
 
   const { id } = useParams();
 
@@ -68,8 +70,23 @@ const CommandDevicePage = () => {
             />
             {textEnabled && (
               <FormControlLabel
-                control={<Checkbox checked={item.textChannel} onChange={(event) => setItem({ ...item, textChannel: event.target.checked })} />}
+                control={
+                  <Checkbox 
+                    checked={item.textChannel} 
+                    onChange={(event) => setItem({ ...item, textChannel: event.target.checked })}
+                    sx={{
+                      color: colors.text,
+                      '&.Mui-checked': {
+                        color: colors.text,
+                      },
+                      '&.MuiCheckbox-root': {
+                        color: colors.text,
+                      }
+                    }}
+                  />
+                }
                 label={t('commandSendSms')}
+                sx={{ color: colors.text }}
               />
             )}
           </AccordionDetails>

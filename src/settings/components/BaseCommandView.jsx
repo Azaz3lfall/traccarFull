@@ -12,6 +12,7 @@ import {
   Box,
 } from '@mui/material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import { useThemeColors } from '../../common/components/ThemeProvider';
 import { useRestriction } from '../../common/util/permissions';
 import { useEffectAsync } from '../../reactHelper';
 import fetchOrThrow from '../../common/util/fetchOrThrow';
@@ -29,6 +30,7 @@ const BaseCommandView = ({
   console.log('Props received:', { deviceId, item, includeSaved, savedId });
   
   const t = useTranslation();
+  const colors = useThemeColors();
   const limitCommands = useRestriction('limitCommands');
 
   const textEnabled = useSelector((state) => state.session.server.textEnabled);
@@ -231,9 +233,19 @@ const BaseCommandView = ({
             <Checkbox
               checked={item.textChannel}
               onChange={(e) => setItem({ ...item, textChannel: e.target.checked })}
+              sx={{
+                color: colors.text,
+                '&.Mui-checked': {
+                  color: colors.text,
+                },
+                '&.MuiCheckbox-root': {
+                  color: colors.text,
+                }
+              }}
             />
           }
           label={t('commandSendSms')}
+          sx={{ color: colors.text }}
         />
       )}
       {!item.textChannel && (
@@ -247,9 +259,19 @@ const BaseCommandView = ({
                   attributes: { ...item?.attributes, noQueue: e.target.checked },
                 })
               }
+              sx={{
+                color: colors.text,
+                '&.Mui-checked': {
+                  color: colors.text,
+                },
+                '&.MuiCheckbox-root': {
+                  color: colors.text,
+                }
+              }}
             />
           }
           label={t('commandNoQueue')}
+          sx={{ color: colors.text }}
         />
       )}
     </>
