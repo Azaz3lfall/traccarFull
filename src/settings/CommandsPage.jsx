@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import {
   Table, TableRow, TableCell, TableHead, TableBody,
   TextField, Button, IconButton, Typography, Container,
@@ -31,8 +29,6 @@ const CommandsPage = () => {
   const { classes } = useSettingsStyles();
   const t = useTranslation();
   const colors = useThemeColors();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const [timestamp, setTimestamp] = useState(Date.now());
   const [items, setItems] = useState([]);
@@ -207,20 +203,21 @@ const CommandsPage = () => {
                 padding: '20px 24px',
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
               }}>
-                <IconButton
-                  onClick={handleCloseDrawer}
-                  size="small"
-                  style={{ color: colors.textSecondary, marginRight: '12px' }}
-                >
-                  <ChevronLeftIcon fontSize="small" />
-                </IconButton>
-                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, flex: 1 }}>
-                  {editingCommand?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedSavedCommands')}
-                </Typography>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={handleCloseDrawer}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    {editingCommand?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedSavedCommands')}
+                  </Typography>
+                </div>
               </div>
 
               {/* Drawer Content */}

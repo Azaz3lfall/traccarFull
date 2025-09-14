@@ -28,6 +28,10 @@ import {
   FormControl,
   InputLabel,
   Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -299,20 +303,21 @@ const FloatingCommandsPopover = ({
               padding: '16px 20px',
               borderBottom: `1px solid ${colors.border}`,
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
               background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
             }}>
-              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                {t('sharedSavedCommands')}
-              </Typography>
-              <IconButton
-                onClick={onClose}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <IconButton
+                  onClick={onClose}
+                  size="small"
+                  style={{ color: colors.textSecondary }}
+                >
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                  {t('sharedSavedCommands')}
+                </Typography>
+              </div>
             </div>
 
             {/* Search and Filters */}
@@ -522,68 +527,47 @@ const FloatingCommandsPopover = ({
           </Menu>
 
           {/* Delete Confirmation Dialog */}
-          <AnimatePresence>
-            {deleteDialog && commandToDelete && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  zIndex: 10000,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+          <Dialog
+            open={deleteDialog}
+            onClose={() => setDeleteDialog(false)}
+            style={{ zIndex: 10003 }}
+            PaperProps={{
+              style: {
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '12px',
+                zIndex: 10003,
+              },
+            }}
+          >
+            <DialogTitle style={{ color: colors.text }}>
+              {t('sharedRemove')} {commandToDelete?.description}
+            </DialogTitle>
+            <DialogContent>
+              <Typography style={{ color: colors.textSecondary }}>
+                {t('sharedRemoveConfirm')} "{commandToDelete?.description}"?
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setDeleteDialog(false)}
+                style={{ color: colors.textSecondary }}
               >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  style={{
-                    backgroundColor: colors.surface,
-                    borderRadius: '12px',
-                    padding: '24px',
-                    maxWidth: '400px',
-                    width: '90%',
-                    boxShadow: colors.shadow,
-                  }}
-                >
-                  <Typography variant="h6" style={{ color: colors.text, marginBottom: '16px' }}>
-                    {t('sharedConfirmDelete')}
-                  </Typography>
-                  <Typography variant="body2" style={{ color: colors.textSecondary, marginBottom: '24px' }}>
-                    {t('sharedConfirmDeleteDescription')}: {commandToDelete.description}
-                  </Typography>
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                    <Button
-                      onClick={() => setDeleteDialog(false)}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={() => deleteCommandMutation.mutate(commandToDelete.id)}
-                      variant="contained"
-                      color="error"
-                      disabled={deleteCommandMutation.isPending}
-                    >
-                      {deleteCommandMutation.isPending ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedDelete')
-                      )}
-                    </Button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {t('sharedCancel')}
+              </Button>
+              <Button
+                onClick={() => deleteCommandMutation.mutate(commandToDelete.id)}
+                style={{ color: colors.error }}
+                disabled={deleteCommandMutation.isPending}
+              >
+                {deleteCommandMutation.isPending ? (
+                  <CircularProgress size={16} />
+                ) : (
+                  t('sharedRemove')
+                )}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {/* Edit Command Drawer */}
           <AnimatePresence>

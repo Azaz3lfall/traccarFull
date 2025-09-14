@@ -828,20 +828,21 @@ const FloatingUsersPopover = ({
                   padding: '20px 24px',
                   borderBottom: `1px solid ${colors.border}`,
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
                   background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                 }}>
-                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-              {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
-                  </Typography>
-                  <IconButton
-                    onClick={handleCloseEditDialog}
-                    size="small"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    <ChevronLeftIcon fontSize="small" />
-                  </IconButton>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <IconButton
+                      onClick={handleCloseEditDialog}
+                      size="small"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      <ChevronLeftIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                      {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
+                    </Typography>
+                  </div>
                 </div>
 
                 {/* Drawer Content */}
@@ -1429,19 +1430,20 @@ const FloatingUsersPopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: colors.surface,
+                    background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {t('settingsServer')}
-                    </Typography>
-                    <IconButton
-                      onClick={() => setServerDialog(false)}
-                      size="small"
-                      style={{ color: colors.textSecondary }}
-                    >
-                      <ChevronLeftIcon fontSize="small" />
-                    </IconButton>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => setServerDialog(false)}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                        {t('settingsServer')}
+                      </Typography>
+                    </div>
                   </div>
 
                   {/* Drawer Content */}

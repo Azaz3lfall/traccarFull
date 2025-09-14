@@ -3378,19 +3378,20 @@ const MainPage = () => {
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: colors.surface,
+                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
               }}>
-                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                  {t('settingsServer')}
-                </Typography>
-                <IconButton
-                  onClick={() => setShowServerDrawer(false)}
-                  size="small"
-                  style={{ color: colors.textSecondary }}
-                >
-                  <ChevronLeftIcon fontSize="small" />
-                </IconButton>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => setShowServerDrawer(false)}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    {t('settingsServer')}
+                  </Typography>
+                </div>
               </div>
 
               {/* Drawer Content */}
