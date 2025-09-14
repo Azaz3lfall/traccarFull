@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -48,12 +50,15 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useManager } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { sessionActions } from '../store';
 
 const UsersModal = ({ open, onClose }) => {
   const t = useTranslation();
   const colors = useThemeColors();
   const manager = useManager();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -99,9 +104,11 @@ const UsersModal = ({ open, onClose }) => {
   );
 
   // Handle user login
-  const handleLogin = useCatch(async (userId) => {
-    await fetchOrThrow(`/api/session/${userId}`);
-    window.location.replace('/');
+  const handleLogin = useCatch(async (user) => {
+    const response = await fetchOrThrow(`/api/session/${user.id}`);
+    const userData = await response.json();
+    dispatch(sessionActions.updateUser(userData));
+    window.location.reload();
   });
 
   // Handle user connections

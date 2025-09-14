@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -66,12 +68,14 @@ import SelectField from '../common/components/SelectField';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import LinkField from '../common/components/LinkField';
 import { formatNotificationTitle } from '../common/util/formatter';
+import { sessionActions } from '../store';
 
 const FloatingUsersPopover = ({ 
   desktop, 
   isMenuExpanded, 
   isVisible, 
-  onClose 
+  onClose,
+  userId = null // Optional userId to edit specific user
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
@@ -80,6 +84,8 @@ const FloatingUsersPopover = ({
   const admin = useAdministrator();
   const fixedEmail = useRestriction('fixedEmail');
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   
   // Server attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
@@ -121,6 +127,28 @@ const FloatingUsersPopover = ({
     enabled: isVisible, // Only fetch when popover is visible
   });
 
+  // Fetch specific user details when userId is provided
+  const { data: specificUser, isLoading: isLoadingSpecificUser } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: async () => {
+      const response = await fetchOrThrow(`/api/users/${userId}`);
+      return response.json();
+    },
+    enabled: !!userId && isVisible, // Only fetch when userId is provided and popover is visible
+  });
+
+  // Auto-open edit dialog when specific user is loaded
+  useEffect(() => {
+    if (specificUser && userId && isVisible) {
+      setEditingUser({
+        ...specificUser,
+        attributes: specificUser.attributes || {}
+      });
+      setActiveTab(0);
+      setEditDialog(true);
+    }
+  }, [specificUser, userId, isVisible]);
+
   // Filter users based on search and temporary status
   const filteredUsers = users.filter(user => {
     const matchesTemporary = showTemporary || !user.temporary;
@@ -148,8 +176,7 @@ const FloatingUsersPopover = ({
       setAnchorEl(null);
       setDeleteDialog(false);
       setUserToDelete(null);
-      setEditDialog(false);
-      setEditingUser(null);
+      handleCloseEditDialog();
       setPage(1);
     };
   }, [queryClient]);
@@ -162,9 +189,11 @@ const FloatingUsersPopover = ({
   );
 
   // Handle user login
-  const handleLogin = useCatch(async (userId) => {
-    await fetchOrThrow(`/api/session/${userId}`);
-    window.location.replace('/');
+  const handleLogin = useCatch(async (user) => {
+    const response = await fetchOrThrow(`/api/session/${user.id}`);
+    const userData = await response.json();
+    dispatch(sessionActions.updateUser(userData));
+    window.location.reload();
   });
 
   // Handle user connections
@@ -199,6 +228,16 @@ const FloatingUsersPopover = ({
     setAnchorEl(null);
   };
 
+  // Handle closing edit dialog
+  const handleCloseEditDialog = () => {
+    setEditDialog(false);
+    setEditingUser(null);
+    // If we were editing a specific user (not from the list), close the entire popover
+    if (userId) {
+      onClose();
+    }
+  };
+
   // Handle delete user
   const handleDelete = (user) => {
     setUserToDelete(user);
@@ -218,8 +257,7 @@ const FloatingUsersPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      setEditDialog(false);
-      setEditingUser(null);
+      handleCloseEditDialog();
     },
   });
 
@@ -234,8 +272,7 @@ const FloatingUsersPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      setEditDialog(false);
-      setEditingUser(null);
+      handleCloseEditDialog();
     },
   });
 
@@ -352,8 +389,7 @@ const FloatingUsersPopover = ({
                   setAnchorEl(null);
                   setDeleteDialog(false);
                   setUserToDelete(null);
-                  setEditDialog(false);
-                  setEditingUser(null);
+                  handleCloseEditDialog();
                   setPage(1);
                   // Close the component
                   onClose();
@@ -764,7 +800,7 @@ const FloatingUsersPopover = ({
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     zIndex: 9999,
                   }}
-                  onClick={() => setEditDialog(false)}
+                  onClick={handleCloseEditDialog}
                 />
                 
                 {/* Drawer */}
@@ -800,7 +836,7 @@ const FloatingUsersPopover = ({
               {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
                   </Typography>
                   <IconButton
-                    onClick={() => setEditDialog(false)}
+                    onClick={handleCloseEditDialog}
                     size="small"
                     style={{ color: colors.textSecondary }}
                   >
@@ -1144,7 +1180,7 @@ const FloatingUsersPopover = ({
                   background: colors.surface,
                 }}>
               <Button
-                onClick={() => setEditDialog(false)}
+                onClick={handleCloseEditDialog}
                 size="small"
                 style={{ color: colors.textSecondary }}
               >

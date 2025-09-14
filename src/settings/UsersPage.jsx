@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   Table, TableRow, TableCell, TableHead, TableBody, Switch, TableFooter, FormControlLabel,
 } from '@mui/material';
@@ -17,10 +18,12 @@ import { useManager } from '../common/util/permissions';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import useSettingsStyles from './common/useSettingsStyles';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { sessionActions } from '../store';
 
 const UsersPage = () => {
   const { classes } = useSettingsStyles();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const t = useTranslation();
 
   const manager = useManager();
@@ -32,8 +35,10 @@ const UsersPage = () => {
   const [temporary, setTemporary] = useState(false);
 
   const handleLogin = useCatch(async (userId) => {
-    await fetchOrThrow(`/api/session/${userId}`);
-    window.location.replace('/');
+    const response = await fetchOrThrow(`/api/session/${userId}`);
+    const user = await response.json();
+    dispatch(sessionActions.updateUser(user));
+    window.location.reload();
   });
 
   const actionLogin = {

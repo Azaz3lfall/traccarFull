@@ -150,6 +150,7 @@ const MainPage = () => {
   const [languageRef, setLanguageRef] = useState(null);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showUsersPopover, setShowUsersPopover] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -3144,7 +3145,8 @@ const MainPage = () => {
                 <button
                   onClick={() => {
                     setShowUserPopover(false);
-                    window.location.href = `/settings/user/${user.id}`;
+                    setEditingUserId(user.id);
+                    setShowUsersPopover(true);
                   }}
                   style={{
                     flex: 1,
@@ -3312,7 +3314,11 @@ const MainPage = () => {
         desktop={desktop}
         isMenuExpanded={isMenuExpanded}
         isVisible={showUsersPopover}
-        onClose={() => setShowUsersPopover(false)}
+        onClose={() => {
+          setShowUsersPopover(false);
+          setEditingUserId(null);
+        }}
+        userId={editingUserId}
       />
       
       {/* Server Settings Drawer */}
