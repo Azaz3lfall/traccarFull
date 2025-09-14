@@ -23,6 +23,10 @@ import {
   Pagination,
   CircularProgress,
   Alert,
+  Select,
+  FormControl,
+  InputLabel,
+  Checkbox,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -60,6 +64,7 @@ const FloatingCommandsPopover = ({
   const navigate = useNavigate();
   
   const limitCommands = useRestriction('limitCommands');
+  console.log('FloatingCommandsPopover - limitCommands:', limitCommands);
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -72,6 +77,7 @@ const FloatingCommandsPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
+  const [commandTypes, setCommandTypes] = useState([]);
 
   // Fetch commands with TanStack Query
   const { data: commands = [], isLoading, error } = useQuery({
@@ -82,6 +88,23 @@ const FloatingCommandsPopover = ({
     },
     enabled: isVisible, // Only fetch when popover is visible
   });
+
+  // Fetch command types
+  useEffect(() => {
+    const fetchCommandTypes = async () => {
+      try {
+        const response = await fetchOrThrow('/api/commands/types');
+        const types = await response.json();
+        // Ensure we have an array of strings
+        const validTypes = Array.isArray(types) ? types.filter(type => typeof type === 'string' && type.length > 0) : [];
+        setCommandTypes(validTypes);
+      } catch (error) {
+        console.error('Failed to load command types:', error);
+        setCommandTypes([]);
+      }
+    };
+    fetchCommandTypes();
+  }, []);
 
   // Filter commands based on search
   const filteredCommands = commands.filter(command => {
@@ -355,11 +378,9 @@ const FloatingCommandsPopover = ({
                         <TableCell style={{ color: colors.text, fontWeight: '600' }}>
                           {t('commandSendSms')}
                         </TableCell>
-                        {!limitCommands && (
-                          <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
-                            {t('sharedActions')}
-                          </TableCell>
-                        )}
+                        <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
+                          {t('sharedActions')}
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -384,25 +405,23 @@ const FloatingCommandsPopover = ({
                             </div>
                           </TableCell>
                           <TableCell style={{ color: colors.textSecondary }}>
-                            {t(prefixString('command', command.type))}
+                            {command.type ? t(prefixString('command', String(command.type))) : '-'}
                           </TableCell>
                           <TableCell style={{ color: colors.textSecondary }}>
                             {formatBoolean(command.textChannel, t)}
                           </TableCell>
-                          {!limitCommands && (
-                            <TableCell style={{ padding: '4px' }}>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  setSelectedCommand(command);
-                                  setAnchorEl(e.currentTarget);
-                                }}
-                                style={{ color: colors.textSecondary }}
-                              >
-                                <MoreVertIcon fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          )}
+                          <TableCell style={{ padding: '4px' }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setSelectedCommand(command);
+                                setAnchorEl(e.currentTarget);
+                              }}
+                              style={{ color: colors.textSecondary }}
+                            >
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -531,6 +550,192 @@ const FloatingCommandsPopover = ({
                   </div>
                 </motion.div>
               </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Edit Command Drawer */}
+          <AnimatePresence>
+            {editDialog && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 10000,
+                  }}
+                  onClick={() => {
+                    setEditDialog(false);
+                    setEditingCommand(null);
+                  }}
+                />
+
+                {/* Drawer */}
+                <motion.div
+                  initial={{ x: 400, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 400, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    width: '400px',
+                    height: '100vh',
+                    backgroundColor: colors.surface,
+                    zIndex: 10001,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+                  }}>
+                    <IconButton
+                      onClick={() => {
+                        setEditDialog(false);
+                        setEditingCommand(null);
+                      }}
+                      size="small"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      <ChevronLeftIcon />
+                    </IconButton>
+                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                      {editingCommand?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedCommand')}
+                    </Typography>
+                  </div>
+
+                  {/* Form */}
+                  <div style={{ flex: 1, padding: '20px', overflow: 'auto' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      {/* Description */}
+                      <TextField
+                        label={t('sharedDescription')}
+                        value={editingCommand?.description || ''}
+                        onChange={(e) => setEditingCommand({
+                          ...editingCommand,
+                          description: e.target.value
+                        })}
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        style={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          }
+                        }}
+                      />
+
+                      {/* Type */}
+                      <FormControl fullWidth size="small">
+                        <InputLabel style={{ color: colors.textSecondary }}>
+                          {t('sharedType')}
+                        </InputLabel>
+                        <Select
+                          value={editingCommand?.type || ''}
+                          onChange={(e) => setEditingCommand({
+                            ...editingCommand,
+                            type: e.target.value
+                          })}
+                          label={t('sharedType')}
+                          style={{
+                            backgroundColor: colors.secondary,
+                            color: colors.text,
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: colors.border,
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: colors.primary,
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: colors.primary,
+                            },
+                          }}
+                        >
+                          {commandTypes.length > 0 ? commandTypes.map((type) => (
+                            <MenuItem key={type} value={type} style={{ color: colors.text }}>
+                              {t(prefixString('command', String(type || '')))}
+                            </MenuItem>
+                          )) : (
+                            <MenuItem disabled style={{ color: colors.textSecondary }}>
+                              {t('sharedNoData')}
+                            </MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
+
+                      {/* Text Channel */}
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={editingCommand?.textChannel || false}
+                            onChange={(e) => setEditingCommand({
+                              ...editingCommand,
+                              textChannel: e.target.checked
+                            })}
+                            style={{ color: colors.primary }}
+                          />
+                        }
+                        label={t('commandSendSms')}
+                        style={{ color: colors.text }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderTop: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'flex-end',
+                  }}>
+                    <Button
+                      onClick={() => {
+                        setEditDialog(false);
+                        setEditingCommand(null);
+                      }}
+                      style={{ color: colors.textSecondary }}
+                    >
+                      {t('sharedCancel')}
+                    </Button>
+                    <Button
+                      onClick={handleSaveCommand}
+                      variant="contained"
+                      disabled={createCommandMutation.isPending || updateCommandMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                      }}
+                    >
+                      {(createCommandMutation.isPending || updateCommandMutation.isPending) ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        t('sharedSave')
+                      )}
+                    </Button>
+                  </div>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
         </motion.div>

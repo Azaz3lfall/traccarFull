@@ -18,7 +18,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const CollectionActions = ({
-  itemId, editPath, endpoint, setTimestamp, customActions, readonly,
+  itemId, editPath, endpoint, setTimestamp, customActions, readonly, onEdit,
 }) => {
   const theme = useTheme();
   const { classes } = useStyles();
@@ -31,7 +31,11 @@ const CollectionActions = ({
   const [removing, setRemoving] = useState(false);
 
   const handleEdit = () => {
-    navigate(`${editPath}/${itemId}`);
+    if (onEdit) {
+      onEdit();
+    } else {
+      navigate(`${editPath}/${itemId}`);
+    }
     setMenuAnchorEl(null);
   };
 

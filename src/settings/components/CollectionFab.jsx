@@ -15,16 +15,28 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
-const CollectionFab = ({ editPath, disabled }) => {
+const CollectionFab = ({ editPath, disabled, onClick }) => {
   const { classes } = useStyles();
   const navigate = useNavigate();
 
   const readonly = useRestriction('readonly');
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(editPath);
+    }
+  };
+
   if (!readonly && !disabled) {
     return (
       <div className={classes.fab}>
-        <Fab size="medium" color="primary" onClick={() => navigate(editPath)}>
+        <Fab 
+          size="medium" 
+          color="primary" 
+          onClick={handleClick}
+        >
           <AddIcon />
         </Fab>
       </div>
