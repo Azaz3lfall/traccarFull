@@ -17,6 +17,7 @@ const SelectField = ({
   data,
   keyGetter = (item) => item.id,
   titleGetter = (item) => item.name,
+  zIndex = 1000,
 }) => {
   const [items, setItems] = useState();
 
@@ -47,6 +48,13 @@ const SelectField = ({
               multiple
               value={value}
               onChange={onChange}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    zIndex: zIndex,
+                  },
+                },
+              }}
             >
               {items.map((item) => (
                 <MenuItem key={keyGetter(item)} value={keyGetter(item)}>{titleGetter(item)}</MenuItem>
@@ -65,6 +73,11 @@ const SelectField = ({
             value={value}
             onChange={(_, value) => onChange({ target: { value: value ? keyGetter(value) : emptyValue } })}
             renderInput={(params) => <TextField {...params} label={label} />}
+            ListboxProps={{
+              style: {
+                zIndex: zIndex,
+              },
+            }}
           />
         )}
       </FormControl>

@@ -1,5 +1,5 @@
 import {
-  useState, useCallback, useEffect,
+  useState, useCallback, useEffect, useRef, useMemo,
 } from 'react';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
@@ -73,10 +73,16 @@ import {
   FormGroup, 
   FormControlLabel,
   Tabs,
-  Tab
+  Tab,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Chip
 } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import CloseIcon from '@mui/icons-material/Close';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useServerAttributes from '../common/attributes/useServerAttributes';
@@ -84,6 +90,8 @@ import EditAttributesAccordion from '../settings/components/EditAttributesAccord
 import SelectField from '../common/components/SelectField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { MuiFileInput } from 'mui-file-input';
+import { prefixString } from '../common/util/stringUtils';
+import { useEffectAsync } from '../reactHelper';
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -145,6 +153,24 @@ const MainPage = () => {
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
+  const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
+  const [announcementData, setAnnouncementData] = useState({
+    users: [],
+    notificator: '',
+    message: { subject: '', body: '' }
+  });
+  
+  // Custom autocomplete states
+  const [usersItems, setUsersItems] = useState([]);
+  const [notificatorsItems, setNotificatorsItems] = useState([]);
+  const [usersAutocompleteOpen, setUsersAutocompleteOpen] = useState(false);
+  const [notificatorsAutocompleteOpen, setNotificatorsAutocompleteOpen] = useState(false);
+  const [usersInputValue, setUsersInputValue] = useState('');
+  const [notificatorsInputValue, setNotificatorsInputValue] = useState('');
+  const [usersHighlightedIndex, setUsersHighlightedIndex] = useState(-1);
+  const [notificatorsHighlightedIndex, setNotificatorsHighlightedIndex] = useState(-1);
+  const usersInputRef = useRef(null);
+  const notificatorsInputRef = useRef(null);
   
   // Logout handlers
   const confirmLogout = () => {
@@ -282,7 +308,7 @@ const MainPage = () => {
   const serverAttributes = useServerAttributes(t);
   
   // Server query and mutation
-  const { data: serverQueryData, isLoading: serverLoading } = useQuery({
+  const { data: serverQueryData } = useQuery({
     queryKey: ['server'],
     queryFn: async () => {
       const response = await fetch('/api/server');
@@ -297,6 +323,124 @@ const MainPage = () => {
       setServerData(serverQueryData);
     }
   }, [serverQueryData]);
+
+  // Reset announcement data when drawer opens
+  useEffect(() => {
+    if (showAnnouncementDrawer) {
+      setAnnouncementData({
+        users: [],
+        notificator: '',
+        message: { subject: '', body: '' }
+      });
+    }
+  }, [showAnnouncementDrawer]);
+
+  // Fetch users data
+  useEffectAsync(async () => {
+    if (showAnnouncementDrawer) {
+      const response = await fetchOrThrow('/api/users');
+      setUsersItems(await response.json());
+    }
+  }, [showAnnouncementDrawer]);
+
+  // Fetch notificators data
+  useEffectAsync(async () => {
+    if (showAnnouncementDrawer) {
+      const response = await fetchOrThrow('/api/notifications/notificators?announcement=true');
+      setNotificatorsItems(await response.json());
+    }
+  }, [showAnnouncementDrawer]);
+
+  // Filtered options for custom autocomplete
+  const filteredUsersOptions = useMemo(() => {
+    if (!usersItems) return [];
+    if (!usersInputValue) return usersItems;
+    return usersItems.filter(item => 
+      item.name.toLowerCase().includes(usersInputValue.toLowerCase())
+    );
+  }, [usersItems, usersInputValue]);
+
+  const filteredNotificatorsOptions = useMemo(() => {
+    if (!notificatorsItems) return [];
+    if (!notificatorsInputValue) return notificatorsItems;
+    return notificatorsItems.filter(item => 
+      t(prefixString('notificator', item.type)).toLowerCase().includes(notificatorsInputValue.toLowerCase())
+    );
+  }, [notificatorsItems, notificatorsInputValue, t]);
+
+  // Users autocomplete handlers
+  const handleUsersInputChange = (event) => {
+    const value = event.target.value;
+    setUsersInputValue(value);
+    setUsersAutocompleteOpen(true);
+    setUsersHighlightedIndex(-1);
+  };
+
+  const handleUsersOptionSelect = (option) => {
+    const currentUsers = announcementData.users || [];
+    const isAlreadySelected = currentUsers.some(user => user.id === option.id);
+    
+    if (!isAlreadySelected) {
+      setAnnouncementData({
+        ...announcementData,
+        users: [...currentUsers, option]
+      });
+    }
+    
+    setUsersInputValue('');
+    setUsersAutocompleteOpen(false);
+    setUsersHighlightedIndex(-1);
+  };
+
+  const handleUsersRemove = (userToRemove) => {
+    const currentUsers = announcementData.users || [];
+    setAnnouncementData({
+      ...announcementData,
+      users: currentUsers.filter(user => user.id !== userToRemove.id)
+    });
+  };
+
+  const handleUsersFocus = () => {
+    setUsersInputValue('');
+    setUsersAutocompleteOpen(true);
+  };
+
+  const handleUsersBlur = () => {
+    setTimeout(() => {
+      setUsersAutocompleteOpen(false);
+      setUsersHighlightedIndex(-1);
+    }, 150);
+  };
+
+  // Notificators autocomplete handlers
+  const handleNotificatorsInputChange = (event) => {
+    const value = event.target.value;
+    setNotificatorsInputValue(value);
+    setNotificatorsAutocompleteOpen(true);
+    setNotificatorsHighlightedIndex(-1);
+  };
+
+  const handleNotificatorsOptionSelect = (option) => {
+    setAnnouncementData({
+      ...announcementData,
+      notificator: option.type
+    });
+    setNotificatorsInputValue('');
+    setNotificatorsAutocompleteOpen(false);
+    setNotificatorsHighlightedIndex(-1);
+  };
+
+  const handleNotificatorsFocus = () => {
+    setNotificatorsInputValue('');
+    setNotificatorsAutocompleteOpen(true);
+  };
+
+  const handleNotificatorsBlur = () => {
+    setTimeout(() => {
+      setNotificatorsAutocompleteOpen(false);
+      setNotificatorsHighlightedIndex(-1);
+    }, 150);
+  };
   
   const updateServerMutation = useMutation({
     mutationFn: async (data) => {
@@ -308,6 +452,21 @@ const MainPage = () => {
     },
     onSuccess: () => {
       setShowServerDrawer(false);
+    },
+  });
+
+  const sendAnnouncementMutation = useMutation({
+    mutationFn: async (data) => {
+      const query = new URLSearchParams();
+      data.users.forEach((userId) => query.append('userId', userId));
+      await fetchOrThrow(`/api/notifications/send/${data.notificator}?${query.toString()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data.message),
+      });
+    },
+    onSuccess: () => {
+      setShowAnnouncementDrawer(false);
     },
   });
 
@@ -1579,7 +1738,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-announcement');
               if (tooltip) tooltip.remove();
-              window.location.href = '/settings/announcement';
+              setShowAnnouncementDrawer(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3598,6 +3757,276 @@ const MainPage = () => {
                   }}
                 >
                   {updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Announcement Drawer - Slides in from right */}
+      <AnimatePresence>
+        {showAnnouncementDrawer && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 10000,
+              }}
+              onClick={() => setShowAnnouncementDrawer(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                width: '500px',
+                height: '100vh',
+                backgroundColor: colors.surface,
+                borderLeft: `1px solid ${colors.border}`,
+                zIndex: 10001,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '20px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}>
+                <ChevronLeftIcon 
+                  style={{ 
+                    cursor: 'pointer', 
+                    color: colors.textSecondary,
+                    fontSize: '24px'
+                  }}
+                  onClick={() => setShowAnnouncementDrawer(false)}
+                />
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600' }}>
+                  {t('serverAnnouncement')}
+                </Typography>
+              </div>
+
+              {/* Content */}
+              <div style={{
+                flex: 1,
+                padding: '20px',
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}>
+                {/* Required Section */}
+                <div style={{
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    padding: '16px',
+                    backgroundColor: colors.surface,
+                    borderBottom: `1px solid ${colors.border}`,
+                  }}>
+                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '600' }}>
+                      {t('sharedRequired')}
+                    </Typography>
+                  </div>
+                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Users Multi-Select */}
+                    <Box sx={{ position: 'relative', width: '100%' }}>
+                      <TextField
+                        ref={usersInputRef}
+                        label={t('settingsUsers')}
+                        value={usersInputValue}
+                        onChange={handleUsersInputChange}
+                        onFocus={handleUsersFocus}
+                        onBlur={handleUsersBlur}
+                        fullWidth
+                        autoComplete="off"
+                        placeholder={t('reportShow')}
+                      />
+                      {usersAutocompleteOpen && filteredUsersOptions.length > 0 && (
+                        <Paper
+                          sx={(theme) => ({
+                            position: 'fixed',
+                            zIndex: 10002,
+                            maxHeight: '200px',
+                            minWidth: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: theme.shape.borderRadius,
+                            boxShadow: theme.shadows[8],
+                            backgroundColor: theme.palette.background.paper,
+                            mt: 0.5,
+                            '&::-webkit-scrollbar': {
+                              display: 'none',
+                            },
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                          })}
+                          style={{
+                            left: usersInputRef.current?.getBoundingClientRect().left || 0,
+                            top: (usersInputRef.current?.getBoundingClientRect().bottom || 0) + 4,
+                            width: usersInputRef.current?.getBoundingClientRect().width || 200,
+                          }}
+                        >
+                          <List dense>
+                            {filteredUsersOptions.map((option, index) => (
+                              <ListItem
+                                key={option.id}
+                                button
+                                onClick={() => handleUsersOptionSelect(option)}
+                                style={{
+                                  backgroundColor: index === usersHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                                }}
+                              >
+                                <ListItemText primary={option.name} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Paper>
+                      )}
+                      {/* Selected Users Chips */}
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                        {announcementData.users?.map((user) => (
+                          <Chip
+                            key={user.id}
+                            label={user.name}
+                            onDelete={() => handleUsersRemove(user)}
+                            deleteIcon={<CloseIcon />}
+                            size="small"
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+
+                    {/* Notificators Single-Select */}
+                    <Box sx={{ position: 'relative', width: '100%' }}>
+                      <TextField
+                        ref={notificatorsInputRef}
+                        label={t('notificationNotificators')}
+                        value={notificatorsInputValue}
+                        onChange={handleNotificatorsInputChange}
+                        onFocus={handleNotificatorsFocus}
+                        onBlur={handleNotificatorsBlur}
+                        fullWidth
+                        autoComplete="off"
+                        placeholder={t('reportShow')}
+                      />
+                      {notificatorsAutocompleteOpen && filteredNotificatorsOptions.length > 0 && (
+                        <Paper
+                          sx={(theme) => ({
+                            position: 'fixed',
+                            zIndex: 10002,
+                            maxHeight: '200px',
+                            minWidth: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: theme.shape.borderRadius,
+                            boxShadow: theme.shadows[8],
+                            backgroundColor: theme.palette.background.paper,
+                            mt: 0.5,
+                            '&::-webkit-scrollbar': {
+                              display: 'none',
+                            },
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                          })}
+                          style={{
+                            left: notificatorsInputRef.current?.getBoundingClientRect().left || 0,
+                            top: (notificatorsInputRef.current?.getBoundingClientRect().bottom || 0) + 4,
+                            width: notificatorsInputRef.current?.getBoundingClientRect().width || 200,
+                          }}
+                        >
+                          <List dense>
+                            {filteredNotificatorsOptions.map((option, index) => (
+                              <ListItem
+                                key={option.type}
+                                button
+                                onClick={() => handleNotificatorsOptionSelect(option)}
+                                style={{
+                                  backgroundColor: index === notificatorsHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                                }}
+                              >
+                                <ListItemText primary={t(prefixString('notificator', option.type))} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Paper>
+                      )}
+                    </Box>
+                    <TextField
+                      fullWidth
+                      value={announcementData.message.subject || ''}
+                      onChange={(e) => setAnnouncementData({ 
+                        ...announcementData, 
+                        message: { ...announcementData.message, subject: e.target.value }
+                      })}
+                      label={t('sharedSubject')}
+                      variant="outlined"
+                    />
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={4}
+                      value={announcementData.message.body || ''}
+                      onChange={(e) => setAnnouncementData({ 
+                        ...announcementData, 
+                        message: { ...announcementData.message, body: e.target.value }
+                      })}
+                      label={t('commandMessage')}
+                      variant="outlined"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div style={{
+                padding: '20px',
+                borderTop: `1px solid ${colors.border}`,
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+              }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setShowAnnouncementDrawer(false)}
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.textSecondary,
+                  }}
+                >
+                  {t('sharedCancel')}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => sendAnnouncementMutation.mutate(announcementData)}
+                  disabled={sendAnnouncementMutation.isPending || !announcementData.notificator || !announcementData.message.subject || !announcementData.message.body}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                  }}
+                >
+                  {sendAnnouncementMutation.isPending ? t('sharedSending') : t('commandSend')}
                 </Button>
               </div>
             </motion.div>
