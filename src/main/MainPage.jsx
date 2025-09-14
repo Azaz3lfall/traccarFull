@@ -16,6 +16,7 @@ import MainMap from './MainMap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
 import FloatingUsersPopover from '../components/FloatingUsersPopover';
+import FloatingCommandsPopover from '../components/FloatingCommandsPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -151,6 +152,7 @@ const MainPage = () => {
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showUsersPopover, setShowUsersPopover] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
+  const [showCommandsPopover, setShowCommandsPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -1544,7 +1546,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-commands');
               if (tooltip) tooltip.remove();
-              window.location.href = '/settings/commands';
+              setShowCommandsPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3319,6 +3321,14 @@ const MainPage = () => {
           setEditingUserId(null);
         }}
         userId={editingUserId}
+      />
+      
+      {/* Commands Management Popover */}
+      <FloatingCommandsPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showCommandsPopover}
+        onClose={() => setShowCommandsPopover(false)}
       />
       
       {/* Server Settings Drawer */}
