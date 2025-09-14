@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -33,9 +33,6 @@ import {
   Select,
   Checkbox,
   FormGroup,
-  OutlinedInput,
-  Grid,
-  Autocomplete,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -53,9 +50,6 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   ExpandMore as ExpandMoreIcon,
-  Close as CloseIcon,
-  Cached as CachedIcon,
-  DeleteForever as DeleteForeverIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
@@ -66,8 +60,8 @@ import fetchOrThrow from '../common/util/fetchOrThrow';
 import useUserAttributes from '../common/attributes/useUserAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useMapStyles from '../map/core/useMapStyles';
-import { useAttributePreference } from '../common/util/preferences';
-import { createFilterOptions } from '@mui/material/useAutocomplete';
+import SelectField from '../common/components/SelectField';
+import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 
 const FloatingUsersPopover = ({ 
   desktop, 
@@ -87,9 +81,6 @@ const FloatingUsersPopover = ({
   const mapStyles = useMapStyles();
   const commonUserAttributes = useCommonUserAttributes(t);
   const userAttributes = useUserAttributes(t);
-  const speedUnit = useAttributePreference('speedUnit');
-  const distanceUnit = useAttributePreference('distanceUnit');
-  const volumeUnit = useAttributePreference('volumeUnit');
 
   // Zebra striping colors
   const lightThemeZebra = '#f8f9fa';
@@ -107,11 +98,6 @@ const FloatingUsersPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(15);
   
-  // Additional state for comprehensive CRUD
-  const [deleteEmail, setDeleteEmail] = useState('');
-  const [deleteFailed, setDeleteFailed] = useState(false);
-  const [addAttributeDialog, setAddAttributeDialog] = useState(false);
-  const [expandedAccordion, setExpandedAccordion] = useState('required');
 
   // Fetch users with TanStack Query
   const { data: users = [], isLoading, error } = useQuery({
@@ -176,7 +162,10 @@ const FloatingUsersPopover = ({
 
   // Handle edit user
   const handleEdit = (user) => {
-    setEditingUser(user);
+    setEditingUser({
+      ...user,
+      attributes: user.attributes || {}
+    });
     setEditDialog(true);
     setAnchorEl(null);
   };
@@ -242,6 +231,7 @@ const FloatingUsersPopover = ({
       createUserMutation.mutate(editingUser);
     }
   };
+
 
   // Menu actions
   const actions = [
@@ -351,7 +341,14 @@ const FloatingUsersPopover = ({
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => {
-                  setEditingUser({ name: '', email: '', password: '', administrator: false, disabled: false });
+                  setEditingUser({ 
+                    name: '', 
+                    email: '', 
+                    password: '', 
+                    administrator: false, 
+                    disabled: false,
+                    attributes: {}
+                  });
                   setEditDialog(true);
                 }}
                 size="small"
@@ -716,367 +713,295 @@ const FloatingUsersPopover = ({
             </DialogActions>
           </Dialog>
 
-          {/* Comprehensive Edit User Dialog */}
+          {/* Edit User Dialog - Exact copy of UserPage.jsx */}
           <Dialog
             open={editDialog}
             onClose={() => setEditDialog(false)}
             maxWidth="md"
             fullWidth
-            style={{ zIndex: 10003 }}
+            disablePortal={false}
+            style={{ zIndex: 10000 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
                 borderRadius: '12px',
-                zIndex: 10003,
+                zIndex: 10000,
                 maxHeight: '90vh',
               },
+            }}
+            MenuProps={{
+              disablePortal: false,
+              style: { zIndex: 10001 }
             }}
           >
             <DialogTitle style={{ color: colors.text, fontSize: '16px', fontWeight: '600' }}>
               {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
             </DialogTitle>
             <DialogContent style={{ padding: '0 24px', maxHeight: '70vh', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
-                
-                {/* Required Fields Accordion */}
-                <Accordion 
-                  expanded={expandedAccordion === 'required'} 
-                  onChange={() => setExpandedAccordion(expandedAccordion === 'required' ? '' : 'required')}
-                  style={{ backgroundColor: colors.surface, boxShadow: 'none' }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '500' }}>
-                      {t('sharedRequired')}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <TextField
-                      label={t('sharedName')}
-                      value={editingUser?.name || ''}
-                      onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                      fullWidth
-                      size="small"
-                      required
-                    />
-                    <TextField
-                      label={t('userEmail')}
-                      type="text"
-                      value={editingUser?.email || ''}
-                      onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
-                      fullWidth
-                      size="small"
-                      required
-                      disabled={fixedEmail && editingUser?.id}
-                    />
-                    {!editingUser?.id && (
+              {editingUser && (
+                <>
+                  <Accordion defaultExpanded>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle1">
+                        {t('sharedRequired')}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       <TextField
-                        label={t('userPassword')}
-                        type="password"
-                        value={editingUser?.password || ''}
-                        onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-                        fullWidth
-                        size="small"
-                        required
+                        value={editingUser.name || ''}
+                        onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                        label={t('sharedName')}
                       />
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-
-                {/* Preferences Accordion */}
-                <Accordion 
-                  expanded={expandedAccordion === 'preferences'} 
-                  onChange={() => setExpandedAccordion(expandedAccordion === 'preferences' ? '' : 'preferences')}
-                  style={{ backgroundColor: colors.surface, boxShadow: 'none' }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '500' }}>
-                      {t('sharedPreferences')}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <TextField
-                      label={t('sharedPhone')}
-                      value={editingUser?.phone || ''}
-                      onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
-                      fullWidth
-                      size="small"
-                    />
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t('mapDefault')}</InputLabel>
-                      <Select
-                        label={t('mapDefault')}
-                        value={editingUser?.map || 'locationIqStreets'}
-                        onChange={(e) => setEditingUser({ ...editingUser, map: e.target.value })}
-                      >
-                        {mapStyles.filter((style) => style.available).map((style) => (
-                          <MenuItem key={style.id} value={style.id}>
-                            <Typography component="span">{style.title}</Typography>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t('settingsCoordinateFormat')}</InputLabel>
-                      <Select
-                        label={t('settingsCoordinateFormat')}
-                        value={editingUser?.coordinateFormat || 'dd'}
-                        onChange={(e) => setEditingUser({ ...editingUser, coordinateFormat: e.target.value })}
-                      >
-                        <MenuItem value="dd">{t('sharedDecimalDegrees')}</MenuItem>
-                        <MenuItem value="ddm">{t('sharedDegreesDecimalMinutes')}</MenuItem>
-                        <MenuItem value="dms">{t('sharedDegreesMinutesSeconds')}</MenuItem>
-                      </Select>
-                    </FormControl>
-                    <TextField
-                      label={t('mapPoiLayer')}
-                      value={editingUser?.poiLayer || ''}
-                      onChange={(e) => setEditingUser({ ...editingUser, poiLayer: e.target.value })}
-                      fullWidth
-                      size="small"
-                    />
-                  </AccordionDetails>
-                </Accordion>
-
-                {/* Permissions Accordion */}
-                <Accordion 
-                  expanded={expandedAccordion === 'permissions'} 
-                  onChange={() => setExpandedAccordion(expandedAccordion === 'permissions' ? '' : 'permissions')}
-                  style={{ backgroundColor: colors.surface, boxShadow: 'none' }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '500' }}>
-                      {t('sharedPermissions')}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <TextField
-                      label={t('userExpirationTime')}
-                      type="date"
-                      value={editingUser?.expirationTime ? editingUser.expirationTime.split('T')[0] : '2099-01-01'}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setEditingUser({ ...editingUser, expirationTime: new Date(e.target.value).toISOString() });
-                        }
-                      }}
-                      fullWidth
-                      size="small"
-                      disabled={!manager}
-                    />
-                    <TextField
-                      label={t('userDeviceLimit')}
-                      type="number"
-                      value={editingUser?.deviceLimit || 0}
-                      onChange={(e) => setEditingUser({ ...editingUser, deviceLimit: Number(e.target.value) })}
-                      fullWidth
-                      size="small"
-                      disabled={!admin}
-                    />
-                    <TextField
-                      label={t('userUserLimit')}
-                      type="number"
-                      value={editingUser?.userLimit || 0}
-                      onChange={(e) => setEditingUser({ ...editingUser, userLimit: Number(e.target.value) })}
-                      fullWidth
-                      size="small"
-                      disabled={!admin}
-                    />
-                    <FormGroup>
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.disabled || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, disabled: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('sharedDisabled')}
-                        style={{ color: colors.text }}
+                      <TextField
+                        value={editingUser.email || ''}
+                        onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                        label={t('userEmail')}
+                        disabled={fixedEmail && editingUser.id}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.administrator || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, administrator: e.target.checked })} 
-                            disabled={!admin}
-                          />
-                        }
-                        label={t('userAdmin')}
-                        style={{ color: colors.text }}
+                      {!editingUser.id && (
+                        <TextField
+                          type="password"
+                          onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
+                          label={t('userPassword')}
+                        />
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle1">
+                        {t('sharedPreferences')}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <TextField
+                        value={editingUser.phone || ''}
+                        onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                        label={t('sharedPhone')}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.readonly || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, readonly: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('serverReadonly')}
-                        style={{ color: colors.text }}
+                      <FormControl>
+                        <InputLabel>{t('mapDefault')}</InputLabel>
+                        <Select
+                          label={t('mapDefault')}
+                          value={editingUser.map || 'locationIqStreets'}
+                          onChange={(e) => setEditingUser({ ...editingUser, map: e.target.value })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {mapStyles.filter((style) => style.available).map((style) => (
+                            <MenuItem key={style.id} value={style.id}>
+                              <Typography component="span">{style.title}</Typography>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>{t('settingsCoordinateFormat')}</InputLabel>
+                        <Select
+                          label={t('settingsCoordinateFormat')}
+                          value={editingUser.coordinateFormat || 'dd'}
+                          onChange={(e) => setEditingUser({ ...editingUser, coordinateFormat: e.target.value })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="dd">{t('sharedDecimalDegrees')}</MenuItem>
+                          <MenuItem value="ddm">{t('sharedDegreesDecimalMinutes')}</MenuItem>
+                          <MenuItem value="dms">{t('sharedDegreesMinutesSeconds')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>{t('settingsSpeedUnit')}</InputLabel>
+                        <Select
+                          label={t('settingsSpeedUnit')}
+                          value={(editingUser.attributes && editingUser.attributes.speedUnit) || 'kn'}
+                          onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, speedUnit: e.target.value } })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="kn">{t('sharedKn')}</MenuItem>
+                          <MenuItem value="kmh">{t('sharedKmh')}</MenuItem>
+                          <MenuItem value="mph">{t('sharedMph')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>{t('settingsDistanceUnit')}</InputLabel>
+                        <Select
+                          label={t('settingsDistanceUnit')}
+                          value={(editingUser.attributes && editingUser.attributes.distanceUnit) || 'km'}
+                          onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, distanceUnit: e.target.value } })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="km">{t('sharedKm')}</MenuItem>
+                          <MenuItem value="mi">{t('sharedMi')}</MenuItem>
+                          <MenuItem value="nmi">{t('sharedNmi')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>{t('settingsAltitudeUnit')}</InputLabel>
+                        <Select
+                          label={t('settingsAltitudeUnit')}
+                          value={(editingUser.attributes && editingUser.attributes.altitudeUnit) || 'm'}
+                          onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, altitudeUnit: e.target.value } })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="m">{t('sharedMeters')}</MenuItem>
+                          <MenuItem value="ft">{t('sharedFeet')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>{t('settingsVolumeUnit')}</InputLabel>
+                        <Select
+                          label={t('settingsVolumeUnit')}
+                          value={(editingUser.attributes && editingUser.attributes.volumeUnit) || 'ltr'}
+                          onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, volumeUnit: e.target.value } })}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="ltr">{t('sharedLiter')}</MenuItem>
+                          <MenuItem value="usGal">{t('sharedUsGallon')}</MenuItem>
+                          <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <SelectField
+                        value={editingUser.attributes && editingUser.attributes.timezone}
+                        onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, timezone: e.target.value } })}
+                        endpoint="/api/server/timezones"
+                        keyGetter={(it) => it}
+                        titleGetter={(it) => it}
+                        label={t('sharedTimezone')}
+                        ListboxProps={{
+                          style: { zIndex: 10002 }
+                        }}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.deviceReadonly || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, deviceReadonly: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('userDeviceReadonly')}
-                        style={{ color: colors.text }}
+                      <TextField
+                        value={editingUser.poiLayer || ''}
+                        onChange={(e) => setEditingUser({ ...editingUser, poiLayer: e.target.value })}
+                        label={t('mapPoiLayer')}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.limitCommands || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, limitCommands: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('userLimitCommands')}
-                        style={{ color: colors.text }}
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle1">
+                        {t('sharedLocation')}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <TextField
+                        type="number"
+                        value={editingUser.latitude || 0}
+                        onChange={(e) => setEditingUser({ ...editingUser, latitude: Number(e.target.value) })}
+                        label={t('positionLatitude')}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.disableReports || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, disableReports: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('userDisableReports')}
-                        style={{ color: colors.text }}
+                      <TextField
+                        type="number"
+                        value={editingUser.longitude || 0}
+                        onChange={(e) => setEditingUser({ ...editingUser, longitude: Number(e.target.value) })}
+                        label={t('positionLongitude')}
                       />
-                      <FormControlLabel
-                        control={
-                          <Checkbox 
-                            checked={editingUser?.fixedEmail || false} 
-                            onChange={(e) => setEditingUser({ ...editingUser, fixedEmail: e.target.checked })} 
-                            disabled={!manager}
-                          />
-                        }
-                        label={t('userFixedEmail')}
-                        style={{ color: colors.text }}
+                      <TextField
+                        type="number"
+                        value={editingUser.zoom || 0}
+                        onChange={(e) => setEditingUser({ ...editingUser, zoom: Number(e.target.value) })}
+                        label={t('serverZoom')}
                       />
-                    </FormGroup>
-                  </AccordionDetails>
-                </Accordion>
-
-                {/* Attributes Accordion */}
-                <Accordion 
-                  expanded={expandedAccordion === 'attributes'} 
-                  onChange={() => setExpandedAccordion(expandedAccordion === 'attributes' ? '' : 'attributes')}
-                  style={{ backgroundColor: colors.surface, boxShadow: 'none' }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '500' }}>
-                      {t('sharedAttributes')}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {editingUser?.attributes && Object.keys(editingUser.attributes).length > 0 ? (
-                      <>
-                        {Object.entries(editingUser.attributes).map(([key, value]) => {
-                          const definition = { ...commonUserAttributes, ...userAttributes }[key];
-                          const type = typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string';
-                          const subtype = definition?.subtype;
-                          
-                          if (type === 'boolean') {
-                            return (
-                              <Grid container direction="row" justifyContent="space-between" key={key} style={{ alignItems: 'center' }}>
-                                <FormControlLabel
-                                  control={
-                                    <Checkbox
-                                      checked={value}
-                                      onChange={(e) => {
-                                        const updatedAttributes = { ...editingUser.attributes };
-                                        updatedAttributes[key] = e.target.checked;
-                                        setEditingUser({ ...editingUser, attributes: updatedAttributes });
-                                      }}
-                                    />
-                                  }
-                                  label={definition?.name || key}
-                                  style={{ color: colors.text }}
-                                />
-                                <IconButton 
-                                  size="small" 
-                                  onClick={() => {
-                                    const updatedAttributes = { ...editingUser.attributes };
-                                    delete updatedAttributes[key];
-                                    setEditingUser({ ...editingUser, attributes: updatedAttributes });
-                                  }}
-                                  style={{ color: colors.textSecondary }}
-                                >
-                                  <CloseIcon fontSize="small" />
-                                </IconButton>
-                              </Grid>
-                            );
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle1">
+                        {t('sharedPermissions')}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <TextField
+                        label={t('userExpirationTime')}
+                        type="date"
+                        value={editingUser.expirationTime ? editingUser.expirationTime.split('T')[0] : '2099-01-01'}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setEditingUser({ ...editingUser, expirationTime: new Date(e.target.value).toISOString() });
                           }
-                          
-                          return (
-                            <FormControl key={key} fullWidth size="small">
-                              <InputLabel>{definition?.name || key}</InputLabel>
-                              <OutlinedInput
-                                label={definition?.name || key}
-                                type={type === 'number' ? 'number' : 'text'}
-                                value={value || ''}
-                                onChange={(e) => {
-                                  const updatedAttributes = { ...editingUser.attributes };
-                                  updatedAttributes[key] = type === 'number' ? Number(e.target.value) : e.target.value;
-                                  setEditingUser({ ...editingUser, attributes: updatedAttributes });
-                                }}
-                                endAdornment={(
-                                  <InputAdornment position="end">
-                                    <IconButton 
-                                      size="small" 
-                                      edge="end" 
-                                      onClick={() => {
-                                        const updatedAttributes = { ...editingUser.attributes };
-                                        delete updatedAttributes[key];
-                                        setEditingUser({ ...editingUser, attributes: updatedAttributes });
-                                      }}
-                                      style={{ color: colors.textSecondary }}
-                                    >
-                                      <CloseIcon fontSize="small" />
-                                    </IconButton>
-                                  </InputAdornment>
-                                )}
-                              />
-                            </FormControl>
-                          );
-                        })}
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => setAddAttributeDialog(true)}
-                          startIcon={<AddIcon />}
-                          size="small"
-                          style={{ alignSelf: 'flex-start' }}
-                        >
-                          {t('sharedAdd')}
-                        </Button>
-                      </>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '20px' }}>
-                        <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                          {t('sharedNoAttributes')}
-                        </Typography>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => setAddAttributeDialog(true)}
-                          startIcon={<AddIcon />}
-                          size="small"
-                        >
-                          {t('sharedAdd')}
-                        </Button>
-                      </div>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-
-              </div>
+                        }}
+                        disabled={!manager}
+                      />
+                      <TextField
+                        type="number"
+                        value={editingUser.deviceLimit || 0}
+                        onChange={(e) => setEditingUser({ ...editingUser, deviceLimit: Number(e.target.value) })}
+                        label={t('userDeviceLimit')}
+                        disabled={!admin}
+                      />
+                      <TextField
+                        type="number"
+                        value={editingUser.userLimit || 0}
+                        onChange={(e) => setEditingUser({ ...editingUser, userLimit: Number(e.target.value) })}
+                        label={t('userUserLimit')}
+                        disabled={!admin}
+                      />
+                      <FormGroup>
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.disabled} onChange={(e) => setEditingUser({ ...editingUser, disabled: e.target.checked })} />}
+                          label={t('sharedDisabled')}
+                          disabled={!manager}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.administrator} onChange={(e) => setEditingUser({ ...editingUser, administrator: e.target.checked })} />}
+                          label={t('userAdmin')}
+                          disabled={!admin}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.readonly} onChange={(e) => setEditingUser({ ...editingUser, readonly: e.target.checked })} />}
+                          label={t('serverReadonly')}
+                          disabled={!manager}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.deviceReadonly} onChange={(e) => setEditingUser({ ...editingUser, deviceReadonly: e.target.checked })} />}
+                          label={t('userDeviceReadonly')}
+                          disabled={!manager}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.limitCommands} onChange={(e) => setEditingUser({ ...editingUser, limitCommands: e.target.checked })} />}
+                          label={t('userLimitCommands')}
+                          disabled={!manager}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.disableReports} onChange={(e) => setEditingUser({ ...editingUser, disableReports: e.target.checked })} />}
+                          label={t('userDisableReports')}
+                          disabled={!manager}
+                        />
+                        <FormControlLabel
+                          control={<Checkbox checked={editingUser.fixedEmail} onChange={(e) => setEditingUser({ ...editingUser, fixedEmail: e.target.checked })} />}
+                          label={t('userFixedEmail')}
+                          disabled={!manager}
+                        />
+                      </FormGroup>
+                    </AccordionDetails>
+                  </Accordion>
+                  <EditAttributesAccordion
+                    attribute={null}
+                    attributes={editingUser.attributes}
+                    setAttributes={(attributes) => setEditingUser({ ...editingUser, attributes })}
+                    definitions={{ ...commonUserAttributes, ...userAttributes }}
+                    focusAttribute={null}
+                  />
+                </>
+              )}
             </DialogContent>
             <DialogActions style={{ padding: '16px 24px', borderTop: `1px solid ${colors.border}` }}>
               <Button
@@ -1100,79 +1025,6 @@ const FloatingUsersPopover = ({
             </DialogActions>
           </Dialog>
 
-          {/* Add Attribute Dialog */}
-          <Dialog
-            open={addAttributeDialog}
-            onClose={() => setAddAttributeDialog(false)}
-            maxWidth="xs"
-            fullWidth
-            style={{ zIndex: 10004 }}
-            PaperProps={{
-              style: {
-                backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
-                borderRadius: '12px',
-                zIndex: 10004,
-              },
-            }}
-          >
-            <DialogTitle style={{ color: colors.text, fontSize: '16px', fontWeight: '600' }}>
-              {t('sharedAdd')} {t('sharedAttribute')}
-            </DialogTitle>
-            <DialogContent style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <Autocomplete
-                  freeSolo
-                  options={Object.entries({ ...commonUserAttributes, ...userAttributes }).map(([key, value]) => ({
-                    key,
-                    name: value.name || key,
-                    type: value.type,
-                  })).sort((a, b) => a.name.localeCompare(b.name))}
-                  getOptionLabel={(option) => option.name || option}
-                  renderOption={(props, option) => <li {...props}>{option.name}</li>}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t('sharedAttribute')}
-                      fullWidth
-                      size="small"
-                    />
-                  )}
-                  onChange={(_, option) => {
-                    if (option && typeof option === 'object') {
-                      const key = option.key;
-                      const type = option.type || 'string';
-                      const updatedAttributes = { ...editingUser.attributes };
-                      
-                      switch (type) {
-                        case 'number':
-                          updatedAttributes[key] = 0;
-                          break;
-                        case 'boolean':
-                          updatedAttributes[key] = false;
-                          break;
-                        default:
-                          updatedAttributes[key] = '';
-                          break;
-                      }
-                      
-                      setEditingUser({ ...editingUser, attributes: updatedAttributes });
-                      setAddAttributeDialog(false);
-                    }
-                  }}
-                />
-              </div>
-            </DialogContent>
-            <DialogActions style={{ padding: '16px 20px', borderTop: `1px solid ${colors.border}` }}>
-              <Button
-                onClick={() => setAddAttributeDialog(false)}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                {t('sharedCancel')}
-              </Button>
-            </DialogActions>
-          </Dialog>
 
         </div>
       </motion.div>
