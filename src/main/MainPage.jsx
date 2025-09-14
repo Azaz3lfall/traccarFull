@@ -756,7 +756,6 @@ const MainPage = () => {
                 z-index: 10001;
                 pointer-events: none;
                 box-shadow: 0 4px 12px ${colors.menuShadow};
-                border: 1px solid ${colors.menuBorder};
               `;
               document.body.appendChild(tooltip);
             }
