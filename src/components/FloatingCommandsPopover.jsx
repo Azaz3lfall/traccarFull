@@ -37,7 +37,6 @@ import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Send as SendIcon,
   Close as CloseIcon,
   Search as SearchIcon,
   FilterList as FilterIcon,
@@ -160,12 +159,6 @@ const FloatingCommandsPopover = ({
     page * pageSize
   );
 
-  // Handle command send
-  const handleSend = useCatch(async (command) => {
-    // This would need to be implemented based on how commands are sent
-    console.log('Send command:', command);
-    setAnchorEl(null);
-  });
 
   // Handle edit command
   const handleEdit = (command) => {
@@ -241,13 +234,6 @@ const FloatingCommandsPopover = ({
   // Menu actions
   const actions = [
     {
-      key: 'send',
-      title: t('commandSend'),
-      icon: <SendIcon fontSize="small" />,
-      handler: handleSend,
-      show: !limitCommands,
-    },
-    {
       key: 'edit',
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
@@ -265,7 +251,7 @@ const FloatingCommandsPopover = ({
 
   const getCommandTypeIcon = (type) => {
     // You can add specific icons for different command types
-    return <SendIcon />;
+    return <EditIcon />;
   };
 
   return (
