@@ -147,32 +147,32 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
           {autocompleteOpen && filteredOptions.length > 0 && (
             <Paper
               ref={listRef}
-              sx={{
+              sx={(theme) => ({
                 position: 'fixed',
                 zIndex: 999999,
                 maxHeight: '200px',
                 minWidth: '200px',
                 overflow: 'auto',
-                border: '1px solid #e0e0e0',
-                borderRadius: '8px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                backgroundColor: 'white',
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: theme.shape.borderRadius,
+                boxShadow: theme.shadows[8],
+                backgroundColor: theme.palette.background.paper,
                 mt: 0.5,
                 '&::-webkit-scrollbar': {
                   width: '6px',
                 },
                 '&::-webkit-scrollbar-track': {
-                  background: '#f1f1f1',
+                  background: theme.palette.grey[100],
                   borderRadius: '3px',
                 },
                 '&::-webkit-scrollbar-thumb': {
-                  background: '#c1c1c1',
+                  background: theme.palette.grey[400],
                   borderRadius: '3px',
                 },
                 '&::-webkit-scrollbar-thumb:hover': {
-                  background: '#a8a8a8',
+                  background: theme.palette.grey[600],
                 },
-              }}
+              })}
               style={{
                 top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
                 left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
@@ -181,41 +181,45 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
             >
               <List 
                 dense
-                sx={{
+                sx={(theme) => ({
                   padding: 0,
                   '& .MuiListItem-root': {
                     padding: '8px 16px',
                     minHeight: '40px',
-                    borderBottom: '1px solid #f5f5f5',
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                     '&:last-child': {
                       borderBottom: 'none',
                     },
                   }
-                }}
+                })}
               >
                 {filteredOptions.map((option, index) => (
                   <ListItem
                     key={option.key}
                     onClick={() => handleOptionSelect(option)}
-                    sx={{
+                    sx={(theme) => ({
                       cursor: 'pointer',
-                      backgroundColor: index === highlightedIndex ? '#e3f2fd' : 'transparent',
-                      transition: 'background-color 0.2s ease',
+                      backgroundColor: index === highlightedIndex ? theme.palette.action.selected : 'transparent',
+                      transition: theme.transitions.create('background-color', {
+                        duration: theme.transitions.duration.short,
+                      }),
                       '&:hover': {
-                        backgroundColor: '#f5f5f5'
+                        backgroundColor: theme.palette.action.hover
                       },
                       '&:active': {
-                        backgroundColor: '#e0e0e0'
+                        backgroundColor: theme.palette.action.selected
                       }
-                    }}
+                    })}
                   >
                     <ListItemText 
                       primary={option.name}
-                      primaryTypographyProps={{
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        color: '#333'
-                      }}
+                      sx={(theme) => ({
+                        '& .MuiListItemText-primary': {
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          color: theme.palette.text.primary
+                        }
+                      })}
                     />
                   </ListItem>
                 ))}
