@@ -148,12 +148,8 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
   };
 
   return features.disableAttributes ? '' : (
-    <Accordion defaultExpanded={!!attribute}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">
-          {t('sharedAttributes')}
-        </Typography>
-      </AccordionSummary>
+    <>
+
       <AccordionDetails className={classes.details}>
         {convertToList(attributes).map(({
           key, value, type, subtype,
@@ -211,7 +207,7 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
           zIndex={zIndex}
         />
       </AccordionDetails>
-    </Accordion>
+    </>
   );
 };
 
