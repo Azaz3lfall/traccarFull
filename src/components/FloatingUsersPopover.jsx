@@ -1213,6 +1213,7 @@ const FloatingUsersPopover = ({
                     flex: 1, 
                     overflow: 'auto', 
                     padding: '24px',
+                    paddingBottom: '200px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '16px'

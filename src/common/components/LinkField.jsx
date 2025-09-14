@@ -54,7 +54,8 @@ const LinkField = ({
   }, [active]);
 
   const filteredOptions = useMemo(() => {
-    if (!items || !inputValue) return [];
+    if (!items) return [];
+    if (!inputValue) return items; // Show all options when no input
     return items.filter(item => 
       titleGetter(item).toLowerCase().includes(inputValue.toLowerCase())
     );
@@ -111,7 +112,7 @@ const LinkField = ({
       onChange(newLinked);
     }
     
-    setInputValue('');
+    setInputValue(''); // Clear input after selection
     setAutocompleteOpen(false);
     setHighlightedIndex(-1);
   };
@@ -150,6 +151,7 @@ const LinkField = ({
   };
 
   const handleInputFocus = () => {
+    setInputValue(''); // Clear input to show all options
     setAutocompleteOpen(true);
     if (!active) {
       setActive(true);
