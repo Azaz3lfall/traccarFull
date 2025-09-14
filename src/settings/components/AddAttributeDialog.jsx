@@ -43,36 +43,33 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
       PaperProps={{
         style: { zIndex }
       }}
+      disableEnforceFocus
+      disableAutoFocus
     >
       <DialogContent className={classes.details}>
-        <Autocomplete
-          freeSolo
-          onChange={(_, option) => {
-            setKey(option && typeof option === 'object' ? (option.key ?? option.inputValue) : option);
-            if (option && (option.type || option.inputValue)) {
-              setType(option.type);
-            }
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-            if (params.inputValue && !options.some((x) => (typeof x === 'object' ? x.key : x) === params.inputValue)) {
-              filtered.push({ inputValue: params.inputValue, name: `${t('sharedAdd')} "${params.inputValue}"` });
-            }
-            return filtered;
-          }}
-          options={options}
-          getOptionLabel={(option) =>
-            option && typeof option === 'object' ? (option.inputValue || option.name) : option
-          }
-          renderOption={(props, option) => <li {...props}>{option.name || option}</li>}
-          renderInput={(params) => <TextField {...params} label={t('sharedAttribute')} />}
-          ListboxProps={{
-            style: { zIndex: zIndex + 1 }
-          }}
-          PopperComponent={(props) => (
-            <div {...props} style={{ ...props.style, zIndex: zIndex + 1 }} />
-          )}
-        />
+        <FormControl fullWidth>
+          <InputLabel>{t('sharedAttribute')}</InputLabel>
+          <Select
+            value={key || ''}
+            onChange={(e) => {
+              const selectedKey = e.target.value;
+              setKey(selectedKey);
+              if (selectedKey && definitions[selectedKey]) {
+                setType(definitions[selectedKey].type || 'string');
+              }
+            }}
+            MenuProps={{
+              style: { zIndex: 99999 },
+              disablePortal: false
+            }}
+          >
+            {options.map((option) => (
+              <MenuItem key={option.key} value={option.key}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <FormControl
           fullWidth
           disabled={key in definitions}
