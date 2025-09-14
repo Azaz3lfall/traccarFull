@@ -425,13 +425,23 @@ const MainPage = () => {
       ...announcementData,
       notificator: option.type
     });
-    setNotificatorsInputValue('');
+    setNotificatorsInputValue(t(prefixString('notificator', option.type)));
     setNotificatorsAutocompleteOpen(false);
     setNotificatorsHighlightedIndex(-1);
   };
 
   const handleNotificatorsFocus = () => {
-    setNotificatorsInputValue('');
+    // Show current selection or clear for new search
+    if (announcementData.notificator) {
+      const selectedNotificator = notificatorsItems.find(item => item.type === announcementData.notificator);
+      if (selectedNotificator) {
+        setNotificatorsInputValue(t(prefixString('notificator', selectedNotificator.type)));
+      } else {
+        setNotificatorsInputValue('');
+      }
+    } else {
+      setNotificatorsInputValue('');
+    }
     setNotificatorsAutocompleteOpen(true);
   };
 
@@ -458,7 +468,7 @@ const MainPage = () => {
   const sendAnnouncementMutation = useMutation({
     mutationFn: async (data) => {
       const query = new URLSearchParams();
-      data.users.forEach((userId) => query.append('userId', userId));
+      data.users.forEach((user) => query.append('userId', user.id));
       await fetchOrThrow(`/api/notifications/send/${data.notificator}?${query.toString()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3892,10 +3902,15 @@ const MainPage = () => {
                             {filteredUsersOptions.map((option, index) => (
                               <ListItem
                                 key={option.id}
-                                button
                                 onClick={() => handleUsersOptionSelect(option)}
                                 style={{
                                   backgroundColor: index === usersHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                                  cursor: 'pointer',
+                                }}
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                  }
                                 }}
                               >
                                 <ListItemText primary={option.name} />
@@ -3960,10 +3975,18 @@ const MainPage = () => {
                             {filteredNotificatorsOptions.map((option, index) => (
                               <ListItem
                                 key={option.type}
-                                button
                                 onClick={() => handleNotificatorsOptionSelect(option)}
                                 style={{
                                   backgroundColor: index === notificatorsHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                  }
+                                }}
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                  }
                                 }}
                               >
                                 <ListItemText primary={t(prefixString('notificator', option.type))} />
@@ -3971,6 +3994,20 @@ const MainPage = () => {
                             ))}
                           </List>
                         </Paper>
+                      )}
+                      {/* Selected Notificator Chip */}
+                      {announcementData.notificator && (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                          <Chip
+                            label={t(prefixString('notificator', announcementData.notificator))}
+                            onDelete={() => setAnnouncementData({
+                              ...announcementData,
+                              notificator: ''
+                            })}
+                            deleteIcon={<CloseIcon />}
+                            size="small"
+                          />
+                        </Box>
                       )}
                     </Box>
                     <TextField
@@ -4020,7 +4057,7 @@ const MainPage = () => {
                 <Button
                   variant="contained"
                   onClick={() => sendAnnouncementMutation.mutate(announcementData)}
-                  disabled={sendAnnouncementMutation.isPending || !announcementData.notificator || !announcementData.message.subject || !announcementData.message.body}
+                  disabled={sendAnnouncementMutation.isPending || !announcementData.users?.length || !announcementData.notificator || !announcementData.message.subject || !announcementData.message.body}
                   style={{
                     backgroundColor: colors.primary,
                     color: colors.text,
