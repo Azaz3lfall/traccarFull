@@ -999,6 +999,7 @@ const FloatingUsersPopover = ({
                     setAttributes={(attributes) => setEditingUser({ ...editingUser, attributes })}
                     definitions={{ ...commonUserAttributes, ...userAttributes }}
                     focusAttribute={null}
+                    zIndex={10003}
                   />
                 </>
               )}

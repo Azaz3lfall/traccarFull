@@ -27,7 +27,7 @@ import {
 import useFeatures from '../../common/util/useFeatures';
 import useSettingsStyles from '../common/useSettingsStyles';
 
-const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definitions, focusAttribute }) => {
+const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definitions, focusAttribute, zIndex = 1300 }) => {
   const { classes } = useSettingsStyles();
   const t = useTranslation();
 
@@ -208,6 +208,7 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
           open={addDialogShown}
           onResult={handleAddResult}
           definitions={definitions}
+          zIndex={zIndex}
         />
       </AccordionDetails>
     </Accordion>

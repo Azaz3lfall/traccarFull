@@ -17,7 +17,7 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
-const AddAttributeDialog = ({ open, onResult, definitions }) => {
+const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
   const { classes } = useStyles();
   const t = useTranslation();
 
@@ -35,7 +35,15 @@ const AddAttributeDialog = ({ open, onResult, definitions }) => {
   const [type, setType] = useState('string');
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xs">
+    <Dialog 
+      open={open} 
+      fullWidth 
+      maxWidth="xs"
+      style={{ zIndex }}
+      PaperProps={{
+        style: { zIndex }
+      }}
+    >
       <DialogContent className={classes.details}>
         <Autocomplete
           freeSolo
@@ -58,6 +66,12 @@ const AddAttributeDialog = ({ open, onResult, definitions }) => {
           }
           renderOption={(props, option) => <li {...props}>{option.name || option}</li>}
           renderInput={(params) => <TextField {...params} label={t('sharedAttribute')} />}
+          ListboxProps={{
+            style: { zIndex: zIndex + 1 }
+          }}
+          PopperComponent={(props) => (
+            <div {...props} style={{ ...props.style, zIndex: zIndex + 1 }} />
+          )}
         />
         <FormControl
           fullWidth
@@ -68,6 +82,10 @@ const AddAttributeDialog = ({ open, onResult, definitions }) => {
             label={t('sharedType')}
             value={type || 'string'}
             onChange={(e) => setType(e.target.value)}
+            MenuProps={{
+              disablePortal: false,
+              style: { zIndex: zIndex + 1 }
+            }}
           >
             <MenuItem value="string">{t('sharedTypeString')}</MenuItem>
             <MenuItem value="number">{t('sharedTypeNumber')}</MenuItem>
