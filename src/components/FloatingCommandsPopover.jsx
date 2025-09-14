@@ -64,7 +64,6 @@ const FloatingCommandsPopover = ({
   const navigate = useNavigate();
   
   const limitCommands = useRestriction('limitCommands');
-  console.log('FloatingCommandsPopover - limitCommands:', limitCommands);
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -466,12 +465,14 @@ const FloatingCommandsPopover = ({
             anchorEl={anchorEl}
             open={!!anchorEl}
             onClose={() => setAnchorEl(null)}
+            style={{ zIndex: 10002 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
                 boxShadow: colors.shadow,
                 minWidth: '160px',
+                zIndex: 10002,
               }
             }}
           >
@@ -657,6 +658,12 @@ const FloatingCommandsPopover = ({
                             type: e.target.value
                           })}
                           label={t('sharedType')}
+                          MenuProps={{
+                            style: { zIndex: 10003 },
+                            PaperProps: {
+                              style: { zIndex: 10003 }
+                            }
+                          }}
                           style={{
                             backgroundColor: colors.secondary,
                             color: colors.text,
