@@ -279,7 +279,7 @@ const FloatingDeviceList = ({
               overflow: 'hidden'
             }}
           >
-            <div style={{ padding: '6px 0px 2px 0px', pointerEvents: 'none' }}>
+            <div style={{ padding: '8px 0px 4px 0px', pointerEvents: 'none' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -545,7 +545,7 @@ const FloatingDeviceList = ({
         backgroundColor: colors.surface,
         borderRadius: !desktop ? '0px' : (selectedDeviceId ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
         boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
-        border: 'none'
+        border: `1px solid ${colors.border}`
       }}>
         {/* Header */}
         <div style={{
@@ -1034,7 +1034,7 @@ const FloatingDeviceList = ({
                 overflowY: 'auto',
                 width: '100%',
                 flex: 1,
-                padding: '0px 8px 0px 8px'
+                padding: '0px 16px 0px 16px'
               }}
             >
               <div
