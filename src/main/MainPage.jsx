@@ -3932,16 +3932,13 @@ const MainPage = () => {
                 padding: '20px',
                 paddingBottom: '200px',
               }}>
-                <iframe
-                  src="/settings/preferences"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                    borderRadius: '8px',
-                  }}
-                  title="Preferences"
-                />
+                <Typography variant="h6" style={{ color: colors.text, marginBottom: '20px', fontWeight: '600' }}>
+                  {t('sharedPreferences')}
+                </Typography>
+                
+                <Typography variant="body2" style={{ color: colors.textSecondary, textAlign: 'center', marginTop: '40px' }}>
+                  Preferences settings will be implemented here following the original Traccar structure
+                </Typography>
               </div>
             </motion.div>
           </>
