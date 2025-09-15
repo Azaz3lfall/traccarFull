@@ -813,9 +813,10 @@ const MainPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '40px',
-                maxWidth: '120px',
+                maxWidth: '130px',
                 overflow: 'hidden',
-                padding: '0 8px'
+                padding: '0 10px',
+                marginBottom: '6px'
               }}>
                 {(() => {
                   const logoUrl = logo || logoInverted;
