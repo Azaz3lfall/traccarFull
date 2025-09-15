@@ -49,7 +49,7 @@ import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
-import { sessionActions } from '../store';
+import { sessionActions, devicesActions } from '../store';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
@@ -144,7 +144,9 @@ const FloatingDevicesPopover = ({
       return result;
     },
     onSuccess: (data) => {
+      console.log('Device created successfully:', data);
       queryClient.invalidateQueries(['devices']);
+      dispatch(devicesActions.update([data]));
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
@@ -189,6 +191,7 @@ const FloatingDevicesPopover = ({
     onSuccess: (data) => {
       console.log('Device updated successfully:', data);
       queryClient.invalidateQueries(['devices']);
+      dispatch(devicesActions.update([data]));
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
@@ -206,7 +209,9 @@ const FloatingDevicesPopover = ({
       });
     },
     onSuccess: () => {
+      console.log('Device deleted successfully');
       queryClient.invalidateQueries(['devices']);
+      dispatch(devicesActions.remove(deviceToDelete.id));
       setDeleteDialog(false);
       setDeviceToDelete(null);
     },
