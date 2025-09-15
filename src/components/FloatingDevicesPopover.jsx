@@ -593,16 +593,19 @@ const FloatingDevicesPopover = ({
               console.log('Closing menu, anchorEl:', anchorEl);
               setAnchorEl(null);
             }}
+            style={{ zIndex: 10020 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
+                border: `2px solid ${colors.primary}`,
                 borderRadius: '8px',
                 minWidth: '160px',
-                zIndex: 10002,
+                zIndex: 10020,
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
               }
             }}
           >
+            {console.log('=== MENU RENDER DEBUG ===', { anchorEl, open: Boolean(anchorEl), actionsCount: actions.length })}
             {actions
               .filter(action => action.show !== false)
               .map((action) => (
