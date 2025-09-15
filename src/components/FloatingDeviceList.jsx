@@ -279,7 +279,7 @@ const FloatingDeviceList = ({
               overflow: 'hidden'
             }}
           >
-            <div style={{ padding: '8px 0px 4px 0px', pointerEvents: 'none' }}>
+            <div style={{ padding: '6px 0px 2px 0px', pointerEvents: 'none' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -1034,7 +1034,7 @@ const FloatingDeviceList = ({
                 overflowY: 'auto',
                 width: '100%',
                 flex: 1,
-                padding: '0px 16px 0px 16px'
+                padding: '0px 8px 0px 8px'
               }}
             >
               <div
