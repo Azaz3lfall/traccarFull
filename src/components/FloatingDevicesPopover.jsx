@@ -204,20 +204,35 @@ const FloatingDevicesPopover = ({
   // Delete device mutation
   const deleteDeviceMutation = useMutation({
     mutationFn: async (deviceId) => {
+      console.log('=== DELETE MUTATION DEBUG ===');
       console.log('Deleting device with ID:', deviceId);
-      await fetchOrThrow(`/api/devices/${deviceId}`, {
-        method: 'DELETE',
-      });
-      return deviceId; // Return the deviceId for use in onSuccess
+      console.log('API URL:', `/api/devices/${deviceId}`);
+      
+      try {
+        const response = await fetchOrThrow(`/api/devices/${deviceId}`, {
+          method: 'DELETE',
+        });
+        console.log('Delete response status:', response.status);
+        console.log('Delete response ok:', response.ok);
+        return deviceId; // Return the deviceId for use in onSuccess
+      } catch (error) {
+        console.error('Delete fetch error:', error);
+        throw error;
+      }
     },
     onSuccess: (deviceId) => {
+      console.log('=== DELETE SUCCESS ===');
       console.log('Device deleted successfully:', deviceId);
+      console.log('Invalidating queries...');
       queryClient.invalidateQueries(['devices']);
+      console.log('Dispatching Redux action...');
       dispatch(devicesActions.remove(deviceId));
+      console.log('Closing dialog...');
       setDeleteDialog(false);
       setDeviceToDelete(null);
     },
     onError: (error) => {
+      console.error('=== DELETE ERROR ===');
       console.error('Delete device error:', error);
     },
   });
@@ -245,8 +260,15 @@ const FloatingDevicesPopover = ({
   };
 
   const handleDeleteDevice = () => {
+    console.log('=== DELETE DEVICE DEBUG ===');
+    console.log('deviceToDelete:', deviceToDelete);
+    console.log('deviceToDelete.id:', deviceToDelete?.id);
+    
     if (deviceToDelete) {
+      console.log('Calling deleteDeviceMutation.mutate with ID:', deviceToDelete.id);
       deleteDeviceMutation.mutate(deviceToDelete.id);
+    } else {
+      console.log('No device to delete!');
     }
   };
 
@@ -275,6 +297,8 @@ const FloatingDevicesPopover = ({
   };
 
   const handleDeleteClick = (device) => {
+    console.log('=== DELETE CLICK DEBUG ===');
+    console.log('Device clicked for deletion:', device);
     setDeviceToDelete(device);
     setDeleteDialog(true);
   };
