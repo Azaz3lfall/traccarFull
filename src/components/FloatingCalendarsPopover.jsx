@@ -75,8 +75,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const serverAttributes = useServerAttributes(t);
 
-  console.log('FloatingCalendarsPopover state:', { editDialog, isVisible });
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -108,6 +106,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     enabled: isVisible,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  console.log('FloatingCalendarsPopover state:', { editDialog, isVisible, isLoading });
 
   // Filter calendars based on search keyword
   const filteredCalendars = calendars.filter(calendar =>
@@ -219,7 +219,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['calendars']);
-      setSnackbar({ open: true, message: t('sharedDeleted'), severity: 'success' });
       setDeleteDialog(false);
       setCalendarToDelete(null);
     },
@@ -472,36 +471,48 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
           </div>
 
           {/* Content */}
-          <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+          <div style={{ flex: 1, overflow: 'visible', position: 'relative' }}>
             {isLoading ? (
               <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1,
-                gap: '16px',
-                padding: '40px 20px',
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 backgroundColor: colors.surface,
+                zIndex: 10
               }}>
-                <CircularProgress 
-                  size={40} 
-                  style={{ 
-                    color: colors.primary,
-                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                  }} 
-                />
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '120px',
+                  height: '120px',
+                  backgroundColor: colors.surface,
+                  borderRadius: '50%',
+                  boxShadow: `0 4px 12px ${colors.border}20`
+                }}>
+                  <CircularProgress 
+                    style={{ 
+                      color: colors.text,
+                      position: 'absolute'
+                    }} 
+                    size={100}
+                    thickness={4}
+                  />
+                </div>
                 <Typography 
                   variant="body2" 
                   style={{ 
                     color: colors.textSecondary,
                     fontSize: '14px',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    marginTop: '16px'
                   }}
                 >
                   {t('sharedLoading')}...
