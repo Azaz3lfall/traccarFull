@@ -4262,7 +4262,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4300,7 +4300,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4373,7 +4373,7 @@ const MainPage = () => {
                       style: {
                         backgroundColor: colors.surface,
                         border: `1px solid ${colors.border}`,
-                        zIndex: 10004,
+                        zIndex: 10010,
                       }
                     }}
                   />
@@ -4389,7 +4389,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4423,7 +4423,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4576,7 +4576,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4612,7 +4612,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4666,7 +4666,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
@@ -4699,7 +4699,7 @@ const MainPage = () => {
                           style: {
                             backgroundColor: colors.surface,
                             border: `1px solid ${colors.border}`,
-                            zIndex: 10004,
+                            zIndex: 10010,
                           }
                         }
                       }}
