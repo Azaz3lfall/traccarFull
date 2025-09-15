@@ -340,7 +340,17 @@ const FloatingComputedAttributesPopover = ({
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={handleAdd}
+                onClick={() => {
+                  setEditingAttribute({
+                    description: '',
+                    attribute: '',
+                    expression: '',
+                    type: 'string',
+                    priority: 0
+                  });
+                  setActiveTab(0);
+                  setEditDialog(true);
+                }}
                 disabled={limitAttributes}
                 size="small"
                 style={{

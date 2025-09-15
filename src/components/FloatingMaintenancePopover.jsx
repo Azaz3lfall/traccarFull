@@ -323,7 +323,17 @@ const FloatingMaintenancePopover = ({
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={handleAdd}
+                onClick={() => {
+                  setEditingMaintenance({
+                    name: '',
+                    type: '',
+                    start: 0,
+                    period: 0,
+                    attributes: {}
+                  });
+                  setActiveTab(0);
+                  setEditDialog(true);
+                }}
                 disabled={limitMaintenance}
                 size="small"
                 style={{

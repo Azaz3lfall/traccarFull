@@ -291,7 +291,16 @@ const FloatingCommandsPopover = ({
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={handleAdd}
+                onClick={() => {
+                  setEditingCommand({
+                    description: '',
+                    type: '',
+                    textChannel: false,
+                    attributes: {}
+                  });
+                  setActiveTab(0);
+                  setEditDialog(true);
+                }}
                 disabled={limitCommands}
                 size="small"
                 style={{
