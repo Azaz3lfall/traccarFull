@@ -347,11 +347,6 @@ const FloatingDevicesPopover = ({
 
   if (!isVisible) return null;
 
-  // Debug logging
-  console.log('=== DEVICES POPOVER DEBUG ===');
-  console.log('anchorEl:', anchorEl);
-  console.log('selectedDevice:', selectedDevice);
-  console.log('actions:', actions);
 
   return (
     <AnimatePresence>
@@ -549,9 +544,6 @@ const FloatingDevicesPopover = ({
                               <IconButton
                                 size="small"
                                 onClick={(e) => {
-                                  console.log('=== MENU CLICK DEBUG ===');
-                                  console.log('Device clicked:', device);
-                                  console.log('Event target:', e.currentTarget);
                                   setSelectedDevice(device);
                                   setAnchorEl(e.currentTarget);
                                 }}
@@ -588,24 +580,18 @@ const FloatingDevicesPopover = ({
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
-            onClose={() => {
-              console.log('=== MENU CLOSE DEBUG ===');
-              console.log('Closing menu, anchorEl:', anchorEl);
-              setAnchorEl(null);
-            }}
-            style={{ zIndex: 10020 }}
+            onClose={() => setAnchorEl(null)}
+            style={{ zIndex: 10002 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
-                border: `2px solid ${colors.primary}`,
+                border: `1px solid ${colors.border}`,
                 borderRadius: '8px',
                 minWidth: '160px',
-                zIndex: 10020,
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+                zIndex: 10002,
               }
             }}
           >
-            {console.log('=== MENU RENDER DEBUG ===', { anchorEl, open: Boolean(anchorEl), actionsCount: actions.length })}
             {actions
               .filter(action => action.show !== false)
               .map((action) => (
@@ -617,14 +603,10 @@ const FloatingDevicesPopover = ({
                     }
                     setAnchorEl(null);
                   }}
-                  style={{
-                    color: colors.text,
-                    fontSize: '14px',
-                    padding: '8px 16px',
-                  }}
+                  style={{ color: colors.text, fontSize: '12px' }}
                 >
-                  {action.icon && <span style={{ marginRight: '8px' }}>{action.icon}</span>}
-                  {action.title}
+                  {action.icon}
+                  <span style={{ marginLeft: '6px' }}>{action.title}</span>
                 </MenuItem>
               ))}
           </Menu>
