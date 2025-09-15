@@ -115,6 +115,7 @@ const FloatingUsersPopover = ({
   const [serverDialog, setServerDialog] = useState(false);
   const [serverData, setServerData] = useState(null);
   const [activeServerTab, setActiveServerTab] = useState(0);
+  const [serverLoading, setServerLoading] = useState(false);
   
 
   // Fetch users with TanStack Query
@@ -206,14 +207,18 @@ const FloatingUsersPopover = ({
   // Handle server settings
   const handleServer = async () => {
     try {
+      setServerLoading(true);
+      setServerDialog(true);
+      setAnchorEl(null);
+      
       const response = await fetch('/api/server');
       const server = await response.json();
       setServerData(server);
-      setServerDialog(true);
       setActiveServerTab(0);
-      setAnchorEl(null);
     } catch (error) {
       console.error('Failed to fetch server data:', error);
+    } finally {
+      setServerLoading(false);
     }
   };
 
@@ -1457,7 +1462,35 @@ const FloatingUsersPopover = ({
                     gap: '16px',
                     paddingBottom: '200px'
                   }}>
-                    {serverData && (
+                    {serverLoading ? (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 1,
+                        gap: '16px',
+                        padding: '40px 20px',
+                      }}>
+                        <CircularProgress 
+                          size={40} 
+                          style={{ 
+                            color: colors.primary,
+                            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                          }} 
+                        />
+                        <Typography 
+                          variant="body2" 
+                          style={{ 
+                            color: colors.textSecondary,
+                            fontSize: '14px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {t('sharedLoading')}...
+                        </Typography>
+                      </div>
+                    ) : serverData ? (
                       <>
                         {/* Server Tabs */}
                         <Tabs
@@ -1795,6 +1828,27 @@ const FloatingUsersPopover = ({
                           </Box>
                         )}
                       </>
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 1,
+                        gap: '16px',
+                        padding: '40px 20px',
+                      }}>
+                        <Typography 
+                          variant="body2" 
+                          style={{ 
+                            color: colors.textSecondary,
+                            fontSize: '14px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {t('sharedError')}
+                        </Typography>
+                      </div>
                     )}
                   </div>
 
