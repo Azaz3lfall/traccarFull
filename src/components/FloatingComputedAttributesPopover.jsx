@@ -313,11 +313,11 @@ const FloatingComputedAttributesPopover = ({
         >
           <div style={{
             backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
             borderRadius: !desktop ? '0px' : '0px 16px 16px 0px',
             height: '100%',
             overflow: 'hidden',
             boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
-            border: 'none',
             display: 'flex',
             flexDirection: 'column',
           }}>
