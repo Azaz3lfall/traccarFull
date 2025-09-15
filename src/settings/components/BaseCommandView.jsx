@@ -26,8 +26,6 @@ const BaseCommandView = ({
   includeSaved = false,
   savedId,
 }) => {
-  console.log('=== BaseCommandView RENDER ===');
-  console.log('Props received:', { deviceId, item, includeSaved, savedId });
   
   const t = useTranslation();
   const colors = useThemeColors();
@@ -42,60 +40,39 @@ const BaseCommandView = ({
   const [loading, setLoading] = useState(true);
 
   useEffectAsync(async () => {
-    console.log('=== BaseCommandView useEffectAsync START ===');
-    console.log('Props:', { includeSaved, deviceId, limitCommands });
-    console.log('Current options state:', options);
-    console.log('Current loading state:', loading);
     
     setLoading(true);
     try {
       if (includeSaved) {
-        console.log('Loading saved commands with deviceId:', deviceId);
         const savedResponse = await fetchOrThrow(`/api/commands/send?deviceId=${deviceId}`);
         const saved = await savedResponse.json();
-        console.log('Saved commands response:', saved);
         let combined = saved.map((it) => ({ ...it, optionType: 'saved', key: `saved-${it.id}` }));
         if (!limitCommands) {
-          console.log('Loading command types with deviceId:', deviceId);
           const typesResponse = await fetchOrThrow(`/api/commands/types?${new URLSearchParams({ deviceId }).toString()}`);
           const types = await typesResponse.json();
-          console.log('Command types from API (with deviceId):', types);
           combined = combined.concat(types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` })));
         }
-        console.log('Combined options (includeSaved):', combined);
         setOptions(combined);
       } else {
-        console.log('Loading command types from /api/commands/types (no deviceId)');
         
         // Test with a simple fetch first
         try {
-          console.log('Testing simple fetch...');
           const testResponse = await fetch('/api/commands/types');
-          console.log('Test response status:', testResponse.status);
-          console.log('Test response ok:', testResponse.ok);
           
           if (!testResponse.ok) {
             throw new Error(`HTTP ${testResponse.status}: ${testResponse.statusText}`);
           }
           
           const testData = await testResponse.json();
-          console.log('Test data:', testData);
         } catch (testError) {
           console.error('Test fetch failed:', testError);
         }
         
         const typesResponse = await fetchOrThrow('/api/commands/types');
-        console.log('Raw API response:', typesResponse);
-        console.log('Response status:', typesResponse.status);
-        console.log('Response ok:', typesResponse.ok);
         
         const types = await typesResponse.json();
-        console.log('Command types from API (no deviceId):', types);
-        console.log('Types array length:', types.length);
         
         const mappedTypes = types.map((it) => ({ ...it, optionType: 'type', key: `type-${it.type}` }));
-        console.log('Mapped types:', mappedTypes);
-        console.log('Setting options to:', mappedTypes);
         setOptions(mappedTypes);
       }
     } catch (error) {
@@ -106,9 +83,7 @@ const BaseCommandView = ({
         name: error.name
       });
     } finally {
-      console.log('Setting loading to false');
       setLoading(false);
-      console.log('=== BaseCommandView useEffectAsync END ===');
     }
   }, []); // Simplified dependency array like CommandsPage
 
@@ -121,19 +96,13 @@ const BaseCommandView = ({
   }, [availableAttributes, item]);
 
 
-  console.log('BaseCommandView render - options:', options);
-  console.log('BaseCommandView render - item:', item);
-  console.log('BaseCommandView render - includeSaved:', includeSaved);
-  console.log('BaseCommandView render - loading:', loading);
 
   // Get available command types
   const commandTypes = options.filter(option => option.optionType === 'type');
-  console.log('Command types for Select:', commandTypes);
 
   // Ensure the current value is valid
   const currentValue = item.type || '';
   const isValidValue = !currentValue || commandTypes.some(option => option.type === currentValue);
-  console.log('Current value:', currentValue, 'Is valid:', isValidValue);
 
   // Use empty string if value is invalid or still loading
   const selectValue = (loading || !isValidValue) ? '' : currentValue;
@@ -141,7 +110,6 @@ const BaseCommandView = ({
   // Restore the original value once data is loaded and value becomes valid
   useEffect(() => {
     if (!loading && currentValue && isValidValue && item.type !== currentValue) {
-      console.log('Restoring original value after data load:', currentValue);
       setItem({ ...item, type: currentValue });
     }
   }, [loading, currentValue, isValidValue]);
@@ -154,7 +122,6 @@ const BaseCommandView = ({
           value={selectValue}
           onChange={(e) => {
             const selectedType = e.target.value;
-            console.log('Selected type:', selectedType);
             if (selectedType) {
               const defaults = {};
               availableAttributes[selectedType]?.forEach((attribute) => {

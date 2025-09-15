@@ -72,8 +72,6 @@ const FloatingComputedAttributesPopover = ({
   isVisible, 
   onClose 
 }) => {
-  console.log('=== FloatingComputedAttributesPopover RENDER ===');
-  console.log('Props:', { desktop, isMenuExpanded, isVisible, onClose });
   
   const t = useTranslation();
   const colors = useThemeColors();
@@ -107,10 +105,8 @@ const FloatingComputedAttributesPopover = ({
   const attributeInputRef = useRef(null);
   const deviceInputRef = useRef(null);
 
-  console.log('FloatingComputedAttributesPopover state:', { editDialog, isVisible });
 
   // Fetch computed attributes with TanStack Query
-  console.log('=== TEST: Before useQuery ===');
   const { data: attributes = [], isLoading, error } = useQuery({
     queryKey: ['computedAttributes'],
     queryFn: async () => {
@@ -119,7 +115,6 @@ const FloatingComputedAttributesPopover = ({
     },
     enabled: isVisible, // Only fetch when popover is visible
   });
-  console.log('=== TEST: After useQuery ===');
 
   // Fetch devices for testing
   useEffectAsync(async () => {

@@ -108,7 +108,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  console.log('FloatingCalendarsPopover state:', { editDialog, isVisible, isLoading });
 
   // Filter calendars based on search keyword
   const filteredCalendars = calendars.filter(calendar =>

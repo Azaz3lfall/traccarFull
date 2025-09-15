@@ -65,8 +65,6 @@ const FloatingMaintenancePopover = ({
   isVisible, 
   onClose 
 }) => {
-  console.log('=== FloatingMaintenancePopover RENDER ===');
-  console.log('Props:', { desktop, isMenuExpanded, isVisible, onClose });
   
   const t = useTranslation();
   const colors = useThemeColors();
@@ -93,10 +91,8 @@ const FloatingMaintenancePopover = ({
   const [activeTab, setActiveTab] = useState(0);
   const [maintenanceTypes, setMaintenanceTypes] = useState([]);
 
-  console.log('FloatingMaintenancePopover state:', { maintenanceTypes, editDialog, isVisible });
 
   // Fetch maintenances with TanStack Query
-  console.log('=== TEST: Before useQuery ===');
   const { data: maintenances = [], isLoading, error } = useQuery({
     queryKey: ['maintenances'],
     queryFn: async () => {
@@ -105,13 +101,11 @@ const FloatingMaintenancePopover = ({
     },
     enabled: isVisible, // Only fetch when popover is visible
   });
-  console.log('=== TEST: After useQuery ===');
 
   // Fetch maintenance types when popover is visible
   useEffectAsync(async () => {
     if (!isVisible) return;
     
-    console.log('=== FloatingMaintenancePopover: Loading maintenance types (isVisible=true) ===');
     try {
       // Get available position attributes for maintenance types
       const availableTypes = Object.keys(positionAttributes).filter(key => {
@@ -119,7 +113,6 @@ const FloatingMaintenancePopover = ({
         return attr && (attr.dataType === 'distance' || attr.dataType === 'hours' || key.endsWith('Time'));
       });
       
-      console.log('Available maintenance types:', availableTypes);
       setMaintenanceTypes(availableTypes);
     } catch (error) {
       console.error('=== FloatingMaintenancePopover: Failed to load maintenance types ===', error);

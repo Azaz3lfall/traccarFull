@@ -69,7 +69,6 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
   const groupAttributes = useGroupAttributes(t);
 
 
-  console.log('FloatingGroupsPopover state:', { editDialog, isVisible });
 
   // Close dropdowns when clicking outside
   useEffect(() => {

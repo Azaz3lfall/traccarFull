@@ -58,7 +58,6 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
 
 
 
-  console.log('FloatingDriversPopover state:', { editDialog, isVisible });
 
   // Fetch drivers with TanStack Query
   const { data: drivers = [], isLoading } = useQuery({
