@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -23,9 +23,6 @@ import {
   Tabs,
   Tab,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
   Chip,
 } from '@mui/material';
 import {
@@ -64,6 +61,14 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [editingCalendar, setEditingCalendar] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  
+  // Custom dropdown states
+  const [recurrenceDropdownOpen, setRecurrenceDropdownOpen] = useState(false);
+  const [daysDropdownOpen, setDaysDropdownOpen] = useState(false);
+  
+  // Refs for dropdown positioning
+  const recurrenceInputRef = useRef(null);
+  const daysInputRef = useRef(null);
 
   // Attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
@@ -72,25 +77,37 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
 
   console.log('FloatingCalendarsPopover state:', { editDialog, isVisible });
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (recurrenceInputRef.current && !recurrenceInputRef.current.contains(event.target)) {
+        setRecurrenceDropdownOpen(false);
+      }
+      if (daysInputRef.current && !daysInputRef.current.contains(event.target)) {
+        setDaysDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Fetch calendars with TanStack Query
-  console.log('=== TEST: Before useQuery ===');
-  const { data: calendars = [], isLoading, error } = useQuery({
+  const { data: calendars = [], isLoading } = useQuery({
     queryKey: ['calendars'],
     queryFn: async () => {
-      console.log('=== TEST: Fetching calendars ===');
       const response = await fetch('/api/calendars');
       if (!response.ok) {
         throw new Error('Failed to fetch calendars');
       }
       const data = await response.json();
-      console.log('=== TEST: Calendars data ===', data);
       return data;
     },
     enabled: isVisible,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-
-  console.log('=== TEST: After useQuery ===', { calendars, isLoading, error });
 
   // Filter calendars based on search keyword
   const filteredCalendars = calendars.filter(calendar =>
@@ -128,7 +145,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     {
       key: 'delete',
-      title: t('sharedDelete'),
+      title: t('sharedRemove'),
       icon: <DeleteIcon fontSize="small" />,
       handler: (calendar) => {
         setCalendarToDelete(calendar);
@@ -353,6 +370,13 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     return decoded.indexOf('//Traccar//') > 0 ? 'simple' : 'custom';
   };
 
+  // Get recurrence display text
+  const getRecurrenceText = (calendar) => {
+    if (getCalendarType(calendar) === 'custom') return t('reportCustom');
+    const rule = getCalendarRule(calendar);
+    return t(prefixString('calendar', rule.frequency.toLowerCase()));
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -496,7 +520,10 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                         <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedType')}
                         </TableCell>
-                        <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          {t('calendarRecurrence')}
+                        </TableCell>
+                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
@@ -528,7 +555,12 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               }}
                             />
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell>
+                            <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
+                              {getRecurrenceText(calendar)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
                             <IconButton
                               onClick={(e) => {
                                 setSelectedCalendar(calendar);
@@ -737,7 +769,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                   </div>
 
                   {/* Form */}
-                  <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ flex: 1, overflow: 'visible', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
                     {/* Tabs Navigation */}
                     <Tabs
                       value={activeTab}
@@ -893,63 +925,201 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                           />
 
                           {/* Recurrence */}
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t('calendarRecurrence')}</InputLabel>
-                            <Select
-                              value={editingCalendar?.frequency || 'ONCE'}
-                              onChange={(e) => setEditingCalendar({ ...editingCalendar, frequency: e.target.value, by: null })}
+                          <div>
+                            <TextField
+                              ref={recurrenceInputRef}
+                              fullWidth
+                              size="small"
                               label={t('calendarRecurrence')}
-                              MenuProps={{
-                                PaperProps: {
-                                  style: {
-                                    zIndex: 10010,
-                                    backgroundColor: colors.background,
-                                    border: `1px solid ${colors.border}`,
-                                  },
-                                },
+                              value={t(prefixString('calendar', (editingCalendar?.frequency || 'ONCE').toLowerCase()))}
+                              onClick={() => setRecurrenceDropdownOpen(!recurrenceDropdownOpen)}
+                              InputProps={{
+                                readOnly: true,
+                                endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
                               }}
-                            >
-                              {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
-                                <MenuItem key={frequency} value={frequency} style={{ color: colors.text }}>
-                                  {t(prefixString('calendar', frequency.toLowerCase()))}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  color: colors.text,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { color: colors.textSecondary },
+                                '& .MuiInputLabel-root.Mui-focused': { color: colors.primary },
+                              }}
+                            />
+                            {recurrenceDropdownOpen && (
+                              <div 
+                                style={{
+                                  position: 'fixed',
+                                  zIndex: 10010,
+                                  maxHeight: '200px',
+                                  overflow: 'auto',
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                  backgroundColor: colors.surface,
+                                  marginTop: '4px',
+                                  width: recurrenceInputRef.current ? recurrenceInputRef.current.getBoundingClientRect().width : '100%',
+                                  left: recurrenceInputRef.current ? recurrenceInputRef.current.getBoundingClientRect().left : 0,
+                                  top: recurrenceInputRef.current ? recurrenceInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency, index) => (
+                                  <div
+                                    key={frequency}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setEditingCalendar({ ...editingCalendar, frequency, by: null });
+                                      setRecurrenceDropdownOpen(false);
+                                    }}
+                                    style={{
+                                      padding: '12px 16px',
+                                      cursor: 'pointer',
+                                      color: colors.text,
+                                      backgroundColor: colors.surface,
+                                      borderBottom: index < 3 ? `1px solid ${colors.border}` : 'none',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.stopPropagation();
+                                      e.target.style.backgroundColor = colors.backgroundHover;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.stopPropagation();
+                                      e.target.style.backgroundColor = colors.surface;
+                                    }}
+                                  >
+                                    {t(prefixString('calendar', frequency.toLowerCase()))}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
                           {/* Conditional Days Selection */}
                           {['WEEKLY', 'MONTHLY'].includes(editingCalendar?.frequency) && (
-                            <FormControl fullWidth size="small">
-                              <InputLabel>{t('calendarDays')}</InputLabel>
-                              <Select
-                                multiple
+                            <div>
+                              <TextField
+                                ref={daysInputRef}
+                                fullWidth
+                                size="small"
                                 label={t('calendarDays')}
-                                value={editingCalendar?.by || []}
-                                onChange={(e) => setEditingCalendar({ ...editingCalendar, by: e.target.value })}
-                                MenuProps={{
-                                  PaperProps: {
-                                    style: {
-                                      zIndex: 10010,
-                                      backgroundColor: colors.background,
-                                      border: `1px solid ${colors.border}`,
-                                    },
-                                  },
-                                }}
-                              >
-                                {editingCalendar?.frequency === 'WEEKLY' ? 
-                                  ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
-                                    <MenuItem key={day} value={day.substring(0, 2).toUpperCase()} style={{ color: colors.text }}>
-                                      {t(prefixString('calendar', day))}
-                                    </MenuItem>
-                                  )) : 
-                                  Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                    <MenuItem key={day} value={String(day)} style={{ color: colors.text }}>
-                                      {day}
-                                    </MenuItem>
-                                  ))
+                                value={editingCalendar?.by?.length > 0 ? 
+                                  (editingCalendar.frequency === 'WEEKLY' ? 
+                                    editingCalendar.by.map(day => t(prefixString('calendar', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].indexOf(day)]))).join(', ') :
+                                    editingCalendar.by.join(', ')
+                                  ) : ''
                                 }
-                              </Select>
-                            </FormControl>
+                                onClick={() => setDaysDropdownOpen(!daysDropdownOpen)}
+                                InputProps={{
+                                  readOnly: true,
+                                  endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
+                                }}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    color: colors.text,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { color: colors.textSecondary },
+                                  '& .MuiInputLabel-root.Mui-focused': { color: colors.primary },
+                                }}
+                              />
+                              {daysDropdownOpen && (
+                                <div 
+                                  style={{
+                                    position: 'fixed',
+                                    zIndex: 10010,
+                                    maxHeight: '200px',
+                                    overflow: 'auto',
+                                    border: `1px solid ${colors.border}`,
+                                    borderRadius: '4px',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                    backgroundColor: colors.surface,
+                                    marginTop: '4px',
+                                    width: daysInputRef.current ? daysInputRef.current.getBoundingClientRect().width : '100%',
+                                    left: daysInputRef.current ? daysInputRef.current.getBoundingClientRect().left : 0,
+                                    top: daysInputRef.current ? daysInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {editingCalendar?.frequency === 'WEEKLY' ? 
+                                    ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day, index) => {
+                                      const dayCode = day.substring(0, 2).toUpperCase();
+                                      const isSelected = editingCalendar?.by?.includes(dayCode);
+                                      return (
+                                        <div
+                                          key={day}
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const currentBy = editingCalendar?.by || [];
+                                            const newBy = isSelected 
+                                              ? currentBy.filter(d => d !== dayCode)
+                                              : [...currentBy, dayCode];
+                                            setEditingCalendar({ ...editingCalendar, by: newBy });
+                                          }}
+                                          style={{
+                                            padding: '12px 16px',
+                                            cursor: 'pointer',
+                                            color: colors.text,
+                                            backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
+                                            borderBottom: index < 6 ? `1px solid ${colors.border}` : 'none',
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.stopPropagation();
+                                            e.target.style.backgroundColor = colors.backgroundHover;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.stopPropagation();
+                                            e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
+                                          }}
+                                        >
+                                          {t(prefixString('calendar', day))}
+                                        </div>
+                                      );
+                                    }) : 
+                                    Array.from({ length: 31 }, (_, i) => i + 1).map((day, index) => {
+                                      const isSelected = editingCalendar?.by?.includes(String(day));
+                                      return (
+                                        <div
+                                          key={day}
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const currentBy = editingCalendar?.by || [];
+                                            const newBy = isSelected 
+                                              ? currentBy.filter(d => d !== String(day))
+                                              : [...currentBy, String(day)];
+                                            setEditingCalendar({ ...editingCalendar, by: newBy });
+                                          }}
+                                          style={{
+                                            padding: '12px 16px',
+                                            cursor: 'pointer',
+                                            color: colors.text,
+                                            backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
+                                            borderBottom: index < 30 ? `1px solid ${colors.border}` : 'none',
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.stopPropagation();
+                                            e.target.style.backgroundColor = colors.backgroundHover;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.stopPropagation();
+                                            e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
+                                          }}
+                                        >
+                                          {day}
+                                        </div>
+                                      );
+                                    })
+                                  }
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
@@ -961,7 +1131,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             attribute={null}
                             attributes={editingCalendar?.attributes || {}}
                             setAttributes={(attributes) => setEditingCalendar({ ...editingCalendar, attributes })}
-                            definitions={{}}
+                            definitions={{ ...commonUserAttributes, ...commonDeviceAttributes, ...serverAttributes }}
                             focusAttribute={null}
                             zIndex={10003}
                           />
