@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -77,6 +77,20 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
   const [activeTab, setActiveTab] = useState(0);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedNotificationForConnections, setSelectedNotificationForConnections] = useState(null);
+  
+  // Custom dropdown states
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const [alarmsDropdownOpen, setAlarmsDropdownOpen] = useState(false);
+  const [notificatorsDropdownOpen, setNotificatorsDropdownOpen] = useState(false);
+  const [commandDropdownOpen, setCommandDropdownOpen] = useState(false);
+  const [calendarDropdownOpen, setCalendarDropdownOpen] = useState(false);
+  
+  // Refs for dropdown positioning
+  const typeInputRef = useRef(null);
+  const alarmsInputRef = useRef(null);
+  const notificatorsInputRef = useRef(null);
+  const commandInputRef = useRef(null);
+  const calendarInputRef = useRef(null);
 
   // Fetch notifications with TanStack Query
   const { data: notifications = [], isLoading, error } = useQuery({
@@ -185,6 +199,32 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
       }));
     }
   });
+
+  // Click outside handlers for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (typeInputRef.current && !typeInputRef.current.contains(event.target)) {
+        setTypeDropdownOpen(false);
+      }
+      if (alarmsInputRef.current && !alarmsInputRef.current.contains(event.target)) {
+        setAlarmsDropdownOpen(false);
+      }
+      if (notificatorsInputRef.current && !notificatorsInputRef.current.contains(event.target)) {
+        setNotificatorsDropdownOpen(false);
+      }
+      if (commandInputRef.current && !commandInputRef.current.contains(event.target)) {
+        setCommandDropdownOpen(false);
+      }
+      if (calendarInputRef.current && !calendarInputRef.current.contains(event.target)) {
+        setCalendarDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSaveNotification = () => {
     if (!editingNotification) {
@@ -405,19 +445,19 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                   <Table size="small">
                     <TableHead>
                       <TableRow style={{ backgroundColor: colors.surface }}>
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedDescription')}
                         </TableCell>
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('notificationType')}
                         </TableCell>
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('notificationAlways')}
                         </TableCell>
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedAlarms')}
                         </TableCell>
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('notificationNotificators')}
                         </TableCell>
                         <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
@@ -658,51 +698,305 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {activeTab === 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <SelectField
-                            value={editingNotification?.type || ''}
-                            onChange={(e) => setEditingNotification({ ...editingNotification, type: e.target.value })}
-                            endpoint="/api/notifications/types"
-                            keyGetter={(it) => it.type}
-                            titleGetter={(it) => t(prefixString('event', it.type))}
-                            label={t('sharedType')}
-                            zIndex={10003}
-                          />
+                          {/* Type Dropdown */}
+                          <div ref={typeInputRef} style={{ position: 'relative' }}>
+                            <TextField
+                              fullWidth
+                              label={t('sharedType')}
+                              value={editingNotification?.type ? t(prefixString('event', editingNotification.type)) : ''}
+                              onClick={() => setTypeDropdownOpen(!typeDropdownOpen)}
+                              readOnly
+                              size="small"
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                            {typeDropdownOpen && (
+                              <div
+                                style={{
+                                  position: 'fixed',
+                                  top: typeInputRef.current ? typeInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                  left: typeInputRef.current ? typeInputRef.current.getBoundingClientRect().left : 0,
+                                  width: typeInputRef.current ? typeInputRef.current.getBoundingClientRect().width : 200,
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                  zIndex: 10004,
+                                  maxHeight: '200px',
+                                  overflow: 'auto',
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {notificationTypes.map((type) => (
+                                  <div
+                                    key={type.type}
+                                    style={{
+                                      padding: '8px 12px',
+                                      cursor: 'pointer',
+                                      color: colors.text,
+                                      fontSize: '14px',
+                                      borderBottom: `1px solid ${colors.border}`,
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      setEditingNotification({ ...editingNotification, type: type.type });
+                                      setTypeDropdownOpen(false);
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = colors.hover;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                  >
+                                    {t(prefixString('event', type.type))}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                           
                           {editingNotification?.type === 'alarm' && (
-                            <SelectField
-                              multiple
-                              value={editingNotification?.attributes?.alarms ? editingNotification.attributes.alarms.split(/[, ]+/) : []}
-                              onChange={(e) => setEditingNotification({ 
-                                ...editingNotification, 
-                                attributes: { ...editingNotification.attributes, alarms: e.target.value.join() } 
-                              })}
-                              data={alarms}
-                              keyGetter={(it) => it.key}
-                              label={t('sharedAlarms')}
-                              zIndex={10003}
-                            />
+                            /* Alarms Dropdown */
+                            <div ref={alarmsInputRef} style={{ position: 'relative' }}>
+                              <TextField
+                                fullWidth
+                                label={t('sharedAlarms')}
+                                value={editingNotification?.attributes?.alarms ? 
+                                  editingNotification.attributes.alarms.split(/[, ]+/).map(alarm => t(prefixString('alarm', alarm))).join(', ') : ''}
+                                onClick={() => setAlarmsDropdownOpen(!alarmsDropdownOpen)}
+                                readOnly
+                                size="small"
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { 
+                                    color: colors.textSecondary,
+                                    '&.Mui-focused': { color: colors.primary }
+                                  },
+                                }}
+                              />
+                              {alarmsDropdownOpen && (
+                                <div
+                                  style={{
+                                    position: 'fixed',
+                                    top: alarmsInputRef.current ? alarmsInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                    left: alarmsInputRef.current ? alarmsInputRef.current.getBoundingClientRect().left : 0,
+                                    width: alarmsInputRef.current ? alarmsInputRef.current.getBoundingClientRect().width : 200,
+                                    backgroundColor: colors.surface,
+                                    border: `1px solid ${colors.border}`,
+                                    borderRadius: '4px',
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                    zIndex: 10004,
+                                    maxHeight: '200px',
+                                    overflow: 'auto',
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {alarms.map((alarm) => {
+                                    const isSelected = editingNotification?.attributes?.alarms?.split(/[, ]+/).includes(alarm.key);
+                                    return (
+                                      <div
+                                        key={alarm.key}
+                                        style={{
+                                          padding: '8px 12px',
+                                          cursor: 'pointer',
+                                          color: colors.text,
+                                          fontSize: '14px',
+                                          borderBottom: `1px solid ${colors.border}`,
+                                          backgroundColor: isSelected ? colors.primary + '20' : 'transparent',
+                                        }}
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          const currentAlarms = editingNotification?.attributes?.alarms ? 
+                                            editingNotification.attributes.alarms.split(/[, ]+/) : [];
+                                          const newAlarms = isSelected 
+                                            ? currentAlarms.filter(a => a !== alarm.key)
+                                            : [...currentAlarms, alarm.key];
+                                          setEditingNotification({ 
+                                            ...editingNotification, 
+                                            attributes: { ...editingNotification.attributes, alarms: newAlarms.join(', ') } 
+                                          });
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = colors.hover;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = isSelected ? colors.primary + '20' : 'transparent';
+                                        }}
+                                      >
+                                        {alarm.name}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
                           )}
                           
-                          <SelectField
-                            multiple
-                            value={editingNotification?.notificators ? editingNotification.notificators.split(/[, ]+/) : []}
-                            onChange={(e) => setEditingNotification({ ...editingNotification, notificators: e.target.value.join() })}
-                            endpoint="/api/notifications/notificators"
-                            keyGetter={(it) => it.type}
-                            titleGetter={(it) => t(prefixString('notificator', it.type))}
-                            label={t('notificationNotificators')}
-                            zIndex={10003}
-                          />
+                          {/* Notificators Dropdown */}
+                          <div ref={notificatorsInputRef} style={{ position: 'relative' }}>
+                            <TextField
+                              fullWidth
+                              label={t('notificationNotificators')}
+                              value={editingNotification?.notificators ? 
+                                editingNotification.notificators.split(/[, ]+/).map(notificator => t(prefixString('notificator', notificator))).join(', ') : ''}
+                              onClick={() => setNotificatorsDropdownOpen(!notificatorsDropdownOpen)}
+                              readOnly
+                              size="small"
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                            {notificatorsDropdownOpen && (
+                              <div
+                                style={{
+                                  position: 'fixed',
+                                  top: notificatorsInputRef.current ? notificatorsInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                  left: notificatorsInputRef.current ? notificatorsInputRef.current.getBoundingClientRect().left : 0,
+                                  width: notificatorsInputRef.current ? notificatorsInputRef.current.getBoundingClientRect().width : 200,
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                  zIndex: 10004,
+                                  maxHeight: '200px',
+                                  overflow: 'auto',
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {notificators.map((notificator) => {
+                                  const isSelected = editingNotification?.notificators?.split(/[, ]+/).includes(notificator.type);
+                                  return (
+                                    <div
+                                      key={notificator.type}
+                                      style={{
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        color: colors.text,
+                                        fontSize: '14px',
+                                        borderBottom: `1px solid ${colors.border}`,
+                                        backgroundColor: isSelected ? colors.primary + '20' : 'transparent',
+                                      }}
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        const currentNotificators = editingNotification?.notificators ? 
+                                          editingNotification.notificators.split(/[, ]+/) : [];
+                                        const newNotificators = isSelected 
+                                          ? currentNotificators.filter(n => n !== notificator.type)
+                                          : [...currentNotificators, notificator.type];
+                                        setEditingNotification({ 
+                                          ...editingNotification, 
+                                          notificators: newNotificators.join(', ') 
+                                        });
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = colors.hover;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = isSelected ? colors.primary + '20' : 'transparent';
+                                      }}
+                                    >
+                                      {t(prefixString('notificator', notificator.type))}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                           
                           {editingNotification?.notificators?.includes('command') && (
-                            <SelectField
-                              value={editingNotification?.commandId || ''}
-                              onChange={(e) => setEditingNotification({ ...editingNotification, commandId: Number(e.target.value) })}
-                              endpoint="/api/commands"
-                              titleGetter={(it) => it.description}
-                              label={t('sharedSavedCommand')}
-                              zIndex={10003}
-                            />
+                            /* Command Dropdown */
+                            <div ref={commandInputRef} style={{ position: 'relative' }}>
+                              <TextField
+                                fullWidth
+                                label={t('sharedSavedCommand')}
+                                value={editingNotification?.commandId ? 
+                                  commands.find(cmd => cmd.id === editingNotification.commandId)?.description || '' : ''}
+                                onClick={() => setCommandDropdownOpen(!commandDropdownOpen)}
+                                readOnly
+                                size="small"
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { 
+                                    color: colors.textSecondary,
+                                    '&.Mui-focused': { color: colors.primary }
+                                  },
+                                }}
+                              />
+                              {commandDropdownOpen && (
+                                <div
+                                  style={{
+                                    position: 'fixed',
+                                    top: commandInputRef.current ? commandInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                    left: commandInputRef.current ? commandInputRef.current.getBoundingClientRect().left : 0,
+                                    width: commandInputRef.current ? commandInputRef.current.getBoundingClientRect().width : 200,
+                                    backgroundColor: colors.surface,
+                                    border: `1px solid ${colors.border}`,
+                                    borderRadius: '4px',
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                    zIndex: 10004,
+                                    maxHeight: '200px',
+                                    overflow: 'auto',
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {commands.map((command) => (
+                                    <div
+                                      key={command.id}
+                                      style={{
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        color: colors.text,
+                                        fontSize: '14px',
+                                        borderBottom: `1px solid ${colors.border}`,
+                                      }}
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        setEditingNotification({ ...editingNotification, commandId: command.id });
+                                        setCommandDropdownOpen(false);
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = colors.hover;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                      }}
+                                    >
+                                      {command.description}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           )}
                           
                           <Button
@@ -763,13 +1057,97 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                             }}
                           />
                           
-                          <SelectField
-                            value={editingNotification?.calendarId || ''}
-                            onChange={(e) => setEditingNotification({ ...editingNotification, calendarId: Number(e.target.value) })}
-                            endpoint="/api/calendars"
-                            label={t('sharedCalendar')}
-                            zIndex={10003}
-                          />
+                          {/* Calendar Dropdown */}
+                          <div ref={calendarInputRef} style={{ position: 'relative' }}>
+                            <TextField
+                              fullWidth
+                              label={t('sharedCalendar')}
+                              value={editingNotification?.calendarId ? 
+                                calendars.find(cal => cal.id === editingNotification.calendarId)?.name || '' : ''}
+                              onClick={() => setCalendarDropdownOpen(!calendarDropdownOpen)}
+                              readOnly
+                              size="small"
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                            {calendarDropdownOpen && (
+                              <div
+                                style={{
+                                  position: 'fixed',
+                                  top: calendarInputRef.current ? calendarInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                  left: calendarInputRef.current ? calendarInputRef.current.getBoundingClientRect().left : 0,
+                                  width: calendarInputRef.current ? calendarInputRef.current.getBoundingClientRect().width : 200,
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                  zIndex: 10004,
+                                  maxHeight: '200px',
+                                  overflow: 'auto',
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div
+                                  style={{
+                                    padding: '8px 12px',
+                                    cursor: 'pointer',
+                                    color: colors.textSecondary,
+                                    fontSize: '14px',
+                                    fontStyle: 'italic',
+                                    borderBottom: `1px solid ${colors.border}`,
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setEditingNotification({ ...editingNotification, calendarId: null });
+                                    setCalendarDropdownOpen(false);
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = colors.hover;
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
+                                >
+                                  -
+                                </div>
+                                {calendars.map((calendar) => (
+                                  <div
+                                    key={calendar.id}
+                                    style={{
+                                      padding: '8px 12px',
+                                      cursor: 'pointer',
+                                      color: colors.text,
+                                      fontSize: '14px',
+                                      borderBottom: `1px solid ${colors.border}`,
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      setEditingNotification({ ...editingNotification, calendarId: calendar.id });
+                                      setCalendarDropdownOpen(false);
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = colors.hover;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                  >
+                                    {calendar.name}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                           
                           <FormControlLabel
                             control={
