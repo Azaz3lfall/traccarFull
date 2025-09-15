@@ -807,7 +807,7 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}>
-            {isMenuExpanded && (
+            {!isMenuExpanded ? (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -833,11 +833,44 @@ const MainPage = () => {
                         objectFit: 'contain'
                       }}
                     />
-                  ) : null;
+                  ) : (
+                    <ChevronRight size={18} color={colors.textSecondary} />
+                  );
                 })()}
               </div>
+            ) : (
+              <>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '40px',
+                  maxWidth: '130px',
+                  overflow: 'hidden',
+                  padding: '0 10px',
+                  marginBottom: '6px'
+                }}>
+                  {(() => {
+                    const logoUrl = logo || logoInverted;
+                    
+                    return logoUrl ? (
+                      <img 
+                        src={logoUrl} 
+                        alt="Server Logo" 
+                        style={{ 
+                          maxWidth: '100%',
+                          maxHeight: '36px',
+                          width: 'auto',
+                          height: 'auto',
+                          objectFit: 'contain'
+                        }}
+                      />
+                    ) : null;
+                  })()}
+                </div>
+                <ChevronLeft size={18} color={colors.textSecondary} />
+              </>
             )}
-            {isMenuExpanded ? <ChevronLeft size={18} color={colors.textSecondary} /> : <ChevronRight size={18} color={colors.textSecondary} />}
           </div>
           
           {/* Device List Toggle Button */}
