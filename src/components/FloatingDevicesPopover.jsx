@@ -35,6 +35,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
+import { MuiFileInput } from 'mui-file-input';
 import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
@@ -92,6 +93,7 @@ const FloatingDevicesPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
+  const [imageFile, setImageFile] = useState(null);
 
   console.log('FloatingDevicesPopover state:', { editDialog, isVisible });
 
@@ -262,16 +264,47 @@ const FloatingDevicesPopover = ({
     setDeleteDialog(true);
   };
 
-  const handleMenuClick = (event, device) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-    setSelectedDevice(device);
-  };
+  const handleFileInput = useCatch(async (newFile) => {
+    setImageFile(newFile);
+    if (newFile && editingDevice?.id) {
+      const response = await fetchOrThrow(`/api/devices/${editingDevice.id}/image`, {
+        method: 'POST',
+        body: newFile,
+      });
+      setEditingDevice({ 
+        ...editingDevice, 
+        attributes: { 
+          ...editingDevice.attributes, 
+          deviceImage: await response.text() 
+        } 
+      });
+    } else if (!newFile) {
+      // eslint-disable-next-line no-unused-vars
+      const { deviceImage, ...remainingAttributes } = editingDevice.attributes || {};
+      setEditingDevice({ 
+        ...editingDevice, 
+        attributes: remainingAttributes 
+      });
+    }
+  });
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedDevice(null);
-  };
+  // Menu actions
+  const actions = [
+    {
+      key: 'edit',
+      title: t('sharedEdit'),
+      icon: <EditIcon fontSize="small" />,
+      handler: handleEditDevice,
+      show: true,
+    },
+    {
+      key: 'delete',
+      title: t('sharedDelete'),
+      icon: <DeleteIcon fontSize="small" />,
+      handler: handleDeleteClick,
+      show: true,
+    },
+  ];
 
   if (!isVisible) return null;
 
@@ -466,11 +499,14 @@ const FloatingDevicesPopover = ({
                                 }}
                               />
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell style={{ padding: '4px' }}>
                               <IconButton
                                 size="small"
-                                onClick={(e) => handleMenuClick(e, device)}
-                                style={{ color: colors.text }}
+                                onClick={(e) => {
+                                  setSelectedDevice(device);
+                                  setAnchorEl(e.currentTarget);
+                                }}
+                                style={{ color: colors.textSecondary }}
                               >
                                 <MoreVertIcon fontSize="small" />
                               </IconButton>
@@ -498,41 +534,34 @@ const FloatingDevicesPopover = ({
             </div>
           </div>
 
-          {/* Actions Menu */}
+          {/* Action Menu */}
           <Menu
             anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
+            open={!!anchorEl}
+            onClose={() => setAnchorEl(null)}
+            style={{ zIndex: 10002 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
-                borderRadius: '8px',
+                boxShadow: colors.shadow,
                 minWidth: '160px',
                 zIndex: 10002,
               }
             }}
           >
-            <MenuItem
-              onClick={() => {
-                handleEditDevice(selectedDevice);
-                handleMenuClose();
-              }}
-              style={{ color: colors.text }}
-            >
-              <EditIcon fontSize="small" style={{ marginRight: '8px' }} />
-              {t('sharedEdit')}
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleDeleteClick(selectedDevice);
-                handleMenuClose();
-              }}
-              style={{ color: colors.error }}
-            >
-              <DeleteIcon fontSize="small" style={{ marginRight: '8px' }} />
-              {t('sharedDelete')}
-            </MenuItem>
+            {actions
+              .filter(action => action.show !== false)
+              .map((action) => (
+                <MenuItem
+                  key={action.key}
+                  onClick={() => action.handler(selectedDevice)}
+                  style={{ color: colors.text, fontSize: '12px' }}
+                >
+                  {action.icon}
+                  <span style={{ marginLeft: '6px' }}>{action.title}</span>
+                </MenuItem>
+              ))}
           </Menu>
 
           {/* Edit Dialog */}
@@ -598,8 +627,9 @@ const FloatingDevicesPopover = ({
                     </Typography>
                   </div>
 
-                  {/* Tabs */}
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  {/* Form */}
+                  <div style={{ flex: 1, overflow: 'visible', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
+                    {/* Tabs Navigation */}
                     <Tabs
                       value={activeTab}
                       onChange={(e, newValue) => setActiveTab(newValue)}
@@ -611,15 +641,29 @@ const FloatingDevicesPopover = ({
                       }}
                       sx={{
                         '& .MuiTab-root': {
-                          color: colors.textSecondary,
-                          fontWeight: '600',
-                          backgroundColor: 'transparent',
-                        },
-                        '& .Mui-selected': {
-                          color: colors.primary,
+                          color: '#666666',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          textTransform: 'none',
+                          minHeight: '40px',
+                          padding: '8px 16px',
+                          '&.Mui-selected': {
+                            color: '#1976d2',
+                            fontWeight: '600',
+                            backgroundColor: 'transparent',
+                          },
+                          '&:hover': {
+                            color: '#1976d2',
+                            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                          },
+                          '&.Mui-selected:hover': {
+                            color: '#1976d2',
+                            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                          },
                         },
                         '& .MuiTabs-indicator': {
-                          backgroundColor: colors.primary,
+                          backgroundColor: '#1976d2',
+                          height: '2px',
                         },
                       }}
                     >
@@ -627,10 +671,9 @@ const FloatingDevicesPopover = ({
                       <Tab label={t('sharedExtra')} />
                       <Tab label={t('sharedAttributes')} />
                     </Tabs>
-                  </Box>
 
-                  {/* Tab Content */}
-                  <div style={{ flex: 1, overflow: 'auto', padding: '20px' }}>
+                    {/* Tab Content */}
+                    <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
                     {activeTab === 0 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <TextField
@@ -864,13 +907,41 @@ const FloatingDevicesPopover = ({
                     )}
 
                     {activeTab === 2 && (
-                      <EditAttributesAccordion
-                        attributes={editingDevice?.attributes || {}}
-                        setAttributes={(attributes) => setEditingDevice({ ...editingDevice, attributes })}
-                        definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
-                        zIndex={10003}
-                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {editingDevice?.id && (
+                          <div>
+                            <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
+                              {t('attributeDeviceImage')}
+                            </Typography>
+                            <MuiFileInput
+                              placeholder={t('attributeDeviceImage')}
+                              value={imageFile}
+                              onChange={handleFileInput}
+                              inputProps={{ accept: 'image/*' }}
+                              style={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                          </div>
+                        )}
+                        <EditAttributesAccordion
+                          attributes={editingDevice?.attributes || {}}
+                          setAttributes={(attributes) => setEditingDevice({ ...editingDevice, attributes })}
+                          definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
+                          zIndex={10003}
+                        />
+                      </div>
                     )}
+                    </Box>
                   </div>
 
                   {/* Footer */}
