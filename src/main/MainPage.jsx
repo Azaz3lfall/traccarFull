@@ -1082,7 +1082,9 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-user');
               if (tooltip) tooltip.remove();
-              window.location.href = `/settings/user/${user.id}`;
+              setShowUserPopover(false);
+              setEditingUserId(user.id);
+              setShowUsersPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
