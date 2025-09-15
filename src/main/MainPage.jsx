@@ -811,8 +811,8 @@ const MainPage = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                maxWidth: '120px',
-                maxHeight: '32px'
+                height: '40px',
+                maxWidth: '120px'
               }}>
                 <LogoImage color={colors.primary} />
               </div>
