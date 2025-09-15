@@ -143,25 +143,8 @@ const FloatingDevicesPopover = ({
       const result = await response.json();
       return result;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       console.log('Device created successfully:', data);
-      
-      // Upload image if there's one
-      if (editingDevice?.imageFile) {
-        try {
-          const response = await fetchOrThrow(`/api/devices/${data.id}/image`, {
-            method: 'POST',
-            body: editingDevice.imageFile,
-          });
-          const imageUrl = await response.text();
-          // Update the device with the image
-          const updatedDevice = { ...data, attributes: { ...data.attributes, deviceImage: imageUrl } };
-          dispatch(devicesActions.update([updatedDevice]));
-        } catch (error) {
-          console.error('Error uploading device image:', error);
-        }
-      }
-      
       queryClient.invalidateQueries(['devices']);
       dispatch(devicesActions.update([data]));
       setEditDialog(false);
@@ -296,44 +279,25 @@ const FloatingDevicesPopover = ({
 
   const handleFileInput = useCatch(async (newFile) => {
     setImageFile(newFile);
-    if (newFile) {
-      if (editingDevice?.id) {
-        // For existing devices, upload immediately
-        const response = await fetchOrThrow(`/api/devices/${editingDevice.id}/image`, {
-          method: 'POST',
-          body: newFile,
-        });
-        setEditingDevice({ 
-          ...editingDevice, 
-          attributes: { 
-            ...editingDevice.attributes, 
-            deviceImage: await response.text() 
-          } 
-        });
-      } else {
-        // For new devices, store the file to upload after creation
-        setEditingDevice({ 
-          ...editingDevice, 
-          imageFile: newFile 
-        });
-      }
-    } else {
-      // Remove image
-      if (editingDevice?.id) {
-        // For existing devices, remove from attributes
-        // eslint-disable-next-line no-unused-vars
-        const { deviceImage, ...remainingAttributes } = editingDevice.attributes || {};
-        setEditingDevice({ 
-          ...editingDevice, 
-          attributes: remainingAttributes 
-        });
-      } else {
-        // For new devices, remove from imageFile
-        setEditingDevice({ 
-          ...editingDevice, 
-          imageFile: null 
-        });
-      }
+    if (newFile && editingDevice?.id) {
+      const response = await fetchOrThrow(`/api/devices/${editingDevice.id}/image`, {
+        method: 'POST',
+        body: newFile,
+      });
+      setEditingDevice({ 
+        ...editingDevice, 
+        attributes: { 
+          ...editingDevice.attributes, 
+          deviceImage: await response.text() 
+        } 
+      });
+    } else if (!newFile) {
+      // eslint-disable-next-line no-unused-vars
+      const { deviceImage, ...remainingAttributes } = editingDevice.attributes || {};
+      setEditingDevice({ 
+        ...editingDevice, 
+        attributes: remainingAttributes 
+      });
     }
   });
 
@@ -961,29 +925,31 @@ const FloatingDevicesPopover = ({
                     {/* Attributes Tab */}
                     {activeTab === 2 && (
                       <div>
-                        <div style={{ marginBottom: '16px' }}>
-                          <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
-                            {t('attributeDeviceImage')}
-                          </Typography>
-                          <MuiFileInput
-                            placeholder={t('attributeDeviceImage')}
-                            value={imageFile}
-                            onChange={handleFileInput}
-                            inputProps={{ accept: 'image/*' }}
-                            style={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': { 
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          />
-                        </div>
+                        {editingDevice?.id && (
+                          <div style={{ marginBottom: '16px' }}>
+                            <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
+                              {t('attributeDeviceImage')}
+                            </Typography>
+                            <MuiFileInput
+                              placeholder={t('attributeDeviceImage')}
+                              value={imageFile}
+                              onChange={handleFileInput}
+                              inputProps={{ accept: 'image/*' }}
+                              style={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                          </div>
+                        )}
                         <EditAttributesAccordion
                           attribute={null}
                           attributes={editingDevice?.attributes || {}}
