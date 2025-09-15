@@ -741,6 +741,13 @@ const FloatingComputedAttributesPopover = ({
                               options={options}
                               getOptionLabel={(option) => typeof option === 'object' ? option.inputValue || option.name : option }
                               renderOption={(props, option) => <li {...props}>{option.name || option}</li>}
+                              ListboxProps={{
+                                style: { 
+                                  zIndex: 10003,
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                }
+                              }}
                               renderInput={(params) => (
                                 <TextField 
                                   {...params} 
@@ -793,6 +800,16 @@ const FloatingComputedAttributesPopover = ({
                                   type: e.target.value
                                 })}
                                 label={t('sharedType')}
+                                MenuProps={{
+                                  style: { zIndex: 10003 },
+                                  PaperProps: {
+                                    style: { 
+                                      zIndex: 10003,
+                                      backgroundColor: colors.surface,
+                                      border: `1px solid ${colors.border}`,
+                                    }
+                                  }
+                                }}
                                 style={{
                                   backgroundColor: colors.secondary,
                                   color: colors.text,
@@ -871,6 +888,13 @@ const FloatingComputedAttributesPopover = ({
                               onChange={(e) => setDeviceId(Number(e.target.value))}
                               endpoint="/api/devices"
                               label={t('sharedDevice')}
+                              ListboxProps={{
+                                style: { 
+                                  zIndex: 10003,
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                }
+                              }}
                               style={{
                                 '& .MuiOutlinedInput-root': {
                                   backgroundColor: colors.secondary,
@@ -891,7 +915,15 @@ const FloatingComputedAttributesPopover = ({
                                 borderColor: colors.primary,
                                 color: colors.primary,
                                 textTransform: 'none',
-                                alignSelf: 'flex-start'
+                                alignSelf: 'flex-start',
+                                '&:hover': {
+                                  borderColor: colors.primary,
+                                  backgroundColor: `${colors.primary}10`,
+                                },
+                                '&:disabled': {
+                                  borderColor: colors.border,
+                                  color: colors.textSecondary,
+                                }
                               }}
                             >
                               {t('sharedTestExpression')}
