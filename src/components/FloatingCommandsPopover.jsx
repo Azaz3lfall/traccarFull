@@ -358,10 +358,49 @@ const FloatingCommandsPopover = ({
             </div>
 
             {/* Commands List */}
-            <div style={{ flex: 1, overflow: 'auto', padding: '0 20px' }}>
+            <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
               {isLoading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-                  <CircularProgress style={{ color: colors.primary }} />
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: colors.surface,
+                  zIndex: 10
+                }}>
+                  <div style={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '120px',
+                    height: '120px',
+                    backgroundColor: colors.surface,
+                    borderRadius: '50%',
+                    boxShadow: `0 4px 12px ${colors.border}20`
+                  }}>
+                    <CircularProgress 
+                      style={{ 
+                        color: theme === 'dark' ? '#ffffff' : '#000000',
+                        position: 'absolute'
+                      }} 
+                      size={100}
+                      thickness={4}
+                    />
+                  </div>
+                  <Typography style={{ 
+                    color: colors.textSecondary, 
+                    lineHeight: 1.2, 
+                    fontSize: '14px',
+                    marginTop: '12px'
+                  }}>
+                    {t('sharedLoading')}...
+                  </Typography>
                 </div>
               ) : error ? (
                 <Alert severity="error" style={{ margin: '20px 0' }}>
@@ -386,7 +425,7 @@ const FloatingCommandsPopover = ({
                   </Typography>
                 </div>
               ) : (
-                <TableContainer style={{ marginTop: '16px' }}>
+                <TableContainer style={{ padding: '0 20px' }}>
                   <Table size="small">
                     <TableHead>
                       <TableRow style={{ backgroundColor: colors.secondary }}>
@@ -455,7 +494,7 @@ const FloatingCommandsPopover = ({
                 <div style={{
                   display: 'flex',
                   justifyContent: 'center',
-                  padding: '20px 0',
+                  padding: '20px',
                   borderTop: `1px solid ${colors.border}`,
                   marginTop: '16px'
                 }}>
