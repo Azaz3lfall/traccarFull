@@ -247,6 +247,8 @@ const MainPage = () => {
   const versionApp = import.meta.env.VITE_APP_VERSION;
   const versionServer = useSelector((state) => state.session.server.version);
   const socket = useSelector((state) => state.session.socket);
+  const logo = useSelector((state) => state.session.server?.attributes?.logo);
+  const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
   
   // Device fields for preferences
   const deviceFields = [
@@ -816,8 +818,6 @@ const MainPage = () => {
                 padding: '0 8px'
               }}>
                 {(() => {
-                  const logo = useSelector((state) => state.session.server?.attributes?.logo);
-                  const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
                   const logoUrl = logo || logoInverted;
                   
                   return logoUrl ? (
