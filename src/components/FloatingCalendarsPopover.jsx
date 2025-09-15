@@ -182,7 +182,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['calendars']);
-      setSnackbar({ open: true, message: t('sharedSaved'), severity: 'success' });
       setEditDialog(false);
       setEditingCalendar(null);
     },
@@ -209,7 +208,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['calendars']);
-      setSnackbar({ open: true, message: t('sharedSaved'), severity: 'success' });
       setEditDialog(false);
       setEditingCalendar(null);
     },
@@ -841,15 +839,31 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               MenuProps={{
                                 PaperProps: {
                                   style: {
-                                    zIndex: 10004,
+                                    zIndex: 10010,
+                                    backgroundColor: colors.background,
+                                    border: `1px solid ${colors.border}`,
                                   },
                                 },
                               }}
                             >
-                              <MenuItem value="simple" style={{ color: colors.text }}>
+                              <MenuItem 
+                                value="simple" 
+                                style={{ 
+                                  color: colors.text,
+                                  backgroundColor: colors.background,
+                                  '&:hover': { backgroundColor: colors.backgroundHover }
+                                }}
+                              >
                                 {t('calendarSimple')}
                               </MenuItem>
-                              <MenuItem value="custom" style={{ color: colors.text }}>
+                              <MenuItem 
+                                value="custom" 
+                                style={{ 
+                                  color: colors.text,
+                                  backgroundColor: colors.background,
+                                  '&:hover': { backgroundColor: colors.backgroundHover }
+                                }}
+                              >
                                 {t('reportCustom')}
                               </MenuItem>
                             </Select>
@@ -932,13 +946,23 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               MenuProps={{
                                 PaperProps: {
                                   style: {
-                                    zIndex: 10004,
+                                    zIndex: 10010,
+                                    backgroundColor: colors.background,
+                                    border: `1px solid ${colors.border}`,
                                   },
                                 },
                               }}
                             >
                               {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
-                                <MenuItem key={frequency} value={frequency} style={{ color: colors.text }}>
+                                <MenuItem 
+                                  key={frequency} 
+                                  value={frequency} 
+                                  style={{ 
+                                    color: colors.text,
+                                    backgroundColor: colors.background,
+                                    '&:hover': { backgroundColor: colors.backgroundHover }
+                                  }}
+                                >
                                   {t(prefixString('calendar', frequency.toLowerCase()))}
                                 </MenuItem>
                               ))}
@@ -957,19 +981,37 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                 MenuProps={{
                                   PaperProps: {
                                     style: {
-                                      zIndex: 10004,
+                                      zIndex: 10010,
+                                      backgroundColor: colors.background,
+                                      border: `1px solid ${colors.border}`,
                                     },
                                   },
                                 }}
                               >
                                 {editingCalendar?.frequency === 'WEEKLY' ? 
                                   ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
-                                    <MenuItem key={day} value={day.substring(0, 2).toUpperCase()} style={{ color: colors.text }}>
+                                    <MenuItem 
+                                      key={day} 
+                                      value={day.substring(0, 2).toUpperCase()} 
+                                      style={{ 
+                                        color: colors.text,
+                                        backgroundColor: colors.background,
+                                        '&:hover': { backgroundColor: colors.backgroundHover }
+                                      }}
+                                    >
                                       {t(prefixString('calendar', day))}
                                     </MenuItem>
                                   )) : 
                                   Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                    <MenuItem key={day} value={String(day)} style={{ color: colors.text }}>
+                                    <MenuItem 
+                                      key={day} 
+                                      value={String(day)} 
+                                      style={{ 
+                                        color: colors.text,
+                                        backgroundColor: colors.background,
+                                        '&:hover': { backgroundColor: colors.backgroundHover }
+                                      }}
+                                    >
                                       {day}
                                     </MenuItem>
                                   ))
