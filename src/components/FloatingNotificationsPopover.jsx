@@ -41,14 +41,12 @@ import {
   Search as SearchIcon,
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
-  Link as LinkIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatBoolean, formatNotificationTitle } from '../common/util/formatter';
 import { useTranslation, useTranslationKeys } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
-import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import SelectField from '../common/components/SelectField';
@@ -75,8 +73,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
-  const [connectionsDialog, setConnectionsDialog] = useState(false);
-  const [selectedNotificationForConnections, setSelectedNotificationForConnections] = useState(null);
   
   // Custom dropdown states
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
@@ -250,12 +246,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
     setAnchorEl(null);
   };
 
-  // Handle notification connections
-  const handleConnections = (notification) => {
-    setSelectedNotificationForConnections(notification);
-    setConnectionsDialog(true);
-    setAnchorEl(null);
-  };
 
   const handleAddNotification = () => {
     setEditingNotification({
@@ -304,13 +294,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
       handler: handleEditNotification,
-      show: !limitNotifications,
-    },
-    {
-      key: 'connections',
-      title: t('sharedConnections'),
-      icon: <LinkIcon fontSize="small" />,
-      handler: handleConnections,
       show: !limitNotifications,
     },
     {
@@ -1259,135 +1242,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
             </DialogActions>
           </Dialog>
 
-          {/* Connections Drawer - Slides in from right */}
-          <AnimatePresence>
-            {connectionsDialog && (
-              <>
-                {/* Backdrop */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    zIndex: 9999,
-                  }}
-                  onClick={() => setConnectionsDialog(false)}
-                />
-                
-                {/* Drawer */}
-                <motion.div
-                  initial={{ x: '100%', opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: '100%', opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  style={{
-                    position: 'fixed',
-                    top: 0,
-                    right: 0,
-                    width: '500px',
-                    height: '100vh',
-                    backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
-                    zIndex: 10000,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Header */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderBottom: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <IconButton
-                        onClick={() => setConnectionsDialog(false)}
-                        size="small"
-                        style={{ color: colors.textSecondary }}
-                      >
-                        <ChevronLeftIcon fontSize="small" />
-                      </IconButton>
-                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                        {t('sharedConnections')} - {selectedNotificationForConnections?.description || selectedNotificationForConnections?.type}
-                      </Typography>
-                    </div>
-                  </div>
-
-                  {/* Drawer Content */}
-                  <div style={{
-                    flex: 1,
-                    overflow: 'auto',
-                    padding: '20px',
-                    paddingBottom: '200px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px'
-                  }}>
-                    {selectedNotificationForConnections && (
-                      <>
-                        <LinkField
-                          endpointAll="/api/devices"
-                          endpointLinked={`/api/devices?notificationId=${selectedNotificationForConnections.id}`}
-                          baseId={selectedNotificationForConnections.id}
-                          keyBase="notificationId"
-                          keyLink="deviceId"
-                          titleGetter={(it) => `${it.name} (${it.uniqueId})`}
-                          label={t('deviceTitle')}
-                          zIndex={50000}
-                        />
-                        <LinkField
-                          endpointAll="/api/users"
-                          endpointLinked={`/api/users?notificationId=${selectedNotificationForConnections.id}`}
-                          baseId={selectedNotificationForConnections.id}
-                          keyBase="notificationId"
-                          keyLink="userId"
-                          titleGetter={(it) => it.name}
-                          label={t('settingsUsers')}
-                          zIndex={50000}
-                        />
-                        <LinkField
-                          endpointAll="/api/groups"
-                          endpointLinked={`/api/groups?notificationId=${selectedNotificationForConnections.id}`}
-                          baseId={selectedNotificationForConnections.id}
-                          keyBase="notificationId"
-                          keyLink="groupId"
-                          label={t('settingsGroups')}
-                          zIndex={50000}
-                        />
-                        <LinkField
-                          endpointAll="/api/geofences"
-                          endpointLinked={`/api/geofences?notificationId=${selectedNotificationForConnections.id}`}
-                          baseId={selectedNotificationForConnections.id}
-                          keyBase="notificationId"
-                          keyLink="geofenceId"
-                          label={t('sharedGeofences')}
-                          zIndex={50000}
-                        />
-                        <LinkField
-                          endpointAll="/api/calendars"
-                          endpointLinked={`/api/calendars?notificationId=${selectedNotificationForConnections.id}`}
-                          baseId={selectedNotificationForConnections.id}
-                          keyBase="notificationId"
-                          keyLink="calendarId"
-                          label={t('sharedCalendars')}
-                          zIndex={50000}
-                        />
-                      </>
-                    )}
-                  </div>
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
