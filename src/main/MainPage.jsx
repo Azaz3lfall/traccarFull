@@ -33,7 +33,6 @@ import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
 import UsersModal from './UsersModal';
-import LogoImage from '../login/LogoImage';
 import { 
   Truck, 
   PieChart, 
@@ -812,9 +811,29 @@ const MainPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '40px',
-                maxWidth: '120px'
+                maxWidth: '120px',
+                overflow: 'hidden',
+                padding: '0 8px'
               }}>
-                <LogoImage color={colors.primary} />
+                {(() => {
+                  const logo = useSelector((state) => state.session.server?.attributes?.logo);
+                  const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
+                  const logoUrl = logo || logoInverted;
+                  
+                  return logoUrl ? (
+                    <img 
+                      src={logoUrl} 
+                      alt="Server Logo" 
+                      style={{ 
+                        maxWidth: '100%',
+                        maxHeight: '32px',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  ) : null;
+                })()}
               </div>
             )}
             {isMenuExpanded ? <ChevronLeft size={18} color={colors.textSecondary} /> : <ChevronRight size={18} color={colors.textSecondary} />}
