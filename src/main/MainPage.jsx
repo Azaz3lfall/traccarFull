@@ -4025,7 +4025,9 @@ const MainPage = () => {
                   {t('sharedPreferences')}
                 </Typography>
                 
-                {/* Map Settings */}
+                {!readonly && (
+                  <>
+                    {/* Map Settings */}
                 <div style={{ marginBottom: '24px' }}>
                   <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
                     {t('mapTitle')}
@@ -4160,6 +4162,446 @@ const MainPage = () => {
                       }
                     }}
                   />
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('mapLiveRoutes')}</InputLabel>
+                    <Select
+                      label={t('mapLiveRoutes')}
+                      value={preferencesAttributes.mapLiveRoutes || 'none'}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapLiveRoutes: e.target.value })}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      <MenuItem value="none">{t('sharedDisabled')}</MenuItem>
+                      <MenuItem value="selected">{t('deviceSelected')}</MenuItem>
+                      <MenuItem value="all">{t('notificationAlways')}</MenuItem>
+                    </Select>
+                  </FormControl>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('mapDirection')}</InputLabel>
+                    <Select
+                      label={t('mapDirection')}
+                      value={preferencesAttributes.mapDirection || 'selected'}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapDirection: e.target.value })}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      <MenuItem value="none">{t('sharedDisabled')}</MenuItem>
+                      <MenuItem value="selected">{t('deviceSelected')}</MenuItem>
+                      <MenuItem value="all">{t('notificationAlways')}</MenuItem>
+                    </Select>
+                  </FormControl>
+                  
+                  <FormGroup style={{ marginTop: '16px' }}>
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={preferencesAttributes.hasOwnProperty('mapGeofences') ? preferencesAttributes.mapGeofences : true}
+                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapGeofences: e.target.checked })}
+                          sx={{
+                            color: colors.primary,
+                            '&.Mui-checked': {
+                              color: colors.primary,
+                            },
+                          }}
+                        />
+                      )}
+                      label={t('attributeShowGeofences')}
+                      style={{ color: colors.text }}
+                    />
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={preferencesAttributes.hasOwnProperty('mapFollow') ? preferencesAttributes.mapFollow : false}
+                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapFollow: e.target.checked })}
+                          sx={{
+                            color: colors.primary,
+                            '&.Mui-checked': {
+                              color: colors.primary,
+                            },
+                          }}
+                        />
+                      )}
+                      label={t('deviceFollow')}
+                      style={{ color: colors.text }}
+                    />
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={preferencesAttributes.hasOwnProperty('mapCluster') ? preferencesAttributes.mapCluster : true}
+                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapCluster: e.target.checked })}
+                          sx={{
+                            color: colors.primary,
+                            '&.Mui-checked': {
+                              color: colors.primary,
+                            },
+                          }}
+                        />
+                      )}
+                      label={t('mapClustering')}
+                      style={{ color: colors.text }}
+                    />
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          checked={preferencesAttributes.hasOwnProperty('mapOnSelect') ? preferencesAttributes.mapOnSelect : true}
+                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapOnSelect: e.target.checked })}
+                          sx={{
+                            color: colors.primary,
+                            '&.Mui-checked': {
+                              color: colors.primary,
+                            },
+                          }}
+                        />
+                      )}
+                      label={t('mapOnSelect')}
+                      style={{ color: colors.text }}
+                    />
+                  </FormGroup>
+                </div>
+
+                {/* Device Settings */}
+                <div style={{ marginBottom: '24px' }}>
+                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                    {t('deviceTitle')}
+                  </Typography>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('devicePrimaryInfo')}</InputLabel>
+                    <Select
+                      label={t('devicePrimaryInfo')}
+                      value={preferencesAttributes.devicePrimary || 'name'}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, devicePrimary: e.target.value })}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      {deviceFields.map((field) => (
+                        <MenuItem key={field.id} value={field.id}>
+                          {t(field.name)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('deviceSecondaryInfo')}</InputLabel>
+                    <Select
+                      label={t('deviceSecondaryInfo')}
+                      value={preferencesAttributes.deviceSecondary || ''}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, deviceSecondary: e.target.value })}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      <MenuItem value="">{'\u00a0'}</MenuItem>
+                      {deviceFields.map((field) => (
+                        <MenuItem key={field.id} value={field.id}>
+                          {t(field.name)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                {/* Sound Settings */}
+                <div style={{ marginBottom: '24px' }}>
+                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                    {t('sharedSound')}
+                  </Typography>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('eventsSoundEvents')}</InputLabel>
+                    <Select
+                      label={t('eventsSoundEvents')}
+                      value={preferencesAttributes.soundEvents?.split(',') || []}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundEvents: e.target.value.join(',') })}
+                      multiple
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      {/* Event types would be loaded from API */}
+                    </Select>
+                  </FormControl>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('eventsSoundAlarms')}</InputLabel>
+                    <Select
+                      label={t('eventsSoundAlarms')}
+                      value={preferencesAttributes.soundAlarms?.split(',') || ['sos']}
+                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundAlarms: e.target.value.join(',') })}
+                      multiple
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      {alarms.map((alarm) => (
+                        <MenuItem key={alarm.key} value={alarm.key}>
+                          {alarm.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+                  </>
+                )}
+
+                {/* User Token */}
+                <div style={{ marginBottom: '24px' }}>
+                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                    {t('userToken')}
+                  </Typography>
+                  
+                  <TextField
+                    fullWidth
+                    label={t('userExpirationTime')}
+                    type="date"
+                    value={tokenExpiration}
+                    onChange={(e) => {
+                      setTokenExpiration(e.target.value);
+                      setToken(null);
+                    }}
+                    margin="normal"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+                  
+                  <FormControl fullWidth margin="normal">
+                    <OutlinedInput
+                      multiline
+                      rows={6}
+                      readOnly
+                      type="text"
+                      value={token || ''}
+                      endAdornment={(
+                        <InputAdornment position="end">
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <IconButton size="small" edge="end" onClick={generateToken} disabled={!!token}>
+                              <CachedIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" edge="end" onClick={() => navigator.clipboard.writeText(token)} disabled={!token}>
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </div>
+                        </InputAdornment>
+                      )}
+                      sx={{
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      }}
+                    />
+                  </FormControl>
+                </div>
+
+                {!readonly && (
+                  <>
+                    {/* System Info */}
+                <div style={{ marginBottom: '24px' }}>
+                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                    {t('sharedInfoTitle')}
+                  </Typography>
+                  
+                  <TextField
+                    fullWidth
+                    value={versionApp}
+                    label={t('settingsAppVersion')}
+                    disabled
+                    margin="normal"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: colors.textSecondary,
+                      },
+                    }}
+                  />
+                  
+                  <TextField
+                    fullWidth
+                    value={versionServer || '-'}
+                    label={t('settingsServerVersion')}
+                    disabled
+                    margin="normal"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: colors.textSecondary,
+                      },
+                    }}
+                  />
+                  
+                  <TextField
+                    fullWidth
+                    value={socket ? t('deviceStatusOnline') : t('deviceStatusOffline')}
+                    label={t('settingsConnection')}
+                    disabled
+                    margin="normal"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: colors.textSecondary,
+                      },
+                    }}
+                  />
+                  
+                  <Button
+                    variant="outlined"
+                    onClick={() => window.location.href = '/emulator'}
+                    style={{
+                      borderColor: colors.border,
+                      color: colors.text,
+                      marginTop: '16px',
+                    }}
+                  >
+                    {t('sharedEmulator')}
+                  </Button>
+                  
+                  {admin && (
+                    <Button
+                      variant="outlined"
+                      onClick={handleReboot}
+                      style={{
+                        borderColor: '#f44336',
+                        color: '#f44336',
+                        marginTop: '16px',
+                        marginLeft: '12px',
+                      }}
+                    >
+                      {t('serverReboot')}
+                    </Button>
+                  )}
                 </div>
                 
                 {/* Action Buttons */}
@@ -4192,6 +4634,8 @@ const MainPage = () => {
                     {t('sharedSave')}
                   </Button>
                 </div>
+                  </>
+                )}
               </div>
             </motion.div>
           </>
