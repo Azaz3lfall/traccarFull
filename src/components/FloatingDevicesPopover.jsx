@@ -231,27 +231,14 @@ const FloatingDevicesPopover = ({
     }
 
 
-    const deviceData = {
-      name: editingDevice.name,
-      uniqueId: editingDevice.uniqueId,
-      groupId: editingDevice.groupId || null,
-      phone: editingDevice.phone || null,
-      model: editingDevice.model || null,
-      contact: editingDevice.contact || null,
-      category: editingDevice.category || 'default',
-      calendarId: editingDevice.calendarId || null,
-      expirationTime: editingDevice.expirationTime || null,
-      disabled: editingDevice.disabled || false,
-      attributes: editingDevice.attributes || {},
-    };
-
+    console.log('Saving device:', editingDevice);
 
     if (editingDevice.id) {
       console.log('Updating existing device with ID:', editingDevice.id);
-      updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: deviceData });
+      updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: editingDevice });
     } else {
       console.log('Creating new device');
-      createDeviceMutation.mutate(deviceData);
+      createDeviceMutation.mutate(editingDevice);
     }
   };
 
