@@ -1053,33 +1053,10 @@ const FloatingComputedAttributesPopover = ({
                               onClick={testAttribute}
                               disabled={!deviceId}
                               style={{
-                                borderColor: colors.primary,
-                                color: colors.primary,
+                                borderColor: colors.border,
+                                color: colors.text,
                                 textTransform: 'none',
                                 alignSelf: 'flex-start',
-                                fontSize: '12px',
-                                fontWeight: '500',
-                                padding: '8px 16px',
-                                minHeight: '36px',
-                                borderRadius: '6px',
-                                borderWidth: '1px',
-                                borderStyle: 'solid',
-                              }}
-                              sx={{
-                                '&:hover': {
-                                  borderColor: colors.primary,
-                                  backgroundColor: `${colors.primary}10`,
-                                  color: colors.primary,
-                                },
-                                '&:disabled': {
-                                  borderColor: colors.border,
-                                  color: colors.textSecondary,
-                                  backgroundColor: 'transparent',
-                                },
-                                '&:focus': {
-                                  outline: `2px solid ${colors.primary}30`,
-                                  outlineOffset: '2px',
-                                },
                               }}
                             >
                               {t('sharedTestExpression')}
