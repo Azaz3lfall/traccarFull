@@ -61,8 +61,6 @@ const FloatingDevicesPopover = ({
   isVisible, 
   onClose 
 }) => {
-  console.log('=== FloatingDevicesPopover RENDER ===');
-  console.log('Props:', { desktop, isMenuExpanded, isVisible, onClose });
   
   const t = useTranslation();
   const colors = useThemeColors();
@@ -88,17 +86,13 @@ const FloatingDevicesPopover = ({
   const [activeTab, setActiveTab] = useState(0);
   const [imageFile, setImageFile] = useState(null);
 
-  console.log('FloatingDevicesPopover state:', { editDialog, isVisible });
 
   // Fetch devices with TanStack Query
-  console.log('=== TEST: Before useQuery ===');
   const { data: devices = [], isLoading, error } = useQuery({
     queryKey: ['devices'],
     queryFn: async () => {
-      console.log('=== TEST: Inside queryFn ===');
       const response = await fetchOrThrow('/api/devices');
       const data = await response.json();
-      console.log('=== TEST: Fetched devices ===', data);
       return data;
     },
     enabled: isVisible,
@@ -124,7 +118,6 @@ const FloatingDevicesPopover = ({
     enabled: isVisible,
   });
 
-  console.log('=== TEST: After useQuery ===', { devices, isLoading, error });
 
   // Filter devices based on search keyword
   const filteredDevices = devices.filter(device =>
@@ -142,18 +135,15 @@ const FloatingDevicesPopover = ({
   // Create device mutation
   const createDeviceMutation = useMutation({
     mutationFn: async (deviceData) => {
-      console.log('Creating device with data:', deviceData);
       const response = await fetchOrThrow('/api/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deviceData),
       });
       const result = await response.json();
-      console.log('Create device response:', result);
       return result;
     },
     onSuccess: (data) => {
-      console.log('Device created successfully:', data);
       queryClient.invalidateQueries(['devices']);
       setEditDialog(false);
       setEditingDevice(null);
@@ -167,18 +157,15 @@ const FloatingDevicesPopover = ({
   // Update device mutation
   const updateDeviceMutation = useMutation({
     mutationFn: async ({ id, ...deviceData }) => {
-      console.log('Updating device with ID:', id, 'and data:', deviceData);
       const response = await fetchOrThrow(`/api/devices/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deviceData),
       });
       const result = await response.json();
-      console.log('Update device response:', result);
       return result;
     },
     onSuccess: (data) => {
-      console.log('Device updated successfully:', data);
       queryClient.invalidateQueries(['devices']);
       setEditDialog(false);
       setEditingDevice(null);
@@ -208,17 +195,14 @@ const FloatingDevicesPopover = ({
 
   const handleSaveDevice = () => {
     if (!editingDevice) {
-      console.log('No editing device found');
       return;
     }
 
     // Basic validation
     if (!editingDevice.name || !editingDevice.uniqueId) {
-      console.log('Missing required fields:', { name: editingDevice.name, uniqueId: editingDevice.uniqueId });
       return;
     }
 
-    console.log('Saving device:', editingDevice);
 
     const deviceData = {
       name: editingDevice.name,
@@ -234,13 +218,10 @@ const FloatingDevicesPopover = ({
       attributes: editingDevice.attributes || {},
     };
 
-    console.log('Device data to save:', deviceData);
 
     if (editingDevice.id) {
-      console.log('Updating existing device with ID:', editingDevice.id);
       updateDeviceMutation.mutate({ id: editingDevice.id, ...deviceData });
     } else {
-      console.log('Creating new device');
       createDeviceMutation.mutate(deviceData);
     }
   };
@@ -311,14 +292,14 @@ const FloatingDevicesPopover = ({
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
       handler: handleEditDevice,
-      show: true,
+      show: !limitDevices,
     },
     {
       key: 'delete',
-      title: t('sharedDelete'),
+      title: t('sharedRemove'),
       icon: <DeleteIcon fontSize="small" />,
       handler: handleDeleteClick,
-      show: true,
+      show: !limitDevices,
     },
   ];
 
@@ -371,7 +352,7 @@ const FloatingDevicesPopover = ({
                   <ChevronLeftIcon fontSize="small" />
                 </IconButton>
                 <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                  {t('settingsDevices')}
+                  {t('deviceTitle')}
                 </Typography>
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -379,6 +360,7 @@ const FloatingDevicesPopover = ({
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={handleAddDevice}
+                  disabled={limitDevices}
                   size="small"
                   style={{
                     backgroundColor: colors.primary,
@@ -981,7 +963,6 @@ const FloatingDevicesPopover = ({
                     </Button>
                     <Button
                       onClick={() => {
-                        console.log('Save button clicked!');
                         handleSaveDevice();
                       }}
                       variant="contained"
