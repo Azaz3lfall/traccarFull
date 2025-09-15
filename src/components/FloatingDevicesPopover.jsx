@@ -156,23 +156,45 @@ const FloatingDevicesPopover = ({
 
   // Update device mutation
   const updateDeviceMutation = useMutation({
-    mutationFn: async ({ id, ...deviceData }) => {
-      const response = await fetchOrThrow(`/api/devices/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(deviceData),
-      });
-      const result = await response.json();
-      return result;
+    mutationFn: async ({ id, deviceData }) => {
+      console.log('=== UPDATE DEVICE DEBUG ===');
+      console.log('Device ID:', id);
+      console.log('Device data to update:', deviceData);
+      console.log('API URL:', `/api/devices/${id}`);
+      
+      try {
+        const response = await fetchOrThrow(`/api/devices/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(deviceData),
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          throw new Error(`API Error: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Update device response:', result);
+        return result;
+      } catch (error) {
+        console.error('Update device fetch error:', error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
+      console.log('Device updated successfully:', data);
       queryClient.invalidateQueries(['devices']);
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
     },
     onError: (error) => {
-      console.error('Update device error:', error);
+      console.error('Update device mutation error:', error);
     },
   });
 
@@ -220,8 +242,10 @@ const FloatingDevicesPopover = ({
 
 
     if (editingDevice.id) {
-      updateDeviceMutation.mutate({ id: editingDevice.id, ...deviceData });
+      console.log('Updating existing device with ID:', editingDevice.id);
+      updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: deviceData });
     } else {
+      console.log('Creating new device');
       createDeviceMutation.mutate(deviceData);
     }
   };
