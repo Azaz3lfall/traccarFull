@@ -61,6 +61,13 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import dayjs from 'dayjs';
+import useUserAttributes from '../common/attributes/useUserAttributes';
+import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
+import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
+import useServerAttributes from '../common/attributes/useServerAttributes';
+import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
+import SelectField from '../common/components/SelectField';
+import { prefixString } from '../common/util/stringUtils';
 
 const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
@@ -82,6 +89,12 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [editingCalendar, setEditingCalendar] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  // Attributes hooks
+  const userAttributes = useUserAttributes();
+  const commonUserAttributes = useCommonUserAttributes();
+  const commonDeviceAttributes = useCommonDeviceAttributes();
+  const serverAttributes = useServerAttributes();
 
   console.log('FloatingCalendarsPopover state:', { editDialog, isVisible });
 
@@ -123,7 +136,16 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       icon: <EditIcon fontSize="small" />,
       handler: (calendar) => {
         setSelectedCalendar(calendar);
-        setEditingCalendar({ ...calendar });
+        const rule = getCalendarRule(calendar);
+        const times = getCalendarTimes(calendar);
+        setEditingCalendar({ 
+          ...calendar, 
+          frequency: rule.frequency,
+          by: rule.by,
+          startTime: times.start.format('YYYY-MM-DDTHH:mm'),
+          endTime: times.end.format('YYYY-MM-DDTHH:mm'),
+          attributes: calendar.attributes || {}
+        });
         setEditDialog(true);
         setActiveTab(0);
         setAnchorEl(null);
@@ -204,10 +226,37 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const handleSaveCalendar = () => {
     if (!editingCalendar) return;
 
+    // Generate iCal data for simple calendars
+    let calendarData = editingCalendar;
+    if (editingCalendar.type === 'simple') {
+      const startTime = dayjs(editingCalendar.startTime);
+      const endTime = dayjs(editingCalendar.endTime);
+      const rule = { frequency: editingCalendar.frequency, by: editingCalendar.by };
+      
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Traccar//NONSGML Traccar//EN',
+        'BEGIN:VEVENT',
+        'UID:00000000-0000-0000-0000-000000000000',
+        `DTSTART;${formatCalendarTime(startTime)}`,
+        `DTEND;${formatCalendarTime(endTime)}`,
+        formatRule(rule),
+        'SUMMARY:Event',
+        'END:VEVENT',
+        'END:VCALENDAR',
+      ];
+      
+      calendarData = {
+        ...editingCalendar,
+        data: window.btoa(lines.join('\n'))
+      };
+    }
+
     if (editingCalendar.id) {
-      updateCalendarMutation.mutate(editingCalendar);
+      updateCalendarMutation.mutate(calendarData);
     } else {
-      createCalendarMutation.mutate(editingCalendar);
+      createCalendarMutation.mutate(calendarData);
     }
   };
 
@@ -220,8 +269,13 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const handleAddCalendar = () => {
     setEditingCalendar({
       name: '',
-      data: '',
+      data: simpleCalendar(),
       type: 'simple',
+      frequency: 'ONCE',
+      by: null,
+      startTime: dayjs().format('YYYY-MM-DDTHH:mm'),
+      endTime: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm'),
+      attributes: {},
     });
     setEditDialog(true);
     setActiveTab(0);
@@ -273,24 +327,38 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     'END:VCALENDAR',
   ].join('\n'));
 
-  // Get calendar type and parsed data
-  const getCalendarType = (calendar) => {
-    if (!calendar?.data) return 'custom';
-    const decoded = window.atob(calendar.data);
-    return decoded.indexOf('//Traccar//') > 0 ? 'simple' : 'custom';
-  };
-
-  const getCalendarData = (calendar) => {
+  // Get calendar data and rule for editing
+  const getCalendarLines = (calendar) => {
     if (!calendar?.data) return null;
     const decoded = window.atob(calendar.data);
     return decoded.split('\n');
   };
 
   const getCalendarRule = (calendar) => {
-    const lines = getCalendarData(calendar);
-    if (!lines) return { frequency: 'ONCE' };
+    const lines = getCalendarLines(calendar);
+    if (!lines) return { frequency: 'ONCE', by: null };
     const ruleLine = lines.find(line => line.startsWith('RRULE:'));
-    return ruleLine ? parseRule(ruleLine) : { frequency: 'ONCE' };
+    return ruleLine ? parseRule(ruleLine) : { frequency: 'ONCE', by: null };
+  };
+
+  const getCalendarTimes = (calendar) => {
+    const lines = getCalendarLines(calendar);
+    if (!lines) return { start: dayjs(), end: dayjs().add(1, 'hour') };
+    
+    const startLine = lines.find(line => line.startsWith('DTSTART;'));
+    const endLine = lines.find(line => line.startsWith('DTEND;'));
+    
+    const start = startLine ? dayjs(startLine.split(':')[1], 'YYYYMMDDTHHmmss') : dayjs();
+    const end = endLine ? dayjs(endLine.split(':')[1], 'YYYYMMDDTHHmmss') : dayjs().add(1, 'hour');
+    
+    return { start, end };
+  };
+
+  // Get calendar type and parsed data
+  const getCalendarType = (calendar) => {
+    if (!calendar?.data) return 'custom';
+    const decoded = window.atob(calendar.data);
+    return decoded.indexOf('//Traccar//') > 0 ? 'simple' : 'custom';
   };
 
   if (!isVisible) return null;
@@ -709,6 +777,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                     >
                       <Tab label={t('sharedRequired')} />
                       <Tab label={t('calendarRecurrence')} />
+                      <Tab label={t('sharedAttributes')} />
                     </Tabs>
 
                     {/* Tab Content */}
@@ -837,7 +906,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             <InputLabel>{t('calendarRecurrence')}</InputLabel>
                             <Select
                               value={editingCalendar?.frequency || 'ONCE'}
-                              onChange={(e) => setEditingCalendar({ ...editingCalendar, frequency: e.target.value })}
+                              onChange={(e) => setEditingCalendar({ ...editingCalendar, frequency: e.target.value, by: null })}
                               label={t('calendarRecurrence')}
                               MenuProps={{
                                 PaperProps: {
@@ -849,11 +918,57 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             >
                               {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
                                 <MenuItem key={frequency} value={frequency} style={{ color: colors.text }}>
-                                  {t(`calendar${frequency.toLowerCase()}`)}
+                                  {t(prefixString('calendar', frequency.toLowerCase()))}
                                 </MenuItem>
                               ))}
                             </Select>
                           </FormControl>
+
+                          {/* Conditional Days Selection */}
+                          {['WEEKLY', 'MONTHLY'].includes(editingCalendar?.frequency) && (
+                            <FormControl fullWidth size="small">
+                              <InputLabel>{t('calendarDays')}</InputLabel>
+                              <Select
+                                multiple
+                                label={t('calendarDays')}
+                                value={editingCalendar?.by || []}
+                                onChange={(e) => setEditingCalendar({ ...editingCalendar, by: e.target.value })}
+                                MenuProps={{
+                                  PaperProps: {
+                                    style: {
+                                      zIndex: 10004,
+                                    },
+                                  },
+                                }}
+                              >
+                                {editingCalendar?.frequency === 'WEEKLY' ? 
+                                  ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
+                                    <MenuItem key={day} value={day.substring(0, 2).toUpperCase()} style={{ color: colors.text }}>
+                                      {t(prefixString('calendar', day))}
+                                    </MenuItem>
+                                  )) : 
+                                  Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                    <MenuItem key={day} value={String(day)} style={{ color: colors.text }}>
+                                      {day}
+                                    </MenuItem>
+                                  ))
+                                }
+                              </Select>
+                            </FormControl>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Attributes Tab */}
+                      {activeTab === 2 && (
+                        <div>
+                          <EditAttributesAccordion
+                            attribute={null}
+                            attributes={editingCalendar?.attributes || {}}
+                            setAttributes={(attributes) => setEditingCalendar({ ...editingCalendar, attributes })}
+                            definitions={{ ...commonUserAttributes, ...commonDeviceAttributes, ...serverAttributes }}
+                            focusAttribute={null}
+                          />
                         </div>
                       )}
                     </Box>
