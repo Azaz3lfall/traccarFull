@@ -794,9 +794,10 @@ const FloatingDevicesPopover = ({
                               style={{
                                 padding: '8px 12px',
                                 cursor: 'pointer',
-                                color: colors.text,
+                                color: colors.textSecondary,
                                 fontSize: '14px',
                                 borderBottom: `1px solid ${colors.border}`,
+                                fontStyle: 'italic',
                               }}
                               onMouseDown={(e) => {
                                 e.preventDefault();
@@ -804,7 +805,7 @@ const FloatingDevicesPopover = ({
                                 setGroupDropdownOpen(false);
                               }}
                             >
-                              {t('sharedNone')}
+                              -
                             </div>
                             {groups.map((group) => (
                               <div
@@ -984,9 +985,10 @@ const FloatingDevicesPopover = ({
                               style={{
                                 padding: '8px 12px',
                                 cursor: 'pointer',
-                                color: colors.text,
+                                color: colors.textSecondary,
                                 fontSize: '14px',
                                 borderBottom: `1px solid ${colors.border}`,
+                                fontStyle: 'italic',
                               }}
                               onMouseDown={(e) => {
                                 e.preventDefault();
@@ -994,7 +996,7 @@ const FloatingDevicesPopover = ({
                                 setCalendarDropdownOpen(false);
                               }}
                             >
-                              {t('sharedNone')}
+                              -
                             </div>
                             {calendars.map((calendar) => (
                               <div
