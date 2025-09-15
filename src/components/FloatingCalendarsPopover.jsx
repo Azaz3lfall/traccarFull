@@ -91,10 +91,10 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   // Attributes hooks
-  const userAttributes = useUserAttributes();
-  const commonUserAttributes = useCommonUserAttributes();
-  const commonDeviceAttributes = useCommonDeviceAttributes();
-  const serverAttributes = useServerAttributes();
+  const userAttributes = useUserAttributes(t);
+  const commonUserAttributes = useCommonUserAttributes(t);
+  const commonDeviceAttributes = useCommonDeviceAttributes(t);
+  const serverAttributes = useServerAttributes(t);
 
   console.log('FloatingCalendarsPopover state:', { editDialog, isVisible });
 
