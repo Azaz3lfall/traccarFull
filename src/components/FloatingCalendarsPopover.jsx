@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -19,12 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Switch,
-  FormControlLabel,
-  Chip,
-  Avatar,
   Typography,
-  InputAdornment,
   CircularProgress,
   Pagination,
   Tabs,
@@ -33,8 +26,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Checkbox,
-  FormGroup,
+  Chip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -42,40 +34,23 @@ import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Login as LoginIcon,
-  Link as LinkIcon,
-  Person as PersonIcon,
-  AdminPanelSettings as AdminIcon,
-  Block as BlockIcon,
-  CheckCircle as CheckIcon,
-  Close as CloseIcon,
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
-  CalendarToday as CalendarIcon,
-  PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
-import { useCatch } from '../reactHelper';
-import { formatBoolean } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
-import fetchOrThrow from '../common/util/fetchOrThrow';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import dayjs from 'dayjs';
-import useUserAttributes from '../common/attributes/useUserAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useServerAttributes from '../common/attributes/useServerAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
-import SelectField from '../common/components/SelectField';
 import { prefixString } from '../common/util/stringUtils';
 
 const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
-  const theme = useTheme();
   const t = useTranslation();
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   // State management
   const [page, setPage] = useState(1);
@@ -91,7 +66,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   // Attributes hooks
-  const userAttributes = useUserAttributes(t);
   const commonUserAttributes = useCommonUserAttributes(t);
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const serverAttributes = useServerAttributes(t);
@@ -330,7 +304,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     }
   };
 
-  const updateCalendar = (lines, index, element) => window.btoa(lines.map((e, i) => (i !== index ? e : element)).join('\n'));
 
   const simpleCalendar = () => window.btoa([
     'BEGIN:VCALENDAR',
@@ -516,37 +489,46 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                 <TableContainer style={{ padding: '0 20px' }}>
                   <Table size="small">
                     <TableHead>
-                      <TableRow>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', borderBottom: `1px solid ${colors.border}` }}>
+                      <TableRow style={{ backgroundColor: colors.surface }}>
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedName')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', borderBottom: `1px solid ${colors.border}` }}>
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedType')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', borderBottom: `1px solid ${colors.border}` }}>
+                        <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {paginatedCalendars.map((calendar) => (
-                        <TableRow key={calendar.id} hover>
-                          <TableCell style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
-                            {calendar.name}
+                      {paginatedCalendars.map((calendar, index) => (
+                        <TableRow 
+                          key={calendar.id} 
+                          hover
+                          style={{ 
+                            backgroundColor: index % 2 === 0 ? colors.surface : colors.background
+                          }}
+                          sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
+                        >
+                          <TableCell>
+                            <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
+                              {calendar.name}
+                            </Typography>
                           </TableCell>
-                          <TableCell style={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>
+                          <TableCell>
                             <Chip
                               label={getCalendarType(calendar) === 'simple' ? t('calendarSimple') : t('reportCustom')}
                               size="small"
                               style={{
-                                backgroundColor: getCalendarType(calendar) === 'simple' ? `${colors.primary}15` : `${colors.secondary}15`,
-                                color: getCalendarType(calendar) === 'simple' ? colors.primary : colors.textSecondary,
-                                fontSize: '11px',
-                                height: '24px',
+                                backgroundColor: getCalendarType(calendar) === 'simple' ? colors.primary : colors.surface,
+                                color: getCalendarType(calendar) === 'simple' ? colors.text : colors.textSecondary,
+                                fontSize: '10px',
+                                height: '16px',
                               }}
                             />
                           </TableCell>
-                          <TableCell style={{ borderBottom: `1px solid ${colors.border}` }}>
+                          <TableCell align="center">
                             <IconButton
                               onClick={(e) => {
                                 setSelectedCalendar(calendar);
@@ -846,24 +828,10 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                 },
                               }}
                             >
-                              <MenuItem 
-                                value="simple" 
-                                style={{ 
-                                  color: colors.text,
-                                  backgroundColor: colors.background,
-                                  '&:hover': { backgroundColor: colors.backgroundHover }
-                                }}
-                              >
+                              <MenuItem value="simple" style={{ color: colors.text }}>
                                 {t('calendarSimple')}
                               </MenuItem>
-                              <MenuItem 
-                                value="custom" 
-                                style={{ 
-                                  color: colors.text,
-                                  backgroundColor: colors.background,
-                                  '&:hover': { backgroundColor: colors.backgroundHover }
-                                }}
-                              >
+                              <MenuItem value="custom" style={{ color: colors.text }}>
                                 {t('reportCustom')}
                               </MenuItem>
                             </Select>
@@ -954,15 +922,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               }}
                             >
                               {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
-                                <MenuItem 
-                                  key={frequency} 
-                                  value={frequency} 
-                                  style={{ 
-                                    color: colors.text,
-                                    backgroundColor: colors.background,
-                                    '&:hover': { backgroundColor: colors.backgroundHover }
-                                  }}
-                                >
+                                <MenuItem key={frequency} value={frequency} style={{ color: colors.text }}>
                                   {t(prefixString('calendar', frequency.toLowerCase()))}
                                 </MenuItem>
                               ))}
@@ -990,28 +950,12 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               >
                                 {editingCalendar?.frequency === 'WEEKLY' ? 
                                   ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => (
-                                    <MenuItem 
-                                      key={day} 
-                                      value={day.substring(0, 2).toUpperCase()} 
-                                      style={{ 
-                                        color: colors.text,
-                                        backgroundColor: colors.background,
-                                        '&:hover': { backgroundColor: colors.backgroundHover }
-                                      }}
-                                    >
+                                    <MenuItem key={day} value={day.substring(0, 2).toUpperCase()} style={{ color: colors.text }}>
                                       {t(prefixString('calendar', day))}
                                     </MenuItem>
                                   )) : 
                                   Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                    <MenuItem 
-                                      key={day} 
-                                      value={String(day)} 
-                                      style={{ 
-                                        color: colors.text,
-                                        backgroundColor: colors.background,
-                                        '&:hover': { backgroundColor: colors.backgroundHover }
-                                      }}
-                                    >
+                                    <MenuItem key={day} value={String(day)} style={{ color: colors.text }}>
                                       {day}
                                     </MenuItem>
                                   ))
@@ -1029,8 +973,9 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             attribute={null}
                             attributes={editingCalendar?.attributes || {}}
                             setAttributes={(attributes) => setEditingCalendar({ ...editingCalendar, attributes })}
-                            definitions={{ ...commonUserAttributes, ...commonDeviceAttributes, ...serverAttributes }}
+                            definitions={{}}
                             focusAttribute={null}
+                            zIndex={10003}
                           />
                         </div>
                       )}
