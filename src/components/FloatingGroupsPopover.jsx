@@ -276,7 +276,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
         <div style={{
           backgroundColor: colors.surface,
           border: `1px solid ${colors.border}`,
-          borderRadius: '12px',
+          borderRadius: !desktop ? '0px' : '0px 16px 16px 0px',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
