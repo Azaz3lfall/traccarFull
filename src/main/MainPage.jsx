@@ -4334,6 +4334,8 @@ const MainPage = () => {
                     multiple
                     freeSolo
                     disablePortal={false}
+                    openOnFocus
+                    blurOnSelect={false}
                     options={Object.keys(positionAttributes)}
                     getOptionLabel={(option) => {
                       if (typeof option === 'object' && option.inputValue) {
@@ -4379,7 +4381,7 @@ const MainPage = () => {
                       style: {
                         backgroundColor: colors.surface,
                         border: `1px solid ${colors.border}`,
-                        zIndex: 10010,
+                        zIndex: 99999,
                       }
                     }}
                   />
