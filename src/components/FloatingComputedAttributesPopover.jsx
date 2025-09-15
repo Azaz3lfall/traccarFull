@@ -762,6 +762,12 @@ const FloatingComputedAttributesPopover = ({
                           backgroundColor: colors.primary,
                           height: '2px',
                         },
+                        '& .MuiTabs-scrollButtons': {
+                          color: colors.textSecondary,
+                          '&.Mui-disabled': {
+                            color: colors.border,
+                          },
+                        },
                       }}
                     >
                       <Tab label={t('sharedRequired')} />
@@ -1057,14 +1063,29 @@ const FloatingComputedAttributesPopover = ({
                                 color: colors.primary,
                                 textTransform: 'none',
                                 alignSelf: 'flex-start',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                padding: '8px 16px',
+                                minHeight: '36px',
+                                borderRadius: '6px',
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                              }}
+                              sx={{
                                 '&:hover': {
                                   borderColor: colors.primary,
                                   backgroundColor: `${colors.primary}10`,
+                                  color: colors.primary,
                                 },
                                 '&:disabled': {
                                   borderColor: colors.border,
                                   color: colors.textSecondary,
-                                }
+                                  backgroundColor: 'transparent',
+                                },
+                                '&:focus': {
+                                  outline: `2px solid ${colors.primary}30`,
+                                  outlineOffset: '2px',
+                                },
                               }}
                             >
                               {t('sharedTestExpression')}
