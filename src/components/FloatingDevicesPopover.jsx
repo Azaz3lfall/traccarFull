@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -85,6 +85,12 @@ const FloatingDevicesPopover = ({
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
   const [imageFile, setImageFile] = useState(null);
+  const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [calendarDropdownOpen, setCalendarDropdownOpen] = useState(false);
+  const [groupInputRef, setGroupInputRef] = useState(null);
+  const [categoryInputRef, setCategoryInputRef] = useState(null);
+  const [calendarInputRef, setCalendarInputRef] = useState(null);
 
 
   // Fetch devices with TanStack Query
@@ -235,6 +241,25 @@ const FloatingDevicesPopover = ({
     }
   };
 
+  // Click outside handlers for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (groupInputRef && !groupInputRef.contains(event.target)) {
+        setGroupDropdownOpen(false);
+      }
+      if (categoryInputRef && !categoryInputRef.contains(event.target)) {
+        setCategoryDropdownOpen(false);
+      }
+      if (calendarInputRef && !calendarInputRef.contains(event.target)) {
+        setCalendarDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [groupInputRef, categoryInputRef, calendarInputRef]);
 
   const handleAddDevice = () => {
     setEditingDevice({
@@ -730,33 +755,78 @@ const FloatingDevicesPopover = ({
 
                     {activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
-                            {t('groupParent')}
-                          </InputLabel>
-                          <Select
-                            value={editingDevice?.groupId || ''}
-                            onChange={(e) => setEditingDevice({ ...editingDevice, groupId: e.target.value || null })}
-                            label={t('groupParent')}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  borderRadius: '8px',
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                          >
-                            <MenuItem value="">{t('sharedNone')}</MenuItem>
+                        <TextField
+                          fullWidth
+                          label={t('groupParent')}
+                          value={groups.find(g => g.id === editingDevice?.groupId)?.name || ''}
+                          onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
+                          readOnly
+                          size="small"
+                          ref={setGroupInputRef}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        {groupDropdownOpen && (
+                          <div style={{
+                            position: 'fixed',
+                            zIndex: 10004,
+                            maxHeight: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '4px',
+                            backgroundColor: colors.surface,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                            left: groupInputRef?.getBoundingClientRect().left || 0,
+                            top: (groupInputRef?.getBoundingClientRect().bottom || 0) + 4,
+                            width: groupInputRef?.getBoundingClientRect().width || 200,
+                          }}>
+                            <div
+                              style={{
+                                padding: '8px 12px',
+                                cursor: 'pointer',
+                                color: colors.text,
+                                fontSize: '14px',
+                                borderBottom: `1px solid ${colors.border}`,
+                              }}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setEditingDevice({ ...editingDevice, groupId: null });
+                                setGroupDropdownOpen(false);
+                              }}
+                            >
+                              {t('sharedNone')}
+                            </div>
                             {groups.map((group) => (
-                              <MenuItem key={group.id} value={group.id}>
+                              <div
+                                key={group.id}
+                                style={{
+                                  padding: '8px 12px',
+                                  cursor: 'pointer',
+                                  color: colors.text,
+                                  fontSize: '14px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                }}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  setEditingDevice({ ...editingDevice, groupId: group.id });
+                                  setGroupDropdownOpen(false);
+                                }}
+                              >
                                 {group.name}
-                              </MenuItem>
+                              </div>
                             ))}
-                          </Select>
-                        </FormControl>
+                          </div>
+                        )}
 
                         <TextField
                           fullWidth
@@ -818,60 +888,135 @@ const FloatingDevicesPopover = ({
                           }}
                         />
 
-                        <FormControl fullWidth size="small">
-                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
-                            {t('deviceCategory')}
-                          </InputLabel>
-                          <Select
-                            value={editingDevice?.category || 'default'}
-                            onChange={(e) => setEditingDevice({ ...editingDevice, category: e.target.value })}
-                            label={t('deviceCategory')}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  borderRadius: '8px',
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                          >
+                        <TextField
+                          fullWidth
+                          label={t('deviceCategory')}
+                          value={t(`category${(editingDevice?.category || 'default').replace(/^\w/, (c) => c.toUpperCase())}`)}
+                          onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                          readOnly
+                          size="small"
+                          ref={setCategoryInputRef}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        {categoryDropdownOpen && (
+                          <div style={{
+                            position: 'fixed',
+                            zIndex: 10004,
+                            maxHeight: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '4px',
+                            backgroundColor: colors.surface,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                            left: categoryInputRef?.getBoundingClientRect().left || 0,
+                            top: (categoryInputRef?.getBoundingClientRect().bottom || 0) + 4,
+                            width: categoryInputRef?.getBoundingClientRect().width || 200,
+                          }}>
                             {deviceCategories.map((category) => (
-                              <MenuItem key={category} value={category}>
+                              <div
+                                key={category}
+                                style={{
+                                  padding: '8px 12px',
+                                  cursor: 'pointer',
+                                  color: colors.text,
+                                  fontSize: '14px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                }}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  setEditingDevice({ ...editingDevice, category: category });
+                                  setCategoryDropdownOpen(false);
+                                }}
+                              >
                                 {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
-                              </MenuItem>
+                              </div>
                             ))}
-                          </Select>
-                        </FormControl>
+                          </div>
+                        )}
 
-                        <FormControl fullWidth size="small">
-                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
-                            {t('sharedCalendar')}
-                          </InputLabel>
-                          <Select
-                            value={editingDevice?.calendarId || ''}
-                            onChange={(e) => setEditingDevice({ ...editingDevice, calendarId: e.target.value || null })}
-                            label={t('sharedCalendar')}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  borderRadius: '8px',
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                          >
-                            <MenuItem value="">{t('sharedNone')}</MenuItem>
+                        <TextField
+                          fullWidth
+                          label={t('sharedCalendar')}
+                          value={calendars.find(c => c.id === editingDevice?.calendarId)?.name || ''}
+                          onClick={() => setCalendarDropdownOpen(!calendarDropdownOpen)}
+                          readOnly
+                          size="small"
+                          ref={setCalendarInputRef}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        {calendarDropdownOpen && (
+                          <div style={{
+                            position: 'fixed',
+                            zIndex: 10004,
+                            maxHeight: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '4px',
+                            backgroundColor: colors.surface,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                            left: calendarInputRef?.getBoundingClientRect().left || 0,
+                            top: (calendarInputRef?.getBoundingClientRect().bottom || 0) + 4,
+                            width: calendarInputRef?.getBoundingClientRect().width || 200,
+                          }}>
+                            <div
+                              style={{
+                                padding: '8px 12px',
+                                cursor: 'pointer',
+                                color: colors.text,
+                                fontSize: '14px',
+                                borderBottom: `1px solid ${colors.border}`,
+                              }}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setEditingDevice({ ...editingDevice, calendarId: null });
+                                setCalendarDropdownOpen(false);
+                              }}
+                            >
+                              {t('sharedNone')}
+                            </div>
                             {calendars.map((calendar) => (
-                              <MenuItem key={calendar.id} value={calendar.id}>
+                              <div
+                                key={calendar.id}
+                                style={{
+                                  padding: '8px 12px',
+                                  cursor: 'pointer',
+                                  color: colors.text,
+                                  fontSize: '14px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                }}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  setEditingDevice({ ...editingDevice, calendarId: calendar.id });
+                                  setCalendarDropdownOpen(false);
+                                }}
+                              >
                                 {calendar.name}
-                              </MenuItem>
+                              </div>
                             ))}
-                          </Select>
-                        </FormControl>
+                          </div>
+                        )}
 
                         <TextField
                           fullWidth
