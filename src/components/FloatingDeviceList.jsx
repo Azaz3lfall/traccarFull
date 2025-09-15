@@ -216,8 +216,9 @@ const FloatingDeviceList = ({
     return (
       <div style={style}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
           style={{
             cursor: 'pointer',
             transition: 'all 0.2s',
@@ -515,16 +516,7 @@ const FloatingDeviceList = ({
     });
   }, [virtualizer, filteredDevices, colors, forceUpdate]);
 
-  // Debug logging
-  console.log('Virtualizer debug:', {
-    totalSize: virtualizer.getTotalSize(),
-    virtualItems: virtualizer.getVirtualItems().map(item => ({
-      index: item.index,
-      start: item.start,
-      size: item.size,
-      end: item.end
-    }))
-  });
+  // Debug logging removed for performance
   
   return (
     <AnimatePresence mode="wait">
@@ -534,7 +526,7 @@ const FloatingDeviceList = ({
           initial={{ x: -400, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
       style={{
         position: 'fixed',
         top: !desktop ? '0px' : '8px',
@@ -543,7 +535,7 @@ const FloatingDeviceList = ({
         height: !desktop ? '100vh' : 'calc(100vh - 16px)',
         zIndex: 9999,
         pointerEvents: 'auto',
-        transition: 'left 0.3s ease'
+        transition: 'left 0.15s ease'
       }}
     >
       <Card style={{
@@ -628,7 +620,7 @@ const FloatingDeviceList = ({
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.1 }}
               style={{
                 position: 'fixed',
                 top: filterButtonRef.current ? filterButtonRef.current.getBoundingClientRect().bottom + 8 : 0,
@@ -719,7 +711,7 @@ const FloatingDeviceList = ({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.1 }}
                         style={{
                           position: 'absolute',
                           top: '100%',
@@ -835,7 +827,7 @@ const FloatingDeviceList = ({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.1 }}
                         style={{
                           position: 'absolute',
                           top: '100%',
@@ -923,7 +915,7 @@ const FloatingDeviceList = ({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.1 }}
                         style={{
                           position: 'absolute',
                           top: '100%',
