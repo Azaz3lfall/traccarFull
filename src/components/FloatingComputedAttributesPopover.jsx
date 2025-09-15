@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEffectAsync } from '../reactHelper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -32,10 +32,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Autocomplete,
+  Tabs,
+  Tab,
   Snackbar,
   createFilterOptions,
 } from '@mui/material';
@@ -51,7 +49,6 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Functions as FunctionsIcon,
-  ExpandMore as ExpandMoreIcon,
   PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
@@ -107,6 +104,8 @@ const FloatingComputedAttributesPopover = ({
   const [attributeInputValue, setAttributeInputValue] = useState('');
   const [deviceDropdownOpen, setDeviceDropdownOpen] = useState(false);
   const [deviceInputValue, setDeviceInputValue] = useState('');
+  const attributeInputRef = useRef(null);
+  const deviceInputRef = useRef(null);
 
   console.log('FloatingComputedAttributesPopover state:', { editDialog, isVisible });
 
@@ -726,17 +725,55 @@ const FloatingComputedAttributesPopover = ({
                   </div>
 
                   {/* Form */}
-                  <div style={{ flex: 1, padding: '20px', overflow: 'auto' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                      {/* Required Fields */}
-                      <Accordion defaultExpanded>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography variant="subtitle1" style={{ color: colors.text }}>
-                            {t('sharedRequired')}
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
+                    {/* Tabs Navigation */}
+                    <Tabs
+                      value={activeTab}
+                      onChange={(e, newValue) => setActiveTab(newValue)}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      style={{
+                        borderBottom: `1px solid ${colors.border}`,
+                        marginBottom: '16px',
+                      }}
+                      sx={{
+                        '& .MuiTab-root': {
+                          color: colors.textSecondary,
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          textTransform: 'none',
+                          minHeight: '40px',
+                          padding: '8px 16px',
+                          '&.Mui-selected': {
+                            color: colors.primary,
+                            fontWeight: '600',
+                            backgroundColor: 'transparent',
+                          },
+                          '&:hover': {
+                            color: colors.primary,
+                            backgroundColor: `${colors.primary}10`,
+                          },
+                          '&.Mui-selected:hover': {
+                            color: colors.primary,
+                            backgroundColor: `${colors.primary}15`,
+                          },
+                        },
+                        '& .MuiTabs-indicator': {
+                          backgroundColor: colors.primary,
+                          height: '2px',
+                        },
+                      }}
+                    >
+                      <Tab label={t('sharedRequired')} />
+                      <Tab label={t('sharedExtra')} />
+                      <Tab label={t('sharedTest')} />
+                    </Tabs>
+
+                    {/* Tab Content */}
+                    <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
+                      {/* Required Tab */}
+                      {activeTab === 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {/* Description */}
                             <TextField
                               label={t('sharedDescription')}
@@ -761,6 +798,7 @@ const FloatingComputedAttributesPopover = ({
                             {/* Attribute */}
                             <div style={{ position: 'relative' }} data-dropdown>
                               <TextField
+                                ref={attributeInputRef}
                                 label={t('sharedAttribute')}
                                 value={attributeInputValue}
                                 onChange={(e) => {
@@ -786,13 +824,15 @@ const FloatingComputedAttributesPopover = ({
                                   position: 'fixed',
                                   zIndex: 10004,
                                   maxHeight: '200px',
-                                  minWidth: '200px',
                                   overflow: 'auto',
                                   border: `1px solid ${colors.border}`,
                                   borderRadius: '4px',
                                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                                   backgroundColor: colors.surface,
                                   marginTop: '4px',
+                                  width: attributeInputRef.current ? attributeInputRef.current.getBoundingClientRect().width : '100%',
+                                  left: attributeInputRef.current ? attributeInputRef.current.getBoundingClientRect().left + window.scrollX : 0,
+                                  top: attributeInputRef.current ? attributeInputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
                                 }}>
                                   {options
                                     .filter(option => 
@@ -901,56 +941,43 @@ const FloatingComputedAttributesPopover = ({
                                 </MenuItem>
                               </Select>
                             </FormControl>
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
+                        </div>
+                      )}
 
-                      {/* Extra Fields */}
-                      <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography variant="subtitle1" style={{ color: colors.text }}>
-                            {t('sharedExtra')}
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            {/* Priority */}
-                            <TextField
-                              type="number"
-                              value={editingAttribute?.priority || 0}
-                              onChange={(e) => setEditingAttribute({
-                                ...editingAttribute,
-                                priority: Number(e.target.value)
-                              })}
-                              label={t('sharedPriority')}
-                              fullWidth
-                              variant="outlined"
-                              size="small"
-                              style={{
-                                '& .MuiOutlinedInput-root': {
-                                  backgroundColor: colors.secondary,
-                                  '& fieldset': { borderColor: colors.border },
-                                  '&:hover fieldset': { borderColor: colors.primary },
-                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                }
-                              }}
-                            />
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
+                      {/* Extra Tab */}
+                      {activeTab === 1 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          {/* Priority */}
+                          <TextField
+                            type="number"
+                            value={editingAttribute?.priority || 0}
+                            onChange={(e) => setEditingAttribute({
+                              ...editingAttribute,
+                              priority: Number(e.target.value)
+                            })}
+                            label={t('sharedPriority')}
+                            fullWidth
+                            variant="outlined"
+                            size="small"
+                            style={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                              }
+                            }}
+                          />
+                        </div>
+                      )}
 
-                      {/* Test Section */}
-                      <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography variant="subtitle1" style={{ color: colors.text }}>
-                            {t('sharedTest')}
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {/* Test Tab */}
+                      {activeTab === 2 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {/* Device Selection */}
                             <div style={{ position: 'relative' }} data-dropdown>
                               <TextField
+                                ref={deviceInputRef}
                                 label={t('sharedDevice')}
                                 value={deviceInputValue}
                                 onChange={(e) => {
@@ -976,13 +1003,15 @@ const FloatingComputedAttributesPopover = ({
                                   position: 'fixed',
                                   zIndex: 10004,
                                   maxHeight: '200px',
-                                  minWidth: '200px',
                                   overflow: 'auto',
                                   border: `1px solid ${colors.border}`,
                                   borderRadius: '4px',
                                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                                   backgroundColor: colors.surface,
                                   marginTop: '4px',
+                                  width: deviceInputRef.current ? deviceInputRef.current.getBoundingClientRect().width : '100%',
+                                  left: deviceInputRef.current ? deviceInputRef.current.getBoundingClientRect().left + window.scrollX : 0,
+                                  top: deviceInputRef.current ? deviceInputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
                                 }}>
                                   {devices
                                     .filter(device => 
@@ -1040,10 +1069,9 @@ const FloatingComputedAttributesPopover = ({
                             >
                               {t('sharedTestExpression')}
                             </Button>
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
-                    </div>
+                        </div>
+                      )}
+                    </Box>
                   </div>
 
                   {/* Footer */}
