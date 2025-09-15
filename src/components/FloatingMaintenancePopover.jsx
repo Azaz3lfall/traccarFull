@@ -305,6 +305,7 @@ const FloatingMaintenancePopover = ({
               borderBottom: `1px solid ${colors.border}`,
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
               background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -319,6 +320,24 @@ const FloatingMaintenancePopover = ({
                   {t('sharedMaintenance')}
                 </Typography>
               </div>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+                disabled={limitMaintenance}
+                size="small"
+                style={{
+                  backgroundColor: colors.primary,
+                  color: colors.text,
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  textTransform: 'none',
+                  padding: '6px 12px',
+                  minWidth: 'auto',
+                }}
+              >
+                {t('sharedAdd')}
+              </Button>
             </div>
 
             {/* Search and Filters */}
@@ -326,51 +345,25 @@ const FloatingMaintenancePopover = ({
               padding: '16px 20px',
               borderBottom: `1px solid ${colors.border}`,
             }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <TextField
-                  size="small"
-                  placeholder={t('sharedSearch')}
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
-                    style: { color: colors.text }
-                  }}
-                  style={{
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    }
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={() => {
-                    setEditingMaintenance({
-                      name: '',
-                      type: '',
-                      start: 0,
-                      period: 0,
-                      attributes: {}
-                    });
-                    setActiveTab(0);
-                    setEditDialog(true);
-                  }}
-                  disabled={limitMaintenance}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                    textTransform: 'none',
-                    fontWeight: '500',
-                  }}
-                >
-                  {t('sharedAdd')}
-                </Button>
-              </div>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder={t('sharedSearch')}
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
+                  style: { color: colors.text }
+                }}
+                style={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: colors.secondary,
+                    '& fieldset': { borderColor: colors.border },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  }
+                }}
+              />
             </div>
 
             {/* Maintenances List */}
