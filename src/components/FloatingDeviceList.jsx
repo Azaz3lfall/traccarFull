@@ -47,7 +47,6 @@ const FloatingDeviceList = ({
   isMenuExpanded,
   isVisible
 }) => {
-  console.log('FloatingDeviceList rendering', { filteredDevices: filteredDevices?.length });
   
   const dispatch = useDispatch();
   const t = useTranslation();
