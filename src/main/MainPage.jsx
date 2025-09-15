@@ -18,6 +18,7 @@ import FloatingStatusCard from '../components/FloatingStatusCard';
 import FloatingUsersPopover from '../components/FloatingUsersPopover';
 import FloatingCommandsPopover from '../components/FloatingCommandsPopover';
 import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover';
+import FloatingComputedAttributesPopover from '../components/FloatingComputedAttributesPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -155,6 +156,7 @@ const MainPage = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   const [showCommandsPopover, setShowCommandsPopover] = useState(false);
   const [showMaintenancePopover, setShowMaintenancePopover] = useState(false);
+  const [showComputedAttributesPopover, setShowComputedAttributesPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -1412,7 +1414,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-attributes');
               if (tooltip) tooltip.remove();
-              window.location.href = '/settings/attributes';
+              setShowComputedAttributesPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3339,6 +3341,13 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={showMaintenancePopover}
         onClose={() => setShowMaintenancePopover(false)}
+      />
+
+      <FloatingComputedAttributesPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showComputedAttributesPopover}
+        onClose={() => setShowComputedAttributesPopover(false)}
       />
       
       {/* Server Settings Drawer */}
