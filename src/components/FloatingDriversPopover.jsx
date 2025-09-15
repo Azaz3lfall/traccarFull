@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -35,15 +35,11 @@ import {
   LastPage as LastPageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
-import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
-import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
-import useServerAttributes from '../common/attributes/useServerAttributes';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 
 const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
-  const { theme } = useTheme();
   const t = useTranslation();
   const queryClient = useQueryClient();
 
@@ -60,14 +56,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Attributes hooks
-  const commonUserAttributes = useCommonUserAttributes(t);
-  const commonDeviceAttributes = useCommonDeviceAttributes(t);
-  const serverAttributes = useServerAttributes(t);
 
-  // Zebra striping colors
-  const lightThemeZebra = '#f8f9fa';
-  const darkThemeZebra = '#353e4b';
 
   console.log('FloatingDriversPopover state:', { editDialog, isVisible });
 
@@ -397,9 +386,15 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                       {paginatedDrivers.map((driver, index) => (
                         <TableRow 
                           key={driver.id} 
-                          hover
-                          style={{ 
-                            backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
+                          style={{
+                            backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
+                            cursor: 'pointer',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = colors.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : colors.secondary;
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >

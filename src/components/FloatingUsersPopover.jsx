@@ -566,8 +566,15 @@ const FloatingUsersPopover = ({
                         {paginatedUsers.map((user, index) => (
                         <TableRow
                           key={user.id}
-                          style={{ 
-                            backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
+                          style={{
+                            backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
+                            cursor: 'pointer',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = colors.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : colors.secondary;
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >

@@ -35,14 +35,13 @@ import {
   LastPage as LastPageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useGroupAttributes from '../common/attributes/useGroupAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 
 const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
-  const { theme } = useTheme();
   const t = useTranslation();
   const queryClient = useQueryClient();
 
@@ -69,9 +68,6 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const groupAttributes = useGroupAttributes(t);
 
-  // Zebra striping colors
-  const lightThemeZebra = '#f8f9fa';
-  const darkThemeZebra = '#353e4b';
 
   console.log('FloatingGroupsPopover state:', { editDialog, isVisible });
 
@@ -421,9 +417,15 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                       {paginatedGroups.map((group, index) => (
                         <TableRow 
                           key={group.id} 
-                          hover
-                          style={{ 
-                            backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
+                          style={{
+                            backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
+                            cursor: 'pointer',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = colors.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : colors.secondary;
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >
