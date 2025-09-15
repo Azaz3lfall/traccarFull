@@ -204,14 +204,16 @@ const FloatingDevicesPopover = ({
   // Delete device mutation
   const deleteDeviceMutation = useMutation({
     mutationFn: async (deviceId) => {
+      console.log('Deleting device with ID:', deviceId);
       await fetchOrThrow(`/api/devices/${deviceId}`, {
         method: 'DELETE',
       });
+      return deviceId; // Return the deviceId for use in onSuccess
     },
-    onSuccess: () => {
-      console.log('Device deleted successfully');
+    onSuccess: (deviceId) => {
+      console.log('Device deleted successfully:', deviceId);
       queryClient.invalidateQueries(['devices']);
-      dispatch(devicesActions.remove(deviceToDelete.id));
+      dispatch(devicesActions.remove(deviceId));
       setDeleteDialog(false);
       setDeviceToDelete(null);
     },
@@ -1039,7 +1041,7 @@ const FloatingDevicesPopover = ({
                   textTransform: 'none',
                 }}
               >
-                {t('sharedDelete')}
+                {t('sharedRemove')}
               </Button>
             </DialogActions>
           </Dialog>
