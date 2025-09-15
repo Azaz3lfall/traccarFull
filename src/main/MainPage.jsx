@@ -3620,7 +3620,26 @@ const MainPage = () => {
                             onChange={(e) => setServerData({ ...serverData, map: e.target.value })}
                             MenuProps={{
                               disablePortal: false,
-                              style: { zIndex: 10002 }
+                              style: { zIndex: 10002 },
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: colors.textSecondary,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           >
                             {mapStyles.filter((style) => style.available).map((style) => (
@@ -3638,7 +3657,26 @@ const MainPage = () => {
                             onChange={(event) => setServerData({ ...serverData, coordinateFormat: event.target.value })}
                             MenuProps={{
                               disablePortal: false,
-                              style: { zIndex: 10002 }
+                              style: { zIndex: 10002 },
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: colors.textSecondary,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           >
                             <MenuItem value="dd">{t('sharedDecimalDegrees')}</MenuItem>
@@ -3657,7 +3695,26 @@ const MainPage = () => {
                             })}
                             MenuProps={{
                               disablePortal: false,
-                              style: { zIndex: 10002 }
+                              style: { zIndex: 10002 },
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: colors.textSecondary,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           >
                             <MenuItem value="kn">{t('sharedKn')}</MenuItem>
@@ -3676,7 +3733,26 @@ const MainPage = () => {
                             })}
                             MenuProps={{
                               disablePortal: false,
-                              style: { zIndex: 10002 }
+                              style: { zIndex: 10002 },
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: colors.textSecondary,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           >
                             <MenuItem value="km">{t('sharedKm')}</MenuItem>
