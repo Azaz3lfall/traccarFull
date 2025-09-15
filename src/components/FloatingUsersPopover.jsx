@@ -1252,20 +1252,21 @@ const FloatingUsersPopover = ({
                     padding: '20px 24px',
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {t('sharedConnections')} - {selectedUserForConnections?.name}
-                    </Typography>
-                    <IconButton
-                      onClick={() => setConnectionsDialog(false)}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                      <ChevronLeftIcon fontSize="small" />
-                    </IconButton>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => setConnectionsDialog(false)}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                        {t('sharedConnections')} - {selectedUserForConnections?.name}
+                      </Typography>
+                    </div>
                   </div>
 
                   {/* Drawer Content */}
