@@ -36,12 +36,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
-import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
-import useServerAttributes from '../common/attributes/useServerAttributes';
+import useGroupAttributes from '../common/attributes/useGroupAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 
-const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
+const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
   const { theme } = useTheme();
   const t = useTranslation();
@@ -52,32 +51,51 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
   const [pageSize] = useState(15);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [driverToDelete, setDriverToDelete] = useState(null);
+  const [groupToDelete, setGroupToDelete] = useState(null);
   const [editDialog, setEditDialog] = useState(false);
-  const [editingDriver, setEditingDriver] = useState(null);
+  const [editingGroup, setEditingGroup] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  
+  // Custom dropdown states
+  const [parentGroupDropdownOpen, setParentGroupDropdownOpen] = useState(false);
+  
+  // Refs for dropdown positioning
+  const parentGroupInputRef = useRef(null);
 
   // Attributes hooks
-  const commonUserAttributes = useCommonUserAttributes(t);
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
-  const serverAttributes = useServerAttributes(t);
+  const groupAttributes = useGroupAttributes(t);
 
   // Zebra striping colors
   const lightThemeZebra = '#f8f9fa';
   const darkThemeZebra = '#353e4b';
 
-  console.log('FloatingDriversPopover state:', { editDialog, isVisible });
+  console.log('FloatingGroupsPopover state:', { editDialog, isVisible });
 
-  // Fetch drivers with TanStack Query
-  const { data: drivers = [], isLoading } = useQuery({
-    queryKey: ['drivers'],
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (parentGroupInputRef.current && !parentGroupInputRef.current.contains(event.target)) {
+        setParentGroupDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Fetch groups with TanStack Query
+  const { data: groups = [], isLoading } = useQuery({
+    queryKey: ['groups'],
     queryFn: async () => {
-      const response = await fetch('/api/drivers');
+      const response = await fetch('/api/groups');
       if (!response.ok) {
-        throw new Error('Failed to fetch drivers');
+        throw new Error('Failed to fetch groups');
       }
       const data = await response.json();
       return data;
@@ -86,28 +104,34 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Filter drivers based on search keyword
-  const filteredDrivers = drivers.filter(driver =>
-    driver.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    driver.uniqueId?.toLowerCase().includes(searchKeyword.toLowerCase())
+  // Filter groups based on search keyword
+  const filteredGroups = groups.filter(group =>
+    group.name?.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   // Pagination
-  const totalPages = Math.ceil(filteredDrivers.length / pageSize);
+  const totalPages = Math.ceil(filteredGroups.length / pageSize);
   const startIndex = (page - 1) * pageSize;
-  const paginatedDrivers = filteredDrivers.slice(startIndex, startIndex + pageSize);
+  const paginatedGroups = filteredGroups.slice(startIndex, startIndex + pageSize);
 
-  // Actions for driver menu
+  // Get parent group name
+  const getParentGroupName = (groupId) => {
+    if (!groupId) return '';
+    const parentGroup = groups.find(g => g.id === groupId);
+    return parentGroup ? parentGroup.name : '';
+  };
+
+  // Actions for group menu
   const actions = [
     {
       key: 'edit',
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
-      handler: (driver) => {
-        setSelectedDriver(driver);
-        setEditingDriver({ 
-          ...driver, 
-          attributes: driver.attributes || {}
+      handler: (group) => {
+        setSelectedGroup(group);
+        setEditingGroup({ 
+          ...group, 
+          attributes: group.attributes || {}
         });
         setEditDialog(true);
         setActiveTab(0);
@@ -118,8 +142,8 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
       key: 'delete',
       title: t('sharedRemove'),
       icon: <DeleteIcon fontSize="small" />,
-      handler: (driver) => {
-        setDriverToDelete(driver);
+      handler: (group) => {
+        setGroupToDelete(group);
         setDeleteDialog(true);
         setAnchorEl(null);
       },
@@ -127,12 +151,12 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
   ];
 
   // Mutations
-  const createDriverMutation = useMutation({
-    mutationFn: async (driverData) => {
-      const response = await fetch('/api/drivers', {
+  const createGroupMutation = useMutation({
+    mutationFn: async (groupData) => {
+      const response = await fetch('/api/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(driverData),
+        body: JSON.stringify(groupData),
       });
       
       if (!response.ok) {
@@ -143,22 +167,22 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['drivers']);
+      queryClient.invalidateQueries(['groups']);
       setEditDialog(false);
-      setEditingDriver(null);
+      setEditingGroup(null);
     },
     onError: (error) => {
-      console.error('Error creating driver:', error);
+      console.error('Error creating group:', error);
       setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
-  const updateDriverMutation = useMutation({
-    mutationFn: async (driverData) => {
-      const response = await fetch(`/api/drivers/${driverData.id}`, {
+  const updateGroupMutation = useMutation({
+    mutationFn: async (groupData) => {
+      const response = await fetch(`/api/groups/${groupData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(driverData),
+        body: JSON.stringify(groupData),
       });
       
       if (!response.ok) {
@@ -169,19 +193,19 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['drivers']);
+      queryClient.invalidateQueries(['groups']);
       setEditDialog(false);
-      setEditingDriver(null);
+      setEditingGroup(null);
     },
     onError: (error) => {
-      console.error('Error updating driver:', error);
+      console.error('Error updating group:', error);
       setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
-  const deleteDriverMutation = useMutation({
-    mutationFn: async (driverId) => {
-      const response = await fetch(`/api/drivers/${driverId}`, { method: 'DELETE' });
+  const deleteGroupMutation = useMutation({
+    mutationFn: async (groupId) => {
+      const response = await fetch(`/api/groups/${groupId}`, { method: 'DELETE' });
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -189,44 +213,44 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['drivers']);
+      queryClient.invalidateQueries(['groups']);
       setDeleteDialog(false);
-      setDriverToDelete(null);
+      setGroupToDelete(null);
     },
     onError: (error) => {
-      console.error('Error deleting driver:', error);
+      console.error('Error deleting group:', error);
       setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
   // Handlers
-  const handleSaveDriver = () => {
-    if (!editingDriver) return;
+  const handleSaveGroup = () => {
+    if (!editingGroup) return;
 
-    const driverData = {
-      id: editingDriver.id,
-      name: editingDriver.name,
-      uniqueId: editingDriver.uniqueId,
-      attributes: editingDriver.attributes || {}
+    const groupData = {
+      id: editingGroup.id,
+      name: editingGroup.name,
+      groupId: editingGroup.groupId || null,
+      attributes: editingGroup.attributes || {}
     };
 
-    if (editingDriver.id) {
-      updateDriverMutation.mutate(driverData);
+    if (editingGroup.id) {
+      updateGroupMutation.mutate(groupData);
     } else {
-      createDriverMutation.mutate(driverData);
+      createGroupMutation.mutate(groupData);
     }
   };
 
-  const handleDeleteDriver = () => {
-    if (driverToDelete) {
-      deleteDriverMutation.mutate(driverToDelete.id);
+  const handleDeleteGroup = () => {
+    if (groupToDelete) {
+      deleteGroupMutation.mutate(groupToDelete.id);
     }
   };
 
-  const handleAddDriver = () => {
-    setEditingDriver({
+  const handleAddGroup = () => {
+    setEditingGroup({
       name: '',
-      uniqueId: '',
+      groupId: null,
       attributes: {},
     });
     setEditDialog(true);
@@ -281,14 +305,14 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                 <ChevronLeftIcon fontSize="small" />
               </IconButton>
               <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                {t('sharedDrivers')}
+                {t('settingsGroups')}
               </Typography>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={handleAddDriver}
+                onClick={handleAddGroup}
                 size="small"
                 style={{
                   backgroundColor: colors.primary,
@@ -386,7 +410,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                           {t('sharedName')}
                         </TableCell>
                         <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('deviceIdentifier')}
+                          {t('groupParent')}
                         </TableCell>
                         <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
@@ -394,9 +418,9 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {paginatedDrivers.map((driver, index) => (
+                      {paginatedGroups.map((group, index) => (
                         <TableRow 
-                          key={driver.id} 
+                          key={group.id} 
                           hover
                           style={{ 
                             backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
@@ -405,18 +429,18 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                         >
                           <TableCell>
                             <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                              {driver.name}
+                              {group.name}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
-                              {driver.uniqueId}
+                              {getParentGroupName(group.groupId)}
                             </Typography>
                           </TableCell>
                           <TableCell align="right">
                             <IconButton
                               onClick={(e) => {
-                                setSelectedDriver(driver);
+                                setSelectedGroup(group);
                                 setAnchorEl(e.currentTarget);
                               }}
                               size="small"
@@ -508,7 +532,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
               .map((action) => (
                 <MenuItem
                   key={action.key}
-                  onClick={() => action.handler(selectedDriver)}
+                  onClick={() => action.handler(selectedGroup)}
                   style={{ color: colors.text, fontSize: '12px' }}
                 >
                   {action.icon}
@@ -532,11 +556,11 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
             }}
           >
             <DialogTitle style={{ color: colors.text, fontSize: '16px', fontWeight: '600' }}>
-              {t('sharedDelete')} {t('sharedDriver')}
+              {t('sharedDelete')} {t('groupDialog')}
             </DialogTitle>
             <DialogContent>
               <Typography style={{ color: colors.textSecondary, fontSize: '14px' }}>
-                {t('sharedDeleteConfirm')} "{driverToDelete?.name}"?
+                {t('sharedDeleteConfirm')} "{groupToDelete?.name}"?
               </Typography>
             </DialogContent>
             <DialogActions>
@@ -548,7 +572,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                 {t('sharedCancel')}
               </Button>
               <Button
-                onClick={handleDeleteDriver}
+                onClick={handleDeleteGroup}
                 size="small"
                 style={{ color: colors.error }}
               >
@@ -616,7 +640,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                         <ChevronLeftIcon fontSize="small" />
                       </IconButton>
                       <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                        {editingDriver?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedDriver')}
+                        {editingGroup?.id ? t('sharedEdit') : t('sharedAdd')} {t('groupDialog')}
                       </Typography>
                     </div>
                   </div>
@@ -662,6 +686,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                       }}
                     >
                       <Tab label={t('sharedRequired')} />
+                      <Tab label={t('sharedExtra')} />
                       <Tab label={t('sharedAttributes')} />
                     </Tabs>
 
@@ -673,30 +698,8 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                           {/* Name */}
                           <TextField
                             label={t('sharedName')}
-                            value={editingDriver?.name || ''}
-                            onChange={(e) => setEditingDriver({ ...editingDriver, name: e.target.value })}
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': { 
-                                color: colors.text,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          />
-
-                          {/* Unique ID */}
-                          <TextField
-                            label={t('deviceIdentifier')}
-                            value={editingDriver?.uniqueId || ''}
-                            onChange={(e) => setEditingDriver({ ...editingDriver, uniqueId: e.target.value })}
+                            value={editingGroup?.name || ''}
+                            onChange={(e) => setEditingGroup({ ...editingGroup, name: e.target.value })}
                             fullWidth
                             variant="outlined"
                             size="small"
@@ -716,13 +719,123 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                         </div>
                       )}
 
-                      {/* Attributes Tab */}
+                      {/* Extra Tab */}
                       {activeTab === 1 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          {/* Parent Group */}
+                          <div>
+                            <TextField
+                              ref={parentGroupInputRef}
+                              fullWidth
+                              size="small"
+                              label={t('groupParent')}
+                              value={editingGroup?.groupId ? getParentGroupName(editingGroup.groupId) : ''}
+                              onClick={() => setParentGroupDropdownOpen(!parentGroupDropdownOpen)}
+                              InputProps={{
+                                readOnly: true,
+                                endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
+                              }}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  color: colors.text,
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.text,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                              }}
+                            />
+                            {parentGroupDropdownOpen && (
+                              <div 
+                                style={{
+                                  position: 'fixed',
+                                  zIndex: 10010,
+                                  maxHeight: '200px',
+                                  overflow: 'auto',
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                  backgroundColor: colors.surface,
+                                  marginTop: '4px',
+                                  width: parentGroupInputRef.current ? parentGroupInputRef.current.getBoundingClientRect().width : '100%',
+                                  left: parentGroupInputRef.current ? parentGroupInputRef.current.getBoundingClientRect().left : 0,
+                                  top: parentGroupInputRef.current ? parentGroupInputRef.current.getBoundingClientRect().bottom + 4 : 0,
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setEditingGroup({ ...editingGroup, groupId: null });
+                                    setParentGroupDropdownOpen(false);
+                                  }}
+                                  style={{
+                                    padding: '12px 16px',
+                                    cursor: 'pointer',
+                                    color: colors.textSecondary,
+                                    backgroundColor: colors.surface,
+                                    borderBottom: groups.filter(group => group.id !== editingGroup?.id).length > 0 ? `1px solid ${colors.border}` : 'none',
+                                    fontStyle: 'italic',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.stopPropagation();
+                                    e.target.style.backgroundColor = colors.backgroundHover;
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.stopPropagation();
+                                    e.target.style.backgroundColor = colors.surface;
+                                  }}
+                                >
+                                  {t('sharedNone')}
+                                </div>
+                                {groups
+                                  .filter(group => group.id !== editingGroup?.id) // Don't allow self as parent
+                                  .map((group, index) => (
+                                    <div
+                                      key={group.id}
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setEditingGroup({ ...editingGroup, groupId: group.id });
+                                        setParentGroupDropdownOpen(false);
+                                      }}
+                                      style={{
+                                        padding: '12px 16px',
+                                        cursor: 'pointer',
+                                        color: colors.text,
+                                        backgroundColor: colors.surface,
+                                        borderBottom: index < groups.filter(g => g.id !== editingGroup?.id).length - 1 ? `1px solid ${colors.border}` : 'none',
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.stopPropagation();
+                                        e.target.style.backgroundColor = colors.backgroundHover;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.stopPropagation();
+                                        e.target.style.backgroundColor = colors.surface;
+                                      }}
+                                    >
+                                      {group.name}
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Attributes Tab */}
+                      {activeTab === 2 && (
                         <div>
                           <EditAttributesAccordion
                             attribute={null}
-                            attributes={editingDriver?.attributes || {}}
-                            setAttributes={(attributes) => setEditingDriver({ ...editingDriver, attributes })}
+                            attributes={editingGroup?.attributes || {}}
+                            setAttributes={(attributes) => setEditingGroup({ ...editingGroup, attributes })}
                             definitions={{}}
                             focusAttribute={null}
                             zIndex={10003}
@@ -743,22 +856,22 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                     <Button
                       onClick={() => {
                         setEditDialog(false);
-                        setEditingDriver(null);
+                        setEditingGroup(null);
                       }}
                       style={{ color: colors.textSecondary }}
                     >
                       {t('sharedCancel')}
                     </Button>
                     <Button
-                      onClick={handleSaveDriver}
+                      onClick={handleSaveGroup}
                       variant="contained"
-                      disabled={createDriverMutation.isPending || updateDriverMutation.isPending || !editingDriver?.name || !editingDriver?.uniqueId}
+                      disabled={createGroupMutation.isPending || updateGroupMutation.isPending || !editingGroup?.name}
                       style={{
                         backgroundColor: colors.primary,
                         color: colors.text,
                       }}
                     >
-                      {(createDriverMutation.isPending || updateDriverMutation.isPending) ? (
+                      {(createGroupMutation.isPending || updateGroupMutation.isPending) ? (
                         <CircularProgress size={16} />
                       ) : (
                         t('sharedSave')
@@ -792,4 +905,4 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
   );
 };
 
-export default FloatingDriversPopover;
+export default FloatingGroupsPopover;

@@ -21,6 +21,7 @@ import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover
 import FloatingComputedAttributesPopover from '../components/FloatingComputedAttributesPopover';
 import FloatingCalendarsPopover from '../components/FloatingCalendarsPopover';
 import FloatingDriversPopover from '../components/FloatingDriversPopover';
+import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -161,6 +162,7 @@ const MainPage = () => {
   const [showComputedAttributesPopover, setShowComputedAttributesPopover] = useState(false);
   const [showCalendarsPopover, setShowCalendarsPopover] = useState(false);
   const [showDriversPopover, setShowDriversPopover] = useState(false);
+  const [showGroupsPopover, setShowGroupsPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -1214,7 +1216,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-groups');
             if (tooltip) tooltip.remove();
-              window.location.href = '/settings/groups';
+              setShowGroupsPopover(true);
           }}
           onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3368,6 +3370,14 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={showDriversPopover}
         onClose={() => setShowDriversPopover(false)}
+      />
+
+      {/* Groups Management Popover */}
+      <FloatingGroupsPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showGroupsPopover}
+        onClose={() => setShowGroupsPopover(false)}
       />
       
       {/* Server Settings Drawer */}

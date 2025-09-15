@@ -36,7 +36,7 @@ import {
   LastPage as LastPageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors } from '../common/components/ThemeProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import dayjs from 'dayjs';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
@@ -46,6 +46,7 @@ import { prefixString } from '../common/util/stringUtils';
 
 const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
+  const { theme } = useTheme();
   const t = useTranslation();
   const queryClient = useQueryClient();
 
@@ -74,6 +75,10 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const commonUserAttributes = useCommonUserAttributes(t);
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const serverAttributes = useServerAttributes(t);
+
+  // Zebra striping colors
+  const lightThemeZebra = '#f8f9fa';
+  const darkThemeZebra = '#353e4b';
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -435,7 +440,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                 size="small"
                 style={{
                   backgroundColor: colors.primary,
-                  color: 'white',
+                  color: colors.text,
                   fontSize: '12px',
                   fontWeight: '500',
                   textTransform: 'none',
@@ -459,13 +464,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
               InputProps={{
                 startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
               }}
-              style={{
+              sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: colors.secondary,
                   '& fieldset': { borderColor: colors.border },
                   '&:hover fieldset': { borderColor: colors.primary },
                   '&.Mui-focused fieldset': { borderColor: colors.primary },
-                }
+                },
+                '& .MuiInputLabel-root': { 
+                  color: colors.text,
+                  '&.Mui-focused': { color: colors.primary }
+                },
               }}
             />
           </div>
@@ -545,7 +554,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                           key={calendar.id} 
                           hover
                           style={{ 
-                            backgroundColor: index % 2 === 0 ? colors.surface : colors.background
+                            backgroundColor: index % 2 === 0 ? colors.surface : (theme === 'dark' ? darkThemeZebra : lightThemeZebra)
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >
@@ -837,13 +846,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             fullWidth
                             variant="outlined"
                             size="small"
-                            style={{
+                            sx={{
                               '& .MuiOutlinedInput-root': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
                                 '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              }
+                              },
+                              '& .MuiInputLabel-root': { 
+                                color: colors.text,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           />
 
@@ -879,13 +892,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               rows={6}
                               variant="outlined"
                               size="small"
-                              style={{
+                              sx={{
                                 '& .MuiOutlinedInput-root': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
                                   '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                }
+                                },
+                                '& .MuiInputLabel-root': { 
+                                  color: colors.text,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
                               }}
                             />
                           )}
@@ -905,13 +922,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             variant="outlined"
                             size="small"
                             InputLabelProps={{ shrink: true }}
-                            style={{
+                            sx={{
                               '& .MuiOutlinedInput-root': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
                                 '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              }
+                              },
+                              '& .MuiInputLabel-root': { 
+                                color: colors.text,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           />
 
@@ -925,13 +946,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             variant="outlined"
                             size="small"
                             InputLabelProps={{ shrink: true }}
-                            style={{
+                            sx={{
                               '& .MuiOutlinedInput-root': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
                                 '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              }
+                              },
+                              '& .MuiInputLabel-root': { 
+                                color: colors.text,
+                                '&.Mui-focused': { color: colors.primary }
+                              },
                             }}
                           />
 
