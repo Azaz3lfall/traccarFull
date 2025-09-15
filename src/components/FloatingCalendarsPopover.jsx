@@ -805,37 +805,25 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                           />
 
                           {/* Type */}
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t('sharedType')}</InputLabel>
-                            <Select
-                              value={editingCalendar?.type || 'simple'}
-                              onChange={(e) => {
-                                const type = e.target.value;
-                                setEditingCalendar({
-                                  ...editingCalendar,
-                                  type,
-                                  data: type === 'simple' ? simpleCalendar() : '',
-                                });
-                              }}
-                              label={t('sharedType')}
-                              MenuProps={{
-                                PaperProps: {
-                                  style: {
-                                    zIndex: 10010,
-                                    backgroundColor: colors.background,
-                                    border: `1px solid ${colors.border}`,
-                                  },
-                                },
-                              }}
-                            >
-                              <MenuItem value="simple" style={{ color: colors.text }}>
-                                {t('calendarSimple')}
-                              </MenuItem>
-                              <MenuItem value="custom" style={{ color: colors.text }}>
-                                {t('reportCustom')}
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label={t('sharedType')}
+                            value={getCalendarType(editingCalendar) === 'simple' ? t('calendarSimple') : t('reportCustom')}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                color: colors.text,
+                                '& fieldset': { borderColor: colors.border },
+                                '&:hover fieldset': { borderColor: colors.border },
+                                '&.Mui-focused fieldset': { borderColor: colors.border },
+                              },
+                              '& .MuiInputLabel-root': { color: colors.textSecondary },
+                              '& .MuiInputLabel-root.Mui-focused': { color: colors.textSecondary },
+                            }}
+                          />
 
                           {/* Custom Data */}
                           {editingCalendar?.type === 'custom' && (
