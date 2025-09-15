@@ -4374,6 +4374,7 @@ const MainPage = () => {
                       />
                     )}
                     ListboxProps={{
+                      disablePortal: false,
                       style: {
                         backgroundColor: colors.surface,
                         border: `1px solid ${colors.border}`,
