@@ -64,6 +64,7 @@ import { prefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import SelectField from '../common/components/SelectField';
+import LinkField from '../common/components/LinkField';
 import { snackBarDurationLongMs } from '../common/util/duration';
 
 const allowedProperties = ['valid', 'latitude', 'longitude', 'altitude', 'speed', 'course', 'address', 'accuracy'];
@@ -101,6 +102,11 @@ const FloatingComputedAttributesPopover = ({
   const [activeTab, setActiveTab] = useState(0);
   const [deviceId, setDeviceId] = useState();
   const [testResult, setTestResult] = useState();
+  const [devices, setDevices] = useState([]);
+  const [attributeDropdownOpen, setAttributeDropdownOpen] = useState(false);
+  const [attributeInputValue, setAttributeInputValue] = useState('');
+  const [deviceDropdownOpen, setDeviceDropdownOpen] = useState(false);
+  const [deviceInputValue, setDeviceInputValue] = useState('');
 
   console.log('FloatingComputedAttributesPopover state:', { editDialog, isVisible });
 
@@ -116,6 +122,19 @@ const FloatingComputedAttributesPopover = ({
   });
   console.log('=== TEST: After useQuery ===');
 
+  // Fetch devices for testing
+  useEffectAsync(async () => {
+    if (isVisible) {
+      try {
+        const response = await fetchOrThrow('/api/devices');
+        setDevices(await response.json());
+      } catch (error) {
+        console.error('Failed to load devices:', error);
+        setDevices([]);
+      }
+    }
+  }, [isVisible]);
+
   // Filter attributes based on search
   const filteredAttributes = attributes.filter(attribute => {
     const matchesSearch = !searchKeyword || 
@@ -129,6 +148,19 @@ const FloatingComputedAttributesPopover = ({
   useEffect(() => {
     setPage(1);
   }, [searchKeyword]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('[data-dropdown]')) {
+        setAttributeDropdownOpen(false);
+        setDeviceDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Pagination
   const totalPages = Math.ceil(filteredAttributes.length / pageSize);
@@ -146,6 +178,13 @@ const FloatingComputedAttributesPopover = ({
     setActiveTab(0);
     setEditDialog(true);
     setAnchorEl(null);
+    
+    // Initialize input values
+    const attributeOption = options.find(option => option.key === attribute.attribute);
+    setAttributeInputValue(attributeOption ? attributeOption.name : attribute.attribute || '');
+    
+    const device = devices.find(d => d.id === deviceId);
+    setDeviceInputValue(device ? device.name : '');
   };
 
   // Handle delete attribute
@@ -720,50 +759,77 @@ const FloatingComputedAttributesPopover = ({
                             />
 
                             {/* Attribute */}
-                            <Autocomplete
-                              freeSolo
-                              value={options.find((option) => option.key === editingAttribute?.attribute) || editingAttribute?.attribute || null}
-                              onChange={(_, option) => {
-                                const attribute = option ? option.key || option.inputValue || option : null;
-                                if (option && (option.type || option.inputValue)) {
-                                  setEditingAttribute({ ...editingAttribute, attribute, type: option.type });
-                                } else {
-                                  setEditingAttribute({ ...editingAttribute, attribute });
-                                }
-                              }}
-                              filterOptions={(options, params) => {
-                                const filtered = filter(options, params);
-                                if (params.inputValue && !options.some((x) => (typeof x === 'object' ? x.key : x) === params.inputValue)) {
-                                  filtered.push({ inputValue: params.inputValue, name: `${t('sharedAdd')} "${params.inputValue}"` });
-                                }
-                                return filtered;
-                              }}
-                              options={options}
-                              getOptionLabel={(option) => typeof option === 'object' ? option.inputValue || option.name : option }
-                              renderOption={(props, option) => <li {...props}>{option.name || option}</li>}
-                              ListboxProps={{
-                                style: { 
+                            <div style={{ position: 'relative' }} data-dropdown>
+                              <TextField
+                                label={t('sharedAttribute')}
+                                value={attributeInputValue}
+                                onChange={(e) => {
+                                  setAttributeInputValue(e.target.value);
+                                  setAttributeDropdownOpen(true);
+                                }}
+                                onFocus={() => {
+                                  setAttributeDropdownOpen(true);
+                                }}
+                                size="small"
+                                fullWidth
+                                style={{
+                                  '& .MuiOutlinedInput-root': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  }
+                                }}
+                              />
+                              {attributeDropdownOpen && (
+                                <div style={{
+                                  position: 'fixed',
                                   zIndex: 10004,
-                                  backgroundColor: colors.surface,
+                                  maxHeight: '200px',
+                                  minWidth: '200px',
+                                  overflow: 'auto',
                                   border: `1px solid ${colors.border}`,
-                                }
-                              }}
-                              renderInput={(params) => (
-                                <TextField 
-                                  {...params} 
-                                  label={t('sharedAttribute')}
-                                  size="small"
-                                  style={{
-                                    '& .MuiOutlinedInput-root': {
-                                      backgroundColor: colors.secondary,
-                                      '& fieldset': { borderColor: colors.border },
-                                      '&:hover fieldset': { borderColor: colors.primary },
-                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                    }
-                                  }}
-                                />
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                  backgroundColor: colors.surface,
+                                  marginTop: '4px',
+                                }}>
+                                  {options
+                                    .filter(option => 
+                                      option.name.toLowerCase().includes(attributeInputValue.toLowerCase())
+                                    )
+                                    .map((option) => (
+                                      <div
+                                        key={option.key}
+                                        onClick={() => {
+                                          setEditingAttribute({ 
+                                            ...editingAttribute, 
+                                            attribute: option.key, 
+                                            type: option.type 
+                                          });
+                                          setAttributeInputValue(option.name);
+                                          setAttributeDropdownOpen(false);
+                                        }}
+                                        style={{
+                                          padding: '8px 16px',
+                                          cursor: 'pointer',
+                                          borderBottom: `1px solid ${colors.border}`,
+                                          backgroundColor: 'transparent',
+                                          color: colors.text,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.target.style.backgroundColor = colors.hover;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.target.style.backgroundColor = 'transparent';
+                                        }}
+                                      >
+                                        {option.name}
+                                      </div>
+                                    ))}
+                                </div>
                               )}
-                            />
+                            </div>
 
                             {/* Expression */}
                             <TextField
@@ -883,21 +949,73 @@ const FloatingComputedAttributesPopover = ({
                         <AccordionDetails>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {/* Device Selection */}
-                            <SelectField
-                              value={deviceId}
-                              onChange={(e) => setDeviceId(Number(e.target.value))}
-                              endpoint="/api/devices"
-                              label={t('sharedDevice')}
-                              zIndex={10004}
-                              style={{
-                                '& .MuiOutlinedInput-root': {
-                                  backgroundColor: colors.secondary,
-                                  '& fieldset': { borderColor: colors.border },
-                                  '&:hover fieldset': { borderColor: colors.primary },
-                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                }
-                              }}
-                            />
+                            <div style={{ position: 'relative' }} data-dropdown>
+                              <TextField
+                                label={t('sharedDevice')}
+                                value={deviceInputValue}
+                                onChange={(e) => {
+                                  setDeviceInputValue(e.target.value);
+                                  setDeviceDropdownOpen(true);
+                                }}
+                                onFocus={() => {
+                                  setDeviceDropdownOpen(true);
+                                }}
+                                size="small"
+                                fullWidth
+                                style={{
+                                  '& .MuiOutlinedInput-root': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  }
+                                }}
+                              />
+                              {deviceDropdownOpen && (
+                                <div style={{
+                                  position: 'fixed',
+                                  zIndex: 10004,
+                                  maxHeight: '200px',
+                                  minWidth: '200px',
+                                  overflow: 'auto',
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '4px',
+                                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                  backgroundColor: colors.surface,
+                                  marginTop: '4px',
+                                }}>
+                                  {devices
+                                    .filter(device => 
+                                      device.name.toLowerCase().includes(deviceInputValue.toLowerCase())
+                                    )
+                                    .map((device) => (
+                                      <div
+                                        key={device.id}
+                                        onClick={() => {
+                                          setDeviceId(device.id);
+                                          setDeviceInputValue(device.name);
+                                          setDeviceDropdownOpen(false);
+                                        }}
+                                        style={{
+                                          padding: '8px 16px',
+                                          cursor: 'pointer',
+                                          borderBottom: `1px solid ${colors.border}`,
+                                          backgroundColor: 'transparent',
+                                          color: colors.text,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.target.style.backgroundColor = colors.hover;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.target.style.backgroundColor = 'transparent';
+                                        }}
+                                      >
+                                        {device.name}
+                                      </div>
+                                    ))}
+                                </div>
+                              )}
+                            </div>
                             
                             {/* Test Button */}
                             <Button
