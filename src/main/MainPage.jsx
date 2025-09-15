@@ -4258,6 +4258,8 @@ const MainPage = () => {
                       }}
                       multiple
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4296,6 +4298,8 @@ const MainPage = () => {
                         setPreferencesAttributes({ ...preferencesAttributes, selectedMapOverlay: e.target.value });
                       }}
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4385,6 +4389,8 @@ const MainPage = () => {
                       value={preferencesAttributes.mapLiveRoutes || 'none'}
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapLiveRoutes: e.target.value })}
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4419,6 +4425,8 @@ const MainPage = () => {
                       value={preferencesAttributes.mapDirection || 'selected'}
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapDirection: e.target.value })}
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4572,6 +4580,8 @@ const MainPage = () => {
                       value={preferencesAttributes.devicePrimary || 'name'}
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, devicePrimary: e.target.value })}
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4608,6 +4618,8 @@ const MainPage = () => {
                       value={preferencesAttributes.deviceSecondary || ''}
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, deviceSecondary: e.target.value })}
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4662,6 +4674,8 @@ const MainPage = () => {
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundEvents: e.target.value.join(',') })}
                       multiple
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
@@ -4695,6 +4709,8 @@ const MainPage = () => {
                       onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundAlarms: e.target.value.join(',') })}
                       multiple
                       MenuProps={{
+                        disablePortal: false,
+                        style: { zIndex: 10010 },
                         PaperProps: {
                           style: {
                             backgroundColor: colors.surface,
