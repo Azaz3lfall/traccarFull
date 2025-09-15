@@ -743,7 +743,7 @@ const FloatingComputedAttributesPopover = ({
                               renderOption={(props, option) => <li {...props}>{option.name || option}</li>}
                               ListboxProps={{
                                 style: { 
-                                  zIndex: 10003,
+                                  zIndex: 10004,
                                   backgroundColor: colors.surface,
                                   border: `1px solid ${colors.border}`,
                                 }
@@ -801,10 +801,10 @@ const FloatingComputedAttributesPopover = ({
                                 })}
                                 label={t('sharedType')}
                                 MenuProps={{
-                                  style: { zIndex: 10003 },
+                                  style: { zIndex: 10004 },
                                   PaperProps: {
                                     style: { 
-                                      zIndex: 10003,
+                                      zIndex: 10004,
                                       backgroundColor: colors.surface,
                                       border: `1px solid ${colors.border}`,
                                     }
@@ -888,13 +888,7 @@ const FloatingComputedAttributesPopover = ({
                               onChange={(e) => setDeviceId(Number(e.target.value))}
                               endpoint="/api/devices"
                               label={t('sharedDevice')}
-                              ListboxProps={{
-                                style: { 
-                                  zIndex: 10003,
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                }
-                              }}
+                              zIndex={10004}
                               style={{
                                 '& .MuiOutlinedInput-root': {
                                   backgroundColor: colors.secondary,

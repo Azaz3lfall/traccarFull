@@ -76,6 +76,8 @@ const SelectField = ({
             ListboxProps={{
               style: {
                 zIndex: zIndex,
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                border: '1px solid var(--mui-palette-divider)',
               },
             }}
           />
