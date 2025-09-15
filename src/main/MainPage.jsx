@@ -9,6 +9,15 @@ import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import useMapStyles from '../map/core/useMapStyles';
+import useMapOverlays from '../map/overlay/useMapOverlays';
+import usePositionAttributes from '../common/attributes/usePositionAttributes';
+import { useTranslationKeys } from '../common/components/LocalizationProvider';
+import { prefixString, unprefixString } from '../common/util/stringUtils';
+import { sessionActions } from '../store';
+import { useAdministrator, useRestriction } from '../common/util/permissions';
+import fetchOrThrow from '../common/util/fetchOrThrow';
+import { useCatch } from '../reactHelper';
+import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
@@ -54,10 +63,28 @@ import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import CachedIcon from '@mui/icons-material/Cached';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
 import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
 import ReactCountryFlag from 'react-country-flag';
-import { Box } from '@mui/material';
+import { 
+  Box, 
+  TextField, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel, 
+  Checkbox, 
+  FormControlLabel, 
+  FormGroup, 
+  InputAdornment, 
+  IconButton, 
+  OutlinedInput, 
+  Autocomplete, 
+  createFilterOptions,
+  Button
+} from '@mui/material';
 import { 
   useAdministrator, 
   useManager, 
@@ -169,6 +196,9 @@ const MainPage = () => {
   const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
+  const [preferencesAttributes, setPreferencesAttributes] = useState({});
+  const [token, setToken] = useState(null);
+  const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
@@ -217,6 +247,33 @@ const MainPage = () => {
   // Map switcher handlers
   const mapStyles = useMapStyles();
   const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,locationIqDark,openFreeMap');
+  
+  // Preferences hooks
+  const mapOverlays = useMapOverlays();
+  const positionAttributes = usePositionAttributes(t);
+  const admin = useAdministrator();
+  const readonly = useRestriction('readonly');
+  const user = useSelector((state) => state.session.user);
+  const versionApp = import.meta.env.VITE_APP_VERSION;
+  const versionServer = useSelector((state) => state.session.server.version);
+  const socket = useSelector((state) => state.session.socket);
+  
+  // Device fields for preferences
+  const deviceFields = [
+    { id: 'name', name: 'sharedName' },
+    { id: 'uniqueId', name: 'deviceIdentifier' },
+    { id: 'phone', name: 'sharedPhone' },
+    { id: 'model', name: 'deviceModel' },
+    { id: 'contact', name: 'deviceContact' },
+  ];
+  
+  // Alarms for sound settings
+  const alarms = useTranslationKeys((it) => it.startsWith('alarm')).map((it) => ({
+    key: unprefixString('alarm', it),
+    name: t(it),
+  }));
+  
+  const filter = createFilterOptions();
   const [selectedMapStyle, setSelectedMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'locationIqStreets'));
   
   const handleMapStyleChange = (styleId) => {
@@ -497,6 +554,38 @@ const MainPage = () => {
       setShowAnnouncementDrawer(false);
     },
   });
+
+  // Preferences functions
+  const generateToken = useCatch(async () => {
+    const expiration = dayjs(tokenExpiration, 'YYYY-MM-DD').toISOString();
+    const response = await fetchOrThrow('/api/session/token', {
+      method: 'POST',
+      body: new URLSearchParams(`expiration=${expiration}`),
+    });
+    setToken(await response.text());
+  });
+
+  const handlePreferencesSave = useCatch(async () => {
+    const response = await fetchOrThrow(`/api/users/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...user, attributes: preferencesAttributes }),
+    });
+    dispatch(sessionActions.updateUser(await response.json()));
+    setShowPreferencesDrawer(false);
+  });
+
+  const handleReboot = useCatch(async () => {
+    const response = await fetch('/api/server/reboot', { method: 'POST' });
+    throw Error(response.statusText);
+  });
+
+  // Initialize preferences attributes when drawer opens
+  useEffect(() => {
+    if (showPreferencesDrawer && user) {
+      setPreferencesAttributes(user.attributes || {});
+    }
+  }, [showPreferencesDrawer, user]);
 
   // File upload handler
   const handleFileChange = useCallback(async (newFile) => {
@@ -3936,9 +4025,173 @@ const MainPage = () => {
                   {t('sharedPreferences')}
                 </Typography>
                 
-                <Typography variant="body2" style={{ color: colors.textSecondary, textAlign: 'center', marginTop: '40px' }}>
-                  Preferences settings will be implemented here following the original Traccar structure
-                </Typography>
+                {/* Map Settings */}
+                <div style={{ marginBottom: '24px' }}>
+                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                    {t('mapTitle')}
+                  </Typography>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('mapActive')}</InputLabel>
+                    <Select
+                      label={t('mapActive')}
+                      value={preferencesAttributes.activeMapStyles?.split(',') || ['locationIqStreets', 'locationIqDark', 'openFreeMap']}
+                      onChange={(e) => {
+                        setPreferencesAttributes({ ...preferencesAttributes, activeMapStyles: e.target.value.join(',') });
+                      }}
+                      multiple
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      {mapStyles.map((style) => (
+                        <MenuItem key={style.id} value={style.id}>
+                          <Typography component="span" color={style.available ? 'textPrimary' : 'error'}>{style.title}</Typography>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>{t('mapOverlay')}</InputLabel>
+                    <Select
+                      label={t('mapOverlay')}
+                      value={preferencesAttributes.selectedMapOverlay || ''}
+                      onChange={(e) => {
+                        setPreferencesAttributes({ ...preferencesAttributes, selectedMapOverlay: e.target.value });
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            backgroundColor: colors.surface,
+                            border: `1px solid ${colors.border}`,
+                            zIndex: 10004,
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    >
+                      <MenuItem value="">{'\u00a0'}</MenuItem>
+                      {mapOverlays.map((overlay) => (
+                        <MenuItem key={overlay.id} value={overlay.id}>
+                          <Typography component="span" color={overlay.available ? 'textPrimary' : 'error'}>{overlay.title}</Typography>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={Object.keys(positionAttributes)}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'object' && option.inputValue) {
+                        return option.inputValue;
+                      }
+                      return positionAttributes[option]?.name || option;
+                    }}
+                    value={preferencesAttributes.positionItems?.split(',') || ['fixTime', 'address', 'speed', 'totalDistance']}
+                    onChange={(_, newValue) => {
+                      setPreferencesAttributes({ ...preferencesAttributes, positionItems: newValue.map((x) => (typeof x === 'string' ? x : x.inputValue)).join(','), });
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      if (params.inputValue && !options.includes(params.inputValue)) {
+                        filtered.push({ inputValue: params.inputValue, name: `${t('sharedAdd')} "${params.inputValue}"` });
+                      }
+                      return filtered;
+                    }}
+                    renderOption={(props, option) => (
+                      <li {...props}>{option.name ? option.name : (positionAttributes[option]?.name || option)}</li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField 
+                        {...params} 
+                        label={t('attributePopupInfo')} 
+                        margin="normal"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    )}
+                    ListboxProps={{
+                      style: {
+                        backgroundColor: colors.surface,
+                        border: `1px solid ${colors.border}`,
+                        zIndex: 10004,
+                      }
+                    }}
+                  />
+                </div>
+                
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'flex-end',
+                  marginTop: '32px',
+                  paddingTop: '20px',
+                  borderTop: `1px solid ${colors.border}`,
+                }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setShowPreferencesDrawer(false)}
+                    style={{
+                      borderColor: colors.border,
+                      color: colors.text,
+                    }}
+                  >
+                    {t('sharedCancel')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handlePreferencesSave}
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.text,
+                    }}
+                  >
+                    {t('sharedSave')}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </>
