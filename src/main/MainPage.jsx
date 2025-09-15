@@ -827,7 +827,7 @@ const MainPage = () => {
                       alt="Server Logo" 
                       style={{ 
                         maxWidth: '100%',
-                        maxHeight: '32px',
+                        maxHeight: '36px',
                         width: 'auto',
                         height: 'auto',
                         objectFit: 'contain'
