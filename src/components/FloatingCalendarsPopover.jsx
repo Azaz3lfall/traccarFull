@@ -140,10 +140,11 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
         const times = getCalendarTimes(calendar);
         setEditingCalendar({ 
           ...calendar, 
-          frequency: rule.frequency,
-          by: rule.by,
-          startTime: times.start.format('YYYY-MM-DDTHH:mm'),
-          endTime: times.end.format('YYYY-MM-DDTHH:mm'),
+          type: getCalendarType(calendar), // UI only field
+          frequency: rule.frequency, // UI only field
+          by: rule.by, // UI only field
+          startTime: times.start.format('YYYY-MM-DDTHH:mm'), // UI only field
+          endTime: times.end.format('YYYY-MM-DDTHH:mm'), // UI only field
           attributes: calendar.attributes || {}
         });
         setEditDialog(true);
@@ -166,11 +167,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   // Mutations
   const createCalendarMutation = useMutation({
     mutationFn: async (calendarData) => {
-      const response = await fetchOrThrow('/api/calendars', {
+      const response = await fetch('/api/calendars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(calendarData),
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -181,17 +188,23 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onError: (error) => {
       console.error('Error creating calendar:', error);
-      setSnackbar({ open: true, message: t('sharedError'), severity: 'error' });
+      setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
   const updateCalendarMutation = useMutation({
     mutationFn: async (calendarData) => {
-      const response = await fetchOrThrow(`/api/calendars/${calendarData.id}`, {
+      const response = await fetch(`/api/calendars/${calendarData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(calendarData),
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -202,13 +215,18 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onError: (error) => {
       console.error('Error updating calendar:', error);
-      setSnackbar({ open: true, message: t('sharedError'), severity: 'error' });
+      setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
   const deleteCalendarMutation = useMutation({
     mutationFn: async (calendarId) => {
-      await fetchOrThrow(`/api/calendars/${calendarId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/calendars/${calendarId}`, { method: 'DELETE' });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['calendars']);
@@ -218,7 +236,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     },
     onError: (error) => {
       console.error('Error deleting calendar:', error);
-      setSnackbar({ open: true, message: t('sharedError'), severity: 'error' });
+      setSnackbar({ open: true, message: error.message || t('sharedError'), severity: 'error' });
     },
   });
 
@@ -227,7 +245,13 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     if (!editingCalendar) return;
 
     // Generate iCal data for simple calendars
-    let calendarData = editingCalendar;
+    let calendarData = {
+      id: editingCalendar.id,
+      name: editingCalendar.name,
+      data: editingCalendar.data,
+      attributes: editingCalendar.attributes || {}
+    };
+
     if (editingCalendar.type === 'simple') {
       const startTime = dayjs(editingCalendar.startTime);
       const endTime = dayjs(editingCalendar.endTime);
@@ -247,10 +271,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
         'END:VCALENDAR',
       ];
       
-      calendarData = {
-        ...editingCalendar,
-        data: window.btoa(lines.join('\n'))
-      };
+      calendarData.data = window.btoa(lines.join('\n'));
     }
 
     if (editingCalendar.id) {
@@ -270,11 +291,11 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     setEditingCalendar({
       name: '',
       data: simpleCalendar(),
-      type: 'simple',
-      frequency: 'ONCE',
-      by: null,
-      startTime: dayjs().format('YYYY-MM-DDTHH:mm'),
-      endTime: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm'),
+      type: 'simple', // UI only field
+      frequency: 'ONCE', // UI only field
+      by: null, // UI only field
+      startTime: dayjs().format('YYYY-MM-DDTHH:mm'), // UI only field
+      endTime: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm'), // UI only field
       attributes: {},
     });
     setEditDialog(true);
