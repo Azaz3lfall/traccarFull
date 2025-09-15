@@ -23,6 +23,7 @@ import FloatingCalendarsPopover from '../components/FloatingCalendarsPopover';
 import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
+import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -165,6 +166,7 @@ const MainPage = () => {
   const [showDriversPopover, setShowDriversPopover] = useState(false);
   const [showGroupsPopover, setShowGroupsPopover] = useState(false);
   const [showDevicesPopover, setShowDevicesPopover] = useState(false);
+  const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -696,7 +698,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
@@ -1198,6 +1200,74 @@ const MainPage = () => {
                 lineHeight: '1.5'
               }}>
                   {t('deviceTitle')}
+              </span>
+            )}
+          </div>
+          )}
+          
+          {/* Notifications Icon */}
+          {!readonly && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-notifications');
+            if (tooltip) tooltip.remove();
+              setShowNotificationsPopover(true);
+          }}
+          onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+                tooltip.textContent = t('sharedNotifications');
+                tooltip.id = 'menu-tooltip-notifications';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+                document.body.appendChild(tooltip);
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-notifications');
+                if (tooltip) tooltip.remove();
+              }
+            }}>
+              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              {isMenuExpanded && (
+                <span style={{
+                  marginLeft: '12px',
+                  color: colors.textSecondary,
+                  fontSize: '14px',
+                  fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('sharedNotifications')}
               </span>
             )}
           </div>
@@ -3390,6 +3460,14 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={showDevicesPopover}
         onClose={() => setShowDevicesPopover(false)}
+      />
+
+      {/* Notifications Management Popover */}
+      <FloatingNotificationsPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showNotificationsPopover}
+        onClose={() => setShowNotificationsPopover(false)}
       />
       
       {/* Server Settings Drawer */}
