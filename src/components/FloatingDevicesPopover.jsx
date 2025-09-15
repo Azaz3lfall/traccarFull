@@ -1051,8 +1051,13 @@ const FloatingDevicesPopover = ({
                               checked={editingDevice?.disabled || false}
                               onChange={(e) => setEditingDevice({ ...editingDevice, disabled: e.target.checked })}
                               sx={{
-                                color: colors.primary,
-                                '&.Mui-checked': { color: colors.primary },
+                                color: colors.text,
+                                '&.Mui-checked': {
+                                  color: colors.text,
+                                },
+                                '&.MuiCheckbox-root': {
+                                  color: colors.text,
+                                }
                               }}
                             />
                           }
