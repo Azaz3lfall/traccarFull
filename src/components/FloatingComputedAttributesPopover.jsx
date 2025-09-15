@@ -166,8 +166,7 @@ const FloatingComputedAttributesPopover = ({
   // Handle edit attribute
   const handleEdit = (attribute) => {
     setEditingAttribute({
-      ...attribute,
-      attributes: attribute.attributes || {}
+      ...attribute
     });
     setActiveTab(0);
     setEditDialog(true);
@@ -351,7 +350,7 @@ const FloatingComputedAttributesPopover = ({
                   setActiveTab(0);
                   setEditDialog(true);
                 }}
-                disabled={limitAttributes}
+                disabled={limitComputedAttributes || !administrator}
                 size="small"
                 style={{
                   backgroundColor: colors.primary,
