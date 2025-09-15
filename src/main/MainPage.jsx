@@ -22,6 +22,7 @@ import FloatingComputedAttributesPopover from '../components/FloatingComputedAtt
 import FloatingCalendarsPopover from '../components/FloatingCalendarsPopover';
 import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
+import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -163,6 +164,7 @@ const MainPage = () => {
   const [showCalendarsPopover, setShowCalendarsPopover] = useState(false);
   const [showDriversPopover, setShowDriversPopover] = useState(false);
   const [showGroupsPopover, setShowGroupsPopover] = useState(false);
+  const [showDevicesPopover, setShowDevicesPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
@@ -694,7 +696,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
@@ -1148,7 +1150,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-devices');
             if (tooltip) tooltip.remove();
-              window.location.href = '/settings/devices';
+              setShowDevicesPopover(true);
           }}
           onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3378,6 +3380,14 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={showGroupsPopover}
         onClose={() => setShowGroupsPopover(false)}
+      />
+
+      {/* Devices Management Popover */}
+      <FloatingDevicesPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showDevicesPopover}
+        onClose={() => setShowDevicesPopover(false)}
       />
       
       {/* Server Settings Drawer */}

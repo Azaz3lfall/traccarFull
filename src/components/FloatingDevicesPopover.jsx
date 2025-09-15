@@ -1,0 +1,960 @@
+import { useState, useEffect } from 'react';
+import { useEffectAsync } from '../reactHelper';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Box,
+  Chip,
+  Switch,
+  FormControlLabel,
+  Pagination,
+  CircularProgress,
+  Alert,
+  Select,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  Tabs,
+  Tab,
+} from '@mui/material';
+import {
+  MoreVert as MoreVertIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Add as AddIcon,
+  ChevronLeft as ChevronLeftIcon,
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon,
+  Devices as DevicesIcon,
+} from '@mui/icons-material';
+import { useCatch } from '../reactHelper';
+import { formatBoolean, formatStatus, formatTime } from '../common/util/formatter';
+import { useTranslation } from '../common/components/LocalizationProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
+import { useRestriction } from '../common/util/permissions';
+import fetchOrThrow from '../common/util/fetchOrThrow';
+import { prefixString } from '../common/util/stringUtils';
+import { sessionActions } from '../store';
+import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
+import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
+import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
+import deviceCategories from '../common/util/deviceCategories';
+
+const FloatingDevicesPopover = ({ 
+  desktop, 
+  isMenuExpanded, 
+  isVisible, 
+  onClose 
+}) => {
+  console.log('=== FloatingDevicesPopover RENDER ===');
+  console.log('Props:', { desktop, isMenuExpanded, isVisible, onClose });
+  
+  const t = useTranslation();
+  const colors = useThemeColors();
+  const { theme } = useTheme();
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const limitDevices = useRestriction('limitDevices');
+  const commonDeviceAttributes = useCommonDeviceAttributes(t);
+  const deviceAttributes = useDeviceAttributes(t);
+
+  // State management
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const [editDialog, setEditDialog] = useState(false);
+  const [editingDevice, setEditingDevice] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [activeTab, setActiveTab] = useState(0);
+
+  console.log('FloatingDevicesPopover state:', { editDialog, isVisible });
+
+  // Fetch devices with TanStack Query
+  console.log('=== TEST: Before useQuery ===');
+  const { data: devices = [], isLoading, error } = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
+      console.log('=== TEST: Inside queryFn ===');
+      const response = await fetchOrThrow('/api/devices');
+      const data = await response.json();
+      console.log('=== TEST: Fetched devices ===', data);
+      return data;
+    },
+    enabled: isVisible,
+  });
+
+  // Fetch groups for dropdown
+  const { data: groups = [] } = useQuery({
+    queryKey: ['groups'],
+    queryFn: async () => {
+      const response = await fetchOrThrow('/api/groups');
+      return response.json();
+    },
+    enabled: isVisible,
+  });
+
+  // Fetch calendars for dropdown
+  const { data: calendars = [] } = useQuery({
+    queryKey: ['calendars'],
+    queryFn: async () => {
+      const response = await fetchOrThrow('/api/calendars');
+      return response.json();
+    },
+    enabled: isVisible,
+  });
+
+  console.log('=== TEST: After useQuery ===', { devices, isLoading, error });
+
+  // Filter devices based on search keyword
+  const filteredDevices = devices.filter(device =>
+    device.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    device.uniqueId?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    device.phone?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    device.model?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    device.contact?.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
+  // Pagination
+  const totalPages = Math.ceil(filteredDevices.length / pageSize);
+  const paginatedDevices = filteredDevices.slice((page - 1) * pageSize, page * pageSize);
+
+  // Create device mutation
+  const createDeviceMutation = useMutation({
+    mutationFn: async (deviceData) => {
+      const response = await fetchOrThrow('/api/devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(deviceData),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['devices']);
+      setEditDialog(false);
+      setEditingDevice(null);
+      setActiveTab(0);
+    },
+    onError: (error) => {
+      console.error('Create device error:', error);
+    },
+  });
+
+  // Update device mutation
+  const updateDeviceMutation = useMutation({
+    mutationFn: async ({ id, ...deviceData }) => {
+      const response = await fetchOrThrow(`/api/devices/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(deviceData),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['devices']);
+      setEditDialog(false);
+      setEditingDevice(null);
+      setActiveTab(0);
+    },
+    onError: (error) => {
+      console.error('Update device error:', error);
+    },
+  });
+
+  // Delete device mutation
+  const deleteDeviceMutation = useMutation({
+    mutationFn: async (deviceId) => {
+      await fetchOrThrow(`/api/devices/${deviceId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['devices']);
+      setDeleteDialog(false);
+      setDeviceToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Delete device error:', error);
+    },
+  });
+
+  const handleSaveDevice = () => {
+    if (!editingDevice) return;
+
+    const deviceData = {
+      name: editingDevice.name,
+      uniqueId: editingDevice.uniqueId,
+      groupId: editingDevice.groupId || null,
+      phone: editingDevice.phone || null,
+      model: editingDevice.model || null,
+      contact: editingDevice.contact || null,
+      category: editingDevice.category || 'default',
+      calendarId: editingDevice.calendarId || null,
+      expirationTime: editingDevice.expirationTime || null,
+      disabled: editingDevice.disabled || false,
+      attributes: editingDevice.attributes || {},
+    };
+
+    if (editingDevice.id) {
+      updateDeviceMutation.mutate({ id: editingDevice.id, ...deviceData });
+    } else {
+      createDeviceMutation.mutate(deviceData);
+    }
+  };
+
+  const handleDeleteDevice = () => {
+    if (deviceToDelete) {
+      deleteDeviceMutation.mutate(deviceToDelete.id);
+    }
+  };
+
+  const handleAddDevice = () => {
+    setEditingDevice({
+      name: '',
+      uniqueId: '',
+      groupId: null,
+      phone: '',
+      model: '',
+      contact: '',
+      category: 'default',
+      calendarId: null,
+      expirationTime: null,
+      disabled: false,
+      attributes: {},
+    });
+    setEditDialog(true);
+    setActiveTab(0);
+  };
+
+  const handleEditDevice = (device) => {
+    setEditingDevice(device);
+    setEditDialog(true);
+    setActiveTab(0);
+  };
+
+  const handleDeleteClick = (device) => {
+    setDeviceToDelete(device);
+    setDeleteDialog(true);
+  };
+
+  const handleMenuClick = (event, device) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setSelectedDevice(device);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedDevice(null);
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ x: -400, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -400, opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          style={{
+            position: 'fixed',
+            top: !desktop ? '0px' : '8px',
+            left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
+            width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
+            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
+            zIndex: 9999,
+            pointerEvents: 'auto',
+            transition: 'left 0.3s ease'
+          }}
+        >
+          <div style={{
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            borderRadius: !desktop ? '0px' : '0px 16px 16px 0px',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <IconButton
+                  onClick={onClose}
+                  size="small"
+                  style={{ color: colors.text }}
+                >
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                  {t('settingsDevices')}
+                </Typography>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddDevice}
+                  size="small"
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    textTransform: 'none',
+                    padding: '6px 12px',
+                    minWidth: 'auto',
+                  }}
+                >
+                  {t('sharedAdd')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div style={{ padding: '16px 20px', borderBottom: `1px solid ${colors.border}` }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder={t('sharedSearch')}
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
+                }}
+                style={{
+                  flex: 1,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: colors.secondary,
+                    '& fieldset': { borderColor: colors.border },
+                    '&:hover fieldset': { borderColor: colors.primary },
+                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                  }
+                }}
+              />
+            </div>
+
+            {/* Content */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '0 20px' }}>
+              {isLoading ? (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '200px',
+                  gap: '16px',
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '120px',
+                    height: '120px',
+                    backgroundColor: colors.surface,
+                    borderRadius: '50%',
+                    boxShadow: `0 4px 12px ${colors.border}20`
+                  }}>
+                    <CircularProgress 
+                      style={{ 
+                        color: colors.text,
+                        position: 'absolute'
+                      }} 
+                      size={100}
+                      thickness={4}
+                    />
+                  </div>
+                  <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                    {t('sharedLoading')}...
+                  </Typography>
+                </div>
+              ) : error ? (
+                <Alert severity="error" style={{ margin: '20px', backgroundColor: colors.error + '20', color: colors.text }}>
+                  {t('sharedError')}: {error.message}
+                </Alert>
+              ) : (
+                <>
+                  {/* Table */}
+                  <TableContainer style={{ padding: '0 20px' }}>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow style={{ backgroundColor: colors.surface }}>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedName')}
+                          </TableCell>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('deviceIdentifier')}
+                          </TableCell>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('deviceStatus')}
+                          </TableCell>
+                          <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedActions')}
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {paginatedDevices.map((device, index) => (
+                          <TableRow 
+                            key={device.id} 
+                            style={{
+                              backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
+                              cursor: 'pointer',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = colors.hover;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : colors.secondary;
+                            }}
+                            sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
+                          >
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
+                                {device.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                {device.uniqueId}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={formatStatus(device.status, t)}
+                                size="small"
+                                style={{
+                                  backgroundColor: device.status === 'online' ? colors.success : colors.error,
+                                  color: colors.text,
+                                  fontSize: '10px',
+                                  height: '16px',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleMenuClick(e, device)}
+                                style={{ color: colors.text }}
+                              >
+                                <MoreVertIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+                      <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(e, newPage) => setPage(newPage)}
+                        size="small"
+                        color="primary"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Actions Menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            PaperProps={{
+              style: {
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '8px',
+                minWidth: '160px',
+                zIndex: 10002,
+              }
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleEditDevice(selectedDevice);
+                handleMenuClose();
+              }}
+              style={{ color: colors.text }}
+            >
+              <EditIcon fontSize="small" style={{ marginRight: '8px' }} />
+              {t('sharedEdit')}
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleDeleteClick(selectedDevice);
+                handleMenuClose();
+              }}
+              style={{ color: colors.error }}
+            >
+              <DeleteIcon fontSize="small" style={{ marginRight: '8px' }} />
+              {t('sharedDelete')}
+            </MenuItem>
+          </Menu>
+
+          {/* Edit Dialog */}
+          <AnimatePresence>
+            {editDialog && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 10000,
+                  }}
+                  onClick={() => {
+                    setEditDialog(false);
+                    setEditingDevice(null);
+                  }}
+                />
+                <motion.div
+                  initial={{ x: 400, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 400, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    width: '500px',
+                    height: '100vh',
+                    backgroundColor: colors.surface,
+                    borderLeft: `1px solid ${colors.border}`,
+                    zIndex: 10000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  {/* Drawer Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+                  }}>
+                    <IconButton
+                      onClick={() => {
+                        setEditDialog(false);
+                        setEditingDevice(null);
+                      }}
+                      size="small"
+                      style={{ color: colors.text, marginRight: '12px' }}
+                    >
+                      <ChevronLeftIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                      {editingDevice?.id ? t('deviceEdit') : t('deviceAdd')}
+                    </Typography>
+                  </div>
+
+                  {/* Tabs */}
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs
+                      value={activeTab}
+                      onChange={(e, newValue) => setActiveTab(newValue)}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      style={{
+                        borderBottom: `1px solid ${colors.border}`,
+                        marginBottom: '16px',
+                      }}
+                      sx={{
+                        '& .MuiTab-root': {
+                          color: colors.textSecondary,
+                          fontWeight: '600',
+                          backgroundColor: 'transparent',
+                        },
+                        '& .Mui-selected': {
+                          color: colors.primary,
+                        },
+                        '& .MuiTabs-indicator': {
+                          backgroundColor: colors.primary,
+                        },
+                      }}
+                    >
+                      <Tab label={t('sharedRequired')} />
+                      <Tab label={t('sharedExtra')} />
+                      <Tab label={t('sharedAttributes')} />
+                    </Tabs>
+                  </Box>
+
+                  {/* Tab Content */}
+                  <div style={{ flex: 1, overflow: 'auto', padding: '20px' }}>
+                    {activeTab === 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <TextField
+                          fullWidth
+                          label={t('sharedName')}
+                          value={editingDevice?.name || ''}
+                          onChange={(e) => setEditingDevice({ ...editingDevice, name: e.target.value })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label={t('deviceIdentifier')}
+                          value={editingDevice?.uniqueId || ''}
+                          onChange={(e) => setEditingDevice({ ...editingDevice, uniqueId: e.target.value })}
+                          size="small"
+                          disabled={Boolean(editingDevice?.id)}
+                          helperText={t('deviceIdentifierHelp')}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 1 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
+                            {t('groupParent')}
+                          </InputLabel>
+                          <Select
+                            value={editingDevice?.groupId || ''}
+                            onChange={(e) => setEditingDevice({ ...editingDevice, groupId: e.target.value || null })}
+                            label={t('groupParent')}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                          >
+                            <MenuItem value="">{t('sharedNone')}</MenuItem>
+                            {groups.map((group) => (
+                              <MenuItem key={group.id} value={group.id}>
+                                {group.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <TextField
+                          fullWidth
+                          label={t('sharedPhone')}
+                          value={editingDevice?.phone || ''}
+                          onChange={(e) => setEditingDevice({ ...editingDevice, phone: e.target.value })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+
+                        <TextField
+                          fullWidth
+                          label={t('deviceModel')}
+                          value={editingDevice?.model || ''}
+                          onChange={(e) => setEditingDevice({ ...editingDevice, model: e.target.value })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+
+                        <TextField
+                          fullWidth
+                          label={t('deviceContact')}
+                          value={editingDevice?.contact || ''}
+                          onChange={(e) => setEditingDevice({ ...editingDevice, contact: e.target.value })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+
+                        <FormControl fullWidth size="small">
+                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
+                            {t('deviceCategory')}
+                          </InputLabel>
+                          <Select
+                            value={editingDevice?.category || 'default'}
+                            onChange={(e) => setEditingDevice({ ...editingDevice, category: e.target.value })}
+                            label={t('deviceCategory')}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                          >
+                            {deviceCategories.map((category) => (
+                              <MenuItem key={category} value={category}>
+                                {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth size="small">
+                          <InputLabel sx={{ color: colors.textSecondary, '&.Mui-focused': { color: colors.primary } }}>
+                            {t('sharedCalendar')}
+                          </InputLabel>
+                          <Select
+                            value={editingDevice?.calendarId || ''}
+                            onChange={(e) => setEditingDevice({ ...editingDevice, calendarId: e.target.value || null })}
+                            label={t('sharedCalendar')}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  backgroundColor: colors.surface,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  zIndex: 10002,
+                                }
+                              }
+                            }}
+                          >
+                            <MenuItem value="">{t('sharedNone')}</MenuItem>
+                            {calendars.map((calendar) => (
+                              <MenuItem key={calendar.id} value={calendar.id}>
+                                {calendar.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <TextField
+                          fullWidth
+                          label={t('userExpirationTime')}
+                          type="date"
+                          value={editingDevice?.expirationTime ? editingDevice.expirationTime.split('T')[0] : '2099-01-01'}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              setEditingDevice({ ...editingDevice, expirationTime: new Date(e.target.value).toISOString() });
+                            }
+                          }}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabel-root': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={editingDevice?.disabled || false}
+                              onChange={(e) => setEditingDevice({ ...editingDevice, disabled: e.target.checked })}
+                              sx={{
+                                color: colors.primary,
+                                '&.Mui-checked': { color: colors.primary },
+                              }}
+                            />
+                          }
+                          label={t('sharedDisabled')}
+                          sx={{ color: colors.text }}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 2 && (
+                      <EditAttributesAccordion
+                        attributes={editingDevice?.attributes || {}}
+                        setAttributes={(attributes) => setEditingDevice({ ...editingDevice, attributes })}
+                        definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
+                        zIndex={10003}
+                      />
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderTop: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'flex-end',
+                  }}>
+                    <Button
+                      onClick={() => {
+                        setEditDialog(false);
+                        setEditingDevice(null);
+                      }}
+                      style={{ color: colors.textSecondary }}
+                    >
+                      {t('sharedCancel')}
+                    </Button>
+                    <Button
+                      onClick={handleSaveDevice}
+                      variant="contained"
+                      disabled={createDeviceMutation.isPending || updateDeviceMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                      }}
+                    >
+                      {(createDeviceMutation.isPending || updateDeviceMutation.isPending) ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        t('sharedSave')
+                      )}
+                    </Button>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog
+            open={deleteDialog}
+            onClose={() => setDeleteDialog(false)}
+            PaperProps={{
+              style: {
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '8px',
+                minWidth: '160px',
+                zIndex: 10002,
+              }
+            }}
+          >
+            <DialogTitle style={{ color: colors.text, padding: '16px 20px' }}>
+              {t('sharedConfirmDelete')}
+            </DialogTitle>
+            <DialogContent style={{ color: colors.text, padding: '0 20px' }}>
+              {t('deviceDeleteConfirm', { device: deviceToDelete?.name })}
+            </DialogContent>
+            <DialogActions style={{ padding: '16px 20px', gap: '12px' }}>
+              <Button
+                onClick={() => setDeleteDialog(false)}
+                style={{ color: colors.text, textTransform: 'none' }}
+              >
+                {t('sharedCancel')}
+              </Button>
+              <Button
+                onClick={handleDeleteDevice}
+                variant="contained"
+                style={{
+                  backgroundColor: colors.error,
+                  color: colors.text,
+                  textTransform: 'none',
+                }}
+              >
+                {t('sharedDelete')}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default FloatingDevicesPopover;
