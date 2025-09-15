@@ -14,7 +14,6 @@ import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
-import { useAdministrator, useRestriction } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useCatch } from '../reactHelper';
 import dayjs from 'dayjs';
@@ -83,7 +82,15 @@ import {
   OutlinedInput, 
   Autocomplete, 
   createFilterOptions,
-  Button
+  Button,
+  Typography, 
+  Tabs,
+  Tab,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Chip
 } from '@mui/material';
 import { 
   useAdministrator, 
@@ -95,26 +102,6 @@ import { formatTime, formatNotificationTitle } from '../common/util/formatter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { eventsActions } from '../store';
-import { 
-  Typography, 
-  IconButton, 
-  Button, 
-  TextField, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Checkbox, 
-  FormGroup, 
-  FormControlLabel,
-  Tabs,
-  Tab,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Chip
-} from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import CloseIcon from '@mui/icons-material/Close';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -123,9 +110,7 @@ import useCommonUserAttributes from '../common/attributes/useCommonUserAttribute
 import useServerAttributes from '../common/attributes/useServerAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import SelectField from '../common/components/SelectField';
-import fetchOrThrow from '../common/util/fetchOrThrow';
 import { MuiFileInput } from 'mui-file-input';
-import { prefixString } from '../common/util/stringUtils';
 import { useEffectAsync } from '../reactHelper';
 
 const useStyles = makeStyles()((theme) => ({
@@ -200,6 +185,7 @@ const MainPage = () => {
   const [token, setToken] = useState(null);
   const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
   const [activeServerTab, setActiveServerTab] = useState(0);
+  const [activePreferencesTab, setActivePreferencesTab] = useState(0);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
   const [announcementData, setAnnouncementData] = useState({
@@ -249,10 +235,13 @@ const MainPage = () => {
   const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,locationIqDark,openFreeMap');
   
   // Preferences hooks
-  const mapOverlays = useMapOverlays();
-  const positionAttributes = usePositionAttributes(t);
+  // Translation and permissions - moved early to avoid hoisting issues
+  const t = useTranslation();
   const admin = useAdministrator();
   const readonly = useRestriction('readonly');
+  
+  const mapOverlays = useMapOverlays();
+  const positionAttributes = usePositionAttributes(t);
   const user = useSelector((state) => state.session.user);
   const versionApp = import.meta.env.VITE_APP_VERSION;
   const versionServer = useSelector((state) => state.session.server.version);
@@ -273,7 +262,7 @@ const MainPage = () => {
     name: t(it),
   }));
   
-  const filter = createFilterOptions();
+  const createFilter = createFilterOptions();
   const [selectedMapStyle, setSelectedMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'locationIqStreets'));
   
   const handleMapStyleChange = (styleId) => {
@@ -371,11 +360,6 @@ const MainPage = () => {
     setSearchResults([]);
   };
 
-  
-  // Translation and permissions
-  const t = useTranslation();
-  const readonly = useRestriction('readonly');
-  const admin = useAdministrator();
   
   // Server attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
@@ -629,7 +613,6 @@ const MainPage = () => {
   }, [currentTheme]);
   
   // User and server data
-  const user = useSelector((state) => state.session.user);
   const server = useSelector((state) => state.session.server);
   const supportLink = useSelector((state) => state.session.server.attributes.support);
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
@@ -4009,29 +3992,83 @@ const MainPage = () => {
                     <ChevronLeftIcon fontSize="small" />
                   </IconButton>
                   <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    {t('settingsTitle')}
+                    {activePreferencesTab === 0 && t('mapTitle')}
+                    {activePreferencesTab === 1 && t('deviceTitle')}
+                    {activePreferencesTab === 2 && t('sharedSound')}
+                    {activePreferencesTab === 3 && t('userToken')}
+                    {activePreferencesTab === 4 && t('sharedInfoTitle')}
                   </Typography>
                 </div>
               </div>
 
               {/* Content */}
-              <div style={{
-                flex: 1,
-                overflow: 'auto',
-                padding: '20px',
-                paddingBottom: '200px',
+              <div style={{ 
+                flex: 1, 
+                overflow: 'auto', 
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                paddingBottom: '200px'
               }}>
-                <Typography variant="h6" style={{ color: colors.text, marginBottom: '20px', fontWeight: '600' }}>
-                  {t('sharedPreferences')}
+                {/* Debug: Preferences Tabs */}
+                <Typography variant="h6" style={{ color: 'red', marginBottom: '16px' }}>
+                  DEBUG: Tabs should be here
                 </Typography>
-                
-                {!readonly && (
-                  <>
-                    {/* Map Settings */}
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                    {t('mapTitle')}
-                  </Typography>
+                <Tabs
+                  value={activePreferencesTab}
+                  onChange={(e, newValue) => setActivePreferencesTab(newValue)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  style={{
+                    borderBottom: `1px solid ${colors.border}`,
+                    marginBottom: '16px',
+                  }}
+                  sx={{
+                    '& .MuiTab-root': {
+                      color: '#666666',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      textTransform: 'none',
+                      minHeight: '40px',
+                      padding: '8px 16px',
+                      '&.Mui-selected': {
+                        color: '#1976d2',
+                        fontWeight: '600',
+                        backgroundColor: 'transparent',
+                      },
+                      '&:hover': {
+                        color: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                      },
+                      '&.Mui-selected:hover': {
+                        color: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                      },
+                    },
+                    '& .MuiTabs-indicator': {
+                      backgroundColor: '#1976d2',
+                      height: '2px',
+                    },
+                  }}
+                >
+                  <Tab label={t('mapTitle')} />
+                  <Tab label={t('deviceTitle')} />
+                  <Tab label={t('sharedSound')} />
+                  <Tab label={t('userToken')} />
+                  <Tab label={t('sharedInfoTitle')} />
+                </Tabs>
+
+                {/* Map Tab */}
+                {activePreferencesTab === 0 && (
+                  <Box sx={{ paddingTop: '16px' }}>
+                    {!readonly && (
+                      <>
+                        {/* Map Settings */}
+                        <div style={{ marginBottom: '24px' }}>
+                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                            {t('mapTitle')}
+                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('mapActive')}</InputLabel>
@@ -4126,7 +4163,7 @@ const MainPage = () => {
                       setPreferencesAttributes({ ...preferencesAttributes, positionItems: newValue.map((x) => (typeof x === 'string' ? x : x.inputValue)).join(','), });
                     }}
                     filterOptions={(options, params) => {
-                      const filtered = filter(options, params);
+                      const filtered = createFilter(options, params);
                       if (params.inputValue && !options.includes(params.inputValue)) {
                         filtered.push({ inputValue: params.inputValue, name: `${t('sharedAdd')} "${params.inputValue}"` });
                       }
@@ -4297,13 +4334,22 @@ const MainPage = () => {
                       style={{ color: colors.text }}
                     />
                   </FormGroup>
-                </div>
+                        </div>
+                      </>
+                    )}
+                  </Box>
+                )}
 
-                {/* Device Settings */}
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                    {t('deviceTitle')}
-                  </Typography>
+                {/* Device Tab */}
+                {activePreferencesTab === 1 && (
+                  <Box sx={{ paddingTop: '16px' }}>
+                    {!readonly && (
+                      <>
+                        {/* Device Settings */}
+                        <div style={{ marginBottom: '24px' }}>
+                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                            {t('deviceTitle')}
+                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('devicePrimaryInfo')}</InputLabel>
@@ -4377,13 +4423,22 @@ const MainPage = () => {
                       ))}
                     </Select>
                   </FormControl>
-                </div>
+                        </div>
+                      </>
+                    )}
+                  </Box>
+                )}
 
-                {/* Sound Settings */}
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                    {t('sharedSound')}
-                  </Typography>
+                {/* Sound Tab */}
+                {activePreferencesTab === 2 && (
+                  <Box sx={{ paddingTop: '16px' }}>
+                    {!readonly && (
+                      <>
+                        {/* Sound Settings */}
+                        <div style={{ marginBottom: '24px' }}>
+                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                            {t('sharedSound')}
+                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('eventsSoundEvents')}</InputLabel>
@@ -4454,15 +4509,20 @@ const MainPage = () => {
                       ))}
                     </Select>
                   </FormControl>
-                </div>
-                  </>
+                        </div>
+                      </>
+                    )}
+                  </Box>
                 )}
 
-                {/* User Token */}
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                    {t('userToken')}
-                  </Typography>
+                {/* User Token Tab */}
+                {activePreferencesTab === 3 && (
+                  <Box sx={{ paddingTop: '16px' }}>
+                    {/* User Token */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                        {t('userToken')}
+                      </Typography>
                   
                   <TextField
                     fullWidth
@@ -4515,15 +4575,20 @@ const MainPage = () => {
                       }}
                     />
                   </FormControl>
-                </div>
+                    </div>
+                  </Box>
+                )}
 
-                {!readonly && (
-                  <>
-                    {/* System Info */}
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                    {t('sharedInfoTitle')}
-                  </Typography>
+                {/* System Info Tab */}
+                {activePreferencesTab === 4 && (
+                  <Box sx={{ paddingTop: '16px' }}>
+                    {!readonly && (
+                      <>
+                        {/* System Info */}
+                        <div style={{ marginBottom: '24px' }}>
+                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
+                            {t('sharedInfoTitle')}
+                          </Typography>
                   
                   <TextField
                     fullWidth
@@ -4602,8 +4667,12 @@ const MainPage = () => {
                       {t('serverReboot')}
                     </Button>
                   )}
-                </div>
-                
+                        </div>
+                      </>
+                    )}
+                  </Box>
+                )}
+
                 {/* Action Buttons */}
                 <div style={{
                   display: 'flex',
@@ -4634,8 +4703,6 @@ const MainPage = () => {
                     {t('sharedSave')}
                   </Button>
                 </div>
-                  </>
-                )}
               </div>
             </motion.div>
           </>
