@@ -33,6 +33,7 @@ import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
 import UsersModal from './UsersModal';
+import LogoImage from '../login/LogoImage';
 import { 
   Truck, 
   PieChart, 
@@ -789,11 +790,12 @@ const MainPage = () => {
             height: '40px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: isMenuExpanded ? 'space-between' : 'center',
             cursor: 'pointer',
             position: 'relative',
             borderRadius: '0px',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            padding: isMenuExpanded ? '0 12px' : '0'
           }}
           onClick={() => {
             setIsMenuExpanded(!isMenuExpanded);
@@ -804,6 +806,17 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}>
+            {isMenuExpanded && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                maxWidth: '120px',
+                maxHeight: '32px'
+              }}>
+                <LogoImage color={colors.primary} />
+              </div>
+            )}
             {isMenuExpanded ? <ChevronLeft size={18} color={colors.textSecondary} /> : <ChevronRight size={18} color={colors.textSecondary} />}
           </div>
           
