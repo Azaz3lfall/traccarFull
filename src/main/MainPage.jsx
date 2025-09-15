@@ -1016,7 +1016,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-notifications');
             if (tooltip) tooltip.remove();
-              window.location.href = '/settings/notifications';
+              setShowNotificationsPopover(true);
           }}
           onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
