@@ -186,6 +186,7 @@ const MainPage = () => {
   const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [activePreferencesTab, setActivePreferencesTab] = useState(0);
+  const [popupInfoOpen, setPopupInfoOpen] = useState(false);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
   const [announcementData, setAnnouncementData] = useState({
@@ -4333,9 +4334,11 @@ const MainPage = () => {
                   <Autocomplete
                     multiple
                     freeSolo
-                    disablePortal={false}
                     openOnFocus
                     blurOnSelect={false}
+                    open={popupInfoOpen}
+                    onOpen={() => setPopupInfoOpen(true)}
+                    onClose={() => setPopupInfoOpen(false)}
                     options={Object.keys(positionAttributes)}
                     getOptionLabel={(option) => {
                       if (typeof option === 'object' && option.inputValue) {
@@ -4384,6 +4387,9 @@ const MainPage = () => {
                         zIndex: 99999,
                       }
                     }}
+                    PopperComponent={(props) => (
+                      <div {...props} style={{ ...props.style, zIndex: 99999 }} />
+                    )}
                   />
                   
                   <FormControl fullWidth margin="normal">
