@@ -3827,7 +3827,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.forceSettings} 
-                                onChange={(event) => setServerData({ ...serverData, forceSettings: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, forceSettings: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('serverForceSettings')}
@@ -3890,7 +3905,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.registration} 
-                                onChange={(event) => setServerData({ ...serverData, registration: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, registration: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('serverRegistration')}
@@ -3899,7 +3929,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.readonly} 
-                                onChange={(event) => setServerData({ ...serverData, readonly: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, readonly: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('serverReadonly')}
@@ -3908,7 +3953,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.deviceReadonly} 
-                                onChange={(event) => setServerData({ ...serverData, deviceReadonly: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, deviceReadonly: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('userDeviceReadonly')}
@@ -3917,7 +3977,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.limitCommands} 
-                                onChange={(event) => setServerData({ ...serverData, limitCommands: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, limitCommands: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('userLimitCommands')}
@@ -3926,7 +4001,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.disableReports} 
-                                onChange={(event) => setServerData({ ...serverData, disableReports: event.target.checked })} 
+                                onChange={(event) => setServerData({ ...serverData, disableReports: event.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('userDisableReports')}
@@ -3935,7 +4025,22 @@ const MainPage = () => {
                             control={
                               <Checkbox 
                                 checked={serverData.fixedEmail} 
-                                onChange={(e) => setServerData({ ...serverData, fixedEmail: e.target.checked })} 
+                                onChange={(e) => setServerData({ ...serverData, fixedEmail: e.target.checked })}
+                                sx={{
+                                  color: colors.textSecondary,
+                                  '&:hover': {
+                                    backgroundColor: `${colors.primary}20`,
+                                  },
+                                  '&.Mui-checked': {
+                                    color: colors.primary,
+                                    '&:hover': {
+                                      backgroundColor: `${colors.primary}30`,
+                                    },
+                                  },
+                                  '&.MuiCheckbox-root': {
+                                    color: colors.textSecondary,
+                                  },
+                                }}
                               />
                             }
                             label={t('userFixedEmail')}
@@ -4087,10 +4192,7 @@ const MainPage = () => {
                 gap: '16px',
                 paddingBottom: '200px'
               }}>
-                {/* Debug: Preferences Tabs */}
-                <Typography variant="h6" style={{ color: 'red', marginBottom: '16px' }}>
-                  DEBUG: Tabs should be here
-                </Typography>
+                {/* Preferences Tabs */}
                 <Tabs
                   value={activePreferencesTab}
                   onChange={(e, newValue) => setActivePreferencesTab(newValue)}
@@ -4351,9 +4453,18 @@ const MainPage = () => {
                           checked={preferencesAttributes.hasOwnProperty('mapGeofences') ? preferencesAttributes.mapGeofences : true}
                           onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapGeofences: e.target.checked })}
                           sx={{
-                            color: colors.primary,
+                            color: colors.textSecondary,
+                            '&:hover': {
+                              backgroundColor: `${colors.primary}20`,
+                            },
                             '&.Mui-checked': {
                               color: colors.primary,
+                              '&:hover': {
+                                backgroundColor: `${colors.primary}30`,
+                              },
+                            },
+                            '&.MuiCheckbox-root': {
+                              color: colors.textSecondary,
                             },
                           }}
                         />
@@ -4367,9 +4478,18 @@ const MainPage = () => {
                           checked={preferencesAttributes.hasOwnProperty('mapFollow') ? preferencesAttributes.mapFollow : false}
                           onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapFollow: e.target.checked })}
                           sx={{
-                            color: colors.primary,
+                            color: colors.textSecondary,
+                            '&:hover': {
+                              backgroundColor: `${colors.primary}20`,
+                            },
                             '&.Mui-checked': {
                               color: colors.primary,
+                              '&:hover': {
+                                backgroundColor: `${colors.primary}30`,
+                              },
+                            },
+                            '&.MuiCheckbox-root': {
+                              color: colors.textSecondary,
                             },
                           }}
                         />
@@ -4383,9 +4503,18 @@ const MainPage = () => {
                           checked={preferencesAttributes.hasOwnProperty('mapCluster') ? preferencesAttributes.mapCluster : true}
                           onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapCluster: e.target.checked })}
                           sx={{
-                            color: colors.primary,
+                            color: colors.textSecondary,
+                            '&:hover': {
+                              backgroundColor: `${colors.primary}20`,
+                            },
                             '&.Mui-checked': {
                               color: colors.primary,
+                              '&:hover': {
+                                backgroundColor: `${colors.primary}30`,
+                              },
+                            },
+                            '&.MuiCheckbox-root': {
+                              color: colors.textSecondary,
                             },
                           }}
                         />
@@ -4399,9 +4528,18 @@ const MainPage = () => {
                           checked={preferencesAttributes.hasOwnProperty('mapOnSelect') ? preferencesAttributes.mapOnSelect : true}
                           onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapOnSelect: e.target.checked })}
                           sx={{
-                            color: colors.primary,
+                            color: colors.textSecondary,
+                            '&:hover': {
+                              backgroundColor: `${colors.primary}20`,
+                            },
                             '&.Mui-checked': {
                               color: colors.primary,
+                              '&:hover': {
+                                backgroundColor: `${colors.primary}30`,
+                              },
+                            },
+                            '&.MuiCheckbox-root': {
+                              color: colors.textSecondary,
                             },
                           }}
                         />
