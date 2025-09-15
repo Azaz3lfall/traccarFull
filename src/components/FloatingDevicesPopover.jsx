@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useEffectAsync } from '../reactHelper';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -23,7 +22,6 @@ import {
   Typography,
   Box,
   Chip,
-  Switch,
   FormControlLabel,
   Pagination,
   CircularProgress,
@@ -40,17 +38,12 @@ import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Close as CloseIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
-  FirstPage as FirstPageIcon,
-  LastPage as LastPageIcon,
-  Devices as DevicesIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
-import { formatBoolean, formatStatus, formatTime } from '../common/util/formatter';
+import { formatStatus } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
@@ -149,14 +142,18 @@ const FloatingDevicesPopover = ({
   // Create device mutation
   const createDeviceMutation = useMutation({
     mutationFn: async (deviceData) => {
+      console.log('Creating device with data:', deviceData);
       const response = await fetchOrThrow('/api/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deviceData),
       });
-      return response.json();
+      const result = await response.json();
+      console.log('Create device response:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Device created successfully:', data);
       queryClient.invalidateQueries(['devices']);
       setEditDialog(false);
       setEditingDevice(null);
@@ -170,14 +167,18 @@ const FloatingDevicesPopover = ({
   // Update device mutation
   const updateDeviceMutation = useMutation({
     mutationFn: async ({ id, ...deviceData }) => {
+      console.log('Updating device with ID:', id, 'and data:', deviceData);
       const response = await fetchOrThrow(`/api/devices/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deviceData),
       });
-      return response.json();
+      const result = await response.json();
+      console.log('Update device response:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Device updated successfully:', data);
       queryClient.invalidateQueries(['devices']);
       setEditDialog(false);
       setEditingDevice(null);
@@ -206,7 +207,18 @@ const FloatingDevicesPopover = ({
   });
 
   const handleSaveDevice = () => {
-    if (!editingDevice) return;
+    if (!editingDevice) {
+      console.log('No editing device found');
+      return;
+    }
+
+    // Basic validation
+    if (!editingDevice.name || !editingDevice.uniqueId) {
+      console.log('Missing required fields:', { name: editingDevice.name, uniqueId: editingDevice.uniqueId });
+      return;
+    }
+
+    console.log('Saving device:', editingDevice);
 
     const deviceData = {
       name: editingDevice.name,
@@ -222,9 +234,13 @@ const FloatingDevicesPopover = ({
       attributes: editingDevice.attributes || {},
     };
 
+    console.log('Device data to save:', deviceData);
+
     if (editingDevice.id) {
+      console.log('Updating existing device with ID:', editingDevice.id);
       updateDeviceMutation.mutate({ id: editingDevice.id, ...deviceData });
     } else {
+      console.log('Creating new device');
       createDeviceMutation.mutate(deviceData);
     }
   };
@@ -701,7 +717,6 @@ const FloatingDevicesPopover = ({
                           value={editingDevice?.uniqueId || ''}
                           onChange={(e) => setEditingDevice({ ...editingDevice, uniqueId: e.target.value })}
                           size="small"
-                          disabled={Boolean(editingDevice?.id)}
                           helperText={t('deviceIdentifierHelp')}
                           sx={{
                             '& .MuiOutlinedInput-root': {
@@ -906,10 +921,11 @@ const FloatingDevicesPopover = ({
                       </div>
                     )}
 
+                    {/* Attributes Tab */}
                     {activeTab === 2 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div>
                         {editingDevice?.id && (
-                          <div>
+                          <div style={{ marginBottom: '16px' }}>
                             <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
                               {t('attributeDeviceImage')}
                             </Typography>
@@ -934,9 +950,11 @@ const FloatingDevicesPopover = ({
                           </div>
                         )}
                         <EditAttributesAccordion
+                          attribute={null}
                           attributes={editingDevice?.attributes || {}}
                           setAttributes={(attributes) => setEditingDevice({ ...editingDevice, attributes })}
                           definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
+                          focusAttribute={null}
                           zIndex={10003}
                         />
                       </div>
@@ -962,7 +980,10 @@ const FloatingDevicesPopover = ({
                       {t('sharedCancel')}
                     </Button>
                     <Button
-                      onClick={handleSaveDevice}
+                      onClick={() => {
+                        console.log('Save button clicked!');
+                        handleSaveDevice();
+                      }}
                       variant="contained"
                       disabled={createDeviceMutation.isPending || updateDeviceMutation.isPending}
                       style={{
