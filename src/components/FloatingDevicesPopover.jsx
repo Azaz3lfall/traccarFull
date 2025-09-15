@@ -347,6 +347,12 @@ const FloatingDevicesPopover = ({
 
   if (!isVisible) return null;
 
+  // Debug logging
+  console.log('=== DEVICES POPOVER DEBUG ===');
+  console.log('anchorEl:', anchorEl);
+  console.log('selectedDevice:', selectedDevice);
+  console.log('actions:', actions);
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -539,10 +545,13 @@ const FloatingDevicesPopover = ({
                                 }}
                               />
                             </TableCell>
-                            <TableCell style={{ padding: '4px' }}>
+                            <TableCell align="right" style={{ padding: '4px' }}>
                               <IconButton
                                 size="small"
                                 onClick={(e) => {
+                                  console.log('=== MENU CLICK DEBUG ===');
+                                  console.log('Device clicked:', device);
+                                  console.log('Event target:', e.currentTarget);
                                   setSelectedDevice(device);
                                   setAnchorEl(e.currentTarget);
                                 }}
@@ -556,6 +565,7 @@ const FloatingDevicesPopover = ({
                       </TableBody>
                     </Table>
                   </TableContainer>
+
 
                   {/* Pagination */}
                   {totalPages > 1 && (
@@ -574,17 +584,20 @@ const FloatingDevicesPopover = ({
             </div>
           </div>
 
-          {/* Action Menu */}
+          {/* Actions Menu */}
           <Menu
             anchorEl={anchorEl}
-            open={!!anchorEl}
-            onClose={() => setAnchorEl(null)}
-            style={{ zIndex: 10002 }}
+            open={Boolean(anchorEl)}
+            onClose={() => {
+              console.log('=== MENU CLOSE DEBUG ===');
+              console.log('Closing menu, anchorEl:', anchorEl);
+              setAnchorEl(null);
+            }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
-                boxShadow: colors.shadow,
+                borderRadius: '8px',
                 minWidth: '160px',
                 zIndex: 10002,
               }
@@ -596,13 +609,19 @@ const FloatingDevicesPopover = ({
                 <MenuItem
                   key={action.key}
                   onClick={() => {
-                    action.handler(selectedDevice);
+                    if (action.handler) {
+                      action.handler(selectedDevice);
+                    }
                     setAnchorEl(null);
                   }}
-                  style={{ color: colors.text, fontSize: '12px' }}
+                  style={{
+                    color: colors.text,
+                    fontSize: '14px',
+                    padding: '8px 16px',
+                  }}
                 >
-                  {action.icon}
-                  <span style={{ marginLeft: '6px' }}>{action.title}</span>
+                  {action.icon && <span style={{ marginRight: '8px' }}>{action.icon}</span>}
+                  {action.title}
                 </MenuItem>
               ))}
           </Menu>
