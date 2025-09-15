@@ -41,12 +41,14 @@ import {
   Search as SearchIcon,
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
-import { formatStatus } from '../common/util/formatter';
+import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
+import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
 import { sessionActions, devicesActions } from '../store';
@@ -91,6 +93,8 @@ const FloatingDevicesPopover = ({
   const [groupInputRef, setGroupInputRef] = useState(null);
   const [categoryInputRef, setCategoryInputRef] = useState(null);
   const [calendarInputRef, setCalendarInputRef] = useState(null);
+  const [connectionsDialog, setConnectionsDialog] = useState(false);
+  const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
 
 
   // Fetch devices with TanStack Query
@@ -291,6 +295,13 @@ const FloatingDevicesPopover = ({
     setAnchorEl(null);
   };
 
+  // Handle device connections
+  const handleConnections = (device) => {
+    setSelectedDeviceForConnections(device);
+    setConnectionsDialog(true);
+    setAnchorEl(null);
+  };
+
   const handleFileInput = useCatch(async (newFile) => {
     setImageFile(newFile);
     if (newFile && editingDevice?.id) {
@@ -322,6 +333,13 @@ const FloatingDevicesPopover = ({
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
       handler: handleEditDevice,
+      show: !limitDevices,
+    },
+    {
+      key: 'connections',
+      title: t('sharedConnections'),
+      icon: <LinkIcon fontSize="small" />,
+      handler: handleConnections,
       show: !limitDevices,
     },
     {
@@ -1190,6 +1208,147 @@ const FloatingDevicesPopover = ({
               </Button>
             </DialogActions>
           </Dialog>
+
+          {/* Connections Drawer - Slides in from right */}
+          <AnimatePresence>
+            {connectionsDialog && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 9999,
+                  }}
+                  onClick={() => setConnectionsDialog(false)}
+                />
+                
+                {/* Drawer */}
+                <motion.div
+                  initial={{ x: '100%', opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: '100%', opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    width: '500px',
+                    height: '100vh',
+                    backgroundColor: colors.surface,
+                    borderLeft: `1px solid ${colors.border}`,
+                    zIndex: 10000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Header */}
+                  <div style={{
+                    padding: '16px 20px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => setConnectionsDialog(false)}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                        {t('sharedConnections')} - {selectedDeviceForConnections?.name}
+                      </Typography>
+                    </div>
+                  </div>
+
+                  {/* Drawer Content */}
+                  <div style={{
+                    flex: 1,
+                    overflow: 'auto',
+                    padding: '20px',
+                    paddingBottom: '200px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                  }}>
+                    {selectedDeviceForConnections && (
+                      <>
+                        <LinkField
+                          endpointAll="/api/geofences"
+                          endpointLinked={`/api/geofences?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="geofenceId"
+                          label={t('sharedGeofences')}
+                          zIndex={50000}
+                        />
+                        <LinkField
+                          endpointAll="/api/notifications"
+                          endpointLinked={`/api/notifications?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="notificationId"
+                          titleGetter={(it) => formatNotificationTitle(t, it)}
+                          label={t('sharedNotifications')}
+                          zIndex={50000}
+                        />
+                        <LinkField
+                          endpointAll="/api/drivers"
+                          endpointLinked={`/api/drivers?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="driverId"
+                          titleGetter={(it) => `${it.name} (${it.uniqueId})`}
+                          label={t('sharedDrivers')}
+                          zIndex={50000}
+                        />
+                        <LinkField
+                          endpointAll="/api/attributes/computed"
+                          endpointLinked={`/api/attributes/computed?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="attributeId"
+                          titleGetter={(it) => it.description}
+                          label={t('sharedComputedAttributes')}
+                          zIndex={50000}
+                        />
+                        <LinkField
+                          endpointAll="/api/commands"
+                          endpointLinked={`/api/commands?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="commandId"
+                          titleGetter={(it) => it.description}
+                          label={t('sharedSavedCommands')}
+                          zIndex={50000}
+                        />
+                        <LinkField
+                          endpointAll="/api/maintenance"
+                          endpointLinked={`/api/maintenance?deviceId=${selectedDeviceForConnections.id}`}
+                          baseId={selectedDeviceForConnections.id}
+                          keyBase="deviceId"
+                          keyLink="maintenanceId"
+                          label={t('sharedMaintenance')}
+                          zIndex={50000}
+                        />
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
