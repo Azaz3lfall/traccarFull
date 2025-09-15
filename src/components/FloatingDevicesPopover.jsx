@@ -204,36 +204,12 @@ const FloatingDevicesPopover = ({
   // Delete device mutation
   const deleteDeviceMutation = useMutation({
     mutationFn: async (deviceId) => {
-      console.log('=== DELETE MUTATION DEBUG ===');
-      console.log('Deleting device with ID:', deviceId);
-      console.log('API URL:', `/api/devices/${deviceId}`);
-      
-      try {
-        const response = await fetchOrThrow(`/api/devices/${deviceId}`, {
-          method: 'DELETE',
-        });
-        console.log('Delete response status:', response.status);
-        console.log('Delete response ok:', response.ok);
-        return deviceId; // Return the deviceId for use in onSuccess
-      } catch (error) {
-        console.error('Delete fetch error:', error);
-        throw error;
-      }
+      await fetchOrThrow(`/api/devices/${deviceId}`, { method: 'DELETE' });
     },
-    onSuccess: (deviceId) => {
-      console.log('=== DELETE SUCCESS ===');
-      console.log('Device deleted successfully:', deviceId);
-      console.log('Invalidating queries...');
-      queryClient.invalidateQueries(['devices']);
-      console.log('Dispatching Redux action...');
-      dispatch(devicesActions.remove(deviceId));
-      console.log('Closing dialog...');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
       setDeleteDialog(false);
       setDeviceToDelete(null);
-    },
-    onError: (error) => {
-      console.error('=== DELETE ERROR ===');
-      console.error('Delete device error:', error);
     },
   });
 
@@ -259,18 +235,6 @@ const FloatingDevicesPopover = ({
     }
   };
 
-  const handleDeleteDevice = () => {
-    console.log('=== DELETE DEVICE DEBUG ===');
-    console.log('deviceToDelete:', deviceToDelete);
-    console.log('deviceToDelete.id:', deviceToDelete?.id);
-    
-    if (deviceToDelete) {
-      console.log('Calling deleteDeviceMutation.mutate with ID:', deviceToDelete.id);
-      deleteDeviceMutation.mutate(deviceToDelete.id);
-    } else {
-      console.log('No device to delete!');
-    }
-  };
 
   const handleAddDevice = () => {
     setEditingDevice({
@@ -297,10 +261,9 @@ const FloatingDevicesPopover = ({
   };
 
   const handleDeleteClick = (device) => {
-    console.log('=== DELETE CLICK DEBUG ===');
-    console.log('Device clicked for deletion:', device);
     setDeviceToDelete(device);
     setDeleteDialog(true);
+    setAnchorEl(null);
   };
 
   const handleFileInput = useCatch(async (newFile) => {
@@ -1037,39 +1000,41 @@ const FloatingDevicesPopover = ({
           <Dialog
             open={deleteDialog}
             onClose={() => setDeleteDialog(false)}
+            style={{ zIndex: 10003 }}
             PaperProps={{
               style: {
                 backgroundColor: colors.surface,
                 border: `1px solid ${colors.border}`,
-                borderRadius: '8px',
-                minWidth: '160px',
-                zIndex: 10002,
-              }
+                borderRadius: '12px',
+                zIndex: 10003,
+              },
             }}
           >
             <DialogTitle style={{ color: colors.text, padding: '16px 20px' }}>
               {t('sharedConfirmDelete')}
             </DialogTitle>
             <DialogContent style={{ color: colors.text, padding: '0 20px' }}>
-              {t('deviceDeleteConfirm', { device: deviceToDelete?.name })}
+              <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                {t('sharedRemoveConfirm')} "{deviceToDelete?.name}"?
+              </Typography>
             </DialogContent>
-            <DialogActions style={{ padding: '16px 20px', gap: '12px' }}>
+            <DialogActions>
               <Button
                 onClick={() => setDeleteDialog(false)}
-                style={{ color: colors.text, textTransform: 'none' }}
+                style={{ color: colors.textSecondary }}
               >
                 {t('sharedCancel')}
               </Button>
               <Button
-                onClick={handleDeleteDevice}
-                variant="contained"
-                style={{
-                  backgroundColor: colors.error,
-                  color: colors.text,
-                  textTransform: 'none',
-                }}
+                onClick={() => deleteDeviceMutation.mutate(deviceToDelete.id)}
+                style={{ color: colors.error }}
+                disabled={deleteDeviceMutation.isPending}
               >
-                {t('sharedRemove')}
+                {deleteDeviceMutation.isPending ? (
+                  <CircularProgress size={16} />
+                ) : (
+                  t('sharedRemove')
+                )}
               </Button>
             </DialogActions>
           </Dialog>
