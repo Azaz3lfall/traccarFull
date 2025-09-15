@@ -168,6 +168,7 @@ const MainPage = () => {
   const [showDevicesPopover, setShowDevicesPopover] = useState(false);
   const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
+  const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
@@ -949,7 +950,7 @@ const MainPage = () => {
           onClick={() => {
             const tooltip = document.getElementById('menu-tooltip-settings');
             if (tooltip) tooltip.remove();
-            window.location.href = '/settings/preferences';
+            setShowPreferencesDrawer(true);
           }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3855,6 +3856,92 @@ const MainPage = () => {
                 >
                   {updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                 </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Preferences Drawer */}
+      <AnimatePresence>
+        {showPreferencesDrawer && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPreferencesDrawer(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 9999,
+              }}
+            />
+            
+            {/* Preferences Drawer */}
+            <motion.div
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                width: '500px',
+                height: '100vh',
+                backgroundColor: colors.surface,
+                borderLeft: `1px solid ${colors.border}`,
+                zIndex: 10000,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => setShowPreferencesDrawer(false)}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    {t('settingsTitle')}
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div style={{
+                flex: 1,
+                overflow: 'auto',
+                padding: '20px',
+                paddingBottom: '200px',
+              }}>
+                <iframe
+                  src="/settings/preferences"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    borderRadius: '8px',
+                  }}
+                  title="Preferences"
+                />
               </div>
             </motion.div>
           </>
