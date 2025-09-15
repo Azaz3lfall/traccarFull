@@ -4333,6 +4333,7 @@ const MainPage = () => {
                   <Autocomplete
                     multiple
                     freeSolo
+                    disablePortal={false}
                     options={Object.keys(positionAttributes)}
                     getOptionLabel={(option) => {
                       if (typeof option === 'object' && option.inputValue) {
