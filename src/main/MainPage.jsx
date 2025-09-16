@@ -19,6 +19,7 @@ import { useCatch } from '../reactHelper';
 import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
+import GeofencesDrawer from '../components/GeofencesDrawer';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
@@ -730,6 +731,7 @@ const MainPage = () => {
   const [filterMap, setFilterMap] = usePersistedState('filterMap', false);
 
   const [eventsOpen, setEventsOpen] = useState(false);
+  const [geofencesOpen, setGeofencesOpen] = useState(false);
 
 
   const onMapClick = useCallback(() => {
@@ -764,6 +766,7 @@ const MainPage = () => {
         </div>
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
+      <GeofencesDrawer open={geofencesOpen} onClose={() => setGeofencesOpen(false)} />
       
       {/* Desktop Menu */}
       {desktop && (
@@ -1023,7 +1026,7 @@ const MainPage = () => {
           onClick={() => {
             const tooltip = document.getElementById('menu-tooltip-geofences');
             if (tooltip) tooltip.remove();
-            window.location.href = '/geofences';
+            setGeofencesOpen(true);
           }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
