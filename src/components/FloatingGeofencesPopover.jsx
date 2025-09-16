@@ -400,7 +400,7 @@ const FloatingGeofencesPopover = ({
               size="small"
               style={{
                 backgroundColor: colors.primary,
-                color: colors.surface,
+                color: colors.text,
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500'
@@ -650,7 +650,7 @@ const FloatingGeofencesPopover = ({
               disabled={!editingGeofence?.name || saving}
               style={{
                 backgroundColor: colors.primary,
-                color: colors.surface,
+                color: colors.text,
                 textTransform: 'none'
               }}
             >
