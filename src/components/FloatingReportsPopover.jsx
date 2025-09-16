@@ -28,8 +28,8 @@ const FloatingReportsPopover = ({
           style={{
             position: 'fixed',
             bottom: '10px',
-            left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '520px' : '380px') : (isMenuExpanded ? '210px' : '73px')),
-            width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - ${isDeviceListVisible ? '310px' : '0px'} - 30px + 8px)`,
+            left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '516px' : '376px') : (isMenuExpanded ? '206px' : '69px')),
+            width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - ${isDeviceListVisible ? '310px' : '0px'} - 26px + 12px)`,
             height: !desktop ? '30vh' : '30vh',
             zIndex: 10000,
             pointerEvents: 'auto',
