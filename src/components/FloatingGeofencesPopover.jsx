@@ -280,11 +280,11 @@ const FloatingGeofencesPopover = ({
     setPage(1);
   }, [searchKeyword]);
 
-  if (!isVisible) return null;
-
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      {isVisible && (
+        <motion.div
+          key="geofences-popover"
         initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
         animate={{ x: 0, y: 0, opacity: 1 }}
         exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
@@ -711,7 +711,8 @@ const FloatingGeofencesPopover = ({
             </Button>
           </DialogActions>
         </Dialog>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };
