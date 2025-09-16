@@ -121,6 +121,26 @@ const FloatingReportsPopover = ({
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [scheduledToDelete, setScheduledToDelete] = useState(null);
 
+  // Statistics report state
+  const [statisticsItems, setStatisticsItems] = useState([]);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [statisticsColumns, setStatisticsColumns] = useState(['captureTime', 'activeUsers', 'activeDevices', 'messagesStored']);
+
+  // Statistics columns configuration
+  const statisticsColumnsArray = [
+    ['captureTime', 'statisticsCaptureTime'],
+    ['activeUsers', 'statisticsActiveUsers'],
+    ['activeDevices', 'statisticsActiveDevices'],
+    ['requests', 'statisticsRequests'],
+    ['messagesReceived', 'statisticsMessagesReceived'],
+    ['messagesStored', 'statisticsMessagesStored'],
+    ['mailSent', 'notificatorMail'],
+    ['smsSent', 'notificatorSms'],
+    ['geocoderRequests', 'statisticsGeocoder'],
+    ['geolocationRequests', 'statisticsGeolocation'],
+  ];
+  const statisticsColumnsMap = new Map(statisticsColumnsArray);
+
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
@@ -1234,6 +1254,69 @@ const FloatingReportsPopover = ({
       console.error('Failed to delete scheduled report:', error);
     }
   });
+
+  // Statistics functionality
+  const onShowStatistics = useCatch(async ({ from, to }) => {
+    setStatisticsLoading(true);
+    try {
+      const query = new URLSearchParams({ from, to });
+      const response = await fetchOrThrow(`/api/statistics?${query.toString()}`);
+      setStatisticsItems(await response.json());
+    } catch (error) {
+      console.error('Failed to load statistics:', error);
+    } finally {
+      setStatisticsLoading(false);
+    }
+  });
+
+  const showStatisticsReport = (period) => {
+    const now = dayjs();
+    let selectedFrom, selectedTo;
+
+    switch (period) {
+      case 'today':
+        selectedFrom = now.startOf('day');
+        selectedTo = now.endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = now.subtract(1, 'day').startOf('day');
+        selectedTo = now.subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = now.startOf('week');
+        selectedTo = now.endOf('week');
+        break;
+      case 'lastWeek':
+        selectedFrom = now.subtract(1, 'week').startOf('week');
+        selectedTo = now.subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = now.startOf('month');
+        selectedTo = now.endOf('month');
+        break;
+      case 'lastMonth':
+        selectedFrom = now.subtract(1, 'month').startOf('month');
+        selectedTo = now.subtract(1, 'month').endOf('month');
+        break;
+      case 'thisYear':
+        selectedFrom = now.startOf('year');
+        selectedTo = now.endOf('year');
+        break;
+      case 'lastYear':
+        selectedFrom = now.subtract(1, 'year').startOf('year');
+        selectedTo = now.subtract(1, 'year').endOf('year');
+        break;
+      case 'custom':
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowStatistics({ 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -2870,6 +2953,138 @@ const FloatingReportsPopover = ({
                         )) : (
                           <TableRow>
                             <TableCell colSpan={4} style={{ textAlign: 'center', padding: '20px' }}>
+                              <CircularProgress size={24} />
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
+              ) : visibleTabs[activeTab]?.key === 'statistics' ? (
+                <>
+                  {/* Statistics Report Form */}
+                  <div style={{ 
+                    padding: '16px', 
+                    borderBottom: `1px solid ${colors.border}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}>
+                    {/* Period Selection */}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {['today', 'yesterday', 'thisWeek', 'lastWeek', 'thisMonth', 'lastMonth', 'thisYear', 'lastYear'].map((period) => (
+                        <Button
+                          key={period}
+                          variant="outlined"
+                          size="small"
+                          onClick={() => showStatisticsReport(period)}
+                          disabled={statisticsLoading}
+                          style={{ 
+                            color: colors.text, 
+                            borderColor: colors.border,
+                            fontSize: '12px',
+                            minWidth: 'auto',
+                            padding: '4px 8px'
+                          }}
+                        >
+                          {t(`report${period.charAt(0).toUpperCase() + period.slice(1)}`)}
+                        </Button>
+                      ))}
+                    </div>
+
+                    {/* Custom Date Range */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <TextField
+                        type="datetime-local"
+                        size="small"
+                        value={customFrom}
+                        onChange={(e) => setCustomFrom(e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        style={{ 
+                          minWidth: '180px',
+                          '& .MuiInputBase-input': { color: colors.text }
+                        }}
+                      />
+                      <TextField
+                        type="datetime-local"
+                        size="small"
+                        value={customTo}
+                        onChange={(e) => setCustomTo(e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        style={{ 
+                          minWidth: '180px',
+                          '& .MuiInputBase-input': { color: colors.text }
+                        }}
+                      />
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => showStatisticsReport('custom')}
+                        disabled={statisticsLoading || !customFrom || !customTo}
+                        style={{ 
+                          color: colors.text, 
+                          borderColor: colors.border,
+                          fontSize: '12px',
+                          minWidth: 'auto',
+                          padding: '4px 12px'
+                        }}
+                      >
+                        {t('sharedShow')}
+                      </Button>
+                    </div>
+
+                    {/* Column Selection */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <FormControl size="small" style={{ minWidth: '200px' }}>
+                        <InputLabel style={{ color: colors.text }}>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          multiple
+                          value={statisticsColumns}
+                          onChange={(e) => setStatisticsColumns(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                          style={{ color: colors.text }}
+                        >
+                          {statisticsColumnsArray.map(([key, title]) => (
+                            <MenuItem key={key} value={key}>
+                              {t(title)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                  </div>
+
+                  {/* Statistics Report Table */}
+                  <div style={{ 
+                    flex: 1, 
+                    overflow: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px'
+                  }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          {statisticsColumns.map((key) => (
+                            <TableCell key={key}>{t(statisticsColumnsMap.get(key))}</TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!statisticsLoading ? statisticsItems.map((item, index) => (
+                          <TableRow key={item.id || index}>
+                            {statisticsColumns.map((key) => (
+                              <TableCell key={key}>
+                                {key === 'captureTime' ? formatTime(item[key], 'date') : item[key]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={statisticsColumns.length} style={{ textAlign: 'center', padding: '20px' }}>
                               <CircularProgress size={24} />
                             </TableCell>
                           </TableRow>
