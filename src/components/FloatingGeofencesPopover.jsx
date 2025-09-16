@@ -534,7 +534,7 @@ const FloatingGeofencesPopover = ({
             onClick={() => {
               handleDelete(selectedGeofence);
             }}
-            style={{ color: '#EF4444', fontSize: '12px' }}
+            style={{ color: colors.text, fontSize: '12px' }}
           >
             <DeleteIcon fontSize="small" />
             <span style={{ marginLeft: '6px' }}>{t('sharedRemove')}</span>
