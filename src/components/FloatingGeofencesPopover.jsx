@@ -91,6 +91,10 @@ const FloatingGeofencesPopover = ({
   const [center, setCenter] = useState(null);
   const [radius, setRadius] = useState(null);
   const [geofenceName, setGeofenceName] = useState('');
+  
+  // Polyline drawing state
+  const [polylineDrawingMode, setPolylineDrawingMode] = useState(false);
+  const [polylinePoints, setPolylinePoints] = useState([]);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -203,23 +207,42 @@ const FloatingGeofencesPopover = ({
       return;
     }
 
-    // Check if we have a completed circle to save
-    if (!center || !radius) {
-      console.log('No completed circle to save', { center, radius });
+    // Check if we have a completed circle or polyline to save
+    const hasCircle = center && radius;
+    const hasPolyline = polylinePoints && polylinePoints.length > 0;
+    
+    if (!hasCircle && !hasPolyline) {
+      console.log('No completed geofence to save', { center, radius, polylinePoints });
       dispatch(errorsActions.push(t('sharedRequired')));
       return;
     }
 
-    // Create the geofence using stored center and radius
-    const newGeofence = {
-      name: geofenceName.trim(),
-      area: `CIRCLE (${center[1]} ${center[0]}, ${Math.round(radius)})`, // lat lng, radius in meters (rounded)
-      attributes: {
-        color: '#1976d2',
-        mapLineWidth: 2,
-        mapLineOpacity: 1
-      }
-    };
+    let newGeofence;
+    
+    if (hasCircle) {
+      // Create circle geofence
+      newGeofence = {
+        name: geofenceName.trim(),
+        area: `CIRCLE (${center[1]} ${center[0]}, ${Math.round(radius)})`, // lat lng, radius in meters (rounded)
+        attributes: {
+          color: '#1976d2',
+          mapLineWidth: 2,
+          mapLineOpacity: 1
+        }
+      };
+    } else if (hasPolyline) {
+      // Create polyline geofence
+      const coordinates = polylinePoints.map(point => `${point[1]} ${point[0]}`).join(', ');
+      newGeofence = {
+        name: geofenceName.trim(),
+        area: `LINESTRING (${coordinates})`,
+        attributes: {
+          color: '#1976d2',
+          mapLineWidth: 2,
+          mapLineOpacity: 1
+        }
+      };
+    }
     
     console.log('Creating geofence:', newGeofence);
     
@@ -228,7 +251,7 @@ const FloatingGeofencesPopover = ({
 
     // Reset everything
     setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
-    resetCircleDrawing(); // Reset any active circle drawing
+    resetDrawingTools(); // Reset any active drawing
     setGeofenceName(''); // Clear name only when saving
   };
 
@@ -309,8 +332,11 @@ const FloatingGeofencesPopover = ({
     if (tool === 'circle') {
       if (circleDrawingMode) {
         // If already in circle drawing mode, reset it
-        resetCircleDrawing();
+        resetDrawingTools();
       } else {
+        // Reset other tools first
+        setPolylineDrawingMode(false);
+        setPolylinePoints([]);
         // Enable circle drawing mode and clear all existing circles
         setCircleDrawingMode(true);
         setClickCount(0);
@@ -337,6 +363,39 @@ const FloatingGeofencesPopover = ({
       }
       
       // Keep popover open for circle drawing
+      // Don't call onClose() here
+    } else if (tool === 'line') {
+      if (polylineDrawingMode) {
+        // If already in polyline drawing mode, reset it
+        resetDrawingTools();
+      } else {
+        // Reset other tools first
+        setCircleDrawingMode(false);
+        setClickCount(0);
+        setCenter(null);
+        setRadius(null);
+        // Enable polyline drawing mode
+        setPolylineDrawingMode(true);
+        setPolylinePoints([]);
+        
+        // Clear all existing polylines from map
+        if (map) {
+          if (map.getSource('polyline-preview')) {
+            map.removeSource('polyline-preview');
+          }
+          if (map.getLayer('polyline-preview')) {
+            map.removeLayer('polyline-preview');
+          }
+          if (map.getSource('polyline-points')) {
+            map.removeSource('polyline-points');
+          }
+          if (map.getLayer('polyline-points')) {
+            map.removeLayer('polyline-points');
+          }
+        }
+      }
+      
+      // Keep popover open for polyline drawing
       // Don't call onClose() here
     } else {
       // For other tools, navigate to geofences page
@@ -461,16 +520,108 @@ const FloatingGeofencesPopover = ({
     };
   }, [circleDrawingMode, clickCount, center, map]);
 
-  // Reset circle drawing
-  const resetCircleDrawing = () => {
+  // Handle map clicks for polyline drawing
+  useEffect(() => {
+    if (!polylineDrawingMode || !map) return;
+
+    const handleMapClick = (e) => {
+      const { lng, lat } = e.lngLat;
+      const newPoint = [lng, lat];
+      
+      // Add point to polyline
+      const updatedPoints = [...polylinePoints, newPoint];
+      setPolylinePoints(updatedPoints);
+      
+      // Update polyline preview on map
+      if (updatedPoints.length > 0) {
+        // Update or create polyline source
+        if (map.getSource('polyline-preview')) {
+          map.removeSource('polyline-preview');
+        }
+        if (map.getLayer('polyline-preview')) {
+          map.removeLayer('polyline-preview');
+        }
+        
+        map.addSource('polyline-preview', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: updatedPoints
+            }
+          }
+        });
+        
+        map.addLayer({
+          id: 'polyline-preview',
+          type: 'line',
+          source: 'polyline-preview',
+          paint: {
+            'line-color': '#1976d2',
+            'line-width': 2,
+            'line-opacity': 1
+          }
+        });
+        
+        // Update or create points source
+        if (map.getSource('polyline-points')) {
+          map.removeSource('polyline-points');
+        }
+        if (map.getLayer('polyline-points')) {
+          map.removeLayer('polyline-points');
+        }
+        
+        map.addSource('polyline-points', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: updatedPoints.map((point, index) => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: point
+              },
+              properties: {
+                index: index
+              }
+            }))
+          }
+        });
+        
+        map.addLayer({
+          id: 'polyline-points',
+          type: 'circle',
+          source: 'polyline-points',
+          paint: {
+            'circle-radius': 4,
+            'circle-color': '#1976d2',
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2
+          }
+        });
+      }
+    };
+
+    map.on('click', handleMapClick);
+    
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [polylineDrawingMode, polylinePoints, map]);
+
+  // Reset drawing tools
+  const resetDrawingTools = () => {
     setCircleDrawingMode(false);
     setClickCount(0);
     setCenter(null);
     setRadius(null);
+    setPolylineDrawingMode(false);
+    setPolylinePoints([]);
     
     // Clean up map layers first, then sources
     if (map) {
-      // Remove layers first
+      // Remove circle layers first
       if (map.getLayer('circle-center')) {
         map.removeLayer('circle-center');
       }
@@ -481,12 +632,26 @@ const FloatingGeofencesPopover = ({
         map.removeLayer('circle-preview-stroke');
       }
       
+      // Remove polyline layers
+      if (map.getLayer('polyline-preview')) {
+        map.removeLayer('polyline-preview');
+      }
+      if (map.getLayer('polyline-points')) {
+        map.removeLayer('polyline-points');
+      }
+      
       // Then remove sources
       if (map.getSource('circle-center')) {
         map.removeSource('circle-center');
       }
       if (map.getSource('circle-preview')) {
         map.removeSource('circle-preview');
+      }
+      if (map.getSource('polyline-preview')) {
+        map.removeSource('polyline-preview');
+      }
+      if (map.getSource('polyline-points')) {
+        map.removeSource('polyline-points');
       }
     }
   };
@@ -761,13 +926,14 @@ const FloatingGeofencesPopover = ({
               <CircleIcon fontSize="small" />
             </Button>
             <Button
-              variant="outlined"
+              variant={polylineDrawingMode ? "contained" : "outlined"}
               size="small"
               onClick={() => handleDrawingTool('line')}
               disabled={isAddMode}
               style={{
-                color: colors.text,
-                borderColor: colors.border,
+                color: polylineDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: polylineDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: polylineDrawingMode ? '#1976d2' : colors.border,
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
