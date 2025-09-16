@@ -45,6 +45,7 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
 } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -442,6 +443,9 @@ const FloatingCommandsPopover = ({
                           {t('sharedType')}
                         </TableCell>
                         <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                          {t('commandCustom')}
+                        </TableCell>
+                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
                           {t('commandSendSms')}
                         </TableCell>
                         <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
@@ -472,6 +476,44 @@ const FloatingCommandsPopover = ({
                           </TableCell>
                           <TableCell style={{ color: colors.textSecondary }}>
                             {command.type ? t(prefixString('command', String(command.type))) : '-'}
+                          </TableCell>
+                          <TableCell style={{ color: colors.textSecondary }}>
+                            {command.type === 'custom' && command.attributes?.data ? (
+                              <Tooltip 
+                                title={command.attributes.data}
+                                placement="top"
+                                arrow
+                                componentsProps={{
+                                  tooltip: {
+                                    style: {
+                                      backgroundColor: colors.surface,
+                                      color: colors.text,
+                                      border: `1px solid ${colors.border}`,
+                                      fontSize: '12px',
+                                      fontFamily: 'monospace',
+                                      maxWidth: '400px',
+                                      whiteSpace: 'pre-wrap'
+                                    }
+                                  }
+                                }}
+                              >
+                                <div style={{
+                                  maxWidth: '200px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  fontFamily: 'monospace',
+                                  fontSize: '12px',
+                                  backgroundColor: colors.secondary,
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  border: `1px solid ${colors.border}`,
+                                  cursor: 'help'
+                                }}>
+                                  {command.attributes.data}
+                                </div>
+                              </Tooltip>
+                            ) : '-'}
                           </TableCell>
                           <TableCell style={{ color: colors.textSecondary }}>
                             {formatBoolean(command.textChannel, t)}
