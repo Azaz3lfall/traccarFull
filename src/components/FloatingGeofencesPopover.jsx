@@ -500,6 +500,7 @@ const FloatingGeofencesPopover = ({
             onClick={handleAdd}
             fullWidth
             size="small"
+            disabled
             style={{
               backgroundColor: colors.primary,
               color: colors.text,
@@ -518,6 +519,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('circle')}
+              disabled
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -538,6 +540,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('line')}
+              disabled
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -558,6 +561,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('polygon')}
+              disabled
               style={{
                 color: colors.text,
                 borderColor: colors.border,
