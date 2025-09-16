@@ -371,24 +371,13 @@ const FloatingGeofencesPopover = ({
         setCircleRadius(null);
         setCirclePreview(null);
         
-        // Clean up map layers
-        setTimeout(() => {
-          if (map.getSource('circle-center')) {
-            map.removeSource('circle-center');
-          }
-          if (map.getLayer('circle-center')) {
-            map.removeLayer('circle-center');
-          }
-          if (map.getSource('circle-preview')) {
-            map.removeSource('circle-preview');
-          }
-          if (map.getLayer('circle-preview')) {
-            map.removeLayer('circle-preview');
-          }
-          if (map.getLayer('circle-preview-stroke')) {
-            map.removeLayer('circle-preview-stroke');
-          }
-        }, 2000);
+        // Clean up only the center marker, keep the circle visible
+        if (map.getSource('circle-center')) {
+          map.removeSource('circle-center');
+        }
+        if (map.getLayer('circle-center')) {
+          map.removeLayer('circle-center');
+        }
       }
     };
 
