@@ -21,15 +21,14 @@ const FloatingReportsPopover = ({
       {isVisible && (
         <motion.div
           key="reports-popover"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0, x: '-50%', y: '-50%' }}
+          animate={{ scale: 1, opacity: 1, x: '-50%', y: '-50%' }}
+          exit={{ scale: 0.8, opacity: 0, x: '-50%', y: '-50%' }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             position: 'fixed',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
             width: '90vw',
             height: '90vh',
             zIndex: 10000,
