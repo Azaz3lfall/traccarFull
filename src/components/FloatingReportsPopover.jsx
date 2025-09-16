@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSelector } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { Card } from './ui/card';
-import { Typography, IconButton, Tabs, Tab, Box } from '@mui/material';
+import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
+import { useCatch } from '../reactHelper';
+import { formatTime } from '../common/util/formatter';
+import { prefixString } from '../common/util/stringUtils';
+import fetchOrThrow from '../common/util/fetchOrThrow';
+import SelectField from '../common/components/SelectField';
+import dayjs from 'dayjs';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
@@ -32,6 +39,18 @@ const FloatingReportsPopover = ({
   const readonly = useRestriction('readonly');
   
   const [activeTab, setActiveTab] = useState(0);
+  
+  // Combined report state
+  const [combinedItems, setCombinedItems] = useState([]);
+  const [combinedLoading, setCombinedLoading] = useState(false);
+  const [deviceIds, setDeviceIds] = useState([]);
+  const [groupIds, setGroupIds] = useState([]);
+  const [period, setPeriod] = useState('today');
+  const [customFrom, setCustomFrom] = useState(dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'));
+  const [customTo, setCustomTo] = useState(dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
+
+  const devices = useSelector((state) => state.devices.items);
+  const groups = useSelector((state) => state.groups.items);
 
   // Define all report tabs with their permissions
   const reportTabs = [
@@ -108,6 +127,66 @@ const FloatingReportsPopover = ({
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  // Combined report functionality
+  const onShowCombined = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    setCombinedLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/reports/combined?${query.toString()}`);
+      setCombinedItems(await response.json());
+    } finally {
+      setCombinedLoading(false);
+    }
+  });
+
+  const showCombinedReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowCombined({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isCombinedDisabled = () => {
+    return !deviceIds.length && !groupIds.length || combinedLoading;
   };
 
   return (
@@ -234,12 +313,139 @@ const FloatingReportsPopover = ({
               padding: '20px',
               flex: 1,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              flexDirection: 'column',
+              overflow: 'hidden'
             }}>
-              <Typography variant="body1" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                {visibleTabs[activeTab] ? visibleTabs[activeTab].title : t('sharedComingSoon')}
-              </Typography>
+              {visibleTabs[activeTab]?.key === 'combined' ? (
+                <>
+                  {/* Combined Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0
+                  }}>
+                    {/* Device Selection */}
+                    <SelectField
+                      label={t('deviceTitle')}
+                      data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                      value={deviceIds}
+                      onChange={(e) => setDeviceIds(e.target.value)}
+                      multiple
+                      fullWidth
+                    />
+                    
+                    {/* Group Selection */}
+                    <SelectField
+                      label={t('settingsGroups')}
+                      data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                      value={groupIds}
+                      onChange={(e) => setGroupIds(e.target.value)}
+                      multiple
+                      fullWidth
+                    />
+                    
+                    {/* Period Selection */}
+                    <FormControl fullWidth>
+                      <InputLabel>{t('reportPeriod')}</InputLabel>
+                      <Select 
+                        label={t('reportPeriod')} 
+                        value={period} 
+                        onChange={(e) => setPeriod(e.target.value)}
+                      >
+                        <MenuItem value="today">{t('reportToday')}</MenuItem>
+                        <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                        <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                        <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                        <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                        <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                        <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                      </Select>
+                    </FormControl>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <TextField
+                          label={t('reportFrom')}
+                          type="datetime-local"
+                          value={customFrom}
+                          onChange={(e) => setCustomFrom(e.target.value)}
+                          fullWidth
+                        />
+                        <TextField
+                          label={t('reportTo')}
+                          type="datetime-local"
+                          value={customTo}
+                          onChange={(e) => setCustomTo(e.target.value)}
+                          fullWidth
+                        />
+                      </>
+                    )}
+                    
+                    {/* Show Button */}
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="secondary"
+                      disabled={isCombinedDisabled()}
+                      onClick={showCombinedReport}
+                      startIcon={combinedLoading ? <CircularProgress size={20} /> : null}
+                    >
+                      <Typography variant="button" noWrap>
+                        {combinedLoading ? t('sharedLoading') : t('reportShow')}
+                      </Typography>
+                    </Button>
+                  </div>
+                  
+                  {/* Combined Report Table */}
+                  {combinedItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px'
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>{t('sharedDevice')}</TableCell>
+                            <TableCell>{t('positionFixTime')}</TableCell>
+                            <TableCell>{t('sharedType')}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {!combinedLoading ? combinedItems.flatMap((item) => item.events.map((event, index) => (
+                            <TableRow key={event.id}>
+                              <TableCell>{index ? '' : devices[item.deviceId]?.name}</TableCell>
+                              <TableCell>{formatTime(event.eventTime, 'seconds')}</TableCell>
+                              <TableCell>{t(prefixString('event', event.type))}</TableCell>
+                            </TableRow>
+                          ))) : (
+                            <TableRow>
+                              <TableCell colSpan={3} style={{ textAlign: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%'
+                }}>
+                  <Typography variant="body1" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                    {visibleTabs[activeTab] ? visibleTabs[activeTab].title : t('sharedComingSoon')}
+                  </Typography>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
