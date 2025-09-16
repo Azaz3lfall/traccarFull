@@ -266,6 +266,16 @@ const FloatingGeofencesPopover = ({
     setEditingGeofence(null);
   };
 
+  // Handle drawing tool selection
+  const handleDrawingTool = (tool) => {
+    // Close the popover first
+    onClose();
+    
+    // Navigate to geofences page with drawing tool
+    // This will open the map with the drawing tool active
+    window.location.href = `/geofences?tool=${tool}`;
+  };
+
   // Handle geofence click - center map and clear selected device
   const handleGeofenceClick = (geofence) => {
     // Clear selected device
@@ -481,22 +491,75 @@ const FloatingGeofencesPopover = ({
                 }}
               />
             </div>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+            fullWidth
+            size="small"
+            style={{
+              backgroundColor: colors.primary,
+              color: colors.text,
+              textTransform: 'none',
+              borderRadius: '8px',
+              fontWeight: '500',
+              marginBottom: '12px'
+            }}
+          >
+            {t('sharedAdd')} {t('sharedGeofence')}
+          </Button>
+          
+          {/* Drawing Tools Row */}
+          <div style={{ display: 'flex', gap: '8px' }}>
             <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-              fullWidth
+              variant="outlined"
               size="small"
+              fullWidth
+              onClick={() => handleDrawingTool('circle')}
               style={{
-                backgroundColor: colors.primary,
                 color: colors.text,
+                borderColor: colors.border,
                 textTransform: 'none',
                 borderRadius: '8px',
-                fontWeight: '500'
+                fontWeight: '500',
+                fontSize: '12px'
               }}
             >
-              {t('sharedAdd')} {t('sharedGeofence')}
+              {t('sharedCircle')}
             </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              fullWidth
+              onClick={() => handleDrawingTool('line')}
+              style={{
+                color: colors.text,
+                borderColor: colors.border,
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: '500',
+                fontSize: '12px'
+              }}
+            >
+              {t('sharedLine')}
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              fullWidth
+              onClick={() => handleDrawingTool('polygon')}
+              style={{
+                color: colors.text,
+                borderColor: colors.border,
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: '500',
+                fontSize: '12px'
+              }}
+            >
+              {t('sharedPolygon')}
+            </Button>
+          </div>
           </div>
 
           {/* Content */}
