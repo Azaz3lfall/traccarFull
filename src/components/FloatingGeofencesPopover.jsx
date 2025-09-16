@@ -161,11 +161,16 @@ const FloatingGeofencesPopover = ({
         method: 'DELETE',
       });
     },
-    onSuccess: (_, geofenceId) => {
-      // Remove from Redux store immediately
-      dispatch(geofencesActions.update(geofences.filter(g => g.id !== geofenceId)));
-      // Invalidate query to refresh from server
-      queryClient.invalidateQueries(['geofences']);
+    onSuccess: async (_, geofenceId) => {
+      // Refresh geofences from server to ensure map updates
+      try {
+        const response = await fetchOrThrow('/api/geofences');
+        const updatedGeofences = await response.json();
+        dispatch(geofencesActions.refresh(updatedGeofences));
+      } catch (error) {
+        console.error('Failed to refresh geofences after deletion:', error);
+      }
+      
       setDeleteDialog(false);
       setGeofenceToDelete(null);
     },
