@@ -321,82 +321,97 @@ const FloatingReportsPopover = ({
                   {/* Combined Report Form */}
                   <div style={{ 
                     display: 'flex', 
-                    flexDirection: 'column', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
                     gap: '16px', 
                     marginBottom: '20px',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
                   }}>
                     {/* Device Selection */}
-                    <SelectField
-                      label={t('deviceTitle')}
-                      data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                      value={deviceIds}
-                      onChange={(e) => setDeviceIds(e.target.value)}
-                      multiple
-                      fullWidth
-                    />
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                      />
+                    </div>
                     
                     {/* Group Selection */}
-                    <SelectField
-                      label={t('settingsGroups')}
-                      data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
-                      value={groupIds}
-                      onChange={(e) => setGroupIds(e.target.value)}
-                      multiple
-                      fullWidth
-                    />
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('settingsGroups')}
+                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={groupIds}
+                        onChange={(e) => setGroupIds(e.target.value)}
+                        multiple
+                        fullWidth
+                      />
+                    </div>
                     
                     {/* Period Selection */}
-                    <FormControl fullWidth>
-                      <InputLabel>{t('reportPeriod')}</InputLabel>
-                      <Select 
-                        label={t('reportPeriod')} 
-                        value={period} 
-                        onChange={(e) => setPeriod(e.target.value)}
-                      >
-                        <MenuItem value="today">{t('reportToday')}</MenuItem>
-                        <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
-                        <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
-                        <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
-                        <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
-                        <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
-                        <MenuItem value="custom">{t('reportCustom')}</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
                     
                     {/* Custom Date Range */}
                     {period === 'custom' && (
                       <>
-                        <TextField
-                          label={t('reportFrom')}
-                          type="datetime-local"
-                          value={customFrom}
-                          onChange={(e) => setCustomFrom(e.target.value)}
-                          fullWidth
-                        />
-                        <TextField
-                          label={t('reportTo')}
-                          type="datetime-local"
-                          value={customTo}
-                          onChange={(e) => setCustomTo(e.target.value)}
-                          fullWidth
-                        />
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
                       </>
                     )}
                     
                     {/* Show Button */}
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      color="secondary"
-                      disabled={isCombinedDisabled()}
-                      onClick={showCombinedReport}
-                      startIcon={combinedLoading ? <CircularProgress size={20} /> : null}
-                    >
-                      <Typography variant="button" noWrap>
-                        {combinedLoading ? t('sharedLoading') : t('reportShow')}
-                      </Typography>
-                    </Button>
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isCombinedDisabled()}
+                        onClick={showCombinedReport}
+                        startIcon={combinedLoading ? <CircularProgress size={20} /> : null}
+                        style={{ minWidth: desktop ? '120px' : 'auto' }}
+                      >
+                        <Typography variant="button" noWrap>
+                          {combinedLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
                   </div>
                   
                   {/* Combined Report Table */}
