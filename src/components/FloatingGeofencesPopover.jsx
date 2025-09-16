@@ -51,7 +51,7 @@ import {
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
-import { geofencesActions, devicesActions } from '../store';
+import { geofencesActions, devicesActions, errorsActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
 import SelectField from '../common/components/SelectField';
@@ -177,8 +177,49 @@ const FloatingGeofencesPopover = ({
     setIsAddMode(false); // Switch to Save mode (drawing tools enabled)
   };
 
-  // Handle save geofence - disables drawing tools
+  // Handle save geofence - validates name and creates geofence
   const handleSave = () => {
+    if (!geofenceName.trim()) {
+      // Show error if name is empty
+      dispatch(errorsActions.push(t('sharedRequired')));
+      return;
+    }
+
+    // Check if we have a circle to save
+    if (circleDrawingMode && center && clickCount === 1) {
+      // We have a center but no radius yet - can't save
+      dispatch(errorsActions.push(t('sharedRequired')));
+      return;
+    }
+
+    // If we have a completed circle, save it
+    if (center && clickCount === 0 && map.getSource('circle-preview')) {
+      // Calculate radius from the circle on map
+      const circleData = map.getSource('circle-preview')._data;
+      if (circleData && circleData.features && circleData.features[0]) {
+        const circleFeature = circleData.features[0];
+        const centerCoords = circleFeature.geometry.coordinates[0][0]; // First coordinate of the polygon
+        const radius = Math.sqrt(
+          Math.pow(centerCoords[0] - center[0], 2) + Math.pow(centerCoords[1] - center[1], 2)
+        ) * 111000; // Convert to meters (approximate)
+        
+        // Create the geofence
+        const newGeofence = {
+          name: geofenceName.trim(),
+          area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
+          attributes: {
+            color: '#1976d2',
+            mapLineWidth: 2,
+            mapLineOpacity: 1
+          }
+        };
+        
+        // Use the existing mutation to create the geofence
+        createGeofenceMutation.mutate(newGeofence);
+      }
+    }
+
+    // Reset everything
     setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
     resetCircleDrawing(); // Reset any active circle drawing
     setGeofenceName(''); // Clear name only when saving
@@ -382,13 +423,14 @@ const FloatingGeofencesPopover = ({
           }
         });
         
-        // Create geofence and save it
-        createCircleGeofence(center, radius);
+        // Don't create geofence yet - just complete the circle visualization
+        // The geofence will be created when user clicks Save button
         
         // Disable circle tool after second click
         setCircleDrawingMode(false);
         setClickCount(0);
-        setCenter(null);
+        // Keep center for saving later
+        // setCenter(null); // Don't clear center yet
         
         // Clean up only the center marker, keep the circle visible
         if (map.getSource('circle-center')) {
@@ -434,35 +476,6 @@ const FloatingGeofencesPopover = ({
     }
   };
 
-  // Create circle geofence
-  const createCircleGeofence = async (center, radius) => {
-    try {
-      const newGeofence = {
-        name: geofenceName || t('sharedGeofence'),
-        area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
-        attributes: {
-          color: '#1976d2',
-          mapLineWidth: 2,
-          mapLineOpacity: 1
-        }
-      };
-      
-      const response = await fetchOrThrow('/api/geofences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newGeofence),
-      });
-      
-      const createdGeofence = await response.json();
-      dispatch(geofencesActions.update([createdGeofence]));
-      
-      // Refresh geofences list
-      queryClient.invalidateQueries(['geofences']);
-      
-    } catch (error) {
-      console.error('Error creating circle geofence:', error);
-    }
-  };
 
   // Handle geofence click - center map and clear selected device
   const handleGeofenceClick = (geofence) => {
