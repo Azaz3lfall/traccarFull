@@ -91,6 +91,7 @@ const FloatingGeofencesPopover = ({
   const [circleDrawingMode, setCircleDrawingMode] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [center, setCenter] = useState(null);
+  const [geofenceName, setGeofenceName] = useState('');
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -265,6 +266,7 @@ const FloatingGeofencesPopover = ({
         setCircleDrawingMode(true);
         setClickCount(0);
         setCenter(null);
+        setGeofenceName('');
         
         // Clear all existing circles from map
         if (map) {
@@ -411,6 +413,7 @@ const FloatingGeofencesPopover = ({
     setCircleDrawingMode(false);
     setClickCount(0);
     setCenter(null);
+    setGeofenceName('');
     
     // Clean up map layers
     if (map) {
@@ -436,7 +439,7 @@ const FloatingGeofencesPopover = ({
   const createCircleGeofence = async (center, radius) => {
     try {
       const newGeofence = {
-        name: t('sharedGeofence'),
+        name: geofenceName || t('sharedGeofence'),
         area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
         attributes: {
           color: '#1976d2',
@@ -695,6 +698,24 @@ const FloatingGeofencesPopover = ({
           >
             {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
           </Button>
+          
+          {/* Geofence Name Input */}
+          <TextField
+            fullWidth
+            size="small"
+            label={t('sharedName')}
+            value={geofenceName}
+            onChange={(e) => setGeofenceName(e.target.value)}
+            style={{
+              marginBottom: '12px'
+            }}
+            InputLabelProps={{
+              style: { color: colors.text }
+            }}
+            InputProps={{
+              style: { color: colors.text }
+            }}
+          />
           
           {/* Drawing Tools Row */}
           <div style={{ display: 'flex', gap: '8px' }}>
