@@ -447,19 +447,6 @@ const FloatingGeofencesPopover = ({
             ) : (
               <TableContainer>
                 <Table>
-                  <TableHead>
-                    <TableRow style={{ backgroundColor: colors.secondary }}>
-                      <TableCell style={{ fontWeight: '600', color: colors.text }}>
-                        {t('sharedName')}
-                      </TableCell>
-                      <TableCell style={{ fontWeight: '600', color: colors.text }}>
-                        {t('sharedDescription')}
-                      </TableCell>
-                      <TableCell style={{ fontWeight: '600', color: colors.text, width: '60px' }}>
-                        {t('sharedActions')}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
                   <TableBody>
                     {paginatedGeofences.map((geofence) => (
                       <TableRow key={geofence.id} hover>
