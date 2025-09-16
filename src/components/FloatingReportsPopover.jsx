@@ -164,7 +164,10 @@ const FloatingReportsPopover = ({
             </div>
 
             {/* Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box sx={{ 
+              borderBottom: `1px solid ${colors.border}`,
+              marginBottom: '16px',
+            }}>
               <Tabs
                 value={activeTab}
                 onChange={handleTabChange}
@@ -173,12 +176,23 @@ const FloatingReportsPopover = ({
                 sx={{
                   '& .MuiTab-root': {
                     color: colors.textSecondary,
-                    textTransform: 'none',
-                    minHeight: '48px',
                     fontSize: '14px',
                     fontWeight: '500',
+                    textTransform: 'none',
+                    minHeight: '48px',
+                    padding: '8px 16px',
                     '&.Mui-selected': {
                       color: colors.primary,
+                      fontWeight: '600',
+                      backgroundColor: 'transparent',
+                    },
+                    '&:hover': {
+                      color: colors.primary,
+                      backgroundColor: `${colors.primary}10`,
+                    },
+                    '&.Mui-selected:hover': {
+                      color: colors.primary,
+                      backgroundColor: `${colors.primary}15`,
                     },
                     '& .MuiTab-iconWrapper': {
                       marginRight: '8px',
@@ -187,6 +201,8 @@ const FloatingReportsPopover = ({
                   },
                   '& .MuiTabs-indicator': {
                     backgroundColor: colors.primary,
+                    height: '3px',
+                    borderRadius: '2px',
                   }
                 }}
               >
