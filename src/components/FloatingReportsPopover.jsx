@@ -330,58 +330,28 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <FormControl fullWidth>
-                        <InputLabel>{t('deviceTitle')}</InputLabel>
-                        <Select
-                          label={t('deviceTitle')}
-                          multiple
-                          value={deviceIds}
-                          onChange={(e) => setDeviceIds(e.target.value)}
-                          MenuProps={{
-                            PaperProps: {
-                              style: {
-                                zIndex: 99999,
-                                position: 'fixed',
-                              },
-                            },
-                            disablePortal: false,
-                          }}
-                        >
-                          {Object.values(devices).sort((a, b) => a.name.localeCompare(b.name)).map((device) => (
-                            <MenuItem key={device.id} value={device.id}>
-                              {device.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                      />
                     </div>
                     
                     {/* Group Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <FormControl fullWidth>
-                        <InputLabel>{t('settingsGroups')}</InputLabel>
-                        <Select
-                          label={t('settingsGroups')}
-                          multiple
-                          value={groupIds}
-                          onChange={(e) => setGroupIds(e.target.value)}
-                          MenuProps={{
-                            PaperProps: {
-                              style: {
-                                zIndex: 99999,
-                                position: 'fixed',
-                              },
-                            },
-                            disablePortal: false,
-                          }}
-                        >
-                          {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
-                            <MenuItem key={group.id} value={group.id}>
-                              {group.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <SelectField
+                        label={t('settingsGroups')}
+                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={groupIds}
+                        onChange={(e) => setGroupIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                      />
                     </div>
                     
                     {/* Period Selection */}
@@ -395,11 +365,9 @@ const FloatingReportsPopover = ({
                           MenuProps={{
                             PaperProps: {
                               style: {
-                                zIndex: 99999,
-                                position: 'fixed',
+                                zIndex: 10002,
                               },
                             },
-                            disablePortal: false,
                           }}
                         >
                           <MenuItem value="today">{t('reportToday')}</MenuItem>
