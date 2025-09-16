@@ -513,7 +513,8 @@ const FloatingGeofencesPopover = ({
               backgroundColor: colors.surface,
               border: `1px solid ${colors.border}`,
               borderRadius: '8px',
-              boxShadow: colors.shadow
+              boxShadow: colors.shadow,
+              zIndex: 10001
             }
           }}
         >
@@ -547,7 +548,8 @@ const FloatingGeofencesPopover = ({
           PaperProps={{
             style: {
               backgroundColor: colors.surface,
-              borderRadius: '12px'
+              borderRadius: '12px',
+              zIndex: 10002
             }
           }}
         >
@@ -666,7 +668,8 @@ const FloatingGeofencesPopover = ({
           PaperProps={{
             style: {
               backgroundColor: colors.surface,
-              borderRadius: '12px'
+              borderRadius: '12px',
+              zIndex: 10002
             }
           }}
         >
