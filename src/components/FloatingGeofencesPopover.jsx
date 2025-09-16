@@ -76,8 +76,6 @@ const FloatingGeofencesPopover = ({
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedGeofence, setSelectedGeofence] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [geofenceToDelete, setGeofenceToDelete] = useState(null);
   const [editDialog, setEditDialog] = useState(false);
@@ -163,7 +161,10 @@ const FloatingGeofencesPopover = ({
         method: 'DELETE',
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, geofenceId) => {
+      // Remove from Redux store immediately
+      dispatch(geofencesActions.update(geofences.filter(g => g.id !== geofenceId)));
+      // Invalidate query to refresh from server
       queryClient.invalidateQueries(['geofences']);
       setDeleteDialog(false);
       setGeofenceToDelete(null);
@@ -571,15 +572,6 @@ const FloatingGeofencesPopover = ({
   };
 
   // Handle menu actions
-  const handleMenuOpen = (event, geofence) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedGeofence(geofence);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedGeofence(null);
-  };
 
   // Reset page when search changes
   useEffect(() => {
@@ -878,10 +870,16 @@ const FloatingGeofencesPopover = ({
                             size="small"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleMenuOpen(e, geofence);
+                              handleDelete(geofence);
+                            }}
+                            style={{
+                              color: colors.textSecondary,
+                              '&:hover': {
+                                color: colors.error
+                              }
                             }}
                           >
-                            <MoreVertIcon style={{ fontSize: 16, color: colors.textSecondary }} />
+                            <DeleteIcon style={{ fontSize: 16 }} />
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -911,43 +909,6 @@ const FloatingGeofencesPopover = ({
           )}
         </div>
 
-        {/* Actions Menu */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          style={{ zIndex: 10002 }}
-          PaperProps={{
-            style: {
-              backgroundColor: colors.surface,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '8px',
-              boxShadow: colors.shadow,
-              minWidth: '160px',
-              zIndex: 10002
-            }
-          }}
-        >
-          <MenuItem
-            onClick={() => {
-              handleEdit(selectedGeofence);
-              handleMenuClose();
-            }}
-            style={{ color: colors.text, fontSize: '12px' }}
-          >
-            <EditIcon fontSize="small" />
-            <span style={{ marginLeft: '6px' }}>{t('sharedEdit')}</span>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleDelete(selectedGeofence);
-            }}
-            style={{ color: colors.text, fontSize: '12px' }}
-          >
-            <DeleteIcon fontSize="small" />
-            <span style={{ marginLeft: '6px' }}>{t('sharedRemove')}</span>
-          </MenuItem>
-        </Menu>
 
         {/* Edit Dialog */}
         <Dialog
