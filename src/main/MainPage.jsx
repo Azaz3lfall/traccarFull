@@ -796,6 +796,8 @@ const MainPage = () => {
       
       <FloatingReportsPopover 
         desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isDeviceListVisible={isDeviceListVisible}
         isVisible={reportsPopoverVisible}
         onClose={() => setReportsPopoverVisible(false)}
       />

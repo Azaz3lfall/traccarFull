@@ -8,6 +8,8 @@ import { X as CloseIcon } from 'lucide-react';
 
 const FloatingReportsPopover = ({ 
   desktop, 
+  isMenuExpanded,
+  isDeviceListVisible,
   isVisible,
   onClose
 }) => {
@@ -25,22 +27,25 @@ const FloatingReportsPopover = ({
           transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '400px',
-            maxHeight: '60vh',
+            bottom: '10px',
+            left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
+            width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - ${isDeviceListVisible ? '310px' : '0px'} - 20px)`,
+            height: !desktop ? '30vh' : '30vh',
             zIndex: 10000,
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            transition: 'left 0.3s ease'
           }}
         >
           <Card style={{
+            height: '100%',
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
             borderRadius: '16px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             overflow: 'hidden',
-            position: 'relative'
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             {/* Header */}
             <div style={{
@@ -66,7 +71,7 @@ const FloatingReportsPopover = ({
             {/* Content */}
             <div style={{ 
               padding: '20px',
-              minHeight: '200px',
+              flex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
