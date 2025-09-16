@@ -57,6 +57,7 @@ import EditAttributesAccordion from '../settings/components/EditAttributesAccord
 const FloatingGeofencesPopover = ({ 
   desktop, 
   isMenuExpanded, 
+  isDeviceListVisible,
   isVisible, 
   onClose 
 }) => {
@@ -292,10 +293,10 @@ const FloatingGeofencesPopover = ({
           position: 'fixed',
           top: !desktop ? 'auto' : '8px',
           bottom: !desktop ? '0px' : 'auto',
-          left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
+          left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '290px',
-          height: !desktop ? '60vh' : 'calc(100vh - 16px)',
-          zIndex: 10000,
+          height: !desktop ? '50vh' : 'calc(100vh - 16px)',
+          zIndex: 9999,
           pointerEvents: 'auto',
           transition: 'left 0.3s ease'
         }}
@@ -304,7 +305,7 @@ const FloatingGeofencesPopover = ({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 16px 16px 0px',
+          borderRadius: !desktop ? '16px 16px 0px 0px' : (isDeviceListVisible ? '0px 16px 16px 0px' : '0px 16px 16px 0px'),
           backgroundColor: colors.surface,
           border: `1px solid ${colors.border}`,
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',

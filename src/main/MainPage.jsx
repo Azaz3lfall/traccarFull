@@ -769,6 +769,7 @@ const MainPage = () => {
       <FloatingGeofencesPopover 
         desktop={desktop}
         isMenuExpanded={isMenuExpanded}
+        isDeviceListVisible={isDeviceListVisible}
         isVisible={geofencesPopoverVisible}
         onClose={() => setGeofencesPopoverVisible(false)}
       />
