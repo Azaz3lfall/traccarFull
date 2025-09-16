@@ -282,7 +282,7 @@ const FloatingGeofencesPopover = ({
   if (!isVisible) return null;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
         initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
         animate={{ x: 0, y: 0, opacity: 1 }}
@@ -293,7 +293,7 @@ const FloatingGeofencesPopover = ({
           top: !desktop ? 'auto' : '8px',
           bottom: !desktop ? '0px' : 'auto',
           left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
-          width: !desktop ? '100vw' : '400px',
+          width: !desktop ? '100vw' : '290px',
           height: !desktop ? '60vh' : 'calc(100vh - 16px)',
           zIndex: 10000,
           pointerEvents: 'auto',
@@ -304,7 +304,7 @@ const FloatingGeofencesPopover = ({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 0px 16px 16px',
+          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 16px 16px 0px',
           backgroundColor: colors.surface,
           border: `1px solid ${colors.border}`,
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
