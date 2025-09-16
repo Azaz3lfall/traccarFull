@@ -181,6 +181,7 @@ const FloatingGeofencesPopover = ({
   const handleSave = () => {
     setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
     resetCircleDrawing(); // Reset any active circle drawing
+    setGeofenceName(''); // Clear name only when saving
   };
 
   // Handle edit geofence
@@ -412,7 +413,6 @@ const FloatingGeofencesPopover = ({
     setCircleDrawingMode(false);
     setClickCount(0);
     setCenter(null);
-    setGeofenceName('');
     
     // Clean up map layers
     if (map) {
