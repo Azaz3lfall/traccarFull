@@ -206,11 +206,20 @@ const FloatingGeofencesPopover = ({
       
       // Calculate radius from the circle on map
       const circleData = map.getSource('circle-preview')._data;
+      console.log('Circle data:', circleData);
+      
       if (circleData && circleData.features && circleData.features[0]) {
         const circleFeature = circleData.features[0];
-        const centerCoords = circleFeature.geometry.coordinates[0][0]; // First coordinate of the polygon
+        console.log('Circle feature:', circleFeature);
+        console.log('Circle geometry:', circleFeature.geometry);
+        
+        // For a circle polygon, coordinates are in [coordinates][0] (first ring)
+        const coordinates = circleFeature.geometry.coordinates[0];
+        console.log('Circle coordinates:', coordinates);
+        
+        // Calculate radius from center to any point on the circle
         const radius = Math.sqrt(
-          Math.pow(centerCoords[0] - center[0], 2) + Math.pow(centerCoords[1] - center[1], 2)
+          Math.pow(coordinates[0][0] - center[0], 2) + Math.pow(coordinates[0][1] - center[1], 2)
         ) * 111000; // Convert to meters (approximate)
         
         console.log('Calculated radius:', radius);
@@ -231,7 +240,7 @@ const FloatingGeofencesPopover = ({
         // Use the existing mutation to create the geofence
         createGeofenceMutation.mutate(newGeofence);
       } else {
-        console.log('No circle data found');
+        console.log('No circle data found', { circleData, hasFeatures: circleData?.features, featuresLength: circleData?.features?.length });
       }
     } else {
       console.log('No circle to save', { center, clickCount, hasPreview: !!map.getSource('circle-preview') });
