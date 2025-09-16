@@ -2976,11 +2976,12 @@ const FloatingReportsPopover = ({
                     {/* Period Selection */}
                     <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
                       <FormControl fullWidth>
-                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <InputLabel style={{ color: colors.text }}>{t('reportPeriod')}</InputLabel>
                         <Select 
                           label={t('reportPeriod')} 
                           value={period} 
                           onChange={(e) => setPeriod(e.target.value)}
+                          style={{ color: colors.text }}
                           MenuProps={{
                             disablePortal: false,
                             style: { zIndex: 10002 }
@@ -3009,6 +3010,10 @@ const FloatingReportsPopover = ({
                             value={customFrom}
                             onChange={(e) => setCustomFrom(e.target.value)}
                             fullWidth
+                            InputLabelProps={{ style: { color: colors.text } }}
+                            InputProps={{
+                              style: { color: colors.text }
+                            }}
                           />
                         </div>
                         <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
@@ -3018,6 +3023,10 @@ const FloatingReportsPopover = ({
                             value={customTo}
                             onChange={(e) => setCustomTo(e.target.value)}
                             fullWidth
+                            InputLabelProps={{ style: { color: colors.text } }}
+                            InputProps={{
+                              style: { color: colors.text }
+                            }}
                           />
                         </div>
                       </>
@@ -3026,13 +3035,14 @@ const FloatingReportsPopover = ({
                     {/* Column Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <FormControl fullWidth>
-                        <InputLabel>{t('sharedColumns')}</InputLabel>
+                        <InputLabel style={{ color: colors.text }}>{t('sharedColumns')}</InputLabel>
                         <Select
                           label={t('sharedColumns')}
                           value={statisticsColumns}
                           onChange={(e) => setStatisticsColumns(e.target.value)}
                           multiple
                           disabled={statisticsLoading}
+                          style={{ color: colors.text }}
                           MenuProps={{
                             disablePortal: false,
                             style: { zIndex: 10002 }
