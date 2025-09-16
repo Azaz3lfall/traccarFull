@@ -4,7 +4,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { Card } from './ui/card';
 import { Typography, IconButton } from '@mui/material';
-import { X as CloseIcon } from 'lucide-react';
+import { ChevronLeft as CloseIcon } from 'lucide-react';
 
 const FloatingReportsPopover = ({ 
   desktop, 
@@ -54,11 +54,9 @@ const FloatingReportsPopover = ({
               backgroundColor: colors.surface,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'flex-start',
+              gap: '12px'
             }}>
-              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                {t('reportTitle')}
-              </Typography>
               <IconButton
                 onClick={onClose}
                 size="small"
@@ -66,6 +64,9 @@ const FloatingReportsPopover = ({
               >
                 <CloseIcon size={20} />
               </IconButton>
+              <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                {t('reportTitle')}
+              </Typography>
             </div>
 
             {/* Content */}
