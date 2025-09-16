@@ -54,6 +54,7 @@ import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
 import SelectField from '../common/components/SelectField';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import { map } from '../map/core/MapView';
+import { parse } from 'wellknown';
 
 const FloatingGeofencesPopover = ({ 
   desktop, 
@@ -273,26 +274,78 @@ const FloatingGeofencesPopover = ({
     // Center map on geofence if it has area data
     if (geofence.area && map && map.loaded()) {
       try {
-        // Parse the area to get coordinates
-        const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
-        if (areaMatch) {
-          const coordinates = areaMatch[1].split(',').map(coord => {
-            const [lat, lng] = coord.trim().split(' ').map(Number);
-            return [lng, lat]; // Convert to [lng, lat] format for map
-          });
-          
-          if (coordinates.length > 0) {
-            // Calculate center of the geofence
-            const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
-            const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-            
-            // Center map on geofence with smooth animation
-            map.easeTo({
-              center: [centerLng, centerLat],
-              zoom: Math.max(map.getZoom(), 15),
-              duration: 1000
-            });
+        let centerLng, centerLat;
+        
+        // Handle different geofence area types
+        if (geofence.area.indexOf('CIRCLE') > -1) {
+          // CIRCLE(lng, lat, radius) format
+          const coordinates = geofence.area.replace(/CIRCLE|\(|\)|,/g, ' ').trim().split(/ +/);
+          if (coordinates.length >= 3) {
+            centerLng = Number(coordinates[0]);
+            centerLat = Number(coordinates[1]);
           }
+        } else if (geofence.area.indexOf('LINESTRING') > -1) {
+          // LINESTRING (lat1 lng1, lat2 lng2, ...) format
+          const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
+          if (areaMatch) {
+            const coordinates = areaMatch[1].split(',').map(coord => {
+              const [lat, lng] = coord.trim().split(' ').map(Number);
+              return [lng, lat]; // Convert to [lng, lat] format for map
+            });
+            
+            if (coordinates.length > 0) {
+              centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+              centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+            }
+          }
+        } else if (geofence.area.indexOf('POLYGON') > -1) {
+          // POLYGON ((lat1 lng1, lat2 lng2, ...)) format
+          const areaMatch = geofence.area.match(/POLYGON\s*\(\s*\(([^)]+)\)\s*\)/);
+          if (areaMatch) {
+            const coordinates = areaMatch[1].split(',').map(coord => {
+              const [lat, lng] = coord.trim().split(' ').map(Number);
+              return [lng, lat]; // Convert to [lng, lat] format for map
+            });
+            
+            if (coordinates.length > 0) {
+              centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+              centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+            }
+          }
+        } else {
+          // Try to parse using wellknown library for other geometry types
+          try {
+            const geometry = parse(geofence.area);
+            if (geometry && geometry.coordinates) {
+              let coordinates = [];
+              
+              if (geometry.type === 'Point') {
+                coordinates = [geometry.coordinates];
+              } else if (geometry.type === 'LineString') {
+                coordinates = geometry.coordinates;
+              } else if (geometry.type === 'Polygon') {
+                coordinates = geometry.coordinates[0]; // Use outer ring
+              } else if (geometry.type === 'MultiPolygon') {
+                coordinates = geometry.coordinates[0][0]; // Use first polygon's outer ring
+              }
+              
+              if (coordinates.length > 0) {
+                centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+                centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+              }
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse geofence area with wellknown:', parseError);
+          }
+        }
+        
+        // Center map if we have valid coordinates
+        if (centerLng !== undefined && centerLat !== undefined) {
+          map.easeTo({
+            center: [centerLng, centerLat],
+            zoom: Math.max(map.getZoom(), 15),
+            duration: 1000
+          });
         }
       } catch (error) {
         console.error('Error centering map on geofence:', error);
