@@ -15,7 +15,6 @@ import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
-import ColumnSelect from '../reports/components/ColumnSelect';
 import dayjs from 'dayjs';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
@@ -1132,12 +1131,24 @@ const FloatingReportsPopover = ({
                     
                     {/* Column Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <ColumnSelect 
-                        columns={tripsColumns} 
-                        setColumns={setTripsColumns} 
-                        columnsArray={tripsColumnsArray}
-                        disabled={tripsLoading}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          label={t('sharedColumns')}
+                          value={tripsColumns}
+                          onChange={(e) => setTripsColumns(e.target.value)}
+                          multiple
+                          disabled={tripsLoading}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {tripsColumnsArray.map(([key, string]) => (
+                            <MenuItem key={key} value={key}>{t(string)}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Show Button */}
