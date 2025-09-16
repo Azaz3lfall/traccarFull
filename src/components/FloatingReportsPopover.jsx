@@ -3071,7 +3071,7 @@ const FloatingReportsPopover = ({
                         }}
                       >
                         <Typography variant="button" noWrap style={{ color: colors.text }}>
-                          {statisticsLoading ? t('sharedLoading') : t('sharedShow')}
+                          {statisticsLoading ? t('sharedLoading') : t('reportShow')}
                         </Typography>
                       </Button>
                     </div>
