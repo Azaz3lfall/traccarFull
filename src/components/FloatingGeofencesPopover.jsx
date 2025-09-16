@@ -517,8 +517,6 @@ const FloatingGeofencesPopover = ({
             <Button
               variant="outlined"
               size="small"
-              fullWidth
-              startIcon={<CircleIcon fontSize="small" />}
               onClick={() => handleDrawingTool('circle')}
               style={{
                 color: colors.text,
@@ -526,16 +524,19 @@ const FloatingGeofencesPopover = ({
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
-                fontSize: '12px'
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {t('sharedCircle')}
+              <CircleIcon fontSize="small" />
             </Button>
             <Button
               variant="outlined"
               size="small"
-              fullWidth
-              startIcon={<LineIcon fontSize="small" />}
               onClick={() => handleDrawingTool('line')}
               style={{
                 color: colors.text,
@@ -543,16 +544,19 @@ const FloatingGeofencesPopover = ({
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
-                fontSize: '12px'
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {t('sharedLine')}
+              <LineIcon fontSize="small" />
             </Button>
             <Button
               variant="outlined"
               size="small"
-              fullWidth
-              startIcon={<PolygonIcon fontSize="small" />}
               onClick={() => handleDrawingTool('polygon')}
               style={{
                 color: colors.text,
@@ -560,10 +564,15 @@ const FloatingGeofencesPopover = ({
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
-                fontSize: '12px'
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {t('sharedPolygon')}
+              <PolygonIcon fontSize="small" />
             </Button>
           </div>
           </div>
