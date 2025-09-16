@@ -45,7 +45,8 @@ const FloatingDeviceList = ({
   setFilterMap,
   desktop,
   isMenuExpanded,
-  isVisible
+  isVisible,
+  geofencesPopoverVisible
 }) => {
   
   const dispatch = useDispatch();
@@ -543,7 +544,7 @@ const FloatingDeviceList = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: colors.surface,
-        borderRadius: !desktop ? '0px' : (selectedDeviceId ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
+        borderRadius: !desktop ? '0px' : (selectedDeviceId || geofencesPopoverVisible ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
         boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
         border: `1px solid ${colors.border}`
       }}>

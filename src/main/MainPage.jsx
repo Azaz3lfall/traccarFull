@@ -2189,6 +2189,7 @@ const MainPage = () => {
         desktop={desktop}
         isMenuExpanded={isMenuExpanded}
         isVisible={desktop ? isDeviceListVisible : true} // Desktop: controlled by toggle, Mobile: always visible unless device selected
+        geofencesPopoverVisible={geofencesPopoverVisible}
       />
       
       {/* Floating Status Card */}
