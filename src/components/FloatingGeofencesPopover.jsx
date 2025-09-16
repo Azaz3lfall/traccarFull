@@ -165,18 +165,12 @@ const FloatingGeofencesPopover = ({
     },
   });
 
-  // Handle add geofence
+  // Handle add geofence - enables drawing tools
   const handleAdd = () => {
-    if (isAddMode) {
-      // Switch to save mode and enable drawing tools
-      setIsAddMode(false);
-    } else {
-      // Switch to add mode and disable drawing tools
-      setIsAddMode(true);
-    }
+    setIsAddMode(false); // Switch to save mode and enable drawing tools
   };
 
-  // Handle save geofence
+  // Handle save geofence - disables drawing tools
   const handleSave = useCatch(async () => {
     if (!editingGeofence?.name) return;
 
@@ -187,11 +181,11 @@ const FloatingGeofencesPopover = ({
       } else {
         createGeofenceMutation.mutate(editingGeofence);
       }
-      // Switch back to add mode after saving
-      setIsAddMode(true);
     } finally {
       setSaving(false);
     }
+    // Always switch back to add mode after saving
+    setIsAddMode(true);
   });
 
   // Handle edit geofence
