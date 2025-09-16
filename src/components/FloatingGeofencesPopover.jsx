@@ -57,6 +57,7 @@ import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
 import SelectField from '../common/components/SelectField';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import { map } from '../map/core/MapView';
+import { circle } from '@turf/turf';
 import { parse } from 'wellknown';
 
 const FloatingGeofencesPopover = ({ 
@@ -85,6 +86,12 @@ const FloatingGeofencesPopover = ({
   const [pageSize] = useState(10);
   const [saving, setSaving] = useState(false);
   const [isAddMode, setIsAddMode] = useState(true); // true = Add mode (drawing disabled), false = Save mode (drawing enabled)
+  
+  // Circle drawing state
+  const [circleDrawingMode, setCircleDrawingMode] = useState(false);
+  const [circleCenter, setCircleCenter] = useState(null);
+  const [circleRadius, setCircleRadius] = useState(null);
+  const [circlePreview, setCirclePreview] = useState(null);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -249,12 +256,204 @@ const FloatingGeofencesPopover = ({
 
   // Handle drawing tool selection
   const handleDrawingTool = (tool) => {
-    // Close the popover first
-    onClose();
+    if (tool === 'circle') {
+      if (circleDrawingMode) {
+        // If already in circle drawing mode, reset it
+        resetCircleDrawing();
+      } else {
+        // Enable circle drawing mode
+        setCircleDrawingMode(true);
+        setCircleCenter(null);
+        setCircleRadius(null);
+        setCirclePreview(null);
+      }
+      
+      // Close the popover
+      onClose();
+    } else {
+      // For other tools, navigate to geofences page
+      onClose();
+      window.location.href = `/geofences?tool=${tool}`;
+    }
+  };
+
+  // Handle map clicks for circle drawing
+  useEffect(() => {
+    if (!circleDrawingMode || !map) return;
+
+    const handleMapClick = (e) => {
+      const { lng, lat } = e.lngLat;
+      
+      if (!circleCenter) {
+        // First click - set center
+        setCircleCenter([lng, lat]);
+        
+        // Add center marker to map
+        if (map.getSource('circle-center')) {
+          map.removeSource('circle-center');
+        }
+        if (map.getLayer('circle-center')) {
+          map.removeLayer('circle-center');
+        }
+        
+        map.addSource('circle-center', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [lng, lat]
+            }
+          }
+        });
+        
+        map.addLayer({
+          id: 'circle-center',
+          type: 'circle',
+          source: 'circle-center',
+          paint: {
+            'circle-radius': 8,
+            'circle-color': '#1976d2',
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2
+          }
+        });
+      } else {
+        // Second click - set radius and complete circle
+        const radius = Math.sqrt(
+          Math.pow(lng - circleCenter[0], 2) + Math.pow(lat - circleCenter[1], 2)
+        ) * 111000; // Convert to meters (approximate)
+        
+        setCircleRadius(radius);
+        
+        // Create circle geofence
+        const circleGeofence = circle(circleCenter, radius / 1000, { steps: 32, units: 'kilometers' });
+        
+        // Add circle to map
+        if (map.getSource('circle-preview')) {
+          map.removeSource('circle-preview');
+        }
+        if (map.getLayer('circle-preview')) {
+          map.removeLayer('circle-preview');
+        }
+        
+        map.addSource('circle-preview', {
+          type: 'geojson',
+          data: circleGeofence
+        });
+        
+        map.addLayer({
+          id: 'circle-preview',
+          type: 'fill',
+          source: 'circle-preview',
+          paint: {
+            'fill-color': '#1976d2',
+            'fill-opacity': 0.2
+          }
+        });
+        
+        map.addLayer({
+          id: 'circle-preview-stroke',
+          type: 'line',
+          source: 'circle-preview',
+          paint: {
+            'line-color': '#1976d2',
+            'line-width': 2
+          }
+        });
+        
+        // Create geofence and save it
+        createCircleGeofence(circleCenter, radius);
+        
+        // Reset circle drawing mode
+        setCircleDrawingMode(false);
+        setCircleCenter(null);
+        setCircleRadius(null);
+        setCirclePreview(null);
+        
+        // Clean up map layers
+        setTimeout(() => {
+          if (map.getSource('circle-center')) {
+            map.removeSource('circle-center');
+          }
+          if (map.getLayer('circle-center')) {
+            map.removeLayer('circle-center');
+          }
+          if (map.getSource('circle-preview')) {
+            map.removeSource('circle-preview');
+          }
+          if (map.getLayer('circle-preview')) {
+            map.removeLayer('circle-preview');
+          }
+          if (map.getLayer('circle-preview-stroke')) {
+            map.removeLayer('circle-preview-stroke');
+          }
+        }, 2000);
+      }
+    };
+
+    map.on('click', handleMapClick);
     
-    // Navigate to geofences page with drawing tool
-    // This will open the map with the drawing tool active
-    window.location.href = `/geofences?tool=${tool}`;
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [circleDrawingMode, circleCenter, map]);
+
+  // Reset circle drawing
+  const resetCircleDrawing = () => {
+    setCircleDrawingMode(false);
+    setCircleCenter(null);
+    setCircleRadius(null);
+    setCirclePreview(null);
+    
+    // Clean up map layers
+    if (map) {
+      if (map.getSource('circle-center')) {
+        map.removeSource('circle-center');
+      }
+      if (map.getLayer('circle-center')) {
+        map.removeLayer('circle-center');
+      }
+      if (map.getSource('circle-preview')) {
+        map.removeSource('circle-preview');
+      }
+      if (map.getLayer('circle-preview')) {
+        map.removeLayer('circle-preview');
+      }
+      if (map.getLayer('circle-preview-stroke')) {
+        map.removeLayer('circle-preview-stroke');
+      }
+    }
+  };
+
+  // Create circle geofence
+  const createCircleGeofence = async (center, radius) => {
+    try {
+      const newGeofence = {
+        name: t('sharedGeofence'),
+        area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
+        attributes: {
+          color: '#1976d2',
+          mapLineWidth: 2,
+          mapLineOpacity: 1
+        }
+      };
+      
+      const response = await fetchOrThrow('/api/geofences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newGeofence),
+      });
+      
+      const createdGeofence = await response.json();
+      dispatch(geofencesActions.update([createdGeofence]));
+      
+      // Refresh geofences list
+      queryClient.invalidateQueries(['geofences']);
+      
+    } catch (error) {
+      console.error('Error creating circle geofence:', error);
+    }
   };
 
   // Handle geofence click - center map and clear selected device
@@ -494,13 +693,14 @@ const FloatingGeofencesPopover = ({
           {/* Drawing Tools Row */}
           <div style={{ display: 'flex', gap: '8px' }}>
             <Button
-              variant="outlined"
+              variant={circleDrawingMode ? "contained" : "outlined"}
               size="small"
               onClick={() => handleDrawingTool('circle')}
               disabled={isAddMode}
               style={{
-                color: colors.text,
-                borderColor: colors.border,
+                color: circleDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: circleDrawingMode ? '#1976d2' : colors.border,
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
