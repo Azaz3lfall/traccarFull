@@ -364,7 +364,8 @@ const FloatingGeofencesPopover = ({
         // Create geofence and save it
         createCircleGeofence(center, radius);
         
-        // Reset for next circle
+        // Disable circle tool after second click
+        setCircleDrawingMode(false);
         setClickCount(0);
         setCenter(null);
         
