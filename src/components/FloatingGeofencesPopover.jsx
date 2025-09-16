@@ -706,6 +706,7 @@ const FloatingGeofencesPopover = ({
             label={t('sharedName')}
             value={geofenceName}
             onChange={(e) => setGeofenceName(e.target.value)}
+            disabled={isAddMode}
             style={{
               marginBottom: '12px'
             }}
