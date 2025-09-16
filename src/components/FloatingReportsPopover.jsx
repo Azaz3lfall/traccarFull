@@ -126,6 +126,11 @@ const FloatingReportsPopover = ({
   const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [statisticsColumns, setStatisticsColumns] = useState(['captureTime', 'activeUsers', 'activeDevices', 'messagesStored']);
 
+  // Audit report state
+  const [auditItems, setAuditItems] = useState([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditColumns, setAuditColumns] = useState(['actionTime', 'userId', 'actionType', 'objectType']);
+
   // Statistics columns configuration
   const statisticsColumnsArray = [
     ['captureTime', 'statisticsCaptureTime'],
@@ -140,6 +145,17 @@ const FloatingReportsPopover = ({
     ['geolocationRequests', 'statisticsGeolocation'],
   ];
   const statisticsColumnsMap = new Map(statisticsColumnsArray);
+
+  // Audit columns configuration
+  const auditColumnsArray = [
+    ['actionTime', 'positionServerTime'],
+    ['address', 'positionAddress'],
+    ['userId', 'settingsUser'],
+    ['actionType', 'sharedActionType'],
+    ['objectType', 'sharedQbjectType'],
+    ['objectId', 'deviceIdentifier'],
+  ];
+  const auditColumnsMap = new Map(auditColumnsArray);
 
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
@@ -1313,6 +1329,61 @@ const FloatingReportsPopover = ({
     }
 
     onShowStatistics({ 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  // Audit functionality
+  const onShowAudit = useCatch(async ({ from, to }) => {
+    setAuditLoading(true);
+    try {
+      const query = new URLSearchParams({ from, to });
+      const response = await fetchOrThrow(`/api/audit?${query.toString()}`);
+      setAuditItems(await response.json());
+    } catch (error) {
+      console.error('Failed to load audit:', error);
+    } finally {
+      setAuditLoading(false);
+    }
+  });
+
+  const showAuditReport = () => {
+    const now = dayjs();
+    let selectedFrom, selectedTo;
+
+    switch (period) {
+      case 'today':
+        selectedFrom = now.startOf('day');
+        selectedTo = now.endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = now.subtract(1, 'day').startOf('day');
+        selectedTo = now.subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = now.startOf('week');
+        selectedTo = now.endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = now.subtract(1, 'week').startOf('week');
+        selectedTo = now.subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = now.startOf('month');
+        selectedTo = now.endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = now.subtract(1, 'month').startOf('month');
+        selectedTo = now.subtract(1, 'month').endOf('month');
+        break;
+      case 'custom':
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowAudit({ 
       from: selectedFrom.toISOString(), 
       to: selectedTo.toISOString() 
     });
@@ -3104,6 +3175,157 @@ const FloatingReportsPopover = ({
                         )) : (
                           <TableRow>
                             <TableCell colSpan={statisticsColumns.length} style={{ textAlign: 'center', padding: '20px' }}>
+                              <CircularProgress size={24} />
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
+              ) : visibleTabs[activeTab]?.key === 'audit' ? (
+                <>
+                  {/* Audit Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel style={{ color: colors.text }}>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          style={{ color: colors.text }}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                            InputLabelProps={{ style: { color: colors.text } }}
+                            InputProps={{
+                              style: { color: colors.text }
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                            InputLabelProps={{ style: { color: colors.text } }}
+                            InputProps={{
+                              style: { color: colors.text }
+                            }}
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Column Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel style={{ color: colors.text }}>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          label={t('sharedColumns')}
+                          value={auditColumns}
+                          onChange={(e) => setAuditColumns(e.target.value)}
+                          multiple
+                          disabled={auditLoading}
+                          style={{ color: colors.text }}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {auditColumnsArray.map(([key, title]) => (
+                            <MenuItem key={key} value={key}>
+                              {t(title)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={auditLoading || (period === 'custom' && (!customFrom || !customTo))}
+                        onClick={showAuditReport}
+                        startIcon={auditLoading ? <CircularProgress size={20} /> : null}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {auditLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Audit Report Table */}
+                  <div style={{ 
+                    flex: 1, 
+                    overflow: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px'
+                  }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          {auditColumns.map((key) => (
+                            <TableCell key={key}>{t(auditColumnsMap.get(key))}</TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!auditLoading ? auditItems.map((item, index) => (
+                          <TableRow key={item.id || index}>
+                            {auditColumns.map((key) => (
+                              <TableCell key={key}>
+                                {key === 'actionTime' ? formatTime(item[key], 'minutes') : item[key]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={auditColumns.length} style={{ textAlign: 'center', padding: '20px' }}>
                               <CircularProgress size={24} />
                             </TableCell>
                           </TableRow>
