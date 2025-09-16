@@ -1165,14 +1165,37 @@ const FloatingGeofencesPopover = ({
                       >
                         <TableCell>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div
-                              style={{
-                                width: '12px',
-                                height: '12px',
-                                borderRadius: '50%',
-                                backgroundColor: geofence.attributes?.color || '#3f51b5'
-                              }}
-                            />
+                            {geofence.area.startsWith('CIRCLE') ? (
+                              <CircleIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : geofence.area.startsWith('LINESTRING') ? (
+                              <LineIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : geofence.area.startsWith('POLYGON') ? (
+                              <PolygonIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  borderRadius: '50%',
+                                  backgroundColor: geofence.attributes?.color || '#3f51b5'
+                                }}
+                              />
+                            )}
                             <Typography variant="body2" style={{ color: colors.text }}>
                               {geofence.name}
                             </Typography>
