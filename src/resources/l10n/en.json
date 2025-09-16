@@ -429,6 +429,8 @@
     "commandNoQueue": "No queue",
     "commandUnit": "Unit",
     "commandCustom": "Custom command",
+    "commandCustomPlaceholder": "Enter custom command data...",
+    "commandCustomDataRequired": "Custom command data is required",
     "commandDeviceIdentification": "Device Identification",
     "commandPositionSingle": "Single Reporting",
     "commandPositionPeriodic": "Periodic Reporting",

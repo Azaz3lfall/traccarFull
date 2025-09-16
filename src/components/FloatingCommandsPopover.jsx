@@ -82,6 +82,7 @@ const FloatingCommandsPopover = ({
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
   const [commandTypes, setCommandTypes] = useState([]);
+  const [validationError, setValidationError] = useState('');
 
 
   // Test if we can execute code after state declarations
@@ -152,6 +153,7 @@ const FloatingCommandsPopover = ({
     setActiveTab(0);
     setEditDialog(true);
     setAnchorEl(null);
+    setValidationError(''); // Clear validation error
   };
 
   // Handle delete command
@@ -207,11 +209,28 @@ const FloatingCommandsPopover = ({
 
   // Handle save command
   const handleSaveCommand = () => {
+    // Clear previous validation error
+    setValidationError('');
+    
+    // Validate custom command data
+    if (editingCommand.type === 'custom' && (!editingCommand.attributes?.data || editingCommand.attributes.data.trim() === '')) {
+      setValidationError(t('commandCustomDataRequired'));
+      return;
+    }
+
     if (editingCommand.id) {
       updateCommandMutation.mutate({ id: editingCommand.id, commandData: editingCommand });
     } else {
       createCommandMutation.mutate(editingCommand);
     }
+  };
+
+  // Check if form is valid
+  const isFormValid = () => {
+    if (editingCommand.type === 'custom') {
+      return editingCommand.attributes?.data && editingCommand.attributes.data.trim() !== '';
+    }
+    return true;
   };
 
   // Menu actions
@@ -300,6 +319,7 @@ const FloatingCommandsPopover = ({
                   });
                   setActiveTab(0);
                   setEditDialog(true);
+                  setValidationError(''); // Clear validation error
                 }}
                 disabled={limitCommands}
                 size="small"
@@ -679,10 +699,13 @@ const FloatingCommandsPopover = ({
                         </InputLabel>
                         <Select
                           value={editingCommand?.type || ''}
-                          onChange={(e) => setEditingCommand({
-                            ...editingCommand,
-                            type: e.target.value
-                          })}
+                          onChange={(e) => {
+                            setEditingCommand({
+                              ...editingCommand,
+                              type: e.target.value
+                            });
+                            setValidationError(''); // Clear validation error when type changes
+                          }}
                           label={t('sharedType')}
                           MenuProps={{
                             style: { zIndex: 10003 },
@@ -717,6 +740,45 @@ const FloatingCommandsPopover = ({
                           )}
                         </Select>
                       </FormControl>
+
+                      {/* Custom Command Data Input - Only show when type is 'custom' */}
+                      {editingCommand?.type === 'custom' && (
+                        <div>
+                          <TextField
+                            label={t('commandData')}
+                            value={editingCommand?.attributes?.data || ''}
+                            onChange={(e) => {
+                              setEditingCommand({
+                                ...editingCommand,
+                                attributes: {
+                                  ...editingCommand.attributes,
+                                  data: e.target.value
+                                }
+                              });
+                              // Clear validation error when user starts typing
+                              if (validationError) {
+                                setValidationError('');
+                              }
+                            }}
+                            fullWidth
+                            variant="outlined"
+                            size="small"
+                            multiline
+                            rows={3}
+                            placeholder={t('commandCustomPlaceholder')}
+                            error={!!validationError}
+                            helperText={validationError}
+                            style={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: colors.secondary,
+                                '& fieldset': { borderColor: validationError ? colors.error : colors.border },
+                                '&:hover fieldset': { borderColor: validationError ? colors.error : colors.primary },
+                                '&.Mui-focused fieldset': { borderColor: validationError ? colors.error : colors.primary },
+                              }
+                            }}
+                          />
+                        </div>
+                      )}
 
                       {/* Text Channel */}
                       <FormControlLabel
@@ -764,7 +826,7 @@ const FloatingCommandsPopover = ({
                     <Button
                       onClick={handleSaveCommand}
                       variant="contained"
-                      disabled={createCommandMutation.isPending || updateCommandMutation.isPending}
+                      disabled={createCommandMutation.isPending || updateCommandMutation.isPending || !isFormValid()}
                       style={{
                         backgroundColor: colors.primary,
                         color: colors.text,
