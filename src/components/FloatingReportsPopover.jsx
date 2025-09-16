@@ -993,13 +993,13 @@ const FloatingReportsPopover = ({
   const valueRange = maxValue - minValue;
 
   const colorPalette = [
-    colors.primary,
-    colors.secondary,
-    colors.error,
-    colors.warning,
-    colors.info,
-    colors.success,
-    colors.text,
+    '#1976d2', // Blue
+    '#dc004e', // Red
+    '#9c27b0', // Purple
+    '#ed6c02', // Orange
+    '#2e7d32', // Green
+    '#d32f2f', // Dark Red
+    '#7b1fa2', // Dark Purple
   ];
 
   return (
@@ -2288,7 +2288,7 @@ const FloatingReportsPopover = ({
                           }}
                         >
                           <XAxis
-                            stroke={colors.text}
+                            stroke="#666666"
                             dataKey={timeType}
                             type="number"
                             tickFormatter={(value) => formatTime(value, 'time')}
@@ -2296,21 +2296,21 @@ const FloatingReportsPopover = ({
                             scale="time"
                           />
                           <YAxis
-                            stroke={colors.text}
+                            stroke="#666666"
                             type="number"
                             tickFormatter={(value) => value.toFixed(2)}
                             domain={[minValue - valueRange / 5, maxValue + valueRange / 5]}
                           />
-                          <CartesianGrid stroke={colors.border} strokeDasharray="3 3" />
+                          <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
                           <Tooltip
-                            wrapperStyle={{ backgroundColor: colors.background, color: colors.text }}
+                            wrapperStyle={{ backgroundColor: '#ffffff', color: '#333333', border: '1px solid #e0e0e0' }}
                             formatter={(value, key) => [value, positionAttributes[key]?.name || key]}
                             labelFormatter={(value) => formatTime(value, 'seconds')}
                           />
                           <Brush
                             dataKey={timeType}
                             height={30}
-                            stroke={colors.primary}
+                            stroke="#1976d2"
                             tickFormatter={() => ''}
                           />
                           {selectedChartTypes.map((type, index) => (
