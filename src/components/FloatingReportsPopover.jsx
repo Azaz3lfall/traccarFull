@@ -2497,18 +2497,27 @@ const FloatingReportsPopover = ({
                     
                     {/* Geofence Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('sharedGeofence')}
-                        data={Object.values(geofences).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={geofenceId}
-                        onChange={(e) => setGeofenceId(e.target.value)}
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
-                        }}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedGeofence')}</InputLabel>
+                        <Select
+                          label={t('sharedGeofence')}
+                          value={geofenceId || ''}
+                          onChange={(e) => setGeofenceId(e.target.value || null)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="">
+                            <em>{t('sharedNone')}</em>
+                          </MenuItem>
+                          {Object.values(geofences).sort((a, b) => a.name.localeCompare(b.name)).map((geofence) => (
+                            <MenuItem key={geofence.id} value={geofence.id}>
+                              {geofence.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Period Selection */}
