@@ -261,10 +261,29 @@ const FloatingGeofencesPopover = ({
         // If already in circle drawing mode, reset it
         resetCircleDrawing();
       } else {
-        // Enable circle drawing mode
+        // Enable circle drawing mode and clear all existing circles
         setCircleDrawingMode(true);
         setClickCount(0);
         setCenter(null);
+        
+        // Clear all existing circles from map
+        if (map) {
+          if (map.getSource('circle-preview')) {
+            map.removeSource('circle-preview');
+          }
+          if (map.getLayer('circle-preview')) {
+            map.removeLayer('circle-preview');
+          }
+          if (map.getLayer('circle-preview-stroke')) {
+            map.removeLayer('circle-preview-stroke');
+          }
+          if (map.getSource('circle-center')) {
+            map.removeSource('circle-center');
+          }
+          if (map.getLayer('circle-center')) {
+            map.removeLayer('circle-center');
+          }
+        }
       }
       
       // Keep popover open for circle drawing
