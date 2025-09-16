@@ -268,8 +268,8 @@ const FloatingGeofencesPopover = ({
         setCirclePreview(null);
       }
       
-      // Close the popover
-      onClose();
+      // Keep popover open for circle drawing
+      // Don't call onClose() here
     } else {
       // For other tools, navigate to geofences page
       onClose();
@@ -696,7 +696,7 @@ const FloatingGeofencesPopover = ({
               variant={circleDrawingMode ? "contained" : "outlined"}
               size="small"
               onClick={() => handleDrawingTool('circle')}
-              disabled={false}
+              disabled={!isAddMode}
               style={{
                 color: circleDrawingMode ? '#ffffff' : colors.text,
                 backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
