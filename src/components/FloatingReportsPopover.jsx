@@ -1269,7 +1269,7 @@ const FloatingReportsPopover = ({
     }
   });
 
-  const showStatisticsReport = (period) => {
+  const showStatisticsReport = () => {
     const now = dayjs();
     let selectedFrom, selectedTo;
 
@@ -2968,75 +2968,72 @@ const FloatingReportsPopover = ({
                     padding: '16px', 
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px'
+                    flexDirection: desktop ? 'row' : 'column',
+                    gap: '12px',
+                    flexWrap: 'wrap',
+                    alignItems: desktop ? 'center' : 'stretch'
                   }}>
                     {/* Period Selection */}
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {['today', 'yesterday', 'thisWeek', 'lastWeek', 'thisMonth', 'lastMonth', 'thisYear', 'lastYear'].map((period) => (
-                        <Button
-                          key={period}
-                          variant="outlined"
-                          size="small"
-                          onClick={() => showStatisticsReport(period)}
-                          disabled={statisticsLoading}
-                          style={{ 
-                            color: colors.text, 
-                            borderColor: colors.border,
-                            fontSize: '12px',
-                            minWidth: 'auto',
-                            padding: '4px 8px'
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel style={{ color: colors.text }}>{t('sharedPeriod')}</InputLabel>
+                        <Select
+                          value={period}
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
                           }}
+                          style={{ color: colors.text }}
                         >
-                          {t(`report${period.charAt(0).toUpperCase() + period.slice(1)}`)}
-                        </Button>
-                      ))}
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="lastWeek">{t('reportLastWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="lastMonth">{t('reportLastMonth')}</MenuItem>
+                          <MenuItem value="thisYear">{t('reportThisYear')}</MenuItem>
+                          <MenuItem value="lastYear">{t('reportLastYear')}</MenuItem>
+                          <MenuItem value="custom">{t('sharedCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
 
-                    {/* Custom Date Range */}
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <TextField
-                        type="datetime-local"
-                        size="small"
-                        value={customFrom}
-                        onChange={(e) => setCustomFrom(e.target.value)}
-                        InputLabelProps={{ shrink: true }}
-                        style={{ 
-                          minWidth: '180px',
-                          '& .MuiInputBase-input': { color: colors.text }
-                        }}
-                      />
-                      <TextField
-                        type="datetime-local"
-                        size="small"
-                        value={customTo}
-                        onChange={(e) => setCustomTo(e.target.value)}
-                        InputLabelProps={{ shrink: true }}
-                        style={{ 
-                          minWidth: '180px',
-                          '& .MuiInputBase-input': { color: colors.text }
-                        }}
-                      />
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => showStatisticsReport('custom')}
-                        disabled={statisticsLoading || !customFrom || !customTo}
-                        style={{ 
-                          color: colors.text, 
-                          borderColor: colors.border,
-                          fontSize: '12px',
-                          minWidth: 'auto',
-                          padding: '4px 12px'
-                        }}
-                      >
-                        {t('sharedShow')}
-                      </Button>
-                    </div>
+                    {/* Custom Date Range - Only show when custom is selected */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                          <TextField
+                            type="datetime-local"
+                            size="small"
+                            fullWidth
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            style={{ 
+                              '& .MuiInputBase-input': { color: colors.text }
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                          <TextField
+                            type="datetime-local"
+                            size="small"
+                            fullWidth
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            style={{ 
+                              '& .MuiInputBase-input': { color: colors.text }
+                            }}
+                          />
+                        </div>
+                      </>
+                    )}
 
                     {/* Column Selection */}
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <FormControl size="small" style={{ minWidth: '200px' }}>
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                      <FormControl fullWidth size="small">
                         <InputLabel style={{ color: colors.text }}>{t('sharedColumns')}</InputLabel>
                         <Select
                           multiple
@@ -3055,6 +3052,27 @@ const FloatingReportsPopover = ({
                           ))}
                         </Select>
                       </FormControl>
+                    </div>
+
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto' }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={showStatisticsReport}
+                        disabled={statisticsLoading || (period === 'custom' && (!customFrom || !customTo))}
+                        style={{ 
+                          color: colors.text, 
+                          borderColor: colors.border,
+                          minWidth: '80px'
+                        }}
+                      >
+                        {statisticsLoading ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          t('sharedShow')
+                        )}
+                      </Button>
                     </div>
                   </div>
 
