@@ -91,6 +91,7 @@ const FloatingGeofencesPopover = ({
   const [circleDrawingMode, setCircleDrawingMode] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [center, setCenter] = useState(null);
+  const [radius, setRadius] = useState(null);
   const [geofenceName, setGeofenceName] = useState('');
 
   // Fetch geofences with TanStack Query
@@ -179,7 +180,7 @@ const FloatingGeofencesPopover = ({
 
   // Handle save geofence - validates name and creates geofence
   const handleSave = () => {
-    console.log('Save button clicked', { isAddMode, geofenceName, center, clickCount, circleDrawingMode });
+    console.log('Save button clicked', { isAddMode, geofenceName, center, radius, clickCount, circleDrawingMode });
     
     // Only proceed if we're in Save mode (not Add mode)
     if (isAddMode) {
@@ -193,58 +194,28 @@ const FloatingGeofencesPopover = ({
       return;
     }
 
-    // Check if we have a circle to save
-    if (circleDrawingMode && center && clickCount === 1) {
-      // We have a center but no radius yet - can't save
+    // Check if we have a completed circle to save
+    if (!center || !radius) {
+      console.log('No completed circle to save', { center, radius });
       dispatch(errorsActions.push(t('sharedRequired')));
       return;
     }
 
-    // If we have a completed circle, save it
-    if (center && clickCount === 0 && map.getSource('circle-preview')) {
-      console.log('Found circle preview, creating geofence');
-      
-      // Calculate radius from the circle on map
-      const circleData = map.getSource('circle-preview')._data;
-      console.log('Circle data:', circleData);
-      
-      if (circleData && circleData.features && circleData.features[0]) {
-        const circleFeature = circleData.features[0];
-        console.log('Circle feature:', circleFeature);
-        console.log('Circle geometry:', circleFeature.geometry);
-        
-        // For a circle polygon, coordinates are in [coordinates][0] (first ring)
-        const coordinates = circleFeature.geometry.coordinates[0];
-        console.log('Circle coordinates:', coordinates);
-        
-        // Calculate radius from center to any point on the circle
-        const radius = Math.sqrt(
-          Math.pow(coordinates[0][0] - center[0], 2) + Math.pow(coordinates[0][1] - center[1], 2)
-        ) * 111000; // Convert to meters (approximate)
-        
-        console.log('Calculated radius:', radius);
-        
-        // Create the geofence
-        const newGeofence = {
-          name: geofenceName.trim(),
-          area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
-          attributes: {
-            color: '#1976d2',
-            mapLineWidth: 2,
-            mapLineOpacity: 1
-          }
-        };
-        
-        console.log('Creating geofence:', newGeofence);
-        
-        // Use the existing mutation to create the geofence
-        createGeofenceMutation.mutate(newGeofence);
-      } else {
-        console.log('No circle data found', { circleData, hasFeatures: circleData?.features, featuresLength: circleData?.features?.length });
+    // Create the geofence using stored center and radius
+    const newGeofence = {
+      name: geofenceName.trim(),
+      area: `CIRCLE(${center[1]}, ${center[0]}, ${radius})`, // lat, lng, radius in meters
+      attributes: {
+        color: '#1976d2',
+        mapLineWidth: 2,
+        mapLineOpacity: 1
       }
-    } else {
-      console.log('No circle to save', { center, clickCount, hasPreview: !!map.getSource('circle-preview') });
-    }
+    };
+    
+    console.log('Creating geofence:', newGeofence);
+    
+    // Use the existing mutation to create the geofence
+    createGeofenceMutation.mutate(newGeofence);
 
     // Reset everything
     setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
@@ -410,12 +381,15 @@ const FloatingGeofencesPopover = ({
         
       } else if (clickCount === 1) {
         // Second click - set radius and complete circle
-        const radius = Math.sqrt(
+        const calculatedRadius = Math.sqrt(
           Math.pow(lng - center[0], 2) + Math.pow(lat - center[1], 2)
         ) * 111000; // Convert to meters (approximate)
         
+        // Store the radius for saving later
+        setRadius(calculatedRadius);
+        
         // Create circle geofence
-        const circleGeofence = circle(center, radius / 1000, { steps: 32, units: 'kilometers' });
+        const circleGeofence = circle(center, calculatedRadius / 1000, { steps: 32, units: 'kilometers' });
         
         // Add circle to map
         if (map.getSource('circle-preview')) {
@@ -456,8 +430,9 @@ const FloatingGeofencesPopover = ({
         // Disable circle tool after second click
         setCircleDrawingMode(false);
         setClickCount(0);
-        // Keep center for saving later
+        // Keep center and radius for saving later
         // setCenter(null); // Don't clear center yet
+        // setRadius(null); // Don't clear radius yet
         
         // Clean up only the center marker, keep the circle visible
         if (map.getSource('circle-center')) {
@@ -482,6 +457,7 @@ const FloatingGeofencesPopover = ({
     setCircleDrawingMode(false);
     setClickCount(0);
     setCenter(null);
+    setRadius(null);
     
     // Clean up map layers first, then sources
     if (map) {
