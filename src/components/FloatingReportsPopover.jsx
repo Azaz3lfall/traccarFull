@@ -205,7 +205,7 @@ const FloatingReportsPopover = ({
             left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
             width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
             height: !desktop ? '50vh' : 'calc(100vh - 16px)',
-            zIndex: 10000,
+            zIndex: 10001,
             pointerEvents: 'auto',
             transition: 'left 0.3s ease'
           }}
@@ -330,28 +330,48 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
-                        multiple
-                        fullWidth
-                        zIndex={10002}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('deviceTitle')}</InputLabel>
+                        <Select
+                          label={t('deviceTitle')}
+                          multiple
+                          value={deviceIds}
+                          onChange={(e) => setDeviceIds(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {Object.values(devices).sort((a, b) => a.name.localeCompare(b.name)).map((device) => (
+                            <MenuItem key={device.id} value={device.id}>
+                              {device.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Group Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('settingsGroups')}
-                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={groupIds}
-                        onChange={(e) => setGroupIds(e.target.value)}
-                        multiple
-                        fullWidth
-                        zIndex={10002}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('settingsGroups')}</InputLabel>
+                        <Select
+                          label={t('settingsGroups')}
+                          multiple
+                          value={groupIds}
+                          onChange={(e) => setGroupIds(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
+                            <MenuItem key={group.id} value={group.id}>
+                              {group.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Period Selection */}
@@ -363,11 +383,8 @@ const FloatingReportsPopover = ({
                           value={period} 
                           onChange={(e) => setPeriod(e.target.value)}
                           MenuProps={{
-                            PaperProps: {
-                              style: {
-                                zIndex: 10002,
-                              },
-                            },
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
                           }}
                         >
                           <MenuItem value="today">{t('reportToday')}</MenuItem>
