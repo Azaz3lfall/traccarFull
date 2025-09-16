@@ -383,6 +383,7 @@ const FloatingGeofencesPopover = ({
           map.removeLayer('circle-center');
         }
       }
+      // Third and subsequent clicks are ignored - no else clause
     };
 
     map.on('click', handleMapClick);
@@ -390,7 +391,7 @@ const FloatingGeofencesPopover = ({
     return () => {
       map.off('click', handleMapClick);
     };
-  }, [circleDrawingMode, circleCenter, map]);
+  }, [circleDrawingMode, circleCenter, circleReadyForNext, map]);
 
   // Reset circle drawing
   const resetCircleDrawing = () => {
