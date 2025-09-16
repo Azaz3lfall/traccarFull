@@ -179,8 +179,11 @@ const FloatingGeofencesPopover = ({
 
   // Handle save geofence - validates name and creates geofence
   const handleSave = () => {
+    console.log('Save button clicked', { isAddMode, geofenceName, center, clickCount, circleDrawingMode });
+    
     // Only proceed if we're in Save mode (not Add mode)
     if (isAddMode) {
+      console.log('In Add mode, doing nothing');
       return; // Do nothing if in Add mode
     }
 
@@ -199,6 +202,8 @@ const FloatingGeofencesPopover = ({
 
     // If we have a completed circle, save it
     if (center && clickCount === 0 && map.getSource('circle-preview')) {
+      console.log('Found circle preview, creating geofence');
+      
       // Calculate radius from the circle on map
       const circleData = map.getSource('circle-preview')._data;
       if (circleData && circleData.features && circleData.features[0]) {
@@ -207,6 +212,8 @@ const FloatingGeofencesPopover = ({
         const radius = Math.sqrt(
           Math.pow(centerCoords[0] - center[0], 2) + Math.pow(centerCoords[1] - center[1], 2)
         ) * 111000; // Convert to meters (approximate)
+        
+        console.log('Calculated radius:', radius);
         
         // Create the geofence
         const newGeofence = {
@@ -219,9 +226,15 @@ const FloatingGeofencesPopover = ({
           }
         };
         
+        console.log('Creating geofence:', newGeofence);
+        
         // Use the existing mutation to create the geofence
         createGeofenceMutation.mutate(newGeofence);
+      } else {
+        console.log('No circle data found');
       }
+    } else {
+      console.log('No circle to save', { center, clickCount, hasPreview: !!map.getSource('circle-preview') });
     }
 
     // Reset everything
