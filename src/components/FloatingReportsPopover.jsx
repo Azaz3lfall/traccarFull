@@ -27,20 +27,20 @@ const FloatingReportsPopover = ({
           transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            bottom: '0px',
-            left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '516px' : '376px') : (isMenuExpanded ? '206px' : '69px')),
-            width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - ${isDeviceListVisible ? '310px' : '0px'} - 26px + 12px)`,
-            height: !desktop ? '30vh' : '30vh',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90vw',
+            height: '90vh',
             zIndex: 10000,
-            pointerEvents: 'auto',
-            transition: 'left 0.3s ease'
+            pointerEvents: 'auto'
           }}
         >
           <Card style={{
             height: '100%',
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
-            borderRadius: '16px 16px 0px 0px',
+            borderRadius: '16px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             overflow: 'hidden',
             position: 'relative',
