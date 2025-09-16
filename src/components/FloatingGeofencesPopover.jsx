@@ -534,47 +534,73 @@ const FloatingGeofencesPopover = ({
       
       // Update polyline preview on map
       if (updatedPoints.length > 0) {
-        // Update or create polyline source
-        if (map.getSource('polyline-preview')) {
-          map.removeSource('polyline-preview');
-        }
-        if (map.getLayer('polyline-preview')) {
-          map.removeLayer('polyline-preview');
-        }
-        
-        map.addSource('polyline-preview', {
-          type: 'geojson',
-          data: {
+        // Create or update polyline source
+        if (!map.getSource('polyline-preview')) {
+          map.addSource('polyline-preview', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: updatedPoints
+              }
+            }
+          });
+          
+          map.addLayer({
+            id: 'polyline-preview',
+            type: 'line',
+            source: 'polyline-preview',
+            paint: {
+              'line-color': '#1976d2',
+              'line-width': 2,
+              'line-opacity': 1
+            }
+          });
+        } else {
+          // Just update the data
+          map.getSource('polyline-preview').setData({
             type: 'Feature',
             geometry: {
               type: 'LineString',
               coordinates: updatedPoints
             }
-          }
-        });
-        
-        map.addLayer({
-          id: 'polyline-preview',
-          type: 'line',
-          source: 'polyline-preview',
-          paint: {
-            'line-color': '#1976d2',
-            'line-width': 2,
-            'line-opacity': 1
-          }
-        });
-        
-        // Update or create points source
-        if (map.getSource('polyline-points')) {
-          map.removeSource('polyline-points');
-        }
-        if (map.getLayer('polyline-points')) {
-          map.removeLayer('polyline-points');
+          });
         }
         
-        map.addSource('polyline-points', {
-          type: 'geojson',
-          data: {
+        // Create or update points source
+        if (!map.getSource('polyline-points')) {
+          map.addSource('polyline-points', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: updatedPoints.map((point, index) => ({
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: point
+                },
+                properties: {
+                  index: index
+                }
+              }))
+            }
+          });
+          
+          map.addLayer({
+            id: 'polyline-points',
+            type: 'circle',
+            source: 'polyline-points',
+            paint: {
+              'circle-radius': 4,
+              'circle-color': '#1976d2',
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 2
+            }
+          });
+        } else {
+          // Just update the data
+          map.getSource('polyline-points').setData({
             type: 'FeatureCollection',
             features: updatedPoints.map((point, index) => ({
               type: 'Feature',
@@ -586,20 +612,8 @@ const FloatingGeofencesPopover = ({
                 index: index
               }
             }))
-          }
-        });
-        
-        map.addLayer({
-          id: 'polyline-points',
-          type: 'circle',
-          source: 'polyline-points',
-          paint: {
-            'circle-radius': 4,
-            'circle-color': '#1976d2',
-            'circle-stroke-color': '#ffffff',
-            'circle-stroke-width': 2
-          }
-        });
+          });
+        }
       }
     };
 
