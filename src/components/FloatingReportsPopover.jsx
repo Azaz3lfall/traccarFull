@@ -2509,7 +2509,7 @@ const FloatingReportsPopover = ({
                           }}
                         >
                           <MenuItem value="">
-                            <em>{t('sharedNone')}</em>
+                            <em>-</em>
                           </MenuItem>
                           {Object.values(geofences).sort((a, b) => a.name.localeCompare(b.name)).map((geofence) => (
                             <MenuItem key={geofence.id} value={geofence.id}>
