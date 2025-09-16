@@ -112,7 +112,6 @@ const FloatingReportsPopover = ({
   const [geofenceId, setGeofenceId] = useState(null);
 
   // Logs report state
-  const [logsItems, setLogsItems] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -1158,7 +1157,6 @@ const FloatingReportsPopover = ({
   useEffect(() => {
     if (visibleTabs[activeTab]?.key === 'logs') {
       dispatch(sessionActions.enableLogs(true));
-      setLogsItems(logs);
     } else {
       dispatch(sessionActions.enableLogs(false));
     }
@@ -1168,7 +1166,7 @@ const FloatingReportsPopover = ({
         dispatch(sessionActions.enableLogs(false));
       }
     };
-  }, [activeTab, dispatch, logs]);
+  }, [activeTab, dispatch]);
 
   return (
     <AnimatePresence mode="wait">
@@ -2741,7 +2739,7 @@ const FloatingReportsPopover = ({
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {logsItems.map((item, index) => (
+                        {logs.map((item, index) => (
                           <TableRow key={index}>
                             <TableCell style={{ padding: '4px' }}>
                               {item.deviceId ? (
