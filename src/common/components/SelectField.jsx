@@ -18,6 +18,7 @@ const SelectField = ({
   keyGetter = (item) => item.id,
   titleGetter = (item) => item.name,
   zIndex = 1000,
+  MenuProps = {},
 }) => {
   const [items, setItems] = useState();
 
@@ -54,6 +55,7 @@ const SelectField = ({
                     zIndex: zIndex,
                   },
                 },
+                ...MenuProps,
               }}
             >
               {items.map((item) => (
