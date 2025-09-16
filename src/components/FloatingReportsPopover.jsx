@@ -21,6 +21,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import DownloadIcon from '@mui/icons-material/Download';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import RouteIcon from '@mui/icons-material/Route';
@@ -1178,8 +1179,9 @@ const FloatingReportsPopover = ({
                         fullWidth
                         variant="outlined"
                         color="primary"
-                        disabled={isTripsDisabled()}
+                        disabled={isTripsDisabled() || tripsItems.length === 0}
                         onClick={exportTripsReport}
+                        startIcon={<DownloadIcon />}
                         style={{ 
                           minWidth: desktop ? '120px' : 'auto',
                           color: colors.text,
