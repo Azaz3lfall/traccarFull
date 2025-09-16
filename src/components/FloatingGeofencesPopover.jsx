@@ -48,11 +48,12 @@ import {
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
-import { geofencesActions } from '../store';
+import { geofencesActions, devicesActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
 import SelectField from '../common/components/SelectField';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
+import { map } from '../map/core/MapView';
 
 const FloatingGeofencesPopover = ({ 
   desktop, 
@@ -264,6 +265,41 @@ const FloatingGeofencesPopover = ({
     setEditingGeofence(null);
   };
 
+  // Handle geofence click - center map and clear selected device
+  const handleGeofenceClick = (geofence) => {
+    // Clear selected device
+    dispatch(devicesActions.selectId(null));
+    
+    // Center map on geofence if it has area data
+    if (geofence.area && map) {
+      try {
+        // Parse the area to get coordinates
+        const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
+        if (areaMatch) {
+          const coordinates = areaMatch[1].split(',').map(coord => {
+            const [lng, lat] = coord.trim().split(' ').map(Number);
+            return [lng, lat];
+          });
+          
+          if (coordinates.length > 0) {
+            // Calculate center of the geofence
+            const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
+            const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
+            
+            // Center map on geofence
+            map.flyTo({
+              center: [centerLng, centerLat],
+              zoom: 15,
+              duration: 1000
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error centering map on geofence:', error);
+      }
+    }
+  };
+
   // Handle menu actions
   const handleMenuOpen = (event, geofence) => {
     setAnchorEl(event.currentTarget);
@@ -447,7 +483,17 @@ const FloatingGeofencesPopover = ({
                 <Table>
                   <TableBody>
                     {paginatedGeofences.map((geofence) => (
-                      <TableRow key={geofence.id} hover>
+                      <TableRow 
+                        key={geofence.id} 
+                        hover
+                        onClick={() => handleGeofenceClick(geofence)}
+                        style={{ 
+                          cursor: 'pointer',
+                          '&:hover': {
+                            backgroundColor: colors.hover
+                          }
+                        }}
+                      >
                         <TableCell>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div
@@ -471,7 +517,10 @@ const FloatingGeofencesPopover = ({
                         <TableCell>
                           <IconButton
                             size="small"
-                            onClick={(e) => handleMenuOpen(e, geofence)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMenuOpen(e, geofence);
+                            }}
                           >
                             <MoreVertIcon style={{ fontSize: 16, color: colors.textSecondary }} />
                           </IconButton>
