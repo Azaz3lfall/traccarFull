@@ -44,6 +44,9 @@ import {
   UploadFile as UploadFileIcon,
   ExpandMore as ExpandMoreIcon,
   Close as CloseIcon,
+  RadioButtonUnchecked as CircleIcon,
+  Timeline as LineIcon,
+  ChangeHistory as PolygonIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -515,6 +518,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               fullWidth
+              startIcon={<CircleIcon fontSize="small" />}
               onClick={() => handleDrawingTool('circle')}
               style={{
                 color: colors.text,
@@ -531,6 +535,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               fullWidth
+              startIcon={<LineIcon fontSize="small" />}
               onClick={() => handleDrawingTool('line')}
               style={{
                 color: colors.text,
@@ -547,6 +552,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               fullWidth
+              startIcon={<PolygonIcon fontSize="small" />}
               onClick={() => handleDrawingTool('polygon')}
               style={{
                 color: colors.text,
