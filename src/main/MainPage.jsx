@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
 import FloatingGeofencesPopover from '../components/FloatingGeofencesPopover';
+import FloatingReportsPopover from '../components/FloatingReportsPopover';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
@@ -732,6 +733,7 @@ const MainPage = () => {
 
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
+  const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
 
 
   const onMapClick = useCallback(() => {
@@ -790,6 +792,12 @@ const MainPage = () => {
         isDeviceListVisible={isDeviceListVisible}
         isVisible={geofencesPopoverVisible}
         onClose={() => setGeofencesPopoverVisible(false)}
+      />
+      
+      <FloatingReportsPopover 
+        desktop={desktop}
+        isVisible={reportsPopoverVisible}
+        onClose={() => setReportsPopoverVisible(false)}
       />
       
       {/* Desktop Menu */}
@@ -983,7 +991,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-reports');
             if (tooltip) tooltip.remove();
-              window.location.href = '/reports/combined';
+              setReportsPopoverVisible(true);
           }}
           onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
