@@ -84,6 +84,7 @@ const FloatingGeofencesPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [saving, setSaving] = useState(false);
+  const [isAddMode, setIsAddMode] = useState(true);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -166,21 +167,32 @@ const FloatingGeofencesPopover = ({
 
   // Handle add geofence
   const handleAdd = () => {
-    setEditingGeofence({
-      name: '',
-      description: '',
-      calendarId: null,
-      attributes: {
-        color: '#3f51b5',
-        mapLineWidth: 2,
-        mapLineOpacity: 1,
-        speedLimit: null,
-        polylineDistance: null,
-        hide: false,
-      },
-    });
-    setEditDialog(true);
+    if (isAddMode) {
+      // Switch to save mode and enable drawing tools
+      setIsAddMode(false);
+    } else {
+      // Switch to add mode and disable drawing tools
+      setIsAddMode(true);
+    }
   };
+
+  // Handle save geofence
+  const handleSave = useCatch(async () => {
+    if (!editingGeofence?.name) return;
+
+    setSaving(true);
+    try {
+      if (editingGeofence.id) {
+        updateGeofenceMutation.mutate(editingGeofence);
+      } else {
+        createGeofenceMutation.mutate(editingGeofence);
+      }
+      // Switch back to add mode after saving
+      setIsAddMode(true);
+    } finally {
+      setSaving(false);
+    }
+  });
 
   // Handle edit geofence
   const handleEdit = (geofence) => {
@@ -205,21 +217,6 @@ const FloatingGeofencesPopover = ({
     setAnchorEl(null);
   };
 
-  // Handle save geofence
-  const handleSave = useCatch(async () => {
-    if (!editingGeofence?.name) return;
-
-    setSaving(true);
-    try {
-      if (editingGeofence.id) {
-        updateGeofenceMutation.mutate(editingGeofence);
-      } else {
-        createGeofenceMutation.mutate(editingGeofence);
-      }
-    } finally {
-      setSaving(false);
-    }
-  });
 
   // Handle file upload (GPX)
   const handleFileUpload = (event) => {
@@ -496,11 +493,11 @@ const FloatingGeofencesPopover = ({
             </div>
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
+            startIcon={isAddMode ? <AddIcon /> : null}
+            onClick={isAddMode ? handleAdd : handleSave}
             fullWidth
             size="small"
-            disabled
+            disabled={!isAddMode && saving}
             style={{
               backgroundColor: colors.primary,
               color: colors.text,
@@ -510,7 +507,7 @@ const FloatingGeofencesPopover = ({
               marginBottom: '12px'
             }}
           >
-            {t('sharedAdd')} {t('sharedGeofence')}
+            {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : saving ? t('sharedSaving') : `${t('sharedSave')} ${t('sharedGeofence')}`}
           </Button>
           
           {/* Drawing Tools Row */}
@@ -519,7 +516,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('circle')}
-              disabled
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -540,7 +537,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('line')}
-              disabled
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -561,7 +558,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('polygon')}
-              disabled
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
