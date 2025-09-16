@@ -175,24 +175,24 @@ const FloatingReportsPopover = ({
                 scrollButtons="auto"
                 sx={{
                   '& .MuiTab-root': {
-                    color: colors.textSecondary,
-                    fontSize: '14px',
+                    color: '#666666',
+                    fontSize: '12px',
                     fontWeight: '500',
                     textTransform: 'none',
-                    minHeight: '48px',
+                    minHeight: '40px',
                     padding: '8px 16px',
                     '&.Mui-selected': {
-                      color: colors.primary,
+                      color: '#1976d2',
                       fontWeight: '600',
                       backgroundColor: 'transparent',
                     },
                     '&:hover': {
-                      color: colors.primary,
-                      backgroundColor: `${colors.primary}10`,
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.1)',
                     },
                     '&.Mui-selected:hover': {
-                      color: colors.primary,
-                      backgroundColor: `${colors.primary}15`,
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.15)',
                     },
                     '& .MuiTab-iconWrapper': {
                       marginRight: '8px',
@@ -200,9 +200,8 @@ const FloatingReportsPopover = ({
                     }
                   },
                   '& .MuiTabs-indicator': {
-                    backgroundColor: colors.primary,
-                    height: '3px',
-                    borderRadius: '2px',
+                    backgroundColor: '#1976d2',
+                    height: '2px',
                   }
                 }}
               >
