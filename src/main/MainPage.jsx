@@ -738,8 +738,26 @@ const MainPage = () => {
     dispatch(devicesActions.selectId(null));
   }, [dispatch]);
 
+  // Refresh devices when device list becomes visible
+  const refreshDevices = useCallback(async () => {
+    try {
+      const response = await fetchOrThrow('/api/devices');
+      const devicesData = await response.json();
+      dispatch(devicesActions.refresh(devicesData));
+    } catch (error) {
+      console.error('Failed to refresh devices:', error);
+    }
+  }, [dispatch]);
+
 
   useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
+
+  // Refresh devices when device list becomes visible
+  useEffect(() => {
+    if (isDeviceListVisible && desktop) {
+      refreshDevices();
+    }
+  }, [isDeviceListVisible, desktop, refreshDevices]);
 
   return (
     <div className={classes.root}>
