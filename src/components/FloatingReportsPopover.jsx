@@ -2965,85 +2965,78 @@ const FloatingReportsPopover = ({
                 <>
                   {/* Statistics Report Form */}
                   <div style={{ 
-                    padding: '16px', 
-                    borderBottom: `1px solid ${colors.border}`,
-                    display: 'flex',
+                    display: 'flex', 
                     flexDirection: desktop ? 'row' : 'column',
-                    gap: '12px',
-                    flexWrap: 'wrap',
-                    alignItems: desktop ? 'center' : 'stretch'
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
                   }}>
                     {/* Period Selection */}
-                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel style={{ color: colors.text }}>{t('sharedPeriod')}</InputLabel>
-                        <Select
-                          value={period}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
                           onChange={(e) => setPeriod(e.target.value)}
                           MenuProps={{
                             disablePortal: false,
                             style: { zIndex: 10002 }
                           }}
-                          style={{ color: colors.text }}
                         >
                           <MenuItem value="today">{t('reportToday')}</MenuItem>
                           <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
                           <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
-                          <MenuItem value="lastWeek">{t('reportLastWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
                           <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
-                          <MenuItem value="lastMonth">{t('reportLastMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
                           <MenuItem value="thisYear">{t('reportThisYear')}</MenuItem>
-                          <MenuItem value="lastYear">{t('reportLastYear')}</MenuItem>
-                          <MenuItem value="custom">{t('sharedCustom')}</MenuItem>
+                          <MenuItem value="previousYear">{t('reportPreviousYear')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
                         </Select>
                       </FormControl>
                     </div>
-
-                    {/* Custom Date Range - Only show when custom is selected */}
+                    
+                    {/* Custom Date Range */}
                     {period === 'custom' && (
                       <>
-                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                           <TextField
+                            label={t('reportFrom')}
                             type="datetime-local"
-                            size="small"
-                            fullWidth
                             value={customFrom}
                             onChange={(e) => setCustomFrom(e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                            style={{ 
-                              '& .MuiInputBase-input': { color: colors.text }
-                            }}
+                            fullWidth
                           />
                         </div>
-                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                           <TextField
+                            label={t('reportTo')}
                             type="datetime-local"
-                            size="small"
-                            fullWidth
                             value={customTo}
                             onChange={(e) => setCustomTo(e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                            style={{ 
-                              '& .MuiInputBase-input': { color: colors.text }
-                            }}
+                            fullWidth
                           />
                         </div>
                       </>
                     )}
-
+                    
                     {/* Column Selection */}
-                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto' }}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel style={{ color: colors.text }}>{t('sharedColumns')}</InputLabel>
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedColumns')}</InputLabel>
                         <Select
-                          multiple
+                          label={t('sharedColumns')}
                           value={statisticsColumns}
                           onChange={(e) => setStatisticsColumns(e.target.value)}
+                          multiple
+                          disabled={statisticsLoading}
                           MenuProps={{
                             disablePortal: false,
                             style: { zIndex: 10002 }
                           }}
-                          style={{ color: colors.text }}
                         >
                           {statisticsColumnsArray.map(([key, title]) => (
                             <MenuItem key={key} value={key}>
@@ -3053,25 +3046,25 @@ const FloatingReportsPopover = ({
                         </Select>
                       </FormControl>
                     </div>
-
+                    
                     {/* Show Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto' }}>
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
                       <Button
+                        fullWidth
                         variant="outlined"
-                        size="small"
-                        onClick={showStatisticsReport}
+                        color="secondary"
                         disabled={statisticsLoading || (period === 'custom' && (!customFrom || !customTo))}
+                        onClick={showStatisticsReport}
+                        startIcon={statisticsLoading ? <CircularProgress size={20} /> : null}
                         style={{ 
-                          color: colors.text, 
-                          borderColor: colors.border,
-                          minWidth: '80px'
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
                         }}
                       >
-                        {statisticsLoading ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          t('sharedShow')
-                        )}
+                        <Typography style={{ color: colors.text }}>
+                          {t('sharedShow')}
+                        </Typography>
                       </Button>
                     </div>
                   </div>
