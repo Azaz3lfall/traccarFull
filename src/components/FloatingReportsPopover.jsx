@@ -8,12 +8,13 @@ import { sessionActions } from '../store';
 import { Card } from './ui/card';
 import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
-import { useCatch } from '../reactHelper';
+import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatTime, formatSpeed, formatDistance, formatVolume, formatNumericHours } from '../common/util/formatter';
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
+import RemoveDialog from '../common/components/RemoveDialog';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
 import PositionValue from '../common/components/PositionValue';
@@ -33,6 +34,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import RouteIcon from '@mui/icons-material/Route';
@@ -114,10 +116,16 @@ const FloatingReportsPopover = ({
   // Logs report state
   const [logsLoading, setLogsLoading] = useState(false);
 
+  // Scheduled report state
+  const [scheduledItems, setScheduledItems] = useState([]);
+  const [scheduledLoading, setScheduledLoading] = useState(false);
+  const [removingId, setRemovingId] = useState(null);
+
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
+  const calendars = useSelector((state) => state.calendars.items);
   const logs = useSelector((state) => state.session.logs);
   const speedUnit = useAttributePreference('speedUnit');
   const distanceUnit = useAttributePreference('distanceUnit');
@@ -1167,6 +1175,43 @@ const FloatingReportsPopover = ({
       }
     };
   }, [activeTab, dispatch]);
+
+  // Scheduled reports functionality
+  const formatScheduledType = (type) => {
+    switch (type) {
+      case 'events':
+        return t('reportEvents');
+      case 'route':
+        return t('reportPositions');
+      case 'summary':
+        return t('reportSummary');
+      case 'trips':
+        return t('reportTrips');
+      case 'stops':
+        return t('reportStops');
+      default:
+        return type;
+    }
+  };
+
+  const loadScheduledReports = async () => {
+    setScheduledLoading(true);
+    try {
+      const response = await fetchOrThrow('/api/reports');
+      setScheduledItems(await response.json());
+    } catch (error) {
+      console.error('Failed to load scheduled reports:', error);
+    } finally {
+      setScheduledLoading(false);
+    }
+  };
+
+  // Load scheduled reports when tab is active
+  useEffect(() => {
+    if (visibleTabs[activeTab]?.key === 'scheduled') {
+      loadScheduledReports();
+    }
+  }, [activeTab]);
 
   return (
     <AnimatePresence mode="wait">
@@ -2766,6 +2811,51 @@ const FloatingReportsPopover = ({
                     </Table>
                   </div>
                 </>
+              ) : visibleTabs[activeTab]?.key === 'scheduled' ? (
+                <>
+                  {/* Scheduled Reports Table */}
+                  <div style={{ 
+                    flex: 1, 
+                    overflow: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px'
+                  }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t('sharedType')}</TableCell>
+                          <TableCell>{t('sharedDescription')}</TableCell>
+                          <TableCell>{t('sharedCalendar')}</TableCell>
+                          <TableCell style={{ width: '1%', paddingRight: '8px' }}></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!scheduledLoading ? scheduledItems.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>{formatScheduledType(item.type)}</TableCell>
+                            <TableCell>{item.description}</TableCell>
+                            <TableCell>{calendars[item.calendarId]?.name || ''}</TableCell>
+                            <TableCell style={{ padding: '4px' }}>
+                              <IconButton 
+                                size="small" 
+                                onClick={() => setRemovingId(item.id)}
+                                style={{ color: colors.text }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={4} style={{ textAlign: 'center', padding: '20px' }}>
+                              <CircularProgress size={24} />
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               ) : (
                 <div style={{ 
                   display: 'flex',
@@ -2782,6 +2872,20 @@ const FloatingReportsPopover = ({
           </div>
         </motion.div>
       )}
+      
+      {/* Remove Dialog for Scheduled Reports */}
+      <RemoveDialog
+        style={{ transform: 'none' }}
+        open={!!removingId}
+        endpoint="reports"
+        itemId={removingId}
+        onResult={(removed) => {
+          setRemovingId(null);
+          if (removed) {
+            loadScheduledReports();
+          }
+        }}
+      />
     </AnimatePresence>
   );
 };
