@@ -266,7 +266,6 @@ const FloatingGeofencesPopover = ({
         setCircleDrawingMode(true);
         setClickCount(0);
         setCenter(null);
-        setGeofenceName('');
         
         // Clear all existing circles from map
         if (map) {
