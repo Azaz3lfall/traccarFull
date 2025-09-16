@@ -696,7 +696,7 @@ const FloatingGeofencesPopover = ({
               variant={circleDrawingMode ? "contained" : "outlined"}
               size="small"
               onClick={() => handleDrawingTool('circle')}
-              disabled={isAddMode}
+              disabled={false}
               style={{
                 color: circleDrawingMode ? '#ffffff' : colors.text,
                 backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
