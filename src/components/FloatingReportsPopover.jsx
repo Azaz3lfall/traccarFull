@@ -337,7 +337,7 @@ const FloatingReportsPopover = ({
                         onChange={(e) => setDeviceIds(e.target.value)}
                         multiple
                         fullWidth
-                        zIndex={10001}
+                        zIndex={99999}
                       />
                     </div>
                     
@@ -350,7 +350,7 @@ const FloatingReportsPopover = ({
                         onChange={(e) => setGroupIds(e.target.value)}
                         multiple
                         fullWidth
-                        zIndex={10001}
+                        zIndex={99999}
                       />
                     </div>
                     
@@ -365,7 +365,7 @@ const FloatingReportsPopover = ({
                           MenuProps={{
                             PaperProps: {
                               style: {
-                                zIndex: 10001,
+                                zIndex: 99999,
                               },
                             },
                           }}
