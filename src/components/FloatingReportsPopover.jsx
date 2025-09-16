@@ -5,7 +5,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { Card } from './ui/card';
-import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress } from '@mui/material';
+import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
 import { useCatch } from '../reactHelper';
 import { formatTime } from '../common/util/formatter';
@@ -330,28 +330,58 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
-                        multiple
-                        fullWidth
-                        zIndex={99999}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('deviceTitle')}</InputLabel>
+                        <Select
+                          label={t('deviceTitle')}
+                          multiple
+                          value={deviceIds}
+                          onChange={(e) => setDeviceIds(e.target.value)}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                zIndex: 99999,
+                                position: 'fixed',
+                              },
+                            },
+                            disablePortal: false,
+                          }}
+                        >
+                          {Object.values(devices).sort((a, b) => a.name.localeCompare(b.name)).map((device) => (
+                            <MenuItem key={device.id} value={device.id}>
+                              {device.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Group Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('settingsGroups')}
-                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={groupIds}
-                        onChange={(e) => setGroupIds(e.target.value)}
-                        multiple
-                        fullWidth
-                        zIndex={99999}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>{t('settingsGroups')}</InputLabel>
+                        <Select
+                          label={t('settingsGroups')}
+                          multiple
+                          value={groupIds}
+                          onChange={(e) => setGroupIds(e.target.value)}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                zIndex: 99999,
+                                position: 'fixed',
+                              },
+                            },
+                            disablePortal: false,
+                          }}
+                        >
+                          {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
+                            <MenuItem key={group.id} value={group.id}>
+                              {group.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </div>
                     
                     {/* Period Selection */}
@@ -366,8 +396,10 @@ const FloatingReportsPopover = ({
                             PaperProps: {
                               style: {
                                 zIndex: 99999,
+                                position: 'fixed',
                               },
                             },
+                            disablePortal: false,
                           }}
                         >
                           <MenuItem value="today">{t('reportToday')}</MenuItem>
