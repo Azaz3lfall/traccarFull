@@ -174,7 +174,9 @@ const FloatingReportsPopover = ({
                 variant="scrollable"
                 scrollButtons="on"
                 sx={{
-                  justifyContent: 'center',
+                  '& .MuiTabs-flexContainer': {
+                    justifyContent: 'center',
+                  },
                   '& .MuiTab-root': {
                     color: '#666666',
                     fontSize: '12px',
@@ -206,9 +208,13 @@ const FloatingReportsPopover = ({
                   },
                   '& .MuiTabs-scrollButtons': {
                     color: '#1976d2',
+                    width: '40px',
                     '&.Mui-disabled': {
                       opacity: 0.3,
                     },
+                  },
+                  '& .MuiTabs-scrollButtonsDesktop': {
+                    display: 'flex',
                   }
                 }}
               >
