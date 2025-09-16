@@ -171,22 +171,9 @@ const FloatingGeofencesPopover = ({
   };
 
   // Handle save geofence - disables drawing tools
-  const handleSave = useCatch(async () => {
-    if (!editingGeofence?.name) return;
-
-    setSaving(true);
-    try {
-      if (editingGeofence.id) {
-        updateGeofenceMutation.mutate(editingGeofence);
-      } else {
-        createGeofenceMutation.mutate(editingGeofence);
-      }
-    } finally {
-      setSaving(false);
-    }
-    // Always switch back to add mode after saving
-    setIsAddMode(true);
-  });
+  const handleSave = () => {
+    setIsAddMode(true); // Switch back to add mode and disable drawing tools
+  };
 
   // Handle edit geofence
   const handleEdit = (geofence) => {
@@ -501,7 +488,7 @@ const FloatingGeofencesPopover = ({
               marginBottom: '12px'
             }}
           >
-            {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : saving ? t('sharedSaving') : `${t('sharedSave')} ${t('sharedGeofence')}`}
+            {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
           </Button>
           
           {/* Drawing Tools Row */}
