@@ -15,6 +15,7 @@ import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
+import PositionValue from '../common/components/PositionValue';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import {
   altitudeFromMeters, distanceFromMeters, speedFromKnots, speedToKnots, volumeFromLiters,
@@ -98,6 +99,14 @@ const FloatingReportsPopover = ({
   const [chartTypes, setChartTypes] = useState(['speed']);
   const [selectedChartTypes, setSelectedChartTypes] = useState(['speed']);
   const [timeType, setTimeType] = useState('fixTime');
+
+  // Positions report state
+  const [positionsItems, setPositionsItems] = useState([]);
+  const [positionsLoading, setPositionsLoading] = useState(false);
+  const [positionsColumns, setPositionsColumns] = useState(['fixTime', 'latitude', 'longitude', 'speed', 'address']);
+  const [selectedPosition, setSelectedPosition] = useState(null);
+  const [availableColumns, setAvailableColumns] = useState([]);
+  const [geofenceId, setGeofenceId] = useState(null);
 
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
@@ -1001,6 +1010,134 @@ const FloatingReportsPopover = ({
     '#d32f2f', // Dark Red
     '#7b1fa2', // Dark Purple
   ];
+
+  // Positions report functionality
+  const onShowPositions = useCatch(async ({ deviceIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    if (geofenceId) {
+      query.append('geofenceId', geofenceId);
+    }
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    setPositionsLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/positions?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      const data = await response.json();
+      const keySet = new Set();
+      const keyList = [];
+      data.forEach((position) => {
+        Object.keys(position).forEach((it) => keySet.add(it));
+        Object.keys(position.attributes).forEach((it) => keySet.add(it));
+      });
+      ['id', 'deviceId', 'outdated', 'network', 'attributes'].forEach((key) => keySet.delete(key));
+      Object.keys(positionAttributes).forEach((key) => {
+        if (keySet.has(key)) {
+          keyList.push(key);
+          keySet.delete(key);
+        }
+      });
+      setAvailableColumns([...keyList, ...keySet].map((key) => [key, positionAttributes[key]?.name || key]));
+      setPositionsItems(data);
+    } finally {
+      setPositionsLoading(false);
+    }
+  });
+
+  const showPositionsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowPositions({ 
+      deviceIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isPositionsDisabled = () => {
+    return !deviceIds.length || positionsLoading;
+  };
+
+  const onExportPositions = useCatch(async ({ deviceIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    if (geofenceId) {
+      query.append('geofenceId', geofenceId);
+    }
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    window.location.assign(`/api/positions/csv?${query.toString()}`);
+  });
+
+  const exportPositionsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onExportPositions({ 
+      deviceIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -2326,6 +2463,222 @@ const FloatingReportsPopover = ({
                           ))}
                         </LineChart>
                       </ResponsiveContainer>
+                    </div>
+                  )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'positions' ? (
+                <>
+                  {/* Positions Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Device Selection (Single) */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Geofence Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('sharedGeofence')}
+                        data={Object.values(geofences).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={geofenceId}
+                        onChange={(e) => setGeofenceId(e.target.value)}
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Column Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          label={t('sharedColumns')}
+                          value={positionsColumns}
+                          onChange={(e) => setPositionsColumns(e.target.value)}
+                          multiple
+                          disabled={!positionsItems.length}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {availableColumns.map(([key, name]) => (
+                            <MenuItem key={key} value={key}>{name}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isPositionsDisabled()}
+                        onClick={showPositionsReport}
+                        startIcon={positionsLoading ? <CircularProgress size={20} /> : null}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {positionsLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                    
+                    {/* Export Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        disabled={isPositionsDisabled() || positionsItems.length === 0}
+                        onClick={exportPositionsReport}
+                        style={{ 
+                          minWidth: '40px',
+                          height: '40px',
+                          padding: '0',
+                          color: colors.text,
+                          borderColor: colors.border,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <DownloadIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Positions Report Table */}
+                  {positionsItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px'
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ width: '1%', paddingLeft: '8px' }}></TableCell>
+                            {positionsColumns.map((key) => (
+                              <TableCell key={key}>{positionAttributes[key]?.name || key}</TableCell>
+                            ))}
+                            <TableCell style={{ width: '1%', paddingLeft: '8px' }}></TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {!positionsLoading ? positionsItems.slice(0, 4000).map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell style={{ padding: '4px' }}>
+                                {selectedPosition === item ? (
+                                  <IconButton size="small" onClick={() => setSelectedPosition(null)}>
+                                    <GpsFixedIcon fontSize="small" />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton size="small" onClick={() => setSelectedPosition(item)}>
+                                    <LocationSearchingIcon fontSize="small" />
+                                  </IconButton>
+                                )}
+                              </TableCell>
+                              {positionsColumns.map((key) => (
+                                <TableCell key={key}>
+                                  <PositionValue
+                                    position={item}
+                                    property={item.hasOwnProperty(key) ? key : null}
+                                    attribute={item.hasOwnProperty(key) ? null : key}
+                                  />
+                                </TableCell>
+                              ))}
+                              <TableCell style={{ padding: '4px' }}>
+                                {/* Actions would go here if needed */}
+                              </TableCell>
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={positionsColumns.length + 2} style={{ textAlign: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
                     </div>
                   )}
                 </>
