@@ -32,7 +32,7 @@ const FloatingReportsPopover = ({
             left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
             width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
             height: !desktop ? '50vh' : 'calc(100vh - 16px)',
-            zIndex: 9999,
+            zIndex: 10000,
             pointerEvents: 'auto',
             transition: 'left 0.3s ease'
           }}
