@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
+import { sessionActions } from '../store';
 import { Card } from './ui/card';
 import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
@@ -30,6 +31,8 @@ import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import DownloadIcon from '@mui/icons-material/Download';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import RouteIcon from '@mui/icons-material/Route';
@@ -108,9 +111,15 @@ const FloatingReportsPopover = ({
   const [availableColumns, setAvailableColumns] = useState([]);
   const [geofenceId, setGeofenceId] = useState(null);
 
+  // Logs report state
+  const [logsItems, setLogsItems] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+
+  const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
+  const logs = useSelector((state) => state.session.logs);
   const speedUnit = useAttributePreference('speedUnit');
   const distanceUnit = useAttributePreference('distanceUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
@@ -1138,6 +1147,28 @@ const FloatingReportsPopover = ({
       to: selectedTo.toISOString() 
     });
   };
+
+  // Logs functionality
+  const registerDevice = (uniqueId) => {
+    // Navigate to device settings with uniqueId
+    window.open(`/settings/device?uniqueId=${uniqueId}`, '_blank');
+  };
+
+  // Enable logs when logs tab is active
+  useEffect(() => {
+    if (visibleTabs[activeTab]?.key === 'logs') {
+      dispatch(sessionActions.enableLogs(true));
+      setLogsItems(logs);
+    } else {
+      dispatch(sessionActions.enableLogs(false));
+    }
+    
+    return () => {
+      if (visibleTabs[activeTab]?.key === 'logs') {
+        dispatch(sessionActions.enableLogs(false));
+      }
+    };
+  }, [activeTab, dispatch, logs]);
 
   return (
     <AnimatePresence mode="wait">
@@ -2690,6 +2721,52 @@ const FloatingReportsPopover = ({
                       </Table>
                     </div>
                   )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'logs' ? (
+                <>
+                  {/* Logs Report Table */}
+                  <div style={{ 
+                    flex: 1, 
+                    overflow: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px'
+                  }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell style={{ width: '1%', paddingLeft: '8px' }}></TableCell>
+                          <TableCell>{t('deviceIdentifier')}</TableCell>
+                          <TableCell>{t('positionProtocol')}</TableCell>
+                          <TableCell>{t('commandData')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {logsItems.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell style={{ padding: '4px' }}>
+                              {item.deviceId ? (
+                                <IconButton color="success" size="small" disabled>
+                                  <CheckCircleOutlineIcon fontSize="small" />
+                                </IconButton>
+                              ) : (
+                                <IconButton 
+                                  color="error" 
+                                  size="small" 
+                                  onClick={() => registerDevice(item.uniqueId)}
+                                  title={t('loginRegister')}
+                                >
+                                  <HelpOutlineIcon fontSize="small" />
+                                </IconButton>
+                              )}
+                            </TableCell>
+                            <TableCell>{item.uniqueId}</TableCell>
+                            <TableCell>{item.protocol}</TableCell>
+                            <TableCell>{item.data}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </>
               ) : (
                 <div style={{ 
