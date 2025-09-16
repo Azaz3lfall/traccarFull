@@ -2993,8 +2993,6 @@ const FloatingReportsPopover = ({
                           <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
                           <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
                           <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
-                          <MenuItem value="thisYear">{t('reportThisYear')}</MenuItem>
-                          <MenuItem value="previousYear">{t('reportPreviousYear')}</MenuItem>
                           <MenuItem value="custom">{t('reportCustom')}</MenuItem>
                         </Select>
                       </FormControl>
@@ -3062,6 +3060,7 @@ const FloatingReportsPopover = ({
                       <Button
                         fullWidth
                         variant="outlined"
+                        color="secondary"
                         disabled={statisticsLoading || (period === 'custom' && (!customFrom || !customTo))}
                         onClick={showStatisticsReport}
                         startIcon={statisticsLoading ? <CircularProgress size={20} /> : null}
@@ -3071,7 +3070,9 @@ const FloatingReportsPopover = ({
                           borderColor: colors.border
                         }}
                       >
-                        {t('sharedShow')}
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {statisticsLoading ? t('sharedLoading') : t('sharedShow')}
+                        </Typography>
                       </Button>
                     </div>
                   </div>
