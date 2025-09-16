@@ -29,8 +29,8 @@ const FloatingReportsPopover = ({
             position: 'fixed',
             top: '50%',
             left: '50%',
-            width: '90vw',
-            height: '90vh',
+            width: '95vw',
+            height: '95vh',
             zIndex: 10000,
             pointerEvents: 'auto'
           }}
