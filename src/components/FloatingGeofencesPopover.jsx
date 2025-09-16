@@ -318,7 +318,7 @@ const FloatingGeofencesPopover = ({
             'circle-stroke-width': 2
           }
         });
-      } else {
+      } else if (!circleRadius) {
         // Second click - set radius and complete circle
         const radius = Math.sqrt(
           Math.pow(lng - circleCenter[0], 2) + Math.pow(lat - circleCenter[1], 2)
@@ -378,6 +378,9 @@ const FloatingGeofencesPopover = ({
         if (map.getLayer('circle-center')) {
           map.removeLayer('circle-center');
         }
+      } else {
+        // Third click - reset and start over
+        resetCircleDrawing();
       }
     };
 
