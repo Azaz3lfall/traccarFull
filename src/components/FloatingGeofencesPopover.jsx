@@ -89,10 +89,7 @@ const FloatingGeofencesPopover = ({
   
   // Circle drawing state
   const [circleDrawingMode, setCircleDrawingMode] = useState(false);
-  const [circleCenter, setCircleCenter] = useState(null);
-  const [circleRadius, setCircleRadius] = useState(null);
-  const [circlePreview, setCirclePreview] = useState(null);
-  const [circleReadyForNext, setCircleReadyForNext] = useState(false);
+  const [circleStep, setCircleStep] = useState('idle'); // 'idle', 'center', 'complete'
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -265,10 +262,8 @@ const FloatingGeofencesPopover = ({
       } else {
         // Enable circle drawing mode
         setCircleDrawingMode(true);
-        setCircleCenter(null);
-        setCircleRadius(null);
-        setCirclePreview(null);
-        setCircleReadyForNext(true);
+        setCircleStep('idle');
+        window.circleCenter = null;
       }
       
       // Keep popover open for circle drawing
@@ -287,10 +282,9 @@ const FloatingGeofencesPopover = ({
     const handleMapClick = (e) => {
       const { lng, lat } = e.lngLat;
       
-      if (!circleCenter && circleReadyForNext) {
+      if (circleStep === 'idle') {
         // First click - set center
-        setCircleCenter([lng, lat]);
-        setCircleReadyForNext(false);
+        setCircleStep('center');
         
         // Add center marker to map
         if (map.getSource('circle-center')) {
@@ -322,16 +316,19 @@ const FloatingGeofencesPopover = ({
             'circle-stroke-width': 2
           }
         });
-      } else if (circleCenter && !circleReadyForNext) {
+        
+        // Store center for second click
+        window.circleCenter = [lng, lat];
+        
+      } else if (circleStep === 'center') {
         // Second click - set radius and complete circle
+        const center = window.circleCenter;
         const radius = Math.sqrt(
-          Math.pow(lng - circleCenter[0], 2) + Math.pow(lat - circleCenter[1], 2)
+          Math.pow(lng - center[0], 2) + Math.pow(lat - center[1], 2)
         ) * 111000; // Convert to meters (approximate)
         
-        setCircleRadius(radius);
-        
         // Create circle geofence
-        const circleGeofence = circle(circleCenter, radius / 1000, { steps: 32, units: 'kilometers' });
+        const circleGeofence = circle(center, radius / 1000, { steps: 32, units: 'kilometers' });
         
         // Add circle to map
         if (map.getSource('circle-preview')) {
@@ -367,13 +364,11 @@ const FloatingGeofencesPopover = ({
         });
         
         // Create geofence and save it
-        createCircleGeofence(circleCenter, radius);
+        createCircleGeofence(center, radius);
         
         // Reset for next circle
-        setCircleCenter(null);
-        setCircleRadius(null);
-        setCirclePreview(null);
-        setCircleReadyForNext(true);
+        setCircleStep('idle');
+        window.circleCenter = null;
         
         // Clean up only the center marker, keep the circle visible
         if (map.getSource('circle-center')) {
@@ -391,15 +386,13 @@ const FloatingGeofencesPopover = ({
     return () => {
       map.off('click', handleMapClick);
     };
-  }, [circleDrawingMode, circleCenter, circleReadyForNext, map]);
+  }, [circleDrawingMode, circleStep, map]);
 
   // Reset circle drawing
   const resetCircleDrawing = () => {
     setCircleDrawingMode(false);
-    setCircleCenter(null);
-    setCircleRadius(null);
-    setCirclePreview(null);
-    setCircleReadyForNext(false);
+    setCircleStep('idle');
+    window.circleCenter = null;
     
     // Clean up map layers
     if (map) {
