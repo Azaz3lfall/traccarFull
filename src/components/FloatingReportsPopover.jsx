@@ -8,10 +8,12 @@ import { Card } from './ui/card';
 import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
 import { useCatch } from '../reactHelper';
-import { formatTime } from '../common/util/formatter';
-import { prefixString } from '../common/util/stringUtils';
+import { formatTime, formatSpeed } from '../common/util/formatter';
+import { prefixString, unprefixString } from '../common/util/stringUtils';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import SelectField from '../common/components/SelectField';
+import { useAttributePreference } from '../common/util/preferences';
+import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import dayjs from 'dayjs';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
@@ -25,6 +27,9 @@ import NotesIcon from '@mui/icons-material/Notes';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+import Link from '@mui/material/Link';
 
 const FloatingReportsPopover = ({ 
   desktop, 
@@ -49,8 +54,36 @@ const FloatingReportsPopover = ({
   const [customFrom, setCustomFrom] = useState(dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'));
   const [customTo, setCustomTo] = useState(dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
 
+  // Events report state
+  const [eventsItems, setEventsItems] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventTypes, setEventTypes] = useState(['allEvents']);
+  const [alarmTypes, setAlarmTypes] = useState([]);
+  const [allEventTypes, setAllEventTypes] = useState([['allEvents', 'eventAll']]);
+  const [eventsColumns, setEventsColumns] = useState(['eventTime', 'type', 'attributes']);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [eventPosition, setEventPosition] = useState(null);
+
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
+  const geofences = useSelector((state) => state.geofences.items);
+  const speedUnit = useAttributePreference('speedUnit');
+
+  // Events columns configuration
+  const eventsColumnsArray = [
+    ['eventTime', 'positionFixTime'],
+    ['type', 'sharedType'],
+    ['geofenceId', 'sharedGeofence'],
+    ['maintenanceId', 'sharedMaintenance'],
+    ['attributes', 'commandData'],
+  ];
+  const eventsColumnsMap = new Map(eventsColumnsArray);
+
+  // Alarms for events
+  const alarms = useTranslationKeys((it) => it.startsWith('alarm')).map((it) => ({
+    key: unprefixString('alarm', it),
+    name: t(it),
+  }));
 
   // Define all report tabs with their permissions
   const reportTabs = [
@@ -187,6 +220,143 @@ const FloatingReportsPopover = ({
 
   const isCombinedDisabled = () => {
     return !deviceIds.length && !groupIds.length || combinedLoading;
+  };
+
+  // Events report functionality
+  const onShowEvents = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    eventTypes.forEach((it) => query.append('type', it));
+    if (eventTypes[0] !== 'allEvents' && eventTypes.includes('alarm')) {
+      alarmTypes.forEach((it) => query.append('alarm', it));
+    }
+    setEventsLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/reports/events?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      setEventsItems(await response.json());
+    } finally {
+      setEventsLoading(false);
+    }
+  });
+
+  const showEventsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowEvents({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isEventsDisabled = () => {
+    return !deviceIds.length && !groupIds.length || eventsLoading;
+  };
+
+  // Load event types
+  useEffect(() => {
+    const loadEventTypes = async () => {
+      try {
+        const response = await fetchOrThrow('/api/notifications/types');
+        const types = await response.json();
+        setAllEventTypes([...allEventTypes, ...types.map((it) => [it.type, prefixString('event', it.type)])]);
+      } catch (error) {
+        console.error('Failed to load event types:', error);
+      }
+    };
+    loadEventTypes();
+  }, []);
+
+  // Load position for selected event
+  useEffect(() => {
+    const loadEventPosition = async () => {
+      if (selectedEvent) {
+        try {
+          const response = await fetchOrThrow(`/api/positions?id=${selectedEvent.positionId}`);
+          const positions = await response.json();
+          if (positions.length > 0) {
+            setEventPosition(positions[0]);
+          }
+        } catch (error) {
+          console.error('Failed to load event position:', error);
+        }
+      } else {
+        setEventPosition(null);
+      }
+    };
+    loadEventPosition();
+  }, [selectedEvent]);
+
+  const formatEventValue = (item, key) => {
+    const value = item[key];
+    switch (key) {
+      case 'deviceId':
+        return devices[value]?.name;
+      case 'eventTime':
+        return formatTime(value, 'seconds');
+      case 'type':
+        return t(prefixString('event', value));
+      case 'geofenceId':
+        if (value > 0) {
+          const geofence = geofences[value];
+          return geofence && geofence.name;
+        }
+        return null;
+      case 'maintenanceId':
+        return value > 0 ? value : null;
+      case 'attributes':
+        switch (item.type) {
+          case 'alarm':
+            return t(prefixString('alarm', item.attributes.alarm));
+          case 'deviceOverspeed':
+            return formatSpeed(item.attributes.speed, speedUnit, t);
+          case 'driverChanged':
+            return item.attributes.driverUniqueId;
+          case 'media':
+            return (<Link href={`/api/media/${devices[item.deviceId]?.uniqueId}/${item.attributes.file}`} target="_blank">{item.attributes.file}</Link>);
+          case 'commandResult':
+            return item.attributes.result;
+          default:
+            return '';
+        }
+      default:
+        return value;
+    }
   };
 
   return (
@@ -454,6 +624,218 @@ const FloatingReportsPopover = ({
                           ))) : (
                             <TableRow>
                               <TableCell colSpan={3} style={{ textAlign: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'events' ? (
+                <>
+                  {/* Events Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Device Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Group Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('settingsGroups')}
+                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={groupIds}
+                        onChange={(e) => setGroupIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Event Types Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportEventTypes')}</InputLabel>
+                        <Select
+                          label={t('reportEventTypes')}
+                          multiple
+                          value={eventTypes}
+                          onChange={(e, child) => {
+                            let values = e.target.value;
+                            const clicked = child.props.value;
+                            if (values.includes('allEvents') && values.length > 1) {
+                              values = [clicked];
+                            }
+                            setEventTypes(values);
+                          }}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {allEventTypes.map(([key, string]) => (
+                            <MenuItem key={key} value={key}>{t(string)}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Alarm Types Selection */}
+                    {eventTypes[0] !== 'allEvents' && eventTypes.includes('alarm') && (
+                      <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                        <SelectField
+                          multiple
+                          value={alarmTypes}
+                          onChange={(e) => setAlarmTypes(e.target.value)}
+                          data={alarms}
+                          keyGetter={(it) => it.key}
+                          titleGetter={(it) => it.name}
+                          label={t('sharedAlarms')}
+                          fullWidth
+                          zIndex={10002}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isEventsDisabled()}
+                        onClick={showEventsReport}
+                        startIcon={eventsLoading ? <CircularProgress size={20} /> : null}
+                        style={{ minWidth: desktop ? '120px' : 'auto' }}
+                      >
+                        <Typography variant="button" noWrap>
+                          {eventsLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Events Report Table */}
+                  {eventsItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px'
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ width: '1%', paddingLeft: '8px' }}></TableCell>
+                            <TableCell>{t('sharedDevice')}</TableCell>
+                            {eventsColumns.map((key) => (
+                              <TableCell key={key}>{t(eventsColumnsMap.get(key))}</TableCell>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {!eventsLoading ? eventsItems.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell style={{ padding: '4px' }}>
+                                {(item.positionId && (selectedEvent === item ? (
+                                  <IconButton size="small" onClick={() => setSelectedEvent(null)}>
+                                    <GpsFixedIcon fontSize="small" />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton size="small" onClick={() => setSelectedEvent(item)}>
+                                    <LocationSearchingIcon fontSize="small" />
+                                  </IconButton>
+                                ))) || ''}
+                              </TableCell>
+                              <TableCell>{devices[item.deviceId]?.name}</TableCell>
+                              {eventsColumns.map((key) => (
+                                <TableCell key={key}>
+                                  {formatEventValue(item, key)}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={eventsColumns.length + 2} style={{ textAlign: 'center', padding: '20px' }}>
                                 <CircularProgress />
                               </TableCell>
                             </TableRow>
