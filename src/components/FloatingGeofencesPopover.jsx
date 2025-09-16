@@ -278,19 +278,19 @@ const FloatingGeofencesPopover = ({
         
         // Handle different geofence area types
         if (geofence.area.indexOf('CIRCLE') > -1) {
-          // CIRCLE(lng, lat, radius) format
+          // CIRCLE (lng lat, radius) format - coordinates are already in [lng, lat] format
           const coordinates = geofence.area.replace(/CIRCLE|\(|\)|,/g, ' ').trim().split(/ +/);
           if (coordinates.length >= 3) {
             centerLng = Number(coordinates[0]);
             centerLat = Number(coordinates[1]);
           }
         } else if (geofence.area.indexOf('LINESTRING') > -1) {
-          // LINESTRING (lat1 lng1, lat2 lng2, ...) format
+          // LINESTRING (lng1 lat1, lng2 lat2, ...) format - coordinates are already in [lng, lat] format
           const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
           if (areaMatch) {
             const coordinates = areaMatch[1].split(',').map(coord => {
-              const [lat, lng] = coord.trim().split(' ').map(Number);
-              return [lng, lat]; // Convert to [lng, lat] format for map
+              const [lng, lat] = coord.trim().split(' ').map(Number);
+              return [lng, lat]; // Already in [lng, lat] format
             });
             
             if (coordinates.length > 0) {
@@ -299,12 +299,12 @@ const FloatingGeofencesPopover = ({
             }
           }
         } else if (geofence.area.indexOf('POLYGON') > -1) {
-          // POLYGON ((lat1 lng1, lat2 lng2, ...)) format
+          // POLYGON ((lng1 lat1, lng2 lat2, ...)) format - coordinates are already in [lng, lat] format
           const areaMatch = geofence.area.match(/POLYGON\s*\(\s*\(([^)]+)\)\s*\)/);
           if (areaMatch) {
             const coordinates = areaMatch[1].split(',').map(coord => {
-              const [lat, lng] = coord.trim().split(' ').map(Number);
-              return [lng, lat]; // Convert to [lng, lat] format for map
+              const [lng, lat] = coord.trim().split(' ').map(Number);
+              return [lng, lat]; // Already in [lng, lat] format
             });
             
             if (coordinates.length > 0) {
