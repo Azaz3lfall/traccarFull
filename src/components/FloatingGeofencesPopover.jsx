@@ -95,6 +95,10 @@ const FloatingGeofencesPopover = ({
   // Polyline drawing state
   const [polylineDrawingMode, setPolylineDrawingMode] = useState(false);
   const [polylinePoints, setPolylinePoints] = useState([]);
+  
+  // Polygon drawing state
+  const [polygonDrawingMode, setPolygonDrawingMode] = useState(false);
+  const [polygonPoints, setPolygonPoints] = useState([]);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -207,12 +211,13 @@ const FloatingGeofencesPopover = ({
       return;
     }
 
-    // Check if we have a completed circle or polyline to save
+    // Check if we have a completed circle, polyline, or polygon to save
     const hasCircle = center && radius;
     const hasPolyline = polylinePoints && polylinePoints.length > 0;
+    const hasPolygon = polygonPoints && polygonPoints.length >= 3;
     
-    if (!hasCircle && !hasPolyline) {
-      console.log('No completed geofence to save', { center, radius, polylinePoints });
+    if (!hasCircle && !hasPolyline && !hasPolygon) {
+      console.log('No completed geofence to save', { center, radius, polylinePoints, polygonPoints });
       dispatch(errorsActions.push(t('sharedRequired')));
       return;
     }
@@ -236,6 +241,18 @@ const FloatingGeofencesPopover = ({
       newGeofence = {
         name: geofenceName.trim(),
         area: `LINESTRING (${coordinates})`,
+        attributes: {
+          color: '#1976d2',
+          mapLineWidth: 2,
+          mapLineOpacity: 1
+        }
+      };
+    } else if (hasPolygon) {
+      // Create polygon geofence - close the polygon by repeating the first point
+      const coordinates = [...polygonPoints, polygonPoints[0]].map(point => `${point[1]} ${point[0]}`).join(', ');
+      newGeofence = {
+        name: geofenceName.trim(),
+        area: `POLYGON ((${coordinates}))`,
         attributes: {
           color: '#1976d2',
           mapLineWidth: 2,
@@ -357,6 +374,20 @@ const FloatingGeofencesPopover = ({
       }
       
       // Keep popover open for polyline drawing
+      // Don't call onClose() here
+    } else if (tool === 'polygon') {
+      if (polygonDrawingMode) {
+        // If already in polygon drawing mode, reset it
+        resetDrawingTools();
+      } else {
+        // Reset ALL other tools first
+        resetDrawingTools();
+        // Enable polygon drawing mode
+        setPolygonDrawingMode(true);
+        setPolygonPoints([]);
+      }
+      
+      // Keep popover open for polygon drawing
       // Don't call onClose() here
     } else {
       // For other tools, navigate to geofences page
@@ -585,6 +616,123 @@ const FloatingGeofencesPopover = ({
     };
   }, [polylineDrawingMode, polylinePoints, map]);
 
+  // Handle map clicks for polygon drawing
+  useEffect(() => {
+    if (!polygonDrawingMode || !map) return;
+
+    const handleMapClick = (e) => {
+      const { lng, lat } = e.lngLat;
+      const newPoint = [lng, lat];
+      
+      // Add point to polygon
+      const updatedPoints = [...polygonPoints, newPoint];
+      setPolygonPoints(updatedPoints);
+      
+      // Update polygon preview on map (only show from 3rd point onwards)
+      if (updatedPoints.length >= 3) {
+        // Create closed polygon by repeating the first point
+        const closedPolygon = [...updatedPoints, updatedPoints[0]];
+        
+        // Create or update polygon source
+        if (!map.getSource('polygon-preview')) {
+          map.addSource('polygon-preview', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [closedPolygon]
+              }
+            }
+          });
+          
+          map.addLayer({
+            id: 'polygon-preview',
+            type: 'fill',
+            source: 'polygon-preview',
+            paint: {
+              'fill-color': '#1976d2',
+              'fill-opacity': 0.2
+            }
+          });
+          
+          map.addLayer({
+            id: 'polygon-preview-stroke',
+            type: 'line',
+            source: 'polygon-preview',
+            paint: {
+              'line-color': '#1976d2',
+              'line-width': 2,
+              'line-opacity': 1
+            }
+          });
+        } else {
+          // Just update the data
+          map.getSource('polygon-preview').setData({
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [closedPolygon]
+            }
+          });
+        }
+        
+        // Create or update points source
+        if (!map.getSource('polygon-points')) {
+          map.addSource('polygon-points', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: updatedPoints.map((point, index) => ({
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: point
+                },
+                properties: {
+                  index: index
+                }
+              }))
+            }
+          });
+          
+          map.addLayer({
+            id: 'polygon-points',
+            type: 'circle',
+            source: 'polygon-points',
+            paint: {
+              'circle-radius': 4,
+              'circle-color': '#1976d2',
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 2
+            }
+          });
+        } else {
+          // Just update the data
+          map.getSource('polygon-points').setData({
+            type: 'FeatureCollection',
+            features: updatedPoints.map((point, index) => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: point
+              },
+              properties: {
+                index: index
+              }
+            }))
+          });
+        }
+      }
+    };
+
+    map.on('click', handleMapClick);
+    
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [polygonDrawingMode, polygonPoints, map]);
+
   // Reset drawing tools
   const resetDrawingTools = () => {
     setCircleDrawingMode(false);
@@ -593,6 +741,8 @@ const FloatingGeofencesPopover = ({
     setRadius(null);
     setPolylineDrawingMode(false);
     setPolylinePoints([]);
+    setPolygonDrawingMode(false);
+    setPolygonPoints([]);
     
     // Clean up map layers first, then sources
     if (map) {
@@ -615,6 +765,17 @@ const FloatingGeofencesPopover = ({
         map.removeLayer('polyline-points');
       }
       
+      // Remove polygon layers
+      if (map.getLayer('polygon-preview')) {
+        map.removeLayer('polygon-preview');
+      }
+      if (map.getLayer('polygon-preview-stroke')) {
+        map.removeLayer('polygon-preview-stroke');
+      }
+      if (map.getLayer('polygon-points')) {
+        map.removeLayer('polygon-points');
+      }
+      
       // Then remove sources
       if (map.getSource('circle-center')) {
         map.removeSource('circle-center');
@@ -627,6 +788,12 @@ const FloatingGeofencesPopover = ({
       }
       if (map.getSource('polyline-points')) {
         map.removeSource('polyline-points');
+      }
+      if (map.getSource('polygon-preview')) {
+        map.removeSource('polygon-preview');
+      }
+      if (map.getSource('polygon-points')) {
+        map.removeSource('polygon-points');
       }
     }
   };
@@ -923,13 +1090,14 @@ const FloatingGeofencesPopover = ({
               <LineIcon fontSize="small" />
             </Button>
             <Button
-              variant="outlined"
+              variant={polygonDrawingMode ? "contained" : "outlined"}
               size="small"
               onClick={() => handleDrawingTool('polygon')}
               disabled={isAddMode}
               style={{
-                color: colors.text,
-                borderColor: colors.border,
+                color: polygonDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: polygonDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: polygonDrawingMode ? '#1976d2' : colors.border,
                 textTransform: 'none',
                 borderRadius: '8px',
                 fontWeight: '500',
