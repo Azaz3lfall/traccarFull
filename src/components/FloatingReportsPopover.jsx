@@ -6,7 +6,7 @@ import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { sessionActions } from '../store';
 import { Card } from './ui/card';
-import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal } from '@mui/material';
+import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
 import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatTime, formatSpeed, formatDistance, formatVolume, formatNumericHours } from '../common/util/formatter';
@@ -14,7 +14,6 @@ import { prefixString, unprefixString } from '../common/util/stringUtils';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
-import RemoveDialog from '../common/components/RemoveDialog';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
 import PositionValue from '../common/components/PositionValue';
@@ -119,7 +118,8 @@ const FloatingReportsPopover = ({
   // Scheduled report state
   const [scheduledItems, setScheduledItems] = useState([]);
   const [scheduledLoading, setScheduledLoading] = useState(false);
-  const [removingId, setRemovingId] = useState(null);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [scheduledToDelete, setScheduledToDelete] = useState(null);
 
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
@@ -1212,6 +1212,28 @@ const FloatingReportsPopover = ({
       loadScheduledReports();
     }
   }, [activeTab]);
+
+  // Handle delete scheduled report
+  const handleDeleteScheduled = (scheduled) => {
+    setScheduledToDelete(scheduled);
+    setDeleteDialog(true);
+  };
+
+  // Delete scheduled report
+  const deleteScheduledReport = useCatch(async () => {
+    if (!scheduledToDelete?.id) return;
+    
+    try {
+      await fetchOrThrow(`/api/reports/${scheduledToDelete.id}`, {
+        method: 'DELETE',
+      });
+      setDeleteDialog(false);
+      setScheduledToDelete(null);
+      loadScheduledReports();
+    } catch (error) {
+      console.error('Failed to delete scheduled report:', error);
+    }
+  });
 
   return (
     <AnimatePresence mode="wait">
@@ -2838,7 +2860,7 @@ const FloatingReportsPopover = ({
                             <TableCell style={{ padding: '4px' }}>
                               <IconButton 
                                 size="small" 
-                                onClick={() => setRemovingId(item.id)}
+                                onClick={() => handleDeleteScheduled(item)}
                                 style={{ color: colors.text }}
                               >
                                 <DeleteIcon fontSize="small" />
@@ -2873,19 +2895,43 @@ const FloatingReportsPopover = ({
         </motion.div>
       )}
       
-      {/* Remove Dialog for Scheduled Reports */}
-      <RemoveDialog
-        style={{ transform: 'none' }}
-        open={!!removingId}
-        endpoint="reports"
-        itemId={removingId}
-        onResult={(removed) => {
-          setRemovingId(null);
-          if (removed) {
-            loadScheduledReports();
-          }
+      {/* Delete Confirmation Dialog for Scheduled Reports */}
+      <Dialog
+        open={deleteDialog}
+        onClose={() => setDeleteDialog(false)}
+        style={{ zIndex: 10004 }}
+        PaperProps={{
+          style: {
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            borderRadius: '12px',
+            zIndex: 10004,
+          },
         }}
-      />
+      >
+        <DialogTitle style={{ color: colors.text, padding: '16px 20px' }}>
+          {t('sharedConfirmDelete')}
+        </DialogTitle>
+        <DialogContent style={{ color: colors.text, padding: '0 20px' }}>
+          <Typography variant="body2" style={{ color: colors.textSecondary }}>
+            {t('sharedRemoveConfirm')} "{scheduledToDelete?.description}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteDialog(false)}
+            style={{ color: colors.textSecondary }}
+          >
+            {t('sharedCancel')}
+          </Button>
+          <Button
+            onClick={deleteScheduledReport}
+            style={{ color: colors.error }}
+          >
+            {t('sharedRemove')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AnimatePresence>
   );
 };
