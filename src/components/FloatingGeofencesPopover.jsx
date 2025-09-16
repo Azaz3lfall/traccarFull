@@ -628,7 +628,55 @@ const FloatingGeofencesPopover = ({
       const updatedPoints = [...polygonPoints, newPoint];
       setPolygonPoints(updatedPoints);
       
-      // Update polygon preview on map (only show from 3rd point onwards)
+      // Always show points from first click
+      // Create or update points source
+      if (!map.getSource('polygon-points')) {
+        map.addSource('polygon-points', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: updatedPoints.map((point, index) => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: point
+              },
+              properties: {
+                index: index
+              }
+            }))
+          }
+        });
+        
+        map.addLayer({
+          id: 'polygon-points',
+          type: 'circle',
+          source: 'polygon-points',
+          paint: {
+            'circle-radius': 4,
+            'circle-color': '#1976d2',
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2
+          }
+        });
+      } else {
+        // Just update the data
+        map.getSource('polygon-points').setData({
+          type: 'FeatureCollection',
+          features: updatedPoints.map((point, index) => ({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: point
+            },
+            properties: {
+              index: index
+            }
+          }))
+        });
+      }
+      
+      // Show polygon shape from 3rd point onwards
       if (updatedPoints.length >= 3) {
         // Create closed polygon by repeating the first point
         const closedPolygon = [...updatedPoints, updatedPoints[0]];
@@ -674,53 +722,6 @@ const FloatingGeofencesPopover = ({
               type: 'Polygon',
               coordinates: [closedPolygon]
             }
-          });
-        }
-        
-        // Create or update points source
-        if (!map.getSource('polygon-points')) {
-          map.addSource('polygon-points', {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: updatedPoints.map((point, index) => ({
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: point
-                },
-                properties: {
-                  index: index
-                }
-              }))
-            }
-          });
-          
-          map.addLayer({
-            id: 'polygon-points',
-            type: 'circle',
-            source: 'polygon-points',
-            paint: {
-              'circle-radius': 4,
-              'circle-color': '#1976d2',
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2
-            }
-          });
-        } else {
-          // Just update the data
-          map.getSource('polygon-points').setData({
-            type: 'FeatureCollection',
-            features: updatedPoints.map((point, index) => ({
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: point
-              },
-              properties: {
-                index: index
-              }
-            }))
           });
         }
       }
