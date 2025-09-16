@@ -15,6 +15,13 @@ import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
+import usePositionAttributes from '../common/attributes/usePositionAttributes';
+import {
+  altitudeFromMeters, distanceFromMeters, speedFromKnots, speedToKnots, volumeFromLiters,
+} from '../common/util/converter';
+import {
+  Brush, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from 'recharts';
 import dayjs from 'dayjs';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
@@ -85,12 +92,23 @@ const FloatingReportsPopover = ({
   const [summaryColumns, setSummaryColumns] = useState(['startTime', 'distance', 'averageSpeed']);
   const [daily, setDaily] = useState(false);
 
+  // Chart report state
+  const [chartItems, setChartItems] = useState([]);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [chartTypes, setChartTypes] = useState(['speed']);
+  const [selectedChartTypes, setSelectedChartTypes] = useState(['speed']);
+  const [timeType, setTimeType] = useState('fixTime');
+
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
   const speedUnit = useAttributePreference('speedUnit');
   const distanceUnit = useAttributePreference('distanceUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
+  const altitudeUnit = useAttributePreference('altitudeUnit');
+
+  // Position attributes for chart
+  const positionAttributes = usePositionAttributes(t);
 
   // Events columns configuration
   const eventsColumnsArray = [
@@ -858,6 +876,131 @@ const FloatingReportsPopover = ({
         return value;
     }
   };
+
+  // Chart report functionality
+  const onShowChart = useCatch(async ({ deviceIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    setChartLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/reports/route?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      const positions = await response.json();
+      const keySet = new Set();
+      const keyList = [];
+      const formattedPositions = positions.map((position) => {
+        const data = { ...position, ...position.attributes };
+        const formatted = {};
+        formatted.fixTime = dayjs(position.fixTime).valueOf();
+        formatted.deviceTime = dayjs(position.deviceTime).valueOf();
+        formatted.serverTime = dayjs(position.serverTime).valueOf();
+        Object.keys(data).filter((key) => !['id', 'deviceId'].includes(key)).forEach((key) => {
+          const value = data[key];
+          if (typeof value === 'number') {
+            keySet.add(key);
+            const definition = positionAttributes[key] || {};
+            switch (definition.dataType) {
+              case 'speed':
+                if (key == 'obdSpeed') {
+                  formatted[key] = speedFromKnots(speedToKnots(value, 'kmh'), speedUnit).toFixed(2);
+                } else {
+                  formatted[key] = speedFromKnots(value, speedUnit).toFixed(2);
+                }
+                break;
+              case 'altitude':
+                formatted[key] = altitudeFromMeters(value, altitudeUnit).toFixed(2);
+                break;
+              case 'distance':
+                formatted[key] = distanceFromMeters(value, distanceUnit).toFixed(2);
+                break;
+              case 'volume':
+                formatted[key] = volumeFromLiters(value, volumeUnit).toFixed(2);
+                break;
+              case 'hours':
+                formatted[key] = (value / 1000).toFixed(2);
+                break;
+              default:
+                formatted[key] = value;
+                break;
+            }
+          }
+        });
+        return formatted;
+      });
+      Object.keys(positionAttributes).forEach((key) => {
+        if (keySet.has(key)) {
+          keyList.push(key);
+          keySet.delete(key);
+        }
+      });
+      setChartTypes([...keyList, ...keySet]);
+      setChartItems(formattedPositions);
+    } finally {
+      setChartLoading(false);
+    }
+  });
+
+  const showChartReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowChart({ 
+      deviceIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isChartDisabled = () => {
+    return !deviceIds.length || chartLoading;
+  };
+
+  // Chart calculations
+  const chartValues = chartItems.map((it) => selectedChartTypes.map((type) => it[type]).filter((value) => value != null));
+  const minValue = chartValues.length ? Math.min(...chartValues) : 0;
+  const maxValue = chartValues.length ? Math.max(...chartValues) : 100;
+  const valueRange = maxValue - minValue;
+
+  const colorPalette = [
+    colors.primary,
+    colors.secondary,
+    colors.error,
+    colors.warning,
+    colors.info,
+    colors.success,
+    colors.text,
+  ];
 
   return (
     <AnimatePresence mode="wait">
@@ -1982,6 +2125,207 @@ const FloatingReportsPopover = ({
                           )}
                         </TableBody>
                       </Table>
+                    </div>
+                  )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'chart' ? (
+                <>
+                  {/* Chart Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Device Selection (Single) */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Chart Type Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportChartType')}</InputLabel>
+                        <Select
+                          label={t('reportChartType')}
+                          value={selectedChartTypes}
+                          onChange={(e) => setSelectedChartTypes(e.target.value)}
+                          multiple
+                          disabled={!chartItems.length}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {chartTypes.map((key) => (
+                            <MenuItem key={key} value={key}>{positionAttributes[key]?.name || key}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Time Type Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportTimeType')}</InputLabel>
+                        <Select
+                          label={t('reportTimeType')}
+                          value={timeType}
+                          onChange={(e) => setTimeType(e.target.value)}
+                          disabled={!chartItems.length}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="fixTime">{t('positionFixTime')}</MenuItem>
+                          <MenuItem value="deviceTime">{t('positionDeviceTime')}</MenuItem>
+                          <MenuItem value="serverTime">{t('positionServerTime')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isChartDisabled()}
+                        onClick={showChartReport}
+                        startIcon={chartLoading ? <CircularProgress size={20} /> : null}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {chartLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Chart Display */}
+                  {chartItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      padding: '16px',
+                      minHeight: '400px'
+                    }}>
+                      <ResponsiveContainer width="100%" height={400}>
+                        <LineChart
+                          data={chartItems}
+                          margin={{
+                            top: 10, right: 40, left: 0, bottom: 10,
+                          }}
+                        >
+                          <XAxis
+                            stroke={colors.text}
+                            dataKey={timeType}
+                            type="number"
+                            tickFormatter={(value) => formatTime(value, 'time')}
+                            domain={['dataMin', 'dataMax']}
+                            scale="time"
+                          />
+                          <YAxis
+                            stroke={colors.text}
+                            type="number"
+                            tickFormatter={(value) => value.toFixed(2)}
+                            domain={[minValue - valueRange / 5, maxValue + valueRange / 5]}
+                          />
+                          <CartesianGrid stroke={colors.border} strokeDasharray="3 3" />
+                          <Tooltip
+                            wrapperStyle={{ backgroundColor: colors.background, color: colors.text }}
+                            formatter={(value, key) => [value, positionAttributes[key]?.name || key]}
+                            labelFormatter={(value) => formatTime(value, 'seconds')}
+                          />
+                          <Brush
+                            dataKey={timeType}
+                            height={30}
+                            stroke={colors.primary}
+                            tickFormatter={() => ''}
+                          />
+                          {selectedChartTypes.map((type, index) => (
+                            <Line
+                              key={type}
+                              type="monotone"
+                              dataKey={type}
+                              stroke={colorPalette[index % colorPalette.length]}
+                              dot={false}
+                              activeDot={{ r: 6 }}
+                              connectNulls
+                            />
+                          ))}
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
                   )}
                 </>
