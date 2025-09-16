@@ -1181,8 +1181,8 @@ const FloatingReportsPopover = ({
                         disabled={isTripsDisabled() || tripsItems.length === 0}
                         onClick={exportTripsReport}
                         style={{ 
-                          minWidth: '48px',
-                          height: '48px',
+                          minWidth: '40px',
+                          height: '40px',
                           padding: '0',
                           color: colors.text,
                           borderColor: colors.border,
