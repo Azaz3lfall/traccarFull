@@ -295,7 +295,7 @@ const FloatingGeofencesPopover = ({
           left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
           width: !desktop ? '100vw' : '400px',
           height: !desktop ? '60vh' : 'calc(100vh - 16px)',
-          zIndex: 9998,
+          zIndex: 10000,
           pointerEvents: 'auto',
           transition: 'left 0.3s ease'
         }}
@@ -304,7 +304,7 @@ const FloatingGeofencesPopover = ({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 16px 16px 0px',
+          borderRadius: !desktop ? '16px 16px 0px 0px' : '0px 0px 16px 16px',
           backgroundColor: colors.surface,
           border: `1px solid ${colors.border}`,
           boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
