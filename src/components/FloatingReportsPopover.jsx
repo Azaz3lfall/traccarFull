@@ -172,7 +172,8 @@ const FloatingReportsPopover = ({
                 value={activeTab}
                 onChange={handleTabChange}
                 variant="scrollable"
-                scrollButtons="auto"
+                scrollButtons="on"
+                centered
                 sx={{
                   '& .MuiTab-root': {
                     color: '#666666',
