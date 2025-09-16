@@ -461,22 +461,25 @@ const FloatingGeofencesPopover = ({
     setClickCount(0);
     setCenter(null);
     
-    // Clean up map layers
+    // Clean up map layers first, then sources
     if (map) {
-      if (map.getSource('circle-center')) {
-        map.removeSource('circle-center');
-      }
+      // Remove layers first
       if (map.getLayer('circle-center')) {
         map.removeLayer('circle-center');
-      }
-      if (map.getSource('circle-preview')) {
-        map.removeSource('circle-preview');
       }
       if (map.getLayer('circle-preview')) {
         map.removeLayer('circle-preview');
       }
       if (map.getLayer('circle-preview-stroke')) {
         map.removeLayer('circle-preview-stroke');
+      }
+      
+      // Then remove sources
+      if (map.getSource('circle-center')) {
+        map.removeSource('circle-center');
+      }
+      if (map.getSource('circle-preview')) {
+        map.removeSource('circle-preview');
       }
     }
   };
