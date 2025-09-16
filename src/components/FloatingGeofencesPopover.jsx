@@ -769,21 +769,25 @@ const FloatingGeofencesPopover = ({
         <Dialog
           open={deleteDialog}
           onClose={() => setDeleteDialog(false)}
+          style={{ zIndex: 10004 }}
           PaperProps={{
             style: {
               backgroundColor: colors.surface,
+              border: `1px solid ${colors.border}`,
               borderRadius: '12px',
-              zIndex: 10004
-            }
+              zIndex: 10004,
+            },
           }}
         >
-          <DialogTitle style={{ color: colors.text }}>
+          <DialogTitle style={{ color: colors.text, padding: '16px 20px' }}>
             {t('sharedConfirmDelete')}
           </DialogTitle>
-          <DialogContent style={{ color: colors.text }}>
-            {t('sharedConfirmDeleteGeofence', { name: geofenceToDelete?.name })}
+          <DialogContent style={{ color: colors.text, padding: '0 20px' }}>
+            <Typography variant="body2" style={{ color: colors.textSecondary }}>
+              {t('sharedRemoveConfirm')} "{geofenceToDelete?.name}"?
+            </Typography>
           </DialogContent>
-          <DialogActions style={{ padding: '16px 20px' }}>
+          <DialogActions>
             <Button
               onClick={() => setDeleteDialog(false)}
               style={{ color: colors.textSecondary }}
@@ -792,14 +796,14 @@ const FloatingGeofencesPopover = ({
             </Button>
             <Button
               onClick={() => deleteGeofenceMutation.mutate(geofenceToDelete?.id)}
-              variant="contained"
-              style={{
-                backgroundColor: '#EF4444',
-                color: 'white',
-                textTransform: 'none'
-              }}
+              style={{ color: colors.error }}
+              disabled={deleteGeofenceMutation.isPending}
             >
-              {t('sharedDelete')}
+              {deleteGeofenceMutation.isPending ? (
+                <CircularProgress size={16} />
+              ) : (
+                t('sharedRemove')
+              )}
             </Button>
           </DialogActions>
         </Dialog>
