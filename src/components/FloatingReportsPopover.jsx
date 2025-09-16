@@ -2,9 +2,22 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
+import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { Card } from './ui/card';
-import { Typography, IconButton } from '@mui/material';
+import { Typography, IconButton, Tabs, Tab, Box } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
+import StarIcon from '@mui/icons-material/Star';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import RouteIcon from '@mui/icons-material/Route';
+import NotesIcon from '@mui/icons-material/Notes';
+import EventRepeatIcon from '@mui/icons-material/EventRepeat';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 
 const FloatingReportsPopover = ({ 
   desktop, 
@@ -15,6 +28,87 @@ const FloatingReportsPopover = ({
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
+  const admin = useAdministrator();
+  const readonly = useRestriction('readonly');
+  
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Define all report tabs with their permissions
+  const reportTabs = [
+    {
+      key: 'combined',
+      title: t('reportCombined'),
+      icon: <StarIcon />,
+      show: true
+    },
+    {
+      key: 'events',
+      title: t('reportEvents'),
+      icon: <NotificationsActiveIcon />,
+      show: true
+    },
+    {
+      key: 'trips',
+      title: t('reportTrips'),
+      icon: <PlayCircleFilledIcon />,
+      show: true
+    },
+    {
+      key: 'stops',
+      title: t('reportStops'),
+      icon: <PauseCircleFilledIcon />,
+      show: true
+    },
+    {
+      key: 'summary',
+      title: t('reportSummary'),
+      icon: <FormatListBulletedIcon />,
+      show: true
+    },
+    {
+      key: 'chart',
+      title: t('reportChart'),
+      icon: <TrendingUpIcon />,
+      show: true
+    },
+    {
+      key: 'positions',
+      title: t('reportPositions'),
+      icon: <TimelineIcon />,
+      show: true
+    },
+    {
+      key: 'logs',
+      title: t('sharedLogs'),
+      icon: <NotesIcon />,
+      show: true
+    },
+    {
+      key: 'scheduled',
+      title: t('reportScheduled'),
+      icon: <EventRepeatIcon />,
+      show: !readonly
+    },
+    {
+      key: 'statistics',
+      title: t('statisticsTitle'),
+      icon: <BarChartIcon />,
+      show: admin
+    },
+    {
+      key: 'audit',
+      title: t('reportAudit'),
+      icon: <VerifiedUserIcon />,
+      show: admin
+    }
+  ];
+
+  // Filter tabs based on permissions
+  const visibleTabs = reportTabs.filter(tab => tab.show);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -69,6 +163,44 @@ const FloatingReportsPopover = ({
               </Typography>
             </div>
 
+            {/* Tabs */}
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  '& .MuiTab-root': {
+                    color: colors.textSecondary,
+                    textTransform: 'none',
+                    minHeight: '48px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    '&.Mui-selected': {
+                      color: colors.primary,
+                    },
+                    '& .MuiTab-iconWrapper': {
+                      marginRight: '8px',
+                      fontSize: '20px',
+                    }
+                  },
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: colors.primary,
+                  }
+                }}
+              >
+                {visibleTabs.map((tab, index) => (
+                  <Tab
+                    key={tab.key}
+                    label={tab.title}
+                    icon={tab.icon}
+                    iconPosition="start"
+                  />
+                ))}
+              </Tabs>
+            </Box>
+
             {/* Content */}
             <div style={{ 
               padding: '20px',
@@ -78,7 +210,7 @@ const FloatingReportsPopover = ({
               justifyContent: 'center'
             }}>
               <Typography variant="body1" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                {t('sharedComingSoon')}
+                {visibleTabs[activeTab] ? visibleTabs[activeTab].title : t('sharedComingSoon')}
               </Typography>
             </div>
           </div>
