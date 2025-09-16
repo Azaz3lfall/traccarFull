@@ -503,19 +503,20 @@ const FloatingGeofencesPopover = ({
           )}
         </div>
 
-        {/* Context Menu */}
+        {/* Actions Menu */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
-          style={{ zIndex: 10003 }}
+          style={{ zIndex: 10002 }}
           PaperProps={{
             style: {
               backgroundColor: colors.surface,
               border: `1px solid ${colors.border}`,
               borderRadius: '8px',
               boxShadow: colors.shadow,
-              zIndex: 10003
+              minWidth: '160px',
+              zIndex: 10002
             }
           }}
         >
@@ -524,19 +525,19 @@ const FloatingGeofencesPopover = ({
               handleEdit(selectedGeofence);
               handleMenuClose();
             }}
-            style={{ color: colors.text }}
+            style={{ color: colors.text, fontSize: '12px' }}
           >
-            <EditIcon style={{ marginRight: '8px', fontSize: 16 }} />
-            {t('sharedEdit')}
+            <EditIcon fontSize="small" />
+            <span style={{ marginLeft: '6px' }}>{t('sharedEdit')}</span>
           </MenuItem>
           <MenuItem
             onClick={() => {
               handleDelete(selectedGeofence);
             }}
-            style={{ color: '#EF4444' }}
+            style={{ color: '#EF4444', fontSize: '12px' }}
           >
-            <DeleteIcon style={{ marginRight: '8px', fontSize: 16 }} />
-            {t('sharedRemove')}
+            <DeleteIcon fontSize="small" />
+            <span style={{ marginLeft: '6px' }}>{t('sharedRemove')}</span>
           </MenuItem>
         </Menu>
 
