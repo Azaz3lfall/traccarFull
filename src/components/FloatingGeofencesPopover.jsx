@@ -180,6 +180,7 @@ const FloatingGeofencesPopover = ({
   // Handle save geofence - disables drawing tools
   const handleSave = () => {
     setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
+    resetCircleDrawing(); // Reset any active circle drawing
   };
 
   // Handle edit geofence
@@ -379,8 +380,27 @@ const FloatingGeofencesPopover = ({
           map.removeLayer('circle-center');
         }
       } else {
-        // Third click - reset and start over
-        resetCircleDrawing();
+        // Third click - reset current circle and start over (but keep tool active)
+        setCircleCenter(null);
+        setCircleRadius(null);
+        setCirclePreview(null);
+        
+        // Clean up map layers
+        if (map.getSource('circle-center')) {
+          map.removeSource('circle-center');
+        }
+        if (map.getLayer('circle-center')) {
+          map.removeLayer('circle-center');
+        }
+        if (map.getSource('circle-preview')) {
+          map.removeSource('circle-preview');
+        }
+        if (map.getLayer('circle-preview')) {
+          map.removeLayer('circle-preview');
+        }
+        if (map.getLayer('circle-preview-stroke')) {
+          map.removeLayer('circle-preview-stroke');
+        }
       }
     };
 
