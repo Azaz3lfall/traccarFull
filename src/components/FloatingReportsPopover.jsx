@@ -3062,7 +3062,6 @@ const FloatingReportsPopover = ({
                       <Button
                         fullWidth
                         variant="outlined"
-                        color="secondary"
                         disabled={statisticsLoading || (period === 'custom' && (!customFrom || !customTo))}
                         onClick={showStatisticsReport}
                         startIcon={statisticsLoading ? <CircularProgress size={20} /> : null}
@@ -3072,9 +3071,7 @@ const FloatingReportsPopover = ({
                           borderColor: colors.border
                         }}
                       >
-                        <Typography style={{ color: colors.text }}>
-                          {t('sharedShow')}
-                        </Typography>
+                        {t('sharedShow')}
                       </Button>
                     </div>
                   </div>
