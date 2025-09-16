@@ -349,67 +349,64 @@ const FloatingGeofencesPopover = ({
                 {t('sharedGeofences')}
               </Typography>
             </div>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-              size="small"
-              style={{
-                backgroundColor: colors.primary,
-                color: colors.surface,
-                textTransform: 'none',
-                borderRadius: '8px',
-                fontWeight: '500'
-              }}
-            >
-              {t('sharedAdd')}
-            </Button>
-          </div>
-
-          {/* Search and Upload */}
-          <div style={{ padding: '16px', borderBottom: `1px solid ${colors.border}` }}>
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-              <TextField
-                fullWidth
-                placeholder={t('sharedSearch')}
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                size="small"
-                InputProps={{
-                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
-                }}
-                style={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '8px'
-                  }
-                }}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                accept=".gpx"
+                id="upload-gpx"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleFileUpload}
               />
-            </div>
-            
-            <input
-              accept=".gpx"
-              id="upload-gpx"
-              type="file"
-              style={{ display: 'none' }}
-              onChange={handleFileUpload}
-            />
-            <label htmlFor="upload-gpx">
+              <label htmlFor="upload-gpx">
+                <IconButton
+                  component="span"
+                  size="small"
+                  style={{
+                    color: colors.textSecondary,
+                    backgroundColor: colors.secondary,
+                    '&:hover': {
+                      backgroundColor: colors.hover
+                    }
+                  }}
+                >
+                  <UploadFileIcon />
+                </IconButton>
+              </label>
               <Button
-                variant="outlined"
-                startIcon={<UploadFileIcon />}
-                component="span"
-                fullWidth
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
                 size="small"
                 style={{
+                  backgroundColor: colors.primary,
+                  color: colors.surface,
                   textTransform: 'none',
                   borderRadius: '8px',
-                  borderColor: colors.border,
-                  color: colors.text
+                  fontWeight: '500'
                 }}
               >
-                {t('sharedUpload')} GPX
+                {t('sharedAdd')}
               </Button>
-            </label>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div style={{ padding: '16px', borderBottom: `1px solid ${colors.border}` }}>
+            <TextField
+              fullWidth
+              placeholder={t('sharedSearch')}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              size="small"
+              InputProps={{
+                startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
+              }}
+              style={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '8px'
+                }
+              }}
+            />
           </div>
 
           {/* Content */}
