@@ -337,6 +337,13 @@ const FloatingReportsPopover = ({
                         onChange={(e) => setDeviceIds(e.target.value)}
                         multiple
                         fullWidth
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              zIndex: 10001,
+                            },
+                          },
+                        }}
                       />
                     </div>
                     
@@ -349,6 +356,13 @@ const FloatingReportsPopover = ({
                         onChange={(e) => setGroupIds(e.target.value)}
                         multiple
                         fullWidth
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              zIndex: 10001,
+                            },
+                          },
+                        }}
                       />
                     </div>
                     
@@ -360,6 +374,13 @@ const FloatingReportsPopover = ({
                           label={t('reportPeriod')} 
                           value={period} 
                           onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                zIndex: 10001,
+                              },
+                            },
+                          }}
                         >
                           <MenuItem value="today">{t('reportToday')}</MenuItem>
                           <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
