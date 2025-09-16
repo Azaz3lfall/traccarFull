@@ -204,7 +204,7 @@ const FloatingGeofencesPopover = ({
     // Create the geofence using stored center and radius
     const newGeofence = {
       name: geofenceName.trim(),
-      area: `CIRCLE(${center[1]}, ${center[0]}, ${Math.round(radius)})`, // lat, lng, radius in meters (rounded)
+      area: `CIRCLE (${center[1]} ${center[0]}, ${Math.round(radius)})`, // lat lng, radius in meters (rounded)
       attributes: {
         color: '#1976d2',
         mapLineWidth: 2,
