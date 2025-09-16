@@ -171,6 +171,9 @@ const FloatingGeofencesPopover = ({
         console.error('Failed to refresh geofences after deletion:', error);
       }
       
+      // Invalidate query to refresh popover list
+      queryClient.invalidateQueries(['geofences']);
+      
       setDeleteDialog(false);
       setGeofenceToDelete(null);
     },
