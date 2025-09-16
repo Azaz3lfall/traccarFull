@@ -516,7 +516,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('circle')}
-              disabled={isAddMode}
+              disabled={!isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -537,7 +537,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('line')}
-              disabled={isAddMode}
+              disabled={!isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -558,7 +558,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('polygon')}
-              disabled={isAddMode}
+              disabled={!isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
