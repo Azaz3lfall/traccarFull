@@ -15,6 +15,7 @@ import SelectField from '../common/components/SelectField';
 import { useAttributePreference } from '../common/util/preferences';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import AddressValue from '../common/components/AddressValue';
+import ColumnSelect from '../reports/components/ColumnSelect';
 import dayjs from 'dayjs';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
@@ -446,6 +447,55 @@ const FloatingReportsPopover = ({
 
   const isTripsDisabled = () => {
     return !deviceIds.length && !groupIds.length || tripsLoading;
+  };
+
+  const onExportTrips = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    window.location.assign(`/api/reports/trips/xlsx?${query.toString()}`);
+  });
+
+  const exportTripsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onExportTrips({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
   };
 
   // Load route for selected trip
@@ -1080,6 +1130,16 @@ const FloatingReportsPopover = ({
                       </>
                     )}
                     
+                    {/* Column Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <ColumnSelect 
+                        columns={tripsColumns} 
+                        setColumns={setTripsColumns} 
+                        columnsArray={tripsColumnsArray}
+                        disabled={tripsLoading}
+                      />
+                    </div>
+                    
                     {/* Show Button */}
                     <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
                       <Button
@@ -1093,6 +1153,22 @@ const FloatingReportsPopover = ({
                       >
                         <Typography variant="button" noWrap>
                           {tripsLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                    
+                    {/* Export Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        disabled={isTripsDisabled()}
+                        onClick={exportTripsReport}
+                        style={{ minWidth: desktop ? '120px' : 'auto' }}
+                      >
+                        <Typography variant="button" noWrap>
+                          {t('sharedExport')}
                         </Typography>
                       </Button>
                     </div>
