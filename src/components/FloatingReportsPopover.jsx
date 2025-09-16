@@ -73,6 +73,12 @@ const FloatingReportsPopover = ({
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [tripRoute, setTripRoute] = useState(null);
 
+  // Stops report state
+  const [stopsItems, setStopsItems] = useState([]);
+  const [stopsLoading, setStopsLoading] = useState(false);
+  const [stopsColumns, setStopsColumns] = useState(['startTime', 'endTime', 'startOdometer', 'address']);
+  const [selectedStop, setSelectedStop] = useState(null);
+
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
@@ -112,6 +118,18 @@ const FloatingReportsPopover = ({
     ['driverName', 'sharedDriver'],
   ];
   const tripsColumnsMap = new Map(tripsColumnsArray);
+
+  // Stops columns configuration
+  const stopsColumnsArray = [
+    ['startTime', 'reportStartTime'],
+    ['startOdometer', 'positionOdometer'],
+    ['address', 'positionAddress'],
+    ['endTime', 'reportEndTime'],
+    ['duration', 'reportDuration'],
+    ['engineHours', 'reportEngineHours'],
+    ['spentFuel', 'reportSpentFuel'],
+  ];
+  const stopsColumnsMap = new Map(stopsColumnsArray);
 
   // Define all report tabs with their permissions
   const reportTabs = [
@@ -545,6 +563,140 @@ const FloatingReportsPopover = ({
         return (<AddressValue latitude={item.startLat} longitude={item.startLon} originalAddress={value} />);
       case 'endAddress':
         return (<AddressValue latitude={item.endLat} longitude={item.endLon} originalAddress={value} />);
+      default:
+        return value;
+    }
+  };
+
+  // Stops report functionality
+  const onShowStops = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    setStopsLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/reports/stops?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      setStopsItems(await response.json());
+    } finally {
+      setStopsLoading(false);
+    }
+  });
+
+  const showStopsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowStops({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isStopsDisabled = () => {
+    return !deviceIds.length && !groupIds.length || stopsLoading;
+  };
+
+  const onExportStops = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    window.location.assign(`/api/reports/stops/xlsx?${query.toString()}`);
+  });
+
+  const exportStopsReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onExportStops({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const formatStopValue = (item, key) => {
+    const value = item[key];
+    switch (key) {
+      case 'deviceId':
+        return devices[value]?.name;
+      case 'startTime':
+      case 'endTime':
+        return formatTime(value, 'minutes');
+      case 'startOdometer':
+        return formatDistance(value, distanceUnit, t);
+      case 'duration':
+        return formatNumericHours(value, t);
+      case 'engineHours':
+        return value > 0 ? formatNumericHours(value, t) : null;
+      case 'spentFuel':
+        return value > 0 ? formatVolume(value, volumeUnit, t) : null;
+      case 'address':
+        return (<AddressValue latitude={item.latitude} longitude={item.longitude} originalAddress={value} />);
       default:
         return value;
     }
@@ -1238,6 +1390,217 @@ const FloatingReportsPopover = ({
                           )) : (
                             <TableRow>
                               <TableCell colSpan={tripsColumns.length + 2} style={{ textAlign: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'stops' ? (
+                <>
+                  {/* Stops Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Device Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Group Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('settingsGroups')}
+                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={groupIds}
+                        onChange={(e) => setGroupIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Column Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          label={t('sharedColumns')}
+                          value={stopsColumns}
+                          onChange={(e) => setStopsColumns(e.target.value)}
+                          multiple
+                          disabled={stopsLoading}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {stopsColumnsArray.map(([key, string]) => (
+                            <MenuItem key={key} value={key}>{t(string)}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isStopsDisabled()}
+                        onClick={showStopsReport}
+                        startIcon={stopsLoading ? <CircularProgress size={20} /> : null}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {stopsLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                    
+                    {/* Export Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        disabled={isStopsDisabled() || stopsItems.length === 0}
+                        onClick={exportStopsReport}
+                        style={{ 
+                          minWidth: '40px',
+                          height: '40px',
+                          padding: '0',
+                          color: colors.text,
+                          borderColor: colors.border,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <DownloadIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Stops Report Table */}
+                  {stopsItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px'
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ width: '1%', paddingLeft: '8px' }}></TableCell>
+                            <TableCell>{t('sharedDevice')}</TableCell>
+                            {stopsColumns.map((key) => (
+                              <TableCell key={key}>{t(stopsColumnsMap.get(key))}</TableCell>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {!stopsLoading ? stopsItems.map((item) => (
+                            <TableRow key={item.positionId}>
+                              <TableCell style={{ padding: '4px' }}>
+                                {selectedStop === item ? (
+                                  <IconButton size="small" onClick={() => setSelectedStop(null)}>
+                                    <GpsFixedIcon fontSize="small" />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton size="small" onClick={() => setSelectedStop(item)}>
+                                    <LocationSearchingIcon fontSize="small" />
+                                  </IconButton>
+                                )}
+                              </TableCell>
+                              <TableCell>{devices[item.deviceId]?.name}</TableCell>
+                              {stopsColumns.map((key) => (
+                                <TableCell key={key}>
+                                  {formatStopValue(item, key)}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={stopsColumns.length + 2} style={{ textAlign: 'center', padding: '20px' }}>
                                 <CircularProgress />
                               </TableCell>
                             </TableRow>
