@@ -334,32 +334,12 @@ const FloatingGeofencesPopover = ({
         // If already in circle drawing mode, reset it
         resetDrawingTools();
       } else {
-        // Reset other tools first
-        setPolylineDrawingMode(false);
-        setPolylinePoints([]);
-        // Enable circle drawing mode and clear all existing circles
+        // Reset ALL other tools first
+        resetDrawingTools();
+        // Enable circle drawing mode
         setCircleDrawingMode(true);
         setClickCount(0);
         setCenter(null);
-        
-        // Clear all existing circles from map
-        if (map) {
-          if (map.getSource('circle-preview')) {
-            map.removeSource('circle-preview');
-          }
-          if (map.getLayer('circle-preview')) {
-            map.removeLayer('circle-preview');
-          }
-          if (map.getLayer('circle-preview-stroke')) {
-            map.removeLayer('circle-preview-stroke');
-          }
-          if (map.getSource('circle-center')) {
-            map.removeSource('circle-center');
-          }
-          if (map.getLayer('circle-center')) {
-            map.removeLayer('circle-center');
-          }
-        }
       }
       
       // Keep popover open for circle drawing
@@ -369,30 +349,11 @@ const FloatingGeofencesPopover = ({
         // If already in polyline drawing mode, reset it
         resetDrawingTools();
       } else {
-        // Reset other tools first
-        setCircleDrawingMode(false);
-        setClickCount(0);
-        setCenter(null);
-        setRadius(null);
+        // Reset ALL other tools first
+        resetDrawingTools();
         // Enable polyline drawing mode
         setPolylineDrawingMode(true);
         setPolylinePoints([]);
-        
-        // Clear all existing polylines from map
-        if (map) {
-          if (map.getSource('polyline-preview')) {
-            map.removeSource('polyline-preview');
-          }
-          if (map.getLayer('polyline-preview')) {
-            map.removeLayer('polyline-preview');
-          }
-          if (map.getSource('polyline-points')) {
-            map.removeSource('polyline-points');
-          }
-          if (map.getLayer('polyline-points')) {
-            map.removeLayer('polyline-points');
-          }
-        }
       }
       
       // Keep popover open for polyline drawing
