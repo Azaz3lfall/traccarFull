@@ -79,6 +79,12 @@ const FloatingReportsPopover = ({
   const [stopsColumns, setStopsColumns] = useState(['startTime', 'endTime', 'startOdometer', 'address']);
   const [selectedStop, setSelectedStop] = useState(null);
 
+  // Summary report state
+  const [summaryItems, setSummaryItems] = useState([]);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryColumns, setSummaryColumns] = useState(['startTime', 'distance', 'averageSpeed']);
+  const [daily, setDaily] = useState(false);
+
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
@@ -130,6 +136,21 @@ const FloatingReportsPopover = ({
     ['spentFuel', 'reportSpentFuel'],
   ];
   const stopsColumnsMap = new Map(stopsColumnsArray);
+
+  // Summary columns configuration
+  const summaryColumnsArray = [
+    ['startTime', 'reportStartDate'],
+    ['distance', 'sharedDistance'],
+    ['startOdometer', 'reportStartOdometer'],
+    ['endOdometer', 'reportEndOdometer'],
+    ['averageSpeed', 'reportAverageSpeed'],
+    ['maxSpeed', 'reportMaximumSpeed'],
+    ['engineHours', 'reportEngineHours'],
+    ['startHours', 'reportStartEngineHours'],
+    ['endHours', 'reportEndEngineHours'],
+    ['spentFuel', 'reportSpentFuel'],
+  ];
+  const summaryColumnsMap = new Map(summaryColumnsArray);
 
   // Define all report tabs with their permissions
   const reportTabs = [
@@ -697,6 +718,142 @@ const FloatingReportsPopover = ({
         return value > 0 ? formatVolume(value, volumeUnit, t) : null;
       case 'address':
         return (<AddressValue latitude={item.latitude} longitude={item.longitude} originalAddress={value} />);
+      default:
+        return value;
+    }
+  };
+
+  // Summary report functionality
+  const onShowSummary = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to, daily });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    setSummaryLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/reports/summary?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      setSummaryItems(await response.json());
+    } finally {
+      setSummaryLoading(false);
+    }
+  });
+
+  const showSummaryReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onShowSummary({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const isSummaryDisabled = () => {
+    return !deviceIds.length && !groupIds.length || summaryLoading;
+  };
+
+  const onExportSummary = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+    const query = new URLSearchParams({ from, to, daily });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
+    window.location.assign(`/api/reports/summary/xlsx?${query.toString()}`);
+  });
+
+  const exportSummaryReport = () => {
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+
+    onExportSummary({ 
+      deviceIds, 
+      groupIds, 
+      from: selectedFrom.toISOString(), 
+      to: selectedTo.toISOString() 
+    });
+  };
+
+  const formatSummaryValue = (item, key) => {
+    const value = item[key];
+    switch (key) {
+      case 'deviceId':
+        return devices[value]?.name;
+      case 'startTime':
+        return formatTime(value, 'date');
+      case 'startOdometer':
+      case 'endOdometer':
+      case 'distance':
+        return formatDistance(value, distanceUnit, t);
+      case 'averageSpeed':
+      case 'maxSpeed':
+        return value > 0 ? formatSpeed(value, speedUnit, t) : null;
+      case 'engineHours':
+      case 'startHours':
+      case 'endHours':
+        return value > 0 ? formatNumericHours(value, t) : null;
+      case 'spentFuel':
+        return value > 0 ? formatVolume(value, volumeUnit, t) : null;
       default:
         return value;
     }
@@ -1601,6 +1758,224 @@ const FloatingReportsPopover = ({
                           )) : (
                             <TableRow>
                               <TableCell colSpan={stopsColumns.length + 2} style={{ textAlign: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
+              ) : visibleTabs[activeTab]?.key === 'summary' ? (
+                <>
+                  {/* Summary Report Form */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: desktop ? 'row' : 'column',
+                    flexWrap: desktop ? 'wrap' : 'nowrap',
+                    gap: '16px', 
+                    marginBottom: '20px',
+                    flexShrink: 0,
+                    alignItems: desktop ? 'flex-end' : 'stretch'
+                  }}>
+                    {/* Device Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('deviceTitle')}
+                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={deviceIds}
+                        onChange={(e) => setDeviceIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Group Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <SelectField
+                        label={t('settingsGroups')}
+                        data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+                        value={groupIds}
+                        onChange={(e) => setGroupIds(e.target.value)}
+                        multiple
+                        fullWidth
+                        zIndex={10002}
+                        MenuProps={{
+                          disablePortal: false,
+                          style: { zIndex: 10002 }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Period Selection */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('reportPeriod')}</InputLabel>
+                        <Select 
+                          label={t('reportPeriod')} 
+                          value={period} 
+                          onChange={(e) => setPeriod(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value="today">{t('reportToday')}</MenuItem>
+                          <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
+                          <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
+                          <MenuItem value="previousWeek">{t('reportPreviousWeek')}</MenuItem>
+                          <MenuItem value="thisMonth">{t('reportThisMonth')}</MenuItem>
+                          <MenuItem value="previousMonth">{t('reportPreviousMonth')}</MenuItem>
+                          <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Custom Date Range */}
+                    {period === 'custom' && (
+                      <>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportFrom')}
+                            type="datetime-local"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                        <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                          <TextField
+                            label={t('reportTo')}
+                            type="datetime-local"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            fullWidth
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Type Selection (Summary/Daily) */}
+                    <div style={{ flex: desktop ? '1 1 150px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedType')}</InputLabel>
+                        <Select 
+                          label={t('sharedType')} 
+                          value={daily} 
+                          onChange={(e) => setDaily(e.target.value)}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          <MenuItem value={false}>{t('reportSummary')}</MenuItem>
+                          <MenuItem value={true}>{t('reportDaily')}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Column Selection */}
+                    <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>{t('sharedColumns')}</InputLabel>
+                        <Select
+                          label={t('sharedColumns')}
+                          value={summaryColumns}
+                          onChange={(e) => setSummaryColumns(e.target.value)}
+                          multiple
+                          disabled={summaryLoading}
+                          MenuProps={{
+                            disablePortal: false,
+                            style: { zIndex: 10002 }
+                          }}
+                        >
+                          {summaryColumnsArray.map(([key, string]) => (
+                            <MenuItem key={key} value={key}>{t(string)}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    
+                    {/* Show Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        disabled={isSummaryDisabled()}
+                        onClick={showSummaryReport}
+                        startIcon={summaryLoading ? <CircularProgress size={20} /> : null}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
+                      >
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
+                          {summaryLoading ? t('sharedLoading') : t('reportShow')}
+                        </Typography>
+                      </Button>
+                    </div>
+                    
+                    {/* Export Button */}
+                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        disabled={isSummaryDisabled() || summaryItems.length === 0}
+                        onClick={exportSummaryReport}
+                        style={{ 
+                          minWidth: '40px',
+                          height: '40px',
+                          padding: '0',
+                          color: colors.text,
+                          borderColor: colors.border,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <DownloadIcon />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Summary Report Table */}
+                  {summaryItems.length > 0 && (
+                    <div style={{ 
+                      flex: 1, 
+                      overflow: 'auto',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px'
+                    }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>{t('sharedDevice')}</TableCell>
+                            {summaryColumns.map((key) => (
+                              <TableCell key={key}>{t(summaryColumnsMap.get(key))}</TableCell>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {!summaryLoading ? summaryItems.map((item) => (
+                            <TableRow key={`${item.deviceId}_${Date.parse(item.startTime)}`}>
+                              <TableCell>{devices[item.deviceId]?.name}</TableCell>
+                              {summaryColumns.map((key) => (
+                                <TableCell key={key}>
+                                  {formatSummaryValue(item, key)}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={summaryColumns.length + 1} style={{ textAlign: 'center', padding: '20px' }}>
                                 <CircularProgress />
                               </TableCell>
                             </TableRow>
