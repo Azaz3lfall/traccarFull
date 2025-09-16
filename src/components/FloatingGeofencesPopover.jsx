@@ -271,14 +271,14 @@ const FloatingGeofencesPopover = ({
     dispatch(devicesActions.selectId(null));
     
     // Center map on geofence if it has area data
-    if (geofence.area && map) {
+    if (geofence.area && map && map.loaded()) {
       try {
         // Parse the area to get coordinates
         const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
         if (areaMatch) {
           const coordinates = areaMatch[1].split(',').map(coord => {
-            const [lng, lat] = coord.trim().split(' ').map(Number);
-            return [lng, lat];
+            const [lat, lng] = coord.trim().split(' ').map(Number);
+            return [lng, lat]; // Convert to [lng, lat] format for map
           });
           
           if (coordinates.length > 0) {
@@ -286,10 +286,10 @@ const FloatingGeofencesPopover = ({
             const centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
             const centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
             
-            // Center map on geofence
-            map.flyTo({
+            // Center map on geofence with smooth animation
+            map.easeTo({
               center: [centerLng, centerLat],
-              zoom: 15,
+              zoom: Math.max(map.getZoom(), 15),
               duration: 1000
             });
           }
