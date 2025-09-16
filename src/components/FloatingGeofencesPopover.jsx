@@ -84,7 +84,7 @@ const FloatingGeofencesPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [saving, setSaving] = useState(false);
-  const [isAddMode, setIsAddMode] = useState(true);
+  const [isAddMode, setIsAddMode] = useState(true); // true = Add mode (drawing disabled), false = Save mode (drawing enabled)
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -167,12 +167,12 @@ const FloatingGeofencesPopover = ({
 
   // Handle add geofence - enables drawing tools
   const handleAdd = () => {
-    setIsAddMode(false); // Switch to save mode and enable drawing tools
+    setIsAddMode(false); // Switch to Save mode (drawing tools enabled)
   };
 
   // Handle save geofence - disables drawing tools
   const handleSave = () => {
-    setIsAddMode(true); // Switch back to add mode and disable drawing tools
+    setIsAddMode(true); // Switch back to Add mode (drawing tools disabled)
   };
 
   // Handle edit geofence
@@ -497,7 +497,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('circle')}
-              disabled={!isAddMode}
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -518,7 +518,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('line')}
-              disabled={!isAddMode}
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
@@ -539,7 +539,7 @@ const FloatingGeofencesPopover = ({
               variant="outlined"
               size="small"
               onClick={() => handleDrawingTool('polygon')}
-              disabled={!isAddMode}
+              disabled={isAddMode}
               style={{
                 color: colors.text,
                 borderColor: colors.border,
