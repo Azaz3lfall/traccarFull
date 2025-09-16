@@ -179,6 +179,11 @@ const FloatingGeofencesPopover = ({
 
   // Handle save geofence - validates name and creates geofence
   const handleSave = () => {
+    // Only proceed if we're in Save mode (not Add mode)
+    if (isAddMode) {
+      return; // Do nothing if in Add mode
+    }
+
     if (!geofenceName.trim()) {
       // Show error if name is empty
       dispatch(errorsActions.push(t('sharedRequired')));
