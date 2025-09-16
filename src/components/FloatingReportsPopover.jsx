@@ -21,30 +21,31 @@ const FloatingReportsPopover = ({
       {isVisible && (
         <motion.div
           key="reports-popover"
-          initial={{ scale: 0.8, opacity: 0, x: '-50%', y: '-50%' }}
-          animate={{ scale: 1, opacity: 1, x: '-50%', y: '-50%' }}
-          exit={{ scale: 0.8, opacity: 0, x: '-50%', y: '-50%' }}
+          initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            top: '50%',
-            left: '50%',
-            width: '95vw',
-            height: '95vh',
-            zIndex: 10000,
-            pointerEvents: 'auto'
+            top: !desktop ? 'auto' : '8px',
+            bottom: !desktop ? '0px' : 'auto',
+            left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
+            width: !desktop ? '100vw' : '320px',
+            height: !desktop ? '50vh' : 'calc(100vh - 16px)',
+            zIndex: 9999,
+            pointerEvents: 'auto',
+            transition: 'left 0.3s ease'
           }}
         >
-          <Card style={{
+          <div style={{
             height: '100%',
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            overflow: 'hidden',
-            position: 'relative',
+            borderRadius: !desktop ? '0px' : '0px 16px 16px 0px',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
           }}>
             {/* Header */}
             <div style={{
@@ -80,7 +81,7 @@ const FloatingReportsPopover = ({
                 {t('sharedComingSoon')}
               </Typography>
             </div>
-          </Card>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
