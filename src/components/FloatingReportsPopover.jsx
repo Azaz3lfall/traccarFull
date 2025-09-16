@@ -1160,9 +1160,13 @@ const FloatingReportsPopover = ({
                         disabled={isTripsDisabled()}
                         onClick={showTripsReport}
                         startIcon={tripsLoading ? <CircularProgress size={20} /> : null}
-                        style={{ minWidth: desktop ? '120px' : 'auto' }}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
                       >
-                        <Typography variant="button" noWrap>
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
                           {tripsLoading ? t('sharedLoading') : t('reportShow')}
                         </Typography>
                       </Button>
@@ -1176,9 +1180,13 @@ const FloatingReportsPopover = ({
                         color="primary"
                         disabled={isTripsDisabled()}
                         onClick={exportTripsReport}
-                        style={{ minWidth: desktop ? '120px' : 'auto' }}
+                        style={{ 
+                          minWidth: desktop ? '120px' : 'auto',
+                          color: colors.text,
+                          borderColor: colors.border
+                        }}
                       >
-                        <Typography variant="button" noWrap>
+                        <Typography variant="button" noWrap style={{ color: colors.text }}>
                           {t('sharedExport')}
                         </Typography>
                       </Button>
