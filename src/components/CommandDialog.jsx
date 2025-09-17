@@ -52,7 +52,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
       });
 
       if (response.ok) {
-        setResult({ type: 'success', message: t('commandQueued') });
+        setResult({ type: 'success', message: t('commandSent') });
         setCommand('');
       } else {
         const errorData = await response.json();
@@ -103,9 +103,10 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
         onClick={handleClose}
       >
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
+          initial={{ opacity: 0, y: -50, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -50, scale: 0.8 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             backgroundColor: colors.surface,
             borderRadius: '12px',
@@ -237,7 +238,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                   fontWeight: '600',
                   color: colors.text
                 }}>
-                  {result.type === 'success' ? t('commandSuccess') : t('commandError')}
+                  {result.type === 'success' ? t('commandSent') : t('commandError')}
                 </h3>
               </div>
               
