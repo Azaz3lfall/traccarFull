@@ -121,30 +121,20 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
           {!result ? (
             <>
               <h3 style={{
-                margin: '0 0 16px 0',
+                margin: '0 0 20px 0',
                 fontSize: '18px',
                 fontWeight: '600',
                 color: colors.text
               }}>
-                {t('commandSend')}
+                {t('commandCustom')}
               </h3>
               
               <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: colors.textSecondary
-                }}>
-                  {t('commandCustom')}
-                </label>
                 <input
                   type="text"
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={t('commandCustomPlaceholder')}
                   disabled={loading}
                   style={{
                     width: '100%',
@@ -189,7 +179,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                     padding: '10px 20px',
                     border: 'none',
                     borderRadius: '8px',
-                    backgroundColor: loading ? colors.border : '#EF4444',
+                    backgroundColor: loading ? colors.border : '#3B82F6',
                     color: 'white',
                     cursor: (loading || !command.trim()) ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
@@ -270,7 +260,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                     padding: '10px 20px',
                     border: 'none',
                     borderRadius: '8px',
-                    backgroundColor: '#EF4444',
+                    backgroundColor: '#3B82F6',
                     color: 'white',
                     cursor: 'pointer',
                     fontSize: '14px',
