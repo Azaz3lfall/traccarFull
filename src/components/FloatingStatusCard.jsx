@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { devicesActions, geofencesActions, errorsActions } from '../store';
+import {
+  devicesActions,
+  geofencesActions,
+  errorsActions,
+  sessionActions
+} from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
@@ -42,8 +47,7 @@ import {
   X,
   ChevronLeft,
   Loader2,
-  Settings,
-  RefreshCw
+  Settings
 } from 'lucide-react';
 import { Card } from './ui/card';
 
@@ -75,7 +79,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showReplayPopover, setShowReplayPopover] = useState(false);
-  const [previousDeviceId, setPreviousDeviceId] = useState(null);
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
@@ -410,11 +413,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
     }
   }, [selectedDeviceId, device, getCustomCommands, t, dispatch]);
 
+  // Clear replay positions when device selection changes
+  useEffect(() => {
+    dispatch(sessionActions.updateReplayPositions([]));
+  }, [selectedDeviceId, dispatch]);
+
   // Replay form handlers
   const handleReplayShow = useCallback(async () => {
     if (!replayDeviceId) return;
 
     setReplayLoading(true);
+    dispatch(sessionActions.updateReplayPositions([])); // Clear previous positions when starting new search
     try {
       let selectedFrom;
       let selectedTo;
@@ -461,12 +470,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
       const response = await fetchOrThrow(`/api/positions?${query.toString()}`);
       const positions = await response.json();
       
-      console.log('Replay API Response:', positions);
-      console.log('Number of positions:', positions.length);
-      
-      if (!positions.length) {
-        console.log('No data found for the selected period');
-      }
+             console.log('Replay API Response:', positions);
+             console.log('Number of positions:', positions.length);
+             
+             // Store positions for map plotting
+             dispatch(sessionActions.updateReplayPositions(positions));
+             
+             if (!positions.length) {
+               console.log('No data found for the selected period');
+             }
       
     } catch (error) {
       console.error('Error fetching replay data:', error);
@@ -893,23 +905,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               
               {/* Button 3 - Refresh (Outlined) */}
               <button
-                onClick={() => {
-                  // Store the current deviceId before clearing it
-                  setPreviousDeviceId(selectedDeviceId);
-                  setReplayDeviceId(selectedDeviceId);
-                  
-                  // Clear device selection and hide device list
-                  dispatch(devicesActions.selectId(null));
-                  onHideDeviceList();
-                  
-                  // Initialize form with current time
-                  const now = dayjs();
-                  setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
-                  setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
-                  
-                  // Show popover
-                  setShowReplayPopover(true);
-                }}
+           onClick={() => {
+             // Store the current deviceId for replay
+             setReplayDeviceId(selectedDeviceId);
+             
+             // Clear device selection and hide device list
+             dispatch(devicesActions.selectId(null));
+             onHideDeviceList();
+             
+             // Initialize form with current time
+             const now = dayjs();
+             setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
+             setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
+             
+             // Show popover
+             setShowReplayPopover(true);
+           }}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1985,20 +1996,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               gap: '12px',
               marginTop: '8px'
             }}>
-              <button
-                onClick={() => setShowReplayPopover(false)}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.border}`,
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s'
-                }}
+                       <button
+                         onClick={() => {
+                           setShowReplayPopover(false);
+                           dispatch(sessionActions.updateReplayPositions([])); // Clear replay positions when closing
+                         }}
+                         style={{
+                           flex: 1,
+                           padding: '12px 20px',
+                           borderRadius: '8px',
+                           border: `1px solid ${colors.border}`,
+                           backgroundColor: colors.surface,
+                           color: colors.text,
+                           cursor: 'pointer',
+                           fontSize: '14px',
+                           fontWeight: '500',
+                           transition: 'all 0.2s'
+                         }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
                   e.target.style.borderColor = colors.primary;

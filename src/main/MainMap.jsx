@@ -14,12 +14,16 @@ import MapLiveRoutes from '../map/main/MapLiveRoutes';
 import MapPositions from '../map/MapPositions';
 import MapOverlay from '../map/overlay/MapOverlay';
 import MapScale from '../map/MapScale';
+import MapRoutePath from '../map/MapRoutePath';
+import MapRoutePoints from '../map/MapRoutePoints';
+import MapCamera from '../map/MapCamera';
 
 const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const replayPositions = useSelector((state) => state.session.replayPositions);
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
@@ -50,6 +54,14 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         <MapDefaultCamera />
         <MapSelectedDevice />
         <PoiMap />
+        {/* Replay components - only show when we have replay positions */}
+        {replayPositions.length > 0 && (
+          <>
+            <MapRoutePath positions={replayPositions} />
+            <MapRoutePoints positions={replayPositions} />
+            <MapCamera positions={replayPositions} />
+          </>
+        )}
       </MapView>
       <MapScale />
       {desktop && (

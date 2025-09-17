@@ -10,6 +10,7 @@ const { reducer, actions } = createSlice({
     logs: [],
     positions: {},
     history: {},
+    replayPositions: [],
   },
   reducers: {
     updateServer(state, action) {
@@ -45,6 +46,9 @@ const { reducer, actions } = createSlice({
           state.history = {};
         }
       });
+    },
+    updateReplayPositions(state, action) {
+      state.replayPositions = action.payload;
     },
   },
 });
