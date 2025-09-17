@@ -791,6 +791,15 @@ const MainPage = () => {
     }
   }, [isDeviceListVisible, desktop, refreshDevices]);
 
+  // Force re-filter when devices are loaded (for mobile empty list issue)
+  useEffect(() => {
+    if (devices && Object.keys(devices).length > 0 && filteredDevices.length === 0) {
+      console.log('MainPage: Devices loaded but filteredDevices empty, forcing re-filter');
+      // Trigger a re-filter by updating keyword (this will cause useFilter to run again)
+      setKeyword(prev => prev + '');
+    }
+  }, [devices, filteredDevices.length, setKeyword]);
+
   return (
     <div className={classes.root}>
       {desktop && (

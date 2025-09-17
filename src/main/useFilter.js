@@ -7,6 +7,12 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
   const devices = useSelector((state) => state.devices.items);
 
   useEffect(() => {
+    // Don't filter if devices are not loaded yet
+    if (!devices || Object.keys(devices).length === 0) {
+      console.log('useFilter: No devices loaded yet, skipping filter');
+      return;
+    }
+
     const deviceGroups = (device) => {
       const groupIds = [];
       let { groupId } = device;
@@ -38,6 +44,14 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       default:
         break;
     }
+    
+    console.log('useFilter: Filtering devices', { 
+      totalDevices: Object.keys(devices).length, 
+      filteredCount: filtered.length,
+      keyword,
+      filter 
+    });
+    
     setFilteredDevices(filtered);
     setFilteredPositions(filterMap
       ? filtered.map((device) => positions[device.id]).filter(Boolean)
