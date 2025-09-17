@@ -719,15 +719,6 @@ const LoginPage = () => {
                 <X size={20} />
               </button>
 
-              {/* Title */}
-              <h3 style={{
-                margin: '0 0 16px 0',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: colors.text
-              }}>
-                Server QR Code
-              </h3>
 
               {/* QR Code */}
               <div style={{
