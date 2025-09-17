@@ -297,15 +297,17 @@ const FloatingDeviceList = ({
                       margin: 0,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
+                      whiteSpace: 'nowrap',
+                      maxWidth: !desktop ? '120px' : '100px',
+                      flex: '1'
                     }}>
                       {device[devicePrimary] || 'Unknown'}
                     </h3>
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: !desktop ? '6px' : '4px',
-                      flexWrap: 'wrap',
+                      gap: !desktop ? '3px' : '2px',
+                      flexWrap: 'nowrap',
                       justifyContent: 'flex-end',
                       minWidth: !desktop ? '80px' : '60px',
                       paddingRight: '4px'
