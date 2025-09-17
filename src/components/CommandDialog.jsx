@@ -79,8 +79,6 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
     }
   };
 
-  if (!open) return null;
-
   return (
     <AnimatePresence>
       {open && (
