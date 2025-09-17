@@ -288,13 +288,14 @@ const FloatingDeviceList = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '2px'
+                    marginBottom: '1px'
                   }}>
                     <h3 style={{
                       fontSize: '12px',
                       fontWeight: '600',
                       color: colors.textSecondary,
                       margin: 0,
+                      lineHeight: '1.2',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -383,7 +384,7 @@ const FloatingDeviceList = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    marginBottom: '4px'
+                    marginBottom: '2px'
                   }}>
                     <div style={{
                       width: '8px',
@@ -395,6 +396,7 @@ const FloatingDeviceList = ({
                       fontSize: '12px',
                       fontWeight: '500',
                       color: colors.text,
+                      lineHeight: '1.2',
                       textTransform: 'capitalize'
                     }}>
                       {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
