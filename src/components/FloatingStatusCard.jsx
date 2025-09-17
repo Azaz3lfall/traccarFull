@@ -651,7 +651,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             
             {/* Position Attributes */}
             {position && (
-              <div style={{ marginBottom: '16px' }}>
+              <div style={{ marginBottom: '8px' }}>
                 {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
                   const attributeName = positionAttributes[key]?.name || key;
                   const value = position.hasOwnProperty(key) ? position[key] : position.attributes[key];
@@ -661,7 +661,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      padding: '8px 0',
+                      padding: '4px 0',
                       borderBottom: `1px solid ${colors.border}`
                     }}>
                       <span style={{
