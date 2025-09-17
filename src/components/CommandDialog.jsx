@@ -82,43 +82,44 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
   if (!open) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10000,
-          padding: '20px'
-        }}
-        onClick={handleClose}
-      >
+    <AnimatePresence mode="wait">
+      {open && (
         <motion.div
-          initial={{ opacity: 0, y: -50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -50, scale: 0.8 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           style={{
-            backgroundColor: colors.surface,
-            borderRadius: '12px',
-            padding: '24px',
-            minWidth: '320px',
-            maxWidth: '500px',
-            width: '100%',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
-            border: `1px solid ${colors.border}`
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '20px'
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={handleClose}
         >
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 0.8 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '12px',
+              padding: '24px',
+              minWidth: '320px',
+              maxWidth: '500px',
+              width: '100%',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
+              border: `1px solid ${colors.border}`
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
           {!result ? (
             <>
               <h3 style={{
@@ -242,14 +243,6 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                 </h3>
               </div>
               
-              <p style={{
-                margin: '0 0 20px 0',
-                fontSize: '14px',
-                color: colors.textSecondary,
-                lineHeight: '1.5'
-              }}>
-                {result.message}
-              </p>
 
               <div style={{
                 display: 'flex',
@@ -273,8 +266,9 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
               </div>
             </>
           )}
+          </motion.div>
         </motion.div>
-      </motion.div>
+      )}
     </AnimatePresence>
   );
 };
