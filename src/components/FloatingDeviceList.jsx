@@ -311,55 +311,55 @@ const FloatingDeviceList = ({
                       paddingRight: '4px'
                     }}>
                       <div style={{
-                        width: !desktop ? '20px' : '16px',
-                        height: !desktop ? '20px' : '16px',
+                        width: !desktop ? '19px' : '15px',
+                        height: !desktop ? '19px' : '15px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <AlertTriangle style={{ 
-                          width: !desktop ? '18px' : '16px', 
-                          height: !desktop ? '18px' : '16px', 
+                          width: !desktop ? '17px' : '15px', 
+                          height: !desktop ? '17px' : '15px', 
                           color: position?.attributes?.alarm ? '#EF4444' : '#D1D5DB' 
                         }} />
                       </div>
                       <div style={{
-                        width: !desktop ? '20px' : '16px',
-                        height: !desktop ? '20px' : '16px',
+                        width: !desktop ? '19px' : '15px',
+                        height: !desktop ? '19px' : '15px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <EngineIcon style={{ 
-                          width: !desktop ? '18px' : '16px', 
-                          height: !desktop ? '18px' : '16px', 
+                          width: !desktop ? '17px' : '15px', 
+                          height: !desktop ? '17px' : '15px', 
                           color: position?.attributes?.ignition ? '#10B981' : '#D1D5DB' 
                         }} />
                       </div>
                       <div style={{
-                        width: !desktop ? '20px' : '16px',
-                        height: !desktop ? '20px' : '16px',
+                        width: !desktop ? '19px' : '15px',
+                        height: !desktop ? '19px' : '15px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <div style={{
-                          width: !desktop ? '10px' : '8px',
-                          height: !desktop ? '10px' : '8px',
+                          width: !desktop ? '9px' : '7px',
+                          height: !desktop ? '9px' : '7px',
                           borderRadius: '50%',
                           backgroundColor: position?.attributes?.motion ? '#3B82F6' : '#D1D5DB'
                         }} />
                       </div>
                       <div style={{
-                        width: !desktop ? '20px' : '16px',
-                        height: !desktop ? '20px' : '16px',
+                        width: !desktop ? '19px' : '15px',
+                        height: !desktop ? '19px' : '15px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <div style={{
-                          width: !desktop ? '14px' : '12px',
-                          height: !desktop ? '10px' : '8px',
+                          width: !desktop ? '13px' : '11px',
+                          height: !desktop ? '9px' : '7px',
                           border: `2px solid ${position?.attributes?.door ? '#10B981' : '#D1D5DB'}`,
                           borderRadius: '2px',
                           position: 'relative'
@@ -368,8 +368,8 @@ const FloatingDeviceList = ({
                             position: 'absolute',
                             top: '-2px',
                             right: '-2px',
-                            width: !desktop ? '5px' : '4px',
-                            height: !desktop ? '5px' : '4px',
+                            width: !desktop ? '4px' : '3px',
+                            height: !desktop ? '4px' : '3px',
                             backgroundColor: position?.attributes?.door ? '#10B981' : '#D1D5DB',
                             borderRadius: '50%'
                           }} />
