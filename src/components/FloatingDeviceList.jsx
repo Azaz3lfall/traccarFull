@@ -395,12 +395,22 @@ const FloatingDeviceList = ({
                     <span style={{
                       fontSize: '12px',
                       fontWeight: '500',
-                      color: colors.text,
+                      color: colors.textSecondary,
                       lineHeight: '1.2',
                       textTransform: 'capitalize'
                     }}>
                       {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
                     </span>
+                  </div>
+                  
+                  {/* Last Update */}
+                  <div style={{
+                    fontSize: '11px',
+                    color: colors.textSecondary,
+                    lineHeight: '1.2',
+                    marginBottom: '2px'
+                  }}>
+                    {formatLastUpdate(device)}
                   </div>
                 </div>
               </div>
