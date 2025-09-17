@@ -6,18 +6,21 @@ import { useThemeColors } from '../common/components/ThemeProvider';
 import { devicesActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 
-// Add CSS animation for spinner
-const spinnerStyle = `
+// Add CSS animation for spinner and input styling
+const cssStyle = `
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  .command-input::placeholder {
+    color: var(--text-secondary);
   }
 `;
 
 // Inject the CSS
 if (typeof document !== 'undefined') {
   const style = document.createElement('style');
-  style.textContent = spinnerStyle;
+  style.textContent = cssStyle;
   document.head.appendChild(style);
 }
 
@@ -136,6 +139,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                   onChange={(e) => setCommand(e.target.value)}
                   onKeyPress={handleKeyPress}
                   disabled={loading}
+                  className="command-input"
                   style={{
                     width: '100%',
                     padding: '12px',
