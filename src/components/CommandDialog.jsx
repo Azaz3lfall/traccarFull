@@ -152,7 +152,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
 
               <div style={{
                 display: 'flex',
-                gap: '12px',
+                gap: '16px',
                 justifyContent: 'flex-end'
               }}>
                 <button
@@ -177,10 +177,10 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                   disabled={loading || !command.trim()}
                   style={{
                     padding: '10px 20px',
-                    border: 'none',
+                    border: `1px solid #3B82F6`,
                     borderRadius: '8px',
-                    backgroundColor: loading ? colors.border : '#3B82F6',
-                    color: 'white',
+                    backgroundColor: 'transparent',
+                    color: '#3B82F6',
                     cursor: (loading || !command.trim()) ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
                     fontWeight: '500',
@@ -250,10 +250,10 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
                   onClick={handleClose}
                   style={{
                     padding: '10px 20px',
-                    border: 'none',
+                    border: `1px solid #3B82F6`,
                     borderRadius: '8px',
-                    backgroundColor: '#3B82F6',
-                    color: 'white',
+                    backgroundColor: 'transparent',
+                    color: '#3B82F6',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500'
