@@ -290,22 +290,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
 
                 {/* Column 2: Device Name, Status, Address */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {/* Chevron and uniqueId on first line */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {/* Chevron placeholder for alignment */}
-                    <div style={{ width: '20px' }} />
-                    
-                    {/* uniqueId */}
-                    <span style={{ 
-                      fontSize: '12px', 
-                      color: colors.textSecondary, 
-                      fontWeight: '500',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0
-                    }}>
-                      {device.uniqueId}
-                    </span>
-                  </div>
+                  {/* Chevron placeholder for alignment */}
+                  <div style={{ width: '20px' }} />
 
                   {/* Device Name centered */}
                   <h3 style={{
@@ -350,22 +336,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               <>
                 {/* Chevron and uniqueId on first line, Device Name below */}
                 <div style={{ marginBottom: '16px' }}>
-                  {/* Chevron and uniqueId on first line */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                    {/* Chevron placeholder for alignment */}
-                    <div style={{ width: '20px' }} />
-                    
-                    {/* uniqueId */}
-                    <span style={{ 
-                      fontSize: '14px', 
-                      color: colors.textSecondary, 
-                      fontWeight: '500',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0
-                    }}>
-                      {device.uniqueId}
-                    </span>
-                  </div>
+                  {/* Chevron placeholder for alignment */}
+                  <div style={{ width: '20px', marginBottom: '8px' }} />
 
                   {/* Device Name centered */}
                   <h3 style={{
