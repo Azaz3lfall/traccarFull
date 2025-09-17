@@ -21,6 +21,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import CommandDialog from './CommandDialog';
+import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -58,6 +59,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [showCommandDialog, setShowCommandDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -615,6 +617,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               
               {/* Button 5 - Share (Outlined) */}
               <button
+                onClick={() => setShowShareDialog(true)}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1315,6 +1318,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
       <CommandDialog
         open={showCommandDialog}
         onClose={() => setShowCommandDialog(false)}
+        deviceId={device?.id}
+      />
+      
+      {/* Share Dialog */}
+      <ShareDialog
+        open={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
         deviceId={device?.id}
       />
     </AnimatePresence>
