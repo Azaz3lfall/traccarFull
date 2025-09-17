@@ -303,7 +303,7 @@ const FloatingDeviceList = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '1px'
+                    marginBottom: '3px'
                   }}>
                     <h3 style={{
                       fontSize: '12px',
