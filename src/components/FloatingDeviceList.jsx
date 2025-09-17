@@ -217,12 +217,8 @@ const FloatingDeviceList = ({
     return (
       <div style={style}>
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1, ease: "easeOut" }}
           style={{
             cursor: 'pointer',
-            transition: 'all 0.2s',
             backgroundColor: colors.surface,
             borderRadius: '12px',
             border: isSelected ? '2px solid #3B82F6' : `1px solid ${colors.border}`,
@@ -234,39 +230,6 @@ const FloatingDeviceList = ({
             overflow: 'hidden'
           }}
           onClick={(e) => handleDeviceClick(device.id, e)}
-          onMouseEnter={(e) => {
-            if (!isSelected) {
-              e.target.style.backgroundColor = colors.hover;
-              e.target.style.transform = 'translateY(-1px)';
-              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            // Force reset hover state
-            e.target.style.backgroundColor = isSelected ? colors.surface : colors.surface;
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
-          }}
-          onMouseDown={(e) => {
-            if (!isSelected) {
-              e.target.style.backgroundColor = colors.hover;
-              e.target.style.transform = 'translateY(-1px)';
-              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-            }
-          }}
-          onMouseUp={(e) => {
-            if (!isSelected) {
-              e.target.style.backgroundColor = colors.hover;
-              e.target.style.transform = 'translateY(-1px)';
-              e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-            }
-          }}
-          onBlur={(e) => {
-            // Reset on blur as well
-            e.target.style.backgroundColor = isSelected ? colors.surface : colors.surface;
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
-          }}
         >
           <Card 
             style={{
@@ -511,17 +474,17 @@ const FloatingDeviceList = ({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
           transition={{ duration: 0.1, ease: "easeOut" }}
-      style={{
-        position: 'fixed',
-        top: !desktop ? '0px' : '8px',
-        left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
-        width: !desktop ? '100vw' : '310px',
-        height: !desktop ? '100vh' : 'calc(100vh - 16px)',
-        zIndex: 9999,
-        pointerEvents: 'auto',
-        transition: 'left 0.15s ease'
-      }}
-    >
+          style={{
+            position: 'fixed',
+            top: !desktop ? '0px' : '8px',
+            left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
+            width: !desktop ? '100vw' : '310px',
+            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
+            zIndex: 9999,
+            pointerEvents: 'auto',
+            transition: 'left 0.15s ease'
+          }}
+        >
       <Card style={{
         height: '100%',
         display: 'flex',
