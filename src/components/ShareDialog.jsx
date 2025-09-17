@@ -200,7 +200,13 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                 </div>
               </>
             ) : (
-              <>
+              <motion.div
+                key="result"
+                initial={{ y: -50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 {result.type === 'success' ? (
                   <>
                     <div style={{
@@ -235,14 +241,14 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                       display: 'flex',
                       justifyContent: 'center',
                       marginBottom: '20px',
-                      padding: '20px',
+                      padding: '16px',
                       backgroundColor: 'white',
                       borderRadius: '8px',
                       border: `1px solid ${colors.border}`
                     }}>
                       <QRCode
                         value={shareUrl}
-                        size={200}
+                        size={150}
                         style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
                       />
                     </div>
@@ -378,7 +384,7 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                     </div>
                   </>
                 )}
-              </>
+              </motion.div>
             )}
           </motion.div>
         </motion.div>
