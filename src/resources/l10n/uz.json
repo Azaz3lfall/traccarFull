@@ -201,6 +201,7 @@
   "deviceShare": "Share Device",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "Ulashish URL",
   "deviceShared": "Device Shared",
   "deviceStatus": "Status",
   "deviceStatusOffline": "Offline",

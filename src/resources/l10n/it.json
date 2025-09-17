@@ -201,6 +201,7 @@
   "deviceShare": "Condividi Dispositivo",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "URL di condivisione",
   "deviceShared": "Device Shared",
   "deviceStatus": "Stato",
   "deviceStatusOffline": "Disconnesso",

@@ -201,6 +201,7 @@
   "deviceShare": "Deel apparaat",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "Deel URL",
   "deviceShared": "Device Shared",
   "deviceStatus": "Status",
   "deviceStatusOffline": "Offline",

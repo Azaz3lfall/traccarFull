@@ -201,6 +201,7 @@
   "deviceShare": "Поделиться",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "URL для обмена",
   "deviceShared": "Device Shared",
   "deviceStatus": "Статус",
   "deviceStatusOffline": "Оффлайн",

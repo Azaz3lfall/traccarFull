@@ -201,6 +201,7 @@
   "deviceShare": "Share Device",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "URL chia sẻ",
   "deviceShared": "Device Shared",
   "deviceStatus": "Trạng thái",
   "deviceStatusOffline": "Ngoại tuyến",

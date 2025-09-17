@@ -201,6 +201,7 @@
   "deviceShare": "Διαμοιρασμός Συσκευής",
   "deviceShareConfirm": "Share this device for 24 hours?",
   "deviceShareError": "Share Error",
+  "deviceShareUrl": "URL κοινοποίησης",
   "deviceShared": "Device Shared",
   "deviceStatus": "Κατάσταση",
   "deviceStatusOffline": "Χωρίς σύνδεση",
