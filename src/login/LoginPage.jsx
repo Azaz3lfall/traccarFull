@@ -696,28 +696,6 @@ const LoginPage = () => {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button */}
-              <button
-                onClick={() => setShowQr(false)}
-                style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  background: 'none',
-                  border: 'none',
-                  color: colors.textSecondary,
-                  cursor: 'pointer',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = colors.hover; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
-              >
-                <X size={20} />
-              </button>
 
 
               {/* QR Code */}
