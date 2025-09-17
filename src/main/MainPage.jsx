@@ -784,12 +784,7 @@ const MainPage = () => {
 
   useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
 
-  // Refresh devices when device list becomes visible
-  useEffect(() => {
-    if (isDeviceListVisible && desktop) {
-      refreshDevices();
-    }
-  }, [isDeviceListVisible, desktop, refreshDevices]);
+  // Old desktop-only refresh - now handled by universal refresh below
 
   // Force re-filter when devices are loaded (for mobile empty list issue)
   useEffect(() => {
@@ -799,6 +794,16 @@ const MainPage = () => {
       setKeyword(prev => prev + '');
     }
   }, [devices, filteredDevices.length, setKeyword]);
+
+  // Force refresh devices when device list becomes visible (mobile and desktop)
+  useEffect(() => {
+    if (isDeviceListVisible) {
+      console.log('MainPage: Device list became visible, refreshing devices');
+      refreshDevices();
+      // Also force re-filter by resetting keyword to trigger useFilter
+      setKeyword(prev => prev + '');
+    }
+  }, [isDeviceListVisible, refreshDevices, setKeyword]);
 
   return (
     <div className={classes.root}>
