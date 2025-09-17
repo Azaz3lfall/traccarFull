@@ -288,7 +288,7 @@ const FloatingDeviceList = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '4px'
+                    marginBottom: '2px'
                   }}>
                     <h3 style={{
                       fontSize: '12px',
