@@ -290,23 +290,27 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                           style={{
                             padding: '4px',
                             border: 'none',
-                            backgroundColor: 'transparent',
+                            backgroundColor: copied ? '#10B981' : 'transparent',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: '4px',
-                            transition: 'background-color 0.2s'
+                            transition: 'all 0.2s'
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = colors.hover;
+                            if (!copied) {
+                              e.target.style.backgroundColor = colors.hover;
+                            }
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = 'transparent';
+                            if (!copied) {
+                              e.target.style.backgroundColor = 'transparent';
+                            }
                           }}
                         >
                           {copied ? (
-                            <Check size={16} color={colors.textSecondary} />
+                            <Check size={16} color="white" />
                           ) : (
                             <Copy size={16} color={colors.textSecondary} />
                           )}
