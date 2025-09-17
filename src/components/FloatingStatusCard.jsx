@@ -503,6 +503,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -529,6 +531,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -555,6 +559,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -581,6 +587,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -607,6 +615,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -633,6 +643,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 style={{
                   width: '50px',
                   height: '50px',
+                  minWidth: '50px',
+                  minHeight: '50px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
