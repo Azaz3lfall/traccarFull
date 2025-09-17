@@ -248,7 +248,7 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                     }}>
                       <QRCode
                         value={shareUrl}
-                        size={120}
+                        size={80}
                         style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
                       />
                     </div>
