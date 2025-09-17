@@ -14,7 +14,7 @@ import PositionValue from '../common/components/PositionValue';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import LockIcon from '@mui/icons-material/Lock';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -545,7 +545,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                <LockIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 3 - Upload/Send */}
