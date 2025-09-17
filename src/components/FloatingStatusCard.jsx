@@ -17,6 +17,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -569,14 +570,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 4 - Share */}
+              {/* Button 4 - Share (Outlined) */}
               <button
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: colors.secondary,
+                  border: `1px solid ${colors.textSecondary}`,
+                  backgroundColor: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -586,65 +587,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.secondary;
-                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.backgroundColor = 'transparent';
                 }}
               >
-                <div style={{
-                  width: '16px',
-                  height: '16px',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '2px',
-                    left: '2px',
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#6B7280',
-                    borderRadius: '50%'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    top: '2px',
-                    right: '2px',
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#6B7280',
-                    borderRadius: '50%'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '2px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#6B7280',
-                    borderRadius: '50%'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '8px',
-                    height: '1px',
-                    backgroundColor: '#6B7280'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%) rotate(90deg)',
-                    width: '8px',
-                    height: '1px',
-                    backgroundColor: '#6B7280'
-                  }} />
-                </div>
+                <ShareOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 5 - Refresh */}
