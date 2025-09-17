@@ -17,7 +17,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
+import UploadIcon from '@mui/icons-material/Upload';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -593,7 +593,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   e.target.style.backgroundColor = 'transparent';
                 }}
               >
-                <SendOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                <UploadIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 5 - Share (Outlined) */}
