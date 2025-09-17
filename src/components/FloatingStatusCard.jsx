@@ -245,7 +245,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     alignItems: 'center',
                     justifyContent: 'center',
                     overflow: 'hidden',
-                    border: `2px solid ${getStatusColor(device.status)}`
+                    border: `3px solid ${getStatusColor(device.status)}`
                   }}>
                     <img 
                       style={{ 
@@ -375,7 +375,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
-                border: `2px solid ${getStatusColor(device.status)}`
+                border: `3px solid ${getStatusColor(device.status)}`
               }}>
                 <img 
                   style={{ 
