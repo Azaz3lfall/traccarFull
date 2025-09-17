@@ -291,7 +291,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 {/* Column 2: Device Name, Status, Address */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {/* Chevron and space for alignment */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     {/* Chevron placeholder for alignment */}
                     <div style={{ width: '20px' }} />
                     
@@ -343,7 +343,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 {/* Chevron and uniqueId on first line, Device Name below */}
                 <div style={{ marginBottom: '16px' }}>
                   {/* Chevron and space for alignment */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                     {/* Chevron placeholder for alignment */}
                     <div style={{ width: '20px' }} />
                     
