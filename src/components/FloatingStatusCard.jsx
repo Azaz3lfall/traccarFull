@@ -17,6 +17,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -570,7 +571,32 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 4 - Share (Outlined) */}
+              {/* Button 4 - Send Commands (Outlined) */}
+              <button
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.textSecondary}`,
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+              >
+                <SendOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+              </button>
+              
+              {/* Button 5 - Share (Outlined) */}
               <button
                 style={{
                   width: '40px',
@@ -595,7 +621,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <ShareOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 5 - Refresh */}
+              {/* Button 6 - Refresh */}
               <button
                 style={{
                   width: '40px',
