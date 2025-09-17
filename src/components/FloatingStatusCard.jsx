@@ -15,7 +15,7 @@ import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
-import InfoIcon from '@mui/icons-material/Info';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -229,10 +229,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
 
           {/* Details Button */}
           <button
-            onClick={() => {
-              // TODO: Add details functionality
-              console.log('Details clicked');
-            }}
+            onClick={handleMoreDetails}
             style={{
               position: 'absolute',
               top: !desktop ? '8px' : '12px',
@@ -255,7 +252,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               e.target.style.transform = 'scale(1)';
             }}
           >
-            <InfoIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+            <InfoOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
           </button>
           
           {/* Header */}
