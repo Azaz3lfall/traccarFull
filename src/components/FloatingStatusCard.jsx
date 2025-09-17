@@ -15,6 +15,7 @@ import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
+import InfoIcon from '@mui/icons-material/Info';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -224,6 +225,37 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             }}
           >
             <ChevronLeft size={20} color={colors.textSecondary} />
+          </button>
+
+          {/* Details Button */}
+          <button
+            onClick={() => {
+              // TODO: Add details functionality
+              console.log('Details clicked');
+            }}
+            style={{
+              position: 'absolute',
+              top: !desktop ? '8px' : '12px',
+              right: !desktop ? '2px' : '12px',
+              zIndex: 10,
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+            }}
+          >
+            <InfoIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
           </button>
           
           {/* Header */}
@@ -690,61 +722,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     borderRight: '3px solid transparent',
                     borderBottom: '4px solid #6B7280',
                     transform: 'rotate(45deg)'
-                  }} />
-                </div>
-              </button>
-              
-              {/* Button 6 - More Details (Green) */}
-              <button
-                onClick={handleMoreDetails}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: colors.secondary,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.secondary;
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{
-                  width: '16px',
-                  height: '16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '2px'
-                }}>
-                  <div style={{
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#10B981',
-                    borderRadius: '50%'
-                  }} />
-                  <div style={{
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#10B981',
-                    borderRadius: '50%'
-                  }} />
-                  <div style={{
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: '#10B981',
-                    borderRadius: '50%'
                   }} />
                 </div>
               </button>
