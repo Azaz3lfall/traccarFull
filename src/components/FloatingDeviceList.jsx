@@ -132,10 +132,25 @@ const FloatingDeviceList = ({
   
   
   const formatLastUpdate = useCallback((device) => {
-    if (device.status === 'online' || !device.lastUpdate) {
+    if (!device.lastUpdate) {
       return formatStatus(device.status, t);
     }
-    return dayjs(device.lastUpdate).fromNow();
+    
+    const now = dayjs();
+    const lastUpdate = dayjs(device.lastUpdate);
+    const diffMinutes = now.diff(lastUpdate, 'minute');
+    
+    // For online devices, show time if < 5 minutes, otherwise show status
+    if (device.status === 'online') {
+      if (diffMinutes < 5) {
+        return lastUpdate.fromNow();
+      } else {
+        return formatStatus(device.status, t);
+      }
+    }
+    
+    // For offline/unknown devices, always show time
+    return lastUpdate.fromNow();
   }, [t]);
   
   const getBatteryIcon = useCallback((battery) => {
@@ -1059,4 +1074,5 @@ const FloatingDeviceList = ({
   );
 };
 
+export default FloatingDeviceList;
 export default FloatingDeviceList;
