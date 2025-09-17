@@ -290,31 +290,49 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
 
                 {/* Column 2: Device Name, Status, Address */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {/* Device Name and Status on same line */}
+                  {/* Chevron and uniqueId on first line */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                    <h3 style={{
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      color: colors.text,
-                      margin: 0,
-                      lineHeight: '1.2',
-                      flex: 1
-                    }}>
-                      {device[devicePrimary]}
-                    </h3>
+                    {/* Chevron placeholder for alignment */}
+                    <div style={{ width: '20px' }} />
                     
-                    {/* Status */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: getStatusColor(device.status)
-                      }} />
-                      <span style={{ fontSize: '12px', color: colors.textSecondary, fontWeight: '500' }}>
-                        {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
-                      </span>
-                    </div>
+                    {/* uniqueId */}
+                    <span style={{ 
+                      fontSize: '12px', 
+                      color: colors.textSecondary, 
+                      fontWeight: '500',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}>
+                      {device.uniqueId}
+                    </span>
+                  </div>
+
+                  {/* Device Name centered */}
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: colors.text,
+                    margin: 0,
+                    lineHeight: '1.2',
+                    textAlign: 'center',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {device[devicePrimary]}
+                  </h3>
+
+                  {/* Status */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: getStatusColor(device.status)
+                    }} />
+                    <span style={{ fontSize: '12px', color: colors.textSecondary, fontWeight: '500' }}>
+                      {t(`deviceStatus${device.status.charAt(0).toUpperCase() + device.status.slice(1)}`)}
+                    </span>
                   </div>
 
                   {/* Address */}
@@ -333,14 +351,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             ) : (
               /* Desktop Layout - Original */
               <>
-                {/* Device Name */}
-                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                {/* Chevron and uniqueId on first line, Device Name below */}
+                <div style={{ marginBottom: '16px' }}>
+                  {/* Chevron and uniqueId on first line */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '8px' }}>
+                    {/* Chevron placeholder for alignment */}
+                    <div style={{ width: '20px' }} />
+                    
+                    {/* uniqueId */}
+                    <span style={{ 
+                      fontSize: '14px', 
+                      color: colors.textSecondary, 
+                      fontWeight: '500',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}>
+                      {device.uniqueId}
+                    </span>
+                  </div>
+
+                  {/* Device Name centered */}
                   <h3 style={{
                     fontSize: '20px',
                     fontWeight: '700',
                     color: colors.text,
                     margin: 0,
-                    lineHeight: '1.2'
+                    lineHeight: '1.2',
+                    textAlign: 'center',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}>
                     {device[devicePrimary]}
                   </h3>
