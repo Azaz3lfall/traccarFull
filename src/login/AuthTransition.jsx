@@ -2,8 +2,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useRef, useEffect, useState } from 'react';
-import { Sun, Moon, QrCode, Lock, ChevronLeft } from 'lucide-react';
+import { Sun, Moon, QrCode, Lock, ChevronLeft, X, Copy, Check } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
+import QRCode from 'react-qr-code';
 import { useLocalization, useTranslation } from '../common/components/LocalizationProvider';
 import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
 import LoginLayout from './LoginLayout';
@@ -56,6 +57,8 @@ const AuthTransition = ({ children }) => {
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
   
   const [direction, setDirection] = useState('forward');
+  const [showQrCode, setShowQrCode] = useState(false);
+  const [copied, setCopied] = useState(false);
   const prevPathname = useRef(location.pathname);
 
   const languageList = Object.entries(languages).map((values) => ({ 
@@ -74,6 +77,38 @@ const AuthTransition = ({ children }) => {
 
   const handleThemeToggle = () => {
     setLocalTheme(currentTheme === 'light' ? 'dark' : 'light');
+  };
+
+  // Get the current server URL
+  const getServerUrl = () => {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+    
+    // If we're in development, use the proxy URL
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `${protocol}//${hostname}:${port}`;
+    }
+    
+    // For production, use the current URL
+    return `${protocol}//${hostname}${port ? ':' + port : ''}`;
+  };
+
+  const serverUrl = getServerUrl();
+
+  const handleQrCodeClick = () => {
+    setShowQrCode(true);
+    setCopied(false);
+  };
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(serverUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
   };
 
   // Track navigation direction
@@ -159,8 +194,8 @@ const AuthTransition = ({ children }) => {
           <button 
             data-control-button
             style={styles.iconButton}
-            onClick={() => {/* QR Code functionality */}}
-            title="QR Code"
+            onClick={handleQrCodeClick}
+            title="Show QR Code"
             onMouseEnter={(e) => { e.target.style.backgroundColor = colors.menuHover; }}
             onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
             onMouseDown={(e) => { e.target.style.backgroundColor = colors.menuHover; }}
@@ -217,6 +252,159 @@ const AuthTransition = ({ children }) => {
       </div>
 
       {children}
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQrCode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: '20px'
+            }}
+            onClick={() => setShowQrCode(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '16px',
+                padding: '24px',
+                maxWidth: '400px',
+                width: '100%',
+                textAlign: 'center',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: `1px solid ${colors.border}`
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowQrCode(false)}
+                style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'none',
+                  border: 'none',
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = colors.hover; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
+              >
+                <X size={20} />
+              </button>
+
+              {/* Title */}
+              <h3 style={{
+                margin: '0 0 16px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text
+              }}>
+                Server QR Code
+              </h3>
+
+              {/* QR Code */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '16px',
+                padding: '16px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <QRCode
+                  value={serverUrl}
+                  size={200}
+                  style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                />
+              </div>
+
+              {/* Server URL */}
+              <div style={{
+                marginBottom: '16px',
+                padding: '12px',
+                backgroundColor: colors.secondary,
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <p style={{
+                  margin: '0 0 8px 0',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: colors.textSecondary
+                }}>
+                  Server URL:
+                </p>
+                <p style={{
+                  margin: 0,
+                  fontSize: '12px',
+                  color: colors.text,
+                  wordBreak: 'break-all',
+                  fontFamily: 'monospace'
+                }}>
+                  {serverUrl}
+                </p>
+              </div>
+
+              {/* Copy button */}
+              <button
+                onClick={handleCopyUrl}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: copied ? '#10B981' : colors.primary,
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (!copied) {
+                    e.target.style.backgroundColor = colors.primaryHover || colors.primary;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!copied) {
+                    e.target.style.backgroundColor = colors.primary;
+                  }
+                }}
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied!' : 'Copy URL'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
