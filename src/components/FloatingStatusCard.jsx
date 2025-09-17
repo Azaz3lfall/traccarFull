@@ -75,6 +75,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showReplayPopover, setShowReplayPopover] = useState(false);
+  const [previousDeviceId, setPreviousDeviceId] = useState(null);
+  
+  // Replay form states
+  const [replayDeviceId, setReplayDeviceId] = useState(null);
+  const [period, setPeriod] = useState('today');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
+  const [replayLoading, setReplayLoading] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -401,6 +409,71 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
       setIsLockClosedLoading(false);
     }
   }, [selectedDeviceId, device, getCustomCommands, t, dispatch]);
+
+  // Replay form handlers
+  const handleReplayShow = useCallback(async () => {
+    if (!replayDeviceId) return;
+
+    setReplayLoading(true);
+    try {
+      let selectedFrom;
+      let selectedTo;
+      
+      switch (period) {
+        case 'today':
+          selectedFrom = dayjs().startOf('day');
+          selectedTo = dayjs().endOf('day');
+          break;
+        case 'yesterday':
+          selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+          selectedTo = dayjs().subtract(1, 'day').endOf('day');
+          break;
+        case 'thisWeek':
+          selectedFrom = dayjs().startOf('week');
+          selectedTo = dayjs().endOf('week');
+          break;
+        case 'previousWeek':
+          selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+          selectedTo = dayjs().subtract(1, 'week').endOf('week');
+          break;
+        case 'thisMonth':
+          selectedFrom = dayjs().startOf('month');
+          selectedTo = dayjs().endOf('month');
+          break;
+        case 'previousMonth':
+          selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+          selectedTo = dayjs().subtract(1, 'month').endOf('month');
+          break;
+        default:
+          selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+          selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+          break;
+      }
+
+      const query = new URLSearchParams({
+        deviceId: replayDeviceId,
+        from: selectedFrom.toISOString(),
+        to: selectedTo.toISOString()
+      });
+
+      console.log('Replay API Call:', `/api/positions?${query.toString()}`);
+      
+      const response = await fetchOrThrow(`/api/positions?${query.toString()}`);
+      const positions = await response.json();
+      
+      console.log('Replay API Response:', positions);
+      console.log('Number of positions:', positions.length);
+      
+      if (!positions.length) {
+        console.log('No data found for the selected period');
+      }
+      
+    } catch (error) {
+      console.error('Error fetching replay data:', error);
+    } finally {
+      setReplayLoading(false);
+    }
+  }, [replayDeviceId, period, customFrom, customTo]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -821,8 +894,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               {/* Button 3 - Refresh (Outlined) */}
               <button
                 onClick={() => {
+                  // Store the current deviceId before clearing it
+                  setPreviousDeviceId(selectedDeviceId);
+                  setReplayDeviceId(selectedDeviceId);
+                  
+                  // Clear device selection and hide device list
                   dispatch(devicesActions.selectId(null));
                   onHideDeviceList();
+                  
+                  // Initialize form with current time
+                  const now = dayjs();
+                  setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
+                  setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
+                  
+                  // Show popover
                   setShowReplayPopover(true);
                 }}
                 style={{
@@ -1675,8 +1760,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
             position: 'fixed',
             top: '10px',
             left: `${(isMenuExpanded ? 200 : 63) + 8}px`,
-            width: '450px',
-            height: '300px',
+            width: '300px',
+            height: 'auto',
+            maxHeight: '80vh',
             zIndex: 10000,
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
@@ -1702,7 +1788,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               margin: 0,
               fontSize: '18px',
               fontWeight: '600',
-              color: colors.textPrimary
+              color: colors.text
             }}>
               {t('reportReplay')}
             </h3>
@@ -1722,7 +1808,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               }}
               onMouseEnter={(e) => {
                 e.target.style.backgroundColor = colors.hover;
-                e.target.style.color = colors.textPrimary;
+                e.target.style.color = colors.text;
               }}
               onMouseLeave={(e) => {
                 e.target.style.backgroundColor = 'transparent';
@@ -1733,55 +1819,171 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
             </button>
           </div>
 
-          {/* Content */}
+          {/* Content - Replay Form */}
           <div
             style={{
               flex: 1,
               padding: '20px',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '20px'
+              gap: '16px',
+              overflowY: 'auto'
             }}
           >
-            <div style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              backgroundColor: colors.primary + '20',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.primary
-            }}>
-              <RefreshCw size={24} />
-            </div>
-            
-            <div style={{ textAlign: 'center' }}>
-              <h4 style={{
-                margin: '0 0 8px 0',
-                fontSize: '16px',
-                fontWeight: '600',
-                color: colors.textPrimary
-              }}>
-                {t('reportReplay')}
-              </h4>
-              <p style={{
-                margin: 0,
+            {/* Device Selection */}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
                 fontSize: '14px',
-                color: colors.textSecondary,
-                lineHeight: '1.5'
+                fontWeight: '500',
+                color: colors.text
               }}>
-                Device selection cleared and device list hidden
-              </p>
+                {t('reportDevice')}
+              </label>
+              <select
+                value={replayDeviceId || ''}
+                onChange={(e) => setReplayDeviceId(Number(e.target.value))}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  Select Device
+                </option>
+                {Object.values(devices).map((device) => (
+                  <option 
+                    key={device.id} 
+                    value={device.id}
+                    style={{ backgroundColor: colors.surface, color: colors.text }}
+                  >
+                    {device.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
+            {/* Period Selection */}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: colors.text
+              }}>
+                {t('reportPeriod')}
+              </label>
+              <select
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="today" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportToday')}
+                </option>
+                <option value="yesterday" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportYesterday')}
+                </option>
+                <option value="thisWeek" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportThisWeek')}
+                </option>
+                <option value="previousWeek" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportPreviousWeek')}
+                </option>
+                <option value="thisMonth" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportThisMonth')}
+                </option>
+                <option value="previousMonth" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportPreviousMonth')}
+                </option>
+                <option value="custom" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('reportCustom')}
+                </option>
+              </select>
+            </div>
+
+            {/* Date/Time Inputs */}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: colors.text
+              }}>
+                {t('reportFrom')}
+              </label>
+              <input
+                type="datetime-local"
+                value={customFrom}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                disabled={period !== 'custom'}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: period === 'custom' ? colors.surface : colors.background,
+                  color: period === 'custom' ? colors.text : colors.textSecondary,
+                  fontSize: '14px',
+                  cursor: period === 'custom' ? 'text' : 'not-allowed',
+                  opacity: period === 'custom' ? 1 : 0.6,
+                  colorScheme: colors.surface === '#1F2937' ? 'dark' : 'light'
+                }}
+              />
+            </div>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: colors.text
+              }}>
+                {t('reportTo')}
+              </label>
+              <input
+                type="datetime-local"
+                value={customTo}
+                onChange={(e) => setCustomTo(e.target.value)}
+                disabled={period !== 'custom'}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: period === 'custom' ? colors.surface : colors.background,
+                  color: period === 'custom' ? colors.text : colors.textSecondary,
+                  fontSize: '14px',
+                  cursor: period === 'custom' ? 'text' : 'not-allowed',
+                  opacity: period === 'custom' ? 1 : 0.6,
+                  colorScheme: colors.surface === '#1F2937' ? 'dark' : 'light'
+                }}
+              />
+            </div>
+
+            {/* Action Buttons */}
             <div style={{
               display: 'flex',
               gap: '12px',
-              width: '100%',
-              maxWidth: '300px'
+              marginTop: '8px'
             }}>
               <button
                 onClick={() => setShowReplayPopover(false)}
@@ -1790,8 +1992,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
                   padding: '12px 20px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.border}`,
-                  backgroundColor: 'transparent',
-                  color: colors.textSecondary,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
@@ -1799,38 +2001,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.color = colors.textPrimary;
+                  e.target.style.borderColor = colors.primary;
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.color = colors.textSecondary;
+                  e.target.style.backgroundColor = colors.surface;
+                  e.target.style.borderColor = colors.border;
                 }}
               >
                 {t('sharedCancel')}
               </button>
               
               <button
-                onClick={() => setShowReplayPopover(false)}
+                onClick={handleReplayShow}
+                disabled={!replayDeviceId || replayLoading}
                 style={{
                   flex: 1,
                   padding: '12px 20px',
                   borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: colors.primary,
-                  color: 'white',
-                  cursor: 'pointer',
+                  border: `1px solid ${replayLoading || !replayDeviceId ? colors.border : '#3B82F6'}`,
+                  backgroundColor: 'transparent',
+                  color: replayLoading || !replayDeviceId ? colors.textSecondary : '#3B82F6',
+                  cursor: replayLoading || !replayDeviceId ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  opacity: replayLoading || !replayDeviceId ? 0.6 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.primaryHover;
+                  if (!replayLoading && replayDeviceId) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#3B82F6';
+                    e.target.style.borderColor = '#3B82F6';
+                    e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.primary;
+                  if (!replayLoading && replayDeviceId) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#3B82F6';
+                    e.target.style.borderColor = '#3B82F6';
+                    e.target.style.boxShadow = 'none';
+                  }
                 }}
               >
-                OK
+                {replayLoading ? (
+                  <>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    Loading...
+                  </>
+                ) : (
+                  t('reportShow')
+                )}
               </button>
             </div>
           </div>
