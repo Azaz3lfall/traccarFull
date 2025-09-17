@@ -314,10 +314,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     color: colors.text,
                     margin: 0,
                     lineHeight: '1.2',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    textAlign: 'center'
                   }}>
                     {device[devicePrimary]}
                   </h3>
@@ -377,10 +374,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                     color: colors.text,
                     margin: 0,
                     lineHeight: '1.2',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    textAlign: 'center'
                   }}>
                     {device[devicePrimary]}
                   </h3>
