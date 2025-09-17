@@ -1,18 +1,31 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { devicesActions } from '../store';
+import { useQueryClient } from '@tanstack/react-query';
+import { devicesActions, geofencesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useDeviceReadonly } from '../common/util/permissions';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
 import fetchOrThrow from '../common/util/fetchOrThrow';
-import { formatPercentage, formatStatus, formatSpeed, formatDistance, formatCoordinate, formatTime, formatCourse, formatAltitude, formatVoltage, formatVolume, formatBoolean, formatAlarm, formatNumber, formatNumericHours } from '../common/util/formatter';
+import {
+  formatPercentage,
+  formatSpeed,
+  formatDistance,
+  formatCoordinate,
+  formatTime,
+  formatCourse,
+  formatAltitude,
+  formatVoltage,
+  formatVolume,
+  formatBoolean,
+  formatAlarm,
+  formatNumber,
+  formatNumericHours
+} from '../common/util/formatter';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
-import PositionValue from '../common/components/PositionValue';
-import { mapIconKey, mapIcons } from '../map/core/preloadImages';
-import EngineIcon from '../resources/images/data/engine.svg?react';
+import localStorageAsync from '../common/util/localStorageAsync';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -25,13 +38,8 @@ import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
-  MapPin, 
-  Battery, 
-  AlertTriangle,
   Gauge,
   X,
-  ChevronDown,
-  ChevronUp,
   ChevronLeft,
   Loader2,
   Settings
@@ -42,15 +50,13 @@ dayjs.extend(relativeTime);
 
 const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const t = useTranslation();
   const colors = useThemeColors();
   
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
-  const groups = useSelector((state) => state.groups.items);
-  
-  const [isExpanded, setIsExpanded] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -60,10 +66,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [isSaving, setIsSaving] = useState(false);
   const [showCommandDialog, setShowCommandDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [isAnchored, setIsAnchored] = useState(false);
+  const [anchorGeofenceId, setAnchorGeofenceId] = useState(null);
+  const [isAnchorLoading, setIsAnchorLoading] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
-  const deviceSecondary = useAttributePreference('deviceSecondary', '');
   const speedUnit = useAttributePreference('speedUnit');
   const distanceUnit = useAttributePreference('distanceUnit');
   const altitudeUnit = useAttributePreference('altitudeUnit');
@@ -76,15 +84,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   // Get current device and position
   const device = selectedDeviceId ? devices[selectedDeviceId] : null;
   const position = selectedDeviceId ? positions[selectedDeviceId] : null;
-  const group = device?.groupId ? groups[device.groupId] : null;
+
+  // Check for existing anchor when device changes
+  useEffect(() => {
+    const checkAnchorStatus = async () => {
+      if (!selectedDeviceId) {
+        setIsAnchored(false);
+        setAnchorGeofenceId(null);
+        return;
+      }
+
+      try {
+        const anchorKey = `anchor_${selectedDeviceId}`;
+        const geofenceId = await localStorageAsync.getItem(anchorKey);
+        
+        if (geofenceId) {
+          setIsAnchored(true);
+          setAnchorGeofenceId(geofenceId);
+        } else {
+          setIsAnchored(false);
+          setAnchorGeofenceId(null);
+        }
+      } catch (error) {
+        console.error('Error checking anchor status:', error);
+        setIsAnchored(false);
+        setAnchorGeofenceId(null);
+      }
+    };
+
+    checkAnchorStatus();
+  }, [selectedDeviceId]);
   
   
-  const formatLastUpdate = useCallback((device) => {
-    if (device.status === 'online' || !device.lastUpdate) {
-      return formatStatus(device.status, t);
-    }
-    return dayjs(device.lastUpdate).fromNow();
-  }, [t]);
 
   const handleMoreDetails = useCallback(async () => {
     if (!position || !position.id) return;
@@ -108,9 +139,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     }
   }, [position]);
   
-  const handleClose = useCallback(() => {
-    dispatch(devicesActions.selectId(null));
-  }, [dispatch]);
 
 
   const handleEditField = useCallback((field, currentValue) => {
@@ -156,9 +184,121 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     }
   }, [device?.id, editField, editValue, position?.attributes, distanceUnit]);
   
-  const handleToggleExpand = useCallback(() => {
-    setIsExpanded(!isExpanded);
-  }, [isExpanded]);
+  // Refresh geofences list and map
+  const refreshGeofences = useCallback(async () => {
+    try {
+      const response = await fetchOrThrow('/api/geofences');
+      const geofences = await response.json();
+      dispatch(geofencesActions.refresh(geofences));
+      
+      // Invalidate TanStack Query to refresh FloatingGeofencesPopover
+      queryClient.invalidateQueries(['geofences']);
+    } catch (error) {
+      console.error('Error refreshing geofences:', error);
+    }
+  }, [dispatch, queryClient]);
+
+  // Anchor button handlers
+  const handleCreateAnchor = useCallback(async () => {
+    if (!selectedDeviceId || !position || !device) return;
+
+    setIsAnchorLoading(true);
+    try {
+      // Get current position
+      const lat = position.latitude;
+      const lon = position.longitude;
+
+      // Create geofence
+      const geofencePayload = {
+        name: `Anchor for ${device.name}`,
+        area: `CIRCLE (${lat} ${lon}, 50)`
+      };
+
+      const geofenceResponse = await fetchOrThrow('/api/geofences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geofencePayload),
+      });
+
+      const geofence = await geofenceResponse.json();
+
+      // Create permission
+      const permissionPayload = {
+        deviceId: selectedDeviceId,
+        geofenceId: geofence.id
+      };
+
+      try {
+        await fetchOrThrow('/api/permissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(permissionPayload),
+        });
+      } catch (permissionError) {
+        // If permission creation fails, clean up the geofence
+        try {
+          await fetchOrThrow(`/api/geofences/${geofence.id}`, {
+            method: 'DELETE',
+          });
+        } catch (cleanupError) {
+          console.error('Error cleaning up geofence after permission failure:', cleanupError);
+        }
+        throw permissionError;
+      }
+
+      // Save to localStorage
+      const anchorKey = `anchor_${selectedDeviceId}`;
+      await localStorageAsync.setItem(anchorKey, geofence.id);
+
+      // Update state
+      setIsAnchored(true);
+      setAnchorGeofenceId(geofence.id);
+
+      // Refresh geofences list and map
+      await refreshGeofences();
+
+    } catch (error) {
+      console.error('Error creating anchor:', error);
+    } finally {
+      setIsAnchorLoading(false);
+    }
+  }, [selectedDeviceId, position, device, refreshGeofences]);
+
+  const handleDeleteAnchor = useCallback(async () => {
+    if (!selectedDeviceId || !anchorGeofenceId) return;
+
+    setIsAnchorLoading(true);
+    try {
+      // Delete geofence
+      await fetchOrThrow(`/api/geofences/${anchorGeofenceId}`, {
+        method: 'DELETE',
+      });
+
+      // Remove from localStorage
+      const anchorKey = `anchor_${selectedDeviceId}`;
+      await localStorageAsync.removeItem(anchorKey);
+
+      // Update state
+      setIsAnchored(false);
+      setAnchorGeofenceId(null);
+
+      // Refresh geofences list and map
+      await refreshGeofences();
+
+    } catch (error) {
+      console.error('Error deleting anchor:', error);
+    } finally {
+      setIsAnchorLoading(false);
+    }
+  }, [selectedDeviceId, anchorGeofenceId, refreshGeofences]);
+
+  const handleAnchorClick = useCallback(() => {
+    if (isAnchored) {
+      handleDeleteAnchor();
+    } else {
+      handleCreateAnchor();
+    }
+  }, [isAnchored, handleCreateAnchor, handleDeleteAnchor]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -169,11 +309,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     }
   };
   
-  const getBatteryIcon = (level) => {
-    if (level > 75) return <Battery size={16} color="#10B981" />;
-    if (level > 25) return <Battery size={16} color="#F59E0B" />;
-    return <Battery size={16} color="#EF4444" />;
-  };
   
   return (
     <AnimatePresence mode="wait">
@@ -646,30 +781,41 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               
               {/* Button 6 - Anchor (Outlined) */}
               <button
+                onClick={handleAnchorClick}
+                disabled={isAnchorLoading || !position}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
                   minWidth: !desktop ? '50px' : '42px',
                   minHeight: !desktop ? '50px' : '42px',
                   borderRadius: '8px',
-                  border: `1px solid ${colors.textSecondary}`,
-                  backgroundColor: 'transparent',
-                  cursor: 'pointer',
+                  border: `1px solid ${isAnchored ? '#10B981' : colors.textSecondary}`,
+                  backgroundColor: isAnchored ? '#D1FAE5' : 'transparent',
+                  cursor: (isAnchorLoading || !position) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   transition: 'all 0.2s',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  opacity: (isAnchorLoading || !position) ? 0.5 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  if (!isAnchorLoading && position) {
+                    e.target.style.backgroundColor = isAnchored ? '#A7F3D0' : colors.hover;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
+                  if (!isAnchorLoading && position) {
+                    e.target.style.backgroundColor = isAnchored ? '#D1FAE5' : 'transparent';
+                  }
                 }}
               >
-                <AnchorIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                {isAnchorLoading ? (
+                  <Loader2 size={16} color={isAnchored ? '#10B981' : colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <AnchorIcon style={{ fontSize: '20px', color: isAnchored ? '#10B981' : colors.textSecondary }} />
+                )}
               </button>
             </div>
           </div>
@@ -720,7 +866,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                             formatCourse(value, t) :
                           key === 'altitude' ? 
                             formatAltitude(value, altitudeUnit, t) :
-                      key === 'accuracy' || key === 'odometer' || key === 'serviceOdometer' || key === 'tripOdometer' || key === 'obdOdometer' || key === 'distance' || key === 'totalDistance' ? 
+                      key === 'accuracy' || key === 'odometer' || key === 'serviceOdometer' || 
+                      key === 'tripOdometer' || key === 'obdOdometer' || key === 'distance' || 
+                      key === 'totalDistance' ? 
                         formatDistance(value, distanceUnit, t) :
                           key === 'batteryLevel' ? 
                             formatPercentage(value) :
@@ -937,7 +1085,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[property]?.name || property}
                               </div>
-                              <div style={{ color: colors.text, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
+                              <div style={{ 
+                                color: colors.text, 
+                                textAlign: 'right', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'flex-end', 
+                                gap: '8px', 
+                                flexWrap: 'wrap', 
+                                paddingLeft: '16px', 
+                                paddingRight: '8px' 
+                              }}>
                                 <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (property === 'totalDistance' || property === 'hours') ? '4px' : '16px' }}>
                                   {property === 'fixTime' || property === 'deviceTime' || property === 'serverTime' ? 
                                     formatTime(value, 'seconds') :
@@ -947,7 +1105,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                   formatCourse(value, t) :
                                 property === 'altitude' ? 
                                   formatAltitude(value, altitudeUnit, t) :
-                              property === 'accuracy' || property === 'odometer' || property === 'serviceOdometer' || property === 'tripOdometer' || property === 'obdOdometer' || property === 'distance' || property === 'totalDistance' ? 
+                              property === 'accuracy' || property === 'odometer' || property === 'serviceOdometer' || 
+                              property === 'tripOdometer' || property === 'obdOdometer' || property === 'distance' || 
+                              property === 'totalDistance' ? 
                                 formatDistance(value, distanceUnit, t) :
                                   property === 'batteryLevel' ? 
                                     formatPercentage(value) :
@@ -1033,7 +1193,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[attribute]?.name || attribute}
                               </div>
-                              <div style={{ color: colors.text, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', paddingLeft: '16px', paddingRight: '8px' }}>
+                              <div style={{ 
+                                color: colors.text, 
+                                textAlign: 'right', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'flex-end', 
+                                gap: '8px', 
+                                flexWrap: 'wrap', 
+                                paddingLeft: '16px', 
+                                paddingRight: '8px' 
+                              }}>
                                 <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (attribute === 'totalDistance' || attribute === 'hours') ? '4px' : '16px' }}>
                                   {attribute === 'fixTime' || attribute === 'deviceTime' || attribute === 'serverTime' ? 
                                     formatTime(value, 'seconds') :
@@ -1043,8 +1213,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                   formatCourse(value, t) :
                                 attribute === 'altitude' ? 
                                   formatAltitude(value, altitudeUnit, t) :
-                              attribute === 'accuracy' || attribute === 'odometer' || attribute === 'serviceOdometer' || attribute === 'tripOdometer' || attribute === 'obdOdometer' || attribute === 'distance' || attribute === 'totalDistance' ? 
-                                formatDistance(value, distanceUnit, t) :
+                                attribute === 'accuracy' || attribute === 'odometer' || attribute === 'serviceOdometer' || 
+                                attribute === 'tripOdometer' || attribute === 'obdOdometer' || attribute === 'distance' || 
+                                attribute === 'totalDistance' ? 
+                                  formatDistance(value, distanceUnit, t) :
                                   attribute === 'batteryLevel' ? 
                                     formatPercentage(value) :
                                   attribute === 'battery' ? 
