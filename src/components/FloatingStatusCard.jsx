@@ -13,6 +13,8 @@ import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import PositionValue from '../common/components/PositionValue';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LockIcon from '@mui/icons-material/Lock';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -463,13 +465,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               width: '100%',
               marginTop: !desktop ? '12px' : '0px'
             }}>
-              {/* Button 1 - Unlock (Outlined) */}
+              {/* Button 1 - Lock Open (Outlined) */}
               <button
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  border: '2px solid #10B981',
+                  border: `2px solid ${colors.border}`,
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
@@ -479,7 +481,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#10B981';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
@@ -487,18 +489,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 11V7C8 5.93913 8.42143 4.92172 9.17157 4.17157C9.92172 3.42143 10.9391 3 12 3C13.0609 3 14.0783 3.42143 14.8284 4.17157C15.5786 4.92172 16 5.93913 16 7V11M5 11H19C20.1046 11 21 11.8954 21 13V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V13C3 11.8954 3.89543 11 5 11Z" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 2 - Lock (Outlined) */}
+              {/* Button 2 - Lock Closed (Outlined) */}
               <button
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  border: '2px solid #EF4444',
+                  border: `2px solid ${colors.border}`,
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
@@ -508,7 +508,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#EF4444';
+                  e.target.style.backgroundColor = colors.hover;
                   e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
@@ -516,9 +516,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 11V7C8 5.93913 8.42143 4.92172 9.17157 4.17157C9.92172 3.42143 10.9391 3 12 3C13.0609 3 14.0783 3.42143 14.8284 4.17157C15.5786 4.92172 16 5.93913 16 7V11M5 11H19C20.1046 11 21 11.8954 21 13V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V13C3 11.8954 3.89543 11 5 11Z" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <LockIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 3 - Upload/Send */}
