@@ -454,23 +454,6 @@ const FloatingDeviceList = ({
                     t('sharedNoData'))}
                 </p>
               </div>
-              {position && position.attributes?.batteryLevel && (
-                <div style={{
-                  marginTop: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  fontSize: '12px',
-                  color: colors.textSecondary
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {getBatteryIcon(position.attributes.batteryLevel)}
-                      <span>{formatPercentage(position.attributes.batteryLevel)}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </Card>
         </motion.div>
