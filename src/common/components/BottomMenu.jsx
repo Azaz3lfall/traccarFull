@@ -50,30 +50,53 @@ const BottomMenu = () => {
   const handleLogout = async () => {
     setAnchorEl(null);
 
-    const notificationToken = window.localStorage.getItem('notificationToken');
-    if (notificationToken && !user.readonly) {
-      window.localStorage.removeItem('notificationToken');
-      const tokens = user.attributes.notificationTokens?.split(',') || [];
-      if (tokens.includes(notificationToken)) {
-        const updatedUser = {
-          ...user,
-          attributes: {
-            ...user.attributes,
-            notificationTokens: tokens.length > 1 ? tokens.filter((it) => it !== notificationToken).join(',') : undefined,
-          },
-        };
-        await fetch(`/api/users/${user.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedUser),
-        });
+    try {
+      const notificationToken = window.localStorage.getItem('notificationToken');
+      if (notificationToken && !user.readonly) {
+        window.localStorage.removeItem('notificationToken');
+        const tokens = user.attributes.notificationTokens?.split(',') || [];
+        if (tokens.includes(notificationToken)) {
+          const updatedUser = {
+            ...user,
+            attributes: {
+              ...user.attributes,
+              notificationTokens: tokens.length > 1 ? tokens.filter((it) => it !== notificationToken).join(',') : undefined,
+            },
+          };
+          await fetch(`/api/users/${user.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedUser),
+          });
+        }
       }
-    }
 
-    await fetch('/api/session', { method: 'DELETE' });
-    nativePostMessage('logout');
-    navigate('/login');
-    dispatch(sessionActions.updateUser(null));
+      // Delete session
+      const sessionResponse = await fetch('/api/session', { 
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (!sessionResponse.ok) {
+        console.warn('Session deletion failed:', sessionResponse.status);
+      }
+
+      // Clear user data
+      dispatch(sessionActions.updateUser(null));
+      
+      // Send native message
+      nativePostMessage('logout');
+      
+      // Navigate to login
+      navigate('/login');
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if there's an error, still clear the user and navigate to login
+      dispatch(sessionActions.updateUser(null));
+      nativePostMessage('logout');
+      navigate('/login');
+    }
   };
 
   const handleSelection = (event, value) => {

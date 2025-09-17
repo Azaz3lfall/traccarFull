@@ -16,6 +16,7 @@ import { prefixString, unprefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useCatch } from '../reactHelper';
+import { nativePostMessage } from '../common/components/NativeInterface';
 import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
@@ -210,9 +211,36 @@ const MainPage = () => {
   const notificatorsInputRef = useRef(null);
   
   // Logout handlers
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
     setShowLogoutModal(false);
-    window.location.href = '/login';
+    
+    try {
+      // Delete session
+      const sessionResponse = await fetch('/api/session', { 
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (!sessionResponse.ok) {
+        console.warn('Session deletion failed:', sessionResponse.status);
+      }
+
+      // Clear user data
+      dispatch(sessionActions.updateUser(null));
+      
+      // Send native message
+      nativePostMessage('logout');
+      
+      // Navigate to login
+      window.location.href = '/login';
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if there's an error, still clear the user and navigate to login
+      dispatch(sessionActions.updateUser(null));
+      nativePostMessage('logout');
+      window.location.href = '/login';
+    }
   };
 
   const cancelLogout = () => {
