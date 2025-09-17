@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { devicesActions, geofencesActions } from '../store';
+import { devicesActions, geofencesActions, errorsActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
@@ -69,6 +69,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [isAnchored, setIsAnchored] = useState(false);
   const [anchorGeofenceId, setAnchorGeofenceId] = useState(null);
   const [isAnchorLoading, setIsAnchorLoading] = useState(false);
+  const [isLockOpenLoading, setIsLockOpenLoading] = useState(false);
+  const [isLockClosedLoading, setIsLockClosedLoading] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -299,6 +302,68 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
       handleCreateAnchor();
     }
   }, [isAnchored, handleCreateAnchor, handleDeleteAnchor]);
+
+  // Lock open button handler
+  const handleLockOpen = useCallback(async () => {
+    if (!selectedDeviceId) return;
+
+    setIsLockOpenLoading(true);
+    try {
+      const commandPayload = {
+        type: 'engineResume',
+        attributes: {},
+        deviceId: selectedDeviceId
+      };
+
+      const response = await fetchOrThrow('/api/commands/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandPayload),
+      });
+
+      if (response.ok) {
+        // Show success message
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error sending engineResume command:', error);
+      dispatch(errorsActions.push(error.message));
+    } finally {
+      setIsLockOpenLoading(false);
+    }
+  }, [selectedDeviceId, dispatch]);
+
+  // Lock closed button handler
+  const handleLockClosed = useCallback(async () => {
+    if (!selectedDeviceId) return;
+
+    setIsLockClosedLoading(true);
+    try {
+      const commandPayload = {
+        type: 'engineStop',
+        attributes: {},
+        deviceId: selectedDeviceId
+      };
+
+      const response = await fetchOrThrow('/api/commands/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandPayload),
+      });
+
+      if (response.ok) {
+        // Show success message
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error sending engineStop command:', error);
+      dispatch(errorsActions.push(error.message));
+    } finally {
+      setIsLockClosedLoading(false);
+    }
+  }, [selectedDeviceId, dispatch]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -639,6 +704,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
             }}>
               {/* Button 1 - Lock Open (Outlined) */}
               <button
+                onClick={handleLockOpen}
+                disabled={isLockOpenLoading || !selectedDeviceId}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -647,26 +714,37 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
-                  cursor: 'pointer',
+                  cursor: (isLockOpenLoading || !selectedDeviceId) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   transition: 'all 0.2s',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  opacity: (isLockOpenLoading || !selectedDeviceId) ? 0.5 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  if (!isLockOpenLoading && selectedDeviceId) {
+                    e.target.style.backgroundColor = colors.hover;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
+                  if (!isLockOpenLoading && selectedDeviceId) {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
-                <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                {isLockOpenLoading ? (
+                  <Loader2 size={16} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                )}
               </button>
               
               {/* Button 2 - Lock Closed (Outlined) */}
               <button
+                onClick={handleLockClosed}
+                disabled={isLockClosedLoading || !selectedDeviceId}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -675,22 +753,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
-                  cursor: 'pointer',
+                  cursor: (isLockClosedLoading || !selectedDeviceId) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   transition: 'all 0.2s',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  opacity: (isLockClosedLoading || !selectedDeviceId) ? 0.5 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
+                  if (!isLockClosedLoading && selectedDeviceId) {
+                    e.target.style.backgroundColor = colors.hover;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
+                  if (!isLockClosedLoading && selectedDeviceId) {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
-                <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                {isLockClosedLoading ? (
+                  <Loader2 size={16} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                )}
               </button>
               
               {/* Button 3 - Refresh (Outlined) */}
@@ -1499,6 +1586,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
         onClose={() => setShowShareDialog(false)}
         deviceId={device?.id}
       />
+
+      {/* Success Message Snackbar */}
+      {showSuccessMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: '#10B981',
+            color: 'white',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            zIndex: 10003,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          {t('commandQueued')}
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };
