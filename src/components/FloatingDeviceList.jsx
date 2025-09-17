@@ -298,7 +298,7 @@ const FloatingDeviceList = ({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      maxWidth: !desktop ? '120px' : '100px',
+                      maxWidth: !desktop ? '160px' : '140px',
                       flex: '1'
                     }}>
                       {device[devicePrimary] || 'Unknown'}
