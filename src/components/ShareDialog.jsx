@@ -60,8 +60,6 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
     onClose();
   };
 
-  if (!open) return null;
-
   return (
     <AnimatePresence>
       {open && (
