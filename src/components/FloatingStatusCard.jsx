@@ -20,6 +20,7 @@ import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import UploadIcon from '@mui/icons-material/Upload';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import AnchorIcon from '@mui/icons-material/Anchor';
+import CommandDialog from './CommandDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -56,6 +57,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [editField, setEditField] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showCommandDialog, setShowCommandDialog] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -584,6 +586,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               
               {/* Button 4 - Send Commands (Outlined) */}
               <button
+                onClick={() => setShowCommandDialog(true)}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1307,6 +1310,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Command Dialog */}
+      <CommandDialog
+        open={showCommandDialog}
+        onClose={() => setShowCommandDialog(false)}
+        deviceId={device?.id}
+      />
     </AnimatePresence>
   );
 };
