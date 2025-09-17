@@ -645,7 +645,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
           {/* Content */}
           <div style={{
             flex: 1,
-            padding: '8px 16px 16px 16px',
+            padding: '4px 16px 16px 16px',
             overflow: 'auto'
           }}>
             
