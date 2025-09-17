@@ -19,6 +19,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import UploadIcon from '@mui/icons-material/Upload';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import AnchorIcon from '@mui/icons-material/Anchor';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -621,14 +622,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <ShareOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 6 - Refresh */}
+              {/* Button 6 - Anchor (Outlined) */}
               <button
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: colors.secondary,
+                  border: `1px solid ${colors.textSecondary}`,
+                  backgroundColor: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -638,32 +639,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.secondary;
-                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.backgroundColor = 'transparent';
                 }}
               >
-                <div style={{
-                  width: '16px',
-                  height: '16px',
-                  border: '1px solid #6B7280',
-                  borderRadius: '50%',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '2px',
-                    right: '2px',
-                    width: '0',
-                    height: '0',
-                    borderLeft: '3px solid transparent',
-                    borderRight: '3px solid transparent',
-                    borderBottom: '4px solid #6B7280',
-                    transform: 'rotate(45deg)'
-                  }} />
-                </div>
+                <AnchorIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
             </div>
           </div>
