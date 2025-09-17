@@ -1,6 +1,7 @@
 import {
   useState, useCallback, useEffect, useRef, useMemo,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -152,6 +153,7 @@ const useStyles = makeStyles()((theme) => ({
 const MainPage = () => {
   const { classes } = useStyles();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const muiTheme = useTheme();
 
   const desktop = useMediaQuery(muiTheme.breakpoints.up('md'));
@@ -231,15 +233,15 @@ const MainPage = () => {
       // Send native message
       nativePostMessage('logout');
       
-      // Navigate to login
-      window.location.href = '/login';
+      // Navigate to login using React Router
+      navigate('/login');
       
     } catch (error) {
       console.error('Logout error:', error);
       // Even if there's an error, still clear the user and navigate to login
       dispatch(sessionActions.updateUser(null));
       nativePostMessage('logout');
-      window.location.href = '/login';
+      navigate('/login');
     }
   };
 
