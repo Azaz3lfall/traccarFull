@@ -247,14 +247,14 @@ const FloatingDeviceList = ({
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '4px'
+                gap: '2px'
               }}>
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '4px',
-                  paddingLeft: '8px'
+                  paddingLeft: '4px'
                 }}>
                   <div style={{
                     width: '40px',
@@ -308,7 +308,7 @@ const FloatingDeviceList = ({
                       flexWrap: 'wrap',
                       justifyContent: 'flex-end',
                       minWidth: !desktop ? '80px' : '60px',
-                      paddingRight: '8px'
+                      paddingRight: '4px'
                     }}>
                       <div style={{
                         width: !desktop ? '20px' : '16px',
@@ -401,8 +401,8 @@ const FloatingDeviceList = ({
                 </div>
               </div>
               <div style={{
-                paddingLeft: '8px',
-                paddingRight: '8px'
+                paddingLeft: '4px',
+                paddingRight: '4px'
               }}>
                 <p style={{
                   fontSize: '12px',
