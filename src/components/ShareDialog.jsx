@@ -114,7 +114,7 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
               backgroundColor: colors.surface,
               borderRadius: '12px',
               padding: '24px',
-              width: '300px',
+              width: '550px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               border: `1px solid ${colors.border}`
             }}
