@@ -72,6 +72,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [isLockOpenLoading, setIsLockOpenLoading] = useState(false);
   const [isLockClosedLoading, setIsLockClosedLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -303,14 +304,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     }
   }, [isAnchored, handleCreateAnchor, handleDeleteAnchor]);
 
+  // Helper function to get custom commands from device attributes
+  const getCustomCommands = useCallback((device) => {
+    if (!device?.attributes?.customCommands) return null;
+    
+    try {
+      return JSON.parse(device.attributes.customCommands);
+    } catch (error) {
+      console.error('Error parsing customCommands:', error);
+      return null;
+    }
+  }, []);
+
   // Lock open button handler
   const handleLockOpen = useCallback(async () => {
-    if (!selectedDeviceId) return;
+    if (!selectedDeviceId || !device) return;
 
     setIsLockOpenLoading(true);
     try {
+      const customCommands = getCustomCommands(device);
+      let commandType = 'engineResume';
+      let successMessage = t('commandQueued');
+
+      // Check if custom command exists
+      if (customCommands?.engineResume) {
+        commandType = customCommands.engineResume;
+        successMessage = `${t('commandQueued')}: ${customCommands.engineResume}`;
+      }
+
       const commandPayload = {
-        type: 'engineResume',
+        type: commandType,
         attributes: {},
         deviceId: selectedDeviceId
       };
@@ -322,7 +345,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
       });
 
       if (response.ok) {
-        // Show success message
+        // Show success message with custom command info if applicable
+        setSuccessMessage(successMessage);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
       }
@@ -332,16 +356,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     } finally {
       setIsLockOpenLoading(false);
     }
-  }, [selectedDeviceId, dispatch]);
+  }, [selectedDeviceId, device, getCustomCommands, t, dispatch]);
 
   // Lock closed button handler
   const handleLockClosed = useCallback(async () => {
-    if (!selectedDeviceId) return;
+    if (!selectedDeviceId || !device) return;
 
     setIsLockClosedLoading(true);
     try {
+      const customCommands = getCustomCommands(device);
+      let commandType = 'engineStop';
+      let successMessage = t('commandQueued');
+
+      // Check if custom command exists
+      if (customCommands?.engineStop) {
+        commandType = customCommands.engineStop;
+        successMessage = `${t('commandQueued')}: ${customCommands.engineStop}`;
+      }
+
       const commandPayload = {
-        type: 'engineStop',
+        type: commandType,
         attributes: {},
         deviceId: selectedDeviceId
       };
@@ -353,7 +387,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
       });
 
       if (response.ok) {
-        // Show success message
+        // Show success message with custom command info if applicable
+        setSuccessMessage(successMessage);
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
       }
@@ -363,7 +398,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
     } finally {
       setIsLockClosedLoading(false);
     }
-  }, [selectedDeviceId, dispatch]);
+  }, [selectedDeviceId, device, getCustomCommands, t, dispatch]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -1615,7 +1650,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          {t('commandQueued')}
+          {successMessage || t('commandQueued')}
         </motion.div>
       )}
     </AnimatePresence>
