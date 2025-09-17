@@ -259,7 +259,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
           {/* Header */}
           <div style={{
             padding: '20px',
-            borderBottom: `1px solid ${colors.border}`,
             backgroundColor: colors.surface
           }}>
             {!desktop ? (
