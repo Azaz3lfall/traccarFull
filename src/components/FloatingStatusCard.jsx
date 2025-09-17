@@ -510,7 +510,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
@@ -535,7 +536,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
@@ -560,7 +562,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
@@ -585,7 +588,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
@@ -610,7 +614,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
@@ -635,7 +640,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
