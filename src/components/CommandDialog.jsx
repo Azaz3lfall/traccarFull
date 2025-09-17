@@ -152,8 +152,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
 
               <div style={{
                 display: 'flex',
-                gap: '16px',
-                justifyContent: 'flex-end'
+                justifyContent: 'space-between'
               }}>
                 <button
                   onClick={handleClose}
