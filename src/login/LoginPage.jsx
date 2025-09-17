@@ -3,8 +3,9 @@ import ReactCountryFlag from 'react-country-flag';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/button';
 import {
-  Sun, Moon, Eye, EyeOff, Lock, QrCode, User, Key
+  Sun, Moon, Eye, EyeOff, Lock, QrCode, User, Key, X, Copy
 } from 'lucide-react';
+import QRCode from 'react-qr-code';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { sessionActions } from '../store';
@@ -666,28 +667,136 @@ const LoginPage = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 10000
-          }}>
+            zIndex: 10000,
+            padding: '20px'
+          }}
+          onClick={() => setShowQr(false)}
+          >
             <div style={{
-              backgroundColor: '#1F2937',
+              backgroundColor: colors.surface,
               padding: '24px',
-              borderRadius: '12px',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ color: '#F9FAFB', marginBottom: '16px' }}>QR Code</h3>
-              <p style={{ color: '#9CA3AF', marginBottom: '16px' }}>QR Code functionality would go here</p>
+              borderRadius: '16px',
+              textAlign: 'center',
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              border: `1px solid ${colors.border}`,
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
               <button
                 onClick={() => setShowQr(false)}
                 style={{
-                  background: '#3B82F6',
-                  color: '#FFFFFF',
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'none',
                   border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = colors.hover; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
+              >
+                <X size={20} />
+              </button>
+
+              {/* Title */}
+              <h3 style={{
+                margin: '0 0 16px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text
+              }}>
+                Server QR Code
+              </h3>
+
+              {/* QR Code */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '16px',
+                padding: '16px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <QRCode
+                  value={window.location.origin}
+                  size={200}
+                  style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                />
+              </div>
+
+              {/* Server URL */}
+              <div style={{
+                marginBottom: '16px',
+                padding: '12px',
+                backgroundColor: colors.secondary,
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <p style={{
+                  margin: '0 0 8px 0',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: colors.textSecondary
+                }}>
+                  Server URL:
+                </p>
+                <p style={{
+                  margin: 0,
+                  fontSize: '12px',
+                  color: colors.text,
+                  wordBreak: 'break-all',
+                  fontFamily: 'monospace'
+                }}>
+                  {window.location.origin}
+                </p>
+              </div>
+
+              {/* Copy button */}
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.origin);
+                    // You could add a toast notification here
+                  } catch (err) {
+                    console.error('Failed to copy URL:', err);
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: colors.primary,
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.primaryHover || colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = colors.primary;
                 }}
               >
-                Close
+                <Copy size={16} />
+                Copy URL
               </button>
             </div>
           </div>
