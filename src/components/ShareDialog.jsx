@@ -117,6 +117,8 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
               minWidth: '320px',
               maxWidth: '500px',
               width: '100%',
+              maxHeight: '300px',
+              overflow: 'auto',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               border: `1px solid ${colors.border}`
             }}
