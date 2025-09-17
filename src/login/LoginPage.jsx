@@ -3,7 +3,7 @@ import ReactCountryFlag from 'react-country-flag';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/button';
 import {
-  Sun, Moon, Eye, EyeOff, Lock, QrCode, User, Key, X, Copy
+  Sun, Moon, Eye, EyeOff, Lock, QrCode, User, Key, X, Copy, Check
 } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { useDispatch, useSelector } from 'react-redux';
@@ -130,6 +130,7 @@ const LoginPage = () => {
   const [code, setCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
 
@@ -656,34 +657,44 @@ const LoginPage = () => {
           </div>
         )}
       </div>
-        {showQr && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10000,
-            padding: '20px'
-          }}
-          onClick={() => setShowQr(false)}
-          >
-            <div style={{
-              backgroundColor: colors.surface,
-              padding: '24px',
-              borderRadius: '16px',
-              textAlign: 'center',
-              maxWidth: '400px',
-              width: '100%',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              border: `1px solid ${colors.border}`,
-              position: 'relative'
+        <AnimatePresence>
+          {showQr && (
+            <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '20px'
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setShowQr(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -50 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+              style={{
+                backgroundColor: colors.surface,
+                padding: '24px',
+                borderRadius: '16px',
+                textAlign: 'center',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: `1px solid ${colors.border}`,
+                position: 'relative'
+              }}
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
               <button
@@ -767,9 +778,23 @@ const LoginPage = () => {
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(window.location.origin);
-                    // You could add a toast notification here
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
                   } catch (err) {
                     console.error('Failed to copy URL:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = window.location.origin;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                      document.execCommand('copy');
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    } catch (fallbackErr) {
+                      console.error('Fallback copy failed:', fallbackErr);
+                    }
+                    document.body.removeChild(textArea);
                   }
                 }}
                 style={{
@@ -779,7 +804,7 @@ const LoginPage = () => {
                   gap: '8px',
                   width: '100%',
                   padding: '12px 16px',
-                  backgroundColor: colors.primary,
+                  backgroundColor: copied ? '#10B981' : colors.primary,
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -789,18 +814,23 @@ const LoginPage = () => {
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.primaryHover || colors.primary;
+                  if (!copied) {
+                    e.target.style.backgroundColor = colors.primaryHover || colors.primary;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.primary;
+                  if (!copied) {
+                    e.target.style.backgroundColor = colors.primary;
+                  }
                 }}
               >
-                <Copy size={16} />
-                Copy URL
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied!' : 'Copy URL'}
               </button>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          </motion.div>
+          )}
+        </AnimatePresence>
         {announcement && !announcementShown && (
           <div style={{
             position: 'fixed',
