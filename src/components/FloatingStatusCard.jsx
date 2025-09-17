@@ -16,6 +16,7 @@ import EngineIcon from '../resources/images/data/engine.svg?react';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -544,14 +545,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
-              {/* Button 3 - Upload/Send */}
+              {/* Button 3 - Refresh (Outlined) */}
               <button
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: colors.secondary,
+                  border: `1px solid ${colors.textSecondary}`,
+                  backgroundColor: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -561,39 +562,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = colors.secondary;
-                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.backgroundColor = 'transparent';
                 }}
               >
-                <div style={{
-                  width: '16px',
-                  height: '16px',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '4px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '0',
-                    height: '0',
-                    borderLeft: '6px solid transparent',
-                    borderRight: '6px solid transparent',
-                    borderBottom: '8px solid #6B7280'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '2px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '12px',
-                    height: '2px',
-                    backgroundColor: '#6B7280'
-                  }} />
-                </div>
+                <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 4 - Share */}
