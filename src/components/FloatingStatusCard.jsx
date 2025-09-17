@@ -42,13 +42,14 @@ import {
   X,
   ChevronLeft,
   Loader2,
-  Settings
+  Settings,
+  RefreshCw
 } from 'lucide-react';
 import { Card } from './ui/card';
 
 dayjs.extend(relativeTime);
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHideDeviceList }) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const t = useTranslation();
@@ -73,6 +74,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   const [isLockClosedLoading, setIsLockClosedLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showReplayPopover, setShowReplayPopover] = useState(false);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -411,6 +413,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
   
   
   return (
+    <>
     <AnimatePresence mode="wait">
       {selectedDeviceId && device && (
         <motion.div
@@ -760,19 +763,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   if (!isLockOpenLoading && selectedDeviceId) {
-                    e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.hover;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isLockOpenLoading && selectedDeviceId) {
-                    e.target.style.backgroundColor = 'transparent';
+                  e.target.style.backgroundColor = 'transparent';
                   }
                 }}
               >
                 {isLockOpenLoading ? (
                   <Loader2 size={16} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
                 ) : (
-                  <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
                 )}
               </button>
               
@@ -799,24 +802,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   if (!isLockClosedLoading && selectedDeviceId) {
-                    e.target.style.backgroundColor = colors.hover;
+                  e.target.style.backgroundColor = colors.hover;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isLockClosedLoading && selectedDeviceId) {
-                    e.target.style.backgroundColor = 'transparent';
+                  e.target.style.backgroundColor = 'transparent';
                   }
                 }}
               >
                 {isLockClosedLoading ? (
                   <Loader2 size={16} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
                 ) : (
-                  <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
                 )}
               </button>
               
               {/* Button 3 - Refresh (Outlined) */}
               <button
+                onClick={() => {
+                  dispatch(devicesActions.selectId(null));
+                  onHideDeviceList();
+                  setShowReplayPopover(true);
+                }}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1338,7 +1346,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                                 attribute === 'accuracy' || attribute === 'odometer' || attribute === 'serviceOdometer' || 
                                 attribute === 'tripOdometer' || attribute === 'obdOdometer' || attribute === 'distance' || 
                                 attribute === 'totalDistance' ? 
-                                  formatDistance(value, distanceUnit, t) :
+                                formatDistance(value, distanceUnit, t) :
                                   attribute === 'batteryLevel' ? 
                                     formatPercentage(value) :
                                   attribute === 'battery' ? 
@@ -1654,6 +1662,182 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Replay Popover */}
+    <AnimatePresence>
+      {showReplayPopover && (
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          style={{
+            position: 'fixed',
+            top: '10px',
+            left: `${(isMenuExpanded ? 200 : 63) + 8}px`,
+            width: '450px',
+            height: '300px',
+            zIndex: 10000,
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            borderRadius: '12px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              padding: '16px 20px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: colors.surface
+            }}
+          >
+            <h3 style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: '600',
+              color: colors.textPrimary
+            }}>
+              {t('reportReplay')}
+            </h3>
+            <button
+              onClick={() => setShowReplayPopover(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.textSecondary,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+                e.target.style.color = colors.textPrimary;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.color = colors.textSecondary;
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div
+            style={{
+              flex: 1,
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '20px'
+            }}
+          >
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: colors.primary + '20',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: colors.primary
+            }}>
+              <RefreshCw size={24} />
+            </div>
+            
+            <div style={{ textAlign: 'center' }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: colors.textPrimary
+              }}>
+                {t('reportReplay')}
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: colors.textSecondary,
+                lineHeight: '1.5'
+              }}>
+                Device selection cleared and device list hidden
+              </p>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              width: '100%',
+              maxWidth: '300px'
+            }}>
+              <button
+                onClick={() => setShowReplayPopover(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: 'transparent',
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.color = colors.textPrimary;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = colors.textSecondary;
+                }}
+              >
+                {t('sharedCancel')}
+              </button>
+              
+              <button
+                onClick={() => setShowReplayPopover(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: colors.primary,
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = colors.primary;
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 

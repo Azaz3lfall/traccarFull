@@ -2265,7 +2265,12 @@ const MainPage = () => {
       />
       
       {/* Floating Status Card */}
-      <FloatingStatusCard desktop={desktop} isMenuExpanded={isMenuExpanded} isDeviceListVisible={isDeviceListVisible} />
+      <FloatingStatusCard 
+        desktop={desktop} 
+        isMenuExpanded={isMenuExpanded} 
+        isDeviceListVisible={isDeviceListVisible}
+        onHideDeviceList={() => setIsDeviceListVisible(false)}
+      />
       
       {/* Vertical Control Bar - Left of Device List */}
       <AnimatePresence>
