@@ -629,5 +629,8 @@
     "userTermsAccepted": "پذیرفتن قوانین",
     "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
     "userToken": "رمز یکبار",
-    "userUserLimit": "محدودیت کاربر"
+    "userUserLimit": "محدودیت کاربر",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

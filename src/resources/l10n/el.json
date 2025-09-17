@@ -629,5 +629,8 @@
     "userTermsAccepted": "Οι όροι έγιναν αποδεκτοί",
     "userTermsPrompt": "Πατώντας Αποδοχή, αποδέχεστε τους Όρους Παροχής Υπηρεσιών μας και επιβεβαιώνετε ότι έχετε διαβάσει την Πολιτική Απορρήτου μας",
     "userToken": "Διακριτικό πρόσβασης",
-    "userUserLimit": "Όριο χρήστη"
+    "userUserLimit": "Όριο χρήστη",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

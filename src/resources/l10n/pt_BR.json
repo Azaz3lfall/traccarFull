@@ -629,5 +629,8 @@
     "userTermsAccepted": "Termos do Aceite",
     "userTermsPrompt": "Ao clicar em Aceitar, você concorda com nossos Termos de Serviço e confirma que leu nossa Política de Privacidade.",
     "userToken": "Token",
-    "userUserLimit": "Limite de Usuários"
+    "userUserLimit": "Limite de Usuários",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

@@ -629,5 +629,8 @@
     "userTermsAccepted": "Termes acceptés",
     "userTermsPrompt": "En cliquant sur accepter, vous acceptez nos termes de service et confirmez que vous avez lu notre politique de vie privée.",
     "userToken": "Jeton",
-    "userUserLimit": "Limite d'utilisateurs"
+    "userUserLimit": "Limite d'utilisateurs",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

@@ -629,5 +629,8 @@
     "userTermsAccepted": "Podmienky prijaté",
     "userTermsPrompt": "Kliknutím na tlačidlo \"Súhlasím\" súhlasíte s našimi zmluvnými podmienkami a potvrdzujete, že ste si prečítali naše zásady ochrany osobných údajov.",
     "userToken": "Token",
-    "userUserLimit": "Obmedzenie používateľov"
+    "userUserLimit": "Obmedzenie používateľov",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

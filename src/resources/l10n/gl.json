@@ -629,5 +629,8 @@
     "userTermsAccepted": "Terms Accepted",
     "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
     "userToken": "Token Acceso",
-    "userUserLimit": "Límite de usuarios"
+    "userUserLimit": "Límite de usuarios",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

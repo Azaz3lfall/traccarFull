@@ -629,5 +629,8 @@
     "userTermsAccepted": "Sąlygos priimtos",
     "userTermsPrompt": "Nuspausdami Sutinku, sutinkate su paslaugos teikimo taisyklėmis ir privatumo politika.",
     "userToken": "Token",
-    "userUserLimit": "Vartotojo limitas"
+    "userUserLimit": "Vartotojo limitas",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

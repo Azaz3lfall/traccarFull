@@ -629,5 +629,8 @@
     "userTermsAccepted": "ยอมรับข้อกำหนดแล้ว",
     "userTermsPrompt": "เมื่อคลิกยอมรับ แสดงว่าคุณยอมรับข้อกำหนดในการให้บริการของเรา และยืนยันว่าคุณได้อ่านนโยบายความเป็นส่วนตัวของเราแล้ว",
     "userToken": "Token",
-    "userUserLimit": "ขีดจำกัดผู้ใช้"
+    "userUserLimit": "ขีดจำกัดผู้ใช้",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

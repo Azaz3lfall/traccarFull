@@ -629,5 +629,8 @@
     "userTermsAccepted": "接受條款",
     "userTermsPrompt": "點擊“接受”，即表示您同意我們的服務條款，並確認您已閱讀我們的隱私權政策。",
     "userToken": "簽證",
-    "userUserLimit": "用戶限制"
+    "userUserLimit": "用戶限制",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

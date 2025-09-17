@@ -629,5 +629,8 @@
     "userTermsAccepted": "Условите се прифатени",
     "userTermsPrompt": "При кликнување на копчето Прифати, Вие се согласувате на нашите услови за користење, и потврдувате дека ја имате прочитано нашата Политика на приватност",
     "userToken": "Токен",
-    "userUserLimit": "Максимален број на корисници"
+    "userUserLimit": "Максимален број на корисници",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

@@ -629,5 +629,8 @@
     "userTermsAccepted": "Nutzungsbedingungen akzeptiert",
     "userTermsPrompt": "Durch den Klick auf „Akzeptieren“ erklären Sie sich mit unseren Nutzungsbedingungen und der Datenschutzerklärung einverstanden.",
     "userToken": "Schlüssel",
-    "userUserLimit": "Benutzerlimit"
+    "userUserLimit": "Benutzerlimit",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

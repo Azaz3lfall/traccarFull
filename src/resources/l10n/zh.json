@@ -629,5 +629,8 @@
     "userTermsAccepted": "接受条款",
     "userTermsPrompt": "点击“接受”，表示您同意我们的服务条款，并确认您已阅读我们的隐私政策。",
     "userToken": "令牌",
-    "userUserLimit": "用户限制"
+    "userUserLimit": "用户限制",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

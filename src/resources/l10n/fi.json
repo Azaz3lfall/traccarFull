@@ -629,5 +629,8 @@
     "userTermsAccepted": "Ehdot hyväksytty",
     "userTermsPrompt": "Klikkaamalla hyväksyt käyttöehdot ja vahvistat lukeneesi tietosuojakäytännön.",
     "userToken": "Todennustunnus",
-    "userUserLimit": "Käyttäjäraja"
+    "userUserLimit": "Käyttäjäraja",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

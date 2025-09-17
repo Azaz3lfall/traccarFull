@@ -629,5 +629,8 @@
     "userTermsAccepted": "Условия приняты",
     "userTermsPrompt": "Нажимая «Принять», Вы подтверждаете, что ознакомились и соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.",
     "userToken": "Ключ",
-    "userUserLimit": "Лимит пользователей"
+    "userUserLimit": "Лимит пользователей",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

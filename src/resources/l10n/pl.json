@@ -629,5 +629,8 @@
     "userTermsAccepted": "Warunki Zaakceptowane",
     "userTermsPrompt": "Klikając Akceptuj, zgadzasz się z naszymi Warunkami Korzystania i potwierdzasz, że przeczytałeś naszą Politykę Prywatności",
     "userToken": "Token",
-    "userUserLimit": "Limit użytkownika"
+    "userUserLimit": "Limit użytkownika",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

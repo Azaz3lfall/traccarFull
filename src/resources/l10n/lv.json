@@ -629,5 +629,8 @@
     "userTermsAccepted": "Noteikumi pieņemti",
     "userTermsPrompt": "Noklikšķinot uz “Pieņemt”, jūs piekrītat mūsu Pakalpojumu sniegšanas noteikumiem un apstiprināt, ka esat izlasījis mūsu Privātuma politiku.",
     "userToken": "Zīme",
-    "userUserLimit": "Lietotāju Limits"
+    "userUserLimit": "Lietotāju Limits",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }

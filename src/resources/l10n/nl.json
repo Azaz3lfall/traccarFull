@@ -629,5 +629,8 @@
     "userTermsAccepted": "Voorwaarden geaccepteerd",
     "userTermsPrompt": "Door op 'accepteren' te klikken, stem je in met de Algemene voorwaarden (Terms of service). Je bevestigt ook dat je instemt met ons Privacy voorwaarden (Privacy Policy).  ",
     "userToken": "Token",
-    "userUserLimit": "Gebruikerlimiet"
+    "userUserLimit": "Gebruikerlimiet",
+    "commandSuccess": "Command Success",
+    "commandError": "Command Error",
+    "sharedOk": "OK"
 }
