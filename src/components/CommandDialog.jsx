@@ -82,12 +82,13 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
   if (!open) return null;
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
           style={{
             position: 'fixed',
             top: 0,
@@ -98,16 +99,15 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 10000,
-            padding: '20px'
+            zIndex: 10000
           }}
           onClick={handleClose}
         >
           <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.8 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ duration: 0.3 }}
             style={{
               backgroundColor: colors.surface,
               borderRadius: '12px',
@@ -115,7 +115,7 @@ const CommandDialog = ({ open, onClose, deviceId }) => {
               minWidth: '320px',
               maxWidth: '500px',
               width: '100%',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               border: `1px solid ${colors.border}`
             }}
             onClick={(e) => e.stopPropagation()}
