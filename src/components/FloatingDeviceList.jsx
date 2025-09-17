@@ -1075,4 +1075,3 @@ const FloatingDeviceList = ({
 };
 
 export default FloatingDeviceList;
-export default FloatingDeviceList;
