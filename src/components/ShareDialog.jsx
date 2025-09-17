@@ -40,6 +40,12 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
       if (response.ok) {
         const responseText = await response.text();
         console.log('Share response:', responseText);
+        
+        // Build share URL with server address and token
+        const serverAddress = window.location.origin;
+        const shareUrl = `${serverAddress}?token=${responseText}`;
+        console.log('Share URL:', shareUrl);
+        
         setResult({ type: 'success', message: t('deviceShared') });
       } else {
         const errorText = await response.text();
