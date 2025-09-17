@@ -493,7 +493,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'space-between',
-              gap: '6px',
+              gap: '4px',
               width: '100%',
               marginTop: !desktop ? '12px' : '0px',
               minHeight: '42px'
