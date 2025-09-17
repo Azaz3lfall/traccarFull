@@ -438,6 +438,7 @@
     "deviceShared": "Device Shared",
     "deviceShareConfirm": "Share this device for 24 hours?",
     "deviceShareError": "Share Error",
+    "deviceShareUrl": "Share URL",
     "commandDeviceIdentification": "Device Identification",
     "commandPositionSingle": "Single Reporting",
     "commandPositionPeriodic": "Periodic Reporting",

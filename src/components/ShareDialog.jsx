@@ -3,10 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import QRCode from 'react-qr-code';
+import { Copy, Check } from 'lucide-react';
 
 const ShareDialog = ({ open, onClose, deviceId }) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { type: 'success'|'error', message: string }
+  const [shareUrl, setShareUrl] = useState('');
+  const [copied, setCopied] = useState(false);
   
   const t = useTranslation();
   const colors = useThemeColors();
@@ -43,9 +47,10 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
         
         // Build share URL with server address and token
         const serverAddress = window.location.origin;
-        const shareUrl = `${serverAddress}?token=${responseText}`;
-        console.log('Share URL:', shareUrl);
+        const url = `${serverAddress}?token=${responseText}`;
+        console.log('Share URL:', url);
         
+        setShareUrl(url);
         setResult({ type: 'success', message: t('deviceShared') });
       } else {
         const errorText = await response.text();
@@ -63,7 +68,19 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
   const handleClose = () => {
     setResult(null);
     setLoading(false);
+    setShareUrl('');
+    setCopied(false);
     onClose();
+  };
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+    }
   };
 
   return (
@@ -184,57 +201,183 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
               </>
             ) : (
               <>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '16px'
-                }}>
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    backgroundColor: result.type === 'success' ? '#10B981' : '#EF4444',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '12px'
-                  }}>
-                    {result.type === 'success' ? (
-                      <span style={{ color: 'white', fontSize: '16px' }}>✓</span>
-                    ) : (
-                      <span style={{ color: 'white', fontSize: '16px' }}>✕</span>
-                    )}
-                  </div>
-                  <h3 style={{
-                    margin: 0,
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    color: colors.text
-                  }}>
-                    {result.type === 'success' ? t('deviceShared') : t('deviceShareError')}
-                  </h3>
-                </div>
+                {result.type === 'success' ? (
+                  <>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '20px'
+                    }}>
+                      <div style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: '#10B981',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '12px'
+                      }}>
+                        <span style={{ color: 'white', fontSize: '16px' }}>✓</span>
+                      </div>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: colors.text
+                      }}>
+                        {t('deviceShared')}
+                      </h3>
+                    </div>
 
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end'
-                }}>
-                  <button
-                    onClick={handleClose}
-                    style={{
-                      padding: '10px 20px',
-                      border: `1px solid #3B82F6`,
+                    {/* QR Code */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '20px',
+                      padding: '20px',
+                      backgroundColor: 'white',
                       borderRadius: '8px',
-                      backgroundColor: 'transparent',
-                      color: '#3B82F6',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    {t('sharedOk')}
-                  </button>
-                </div>
+                      border: `1px solid ${colors.border}`
+                    }}>
+                      <QRCode
+                        value={shareUrl}
+                        size={200}
+                        style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                      />
+                    </div>
+
+                    {/* Share URL */}
+                    <div style={{
+                      marginBottom: '20px'
+                    }}>
+                      <p style={{
+                        margin: '0 0 8px 0',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: colors.text
+                      }}>
+                        {t('deviceShareUrl')}:
+                      </p>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        backgroundColor: colors.background,
+                        borderRadius: '6px',
+                        border: `1px solid ${colors.border}`
+                      }}>
+                        <span style={{
+                          flex: 1,
+                          fontSize: '12px',
+                          color: colors.textSecondary,
+                          wordBreak: 'break-all',
+                          fontFamily: 'monospace'
+                        }}>
+                          {shareUrl}
+                        </span>
+                        <button
+                          onClick={handleCopyUrl}
+                          style={{
+                            padding: '4px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '4px',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = colors.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          {copied ? (
+                            <Check size={16} color={colors.textSecondary} />
+                          ) : (
+                            <Copy size={16} color={colors.textSecondary} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <button
+                        onClick={handleClose}
+                        style={{
+                          padding: '10px 20px',
+                          border: `1px solid #3B82F6`,
+                          borderRadius: '8px',
+                          backgroundColor: 'transparent',
+                          color: '#3B82F6',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        {t('sharedOk')}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '16px'
+                    }}>
+                      <div style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: '#EF4444',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '12px'
+                      }}>
+                        <span style={{ color: 'white', fontSize: '16px' }}>✕</span>
+                      </div>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: colors.text
+                      }}>
+                        {t('deviceShareError')}
+                      </h3>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <button
+                        onClick={handleClose}
+                        style={{
+                          padding: '10px 20px',
+                          border: `1px solid #3B82F6`,
+                          borderRadius: '8px',
+                          backgroundColor: 'transparent',
+                          color: '#3B82F6',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        {t('sharedOk')}
+                      </button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </motion.div>
