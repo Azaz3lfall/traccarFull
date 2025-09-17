@@ -240,7 +240,11 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                     <div style={{
                       display: 'flex',
                       justifyContent: 'center',
+                      alignItems: 'center',
                       marginBottom: '20px',
+                      width: '200px',
+                      height: '200px',
+                      margin: '0 auto 20px auto',
                       padding: '16px',
                       backgroundColor: 'white',
                       borderRadius: '8px',
@@ -248,7 +252,7 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                     }}>
                       <QRCode
                         value={shareUrl}
-                        size={60}
+                        size={150}
                         style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
                       />
                     </div>
