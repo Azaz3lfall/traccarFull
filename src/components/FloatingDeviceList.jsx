@@ -65,15 +65,21 @@ const FloatingDeviceList = ({
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [forceUpdate, setForceUpdate] = useState(0);
   
-  // Force re-render when colors change
+  // Force re-render when colors change (less aggressive on mobile)
   useEffect(() => {
-    setForceUpdate(prev => prev + 1);
-  }, [colors.background, colors.surface, colors.text, colors.border]);
+    if (desktop) {
+      setForceUpdate(prev => prev + 1);
+    }
+  }, [colors.background, colors.surface, colors.text, colors.border, desktop]);
 
   // Create a key that changes when theme changes to force virtualizer re-mount
   const virtualizerContainerKey = useMemo(() => {
+    // On mobile, use a simpler key to reduce re-mounts
+    if (!desktop) {
+      return `virtualizer-mobile-${showOnMobile}`;
+    }
     return `virtualizer-${forceUpdate}-${colors.background}-${colors.surface}-${colors.text}-${showOnMobile}`;
-  }, [forceUpdate, colors.background, colors.surface, colors.text, showOnMobile]);
+  }, [forceUpdate, colors.background, colors.surface, colors.text, showOnMobile, desktop]);
   const filterButtonRef = useRef(null);
   const filterPopupRef = useRef(null);
   const sortDropdownRef = useRef(null);
@@ -486,7 +492,7 @@ const FloatingDeviceList = ({
     count: filteredDevices.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 105, // Estimated height of each device row (no overlapping)
-    overscan: 5,
+    overscan: !desktop ? 2 : 5, // Reduce overscan on mobile for better performance
   });
 
   // Force re-render when colors change by using colors in the virtualizer items
@@ -496,11 +502,11 @@ const FloatingDeviceList = ({
       return {
         ...virtualItem,
         device,
-        colors, // Include colors in each item to force re-render
-        forceUpdate // Include forceUpdate to trigger re-render
+        // Only include colors and forceUpdate on desktop to reduce mobile re-renders
+        ...(desktop ? { colors, forceUpdate } : {})
       };
     });
-  }, [virtualizer, filteredDevices, colors, forceUpdate]);
+  }, [virtualizer, filteredDevices, desktop, colors, forceUpdate]);
 
   // Debug logging removed for performance
   
