@@ -496,15 +496,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               gap: '8px',
               width: '100%',
               marginTop: !desktop ? '12px' : '0px',
-              minHeight: '50px'
+              minHeight: '44px'
             }}>
               {/* Button 1 - Lock Open (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -529,10 +529,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               {/* Button 2 - Lock Closed (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -557,10 +557,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               {/* Button 3 - Refresh (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -585,10 +585,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               {/* Button 4 - Send Commands (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -613,10 +613,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               {/* Button 5 - Share (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -641,10 +641,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
               {/* Button 6 - Anchor (Outlined) */}
               <button
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  minWidth: '50px',
-                  minHeight: '50px',
+                  width: '44px',
+                  height: '44px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
