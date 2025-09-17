@@ -511,11 +511,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
-                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
@@ -538,11 +536,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible }) =>
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = colors.hover;
-                  e.target.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
-                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
