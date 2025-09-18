@@ -2231,23 +2231,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       input[type="range"]::-webkit-slider-thumb {
                         -webkit-appearance: none;
                         appearance: none;
-                        width: 20px;
-                        height: 20px;
+                        width: 16px;
+                        height: 16px;
                         border-radius: 50%;
-                        background: ${colors.primary};
+                        background: #18a9fd;
                         cursor: pointer;
-                        border: 3px solid ${colors.surface};
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        border: 3px solid #ffffff;
+                        box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
                       }
                       
                       input[type="range"]::-moz-range-thumb {
-                        width: 20px;
-                        height: 20px;
+                        width: 16px;
+                        height: 16px;
                         border-radius: 50%;
-                        background: ${colors.primary};
+                        background: #18a9fd;
                         cursor: pointer;
-                        border: 3px solid ${colors.surface};
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        border: 3px solid #ffffff;
+                        box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
                       }
                     `}
                   </style>
