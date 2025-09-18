@@ -16,7 +16,9 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-  const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
+  // const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
+  const iconScale = useAttributePreference("iconScale", desktop ? 0.45 : 0.50);
+
 
   const devices = useSelector((state) => state.devices.items);
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
@@ -185,6 +187,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           'text-offset': [0, -2.3],
           'text-font': findFonts(map),
           'text-size': 12,
+          "icon-rotate": ["get", "rotation"],
         },
         paint: {
           'text-color': theme.palette.mode === 'dark' ? 'white' : 'black',

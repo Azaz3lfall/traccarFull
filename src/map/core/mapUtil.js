@@ -48,6 +48,31 @@ export const prepareIcon = (background, icon, color) => {
   return context.getImageData(0, 0, canvas.width, canvas.height);
 };
 
+export const prepareIconWithShadow = (icon) => {
+  const canvas = document.createElement('canvas');
+  const shadowOffset = 2;
+  const shadowBlur = 6;
+  
+  // Make canvas larger to accommodate shadow
+  canvas.width = (icon.width + shadowOffset + shadowBlur) * devicePixelRatio;
+  canvas.height = (icon.height + shadowOffset + shadowBlur) * devicePixelRatio;
+  canvas.style.width = `${icon.width + shadowOffset + shadowBlur}px`;
+  canvas.style.height = `${icon.height + shadowOffset + shadowBlur}px`;
+
+  const context = canvas.getContext('2d');
+  
+  // Enable shadow
+  context.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  context.shadowBlur = shadowBlur * devicePixelRatio;
+  context.shadowOffsetX = shadowOffset * devicePixelRatio;
+  context.shadowOffsetY = shadowOffset * devicePixelRatio;
+  
+  // Draw the icon
+  context.drawImage(icon, 0, 0, icon.width * devicePixelRatio, icon.height * devicePixelRatio);
+
+  return context.getImageData(0, 0, canvas.width, canvas.height);
+};
+
 export const reverseCoordinates = (it) => {
   if (!it) {
     return it;

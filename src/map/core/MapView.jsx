@@ -44,10 +44,16 @@ const updateReadyValue = (value) => {
 const initMap = async () => {
   if (ready) return;
   if (!map.hasImage('background')) {
+    console.log('Adding images to map:', Object.keys(mapImages));
     Object.entries(mapImages).forEach(([key, value]) => {
-      map.addImage(key, value, {
-        pixelRatio: window.devicePixelRatio,
-      });
+      try {
+        map.addImage(key, value, {
+          pixelRatio: window.devicePixelRatio,
+        });
+        console.log(`Added image: ${key}`);
+      } catch (error) {
+        console.error(`Failed to add image ${key}:`, error);
+      }
     });
   }
 };
