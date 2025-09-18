@@ -221,11 +221,11 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
     setActiveTab(0);
   };
 
-  if (!isVisible) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
+    <AnimatePresence mode="wait">
+      {isVisible && (
+        <motion.div
+          key="floating-drivers-popover"
         initial={{ x: -400, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -400, opacity: 0 }}
@@ -782,6 +782,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
           </Dialog>
         </div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 };

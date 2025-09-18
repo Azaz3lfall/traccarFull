@@ -351,13 +351,11 @@ const FloatingDevicesPopover = ({
     },
   ];
 
-  if (!isVisible) return null;
-
-
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
+          key="floating-devices-popover"
           initial={{ x: -400, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
