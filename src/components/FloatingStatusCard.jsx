@@ -2213,16 +2213,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     disabled={replayPositions.length === 0}
                     style={{
                       width: '100%',
-                      height: '6px',
-                      borderRadius: '3px',
+                      height: '8px',
+                      borderRadius: '4px',
                       background: replayPositions.length === 0 
                         ? colors.border 
-                        : `linear-gradient(to right, ${colors.primary} 0%, ${colors.primary} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
+                        : `linear-gradient(to right, #18a9fd 0%, #18a9fd ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
                       outline: 'none',
                       cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
                       WebkitAppearance: 'none',
                       MozAppearance: 'none',
-                      opacity: replayPositions.length === 0 ? 0.5 : 1
+                      opacity: replayPositions.length === 0 ? 0.5 : 1,
+                      border: 'none'
                     }}
                   />
                   <style>
@@ -2230,23 +2231,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       input[type="range"]::-webkit-slider-thumb {
                         -webkit-appearance: none;
                         appearance: none;
-                        width: 16px;
-                        height: 16px;
+                        width: 20px;
+                        height: 20px;
                         border-radius: 50%;
                         background: ${colors.primary};
                         cursor: pointer;
-                        border: 2px solid ${colors.surface};
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        border: 3px solid ${colors.surface};
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                       }
                       
                       input[type="range"]::-moz-range-thumb {
-                        width: 16px;
-                        height: 16px;
+                        width: 20px;
+                        height: 20px;
                         border-radius: 50%;
                         background: ${colors.primary};
                         cursor: pointer;
-                        border: 2px solid ${colors.surface};
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        border: 3px solid ${colors.surface};
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                       }
                     `}
                   </style>
