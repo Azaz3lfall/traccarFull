@@ -40,9 +40,30 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         break;
     }
     
-    const displayName = device.name.length > 10 ? device.name.substring(0, 10) + '...' : device.name;
+    const displayName = device.name.length > 15 ? device.name.substring(0, 15) + '...' : device.name;
     const nameLength = displayName.length;
-    const svgWidth = Math.max(50, nameLength * 10); // Minimum 50px, 10px per character
+    
+    // Calculate width based on character types: 7px for lowercase, 8px for uppercase, 5px for symbols, 6px for spaces
+    const calculateWidth = (text) => {
+      let totalWidth = 0;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char >= 'A' && char <= 'Z') {
+          totalWidth += 8; // Uppercase
+        } else if (char >= 'a' && char <= 'z') {
+          totalWidth += 7; // Lowercase
+        } else if (char === ' ') {
+          totalWidth += 6; // Space
+        } else if (char === '.' || char === ',') {
+          totalWidth += 5; // Period and comma
+        } else {
+          totalWidth += 7; // Other characters (numbers, symbols, etc.)
+        }
+      }
+      return totalWidth;
+    };
+    
+    const svgWidth = Math.max(50, calculateWidth(displayName)); // Minimum 50px
     
     return {
       id: position.id,
