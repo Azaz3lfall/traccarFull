@@ -64,13 +64,13 @@ const themes = {
 };
 
 const getDefaultTheme = () => {
-  // Default to light theme, user can switch manually
-  return 'light';
+  // Default to dark theme, user can switch manually
+  return 'dark';
 };
 
 const ThemeContext = createContext({
   themes,
-  theme: 'light',
+  theme: 'dark',
   setLocalTheme: () => {},
 });
 
