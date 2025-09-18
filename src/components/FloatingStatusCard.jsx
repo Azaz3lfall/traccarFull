@@ -966,7 +966,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box',
                   opacity: (isLockOpenLoading || !selectedDeviceId) ? 0.5 : 1
                 }}
@@ -1005,7 +1004,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box',
                   opacity: (isLockClosedLoading || !selectedDeviceId) ? 0.5 : 1
                 }}
@@ -1063,7 +1061,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
@@ -1095,7 +1092,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
@@ -1127,7 +1123,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
@@ -1157,7 +1152,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  transition: 'all 0.2s',
                   boxSizing: 'border-box',
                   opacity: (isAnchorLoading || !position) ? 0.5 : 1
                 }}
@@ -1264,7 +1258,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              transition: 'all 0.2s',
                               padding: '2px'
                             }}
                             onMouseEnter={(e) => {
@@ -1505,7 +1498,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    transition: 'all 0.2s',
                                     flexShrink: 0,
                                     marginTop: '2px',
                                     marginRight: '16px',
@@ -1613,7 +1605,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    transition: 'all 0.2s',
                                     flexShrink: 0,
                                     marginTop: '2px',
                                     marginRight: '16px',
@@ -1821,7 +1812,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       fontSize: '14px',
                       fontWeight: '500',
                       cursor: isSaving ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px'
@@ -2037,12 +2027,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 style={{
                   width: '100%',
                   padding: '8px 12px',
+                  paddingRight: '32px',
                   borderRadius: '6px',
                   border: `1px solid ${colors.border}`,
                   backgroundColor: colors.surface,
                   color: colors.text,
                   fontSize: '14px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='${encodeURIComponent(colors.textSecondary)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 8px center',
+                  backgroundSize: '16px'
                 }}
               >
                 <option value="today" style={{ backgroundColor: colors.surface, color: colors.text }}>
@@ -2090,7 +2086,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   padding: '8px 12px',
                   borderRadius: '6px',
                   border: `1px solid ${colors.border}`,
-                  backgroundColor: period === 'custom' ? colors.surface : colors.background,
+                  backgroundColor: period === 'custom' ? colors.surface : colors.surface,
                   color: period === 'custom' ? colors.text : colors.textSecondary,
                   fontSize: '14px',
                   cursor: period === 'custom' ? 'text' : 'not-allowed',
@@ -2119,7 +2115,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   padding: '8px 12px',
                   borderRadius: '6px',
                   border: `1px solid ${colors.border}`,
-                  backgroundColor: period === 'custom' ? colors.surface : colors.background,
+                  backgroundColor: period === 'custom' ? colors.surface : colors.surface,
                   color: period === 'custom' ? colors.text : colors.textSecondary,
                   fontSize: '14px',
                   cursor: period === 'custom' ? 'text' : 'not-allowed',
@@ -2168,34 +2164,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   flex: 1,
                   padding: '12px 20px',
                   borderRadius: '8px',
-                  border: `1px solid ${replayLoading || !replayDeviceId ? colors.border : '#3B82F6'}`,
-                  backgroundColor: 'transparent',
-                  color: replayLoading || !replayDeviceId ? colors.textSecondary : '#3B82F6',
+                  border: `1px solid ${colors.primary}`,
+                  backgroundColor: colors.primary,
+                  color: colors.text,
                   cursor: replayLoading || !replayDeviceId ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
-                  transition: 'all 0.2s',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  opacity: replayLoading || !replayDeviceId ? 0.6 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!replayLoading && replayDeviceId) {
-                    e.target.style.backgroundColor = 'transparent';
-                    e.target.style.color = '#3B82F6';
-                    e.target.style.borderColor = '#3B82F6';
-                    e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!replayLoading && replayDeviceId) {
-                    e.target.style.backgroundColor = 'transparent';
-                    e.target.style.color = '#3B82F6';
-                    e.target.style.borderColor = '#3B82F6';
-                    e.target.style.boxShadow = 'none';
-                  }
+                  opacity: replayLoading || !replayDeviceId ? 0.6 : 1,
+                  boxShadow: 'none',
+                  outline: 'none'
                 }}
               >
                 {replayLoading ? (
@@ -2210,89 +2191,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
             </div>
 
             {/* Replay Controls Section - BELOW the Cancel and Show buttons */}
-            {replayPositions.length > 0 && (
-              <>
-                {/* Device Info */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  backgroundColor: colors.background,
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.border}`,
-                  marginTop: '16px'
-                }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: colors.primary,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <img 
-                      style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} 
-                      src={mapIcons[mapIconKey(devices[replayDeviceId]?.category)] || mapIcons.default} 
-                      alt="" 
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: colors.text
-                    }}>
-                      {devices[replayDeviceId]?.name}
-                    </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: colors.textSecondary
-                    }}>
-                      {replayPositions.length} data points
-                    </div>
-                  </div>
-                </div>
-
-                {/* Position Info */}
-                {replayPositions[currentPositionIndex] && (
-                  <div style={{
-                    padding: '12px',
-                    backgroundColor: colors.background,
-                    borderRadius: '8px',
-                    border: `1px solid ${colors.border}`
-                  }}>
-                    <div style={{
-                      fontSize: '12px',
-                      color: colors.textSecondary,
-                      marginBottom: '4px'
-                    }}>
-                      Position {currentPositionIndex + 1} of {replayPositions.length}
-                    </div>
-                    <div style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: colors.text,
-                      marginBottom: '8px'
-                    }}>
-                      {formatTime(replayPositions[currentPositionIndex].fixTime, 'seconds')}
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      gap: '16px',
-                      fontSize: '12px',
-                      color: colors.textSecondary
-                    }}>
-                      <span>
-                        Speed: {formatSpeed(replayPositions[currentPositionIndex].speed || 0, speedUnit, t)}
-                      </span>
-                      <span>
-                        Course: {formatCourse(replayPositions[currentPositionIndex].course || 0)}
-                      </span>
-                    </div>
-                  </div>
-                )}
+            <>
 
                 {/* Slider */}
                 <div>
@@ -2308,18 +2207,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   <input
                     type="range"
                     min="0"
-                    max={replayPositions.length - 1}
+                    max={Math.max(0, replayPositions.length - 1)}
                     value={currentPositionIndex}
                     onChange={handleSliderChange}
+                    disabled={replayPositions.length === 0}
                     style={{
                       width: '100%',
                       height: '6px',
                       borderRadius: '3px',
-                      background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${(currentPositionIndex / (replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / (replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
+                      background: replayPositions.length === 0 
+                        ? colors.border 
+                        : `linear-gradient(to right, ${colors.primary} 0%, ${colors.primary} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
                       outline: 'none',
-                      cursor: 'pointer',
+                      cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
                       WebkitAppearance: 'none',
-                      MozAppearance: 'none'
+                      MozAppearance: 'none',
+                      opacity: replayPositions.length === 0 ? 0.5 : 1
                     }}
                   />
                   <style>
@@ -2330,9 +2233,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                         width: 16px;
                         height: 16px;
                         border-radius: 50%;
-                        background: #3B82F6;
+                        background: ${colors.primary};
                         cursor: pointer;
-                        border: 2px solid white;
+                        border: 2px solid ${colors.surface};
                         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                       }
                       
@@ -2340,9 +2243,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                         width: 16px;
                         height: 16px;
                         border-radius: 50%;
-                        background: #3B82F6;
+                        background: ${colors.primary};
                         cursor: pointer;
-                        border: 2px solid white;
+                        border: 2px solid ${colors.surface};
                         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                       }
                     `}
@@ -2356,30 +2259,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   justifyContent: 'center',
                   gap: '8px',
                   padding: '12px',
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.surface,
                   borderRadius: '8px',
                   border: `1px solid ${colors.border}`
                 }}>
                   <button
                     onClick={handleStop}
+                    disabled={replayPositions.length === 0}
                     style={{
                       width: '40px',
                       height: '40px',
                       borderRadius: '50%',
-                      border: `1px solid ${colors.border}`,
+                      border: 'none',
                       backgroundColor: colors.surface,
                       color: colors.text,
-                      cursor: 'pointer',
+                      cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = colors.hover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = colors.surface;
+                      opacity: replayPositions.length === 0 ? 0.5 : 1
                     }}
                   >
                     <StopIcon style={{ fontSize: '20px' }} />
@@ -2387,30 +2285,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   
                   <button
                     onClick={isPlaying ? handlePause : handlePlay}
-                    disabled={currentPositionIndex >= replayPositions.length - 1 && !isPlaying}
+                    disabled={replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)}
                     style={{
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
                       border: 'none',
-                      backgroundColor: '#3B82F6',
-                      color: 'white',
-                      cursor: (currentPositionIndex >= replayPositions.length - 1 && !isPlaying) ? 'not-allowed' : 'pointer',
+                      backgroundColor: colors.primary,
+                      color: colors.text,
+                      cursor: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.2s',
-                      opacity: (currentPositionIndex >= replayPositions.length - 1 && !isPlaying) ? 0.5 : 1
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!(currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) {
-                        e.target.style.backgroundColor = '#2563EB';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!(currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) {
-                        e.target.style.backgroundColor = '#3B82F6';
-                      }
+                      opacity: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? 0.5 : 1
                     }}
                   >
                     {isPlaying ? (
@@ -2429,6 +2316,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   }}>
                     <select
                       value={playbackSpeed}
+                      disabled={replayPositions.length === 0}
                       onChange={(e) => {
                         const newSpeed = Number(e.target.value);
                         setPlaybackSpeed(newSpeed);
@@ -2441,13 +2329,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       }}
                       style={{
                         padding: '4px 8px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
+                        borderRadius: '6px',
+                        border: `1px solid ${colors.border}`,
+                        backgroundColor: colors.surface,
                         color: colors.text,
                         fontSize: '12px',
-                        cursor: 'pointer',
-                        outline: 'none'
+                        cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
+                        outline: 'none',
+                        opacity: replayPositions.length === 0 ? 0.5 : 1
                       }}
                     >
                       <option value={0.5}>0.5x</option>
@@ -2458,8 +2347,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     </select>
                   </div>
                 </div>
-              </>
-            )}
+            </>
           </div>
         </motion.div>
       )}
