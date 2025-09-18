@@ -51,7 +51,7 @@ export const prepareIcon = (background, icon, color) => {
 export const prepareIconWithShadow = (icon) => {
   const canvas = document.createElement('canvas');
   const shadowOffset = 5;
-  const shadowBlur = 6;
+  const shadowBlur = 7;
   
   // Make canvas larger to accommodate shadow
   canvas.width = (icon.width + shadowOffset + shadowBlur) * devicePixelRatio;
@@ -61,13 +61,13 @@ export const prepareIconWithShadow = (icon) => {
 
   const context = canvas.getContext('2d');
   
-  // Enable shadow
-  context.shadowColor = 'rgba(24, 169, 253, 0.99)';
+  // Shadow - bottom right
+  context.shadowColor = 'rgba(0, 0, 0, 0.99)';
   context.shadowBlur = shadowBlur * devicePixelRatio;
   context.shadowOffsetX = shadowOffset * devicePixelRatio;
   context.shadowOffsetY = shadowOffset * devicePixelRatio;
   
-  // Draw the icon
+  // Draw the icon with bottom right shadow
   context.drawImage(icon, 0, 0, icon.width * devicePixelRatio, icon.height * devicePixelRatio);
 
   return context.getImageData(0, 0, canvas.width, canvas.height);
