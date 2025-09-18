@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { useDispatch, useSelector, connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Snackbar } from '@mui/material';
+import { Snackbar, Alert } from '@mui/material';
 import { devicesActions, sessionActions } from './store';
 import { useCatchCallback, useEffectAsync } from './reactHelper';
 import { snackBarDurationLongMs } from './common/util/duration';
@@ -165,10 +165,17 @@ const SocketController = () => {
         <Snackbar
           key={notification.id}
           open={notification.show}
-          message={notification.message}
           autoHideDuration={snackBarDurationLongMs}
           onClose={() => setNotifications(notifications.filter((e) => e.id !== notification.id))}
-        />
+        >
+          <Alert
+            onClose={() => setNotifications(notifications.filter((e) => e.id !== notification.id))}
+            severity="info"
+            variant="filled"
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
       ))}
     </>
   );

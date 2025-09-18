@@ -180,9 +180,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
 
   const handleEditField = useCallback((field, currentValue) => {
     if (field === 'hours') {
-      setEditValue((currentValue / 3600000).toString());
+      setEditValue((currentValue / 3600000).toFixed(2));
     } else if (field === 'totalDistance') {
-      setEditValue(distanceFromMeters(currentValue, distanceUnit).toString());
+      setEditValue(distanceFromMeters(currentValue, distanceUnit).toFixed(2));
     }
     setEditField(field);
     setShowEditModal(true);
