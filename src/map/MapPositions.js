@@ -8,6 +8,7 @@ import { mapIconKey } from './core/preloadImages';
 import { useAttributePreference } from '../common/util/preferences';
 import { useCatchCallback } from '../reactHelper';
 import { findFonts } from './core/mapUtil';
+import maplibregl from 'maplibre-gl';
 
 const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, selectedPosition, titleField }) => {
   const id = useId();
@@ -23,6 +24,9 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const mapCluster = useAttributePreference('mapCluster', true);
   const directionType = useAttributePreference('mapDirection', 'selected');
+
+  // Popup instances
+  const popups = new Map();
 
   const createFeature = (devices, position, selectedPositionId) => {
     const device = devices[position.deviceId];
@@ -58,6 +62,36 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       onMapClick(event.lngLat.lat, event.lngLat.lng);
     }
   }, [onMapClick]);
+
+  const createPopup = (device, position) => {
+    const popupContent = document.createElement('div');
+    popupContent.style.cssText = `
+      padding: 0;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    popupContent.innerHTML = `
+      <div style="
+        font-weight: 600; 
+        font-size: 12px; 
+        color: #1f2937; 
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        white-space: nowrap;
+      ">
+        ${device.name}
+      </div>
+    `;
+    
+    return new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      className: 'device-popup'
+    })
+    .setLngLat([position.longitude, position.latitude])
+    .setDOMContent(popupContent)
+    .addTo(map);
+  };
 
   const onMarkerClickCallback = useCallback((event) => {
     event.preventDefault();
@@ -108,16 +142,6 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           'icon-image': '{category}-{color}',
           'icon-size': iconScale,
           'icon-allow-overlap': true,
-          'text-field': `{${titleField || 'name'}}`,
-          'text-allow-overlap': true,
-          'text-anchor': 'bottom',
-          'text-offset': [0, -2 * iconScale],
-          'text-font': findFonts(map),
-          'text-size': 12,
-        },
-        paint: {
-          'text-halo-color': 'white',
-          'text-halo-width': 1,
         },
       });
       map.addLayer({
@@ -190,6 +214,22 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   }, [mapCluster, clusters, onMarkerClickCallback, onClusterClick]);
 
   useEffect(() => {
+    // Remove all existing popups
+    popups.forEach((popup) => {
+      popup.remove();
+    });
+    popups.clear();
+
+    // Create popups for all visible devices
+    const visiblePositions = positions.filter((it) => devices.hasOwnProperty(it.deviceId));
+    visiblePositions.forEach((position) => {
+      const device = devices[position.deviceId];
+      if (device) {
+        const popup = createPopup(device, position);
+        popups.set(position.deviceId, popup);
+      }
+    });
+
     [id, selected].forEach((source) => {
       map.getSource(source)?.setData({
         type: 'FeatureCollection',
