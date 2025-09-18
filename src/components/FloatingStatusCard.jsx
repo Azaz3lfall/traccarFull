@@ -2264,26 +2264,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   border: `1px solid ${colors.border}`
                 }}>
                   <button
-                    onClick={handleStop}
-                    disabled={replayPositions.length === 0}
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      border: `1px solid ${colors.text}`,
-                      backgroundColor: colors.surface,
-                      color: colors.text,
-                      cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: replayPositions.length === 0 ? 0.5 : 1
-                    }}
-                  >
-                    <StopIcon style={{ fontSize: '20px' }} />
-                  </button>
-                  
-                  <button
                     onClick={isPlaying ? handlePause : handlePlay}
                     disabled={replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)}
                     style={{
@@ -2301,9 +2281,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     }}
                   >
                     {isPlaying ? (
-                      <PauseIcon style={{ fontSize: '24px' }} />
+                      <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: colors.text }} />
                     ) : (
-                      <PlayArrowIcon style={{ fontSize: '24px' }} />
+                      <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: colors.text }} />
                     )}
                   </button>
 
