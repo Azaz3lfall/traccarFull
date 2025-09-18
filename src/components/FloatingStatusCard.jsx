@@ -1314,7 +1314,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 10000
+              zIndex: 10002
             }}
             onClick={() => setShowDetailsModal(false)}
           >
