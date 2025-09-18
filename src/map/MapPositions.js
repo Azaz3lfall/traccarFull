@@ -110,11 +110,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     });
   }, [clusters]);
 
-  const createDynamicSvg = (width, height = 21) => {
+  const createDynamicSvg = (width, height = 21, isDarkMode = false) => {
+    const backgroundColor = isDarkMode ? '#2d2d2d' : 'white';
+    const borderColor = isDarkMode ? '#404040' : 'black';
+    
     const svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="3" ry="3" 
-            fill="white" 
-            stroke="black" 
+      <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="4" ry="4" 
+            fill="${backgroundColor}" 
+            stroke="${borderColor}" 
             stroke-width="0.5"
             filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/>
     </svg>`;
@@ -125,9 +128,10 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   };
 
   const loadDynamicSvg = async (width) => {
-    const imageId = `device-name-bg-${width}`;
+    const isDarkMode = theme.palette.mode === 'dark';
+    const imageId = `device-name-bg-${width}-${isDarkMode ? 'dark' : 'light'}`;
     if (!map.hasImage(imageId)) {
-      const svgUrl = createDynamicSvg(width);
+      const svgUrl = createDynamicSvg(width, 21, isDarkMode);
       const img = new Image();
       img.onload = () => {
         map.addImage(imageId, img);
@@ -164,7 +168,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         source,
         filter: ['!has', 'point_count'],
         layout: {
-          'icon-image': ['concat', 'device-name-bg-', ['get', 'svgWidth']],
+          'icon-image': ['concat', 'device-name-bg-', ['get', 'svgWidth'], '-', theme.palette.mode === 'dark' ? 'dark' : 'light'],
           'icon-size': 1.0,
           'icon-allow-overlap': true,
           'icon-offset': [0, -35], // Position behind text (offset -35)
@@ -192,7 +196,8 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           'text-size': 12,
         },
         paint: {
-          'text-halo-color': 'white',
+          'text-color': theme.palette.mode === 'dark' ? 'white' : 'black',
+          'text-halo-color': theme.palette.mode === 'dark' ? '#2d2d2d' : 'white',
           'text-halo-width': 1,
         },
       });
@@ -314,7 +319,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     };
 
     updateData();
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode]);
 
   return null;
 };
