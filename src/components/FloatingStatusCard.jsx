@@ -605,6 +605,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
       }
     }
   }, [showReplayPopover, isReplayMode]);
+
+  // Close replay popover when status card is closed (selectedDeviceId becomes null)
+  useEffect(() => {
+    if (!selectedDeviceId && showReplayPopover) {
+      handleCloseReplayPopover();
+    }
+  }, [selectedDeviceId, showReplayPopover, handleCloseReplayPopover]);
   
   const getStatusColor = (status) => {
     switch (status) {
