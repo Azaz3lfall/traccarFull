@@ -287,7 +287,11 @@ const FloatingDeviceList = ({
                     justifyContent: 'center'
                   }}>
                     <img 
-                      style={{ width: '24px', height: '24px' }} 
+                      style={{ 
+                        width: '27px', 
+                        height: '27px',
+                        objectFit: 'contain'
+                      }} 
                       src={mapIcons[mapIconKey(device.category)] || ''} 
                       alt="" 
                     />

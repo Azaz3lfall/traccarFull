@@ -27,8 +27,9 @@ dayjs.extend(relativeTime);
 
 const useStyles = makeStyles()((theme) => ({
   icon: {
-    width: '25px',
-    height: '25px',
+    width: '28px',
+    height: '28px',
+    objectFit: 'contain',
     filter: 'brightness(0) invert(1)',
   },
   batteryText: {
