@@ -636,5 +636,6 @@
   "userTermsAccepted": "Sąlygos priimtos",
   "userTermsPrompt": "Nuspausdami Sutinku, sutinkate su paslaugos teikimo taisyklėmis ir privatumo politika.",
   "userToken": "Token",
-  "userUserLimit": "Vartotojo limitas"
+  "userUserLimit": "Vartotojo limitas",
+  "sharedTimeline": "Laiko juosta"
 }

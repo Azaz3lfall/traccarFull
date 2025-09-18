@@ -636,5 +636,6 @@
   "userTermsAccepted": "Condicions Acceptades",
   "userTermsPrompt": "En fer clic a Acceptar, acceptes les nostres Condicions del servei i confirmes que has llegit la nostra Política de privacitat.",
   "userToken": "Token Accés",
-  "userUserLimit": "Límit d\\'usuaris"
+  "userUserLimit": "Límit d\\'usuaris",
+  "sharedTimeline": "Línia de temps"
 }

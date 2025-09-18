@@ -636,5 +636,6 @@
   "userTermsAccepted": "התנאי השימוש התקבלו",
   "userTermsPrompt": "בלחיצה על אישור, הנך מסכים לתנאי השירות שלנו ומאשר שקראת את מדיניות הפרטיות שלנו.",
   "userToken": "אסימון",
-  "userUserLimit": "מגבלת משתמשים"
+  "userUserLimit": "מגבלת משתמשים",
+  "sharedTimeline": "ציר זמן"
 }

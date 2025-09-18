@@ -636,5 +636,6 @@
   "userTermsAccepted": "Villkor accepterade",
   "userTermsPrompt": "Genom att klicka på Acceptera godkänner du våra användarvillkor och bekräftar att du har läst vår integritetspolicy.",
   "userToken": "Token",
-  "userUserLimit": "Användarbegränsning"
+  "userUserLimit": "Användarbegränsning",
+  "sharedTimeline": "Tidslinje"
 }

@@ -636,5 +636,6 @@
   "userTermsAccepted": "Podmínky přijaty",
   "userTermsPrompt": "Kliknutím na tlačítko \"Akceptovat\" souhlasíte s našimi Podmínkami služby a potvrzujete, že jste si přečetli naše Zásady ochrany osobních údajů.",
   "userToken": "Token",
-  "userUserLimit": "Limit uživatele"
+  "userUserLimit": "Limit uživatele",
+  "sharedTimeline": "Časová osa"
 }

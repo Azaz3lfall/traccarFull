@@ -636,5 +636,6 @@
   "userTermsAccepted": "Uslovi su prihvaćeni",
   "userTermsPrompt": "Klikom na Prihvati, prihvatate naše Uslove korišćenja usluge i potvrđujete da ste pročitali našu Politiku privatnosti.",
   "userToken": "Znak",
-  "userUserLimit": "Limit korisnika"
+  "userUserLimit": "Limit korisnika",
+  "sharedTimeline": "Временска линија"
 }

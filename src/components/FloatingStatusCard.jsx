@@ -2182,7 +2182,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 {replayLoading ? (
                   <>
                     <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                    Loading...
+                    {t('sharedLoading')}
                   </>
                 ) : (
                   t('reportShow')
@@ -2202,7 +2202,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     fontWeight: '500',
                     color: colors.text
                   }}>
-                    Timeline
+                    {t('sharedTimeline')}
                   </label>
                   <input
                     type="range"

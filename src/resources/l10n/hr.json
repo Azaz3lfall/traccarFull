@@ -636,5 +636,6 @@
   "userTermsAccepted": "Uvjeti prihvaćeni",
   "userTermsPrompt": "Prihvaćanjem pristajete na naše Opće uvjete poslovanja i da ste pročitali politiku privatnosti",
   "userToken": "Token",
-  "userUserLimit": "Maksimalni broj korisnika"
+  "userUserLimit": "Maksimalni broj korisnika",
+  "sharedTimeline": "Vremenska linija"
 }
