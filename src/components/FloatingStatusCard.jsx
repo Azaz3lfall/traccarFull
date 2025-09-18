@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -57,7 +57,7 @@ import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 
 dayjs.extend(relativeTime);
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHideDeviceList }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geofencesPopoverVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList }) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const t = useTranslation();
@@ -83,7 +83,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const [isLockClosedLoading, setIsLockClosedLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [showReplayPopover, setShowReplayPopover] = useState(false);
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
@@ -110,8 +109,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const deviceReadonly = useDeviceReadonly();
   
   // Get current device and position
+  // In replay mode, use replay data; otherwise use real-time websocket data
+  const isReplayMode = showReplayPopover && replayPositions.length > 0;
   const device = selectedDeviceId ? devices[selectedDeviceId] : null;
-  const position = selectedDeviceId ? positions[selectedDeviceId] : null;
+  
+  // Memoize position to ensure it updates when replay position changes
+  const position = useMemo(() => {
+    if (isReplayMode && replayPositions[currentPositionIndex]) {
+      return replayPositions[currentPositionIndex];
+    }
+    return selectedDeviceId ? positions[selectedDeviceId] : null;
+  }, [isReplayMode, replayPositions, currentPositionIndex, selectedDeviceId, positions]);
+
 
   // Check for existing anchor when device changes
   useEffect(() => {
@@ -547,12 +556,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
 
   const handleCloseReplayPopover = useCallback(() => {
     setShowReplayPopover(false);
+    
+    // Clear all replay-related state variables
+    setReplayDeviceId(null);
+    setPeriod('today');
+    setCustomFrom('');
+    setCustomTo('');
+    setReplayLoading(false);
     setCurrentPositionIndex(0);
     setIsPlaying(false);
+    setPlaybackSpeed(1);
+    
+    // Clear interval if running
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    
     // Clear all replay data from map
     dispatch(sessionActions.updateReplayPositions([]));
   }, [dispatch]);
@@ -565,6 +585,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
       }
     };
   }, []);
+
+  // Hide replay popover when device list is shown
+  useEffect(() => {
+    if (isDeviceListVisible && showReplayPopover) {
+      setShowReplayPopover(false);
+    }
+  }, [isDeviceListVisible, showReplayPopover, setShowReplayPopover]);
+
+  // Handle replay mode changes - ensure proper data source switching
+  useEffect(() => {
+    // When exiting replay mode, reset to first position and stop playback
+    if (!showReplayPopover && isReplayMode) {
+      setCurrentPositionIndex(0);
+      setIsPlaying(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  }, [showReplayPopover, isReplayMode]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -575,6 +615,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
     }
   };
   
+  
+  console.log('Status card render - selectedDeviceId:', selectedDeviceId, 'device:', device, 'showReplayPopover:', showReplayPopover);
   
   return (
     <>
@@ -590,7 +632,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
           position: 'fixed',
           top: !desktop ? 'auto' : '8px',
           bottom: !desktop ? '0px' : 'auto',
-          left: !desktop ? '0px' : (isDeviceListVisible ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
+          left: !desktop ? '0px' : (isDeviceListVisible || showReplayPopover ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '310px',
           height: !desktop ? '50vh' : 'calc(100vh - 16px)',
           zIndex: 9998,
@@ -611,7 +653,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
         }}>
           {/* Back Button */}
           <button
-            onClick={() => dispatch(devicesActions.selectId(null))}
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch(devicesActions.selectId(null));
+            }}
             style={{
               position: 'absolute',
               top: !desktop ? '8px' : '12px',
@@ -984,12 +1029,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               
               {/* Button 3 - Refresh (Outlined) */}
               <button
-           onClick={() => {
+           onClick={(e) => {
+             e.stopPropagation(); // Prevent event bubbling to map
+             console.log('Replay button clicked, selectedDeviceId:', selectedDeviceId);
+             
              // Store the current deviceId for replay
              setReplayDeviceId(selectedDeviceId);
              
-             // Clear device selection and hide device list
-             dispatch(devicesActions.selectId(null));
+             // Hide device list but keep device selection
              onHideDeviceList();
              
              // Initialize form with current time
@@ -997,8 +1044,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
              setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
              setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
              
-             // Show popover
+             // Show popover and close device list
              setShowReplayPopover(true);
+             onHideDeviceList();
+             
+             console.log('After setting showReplayPopover to true, selectedDeviceId:', selectedDeviceId);
            }}
                 style={{
                   width: !desktop ? '50px' : '42px',
@@ -1028,7 +1078,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               
               {/* Button 4 - Send Commands (Outlined) */}
               <button
-                onClick={() => setShowCommandDialog(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowCommandDialog(true);
+                }}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1057,7 +1110,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               
               {/* Button 5 - Share (Outlined) */}
               <button
-                onClick={() => setShowShareDialog(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowShareDialog(true);
+                }}
                 style={{
                   width: !desktop ? '50px' : '42px',
                   height: !desktop ? '50px' : '42px',
@@ -1842,25 +1898,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
     <AnimatePresence>
       {showReplayPopover && (
         <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          initial={{ x: -400, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -400, opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            top: '10px',
-            left: `${(isMenuExpanded ? 200 : 63) + 8}px`,
-            width: '300px',
-            height: 'auto',
-            maxHeight: '80vh',
+            top: !desktop ? '0px' : '8px',
+            left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
+            width: !desktop ? '100vw' : '310px',
+            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
             zIndex: 10000,
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
-            borderRadius: '12px',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            borderRadius: !desktop ? '0px' : (selectedDeviceId && device ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
+            boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'left 0.3s ease'
           }}
         >
           {/* Header */}
@@ -1874,39 +1930,41 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               backgroundColor: colors.surface
             }}
           >
-            <h3 style={{
-              margin: 0,
-              fontSize: '18px',
-              fontWeight: '600',
-              color: colors.text
-            }}>
-              {t('reportReplay')}
-            </h3>
-            <button
-              onClick={() => setShowReplayPopover(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: colors.textSecondary,
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = colors.hover;
-                e.target.style.color = colors.text;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent';
-                e.target.style.color = colors.textSecondary;
-              }}
-            >
-              <X size={20} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button
+                onClick={handleCloseReplayPopover}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.textSecondary,
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.color = colors.text;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = colors.textSecondary;
+                }}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <h3 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text
+              }}>
+                {t('reportReplay')}
+              </h3>
+            </div>
           </div>
 
           {/* Content - Replay Form */}
@@ -1920,45 +1978,47 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               overflowY: 'auto'
             }}
           >
-            {/* Device Selection */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: colors.text
-              }}>
-                {t('reportDevice')}
-              </label>
-              <select
-                value={replayDeviceId || ''}
-                onChange={(e) => setReplayDeviceId(Number(e.target.value))}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${colors.border}`,
-                  backgroundColor: colors.surface,
-                  color: colors.text,
+            {/* Device Selection - Hidden since device is already selected */}
+            {false && (
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
                   fontSize: '14px',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="" style={{ backgroundColor: colors.surface, color: colors.text }}>
-                  Select Device
-                </option>
-                {Object.values(devices).map((device) => (
-                  <option 
-                    key={device.id} 
-                    value={device.id}
-                    style={{ backgroundColor: colors.surface, color: colors.text }}
-                  >
-                    {device.name}
+                  fontWeight: '500',
+                  color: colors.text
+                }}>
+                  {t('reportDevice')}
+                </label>
+                <select
+                  value={replayDeviceId || ''}
+                  onChange={(e) => setReplayDeviceId(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    border: `1px solid ${colors.border}`,
+                    backgroundColor: colors.surface,
+                    color: colors.text,
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                    Select Device
                   </option>
-                ))}
-              </select>
-            </div>
+                  {Object.values(devices).map((device) => (
+                    <option 
+                      key={device.id} 
+                      value={device.id}
+                      style={{ backgroundColor: colors.surface, color: colors.text }}
+                    >
+                      {device.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Period Selection */}
             <div>
@@ -2369,15 +2429,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
                   }}>
                     <select
                       value={playbackSpeed}
-                      onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
+                      onChange={(e) => {
+                        const newSpeed = Number(e.target.value);
+                        setPlaybackSpeed(newSpeed);
+                        // Stop playback when speed changes
+                        setIsPlaying(false);
+                        if (intervalRef.current) {
+                          clearInterval(intervalRef.current);
+                          intervalRef.current = null;
+                        }
+                      }}
                       style={{
                         padding: '4px 8px',
                         borderRadius: '4px',
-                        border: `1px solid ${colors.border}`,
-                        backgroundColor: colors.surface,
+                        border: 'none',
+                        backgroundColor: 'transparent',
                         color: colors.text,
                         fontSize: '12px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        outline: 'none'
                       }}
                     >
                       <option value={0.5}>0.5x</option>
@@ -2386,12 +2456,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
                       <option value={5}>5x</option>
                       <option value={10}>10x</option>
                     </select>
-                    <span style={{
-                      fontSize: '10px',
-                      color: colors.textSecondary
-                    }}>
-                      Speed
-                    </span>
                   </div>
                 </div>
               </>

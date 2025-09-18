@@ -764,6 +764,7 @@ const MainPage = () => {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
+  const [showReplayPopover, setShowReplayPopover] = useState(false);
 
 
   const onMapClick = useCallback(() => {
@@ -855,7 +856,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible || showReplayPopover) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
@@ -2269,6 +2270,9 @@ const MainPage = () => {
         desktop={desktop} 
         isMenuExpanded={isMenuExpanded} 
         isDeviceListVisible={isDeviceListVisible}
+        geofencesPopoverVisible={geofencesPopoverVisible}
+        showReplayPopover={showReplayPopover}
+        setShowReplayPopover={setShowReplayPopover}
         onHideDeviceList={() => setIsDeviceListVisible(false)}
       />
       
