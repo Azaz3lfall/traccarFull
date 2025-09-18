@@ -142,25 +142,16 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     return imageId;
   };
 
-  useEffect(() => {
-    map.addSource(id, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-      cluster: mapCluster,
-      clusterMaxZoom: 14,
-      clusterRadius: 50,
-    });
-    map.addSource(selected, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    });
+  const addLayers = useCallback(() => {
     [id, selected].forEach((source) => {
+      // Remove existing layers if they exist
+      if (map.getLayer(`${source}-text-bg`)) {
+        map.removeLayer(`${source}-text-bg`);
+      }
+      if (map.getLayer(source)) {
+        map.removeLayer(source);
+      }
+      
       // Add white rectangle background for text using dynamic SVG
       map.addLayer({
         id: `${source}-text-bg`,
@@ -201,6 +192,31 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           'text-halo-width': 1,
         },
       });
+    });
+  }, [theme.palette.mode, iconScale, titleField]);
+
+  useEffect(() => {
+    map.addSource(id, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+      cluster: mapCluster,
+      clusterMaxZoom: 14,
+      clusterRadius: 50,
+    });
+    map.addSource(selected, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+    
+    addLayers();
+    
+    [id, selected].forEach((source) => {
       map.addLayer({
         id: `direction-${source}`,
         type: 'symbol',
@@ -271,7 +287,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         }
       });
     };
-  }, [mapCluster, clusters, onMarkerClickCallback, onClusterClick]);
+  }, [mapCluster, clusters, onMarkerClickCallback, onClusterClick, addLayers]);
 
   useEffect(() => {
     const updateData = async () => {
