@@ -115,7 +115,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     const borderColor = isDarkMode ? '#404040' : 'black';
     
     const svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="4" ry="4" 
+      <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="6" ry="6" 
             fill="${backgroundColor}" 
             stroke="${borderColor}" 
             stroke-width="0.5"

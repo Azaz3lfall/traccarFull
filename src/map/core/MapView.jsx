@@ -78,24 +78,31 @@ const MapView = ({ children, selectedMapStyle }) => {
     
     // Style attribution control to match our theme
     const style = document.createElement('style');
+    const isDark = theme.palette.mode === 'dark';
+    const backgroundColor = isDark ? '#1F2937' : '#FFFFFF';
+    const textColor = isDark ? '#9CA3AF' : '#6B7280';
+    const borderColor = isDark ? '#374151' : '#E5E7EB';
+    const linkColor = isDark ? '#3B82F6' : '#2563EB';
+    const linkHoverColor = isDark ? '#60A5FA' : '#1D4ED8';
+    
     style.textContent = `
       /* Attribution control styling */
       .maplibregl-ctrl-attrib {
-        background-color: #1F2937 !important;
-        color: #9CA3AF !important;
-        border: 1px solid #374151 !important;
+        background-color: ${backgroundColor} !important;
+        color: ${textColor} !important;
+        border: 1px solid ${borderColor} !important;
         border-radius: 4px !important;
         font-size: 11px !important;
         padding: 4px 8px !important;
       }
       
       .maplibregl-ctrl-attrib a {
-        color: #3B82F6 !important;
+        color: ${linkColor} !important;
         text-decoration: none !important;
       }
       
       .maplibregl-ctrl-attrib a:hover {
-        color: #60A5FA !important;
+        color: ${linkHoverColor} !important;
         text-decoration: underline !important;
       }
     `;
@@ -105,7 +112,7 @@ const MapView = ({ children, selectedMapStyle }) => {
       map.removeControl(attribution);
       document.head.removeChild(style);
     };
-  }, [theme.direction]);
+  }, [theme.direction, theme.palette.mode]);
 
   useEffect(() => {
     if (maxZoom) {
