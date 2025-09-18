@@ -689,33 +689,35 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
 
-          {/* Details Button */}
-          <button
-            onClick={handleMoreDetails}
-            style={{
-              position: 'absolute',
-              top: !desktop ? '8px' : '12px',
-              right: !desktop ? '2px' : '12px',
-              zIndex: 10,
-              width: '32px',
-              height: '32px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'scale(1.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'scale(1)';
-            }}
-          >
-            <InfoOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
-          </button>
+          {/* Details Button - Hidden in replay mode */}
+          {!isReplayMode && (
+            <button
+              onClick={handleMoreDetails}
+              style={{
+                position: 'absolute',
+                top: !desktop ? '8px' : '12px',
+                right: !desktop ? '2px' : '12px',
+                zIndex: 10,
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)';
+              }}
+            >
+              <InfoOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+            </button>
+          )}
           
           {/* Header */}
           <div style={{
