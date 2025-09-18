@@ -2270,7 +2270,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      border: `1px solid ${colors.text}`,
+                      border: `1px solid ${(replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? colors.border : colors.text}`,
                       backgroundColor: colors.primary,
                       color: colors.text,
                       cursor: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
@@ -2281,9 +2281,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     }}
                   >
                     {isPlaying ? (
-                      <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: colors.text }} />
+                      <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? colors.border : colors.text }} />
                     ) : (
-                      <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: colors.text }} />
+                      <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? colors.border : colors.text }} />
                     )}
                   </button>
 
