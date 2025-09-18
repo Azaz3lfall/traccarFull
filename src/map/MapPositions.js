@@ -39,10 +39,17 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         showDirection = selectedPositionId === position.id && position.course > 0;
         break;
     }
+    
+    const displayName = device.name.length > 10 ? device.name.substring(0, 10) + '...' : device.name;
+    const nameLength = displayName.length;
+    const svgWidth = Math.max(50, nameLength * 10); // Minimum 50px, 10px per character
+    
     return {
       id: position.id,
       deviceId: position.deviceId,
-      name: device.name,
+      name: displayName,
+      nameLength: nameLength,
+      svgWidth: svgWidth,
       fixTime: formatTime(position.fixTime, 'seconds'),
       category: mapIconKey(device.category),
       color: showStatus ? position.attributes.color || getStatusColor(device.status) : 'neutral',
@@ -82,6 +89,34 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     });
   }, [clusters]);
 
+  const createDynamicSvg = (width, height = 21) => {
+    const svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="3" ry="3" 
+            fill="white" 
+            stroke="black" 
+            stroke-width="0.5"
+            filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/>
+    </svg>`;
+    
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    return svgUrl;
+  };
+
+  const loadDynamicSvg = async (width) => {
+    const imageId = `device-name-bg-${width}`;
+    if (!map.hasImage(imageId)) {
+      const svgUrl = createDynamicSvg(width);
+      const img = new Image();
+      img.onload = () => {
+        map.addImage(imageId, img);
+        URL.revokeObjectURL(svgUrl);
+      };
+      img.src = svgUrl;
+    }
+    return imageId;
+  };
+
   useEffect(() => {
     map.addSource(id, {
       type: 'geojson',
@@ -101,14 +136,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       },
     });
     [id, selected].forEach((source) => {
-      // Add white rectangle background for text using custom SVG
+      // Add white rectangle background for text using dynamic SVG
       map.addLayer({
         id: `${source}-text-bg`,
         type: 'symbol',
         source,
         filter: ['!has', 'point_count'],
         layout: {
-          'icon-image': 'device-name-bg',
+          'icon-image': ['concat', 'device-name-bg-', ['get', 'svgWidth']],
           'icon-size': 1.0,
           'icon-allow-overlap': true,
           'icon-offset': [0, -35], // Position behind text (offset -35)
@@ -213,21 +248,51 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   }, [mapCluster, clusters, onMarkerClickCallback, onClusterClick]);
 
   useEffect(() => {
-    [id, selected].forEach((source) => {
-      map.getSource(source)?.setData({
-        type: 'FeatureCollection',
-        features: positions.filter((it) => devices.hasOwnProperty(it.deviceId))
-          .filter((it) => (source === id ? it.deviceId !== selectedDeviceId : it.deviceId === selectedDeviceId))
-          .map((position) => ({
+    const updateData = async () => {
+      const features = positions.filter((it) => devices.hasOwnProperty(it.deviceId))
+        .filter((it) => (it.deviceId !== selectedDeviceId))
+        .map((position) => {
+          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id);
+          return {
             type: 'Feature',
             geometry: {
               type: 'Point',
               coordinates: [position.longitude, position.latitude],
             },
-            properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
-          })),
+            properties: feature,
+          };
+        });
+
+      const selectedFeatures = positions.filter((it) => devices.hasOwnProperty(it.deviceId))
+        .filter((it) => (it.deviceId === selectedDeviceId))
+        .map((position) => {
+          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id);
+          return {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [position.longitude, position.latitude],
+            },
+            properties: feature,
+          };
+        });
+
+      // Load dynamic SVGs for all unique widths
+      const uniqueWidths = [...new Set(features.concat(selectedFeatures).map(f => f.properties.svgWidth))];
+      await Promise.all(uniqueWidths.map(width => loadDynamicSvg(width)));
+
+      map.getSource(id)?.setData({
+        type: 'FeatureCollection',
+        features: features,
       });
-    });
+
+      map.getSource(selected)?.setData({
+        type: 'FeatureCollection',
+        features: selectedFeatures,
+      });
+    };
+
+    updateData();
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition]);
 
   return null;
