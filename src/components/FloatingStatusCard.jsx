@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -38,6 +38,9 @@ import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import UploadIcon from '@mui/icons-material/Upload';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import AnchorIcon from '@mui/icons-material/Anchor';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -50,6 +53,7 @@ import {
   Settings
 } from 'lucide-react';
 import { Card } from './ui/card';
+import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 
 dayjs.extend(relativeTime);
 
@@ -62,6 +66,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
+  const replayPositions = useSelector((state) => state.session.replayPositions);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -86,6 +91,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [replayLoading, setReplayLoading] = useState(false);
+  
+  // Enhanced replay states
+  const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const intervalRef = useRef(null);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -416,6 +427,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
   // Clear replay positions when device selection changes
   useEffect(() => {
     dispatch(sessionActions.updateReplayPositions([]));
+    setCurrentPositionIndex(0);
+    setIsPlaying(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   }, [selectedDeviceId, dispatch]);
 
   // Replay form handlers
@@ -424,6 +441,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
 
     setReplayLoading(true);
     dispatch(sessionActions.updateReplayPositions([])); // Clear previous positions when starting new search
+    setCurrentPositionIndex(0);
+    setIsPlaying(false);
     try {
       let selectedFrom;
       let selectedTo;
@@ -485,7 +504,67 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
     } finally {
       setReplayLoading(false);
     }
-  }, [replayDeviceId, period, customFrom, customTo]);
+  }, [replayDeviceId, period, customFrom, customTo, dispatch]);
+
+  // Replay control handlers
+  const handlePlay = useCallback(() => {
+    if (!replayPositions.length || isPlaying) return;
+    
+    setIsPlaying(true);
+    intervalRef.current = setInterval(() => {
+      setCurrentPositionIndex(prevIndex => {
+        const nextIndex = prevIndex + 1;
+        if (nextIndex >= replayPositions.length) {
+          setIsPlaying(false);
+          return prevIndex; // Stay at last position
+        }
+        return nextIndex;
+      });
+    }, 1000 / playbackSpeed);
+  }, [replayPositions, isPlaying, playbackSpeed]);
+
+  const handlePause = useCallback(() => {
+    setIsPlaying(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const handleStop = useCallback(() => {
+    setIsPlaying(false);
+    setCurrentPositionIndex(0);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const handleSliderChange = useCallback((event) => {
+    const newIndex = parseInt(event.target.value);
+    setCurrentPositionIndex(newIndex);
+  }, []);
+
+  const handleCloseReplayPopover = useCallback(() => {
+    setShowReplayPopover(false);
+    setCurrentPositionIndex(0);
+    setIsPlaying(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    // Clear all replay data from map
+    dispatch(sessionActions.updateReplayPositions([]));
+  }, [dispatch]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -1997,10 +2076,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
               marginTop: '8px'
             }}>
                        <button
-                         onClick={() => {
-                           setShowReplayPopover(false);
-                           dispatch(sessionActions.updateReplayPositions([])); // Clear replay positions when closing
-                         }}
+                         onClick={handleCloseReplayPopover}
                          style={{
                            flex: 1,
                            padding: '12px 20px',
@@ -2072,6 +2148,254 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, onHi
                 )}
               </button>
             </div>
+
+            {/* Replay Controls Section - BELOW the Cancel and Show buttons */}
+            {replayPositions.length > 0 && (
+              <>
+                {/* Device Info */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  backgroundColor: colors.background,
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.border}`,
+                  marginTop: '16px'
+                }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: colors.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <img 
+                      style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} 
+                      src={mapIcons[mapIconKey(devices[replayDeviceId]?.category)] || mapIcons.default} 
+                      alt="" 
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.text
+                    }}>
+                      {devices[replayDeviceId]?.name}
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      color: colors.textSecondary
+                    }}>
+                      {replayPositions.length} data points
+                    </div>
+                  </div>
+                </div>
+
+                {/* Position Info */}
+                {replayPositions[currentPositionIndex] && (
+                  <div style={{
+                    padding: '12px',
+                    backgroundColor: colors.background,
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.border}`
+                  }}>
+                    <div style={{
+                      fontSize: '12px',
+                      color: colors.textSecondary,
+                      marginBottom: '4px'
+                    }}>
+                      Position {currentPositionIndex + 1} of {replayPositions.length}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.text,
+                      marginBottom: '8px'
+                    }}>
+                      {formatTime(replayPositions[currentPositionIndex].fixTime, 'seconds')}
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      gap: '16px',
+                      fontSize: '12px',
+                      color: colors.textSecondary
+                    }}>
+                      <span>
+                        Speed: {formatSpeed(replayPositions[currentPositionIndex].speed || 0, speedUnit, t)}
+                      </span>
+                      <span>
+                        Course: {formatCourse(replayPositions[currentPositionIndex].course || 0)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Slider */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: colors.text
+                  }}>
+                    Timeline
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max={replayPositions.length - 1}
+                    value={currentPositionIndex}
+                    onChange={handleSliderChange}
+                    style={{
+                      width: '100%',
+                      height: '6px',
+                      borderRadius: '3px',
+                      background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${(currentPositionIndex / (replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / (replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
+                      outline: 'none',
+                      cursor: 'pointer',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none'
+                    }}
+                  />
+                  <style>
+                    {`
+                      input[type="range"]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        background: #3B82F6;
+                        cursor: pointer;
+                        border: 2px solid white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                      }
+                      
+                      input[type="range"]::-moz-range-thumb {
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        background: #3B82F6;
+                        cursor: pointer;
+                        border: 2px solid white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                      }
+                    `}
+                  </style>
+                </div>
+
+                {/* Playback Controls */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.background,
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.border}`
+                }}>
+                  <button
+                    onClick={handleStop}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      border: `1px solid ${colors.border}`,
+                      backgroundColor: colors.surface,
+                      color: colors.text,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.surface;
+                    }}
+                  >
+                    <StopIcon style={{ fontSize: '20px' }} />
+                  </button>
+                  
+                  <button
+                    onClick={isPlaying ? handlePause : handlePlay}
+                    disabled={currentPositionIndex >= replayPositions.length - 1 && !isPlaying}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      backgroundColor: '#3B82F6',
+                      color: 'white',
+                      cursor: (currentPositionIndex >= replayPositions.length - 1 && !isPlaying) ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s',
+                      opacity: (currentPositionIndex >= replayPositions.length - 1 && !isPlaying) ? 0.5 : 1
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!(currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) {
+                        e.target.style.backgroundColor = '#2563EB';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!(currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) {
+                        e.target.style.backgroundColor = '#3B82F6';
+                      }
+                    }}
+                  >
+                    {isPlaying ? (
+                      <PauseIcon style={{ fontSize: '24px' }} />
+                    ) : (
+                      <PlayArrowIcon style={{ fontSize: '24px' }} />
+                    )}
+                  </button>
+
+                  {/* Speed Control */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <select
+                      value={playbackSpeed}
+                      onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        border: `1px solid ${colors.border}`,
+                        backgroundColor: colors.surface,
+                        color: colors.text,
+                        fontSize: '12px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value={0.5}>0.5x</option>
+                      <option value={1}>1x</option>
+                      <option value={2}>2x</option>
+                      <option value={5}>5x</option>
+                      <option value={10}>10x</option>
+                    </select>
+                    <span style={{
+                      fontSize: '10px',
+                      color: colors.textSecondary
+                    }}>
+                      Speed
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
       )}
