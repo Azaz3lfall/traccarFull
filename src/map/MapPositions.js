@@ -101,21 +101,20 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       },
     });
     [id, selected].forEach((source) => {
-      // Add white rectangle background for text
+      // Add white rectangle background for text using custom SVG
       map.addLayer({
         id: `${source}-text-bg`,
         type: 'symbol',
         source,
         filter: ['!has', 'point_count'],
         layout: {
-          'icon-image': 'square',
-          'icon-size': 1.2,
+          'icon-image': 'device-name-bg',
+          'icon-size': 1.0,
           'icon-allow-overlap': true,
-          'icon-offset': [0, -2 * iconScale],
+          'icon-offset': [0, -35], // Position behind text (offset -35)
         },
         paint: {
-          'icon-color': 'white',
-          'icon-opacity': 0.9,
+          'icon-opacity': 1.0,
         },
       });
       
@@ -132,14 +131,13 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           'text-field': `{${titleField || 'name'}}`,
           'text-allow-overlap': true,
           'text-anchor': 'bottom',
-          'text-offset': [0, -2 * iconScale],
+          'text-offset': [0, -2.3],
           'text-font': findFonts(map),
           'text-size': 12,
         },
         paint: {
           'text-halo-color': 'white',
-          'text-halo-width': 2,
-          'text-color': '#1f2937',
+          'text-halo-width': 1,
         },
       });
       map.addLayer({
