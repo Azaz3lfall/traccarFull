@@ -730,17 +730,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 {/* Column 1: Picture and Speed */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', minWidth: '80px' }}>
                   {/* Device Image */}
-                  <div style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    backgroundColor: colors.secondary,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    border: `3px solid ${getStatusColor(device.status)}`
-                  }}>
+                  <div 
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      backgroundColor: colors.secondary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      border: `3px solid ${getStatusColor(device.status)}`,
+                      position: 'relative',
+                      cursor: device.attributes?.deviceImage ? 'pointer' : 'default'
+                    }}
+                    onMouseMove={(e) => {
+                      if (device.attributes?.deviceImage) {
+                        let tooltip = document.getElementById('device-image-tooltip');
+                        if (!tooltip) {
+                          tooltip = document.createElement('div');
+                          tooltip.id = 'device-image-tooltip';
+                          tooltip.style.cssText = `
+                            position: fixed;
+                            z-index: 10000;
+                            pointer-events: none;
+                            border-radius: 8px;
+                            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                            max-width: 300px;
+                            max-height: 300px;
+                          `;
+                          const img = document.createElement('img');
+                          img.src = `/api/media/${device.uniqueId}/${device.attributes.deviceImage}`;
+                          img.style.cssText = `
+                            width: auto;
+                            height: auto;
+                            max-width: 100%;
+                            max-height: 100%;
+                            border-radius: 8px;
+                            display: block;
+                          `;
+                          tooltip.appendChild(img);
+                          document.body.appendChild(tooltip);
+                        }
+                        // Position bottom-left of image at mouse pointer
+                        tooltip.style.left = `${e.clientX}px`;
+                        tooltip.style.top = `${e.clientY}px`;
+                        tooltip.style.transform = 'translateY(-100%)';
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      const tooltip = document.getElementById('device-image-tooltip');
+                      if (tooltip) {
+                        tooltip.remove();
+                      }
+                    }}
+                  >
                     <img 
                       style={{ 
                         width: '60px', 
@@ -860,17 +904,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
 
             {/* Device Image */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-              <div style={{
-                width: '120px',
-                height: '120px',
-                borderRadius: '50%',
-                        backgroundColor: colors.secondary,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                border: `3px solid ${getStatusColor(device.status)}`
-              }}>
+              <div 
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  backgroundColor: colors.secondary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  border: `3px solid ${getStatusColor(device.status)}`,
+                  position: 'relative',
+                  cursor: device.attributes?.deviceImage ? 'pointer' : 'default'
+                }}
+                onMouseMove={(e) => {
+                  if (device.attributes?.deviceImage) {
+                    let tooltip = document.getElementById('device-image-tooltip');
+                    if (!tooltip) {
+                      tooltip = document.createElement('div');
+                      tooltip.id = 'device-image-tooltip';
+                      tooltip.style.cssText = `
+                        position: fixed;
+                        z-index: 10000;
+                        pointer-events: none;
+                        border-radius: 8px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                        max-width: 300px;
+                        max-height: 300px;
+                      `;
+                      const img = document.createElement('img');
+                      img.src = `/api/media/${device.uniqueId}/${device.attributes.deviceImage}`;
+                      img.style.cssText = `
+                        width: auto;
+                        height: auto;
+                        max-width: 100%;
+                        max-height: 100%;
+                        border-radius: 8px;
+                        display: block;
+                      `;
+                      tooltip.appendChild(img);
+                      document.body.appendChild(tooltip);
+                    }
+                    // Position bottom-left of image at mouse pointer
+                    tooltip.style.left = `${e.clientX}px`;
+                    tooltip.style.top = `${e.clientY}px`;
+                    tooltip.style.transform = 'translateY(-100%)';
+                  }
+                }}
+                onMouseLeave={() => {
+                  const tooltip = document.getElementById('device-image-tooltip');
+                  if (tooltip) {
+                    tooltip.remove();
+                  }
+                }}
+              >
                 <img 
                   style={{ 
                     width: '120px', 
