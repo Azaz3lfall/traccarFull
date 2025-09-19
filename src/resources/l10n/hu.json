@@ -640,4 +640,8 @@
   "userUserLimit": "Felhasználólimit",
   "sharedTimeline": "Idővonal",
   "commandConfirm": "A trackernek jó 4G lefedettségű régióban kell lennie a parancs fogadásához."
+,
+  "serverUrl": "Szerver URL:",
+  "copyUrl": "URL másolása",
+  "copied": "Másolva!"
 }

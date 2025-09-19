@@ -640,4 +640,8 @@
   "userUserLimit": "Limite Utente",
   "sharedTimeline": "Cronologia",
   "commandConfirm": "Il tracker deve essere in una regione con buona copertura 4G per ricevere il comando."
+,
+  "serverUrl": "URL del Server:",
+  "copyUrl": "Copia URL",
+  "copied": "Copiato!"
 }

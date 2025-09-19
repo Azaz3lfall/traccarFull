@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Koha",
   "commandConfirm": "Gjurmuesi duhet të jetë në një rajon me mbulim të mirë 4G për të marrë komandën."
+,
+  "serverUrl": "URL e serverit:",
+  "copyUrl": "Kopjo URL",
+  "copied": "Kopjuar!"
 }

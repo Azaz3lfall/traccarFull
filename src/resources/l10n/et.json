@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Ajajoon",
   "commandConfirm": "Jälgija peab olema piirkonnas hea 4G kattega, et käsk vastu võtta."
+,
+  "serverUrl": "Serveri URL:",
+  "copyUrl": "Kopeeri URL",
+  "copied": "Kopeeritud!"
 }

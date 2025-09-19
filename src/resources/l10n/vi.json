@@ -640,4 +640,8 @@
   "userUserLimit": "Hạn chế người dùng",
   "sharedTimeline": "Dòng thời gian",
   "commandConfirm": "Trình theo dõi cần ở trong khu vực có phủ sóng 4G tốt để nhận lệnh."
+,
+  "serverUrl": "URL máy chủ:",
+  "copyUrl": "Sao chép URL",
+  "copied": "Đã sao chép!"
 }

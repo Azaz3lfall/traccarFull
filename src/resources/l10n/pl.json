@@ -640,4 +640,8 @@
   "userUserLimit": "Limit użytkownika",
   "sharedTimeline": "Oś czasu",
   "commandConfirm": "Tracker musi znajdować się w regionie z dobrym zasięgiem 4G, aby odebrać polecenie."
+,
+  "serverUrl": "URL serwera:",
+  "copyUrl": "Kopiuj URL",
+  "copied": "Skopiowano!"
 }

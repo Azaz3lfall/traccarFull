@@ -640,4 +640,8 @@
   "userUserLimit": "Limit uživatele",
   "sharedTimeline": "Časová osa",
   "commandConfirm": "Tracker musí být v oblasti s dobrým 4G pokrytím, aby mohl přijmout příkaz."
+,
+  "serverUrl": "URL serveru:",
+  "copyUrl": "Kopírovat URL",
+  "copied": "Zkopírováno!"
 }

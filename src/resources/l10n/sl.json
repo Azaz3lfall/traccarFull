@@ -640,4 +640,8 @@
   "userUserLimit": "Omejitev uporabnikov",
   "sharedTimeline": "Časovnica",
   "commandConfirm": "Sledilnik mora biti v regiji z dobrim 4G pokritjem, da prejme ukaz."
+,
+  "serverUrl": "URL strežnika:",
+  "copyUrl": "Kopiraj URL",
+  "copied": "Kopirano!"
 }

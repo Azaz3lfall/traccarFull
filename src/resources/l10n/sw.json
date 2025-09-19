@@ -640,4 +640,8 @@
   "userUserLimit": "Kikomom cha watumiaji",
   "sharedTimeline": "Mstari wa wakati",
   "commandConfirm": "Kifuatiliaji anahitaji kuwa katika eneo lenye chanjo nzuri ya 4G ili kupokea amri."
+,
+  "serverUrl": "URL ya Seva:",
+  "copyUrl": "Nakili URL",
+  "copied": "Imenakiliwa!"
 }

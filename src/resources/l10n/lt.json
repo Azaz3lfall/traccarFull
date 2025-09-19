@@ -640,4 +640,8 @@
   "userUserLimit": "Vartotojo limitas",
   "sharedTimeline": "Laiko juosta",
   "commandConfirm": "Seklys turi būti regione su geru 4G aprėpimu, kad gautų komandą."
+,
+  "serverUrl": "Serverio URL:",
+  "copyUrl": "Kopijuoti URL",
+  "copied": "Nukopijuota!"
 }

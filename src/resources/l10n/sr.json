@@ -640,4 +640,8 @@
   "userUserLimit": "Limit korisnika",
   "sharedTimeline": "Временска линија",
   "commandConfirm": "Трекер мора бити у региону са добром 4G покривеношћу да би примио команду."
+,
+  "serverUrl": "URL сервера:",
+  "copyUrl": "Копирај URL",
+  "copied": "Копирано!"
 }

@@ -640,4 +640,8 @@
   "userUserLimit": "Limită Utilizator",
   "sharedTimeline": "Cronologie",
   "commandConfirm": "Tracker-ul trebuie să fie într-o regiune cu acoperire 4G bună pentru a primi comanda."
+,
+  "serverUrl": "URL server:",
+  "copyUrl": "Copiază URL",
+  "copied": "Copiat!"
 }

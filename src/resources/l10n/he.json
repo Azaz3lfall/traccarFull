@@ -640,4 +640,8 @@
   "userUserLimit": "מגבלת משתמשים",
   "sharedTimeline": "ציר זמן",
   "commandConfirm": "המעקב צריך להיות באזור עם כיסוי 4G טוב כדי לקבל את הפקודה."
+,
+  "serverUrl": "כתובת שרת:",
+  "copyUrl": "העתק כתובת",
+  "copied": "הועתק!"
 }

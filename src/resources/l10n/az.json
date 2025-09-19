@@ -640,4 +640,8 @@
   "userUserLimit": "İstifadəçilərin  məhdudiyyəti",
   "sharedTimeline": "Zaman xətti",
   "commandConfirm": "İzleyicinin əmri qəbul etmək üçün yaxşı 4G əhatə dairəsində olması lazımdır."
+,
+  "serverUrl": "Server URL-si:",
+  "copyUrl": "URL-i kopyala",
+  "copied": "Kopyalandı!"
 }

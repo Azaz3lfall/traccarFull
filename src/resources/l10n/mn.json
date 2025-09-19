@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Цаг хугацаа",
   "commandConfirm": "Командыг хүлээн авахын тулд трекер сайн 4G хамралттай бүс нутагт байх ёстой."
+,
+  "serverUrl": "Серверийн URL:",
+  "copyUrl": "URL хуулах",
+  "copied": "Хуулагдсан!"
 }

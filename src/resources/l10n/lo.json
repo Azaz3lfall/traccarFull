@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "ເສັ້ນເວລາ",
   "commandConfirm": "ຕົວຕິດຕາມຕ້ອງຢູ່ໃນພື້ນທີ່ທີ່ມີການປົກຫຸ້ມ 4G ທີ່ດີເພື່ອຮັບຄຳສັ່ງ."
+,
+  "serverUrl": "URL ເຊີເວີ:",
+  "copyUrl": "ສຳເນົາ URL",
+  "copied": "ສຳເນົາແລ້ວ!"
 }

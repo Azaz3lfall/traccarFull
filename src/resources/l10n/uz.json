@@ -640,4 +640,8 @@
   "userUserLimit": "Фойдаланувчини чегаралаш",
   "sharedTimeline": "Vaqt chizig'i",
   "commandConfirm": "Buyruqni olish uchun treker yaxshi 4G qamrovi bo'lgan mintaqada bo'lishi kerak."
+,
+  "serverUrl": "Server URL manzili:",
+  "copyUrl": "URL-ni nusxalash",
+  "copied": "Nusxalandi!"
 }

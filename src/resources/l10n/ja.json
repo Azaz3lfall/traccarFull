@@ -640,4 +640,8 @@
   "userUserLimit": "ユーザー制限",
   "sharedTimeline": "タイムライン",
   "commandConfirm": "コマンドを受信するには、トラッカーが良好な4Gカバレッジのある地域にいる必要があります。"
+,
+  "serverUrl": "サーバーURL:",
+  "copyUrl": "URLをコピー",
+  "copied": "コピーしました!"
 }

@@ -640,4 +640,8 @@
   "userUserLimit": "Límite de usuarios",
   "sharedTimeline": "Liña de tempo",
   "commandConfirm": "O rastreador debe estar nunha rexión con boa cobertura 4G para recibir a orde."
+,
+  "serverUrl": "URL do servidor:",
+  "copyUrl": "Copiar URL",
+  "copied": "Copiado!"
 }

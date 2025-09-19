@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Ժամանակային գիծ",
   "commandConfirm": "Հետևիչը պետք է լինի 4G լավ ծածկույթ ունեցող տարածաշրջանում՝ հրամանը ստանալու համար:"
+,
+  "serverUrl": "Սերվերի URL:",
+  "copyUrl": "Պատճենել URL",
+  "copied": "Պատճենված է!"
 }

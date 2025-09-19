@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Garis masa",
   "commandConfirm": "Penjejak perlu berada di kawasan dengan liputan 4G yang baik untuk menerima arahan."
+,
+  "serverUrl": "URL Pelayan:",
+  "copyUrl": "Salin URL",
+  "copied": "Disalin!"
 }

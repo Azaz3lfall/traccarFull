@@ -640,4 +640,8 @@
   "userUserLimit": "Gebruikerlimiet",
   "sharedTimeline": "Tijdlijn",
   "commandConfirm": "De tracker moet zich in een regio met goede 4G-dekking bevinden om het commando te ontvangen."
+,
+  "serverUrl": "Server-URL:",
+  "copyUrl": "URL kopiëren",
+  "copied": "Gekopieerd!"
 }

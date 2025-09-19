@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "Wagt çyzygy",
   "commandConfirm": "Tracker, buýrugy almak üçin gowy 4G örtügi bolan sebitde bolmalydyr."
+,
+  "serverUrl": "Serwer URL:",
+  "copyUrl": "URL-ny göçür",
+  "copied": "Göçürildi!"
 }

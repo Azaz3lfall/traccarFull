@@ -640,4 +640,8 @@
   "userUserLimit": "Användarbegränsning",
   "sharedTimeline": "Tidslinje",
   "commandConfirm": "Trackern måste vara i en region med bra 4G-täckning för att ta emot kommandot."
+,
+  "serverUrl": "Server-URL:",
+  "copyUrl": "Kopiera URL",
+  "copied": "Kopierat!"
 }

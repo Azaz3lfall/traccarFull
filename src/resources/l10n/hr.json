@@ -640,4 +640,8 @@
   "userUserLimit": "Maksimalni broj korisnika",
   "sharedTimeline": "Vremenska linija",
   "commandConfirm": "Tracker mora biti u regiji s dobrom 4G pokrivenošću da bi primio naredbu."
+,
+  "serverUrl": "URL poslužitelja:",
+  "copyUrl": "Kopiraj URL",
+  "copied": "Kopirano!"
 }

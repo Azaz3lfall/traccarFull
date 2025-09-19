@@ -640,4 +640,8 @@
   "userUserLimit": "Brukargrense",
   "sharedTimeline": "Tidslinje",
   "commandConfirm": "Sporaren må vere i ein region med god 4G-dekning for å motta kommandoen."
+,
+  "serverUrl": "Server-URL:",
+  "copyUrl": "Kopier URL",
+  "copied": "Kopiert!"
 }

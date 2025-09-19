@@ -640,4 +640,8 @@
   "userUserLimit": "Kullanıcı Limiti",
   "sharedTimeline": "Zaman çizelgesi",
   "commandConfirm": "Tracker'ın komutu alabilmesi için iyi 4G kapsama alanı olan bir bölgede olması gerekir."
+,
+  "serverUrl": "Sunucu URL:",
+  "copyUrl": "URL'yi Kopyala",
+  "copied": "Kopyalandı!"
 }

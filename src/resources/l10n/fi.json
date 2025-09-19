@@ -640,4 +640,8 @@
   "userUserLimit": "Käyttäjäraja",
   "sharedTimeline": "Aikajana",
   "commandConfirm": "Seurantalaiteen on oltava alueella, jossa on hyvä 4G-peitto, jotta se voi vastaanottaa komennon."
+,
+  "serverUrl": "Palvelimen URL:",
+  "copyUrl": "Kopioi URL",
+  "copied": "Kopioitu!"
 }

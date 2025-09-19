@@ -639,5 +639,8 @@
   "categoryVan": "Van",
   "categoryScooter": "Scooter",
   "maintenanceStart": "Start",
-  "maintenancePeriod": "Period"
+  "maintenancePeriod": "Period",
+  "serverUrl": "Server URL:",
+  "copyUrl": "Copy URL",
+  "copied": "Copied!"
 }

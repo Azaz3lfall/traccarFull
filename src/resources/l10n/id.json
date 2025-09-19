@@ -640,4 +640,8 @@
   "userUserLimit": "Batas Pengguna",
   "sharedTimeline": "Timeline",
   "commandConfirm": "Tracker harus berada di wilayah dengan cakupan 4G yang baik untuk menerima perintah."
+,
+  "serverUrl": "URL Server:",
+  "copyUrl": "Salin URL",
+  "copied": "Disalin!"
 }

@@ -640,4 +640,8 @@
   "userUserLimit": "Lietotāju Limits",
   "sharedTimeline": "Laika līnija",
   "commandConfirm": "Sekotājam jābūt reģionā ar labu 4G pārklājumu, lai saņemtu komandu."
+,
+  "serverUrl": "Servera URL:",
+  "copyUrl": "Kopēt URL",
+  "copied": "Nokopēts!"
 }

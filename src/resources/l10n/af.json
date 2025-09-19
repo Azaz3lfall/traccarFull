@@ -640,4 +640,8 @@
   "userUserLimit": "Gebruiker Limiet",
   "sharedTimeline": "Tydlyn",
   "commandConfirm": "Die tracker moet in 'n streek met goeie 4G-dekking wees om die opdrag te ontvang."
+,
+  "serverUrl": "Bediener URL:",
+  "copyUrl": "Kopieer URL",
+  "copied": "Gekopieer!"
 }

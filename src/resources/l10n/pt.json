@@ -640,4 +640,8 @@
   "userToken": "Símbolo",
   "userUserLimit": "Limite de Utilizadores",
   "commandConfirm": "O rastreador precisa estar numa região com boa cobertura 4G para receber o comando."
+,
+  "serverUrl": "URL do Servidor:",
+  "copyUrl": "Copiar URL",
+  "copied": "Copiado!"
 }

@@ -640,4 +640,8 @@
   "userUserLimit": "用戶限制",
   "sharedTimeline": "時間軸",
   "commandConfirm": "追蹤器需要在4G覆蓋良好的區域才能接收命令。"
+,
+  "serverUrl": "伺服器URL:",
+  "copyUrl": "複製URL",
+  "copied": "已複製!"
 }

@@ -640,4 +640,8 @@
   "userUserLimit": "Bruger grænse",
   "sharedTimeline": "Tidslinje",
   "commandConfirm": "Trackeren skal være i et område med god 4G-dækning for at modtage kommandoen."
+,
+  "serverUrl": "Server-URL:",
+  "copyUrl": "Kopier URL",
+  "copied": "Kopieret!"
 }

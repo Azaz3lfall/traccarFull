@@ -640,4 +640,8 @@
   "userUserLimit": "User Limit",
   "sharedTimeline": "കാലഗതി",
   "commandConfirm": "കമാൻഡ് സ്വീകരിക്കാൻ ട്രാക്കർ നല്ല 4G കവറേജ് ഉള്ള പ്രദേശത്ത് ഉണ്ടായിരിക്കണം."
+,
+  "serverUrl": "സെർവർ URL:",
+  "copyUrl": "URL പകർത്തുക",
+  "copied": "പകർത്തി!"
 }
