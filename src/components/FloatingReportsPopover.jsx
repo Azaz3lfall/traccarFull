@@ -1539,11 +1539,11 @@ const FloatingReportsPopover = ({
                     },
                     '&:hover': {
                       color: colors.primary,
-                      backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                      backgroundColor: `${colors.primary}1A`,
                     },
                     '&.Mui-selected:hover': {
                       color: colors.primary,
-                      backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                      backgroundColor: `${colors.primary}26`,
                     },
                     '& .MuiTab-iconWrapper': {
                       marginRight: '8px',
@@ -1558,7 +1558,11 @@ const FloatingReportsPopover = ({
                     color: colors.primary,
                     width: '40px',
                     '&.Mui-disabled': {
+                      color: colors.textSecondary,
                       opacity: 0.3,
+                    },
+                    '&:hover': {
+                      backgroundColor: `${colors.primary}1A`,
                     },
                   },
                   '& .MuiTabs-scrollButtonsDesktop': {
