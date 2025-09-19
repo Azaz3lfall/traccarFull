@@ -1093,7 +1093,14 @@ const FloatingDeviceList = ({
         </div>
         
         {/* Floating Action Button for Mobile Drawer */}
-        {!desktop && onDrawerOpen && (
+        {(() => {
+          console.log('Checking FAB button conditions - desktop:', desktop, 'onDrawerOpen:', !!onDrawerOpen);
+          if (onDrawerOpen) {
+            console.log('FAB button should be rendered!');
+            return true;
+          }
+          return false;
+        })() && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

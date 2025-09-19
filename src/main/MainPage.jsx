@@ -201,11 +201,6 @@ const MainPage = () => {
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
   
-  // Debug drawer state
-  useEffect(() => {
-    console.log('Drawer state changed:', drawerOpen);
-    console.log('Desktop mode:', desktop);
-  }, [drawerOpen, desktop]);
   
   // Custom autocomplete states
   const [usersItems, setUsersItems] = useState([]);
@@ -2263,10 +2258,7 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={desktop ? isDeviceListVisible : true} // Desktop: controlled by toggle, Mobile: always visible unless device selected
         geofencesPopoverVisible={geofencesPopoverVisible}
-        onDrawerOpen={() => {
-          console.log('FAB button clicked, opening drawer...');
-          setDrawerOpen(true);
-        }}
+        onDrawerOpen={() => setDrawerOpen(true)}
       />
       
       {/* Floating Status Card */}
@@ -5395,45 +5387,11 @@ const MainPage = () => {
         )}
       </AnimatePresence>
       
-      {/* Test Button for Debugging */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}>
-        <button 
-          onClick={() => {
-            console.log('Test button clicked, setting drawer to true');
-            setDrawerOpen(true);
-          }}
-          style={{
-            padding: '10px',
-            backgroundColor: 'red',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px'
-          }}
-        >
-          Test Drawer
-        </button>
-        <div style={{
-          padding: '5px',
-          backgroundColor: drawerOpen ? 'green' : 'gray',
-          color: 'white',
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
-          Drawer: {drawerOpen ? 'OPEN' : 'CLOSED'}
-        </div>
-      </div>
 
-      {/* Proper Mobile Drawer Menu */}
-      <AnimatePresence>
-        {drawerOpen && (
+      {/* Mobile Drawer Menu */}
+      {!desktop && (
+        <AnimatePresence>
+          {drawerOpen && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -5514,7 +5472,6 @@ const MainPage = () => {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <button
                     onClick={() => {
-                      console.log('Devices clicked');
                       setIsDeviceListVisible(true);
                       setDrawerOpen(false);
                     }}
@@ -5537,7 +5494,6 @@ const MainPage = () => {
                   
                   <button
                     onClick={() => {
-                      console.log('Map clicked');
                       navigate('/map');
                       setDrawerOpen(false);
                     }}
@@ -5560,7 +5516,6 @@ const MainPage = () => {
                   
                   <button
                     onClick={() => {
-                      console.log('Events clicked');
                       setEventsOpen(true);
                       setDrawerOpen(false);
                     }}
@@ -5583,7 +5538,6 @@ const MainPage = () => {
                   
                   <button
                     onClick={() => {
-                      console.log('Settings clicked');
                       setShowPreferencesDrawer(true);
                       setDrawerOpen(false);
                     }}
@@ -5607,8 +5561,9 @@ const MainPage = () => {
               </div>
             </motion.div>
           </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      )}
 
       
     </div>
