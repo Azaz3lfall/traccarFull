@@ -404,9 +404,11 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                         <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedName')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('groupParent')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('groupParent')}
+                          </TableCell>
+                        )}
                         <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -433,11 +435,13 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                               {group.name}
                             </Typography>
                           </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
-                              {getParentGroupName(group.groupId)}
-                            </Typography>
-                          </TableCell>
+                          {desktop && (
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
+                                {getParentGroupName(group.groupId)}
+                              </Typography>
+                            </TableCell>
+                          )}
                           <TableCell align="right">
                             <IconButton
                               onClick={(e) => {
@@ -614,14 +618,14 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
+                    borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                     zIndex: 10000,
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+                    boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
                   }}
                 >
                   {/* Drawer Header */}
