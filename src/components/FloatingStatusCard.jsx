@@ -890,7 +890,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     fontSize: '18px',
                     fontWeight: '700',
                     color: colors.text,
-                    margin: 0,
+                    margin: !desktop ? '-15px 0 0 0' : '0',
                     lineHeight: '1.2',
                     textAlign: 'center'
                   }}>
@@ -942,7 +942,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     fontSize: '20px',
                     fontWeight: '700',
                     color: colors.text,
-                    margin: 0,
+                    margin: !desktop ? '-15px 0 0 0' : '0',
                     lineHeight: '1.2',
                     textAlign: 'center'
                   }}>
