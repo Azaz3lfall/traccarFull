@@ -642,5 +642,13 @@
   "commandConfirm": "Der Tracker muss sich in einer Region mit guter 4G-Abdeckung befinden, um den Befehl zu empfangen.",
   "serverUrl": "Server-URL:",
   "copyUrl": "URL kopieren",
-  "copied": "Kopiert!"
+  "copied": "Kopiert!",
+  "loadingInitializing": "Initialisierung...",
+  "loadingModules": "Module laden...",
+  "loadingConnecting": "Verbindung zum Server...",
+  "loadingData": "Daten laden...",
+  "loadingRendering": "Interface rendern...",
+  "loadingFinalizing": "Abschließen...",
+  "loadingComplete": "Abgeschlossen!",
+  "loadingStarting": "Starten..."
 }

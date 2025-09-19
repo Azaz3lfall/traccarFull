@@ -642,5 +642,13 @@
   "maintenancePeriod": "Period",
   "serverUrl": "Server URL:",
   "copyUrl": "Copy URL",
-  "copied": "Copied!"
+  "copied": "Copied!",
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }

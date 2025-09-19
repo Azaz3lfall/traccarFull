@@ -642,5 +642,13 @@
   "commandConfirm": "El rastreador debe estar en una región con buena cobertura 4G para recibir el comando.",
   "serverUrl": "URL del Servidor:",
   "copyUrl": "Copiar URL",
-  "copied": "¡Copiado!"
+  "copied": "¡Copiado!",
+  "loadingInitializing": "Inicializando...",
+  "loadingModules": "Cargando módulos...",
+  "loadingConnecting": "Conectando al servidor...",
+  "loadingData": "Cargando datos...",
+  "loadingRendering": "Renderizando interfaz...",
+  "loadingFinalizing": "Finalizando...",
+  "loadingComplete": "¡Completo!",
+  "loadingStarting": "Iniciando..."
 }

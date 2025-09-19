@@ -644,4 +644,13 @@
   "serverUrl": "서버 URL:",
   "copyUrl": "URL 복사",
   "copied": "복사됨!"
+,
+  "loadingInitializing": "초기화 중...",
+  "loadingModules": "모듈 로딩 중...",
+  "loadingConnecting": "서버 연결 중...",
+  "loadingData": "데이터 로딩 중...",
+  "loadingRendering": "인터페이스 렌더링 중...",
+  "loadingFinalizing": "마무리 중...",
+  "loadingComplete": "완료!",
+  "loadingStarting": "시작 중..."
 }

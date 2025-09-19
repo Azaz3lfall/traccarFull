@@ -644,4 +644,13 @@
   "serverUrl": "Server URL-si:",
   "copyUrl": "URL-i kopyala",
   "copied": "Kopyalandı!"
+,
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }

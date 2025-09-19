@@ -644,4 +644,13 @@
   "serverUrl": "URL сервера:",
   "copyUrl": "Копировать URL",
   "copied": "Скопировано!"
+,
+  "loadingInitializing": "Инициализация...",
+  "loadingModules": "Загрузка модулей...",
+  "loadingConnecting": "Подключение к серверу...",
+  "loadingData": "Загрузка данных...",
+  "loadingRendering": "Отрисовка интерфейса...",
+  "loadingFinalizing": "Завершение...",
+  "loadingComplete": "Готово!",
+  "loadingStarting": "Запуск..."
 }

@@ -644,4 +644,13 @@
   "serverUrl": "Serveri URL:",
   "copyUrl": "Kopeeri URL",
   "copied": "Kopeeritud!"
+,
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }

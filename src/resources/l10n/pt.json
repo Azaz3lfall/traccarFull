@@ -643,5 +643,13 @@
 ,
   "serverUrl": "URL do Servidor:",
   "copyUrl": "Copiar URL",
-  "copied": "Copiado!"
+  "copied": "Copiado!",
+  "loadingInitializing": "Inicializando...",
+  "loadingModules": "Carregando módulos...",
+  "loadingConnecting": "Conectando ao servidor...",
+  "loadingData": "Carregando dados...",
+  "loadingRendering": "Renderizando interface...",
+  "loadingFinalizing": "Finalizando...",
+  "loadingComplete": "Completo!",
+  "loadingStarting": "Iniciando..."
 }

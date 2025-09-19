@@ -644,4 +644,13 @@
   "serverUrl": "URL เซิร์ฟเวอร์:",
   "copyUrl": "คัดลอก URL",
   "copied": "คัดลอกแล้ว!"
+,
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }

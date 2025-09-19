@@ -644,4 +644,13 @@
   "serverUrl": "सर्भर URL:",
   "copyUrl": "URL प्रतिलिपि गर्नुहोस्",
   "copied": "प्रतिलिपि भयो!"
+,
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }

@@ -644,4 +644,13 @@
   "serverUrl": "サーバーURL:",
   "copyUrl": "URLをコピー",
   "copied": "コピーしました!"
+,
+  "loadingInitializing": "初期化中...",
+  "loadingModules": "モジュール読み込み中...",
+  "loadingConnecting": "サーバーに接続中...",
+  "loadingData": "データ読み込み中...",
+  "loadingRendering": "インターフェース描画中...",
+  "loadingFinalizing": "最終処理中...",
+  "loadingComplete": "完了!",
+  "loadingStarting": "開始中..."
 }

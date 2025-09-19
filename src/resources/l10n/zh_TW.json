@@ -644,4 +644,13 @@
   "serverUrl": "伺服器URL:",
   "copyUrl": "複製URL",
   "copied": "已複製!"
+,
+  "loadingInitializing": "初始化中...",
+  "loadingModules": "載入模組...",
+  "loadingConnecting": "連接伺服器...",
+  "loadingData": "載入資料...",
+  "loadingRendering": "渲染介面...",
+  "loadingFinalizing": "完成中...",
+  "loadingComplete": "完成!",
+  "loadingStarting": "啟動中..."
 }

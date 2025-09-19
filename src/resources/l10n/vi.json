@@ -644,4 +644,13 @@
   "serverUrl": "URL máy chủ:",
   "copyUrl": "Sao chép URL",
   "copied": "Đã sao chép!"
+,
+  "loadingInitializing": "Initializing...",
+  "loadingModules": "Loading modules...",
+  "loadingConnecting": "Connecting to server...",
+  "loadingData": "Loading data...",
+  "loadingRendering": "Rendering interface...",
+  "loadingFinalizing": "Finalizing...",
+  "loadingComplete": "Complete!",
+  "loadingStarting": "Starting..."
 }
