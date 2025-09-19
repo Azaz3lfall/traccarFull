@@ -656,7 +656,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
     switch (status) {
       case 'online': return '#10B981';
       case 'offline': return '#EF4444';
-      case 'unknown': return '#6B7280';
+      case 'unknown': return '#F59E0B';
       default: return '#6B7280';
     }
   };
