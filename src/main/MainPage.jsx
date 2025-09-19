@@ -784,39 +784,28 @@ const MainPage = () => {
   }, [dispatch]);
 
 
-  useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
+  // Only use filter on desktop, mobile gets direct access to devices
+  if (desktop) {
+    useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
+  }
+
+  // Mobile: Always show all devices directly from Redux (no filtering delays)
+  useEffect(() => {
+    if (!desktop && devices && Object.keys(devices).length > 0) {
+      console.log('MainPage: Mobile - setting all devices directly from Redux');
+      setFilteredDevices(Object.values(devices));
+    }
+  }, [desktop, devices, setFilteredDevices]);
 
   // Old desktop-only refresh - now handled by universal refresh below
 
-  // Force refresh devices when device list becomes visible (mobile and desktop)
+  // Force refresh devices when device list becomes visible (desktop only)
   useEffect(() => {
-    if (isDeviceListVisible) {
-      console.log('MainPage: Device list became visible, refreshing devices');
+    if (desktop && isDeviceListVisible) {
+      console.log('MainPage: Desktop device list became visible, refreshing devices');
       refreshDevices();
     }
-  }, [isDeviceListVisible, refreshDevices]);
-
-  // Immediate reload of filtered devices when going back from selected device (mobile)
-  useEffect(() => {
-    if (!desktop && !selectedDeviceId && devices && Object.keys(devices).length > 0) {
-      console.log('MainPage: Back from selected device, immediately reloading filtered devices');
-      // Immediately set all devices as filtered (no keyword filter initially)
-      const allDevices = Object.values(devices);
-      setFilteredDevices(allDevices);
-      console.log('MainPage: Set filteredDevices to', allDevices.length, 'devices');
-    }
-  }, [desktop, selectedDeviceId, devices, setFilteredDevices]);
-
-  // Force re-filter when devices are loaded but filteredDevices is empty (mobile optimization)
-  useEffect(() => {
-    if (devices && Object.keys(devices).length > 0 && filteredDevices.length === 0) {
-      console.log('MainPage: Devices loaded but filteredDevices empty, setting all devices');
-      // On mobile, immediately show all devices without triggering useFilter
-      if (!desktop) {
-        setFilteredDevices(Object.values(devices));
-      }
-    }
-  }, [devices, filteredDevices.length, desktop, setFilteredDevices]);
+  }, [desktop, isDeviceListVisible, refreshDevices]);
 
   return (
     <div className={classes.root}>
