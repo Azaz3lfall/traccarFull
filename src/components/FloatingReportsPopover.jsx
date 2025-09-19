@@ -1518,32 +1518,30 @@ const FloatingReportsPopover = ({
                 onChange={handleTabChange}
                 variant="scrollable"
                 scrollButtons="auto"
-                allowScrollButtonsMobile
+                style={{
+                  borderBottom: `1px solid ${colors.border}`,
+                  marginBottom: '16px',
+                }}
                 sx={{
-                  '& .MuiTabs-flexContainer': {
-                    justifyContent: desktop ? 'center' : 'flex-start',
-                  },
                   '& .MuiTab-root': {
-                    color: colors.textSecondary,
+                    color: '#666666',
                     fontSize: '12px',
                     fontWeight: '500',
                     textTransform: 'none',
                     minHeight: '40px',
                     padding: '8px 16px',
-                    minWidth: 'auto',
-                    flexShrink: 0,
                     '&.Mui-selected': {
-                      color: colors.text,
+                      color: '#1976d2',
                       fontWeight: '600',
-                      backgroundColor: `${colors.primary}20`,
+                      backgroundColor: 'transparent',
                     },
                     '&:hover': {
-                      color: colors.primary,
-                      backgroundColor: `${colors.primary}1A`,
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.1)',
                     },
                     '&.Mui-selected:hover': {
-                      color: colors.primary,
-                      backgroundColor: `${colors.primary}26`,
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.15)',
                     },
                     '& .MuiTab-iconWrapper': {
                       marginRight: '8px',
@@ -1551,32 +1549,9 @@ const FloatingReportsPopover = ({
                     }
                   },
                   '& .MuiTabs-indicator': {
-                    backgroundColor: colors.primary,
+                    backgroundColor: '#1976d2',
                     height: '2px',
                   },
-                  '& .MuiTabs-scrollButtons': {
-                    color: colors.text,
-                    width: '40px',
-                    backgroundColor: colors.surface,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '4px',
-                    margin: '0 4px',
-                    '&.Mui-disabled': {
-                      color: colors.textSecondary,
-                      opacity: 0.3,
-                      backgroundColor: 'transparent',
-                    },
-                    '&:hover': {
-                      backgroundColor: `${colors.primary}1A`,
-                      color: colors.primary,
-                    },
-                  },
-                  '& .MuiTabs-scrollButtonsDesktop': {
-                    display: 'flex',
-                  },
-                  '& .MuiTabs-scrollButtonsMobile': {
-                    display: 'flex',
-                  }
                 }}
               >
                 {visibleTabs.map((tab, index) => (
