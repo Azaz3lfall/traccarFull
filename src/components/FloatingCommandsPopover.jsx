@@ -676,13 +676,13 @@ const FloatingCommandsPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '400px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
                     zIndex: 10001,
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+                    boxShadow: desktop ? '-2px 0 8px rgba(0, 0, 0, 0.1)' : 'none',
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
