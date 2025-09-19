@@ -467,15 +467,21 @@ const FloatingComputedAttributesPopover = ({
                         <TableCell style={{ color: colors.text, fontWeight: '600' }}>
                           {t('sharedDescription')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('sharedAttribute')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('sharedExpression')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('sharedType')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('sharedAttribute')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('sharedExpression')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('sharedType')}
+                          </TableCell>
+                        )}
                         <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -502,33 +508,39 @@ const FloatingComputedAttributesPopover = ({
                               <span style={{ fontWeight: '500' }}>{attribute.description}</span>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {attribute.attribute}
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            <Typography variant="body2" style={{ 
-                              fontFamily: 'monospace',
-                              fontSize: '11px',
-                              maxWidth: '200px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {attribute.expression}
-                            </Typography>
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            <Chip
-                              label={attribute.type}
-                              size="small"
-                              style={{
-                                backgroundColor: colors.primary,
-                                color: colors.text,
-                                fontSize: '10px',
-                                height: '20px',
-                              }}
-                            />
-                          </TableCell>
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {attribute.attribute}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              <Typography variant="body2" style={{ 
+                                fontFamily: 'monospace',
+                                fontSize: '11px',
+                                maxWidth: '200px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                {attribute.expression}
+                              </Typography>
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              <Chip
+                                label={attribute.type}
+                                size="small"
+                                style={{
+                                  backgroundColor: colors.primary,
+                                  color: colors.text,
+                                  fontSize: '10px',
+                                  height: '20px',
+                                }}
+                              />
+                            </TableCell>
+                          )}
                           <TableCell style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
@@ -687,13 +699,13 @@ const FloatingComputedAttributesPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
                     zIndex: 10001,
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+                    boxShadow: desktop ? '-2px 0 8px rgba(0, 0, 0, 0.1)' : 'none',
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
