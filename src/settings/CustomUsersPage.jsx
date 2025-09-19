@@ -138,13 +138,29 @@ const CustomUsersPage = () => {
   const handleSaveUser = useCatch(async () => {
     if (!editingUser) return;
 
+    // Prepare user data for saving
+    const userData = { ...editingUser };
+    
+    // Handle password field
+    if (editingUser.id) {
+      // For existing users, only include password if it's not empty
+      if (!userData.password || userData.password.trim() === '') {
+        delete userData.password; // Remove password field if empty
+      }
+    } else {
+      // For new users, password is required
+      if (!userData.password || userData.password.trim() === '') {
+        return; // Don't save if password is empty for new users
+      }
+    }
+
     const url = editingUser.id ? `/api/users/${editingUser.id}` : '/api/users';
     const method = editingUser.id ? 'PUT' : 'POST';
 
     const response = await fetchOrThrow(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingUser),
+      body: JSON.stringify(userData),
     });
 
     const savedUser = await response.json();
@@ -510,16 +526,15 @@ const CustomUsersPage = () => {
               fullWidth
               style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             />
-            {!editingUser?.id && (
-              <TextField
-                label={t('userPassword')}
-                type="password"
-                value={editingUser?.password || ''}
-                onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-                fullWidth
-                style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              />
-            )}
+            <TextField
+              label={t('userPassword')}
+              type="password"
+              value={editingUser?.password || ''}
+              onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
+              placeholder={editingUser?.id ? t('userPassword') + ' (leave empty to keep current)' : t('userPassword')}
+              fullWidth
+              style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+            />
             <div style={{ display: 'flex', gap: '16px' }}>
               <FormControlLabel
                 control={

@@ -101,6 +101,40 @@ const UserPage = () => {
     }
   };
 
+  // Custom save handler to handle password field properly
+  const handleSave = useCatch(async () => {
+    if (!item) return;
+
+    // Prepare user data for saving
+    const userData = { ...item };
+    
+    // Handle password field
+    if (item.id) {
+      // For existing users, only include password if it's not empty
+      if (!userData.password || userData.password.trim() === '') {
+        delete userData.password; // Remove password field if empty
+      }
+    } else {
+      // For new users, password is required
+      if (!userData.password || userData.password.trim() === '') {
+        return; // Don't save if password is empty for new users
+      }
+    }
+
+    const url = item.id ? `/api/users/${item.id}` : '/api/users';
+    const method = item.id ? 'PUT' : 'POST';
+
+    const response = await fetchOrThrow(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+
+    const result = await response.json();
+    onItemSaved(result);
+    navigate(-1);
+  });
+
   const validate = () => item && item.name && item.email && (item.id || item.password) && (admin || !totpForce || item.totpKey);
 
   return (
@@ -111,6 +145,7 @@ const UserPage = () => {
       defaultItem={admin ? { deviceLimit: -1 } : {}}
       validate={validate}
       onItemSaved={onItemSaved}
+      customSaveHandler={handleSave}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'settingsUser']}
     >
@@ -134,13 +169,13 @@ const UserPage = () => {
                 label={t('userEmail')}
                 disabled={fixedEmail && item.id === currentUser.id}
               />
-              {!openIdForced && (
-                <TextField
-                  type="password"
-                  onChange={(e) => setItem({ ...item, password: e.target.value })}
-                  label={t('userPassword')}
-                />
-              )}
+              <TextField
+                type="password"
+                value={item.password || ''}
+                onChange={(e) => setItem({ ...item, password: e.target.value })}
+                label={t('userPassword')}
+                placeholder={t('userPassword') + ' (leave empty to keep current)'}
+              />
               {totpEnable && (
                 <FormControl>
                   <InputLabel>{t('loginTotpKey')}</InputLabel>

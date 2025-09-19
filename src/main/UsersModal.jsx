@@ -185,10 +185,26 @@ const UsersModal = ({ open, onClose }) => {
   const handleSaveUser = () => {
     if (!editingUser) return;
 
+    // Prepare user data for saving
+    const userData = { ...editingUser };
+    
+    // Handle password field
     if (editingUser.id) {
-      updateUserMutation.mutate({ id: editingUser.id, userData: editingUser });
+      // For existing users, only include password if it's not empty
+      if (!userData.password || userData.password.trim() === '') {
+        delete userData.password; // Remove password field if empty
+      }
     } else {
-      createUserMutation.mutate(editingUser);
+      // For new users, password is required
+      if (!userData.password || userData.password.trim() === '') {
+        return; // Don't save if password is empty for new users
+      }
+    }
+
+    if (editingUser.id) {
+      updateUserMutation.mutate({ id: editingUser.id, userData });
+    } else {
+      createUserMutation.mutate(userData);
     }
   };
 
@@ -652,16 +668,15 @@ const UsersModal = ({ open, onClose }) => {
                   fullWidth
                   style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 />
-                {!editingUser?.id && (
-                  <TextField
-                    label={t('userPassword')}
-                    type="password"
-                    value={editingUser?.password || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-                    fullWidth
-                    style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                  />
-                )}
+                <TextField
+                  label={t('userPassword')}
+                  type="password"
+                  value={editingUser?.password || ''}
+                  onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
+                  placeholder={editingUser?.id ? t('userPassword') + ' (leave empty to keep current)' : t('userPassword')}
+                  fullWidth
+                  style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                />
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <FormControlLabel
                     control={

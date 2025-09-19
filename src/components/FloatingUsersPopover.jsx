@@ -296,10 +296,26 @@ const FloatingUsersPopover = ({
   const handleSaveUser = () => {
     if (!editingUser) return;
 
+    // Prepare user data for saving
+    const userData = { ...editingUser };
+    
+    // Handle password field
     if (editingUser.id) {
-      updateUserMutation.mutate({ id: editingUser.id, userData: editingUser });
+      // For existing users, only include password if it's not empty
+      if (!userData.password || userData.password.trim() === '') {
+        delete userData.password; // Remove password field if empty
+      }
     } else {
-      createUserMutation.mutate(editingUser);
+      // For new users, password is required
+      if (!userData.password || userData.password.trim() === '') {
+        return; // Don't save if password is empty for new users
+      }
+    }
+
+    if (editingUser.id) {
+      updateUserMutation.mutate({ id: editingUser.id, userData });
+    } else {
+      createUserMutation.mutate(userData);
     }
   };
 
@@ -930,14 +946,14 @@ const FloatingUsersPopover = ({
                           disabled={fixedEmail && editingUser.id}
                       fullWidth
                     />
-                        {!editingUser.id && (
-                      <TextField
-                        type="password"
-                        onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-                            label={t('userPassword')}
-                        fullWidth
-                          />
-                        )}
+                    <TextField
+                      type="password"
+                      value={editingUser.password || ''}
+                      onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
+                      label={t('userPassword')}
+                      placeholder={editingUser.id ? t('userPassword') + ' (leave empty to keep current)' : t('userPassword')}
+                      fullWidth
+                    />
                       </div>
                     )}
 

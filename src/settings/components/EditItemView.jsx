@@ -9,7 +9,7 @@ import useSettingsStyles from '../common/useSettingsStyles';
 import fetchOrThrow from '../../common/util/fetchOrThrow';
 
 const EditItemView = ({
-  children, endpoint, item, setItem, defaultItem, validate, onItemSaved, menu, breadcrumbs,
+  children, endpoint, item, setItem, defaultItem, validate, onItemSaved, menu, breadcrumbs, customSaveHandler,
 }) => {
   const navigate = useNavigate();
   const { classes } = useSettingsStyles();
@@ -77,7 +77,7 @@ const EditItemView = ({
           <Button
             color="primary"
             variant="contained"
-            onClick={handleSave}
+            onClick={customSaveHandler || handleSave}
             disabled={!item || !validate()}
           >
             {t('sharedSave')}
