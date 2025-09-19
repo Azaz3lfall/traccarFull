@@ -1460,10 +1460,10 @@ const FloatingReportsPopover = ({
       {isVisible && (
         <motion.div
           key="reports-popover"
-          initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
-          exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          initial={{ x: -400, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -400, opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             position: 'fixed',
             top: !desktop ? 'auto' : '8px',
