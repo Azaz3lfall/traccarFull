@@ -547,18 +547,24 @@ const FloatingUsersPopover = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow style={{ backgroundColor: colors.surface }}>
-                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                        {t('sharedName')}
-                      </TableCell>
+                      {desktop && (
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          {t('sharedName')}
+                        </TableCell>
+                      )}
                       <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('userEmail')}
                       </TableCell>
-                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                        {t('userAdmin')}
-                      </TableCell>
-                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                        {t('sharedStatus')}
-                      </TableCell>
+                      {desktop && (
+                        <>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('userAdmin')}
+                          </TableCell>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedStatus')}
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('sharedActions')}
                       </TableCell>
@@ -567,13 +573,13 @@ const FloatingUsersPopover = ({
                   <TableBody>
                     {error ? (
                       <TableRow>
-                        <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.error, lineHeight: 0.8, fontSize: '12px' }}>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.error, lineHeight: 0.8, fontSize: '12px' }}>
                           {t('sharedError')}: {error.message}
                         </TableCell>
                       </TableRow>
                     ) : paginatedUsers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
                           {t('sharedNoData')}
                         </TableCell>
                       </TableRow>
@@ -594,66 +600,72 @@ const FloatingUsersPopover = ({
                           }}
                           sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                         >
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <Avatar
-                                style={{
-                                  backgroundColor: colors.primary,
-                                  color: colors.text,
-                                  width: '20px',
-                                  height: '20px',
-                                }}
-                              >
-                                <PersonIcon fontSize="small" />
-                              </Avatar>
-                              <div>
-                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                                  {user.name || t('sharedUnknown')}
-                                </Typography>
-                                {user.temporary && (
-                                  <Chip
-                                    label={t('userTemporary')}
-                                    size="small"
-                                    style={{
-                                      backgroundColor: colors.warning,
-                                      color: colors.text,
-                                      fontSize: '8px',
-                                      height: '12px',
-                                    }}
-                                  />
-                                )}
+                          {desktop && (
+                            <TableCell>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Avatar
+                                  style={{
+                                    backgroundColor: colors.primary,
+                                    color: colors.text,
+                                    width: '20px',
+                                    height: '20px',
+                                  }}
+                                >
+                                  <PersonIcon fontSize="small" />
+                                </Avatar>
+                                <div>
+                                  <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
+                                    {user.name || t('sharedUnknown')}
+                                  </Typography>
+                                  {user.temporary && (
+                                    <Chip
+                                      label={t('userTemporary')}
+                                      size="small"
+                                      style={{
+                                        backgroundColor: colors.warning,
+                                        color: colors.text,
+                                        fontSize: '8px',
+                                        height: '12px',
+                                      }}
+                                    />
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
+                            </TableCell>
+                          )}
                           <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
                             {user.email || '-'}
                           </TableCell>
-                          <TableCell>
-                            <Chip
-                              icon={getStatusIcon(user)}
-                              label={formatBoolean(user.administrator, t)}
-                              size="small"
-                              style={{
-                                backgroundColor: user.administrator ? colors.primary : colors.surface,
-                                color: user.administrator ? colors.text : colors.textSecondary,
-                                fontSize: '10px',
-                                height: '16px',
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              icon={getStatusIcon(user)}
-                              label={user.disabled ? t('sharedDisabled') : t('sharedEnabled')}
-                              size="small"
-                              style={{
-                                backgroundColor: user.disabled ? colors.error : colors.success,
-                                color: colors.text,
-                                fontSize: '10px',
-                                height: '16px',
-                              }}
-                            />
-                          </TableCell>
+                          {desktop && (
+                            <>
+                              <TableCell>
+                                <Chip
+                                  icon={getStatusIcon(user)}
+                                  label={formatBoolean(user.administrator, t)}
+                                  size="small"
+                                  style={{
+                                    backgroundColor: user.administrator ? colors.primary : colors.surface,
+                                    color: user.administrator ? colors.text : colors.textSecondary,
+                                    fontSize: '10px',
+                                    height: '16px',
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  icon={getStatusIcon(user)}
+                                  label={user.disabled ? t('sharedDisabled') : t('sharedEnabled')}
+                                  size="small"
+                                  style={{
+                                    backgroundColor: user.disabled ? colors.error : colors.success,
+                                    color: colors.text,
+                                    fontSize: '10px',
+                                    height: '16px',
+                                  }}
+                                />
+                              </TableCell>
+                            </>
+                          )}
                           <TableCell align="center">
                             <IconButton
                               onClick={(e) => {
@@ -841,7 +853,7 @@ const FloatingUsersPopover = ({
                   position: 'fixed',
                   top: 0,
                   right: 0,
-                  width: '500px',
+                  width: desktop ? '500px' : '100vw',
                   height: '100vh',
                 backgroundColor: colors.surface,
                   borderLeft: `1px solid ${colors.border}`,
@@ -1265,7 +1277,7 @@ const FloatingUsersPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '600px',
+                    width: desktop ? '600px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
                     borderLeft: `1px solid ${colors.border}`,
@@ -1443,7 +1455,7 @@ const FloatingUsersPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '500px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
                     borderLeft: `1px solid ${colors.border}`,
