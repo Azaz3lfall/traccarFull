@@ -1528,7 +1528,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     <div style={{
                       backgroundColor: colors.surface,
                       borderRadius: '8px',
-                      border: `1px solid ${colors.textSecondary}`,
                       overflow: 'hidden',
                       width: '100%',
                       boxSizing: 'border-box'
