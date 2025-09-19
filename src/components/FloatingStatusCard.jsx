@@ -714,13 +714,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
+              boxShadow: !desktop ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none',
               ...(desktop ? {} : {
                 outline: 'none !important',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
                 MozUserSelect: 'none',
-                msUserSelect: 'none',
-                boxShadow: 'none !important'
+                msUserSelect: 'none'
               })
             }}
             onMouseEnter={(e) => {
