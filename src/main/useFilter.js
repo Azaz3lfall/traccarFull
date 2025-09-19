@@ -12,9 +12,20 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       return;
     }
 
-    // On mobile, just return all devices without filtering
+    // On mobile, do basic filtering but skip complex operations
     if (!desktop) {
-      setFilteredDevices(Object.values(devices));
+      let filtered = Object.values(devices);
+      
+      // Only apply keyword search on mobile (most common use case)
+      if (keyword) {
+        const lowerCaseKeyword = keyword.toLowerCase();
+        filtered = filtered.filter((device) => 
+          [device.name, device.uniqueId, device.phone, device.model, device.contact]
+            .some((s) => s && s.toLowerCase().includes(lowerCaseKeyword))
+        );
+      }
+      
+      setFilteredDevices(filtered);
       setFilteredPositions(Object.values(positions));
       return;
     }
