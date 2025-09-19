@@ -581,7 +581,8 @@
   "sharedSavedCommand": "저장된 커맨드",
   "sharedSavedCommands": "저장된 커맨드",
   "sharedSearch": "검색",
-  "sharedSearchDevices": "기기 검색",
+  "sharedSearchDevices": "기기 검색"
+  "sharedSearchPlaces": "장소 검색... (최소 5자)",
   "sharedSecond": "초",
   "sharedSecondAbbreviation": "초",
   "sharedSecondary": "일반",

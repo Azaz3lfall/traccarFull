@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Αποθηκευμένη Εντολή",
   "sharedSavedCommands": "Αποθηκευμένες Εντολές",
   "sharedSearch": "Αναζήτηση",
-  "sharedSearchDevices": "Αναζήτηση Συσκευών",
+  "sharedSearchDevices": "Αναζήτηση Συσκευών"
+  "sharedSearchPlaces": "Αναζήτηση τοπών... (ελάχ. 5 χαρακτήρες)",
   "sharedSecond": "Δευτερόλεπτα",
   "sharedSecondAbbreviation": "δ",
   "sharedSecondary": "Δευτερεύον",

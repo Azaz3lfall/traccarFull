@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Zapisane polecenie",
   "sharedSavedCommands": "Zapisane polecenia",
   "sharedSearch": "Szukaj",
-  "sharedSearchDevices": "Szukaj urządzeń",
+  "sharedSearchDevices": "Szukaj urządzeń"
+  "sharedSearchPlaces": "Szukaj miejsc... (min 5 znaków)",
   "sharedSecond": "Sekunda",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Drugorzędny",

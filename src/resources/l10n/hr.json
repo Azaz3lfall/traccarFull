@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Snimljena naredba",
   "sharedSavedCommands": "Snimljene naredbe",
   "sharedSearch": "Pretraži",
-  "sharedSearchDevices": "Traži uređaje",
+  "sharedSearchDevices": "Traži uređaje"
+  "sharedSearchPlaces": "Pretraži mjesta... (min 5 znakova)",
   "sharedSecond": "Sekunda",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Sekundarno",

@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Gestoorde Bevel",
   "sharedSavedCommands": "Gestoorde Bevele",
   "sharedSearch": "Soek",
-  "sharedSearchDevices": "Soek Toestelle",
+  "sharedSearchDevices": "Soek Toestelle"
+  "sharedSearchPlaces": "Soek plekke... (min 5 karakters)",
   "sharedSecond": "Sekonde",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Secondary",

@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Запазена команда",
   "sharedSavedCommands": "Запазени команди",
   "sharedSearch": "Търси",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "Търсене на места... (мин. 5 символа)",
   "sharedSecond": "Секунда",
   "sharedSecondAbbreviation": "сек.",
   "sharedSecondary": "Secondary",

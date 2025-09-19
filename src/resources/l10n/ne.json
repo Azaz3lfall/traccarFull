@@ -581,7 +581,8 @@
   "sharedSavedCommand": "संचित आदेश",
   "sharedSavedCommands": "संचित आदेशहरू",
   "sharedSearch": "खोज्ने ",
-  "sharedSearchDevices": "खोज उपकरण",
+  "sharedSearchDevices": "खोज उपकरण"
+  "sharedSearchPlaces": "स्थानहरू खोज्नुहोस्... (न्यूनतम ५ अक्षर)",
   "sharedSecond": "सेकेन्ड ",
   "sharedSecondAbbreviation": "से ",
   "sharedSecondary": "माध्यमिक",

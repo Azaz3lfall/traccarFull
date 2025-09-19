@@ -581,7 +581,8 @@
   "sharedSavedCommand": "פקודות שמורות",
   "sharedSavedCommands": "פקודות שמורות",
   "sharedSearch": "חיפוש",
-  "sharedSearchDevices": "חיפוש מכשירים",
+  "sharedSearchDevices": "חיפוש מכשירים"
+  "sharedSearchPlaces": "חיפוש מקומות... (מינימום 5 תווים)",
   "sharedSecond": "שנייה",
   "sharedSecondAbbreviation": "שנ'",
   "sharedSecondary": "משני",

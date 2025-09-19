@@ -581,7 +581,8 @@
   "sharedSavedCommand": "संग्रहीत आदेश",
   "sharedSavedCommands": "संग्रहीत आदेश",
   "sharedSearch": "खोजें",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "स्थान खोजें... (न्यूनतम 5 अक्षर)",
   "sharedSecond": "सैकंड",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Secondary",

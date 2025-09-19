@@ -581,7 +581,8 @@
   "sharedSavedCommand": "შენახული ბრძანებება",
   "sharedSavedCommands": "შენახული ბრძანებები",
   "sharedSearch": "ძებნა",
-  "sharedSearchDevices": "მოწყობილობების ძებნა",
+  "sharedSearchDevices": "მოწყობილობების ძებნა"
+  "sharedSearchPlaces": "ადგილების ძებნა... (მინ. 5 სიმბოლო)",
   "sharedSecond": "წამი",
   "sharedSecondAbbreviation": "წ",
   "sharedSecondary": "მეორადი",

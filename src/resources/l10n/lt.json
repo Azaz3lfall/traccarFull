@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Išsaugota komanda",
   "sharedSavedCommands": "Išsaugotos komandos",
   "sharedSearch": "Paieška",
-  "sharedSearchDevices": "Ieškoti įrenginių",
+  "sharedSearchDevices": "Ieškoti įrenginių"
+  "sharedSearchPlaces": "Ieškoti vietų... (min 5 simboliai)",
   "sharedSecond": "Sekundė(-es)",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Antrinis",

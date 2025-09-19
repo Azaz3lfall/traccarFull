@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Gemt kommando",
   "sharedSavedCommands": "Gemte Kommandoer",
   "sharedSearch": "Søg",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "Søg steder... (min 5 tegn)",
   "sharedSecond": "Sekund",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Secondary",

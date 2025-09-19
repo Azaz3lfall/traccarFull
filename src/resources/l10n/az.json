@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Tarif Saxlamish",
   "sharedSavedCommands": "Tarifler Saxlamish",
   "sharedSearch": "Axtarış",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "Yerləri axtar... (min 5 simvol)",
   "sharedSecond": "Saniyə",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Secondary",

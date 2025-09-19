@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Saved Command",
   "sharedSavedCommands": "Saved Commands",
   "sharedSearch": "অনুসন্ধান / খোঁজা",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "স্থান খুঁজুন... (সর্বনিম্ন ৫ অক্ষর)",
   "sharedSecond": "সেকেন্ড",
   "sharedSecondAbbreviation": "সে",
   "sharedSecondary": "Secondary",

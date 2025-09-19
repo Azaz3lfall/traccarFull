@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Komut Kaydet",
   "sharedSavedCommands": "Komutları Kaydet",
   "sharedSearch": "Arama",
-  "sharedSearchDevices": "Cihaz Arama",
+  "sharedSearchDevices": "Cihaz Arama"
+  "sharedSearchPlaces": "Yer ara... (min 5 karakter)",
   "sharedSecond": "Saniye",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "İkincil",

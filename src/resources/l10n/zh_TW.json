@@ -581,7 +581,8 @@
   "sharedSavedCommand": "儲存指令",
   "sharedSavedCommands": "儲存指令",
   "sharedSearch": "搜尋",
-  "sharedSearchDevices": "搜尋設備",
+  "sharedSearchDevices": "搜尋設備"
+  "sharedSearchPlaces": "搜尋地點... (至少5個字元)",
   "sharedSecond": "秒",
   "sharedSecondAbbreviation": "秒",
   "sharedSecondary": "次要",

@@ -2976,7 +2976,7 @@ const MainPage = () => {
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 type="text"
-                placeholder="Search for places... (min 5 chars)"
+                placeholder={t('sharedSearchPlaces')}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 style={{

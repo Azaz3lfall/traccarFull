@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Sparade kommando",
   "sharedSavedCommands": "Sparade kommandon",
   "sharedSearch": "Sök",
-  "sharedSearchDevices": "Sök Enheter",
+  "sharedSearchDevices": "Sök Enheter"
+  "sharedSearchPlaces": "Sök platser... (min 5 tecken)",
   "sharedSecond": "sek",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Sekundär",

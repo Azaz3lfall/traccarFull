@@ -581,7 +581,8 @@
   "sharedSavedCommand": "Saved Command",
   "sharedSavedCommands": "Saved Commands",
   "sharedSearch": "ຄົ້ນຫາ",
-  "sharedSearchDevices": "Search Devices",
+  "sharedSearchDevices": "Search Devices"
+  "sharedSearchPlaces": "ຊອກຫາສະຖານທີ່... (ຢ່າງໜ້ອຍ 5 ຕົວອັກສອນ)",
   "sharedSecond": "ວິນາທີ",
   "sharedSecondAbbreviation": "s",
   "sharedSecondary": "Secondary",
