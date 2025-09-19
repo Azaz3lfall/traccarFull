@@ -1817,7 +1817,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 10001
+              zIndex: 10004
             }}
             onClick={() => setShowEditModal(false)}
           >
