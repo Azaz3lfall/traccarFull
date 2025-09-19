@@ -1517,29 +1517,32 @@ const FloatingReportsPopover = ({
                 value={activeTab}
                 onChange={handleTabChange}
                 variant="scrollable"
-                scrollButtons="on"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
                 sx={{
                   '& .MuiTabs-flexContainer': {
-                    justifyContent: 'center',
+                    justifyContent: desktop ? 'center' : 'flex-start',
                   },
                   '& .MuiTab-root': {
-                    color: '#666666',
+                    color: colors.textSecondary,
                     fontSize: '12px',
                     fontWeight: '500',
                     textTransform: 'none',
                     minHeight: '40px',
                     padding: '8px 16px',
+                    minWidth: 'auto',
+                    flexShrink: 0,
                     '&.Mui-selected': {
-                      color: '#1976d2',
+                      color: colors.primary,
                       fontWeight: '600',
                       backgroundColor: 'transparent',
                     },
                     '&:hover': {
-                      color: '#1976d2',
+                      color: colors.primary,
                       backgroundColor: 'rgba(25, 118, 210, 0.1)',
                     },
                     '&.Mui-selected:hover': {
-                      color: '#1976d2',
+                      color: colors.primary,
                       backgroundColor: 'rgba(25, 118, 210, 0.15)',
                     },
                     '& .MuiTab-iconWrapper': {
@@ -1548,17 +1551,20 @@ const FloatingReportsPopover = ({
                     }
                   },
                   '& .MuiTabs-indicator': {
-                    backgroundColor: '#1976d2',
+                    backgroundColor: colors.primary,
                     height: '2px',
                   },
                   '& .MuiTabs-scrollButtons': {
-                    color: '#1976d2',
+                    color: colors.primary,
                     width: '40px',
                     '&.Mui-disabled': {
                       opacity: 0.3,
                     },
                   },
                   '& .MuiTabs-scrollButtonsDesktop': {
+                    display: 'flex',
+                  },
+                  '& .MuiTabs-scrollButtonsMobile': {
                     display: 'flex',
                   }
                 }}
