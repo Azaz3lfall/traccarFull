@@ -102,7 +102,7 @@ const ModernDeviceList = ({ devices, positions }) => {
       </div>
 
       {/* Floating Action Button for Mobile Drawer */}
-      {!desktop && (
+      {true && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
