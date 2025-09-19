@@ -1540,7 +1540,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       }}>
                         <div style={{
                           display: 'grid',
-                          gridTemplateColumns: '20% 20% 60%',
+                          gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
                           gap: '16px',
                           fontSize: '11px',
                           fontWeight: '600',
@@ -1548,7 +1548,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em'
                         }}>
-                          <div>{t('stateName')}</div>
+                          {desktop && <div>{t('stateName')}</div>}
                           <div>{t('sharedName')}</div>
                           <div>{t('stateValue')}</div>
                         </div>
@@ -1561,7 +1561,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                           return (
                             <div key={`property-${property || 'empty'}-${propIndex}`} style={{
                               display: 'grid',
-                              gridTemplateColumns: '20% 20% 60%',
+                              gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
                               gap: '16px',
                               padding: '8px 16px',
                               borderBottom: `1px solid ${colors.border}`,
@@ -1569,9 +1569,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                               lineHeight: '1.4',
                               minHeight: '32px'
                             }}>
-                              <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
-                                {property}
-                              </div>
+                              {desktop && (
+                                <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                                  {property}
+                                </div>
+                              )}
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[property]?.name || property}
                               </div>
@@ -1668,7 +1670,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                           return (
                             <div key={`attribute-${attribute || 'empty'}-${attrIndex}`} style={{
                               display: 'grid',
-                              gridTemplateColumns: '20% 20% 60%',
+                              gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
                               gap: '16px',
                               padding: '8px 16px',
                               borderBottom: `1px solid ${colors.border}`,
@@ -1676,9 +1678,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                               lineHeight: '1.4',
                               minHeight: '32px'
                             }}>
-                              <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
-                                {attribute}
-                              </div>
+                              {desktop && (
+                                <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                                  {attribute}
+                                </div>
+                              )}
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {positionAttributes[attribute]?.name || attribute}
                               </div>
