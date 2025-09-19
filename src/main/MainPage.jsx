@@ -2991,8 +2991,8 @@ const MainPage = () => {
                   top: 'calc(50% - 8px)',
                   width: '16px',
                   height: '16px',
-                  border: '2px solid #D1D5DB',
-                  borderTop: '2px solid #3B82F6',
+                  border: '2px solid transparent',
+                  borderTop: '2px solid #18a9fd',
                   borderRadius: '50%',
                   animation: 'spin 1s linear infinite'
                 }} />
