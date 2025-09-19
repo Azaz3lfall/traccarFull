@@ -653,4 +653,6 @@
   "loadingFinalizing": "完成中...",
   "loadingComplete": "完成!",
   "loadingStarting": "启动中..."
+,
+  "sharedMenu": "菜单"
 }

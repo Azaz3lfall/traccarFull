@@ -653,4 +653,6 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting..."
+,
+  "sharedMenu": "Menu"
 }
