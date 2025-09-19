@@ -316,13 +316,11 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
           transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            top: !desktop ? '50%' : '8px',
-            left: !desktop ? '50%' : (isMenuExpanded ? '200px' : '63px'),
-            transform: !desktop ? 'translate(-50%, -50%)' : 'none',
+            top: !desktop ? '8px' : '8px',
+            right: !desktop ? '65px' : '65px',
             width: !desktop ? '75vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
-            maxWidth: !desktop ? '75vw' : 'none',
-            height: !desktop ? '80vh' : 'calc(100vh - 16px)',
-            maxHeight: !desktop ? '80vh' : 'none',
+            maxWidth: '75vw',
+            height: !desktop ? 'calc(100vh - 16px)' : 'calc(100vh - 16px)',
             zIndex: 9999,
             backgroundColor: colors.surface,
             border: `1px solid ${colors.border}`,
