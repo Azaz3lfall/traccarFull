@@ -2048,47 +2048,54 @@ const FloatingReportsPopover = ({
                       </FormControl>
                     </div>
                     
-                    {/* Show Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="secondary"
-                        disabled={isTripsDisabled()}
-                        onClick={showTripsReport}
-                        startIcon={tripsLoading ? <CircularProgress size={20} /> : null}
-                        style={{ 
-                          minWidth: desktop ? '120px' : 'auto',
-                          color: colors.text,
-                          borderColor: colors.border
-                        }}
-                      >
-                        <Typography variant="button" noWrap style={{ color: colors.text }}>
-                          {tripsLoading ? t('sharedLoading') : t('reportShow')}
-                        </Typography>
-                      </Button>
-                    </div>
-                    
-                    {/* Export Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        disabled={isTripsDisabled() || tripsItems.length === 0}
-                        onClick={exportTripsReport}
-                        style={{ 
-                          minWidth: '40px',
-                          height: '40px',
-                          padding: '0',
-                          color: colors.text,
-                          borderColor: colors.border,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <DownloadIcon />
-                      </Button>
+                    {/* Show and Export Buttons Container */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: desktop ? 'row' : 'row',
+                      gap: '8px',
+                      flex: desktop ? '0 0 auto' : '1 1 auto',
+                      minWidth: 0
+                    }}>
+                      {/* Show Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="secondary"
+                          disabled={isTripsDisabled()}
+                          onClick={showTripsReport}
+                          startIcon={tripsLoading ? <CircularProgress size={20} /> : null}
+                          style={{ 
+                            minWidth: desktop ? '120px' : 'auto',
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {tripsLoading ? t('sharedLoading') : t('reportShow')}
+                          </Typography>
+                        </Button>
+                      </div>
+                      
+                      {/* Export Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="primary"
+                          disabled={isTripsDisabled() || tripsItems.length === 0}
+                          onClick={exportTripsReport}
+                          startIcon={<DownloadIcon />}
+                          style={{ 
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {t('sharedExport')}
+                          </Typography>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
@@ -2259,47 +2266,54 @@ const FloatingReportsPopover = ({
                       </FormControl>
                     </div>
                     
-                    {/* Show Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="secondary"
-                        disabled={isStopsDisabled()}
-                        onClick={showStopsReport}
-                        startIcon={stopsLoading ? <CircularProgress size={20} /> : null}
-                        style={{ 
-                          minWidth: desktop ? '120px' : 'auto',
-                          color: colors.text,
-                          borderColor: colors.border
-                        }}
-                      >
-                        <Typography variant="button" noWrap style={{ color: colors.text }}>
-                          {stopsLoading ? t('sharedLoading') : t('reportShow')}
-                        </Typography>
-                      </Button>
-                    </div>
-                    
-                    {/* Export Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        disabled={isStopsDisabled() || stopsItems.length === 0}
-                        onClick={exportStopsReport}
-                        style={{ 
-                          minWidth: '40px',
-                          height: '40px',
-                          padding: '0',
-                          color: colors.text,
-                          borderColor: colors.border,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <DownloadIcon />
-                      </Button>
+                    {/* Show and Export Buttons Container */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: desktop ? 'row' : 'row',
+                      gap: '8px',
+                      flex: desktop ? '0 0 auto' : '1 1 auto',
+                      minWidth: 0
+                    }}>
+                      {/* Show Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="secondary"
+                          disabled={isStopsDisabled()}
+                          onClick={showStopsReport}
+                          startIcon={stopsLoading ? <CircularProgress size={20} /> : null}
+                          style={{ 
+                            minWidth: desktop ? '120px' : 'auto',
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {stopsLoading ? t('sharedLoading') : t('reportShow')}
+                          </Typography>
+                        </Button>
+                      </div>
+                      
+                      {/* Export Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="primary"
+                          disabled={isStopsDisabled() || stopsItems.length === 0}
+                          onClick={exportStopsReport}
+                          startIcon={<DownloadIcon />}
+                          style={{ 
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {t('sharedExport')}
+                          </Typography>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
@@ -2489,47 +2503,54 @@ const FloatingReportsPopover = ({
                       </FormControl>
                     </div>
                     
-                    {/* Show Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="secondary"
-                        disabled={isSummaryDisabled()}
-                        onClick={showSummaryReport}
-                        startIcon={summaryLoading ? <CircularProgress size={20} /> : null}
-                        style={{ 
-                          minWidth: desktop ? '120px' : 'auto',
-                          color: colors.text,
-                          borderColor: colors.border
-                        }}
-                      >
-                        <Typography variant="button" noWrap style={{ color: colors.text }}>
-                          {summaryLoading ? t('sharedLoading') : t('reportShow')}
-                        </Typography>
-                      </Button>
-                    </div>
-                    
-                    {/* Export Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        disabled={isSummaryDisabled() || summaryItems.length === 0}
-                        onClick={exportSummaryReport}
-                        style={{ 
-                          minWidth: '40px',
-                          height: '40px',
-                          padding: '0',
-                          color: colors.text,
-                          borderColor: colors.border,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <DownloadIcon />
-                      </Button>
+                    {/* Show and Export Buttons Container */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: desktop ? 'row' : 'row',
+                      gap: '8px',
+                      flex: desktop ? '0 0 auto' : '1 1 auto',
+                      minWidth: 0
+                    }}>
+                      {/* Show Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="secondary"
+                          disabled={isSummaryDisabled()}
+                          onClick={showSummaryReport}
+                          startIcon={summaryLoading ? <CircularProgress size={20} /> : null}
+                          style={{ 
+                            minWidth: desktop ? '120px' : 'auto',
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {summaryLoading ? t('sharedLoading') : t('reportShow')}
+                          </Typography>
+                        </Button>
+                      </div>
+                      
+                      {/* Export Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="primary"
+                          disabled={isSummaryDisabled() || summaryItems.length === 0}
+                          onClick={exportSummaryReport}
+                          startIcon={<DownloadIcon />}
+                          style={{ 
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {t('sharedExport')}
+                          </Typography>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
@@ -2897,47 +2918,54 @@ const FloatingReportsPopover = ({
                       </FormControl>
                     </div>
                     
-                    {/* Show Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="secondary"
-                        disabled={isPositionsDisabled()}
-                        onClick={showPositionsReport}
-                        startIcon={positionsLoading ? <CircularProgress size={20} /> : null}
-                        style={{ 
-                          minWidth: desktop ? '120px' : 'auto',
-                          color: colors.text,
-                          borderColor: colors.border
-                        }}
-                      >
-                        <Typography variant="button" noWrap style={{ color: colors.text }}>
-                          {positionsLoading ? t('sharedLoading') : t('reportShow')}
-                        </Typography>
-                      </Button>
-                    </div>
-                    
-                    {/* Export Button */}
-                    <div style={{ flex: desktop ? '0 0 auto' : '1 1 auto', minWidth: 0 }}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        disabled={isPositionsDisabled() || positionsItems.length === 0}
-                        onClick={exportPositionsReport}
-                        style={{ 
-                          minWidth: '40px',
-                          height: '40px',
-                          padding: '0',
-                          color: colors.text,
-                          borderColor: colors.border,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <DownloadIcon />
-                      </Button>
+                    {/* Show and Export Buttons Container */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: desktop ? 'row' : 'row',
+                      gap: '8px',
+                      flex: desktop ? '0 0 auto' : '1 1 auto',
+                      minWidth: 0
+                    }}>
+                      {/* Show Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="secondary"
+                          disabled={isPositionsDisabled()}
+                          onClick={showPositionsReport}
+                          startIcon={positionsLoading ? <CircularProgress size={20} /> : null}
+                          style={{ 
+                            minWidth: desktop ? '120px' : 'auto',
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {positionsLoading ? t('sharedLoading') : t('reportShow')}
+                          </Typography>
+                        </Button>
+                      </div>
+                      
+                      {/* Export Button */}
+                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="primary"
+                          disabled={isPositionsDisabled() || positionsItems.length === 0}
+                          onClick={exportPositionsReport}
+                          startIcon={<DownloadIcon />}
+                          style={{ 
+                            color: colors.text,
+                            borderColor: colors.border
+                          }}
+                        >
+                          <Typography variant="button" noWrap style={{ color: colors.text }}>
+                            {t('sharedExport')}
+                          </Typography>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
