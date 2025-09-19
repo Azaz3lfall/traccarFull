@@ -429,7 +429,7 @@ const FloatingDevicesPopover = ({
               <TextField
                 fullWidth
                 size="small"
-                placeholder={t('sharedSearch')}
+                placeholder={t('sharedSearchDevices')}
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 InputProps={{

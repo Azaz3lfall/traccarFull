@@ -562,7 +562,7 @@ const FloatingDeviceList = ({
               color: colors.textSecondary
             }} />
             <Input
-              placeholder={t('sharedEnterValue')}
+              placeholder={t('sharedSearchDevices')}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               style={{
