@@ -706,7 +706,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               width: !desktop ? '34px' : '32px',
               height: !desktop ? '34px' : '32px',
               borderRadius: !desktop ? '8px' : '0px',
-              backgroundColor: 'transparent',
+              backgroundColor: !desktop ? colors.surface : 'transparent',
               border: 'none',
               color: !desktop ? colors.textSecondary : colors.textSecondary,
               display: 'flex',
@@ -722,37 +722,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               boxShadow: 'none !important'
             }}
             onMouseEnter={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = colors.menuHover;
-              } else {
+              if (desktop) {
                 e.target.style.transform = 'scale(1.1)';
               }
             }}
             onMouseLeave={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = 'transparent';
-              } else {
+              if (desktop) {
                 e.target.style.transform = 'scale(1)';
-              }
-            }}
-            onMouseDown={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = colors.menuHover;
-              }
-            }}
-            onMouseUp={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = colors.menuHover;
-              }
-            }}
-            onFocus={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = colors.menuHover;
-              }
-            }}
-            onBlur={(e) => {
-              if (!desktop) {
-                e.target.style.backgroundColor = 'transparent';
               }
             }}
           >
