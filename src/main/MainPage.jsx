@@ -788,29 +788,13 @@ const MainPage = () => {
 
   // Old desktop-only refresh - now handled by universal refresh below
 
-  // Force re-filter when devices are loaded (for mobile empty list issue)
-  useEffect(() => {
-    if (devices && Object.keys(devices).length > 0 && filteredDevices.length === 0) {
-      console.log('MainPage: Devices loaded but filteredDevices empty, forcing re-filter');
-      // Trigger a re-filter by updating keyword (this will cause useFilter to run again)
-      setKeyword(prev => prev + '');
-    }
-  }, [devices, filteredDevices.length, setKeyword]);
-
   // Force refresh devices when device list becomes visible (mobile and desktop)
   useEffect(() => {
     if (isDeviceListVisible) {
       console.log('MainPage: Device list became visible, refreshing devices');
       refreshDevices();
-      // Also force re-filter by resetting keyword to trigger useFilter
-      setKeyword(prev => prev + '');
-      // On mobile, immediately show all devices if we have them
-      if (!desktop && devices && Object.keys(devices).length > 0) {
-        console.log('MainPage: Mobile device list visible, immediately showing all devices');
-        setFilteredDevices(Object.values(devices));
-      }
     }
-  }, [isDeviceListVisible, refreshDevices, setKeyword, desktop, devices, setFilteredDevices]);
+  }, [isDeviceListVisible, refreshDevices]);
 
   // Immediate reload of filtered devices when going back from selected device (mobile)
   useEffect(() => {
@@ -822,6 +806,17 @@ const MainPage = () => {
       console.log('MainPage: Set filteredDevices to', allDevices.length, 'devices');
     }
   }, [desktop, selectedDeviceId, devices, setFilteredDevices]);
+
+  // Force re-filter when devices are loaded but filteredDevices is empty (mobile optimization)
+  useEffect(() => {
+    if (devices && Object.keys(devices).length > 0 && filteredDevices.length === 0) {
+      console.log('MainPage: Devices loaded but filteredDevices empty, setting all devices');
+      // On mobile, immediately show all devices without triggering useFilter
+      if (!desktop) {
+        setFilteredDevices(Object.values(devices));
+      }
+    }
+  }, [devices, filteredDevices.length, desktop, setFilteredDevices]);
 
   return (
     <div className={classes.root}>
