@@ -5486,44 +5486,6 @@ const MainPage = () => {
                     flexDirection: 'column',
                     gap: '0'
                   }}>
-                  {/* Device List Toggle */}
-                  <button
-                    onClick={() => {
-                      setIsDeviceListVisible(!isDeviceListVisible);
-                      setDrawerOpen(false);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px 20px',
-                      background: 'none',
-                      border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                      margin: '0',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      width: '100%',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '400',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.menuHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <Truck size={18} color={colors.textSecondary} style={{ marginRight: '12px' }} />
-                    {t('showHideDevices')}
-                  </button>
-                  
                   {/* Reports */}
                   {!disableReports && (
                     <button
@@ -5559,44 +5521,6 @@ const MainPage = () => {
                       {t('reportTitle')}
                     </button>
                   )}
-                  
-                  {/* Geofences */}
-                  <button
-                    onClick={() => {
-                      setGeofencesPopoverVisible(true);
-                      setDrawerOpen(false);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px 20px',
-                      background: 'none',
-                      border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                      margin: '0',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      width: '100%',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '400',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.menuHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <CreateIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                    {t('sharedGeofences')}
-                  </button>
                   
                   {/* Settings */}
                   <button
