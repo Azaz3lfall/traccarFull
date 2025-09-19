@@ -804,23 +804,24 @@ const MainPage = () => {
       refreshDevices();
       // Also force re-filter by resetting keyword to trigger useFilter
       setKeyword(prev => prev + '');
+      // On mobile, immediately show all devices if we have them
+      if (!desktop && devices && Object.keys(devices).length > 0) {
+        console.log('MainPage: Mobile device list visible, immediately showing all devices');
+        setFilteredDevices(Object.values(devices));
+      }
     }
-  }, [isDeviceListVisible, refreshDevices, setKeyword]);
+  }, [isDeviceListVisible, refreshDevices, setKeyword, desktop, devices, setFilteredDevices]);
 
-  // Reload filtered devices when going back from selected device (mobile)
+  // Immediate reload of filtered devices when going back from selected device (mobile)
   useEffect(() => {
     if (!desktop && !selectedDeviceId && devices && Object.keys(devices).length > 0) {
-      console.log('MainPage: Back from selected device, reloading filtered devices');
-      // Force re-filter by updating keyword to trigger useFilter
-      setKeyword(prev => prev + '');
-      // Also directly set filtered devices to ensure immediate update
-      const filtered = Object.values(devices).filter((device) => {
-        const lowerCaseKeyword = keyword.toLowerCase();
-        return [device.name, device.uniqueId, device.phone, device.model, device.contact].some((s) => s && s.toLowerCase().includes(lowerCaseKeyword));
-      });
-      setFilteredDevices(filtered);
+      console.log('MainPage: Back from selected device, immediately reloading filtered devices');
+      // Immediately set all devices as filtered (no keyword filter initially)
+      const allDevices = Object.values(devices);
+      setFilteredDevices(allDevices);
+      console.log('MainPage: Set filteredDevices to', allDevices.length, 'devices');
     }
-  }, [desktop, selectedDeviceId, devices, keyword, setKeyword, setFilteredDevices]);
+  }, [desktop, selectedDeviceId, devices, setFilteredDevices]);
 
   return (
     <div className={classes.root}>
