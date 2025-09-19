@@ -2256,6 +2256,7 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={desktop ? isDeviceListVisible : true} // Desktop: controlled by toggle, Mobile: always visible unless device selected
         geofencesPopoverVisible={geofencesPopoverVisible}
+        onDrawerOpen={() => console.log('Drawer opened!')}
       />
       
       {/* Floating Status Card */}
