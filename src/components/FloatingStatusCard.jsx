@@ -699,27 +699,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               dispatch(devicesActions.selectId(null));
             }}
             style={{
-              position: 'fixed',
-              top: !desktop ? '10px' : '20px',
-              left: !desktop ? '10px' : '20px',
-              zIndex: 10000,
+              position: !desktop ? 'fixed' : 'absolute',
+              top: !desktop ? '10px' : '12px',
+              left: !desktop ? '10px' : '12px',
+              zIndex: !desktop ? 10000 : 10,
               width: !desktop ? '34px' : '32px',
               height: !desktop ? '34px' : '32px',
               borderRadius: !desktop ? '12px' : '0px',
               backgroundColor: !desktop ? colors.surface : 'transparent',
               border: 'none',
-              color: !desktop ? colors.textSecondary : colors.textSecondary,
+              color: colors.textSecondary,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              outline: 'none !important',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              MozUserSelect: 'none',
-              msUserSelect: 'none',
-              boxShadow: 'none !important'
+              ...(desktop ? {} : {
+                outline: 'none !important',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
+                boxShadow: 'none !important'
+              })
             }}
             onMouseEnter={(e) => {
               if (desktop) {
