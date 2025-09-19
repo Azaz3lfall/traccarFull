@@ -807,6 +807,15 @@ const MainPage = () => {
     }
   }, [isDeviceListVisible, refreshDevices, setKeyword]);
 
+  // Reload filtered devices when going back from selected device (mobile)
+  useEffect(() => {
+    if (!desktop && !selectedDeviceId && devices && Object.keys(devices).length > 0) {
+      console.log('MainPage: Back from selected device, reloading filtered devices');
+      // Force re-filter by updating keyword to trigger useFilter
+      setKeyword(prev => prev + '');
+    }
+  }, [desktop, selectedDeviceId, devices, setKeyword]);
+
   return (
     <div className={classes.root}>
       {desktop && (
