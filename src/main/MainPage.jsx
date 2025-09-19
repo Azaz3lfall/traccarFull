@@ -792,7 +792,6 @@ const MainPage = () => {
   // Mobile: Always show all devices directly from Redux (no filtering delays)
   useEffect(() => {
     if (!desktop && devices && Object.keys(devices).length > 0) {
-      console.log('MainPage: Mobile - setting all devices directly from Redux');
       setFilteredDevices(Object.values(devices));
     }
   }, [desktop, devices, setFilteredDevices]);
@@ -802,7 +801,6 @@ const MainPage = () => {
   // Force refresh devices when device list becomes visible (desktop only)
   useEffect(() => {
     if (desktop && isDeviceListVisible) {
-      console.log('MainPage: Desktop device list became visible, refreshing devices');
       refreshDevices();
     }
   }, [desktop, isDeviceListVisible, refreshDevices]);
