@@ -495,12 +495,16 @@ const FloatingDevicesPopover = ({
                           <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                             {t('sharedName')}
                           </TableCell>
-                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                            {t('deviceIdentifier')}
-                          </TableCell>
-                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                            {t('deviceStatus')}
-                          </TableCell>
+                          {desktop && (
+                            <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                              {t('deviceIdentifier')}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                              {t('deviceStatus')}
+                            </TableCell>
+                          )}
                           <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                             {t('sharedActions')}
                           </TableCell>
@@ -527,23 +531,27 @@ const FloatingDevicesPopover = ({
                                 {device.name}
                               </Typography>
                             </TableCell>
-                            <TableCell>
-                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                                {device.uniqueId}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Chip
-                                label={formatStatus(device.status, t)}
-                                size="small"
-                                style={{
-                                  backgroundColor: device.status === 'online' ? colors.success : colors.error,
-                                  color: colors.text,
-                                  fontSize: '10px',
-                                  height: '16px',
-                                }}
-                              />
-                            </TableCell>
+                            {desktop && (
+                              <TableCell>
+                                <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {device.uniqueId}
+                                </Typography>
+                              </TableCell>
+                            )}
+                            {desktop && (
+                              <TableCell>
+                                <Chip
+                                  label={formatStatus(device.status, t)}
+                                  size="small"
+                                  style={{
+                                    backgroundColor: device.status === 'online' ? colors.success : colors.error,
+                                    color: colors.text,
+                                    fontSize: '10px',
+                                    height: '16px',
+                                  }}
+                                />
+                              </TableCell>
+                            )}
                             <TableCell align="right" style={{ padding: '4px' }}>
                               <IconButton
                                 size="small"
@@ -646,10 +654,10 @@ const FloatingDevicesPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
+                    borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                     zIndex: 10000,
                     display: 'flex',
                     flexDirection: 'column',
@@ -1238,10 +1246,10 @@ const FloatingDevicesPopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
+                    borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                     zIndex: 10000,
                     display: 'flex',
                     flexDirection: 'column',
