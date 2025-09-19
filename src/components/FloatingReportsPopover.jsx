@@ -1249,6 +1249,72 @@ const FloatingReportsPopover = ({
     }
   }, [activeTab]);
 
+  // Cleanup all state variables when popover is closed
+  useEffect(() => {
+    if (!isVisible) {
+      // Reset all report data arrays
+      setCombinedItems([]);
+      setEventsItems([]);
+      setTripsItems([]);
+      setStopsItems([]);
+      setSummaryItems([]);
+      setChartItems([]);
+      setPositionsItems([]);
+      setScheduledItems([]);
+      setStatisticsItems([]);
+      setAuditItems([]);
+
+      // Reset all loading states
+      setCombinedLoading(false);
+      setEventsLoading(false);
+      setTripsLoading(false);
+      setStopsLoading(false);
+      setSummaryLoading(false);
+      setChartLoading(false);
+      setPositionsLoading(false);
+      setScheduledLoading(false);
+      setStatisticsLoading(false);
+      setAuditLoading(false);
+      setLogsLoading(false);
+
+      // Reset all filter and selection states
+      setDeviceIds([]);
+      setGroupIds([]);
+      setPeriod('today');
+      setCustomFrom(dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'));
+      setCustomTo(dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
+      setEventTypes(['allEvents']);
+      setAlarmTypes([]);
+      setAllEventTypes([['allEvents', 'eventAll']]);
+      setEventsColumns(['eventTime', 'type', 'attributes']);
+      setSelectedEvent(null);
+      setEventPosition(null);
+      setTripsColumns(['startTime', 'endTime', 'distance', 'averageSpeed']);
+      setSelectedTrip(null);
+      setTripRoute(null);
+      setStopsColumns(['startTime', 'endTime', 'startOdometer', 'address']);
+      setSelectedStop(null);
+      setSummaryColumns(['startTime', 'distance', 'averageSpeed']);
+      setDaily(false);
+      setChartTypes(['speed']);
+      setSelectedChartTypes(['speed']);
+      setTimeType('fixTime');
+      setPositionsColumns(['fixTime', 'latitude', 'longitude', 'speed', 'address']);
+      setSelectedPosition(null);
+      setAvailableColumns([]);
+      setGeofenceId(null);
+      setStatisticsColumns(['captureTime', 'activeUsers', 'activeDevices', 'messagesStored']);
+      setAuditColumns(['actionTime', 'userId', 'actionType', 'objectType']);
+
+      // Reset dialog states
+      setDeleteDialog(false);
+      setScheduledToDelete(null);
+
+      // Reset active tab
+      setActiveTab(0);
+    }
+  }, [isVisible]);
+
   // Handle delete scheduled report
   const handleDeleteScheduled = (scheduled) => {
     setScheduledToDelete(scheduled);
