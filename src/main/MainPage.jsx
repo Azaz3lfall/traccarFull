@@ -36,6 +36,7 @@ import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
+import DrawerMenu from '../components/DrawerMenu';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -199,6 +200,7 @@ const MainPage = () => {
     notificator: '',
     message: { subject: '', body: '' }
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
   
   // Custom autocomplete states
   const [usersItems, setUsersItems] = useState([]);
@@ -2256,7 +2258,7 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={desktop ? isDeviceListVisible : true} // Desktop: controlled by toggle, Mobile: always visible unless device selected
         geofencesPopoverVisible={geofencesPopoverVisible}
-        onDrawerOpen={() => console.log('Drawer opened!')}
+        onDrawerOpen={() => setDrawerOpen(true)}
       />
       
       {/* Floating Status Card */}
@@ -5384,6 +5386,30 @@ const MainPage = () => {
           </>
         )}
       </AnimatePresence>
+      
+      {/* Mobile Drawer Menu */}
+      {!desktop && (
+        <DrawerMenu
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          onNavigate={(route) => {
+            navigate(route);
+            setDrawerOpen(false);
+          }}
+          onEventsClick={() => {
+            setEventsOpen(true);
+            setDrawerOpen(false);
+          }}
+          onDevicesClick={() => {
+            setIsDeviceListVisible(true);
+            setDrawerOpen(false);
+          }}
+          onSettingsClick={() => {
+            setShowPreferencesDrawer(true);
+            setDrawerOpen(false);
+          }}
+        />
+      )}
       
     </div>
   );
