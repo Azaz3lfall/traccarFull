@@ -527,19 +527,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
         to: selectedTo.toISOString()
       });
 
-      console.log('Replay API Call:', `/api/positions?${query.toString()}`);
       
       const response = await fetchOrThrow(`/api/positions?${query.toString()}`);
       const positions = await response.json();
       
-             console.log('Replay API Response:', positions);
-             console.log('Number of positions:', positions.length);
              
              // Store positions for map plotting
              dispatch(sessionActions.updateReplayPositions(positions));
              
              if (!positions.length) {
-               console.log('No data found for the selected period');
              }
       
     } catch (error) {
@@ -662,7 +658,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   };
   
   
-  console.log('Status card render - selectedDeviceId:', selectedDeviceId, 'device:', device, 'showReplayPopover:', showReplayPopover);
   
   return (
     <>
@@ -705,8 +700,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
             }}
             style={{
               position: 'absolute',
-              top: !desktop ? '8px' : '12px',
-              left: !desktop ? '2px' : '12px',
+              top: !desktop ? '10px' : '12px',
+              left: !desktop ? '10px' : '12px',
               zIndex: 10,
               width: '32px',
               height: '32px',
@@ -1165,7 +1160,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               <button
            onClick={(e) => {
              e.stopPropagation(); // Prevent event bubbling to map
-             console.log('Replay button clicked, selectedDeviceId:', selectedDeviceId);
              
              // Store the current deviceId for replay
              setReplayDeviceId(selectedDeviceId);
@@ -1182,7 +1176,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
              setShowReplayPopover(true);
              onHideDeviceList();
              
-             console.log('After setting showReplayPopover to true, selectedDeviceId:', selectedDeviceId);
            }}
                 style={{
                   width: !desktop ? '50px' : '42px',
