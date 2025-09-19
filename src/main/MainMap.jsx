@@ -17,6 +17,7 @@ import MapScale from '../map/MapScale';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapCamera from '../map/MapCamera';
+import MapReplayCamera from '../map/MapReplayCamera';
 
 const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0 }) => {
   const theme = useTheme();
@@ -69,7 +70,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
           <>
             <MapRoutePath positions={replayPositions} />
             <MapRoutePoints positions={replayPositions} />
-            <MapCamera positions={mapPositions} />
+            <MapReplayCamera position={mapPositions[0]} />
           </>
         )}
       </MapView>
