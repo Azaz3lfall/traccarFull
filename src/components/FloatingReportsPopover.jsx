@@ -1533,9 +1533,9 @@ const FloatingReportsPopover = ({
                     minWidth: 'auto',
                     flexShrink: 0,
                     '&.Mui-selected': {
-                      color: colors.primary,
+                      color: colors.text,
                       fontWeight: '600',
-                      backgroundColor: 'transparent',
+                      backgroundColor: `${colors.primary}20`,
                     },
                     '&:hover': {
                       color: colors.primary,
@@ -1555,14 +1555,20 @@ const FloatingReportsPopover = ({
                     height: '2px',
                   },
                   '& .MuiTabs-scrollButtons': {
-                    color: colors.primary,
+                    color: colors.text,
                     width: '40px',
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    margin: '0 4px',
                     '&.Mui-disabled': {
                       color: colors.textSecondary,
                       opacity: 0.3,
+                      backgroundColor: 'transparent',
                     },
                     '&:hover': {
                       backgroundColor: `${colors.primary}1A`,
+                      color: colors.primary,
                     },
                   },
                   '& .MuiTabs-scrollButtonsDesktop': {
