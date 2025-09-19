@@ -222,7 +222,7 @@ const FloatingDeviceList = ({
     } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
     }
-  }, [!desktop, selectedDeviceId]);
+  }, [desktop, selectedDeviceId]);
   
 
   // Memoized device row component for virtualized rendering
