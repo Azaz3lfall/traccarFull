@@ -2725,7 +2725,8 @@ const MainPage = () => {
               position: 'fixed',
               top: eventsButtonRef ? eventsButtonRef.getBoundingClientRect().top + 'px' : '60px', // Align with events button top
               right: '65px', // 8px control bar + 30px offset + 15px additional + 12px popover margin
-              width: '300px',
+              width: desktop ? '300px' : '75vw',
+              maxWidth: '75vw',
               maxHeight: '400px',
               backgroundColor: colors.surface,
               borderRadius: '12px',
