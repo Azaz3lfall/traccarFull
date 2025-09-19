@@ -813,8 +813,14 @@ const MainPage = () => {
       console.log('MainPage: Back from selected device, reloading filtered devices');
       // Force re-filter by updating keyword to trigger useFilter
       setKeyword(prev => prev + '');
+      // Also directly set filtered devices to ensure immediate update
+      const filtered = Object.values(devices).filter((device) => {
+        const lowerCaseKeyword = keyword.toLowerCase();
+        return [device.name, device.uniqueId, device.phone, device.model, device.contact].some((s) => s && s.toLowerCase().includes(lowerCaseKeyword));
+      });
+      setFilteredDevices(filtered);
     }
-  }, [desktop, selectedDeviceId, devices, setKeyword]);
+  }, [desktop, selectedDeviceId, devices, keyword, setKeyword, setFilteredDevices]);
 
   return (
     <div className={classes.root}>
