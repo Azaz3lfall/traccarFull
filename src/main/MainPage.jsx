@@ -784,17 +784,9 @@ const MainPage = () => {
   }, [dispatch]);
 
 
-  // Only use filter on desktop, mobile gets direct access to devices
-  if (desktop) {
-    useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
-  }
+  // Always call useFilter (required by Rules of Hooks)
+  useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop);
 
-  // Mobile: Always show all devices directly from Redux (no filtering delays)
-  useEffect(() => {
-    if (!desktop && devices && Object.keys(devices).length > 0) {
-      setFilteredDevices(Object.values(devices));
-    }
-  }, [desktop, devices, setFilteredDevices]);
 
   // Old desktop-only refresh - now handled by universal refresh below
 

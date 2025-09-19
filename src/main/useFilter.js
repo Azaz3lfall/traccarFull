@@ -2,14 +2,20 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 
-export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions) => {
+export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop = true) => {
   const groups = useSelector((state) => state.groups.items);
   const devices = useSelector((state) => state.devices.items);
 
   useEffect(() => {
     // Don't filter if devices are not loaded yet
     if (!devices || Object.keys(devices).length === 0) {
-      console.log('useFilter: No devices loaded yet, skipping filter');
+      return;
+    }
+
+    // On mobile, just return all devices without filtering
+    if (!desktop) {
+      setFilteredDevices(Object.values(devices));
+      setFilteredPositions(Object.values(positions));
       return;
     }
 
@@ -72,5 +78,5 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
     setFilteredPositions(filterMap
       ? filtered.map((device) => positions[device.id]).filter(Boolean)
       : Object.values(positions));
-  }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions]);
+  }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions, desktop]);
 };
