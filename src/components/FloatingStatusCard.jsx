@@ -703,21 +703,57 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               top: !desktop ? '10px' : '20px',
               left: !desktop ? '10px' : '20px',
               zIndex: 10000,
-              width: '32px',
-              height: '32px',
+              width: !desktop ? '34px' : '32px',
+              height: !desktop ? '34px' : '32px',
+              borderRadius: !desktop ? '8px' : '0px',
               backgroundColor: 'transparent',
               border: 'none',
+              color: !desktop ? colors.textSecondary : colors.textSecondary,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              outline: 'none !important',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none',
+              boxShadow: 'none !important'
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = 'scale(1.1)';
+              if (!desktop) {
+                e.target.style.backgroundColor = colors.menuHover;
+              } else {
+                e.target.style.transform = 'scale(1.1)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = 'scale(1)';
+              if (!desktop) {
+                e.target.style.backgroundColor = 'transparent';
+              } else {
+                e.target.style.transform = 'scale(1)';
+              }
+            }}
+            onMouseDown={(e) => {
+              if (!desktop) {
+                e.target.style.backgroundColor = colors.menuHover;
+              }
+            }}
+            onMouseUp={(e) => {
+              if (!desktop) {
+                e.target.style.backgroundColor = colors.menuHover;
+              }
+            }}
+            onFocus={(e) => {
+              if (!desktop) {
+                e.target.style.backgroundColor = colors.menuHover;
+              }
+            }}
+            onBlur={(e) => {
+              if (!desktop) {
+                e.target.style.backgroundColor = 'transparent';
+              }
             }}
           >
             <ChevronLeft size={20} color={colors.textSecondary} />
