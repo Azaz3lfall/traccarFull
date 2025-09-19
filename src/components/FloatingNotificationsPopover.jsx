@@ -316,25 +316,30 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
           transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            top: !desktop ? '8px' : '8px',
-            right: !desktop ? '65px' : '65px',
+            top: !desktop ? '0px' : '8px',
+            left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
             width: !desktop ? '75vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
             maxWidth: '75vw',
-            height: !desktop ? 'calc(100vh - 16px)' : 'calc(100vh - 16px)',
+            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
             zIndex: 9999,
-            backgroundColor: colors.surface,
-            border: `1px solid ${colors.border}`,
-            borderRadius: !desktop ? '12px' : '0px 16px 16px 0px',
-            overflow: 'hidden',
-            boxShadow: !desktop ? '0 8px 32px rgba(0, 0, 0, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
+            pointerEvents: 'auto',
+            transition: 'left 0.3s ease'
           }}
         >
-          {/* Header */}
           <div style={{
-            padding: '16px 20px',
-            borderBottom: `1px solid ${colors.border}`,
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            borderRadius: !desktop ? '0px' : '0px 16px 16px 0px',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: `1px solid ${colors.border}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -1241,6 +1246,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
             </DialogActions>
           </Dialog>
 
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
