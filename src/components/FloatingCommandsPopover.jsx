@@ -439,15 +439,21 @@ const FloatingCommandsPopover = ({
                         <TableCell style={{ color: colors.text, fontWeight: '600' }}>
                           {t('sharedDescription')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('sharedType')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('commandCustom')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('commandSendSms')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('sharedType')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('commandCustom')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('commandSendSms')}
+                          </TableCell>
+                        )}
                         <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -474,50 +480,56 @@ const FloatingCommandsPopover = ({
                               <span style={{ fontWeight: '500' }}>{command.description}</span>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {command.type ? t(prefixString('command', String(command.type))) : '-'}
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {command.type === 'custom' && command.attributes?.data ? (
-                              <Tooltip 
-                                title={command.attributes.data}
-                                placement="top"
-                                arrow
-                                componentsProps={{
-                                  tooltip: {
-                                    style: {
-                                      backgroundColor: colors.surface,
-                                      color: colors.text,
-                                      border: `1px solid ${colors.border}`,
-                                      fontSize: '12px',
-                                      fontFamily: 'monospace',
-                                      maxWidth: '400px',
-                                      whiteSpace: 'pre-wrap'
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {command.type ? t(prefixString('command', String(command.type))) : '-'}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {command.type === 'custom' && command.attributes?.data ? (
+                                <Tooltip 
+                                  title={command.attributes.data}
+                                  placement="top"
+                                  arrow
+                                  componentsProps={{
+                                    tooltip: {
+                                      style: {
+                                        backgroundColor: colors.surface,
+                                        color: colors.text,
+                                        border: `1px solid ${colors.border}`,
+                                        fontSize: '12px',
+                                        fontFamily: 'monospace',
+                                        maxWidth: '400px',
+                                        whiteSpace: 'pre-wrap'
+                                      }
                                     }
-                                  }
-                                }}
-                              >
-                                <div style={{
-                                  maxWidth: '200px',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  fontFamily: 'monospace',
-                                  fontSize: '12px',
-                                  backgroundColor: colors.secondary,
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  border: `1px solid ${colors.border}`,
-                                  cursor: 'help'
-                                }}>
-                                  {command.attributes.data}
-                                </div>
-                              </Tooltip>
-                            ) : '-'}
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {formatBoolean(command.textChannel, t)}
-                          </TableCell>
+                                  }}
+                                >
+                                  <div style={{
+                                    maxWidth: '200px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    fontFamily: 'monospace',
+                                    fontSize: '12px',
+                                    backgroundColor: colors.secondary,
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`,
+                                    cursor: 'help'
+                                  }}>
+                                    {command.attributes.data}
+                                  </div>
+                                </Tooltip>
+                              ) : '-'}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {formatBoolean(command.textChannel, t)}
+                            </TableCell>
+                          )}
                           <TableCell style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
