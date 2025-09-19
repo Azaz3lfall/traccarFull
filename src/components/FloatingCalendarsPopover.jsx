@@ -532,12 +532,16 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                         <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedName')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('sharedType')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('calendarRecurrence')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedType')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('calendarRecurrence')}
+                          </TableCell>
+                        )}
                         <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -564,23 +568,27 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               {calendar.name}
                             </Typography>
                           </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={getCalendarType(calendar) === 'simple' ? t('calendarSimple') : t('reportCustom')}
-                              size="small"
-                              style={{
-                                backgroundColor: getCalendarType(calendar) === 'simple' ? colors.primary : colors.surface,
-                                color: getCalendarType(calendar) === 'simple' ? colors.text : colors.textSecondary,
-                                fontSize: '10px',
-                                height: '16px',
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
-                              {getRecurrenceText(calendar)}
-                            </Typography>
-                          </TableCell>
+                          {desktop && (
+                            <TableCell>
+                              <Chip
+                                label={getCalendarType(calendar) === 'simple' ? t('calendarSimple') : t('reportCustom')}
+                                size="small"
+                                style={{
+                                  backgroundColor: getCalendarType(calendar) === 'simple' ? colors.primary : colors.surface,
+                                  color: getCalendarType(calendar) === 'simple' ? colors.text : colors.textSecondary,
+                                  fontSize: '10px',
+                                  height: '16px',
+                                }}
+                              />
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '12px' }}>
+                                {getRecurrenceText(calendar)}
+                              </Typography>
+                            </TableCell>
+                          )}
                           <TableCell align="right">
                             <IconButton
                               onClick={(e) => {
@@ -757,14 +765,14 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
+                    borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                     zIndex: 10000,
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+                    boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
                   }}
                 >
                   {/* Drawer Header */}
