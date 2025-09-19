@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "Batas Pengguna",
-  "sharedTimeline": "Timeline"
+  "sharedTimeline": "Timeline",
+  "commandConfirm": "Tracker harus berada di wilayah dengan cakupan 4G yang baik untuk menerima perintah."
 }

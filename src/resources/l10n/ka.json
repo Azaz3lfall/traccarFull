@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "ტოკენი",
   "userUserLimit": "მომხმარებლის ლიმიტი",
-  "sharedTimeline": "დროის ხაზი"
+  "sharedTimeline": "დროის ხაზი",
+  "commandConfirm": "ტრეკერს უნდა იყოს კარგი 4G დაფარვის მქონე რეგიონში ბრძანების მისაღებად."
 }

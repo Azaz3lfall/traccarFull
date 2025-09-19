@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "ටෝකනය",
   "userUserLimit": "පරිශීලක සීමාව",
-  "sharedTimeline": "කාල රේඛාව"
+  "sharedTimeline": "කාල රේඛාව",
+  "commandConfirm": "විධානය ලබා ගැනීම සඳහා ට්‍රැකරය 4G ආවරණය හොඳින් ඇති කලාපයක පිහිටිය යුතුය."
 }

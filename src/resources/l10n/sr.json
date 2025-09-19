@@ -637,5 +637,6 @@
   "userTermsPrompt": "Klikom na Prihvati, prihvatate naše Uslove korišćenja usluge i potvrđujete da ste pročitali našu Politiku privatnosti.",
   "userToken": "Znak",
   "userUserLimit": "Limit korisnika",
-  "sharedTimeline": "Временска линија"
+  "sharedTimeline": "Временска линија",
+  "commandConfirm": "Трекер мора бити у региону са добром 4G покривеношћу да би примио команду."
 }

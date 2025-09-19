@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "Bruger grænse",
-  "sharedTimeline": "Tidslinje"
+  "sharedTimeline": "Tidslinje",
+  "commandConfirm": "Trackeren skal være i et område med god 4G-dækning for at modtage kommandoen."
 }

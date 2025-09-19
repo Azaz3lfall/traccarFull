@@ -637,5 +637,6 @@
   "userTermsPrompt": "點擊“接受”，即表示您同意我們的服務條款，並確認您已閱讀我們的隱私權政策。",
   "userToken": "簽證",
   "userUserLimit": "用戶限制",
-  "sharedTimeline": "時間軸"
+  "sharedTimeline": "時間軸",
+  "commandConfirm": "追蹤器需要在4G覆蓋良好的區域才能接收命令。"
 }

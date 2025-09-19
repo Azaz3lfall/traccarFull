@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "User Limit",
-  "sharedTimeline": "Цаг хугацаа"
+  "sharedTimeline": "Цаг хугацаа",
+  "commandConfirm": "Командыг хүлээн авахын тулд трекер сайн 4G хамралттай бүс нутагт байх ёстой."
 }

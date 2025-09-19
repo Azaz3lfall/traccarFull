@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "User Limit",
-  "sharedTimeline": "Ժամանակային գիծ"
+  "sharedTimeline": "Ժամանակային գիծ",
+  "commandConfirm": "Հետևիչը պետք է լինի 4G լավ ծածկույթ ունեցող տարածաշրջանում՝ հրամանը ստանալու համար:"
 }

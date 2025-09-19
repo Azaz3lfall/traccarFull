@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "User Limit",
-  "sharedTimeline": "Ajajoon"
+  "sharedTimeline": "Ajajoon",
+  "commandConfirm": "Jälgija peab olema piirkonnas hea 4G kattega, et käsk vastu võtta."
 }

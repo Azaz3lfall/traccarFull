@@ -637,5 +637,6 @@
   "userTermsPrompt": "Noklikšķinot uz “Pieņemt”, jūs piekrītat mūsu Pakalpojumu sniegšanas noteikumiem un apstiprināt, ka esat izlasījis mūsu Privātuma politiku.",
   "userToken": "Zīme",
   "userUserLimit": "Lietotāju Limits",
-  "sharedTimeline": "Laika līnija"
+  "sharedTimeline": "Laika līnija",
+  "commandConfirm": "Sekotājam jābūt reģionā ar labu 4G pārklājumu, lai saņemtu komandu."
 }

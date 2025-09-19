@@ -637,5 +637,6 @@
   "userTermsPrompt": "Kliknutím na tlačidlo \"Súhlasím\" súhlasíte s našimi zmluvnými podmienkami a potvrdzujete, že ste si prečítali naše zásady ochrany osobných údajov.",
   "userToken": "Token",
   "userUserLimit": "Obmedzenie používateľov",
-  "sharedTimeline": "Časová os"
+  "sharedTimeline": "Časová os",
+  "commandConfirm": "Tracker musí byť v oblasti s dobrým 4G pokrytím, aby mohol prijať príkaz."
 }

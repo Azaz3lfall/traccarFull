@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token",
   "userUserLimit": "Hạn chế người dùng",
-  "sharedTimeline": "Dòng thời gian"
+  "sharedTimeline": "Dòng thời gian",
+  "commandConfirm": "Trình theo dõi cần ở trong khu vực có phủ sóng 4G tốt để nhận lệnh."
 }

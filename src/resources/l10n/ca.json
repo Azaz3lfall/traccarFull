@@ -637,5 +637,6 @@
   "userTermsPrompt": "En fer clic a Acceptar, acceptes les nostres Condicions del servei i confirmes que has llegit la nostra Política de privacitat.",
   "userToken": "Token Accés",
   "userUserLimit": "Límit d\\'usuaris",
-  "sharedTimeline": "Línia de temps"
+  "sharedTimeline": "Línia de temps",
+  "commandConfirm": "El rastrejador ha d'estar en una regió amb bona cobertura 4G per rebre la comanda."
 }

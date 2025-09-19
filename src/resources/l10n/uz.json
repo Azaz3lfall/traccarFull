@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Калит",
   "userUserLimit": "Фойдаланувчини чегаралаш",
-  "sharedTimeline": "Vaqt chizig'i"
+  "sharedTimeline": "Vaqt chizig'i",
+  "commandConfirm": "Buyruqni olish uchun treker yaxshi 4G qamrovi bo'lgan mintaqada bo'lishi kerak."
 }

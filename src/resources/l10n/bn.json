@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "টোকেন",
   "userUserLimit": "ব্যবহারকারীর সীমা",
-  "sharedTimeline": "সময়রেখা"
+  "sharedTimeline": "সময়রেখা",
+  "commandConfirm": "কমান্ড গ্রহণের জন্য ট্র্যাকারকে ভাল 4G কভারেজ সহ একটি অঞ্চলে থাকতে হবে।"
 }

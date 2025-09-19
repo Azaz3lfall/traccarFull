@@ -637,5 +637,6 @@
   "userTermsPrompt": "Genom att klicka på Acceptera godkänner du våra användarvillkor och bekräftar att du har läst vår integritetspolicy.",
   "userToken": "Token",
   "userUserLimit": "Användarbegränsning",
-  "sharedTimeline": "Tidslinje"
+  "sharedTimeline": "Tidslinje",
+  "commandConfirm": "Trackern måste vara i en region med bra 4G-täckning för att ta emot kommandot."
 }

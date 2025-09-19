@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Symbol",
   "userUserLimit": "Brukargrense",
-  "sharedTimeline": "Tidslinje"
+  "sharedTimeline": "Tidslinje",
+  "commandConfirm": "Sporaren må vere i ein region med god 4G-dekning for å motta kommandoen."
 }

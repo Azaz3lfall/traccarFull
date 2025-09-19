@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "رمز",
   "userUserLimit": "الحد الأقصى للمستخدمين",
-  "sharedTimeline": "الجدول الزمني"
+  "sharedTimeline": "الجدول الزمني",
+  "commandConfirm": "يجب أن يكون المتتبع في منطقة ذات تغطية 4G جيدة لاستقبال الأمر."
 }

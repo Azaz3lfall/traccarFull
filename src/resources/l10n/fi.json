@@ -637,5 +637,6 @@
   "userTermsPrompt": "Klikkaamalla hyväksyt käyttöehdot ja vahvistat lukeneesi tietosuojakäytännön.",
   "userToken": "Todennustunnus",
   "userUserLimit": "Käyttäjäraja",
-  "sharedTimeline": "Aikajana"
+  "sharedTimeline": "Aikajana",
+  "commandConfirm": "Seurantalaiteen on oltava alueella, jossa on hyvä 4G-peitto, jotta se voi vastaanottaa komennon."
 }

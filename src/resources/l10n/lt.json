@@ -637,5 +637,6 @@
   "userTermsPrompt": "Nuspausdami Sutinku, sutinkate su paslaugos teikimo taisyklėmis ir privatumo politika.",
   "userToken": "Token",
   "userUserLimit": "Vartotojo limitas",
-  "sharedTimeline": "Laiko juosta"
+  "sharedTimeline": "Laiko juosta",
+  "commandConfirm": "Seklys turi būti regione su geru 4G aprėpimu, kad gautų komandą."
 }

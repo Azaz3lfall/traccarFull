@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "رمز یکبار",
   "userUserLimit": "محدودیت کاربر",
-  "sharedTimeline": "خط زمانی"
+  "sharedTimeline": "خط زمانی",
+  "commandConfirm": "ردیاب باید در منطقه‌ای با پوشش 4G خوب باشد تا دستور را دریافت کند."
 }

@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "டோக்கன் ",
   "userUserLimit": "பயனர் வரம்பு",
-  "sharedTimeline": "நேரக்கோடு"
+  "sharedTimeline": "நேரக்கோடு",
+  "commandConfirm": "கட்டளையைப் பெற ட்ராக்கர் நல்ல 4G கவரேஜ் உள்ள பிராந்தியத்தில் இருக்க வேண்டும்."
 }

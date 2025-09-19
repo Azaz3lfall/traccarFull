@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "トークン",
   "userUserLimit": "ユーザー制限",
-  "sharedTimeline": "タイムライン"
+  "sharedTimeline": "タイムライン",
+  "commandConfirm": "コマンドを受信するには、トラッカーが良好な4Gカバレッジのある地域にいる必要があります。"
 }

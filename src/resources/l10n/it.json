@@ -637,5 +637,6 @@
   "userTermsPrompt": "Facendo clic su Accetto, accetti i nostri Termini di servizio e confermi di aver letto la nostra Informativa sulla privacy.",
   "userToken": "Token",
   "userUserLimit": "Limite Utente",
-  "sharedTimeline": "Cronologia"
+  "sharedTimeline": "Cronologia",
+  "commandConfirm": "Il tracker deve essere in una regione con buona copertura 4G per ricevere il comando."
 }

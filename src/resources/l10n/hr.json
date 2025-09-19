@@ -637,5 +637,6 @@
   "userTermsPrompt": "Prihvaćanjem pristajete na naše Opće uvjete poslovanja i da ste pročitali politiku privatnosti",
   "userToken": "Token",
   "userUserLimit": "Maksimalni broj korisnika",
-  "sharedTimeline": "Vremenska linija"
+  "sharedTimeline": "Vremenska linija",
+  "commandConfirm": "Tracker mora biti u regiji s dobrom 4G pokrivenošću da bi primio naredbu."
 }

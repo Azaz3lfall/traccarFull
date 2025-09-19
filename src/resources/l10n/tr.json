@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Kullanıcı Anahtarı",
   "userUserLimit": "Kullanıcı Limiti",
-  "sharedTimeline": "Zaman çizelgesi"
+  "sharedTimeline": "Zaman çizelgesi",
+  "commandConfirm": "Tracker'ın komutu alabilmesi için iyi 4G kapsama alanı olan bir bölgede olması gerekir."
 }

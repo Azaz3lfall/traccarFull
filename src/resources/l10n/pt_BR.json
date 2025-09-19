@@ -161,6 +161,7 @@
   "commandPositionStop": "Parar Atualização",
   "commandPowerOff": "Desligar o Dispositivo",
   "commandQueued": "Comando na fila",
+  "commandConfirm": "É necessário que o rastreador esteja em uma região com boa cobertura 4G para a recepção do comando.",
   "commandRadius": "Raio",
   "commandRebootDevice": "Reiniciar dispositivo",
   "commandRequestPhoto": "Pegar foto",

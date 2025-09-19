@@ -637,5 +637,6 @@
   "userTermsAccepted": "Termos Aceites",
   "userTermsPrompt": "Ao clicar em Aceitar, concorda com os nossos Termos de Serviço e confirma que leu a nossa Política de Privacidade.",
   "userToken": "Símbolo",
-  "userUserLimit": "Limite de Utilizadores"
+  "userUserLimit": "Limite de Utilizadores",
+  "commandConfirm": "O rastreador precisa estar numa região com boa cobertura 4G para receber o comando."
 }

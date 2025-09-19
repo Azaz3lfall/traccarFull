@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Кілт",
   "userUserLimit": "Қолданушылар Лимиті",
-  "sharedTimeline": "Уақыт сызығы"
+  "sharedTimeline": "Уақыт сызығы",
+  "commandConfirm": "Трекер команданы алу үшін жақсы 4G қамтуы бар аймақта болуы керек."
 }

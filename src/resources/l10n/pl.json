@@ -637,5 +637,6 @@
   "userTermsPrompt": "Klikając Akceptuj, zgadzasz się z naszymi Warunkami Korzystania i potwierdzasz, że przeczytałeś naszą Politykę Prywatności",
   "userToken": "Token",
   "userUserLimit": "Limit użytkownika",
-  "sharedTimeline": "Oś czasu"
+  "sharedTimeline": "Oś czasu",
+  "commandConfirm": "Tracker musi znajdować się w regionie z dobrym zasięgiem 4G, aby odebrać polecenie."
 }

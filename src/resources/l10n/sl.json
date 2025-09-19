@@ -637,5 +637,6 @@
   "userTermsPrompt": "S klikom na gumb Sprejmi se strinjate z našimi Pogoji uporabe storitev in potrjujete, da ste prebrali Pravilnik o zasebnosti.",
   "userToken": "Žeton",
   "userUserLimit": "Omejitev uporabnikov",
-  "sharedTimeline": "Časovnica"
+  "sharedTimeline": "Časovnica",
+  "commandConfirm": "Sledilnik mora biti v regiji z dobrim 4G pokritjem, da prejme ukaz."
 }

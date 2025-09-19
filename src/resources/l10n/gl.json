@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Token Acceso",
   "userUserLimit": "Límite de usuarios",
-  "sharedTimeline": "Liña de tempo"
+  "sharedTimeline": "Liña de tempo",
+  "commandConfirm": "O rastreador debe estar nunha rexión con boa cobertura 4G para recibir a orde."
 }

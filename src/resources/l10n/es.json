@@ -637,5 +637,6 @@
   "userTermsAccepted": "Condiciones Aceptadas",
   "userTermsPrompt": "Al hacer clic en Aceptar, aceptas nuestras Condiciones del Servicio y confirmas que has leído nuestra Política de Privacidad",
   "userToken": "Token Acceso",
-  "userUserLimit": "Límite de usuarios"
+  "userUserLimit": "Límite de usuarios",
+  "commandConfirm": "El rastreador debe estar en una región con buena cobertura 4G para recibir el comando."
 }

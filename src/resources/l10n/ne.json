@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "टोकन",
   "userUserLimit": "प्रयोगकर्ता सिमित",
-  "sharedTimeline": "समयरेखा"
+  "sharedTimeline": "समयरेखा",
+  "commandConfirm": "कमान्ड प्राप्त गर्नको लागि ट्र्याकरलाई राम्रो 4G कभरेज भएको क्षेत्रमा हुनुपर्छ।"
 }

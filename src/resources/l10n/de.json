@@ -637,5 +637,6 @@
   "userTermsAccepted": "Nutzungsbedingungen akzeptiert",
   "userTermsPrompt": "Durch den Klick auf „Akzeptieren“ erklären Sie sich mit unseren Nutzungsbedingungen und der Datenschutzerklärung einverstanden.",
   "userToken": "Schlüssel",
-  "userUserLimit": "Benutzerlimit"
+  "userUserLimit": "Benutzerlimit",
+  "commandConfirm": "Der Tracker muss sich in einer Region mit guter 4G-Abdeckung befinden, um den Befehl zu empfangen."
 }

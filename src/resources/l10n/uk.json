@@ -637,5 +637,6 @@
   "userTermsPrompt": "By clicking Accept, you agree to our Terms of Service and confirm that you have read our Privacy Policy.",
   "userToken": "Ключ",
   "userUserLimit": "Обмеження користувачів",
-  "sharedTimeline": "Часова лінія"
+  "sharedTimeline": "Часова лінія",
+  "commandConfirm": "Трекер повинен знаходитися в регіоні з хорошим покриттям 4G для отримання команди."
 }

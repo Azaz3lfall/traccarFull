@@ -637,5 +637,6 @@
   "userTermsPrompt": "Door op 'accepteren' te klikken, stem je in met de Algemene voorwaarden (Terms of service). Je bevestigt ook dat je instemt met ons Privacy voorwaarden (Privacy Policy).  ",
   "userToken": "Token",
   "userUserLimit": "Gebruikerlimiet",
-  "sharedTimeline": "Tijdlijn"
+  "sharedTimeline": "Tijdlijn",
+  "commandConfirm": "De tracker moet zich in een regio met goede 4G-dekking bevinden om het commando te ontvangen."
 }
