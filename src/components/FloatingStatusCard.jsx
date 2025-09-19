@@ -705,7 +705,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               zIndex: 10000,
               width: !desktop ? '34px' : '32px',
               height: !desktop ? '34px' : '32px',
-              borderRadius: !desktop ? '8px' : '0px',
+              borderRadius: !desktop ? '12px' : '0px',
               backgroundColor: !desktop ? colors.surface : 'transparent',
               border: 'none',
               color: !desktop ? colors.textSecondary : colors.textSecondary,
