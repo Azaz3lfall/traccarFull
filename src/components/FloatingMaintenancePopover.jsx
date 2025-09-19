@@ -451,15 +451,21 @@ const FloatingMaintenancePopover = ({
                         <TableCell style={{ color: colors.text, fontWeight: '600' }}>
                           {t('sharedName')}
                         </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('sharedType')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('maintenanceStart')}
-                        </TableCell>
-                        <TableCell style={{ color: colors.text, fontWeight: '600' }}>
-                          {t('maintenancePeriod')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('sharedType')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('maintenanceStart')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell style={{ color: colors.text, fontWeight: '600' }}>
+                            {t('maintenancePeriod')}
+                          </TableCell>
+                        )}
                         <TableCell style={{ color: colors.text, fontWeight: '600', width: '60px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -486,15 +492,21 @@ const FloatingMaintenancePopover = ({
                               <span style={{ fontWeight: '500' }}>{maintenance.name}</span>
                             </div>
                           </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {maintenance.type ? positionAttributes[maintenance.type]?.name || maintenance.type : '-'}
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {displayRawValue(maintenance.type, true, maintenance.start)}
-                          </TableCell>
-                          <TableCell style={{ color: colors.textSecondary }}>
-                            {displayRawValue(maintenance.type, false, maintenance.period)}
-                          </TableCell>
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {maintenance.type ? positionAttributes[maintenance.type]?.name || maintenance.type : '-'}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {displayRawValue(maintenance.type, true, maintenance.start)}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.textSecondary }}>
+                              {displayRawValue(maintenance.type, false, maintenance.period)}
+                            </TableCell>
+                          )}
                           <TableCell style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
@@ -653,13 +665,13 @@ const FloatingMaintenancePopover = ({
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '400px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
                     zIndex: 10001,
                     display: 'flex',
                     flexDirection: 'column',
-                    boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+                    boxShadow: desktop ? '-2px 0 8px rgba(0, 0, 0, 0.1)' : 'none',
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
