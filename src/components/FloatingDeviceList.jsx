@@ -12,7 +12,7 @@ import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
-import { formatPercentage, formatStatus, formatSpeed, formatDistance, formatCoordinate } from '../common/util/formatter';
+import { formatStatus, formatSpeed, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
@@ -20,7 +20,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
   Search, 
   Filter, 
-  MapPin, 
   Battery, 
   AlertTriangle,
   Gauge,
@@ -64,7 +63,6 @@ const FloatingDeviceList = ({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [forceUpdate, setForceUpdate] = useState(0);
   
   // Force re-render when colors change (less aggressive on mobile)
@@ -89,18 +87,10 @@ const FloatingDeviceList = ({
   const groupsDropdownRef = useRef(null);
   const parentRef = useRef(null);
   
-  // Handle window resize for proper virtualization height
-  React.useEffect(() => {
-    const handleResize = () => setWindowHeight(window.innerHeight);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
-  const deviceSecondary = useAttributePreference('deviceSecondary', '');
   const speedUnit = useAttributePreference('speedUnit');
-  const distanceUnit = useAttributePreference('distanceUnit');
   const coordinateFormat = usePreference('coordinateFormat');
   
   const deviceStatusCount = useCallback((status) => {
@@ -1106,7 +1096,7 @@ const FloatingDeviceList = ({
               right: '20px',
               width: '56px',
               height: '56px',
-              borderRadius: '50%',
+              borderRadius: '12px',
               backgroundColor: colors.primary,
               border: 'none',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -1130,7 +1120,7 @@ const FloatingDeviceList = ({
               style={{ 
                 width: '24px', 
                 height: '24px', 
-                color: 'white' 
+                color: colors.primary === '#FFFFFF' ? '#1F2937' : 'white' 
               }} 
             />
           </motion.button>
