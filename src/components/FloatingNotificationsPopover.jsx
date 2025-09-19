@@ -434,18 +434,26 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                         <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedDescription')}
                         </TableCell>
-                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('notificationType')}
-                        </TableCell>
-                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('notificationAlways')}
-                        </TableCell>
-                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('sharedAlarms')}
-                        </TableCell>
-                        <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('notificationNotificators')}
-                        </TableCell>
+                        {desktop && (
+                          <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('notificationType')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('notificationAlways')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedAlarms')}
+                          </TableCell>
+                        )}
+                        {desktop && (
+                          <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('notificationNotificators')}
+                          </TableCell>
+                        )}
                         <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                           {t('sharedActions')}
                         </TableCell>
@@ -472,33 +480,41 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                               {notification.description || '-'}
                             </Typography>
                           </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={t(prefixString('event', notification.type))}
-                              size="small"
-                              style={{
-                                backgroundColor: colors.primary,
-                                color: colors.text,
-                                fontSize: '10px',
-                                height: '16px',
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                              {formatBoolean(notification.always, t)}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                              {formatList('alarm', notification.attributes?.alarms)}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                              {formatList('notificator', notification.notificators)}
-                            </Typography>
-                          </TableCell>
+                          {desktop && (
+                            <TableCell>
+                              <Chip
+                                label={t(prefixString('event', notification.type))}
+                                size="small"
+                                style={{
+                                  backgroundColor: colors.primary,
+                                  color: colors.text,
+                                  fontSize: '10px',
+                                  height: '16px',
+                                }}
+                              />
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                {formatBoolean(notification.always, t)}
+                              </Typography>
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                {formatList('alarm', notification.attributes?.alarms)}
+                              </Typography>
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                {formatList('notificator', notification.notificators)}
+                              </Typography>
+                            </TableCell>
+                          )}
                           <TableCell align="right" style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
@@ -610,10 +626,10 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     position: 'fixed',
                     top: 0,
                     right: 0,
-                    width: '500px',
+                    width: desktop ? '400px' : '100vw',
                     height: '100vh',
                     backgroundColor: colors.surface,
-                    borderLeft: `1px solid ${colors.border}`,
+                    borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                     zIndex: 10001,
                     display: 'flex',
                     flexDirection: 'column',
