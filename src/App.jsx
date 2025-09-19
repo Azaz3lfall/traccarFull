@@ -45,9 +45,22 @@ const App = () => {
       const response = await fetch('/api/session');
       if (response.ok) {
         dispatch(sessionActions.updateUser(await response.json()));
+        // Complete progress when user is loaded
+        if (window.progressTracker) {
+          window.progressTracker.complete();
+        }
       } else {
         window.sessionStorage.setItem('postLogin', pathname + search);
         navigate(newServer ? '/register' : '/login', { replace: true });
+        // Complete progress even on redirect
+        if (window.progressTracker) {
+          window.progressTracker.complete();
+        }
+      }
+    } else {
+      // User already loaded, complete progress
+      if (window.progressTracker) {
+        window.progressTracker.complete();
       }
     }
     return null;

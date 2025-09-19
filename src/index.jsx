@@ -13,7 +13,11 @@ import NativeInterface from './common/components/NativeInterface';
 import ServerProvider from './ServerProvider';
 import ErrorBoundary from './ErrorBoundary';
 import AppThemeProvider from './AppThemeProvider';
+import ProgressTracker from './common/util/ProgressTracker';
 import './index.css';
+
+// Initialize progress tracker
+const progressTracker = new ProgressTracker();
 
 preloadImages();
 
@@ -26,6 +30,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Update progress when React starts rendering
+progressTracker.setProgress(70, 'Rendering interface...');
 
 const root = createRoot(document.getElementById('root'));
 root.render(
@@ -52,3 +59,12 @@ root.render(
     </QueryClientProvider>
   </ErrorBoundary>,
 );
+
+// Update progress when React finishes rendering
+setTimeout(() => {
+  progressTracker.setProgress(90, 'Finalizing...');
+  // Complete after a short delay
+  setTimeout(() => {
+    progressTracker.complete();
+  }, 500);
+}, 100);
