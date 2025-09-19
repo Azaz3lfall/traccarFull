@@ -1527,7 +1527,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     {/* Position Properties Table */}
                     <div style={{
                       backgroundColor: colors.surface,
-                      borderRadius: '8px',
                       overflow: 'hidden',
                       width: '100%',
                       boxSizing: 'border-box'
