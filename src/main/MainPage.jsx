@@ -36,7 +36,6 @@ import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
-import DrawerMenu from '../components/DrawerMenu';
 import UsersModal from './UsersModal';
 import { 
   Truck, 
@@ -201,6 +200,12 @@ const MainPage = () => {
     message: { subject: '', body: '' }
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  // Debug drawer state
+  useEffect(() => {
+    console.log('Drawer state changed:', drawerOpen);
+    console.log('Desktop mode:', desktop);
+  }, [drawerOpen, desktop]);
   
   // Custom autocomplete states
   const [usersItems, setUsersItems] = useState([]);
@@ -2258,7 +2263,10 @@ const MainPage = () => {
         isMenuExpanded={isMenuExpanded}
         isVisible={desktop ? isDeviceListVisible : true} // Desktop: controlled by toggle, Mobile: always visible unless device selected
         geofencesPopoverVisible={geofencesPopoverVisible}
-        onDrawerOpen={() => setDrawerOpen(true)}
+        onDrawerOpen={() => {
+          console.log('FAB button clicked, opening drawer...');
+          setDrawerOpen(true);
+        }}
       />
       
       {/* Floating Status Card */}
@@ -5387,29 +5395,221 @@ const MainPage = () => {
         )}
       </AnimatePresence>
       
-      {/* Mobile Drawer Menu */}
-      {!desktop && (
-        <DrawerMenu
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          onNavigate={(route) => {
-            navigate(route);
-            setDrawerOpen(false);
+      {/* Test Button for Debugging */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px'
+      }}>
+        <button 
+          onClick={() => {
+            console.log('Test button clicked, setting drawer to true');
+            setDrawerOpen(true);
           }}
-          onEventsClick={() => {
-            setEventsOpen(true);
-            setDrawerOpen(false);
+          style={{
+            padding: '10px',
+            backgroundColor: 'red',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px'
           }}
-          onDevicesClick={() => {
-            setIsDeviceListVisible(true);
-            setDrawerOpen(false);
-          }}
-          onSettingsClick={() => {
-            setShowPreferencesDrawer(true);
-            setDrawerOpen(false);
-          }}
-        />
-      )}
+        >
+          Test Drawer
+        </button>
+        <div style={{
+          padding: '5px',
+          backgroundColor: drawerOpen ? 'green' : 'gray',
+          color: 'white',
+          borderRadius: '4px',
+          fontSize: '12px'
+        }}>
+          Drawer: {drawerOpen ? 'OPEN' : 'CLOSED'}
+        </div>
+      </div>
+
+      {/* Proper Mobile Drawer Menu */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setDrawerOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 9999,
+              }}
+            />
+            
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-100%', opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: desktop ? '320px' : '280px',
+                height: '100vh',
+                backgroundColor: colors.surface,
+                borderRight: `1px solid ${colors.border}`,
+                zIndex: 10000,
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
+              }}
+            >
+              {/* Drawer Header */}
+              <div style={{
+                padding: '20px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <h2 style={{ 
+                  margin: 0, 
+                  fontSize: '20px', 
+                  fontWeight: '600',
+                  color: colors.text 
+                }}>
+                  Menu
+                </h2>
+                <button
+                  onClick={() => setDrawerOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    color: colors.textSecondary,
+                    padding: '4px'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div style={{ 
+                flex: 1, 
+                overflow: 'auto', 
+                padding: '20px 0' 
+              }}>
+                {/* Menu Items */}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <button
+                    onClick={() => {
+                      console.log('Devices clicked');
+                      setIsDeviceListVisible(true);
+                      setDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      background: 'none',
+                      border: 'none',
+                      width: '100%',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: colors.text,
+                      fontSize: '16px',
+                      borderBottom: `1px solid ${colors.border}`
+                    }}
+                  >
+                    📱 Devices
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      console.log('Map clicked');
+                      navigate('/map');
+                      setDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      background: 'none',
+                      border: 'none',
+                      width: '100%',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: colors.text,
+                      fontSize: '16px',
+                      borderBottom: `1px solid ${colors.border}`
+                    }}
+                  >
+                    🗺️ Map
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      console.log('Events clicked');
+                      setEventsOpen(true);
+                      setDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      background: 'none',
+                      border: 'none',
+                      width: '100%',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: colors.text,
+                      fontSize: '16px',
+                      borderBottom: `1px solid ${colors.border}`
+                    }}
+                  >
+                    🔔 Events
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      console.log('Settings clicked');
+                      setShowPreferencesDrawer(true);
+                      setDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      background: 'none',
+                      border: 'none',
+                      width: '100%',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: colors.text,
+                      fontSize: '16px',
+                      borderBottom: `1px solid ${colors.border}`
+                    }}
+                  >
+                    ⚙️ Settings
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       
     </div>
   );
