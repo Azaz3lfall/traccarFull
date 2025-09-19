@@ -120,7 +120,8 @@ const DrawerMenu = ({
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50"
+            style={{ zIndex: 10000 }}
             variants={overlayVariants}
             initial="closed"
             animate="open"
@@ -130,7 +131,8 @@ const DrawerMenu = ({
 
           {/* Drawer */}
           <motion.div
-            className="fixed top-0 left-0 h-full w-80 z-50"
+            className="fixed top-0 left-0 h-full w-80"
+            style={{ zIndex: 10001 }}
             variants={drawerVariants}
             initial="closed"
             animate="open"
