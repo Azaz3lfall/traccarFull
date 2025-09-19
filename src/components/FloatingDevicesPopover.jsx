@@ -682,7 +682,7 @@ const FloatingDevicesPopover = ({
                       <ChevronLeftIcon fontSize="small" />
                     </IconButton>
                     <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {editingDevice?.id ? t('deviceEdit') : t('deviceAdd')}
+                      {editingDevice?.id ? `${t('deviceEdit')} - ${editingDevice.name}` : t('deviceAdd')}
                     </Typography>
                   </div>
 
