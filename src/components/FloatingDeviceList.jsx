@@ -219,8 +219,12 @@ const FloatingDeviceList = ({
   React.useEffect(() => {
     if (!desktop && selectedDeviceId) {
       setShowOnMobile(false);
+      // Inject dummy text to trigger search and reload
+      setKeyword('kkkkkk');
     } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
+      // Clear dummy text to trigger reload
+      setKeyword('');
     }
   }, [desktop, selectedDeviceId]);
   
