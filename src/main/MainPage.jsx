@@ -748,6 +748,7 @@ const MainPage = () => {
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
   const devices = useSelector((state) => state.devices.items);
+  const currentReplayIndex = useSelector((state) => state.session.currentReplayIndex);
   const [filteredPositions, setFilteredPositions] = useState([]);
   const selectedPosition = filteredPositions.find((position) => selectedDeviceId && position.deviceId === selectedDeviceId);
 
@@ -814,6 +815,7 @@ const MainPage = () => {
           selectedPosition={selectedPosition}
           onMapClick={onMapClick}
           selectedMapStyle={selectedMapStyle}
+          currentReplayIndex={currentReplayIndex}
         />
       )}
       <div className={classes.sidebar}>
@@ -825,6 +827,7 @@ const MainPage = () => {
                 selectedPosition={selectedPosition}
                 onMapClick={onMapClick}
                 selectedMapStyle={selectedMapStyle}
+                currentReplayIndex={currentReplayIndex}
               />
             </div>
           )}

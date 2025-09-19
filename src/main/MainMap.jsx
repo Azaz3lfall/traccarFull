@@ -1,4 +1,4 @@
-import { useCallback, memo } from 'react';
+import { useCallback, memo, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapCamera from '../map/MapCamera';
 
-const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle }) => {
+const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0 }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -38,6 +38,16 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
     }
   }, [dispatch, onMapClick]);
 
+  // Determine which positions to show on the map
+  const mapPositions = useMemo(() => {
+    if (replayPositions.length > 0 && currentReplayIndex < replayPositions.length) {
+      // When we have replay positions, show only the current replay position
+      return [replayPositions[currentReplayIndex]];
+    }
+    // In normal mode, show all filtered positions
+    return filteredPositions;
+  }, [replayPositions, currentReplayIndex, filteredPositions]);
+
   return (
     <>
       <MapView onClick={handleMapClick} selectedMapStyle={selectedMapStyle}>
@@ -46,7 +56,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         <MapAccuracy positions={filteredPositions} />
         <MapLiveRoutes />
         <MapPositions
-          positions={filteredPositions}
+          positions={mapPositions}
           onMarkerClick={onMarkerClick}
           selectedPosition={selectedPosition}
           showStatus
@@ -59,7 +69,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
           <>
             <MapRoutePath positions={replayPositions} />
             <MapRoutePoints positions={replayPositions} />
-            <MapCamera positions={replayPositions} />
+            <MapCamera positions={mapPositions} />
           </>
         )}
       </MapView>

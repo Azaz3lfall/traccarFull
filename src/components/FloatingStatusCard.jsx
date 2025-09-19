@@ -92,10 +92,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   const [replayLoading, setReplayLoading] = useState(false);
   
   // Enhanced replay states
-  const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [currentReplayIndex, setCurrentReplayIndex] = useState(0);
   const intervalRef = useRef(null);
+  
+  // Get replay state from Redux
+  const reduxCurrentReplayIndex = useSelector((state) => state.session.currentReplayIndex);
   
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -110,16 +113,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   
   // Get current device and position
   // In replay mode, use replay data; otherwise use real-time websocket data
-  const isReplayMode = showReplayPopover && replayPositions.length > 0;
   const device = selectedDeviceId ? devices[selectedDeviceId] : null;
   
+  // Sync local state with Redux state
+  useEffect(() => {
+    setCurrentReplayIndex(reduxCurrentReplayIndex);
+  }, [reduxCurrentReplayIndex]);
+
   // Memoize position to ensure it updates when replay position changes
   const position = useMemo(() => {
-    if (isReplayMode && replayPositions[currentPositionIndex]) {
-      return replayPositions[currentPositionIndex];
+    if (showReplayPopover && replayPositions[currentReplayIndex]) {
+      return replayPositions[currentReplayIndex];
     }
     return selectedDeviceId ? positions[selectedDeviceId] : null;
-  }, [isReplayMode, replayPositions, currentPositionIndex, selectedDeviceId, positions]);
+  }, [showReplayPopover, replayPositions, currentReplayIndex, selectedDeviceId, positions]);
 
 
   // Check for existing anchor when device changes
@@ -436,7 +443,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   // Clear replay positions when device selection changes
   useEffect(() => {
     dispatch(sessionActions.updateReplayPositions([]));
-    setCurrentPositionIndex(0);
+    setCurrentReplayIndex(0);
     setIsPlaying(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -450,7 +457,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
 
     setReplayLoading(true);
     dispatch(sessionActions.updateReplayPositions([])); // Clear previous positions when starting new search
-    setCurrentPositionIndex(0);
+    setCurrentReplayIndex(0);
+    dispatch(sessionActions.updateCurrentReplayIndex(0));
     setIsPlaying(false);
     try {
       let selectedFrom;
@@ -521,16 +529,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
     
     setIsPlaying(true);
     intervalRef.current = setInterval(() => {
-      setCurrentPositionIndex(prevIndex => {
+      setCurrentReplayIndex(prevIndex => {
         const nextIndex = prevIndex + 1;
         if (nextIndex >= replayPositions.length) {
           setIsPlaying(false);
           return prevIndex; // Stay at last position
         }
+        // Update Redux state
+        dispatch(sessionActions.updateCurrentReplayIndex(nextIndex));
         return nextIndex;
       });
     }, 1000 / playbackSpeed);
-  }, [replayPositions, isPlaying, playbackSpeed]);
+  }, [replayPositions, isPlaying, playbackSpeed, dispatch]);
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);
@@ -542,17 +552,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
 
   const handleStop = useCallback(() => {
     setIsPlaying(false);
-    setCurrentPositionIndex(0);
+    setCurrentReplayIndex(0);
+    dispatch(sessionActions.updateCurrentReplayIndex(0));
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, []);
+  }, [dispatch]);
 
   const handleSliderChange = useCallback((event) => {
     const newIndex = parseInt(event.target.value);
-    setCurrentPositionIndex(newIndex);
-  }, []);
+    setCurrentReplayIndex(newIndex);
+    dispatch(sessionActions.updateCurrentReplayIndex(newIndex));
+  }, [dispatch]);
 
   const handleCloseReplayPopover = useCallback(() => {
     setShowReplayPopover(false);
@@ -563,18 +575,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
     setCustomFrom('');
     setCustomTo('');
     setReplayLoading(false);
-    setCurrentPositionIndex(0);
     setIsPlaying(false);
     setPlaybackSpeed(1);
+    
+    // Clear local and Redux replay state
+    setCurrentReplayIndex(0);
+    dispatch(sessionActions.updateCurrentReplayIndex(0));
+    dispatch(sessionActions.updateReplayPositions([]));
     
     // Clear interval if running
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
-    // Clear all replay data from map
-    dispatch(sessionActions.updateReplayPositions([]));
   }, [dispatch]);
 
   // Cleanup on unmount
@@ -596,15 +609,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   // Handle replay mode changes - ensure proper data source switching
   useEffect(() => {
     // When exiting replay mode, reset to first position and stop playback
-    if (!showReplayPopover && isReplayMode) {
-      setCurrentPositionIndex(0);
+    if (!showReplayPopover && replayPositions.length > 0) {
+      setCurrentReplayIndex(0);
       setIsPlaying(false);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }
-  }, [showReplayPopover, isReplayMode]);
+  }, [showReplayPopover, replayPositions.length]);
 
   // Close replay popover when status card is closed (selectedDeviceId becomes null)
   useEffect(() => {
@@ -690,7 +703,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
           </button>
 
           {/* Details Button - Hidden in replay mode */}
-          {!isReplayMode && (
+          {!showReplayPopover && (
             <button
               onClick={handleMoreDetails}
               style={{
@@ -2305,7 +2318,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     type="range"
                     min="0"
                     max={Math.max(0, replayPositions.length - 1)}
-                    value={currentPositionIndex}
+                    value={currentReplayIndex}
                     onChange={handleSliderChange}
                     disabled={replayPositions.length === 0}
                     style={{
@@ -2314,7 +2327,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       borderRadius: '4px',
                       background: replayPositions.length === 0 
                         ? colors.border 
-                        : `linear-gradient(to right, #18a9fd 0%, #18a9fd ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentPositionIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
+                        : `linear-gradient(to right, #18a9fd 0%, #18a9fd ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
                       outline: 'none',
                       cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
                       WebkitAppearance: 'none',
@@ -2363,7 +2376,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 }}>
                   <button
                     onClick={isPlaying ? handlePause : handlePlay}
-                    disabled={replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)}
+                    disabled={replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)}
                     style={{
                       width: '48px',
                       height: '48px',
@@ -2371,11 +2384,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       border: 'none',
                       backgroundColor: "#18a9fd",
                       color: colors.surface,
-                      cursor: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
+                      cursor: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || (currentPositionIndex >= replayPositions.length - 1 && !isPlaying)) ? 0.5 : 1
+                      opacity: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 0.5 : 1
                     }}
                   >
                     {isPlaying ? (
