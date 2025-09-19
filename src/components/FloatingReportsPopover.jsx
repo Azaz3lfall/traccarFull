@@ -2078,22 +2078,24 @@ const FloatingReportsPopover = ({
                       </div>
                       
                       {/* Export Button */}
-                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                      <div style={{ flex: '0 0 auto', minWidth: 0 }}>
                         <Button
-                          fullWidth
                           variant="outlined"
                           color="primary"
                           disabled={isTripsDisabled() || tripsItems.length === 0}
                           onClick={exportTripsReport}
-                          startIcon={<DownloadIcon />}
                           style={{ 
+                            minWidth: '40px',
+                            height: '40px',
+                            padding: '0',
                             color: colors.text,
-                            borderColor: colors.border
+                            borderColor: colors.border,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
-                          <Typography variant="button" noWrap style={{ color: colors.text }}>
-                            {t('sharedExport')}
-                          </Typography>
+                          <DownloadIcon />
                         </Button>
                       </div>
                     </div>
@@ -2296,22 +2298,24 @@ const FloatingReportsPopover = ({
                       </div>
                       
                       {/* Export Button */}
-                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                      <div style={{ flex: '0 0 auto', minWidth: 0 }}>
                         <Button
-                          fullWidth
                           variant="outlined"
                           color="primary"
                           disabled={isStopsDisabled() || stopsItems.length === 0}
                           onClick={exportStopsReport}
-                          startIcon={<DownloadIcon />}
                           style={{ 
+                            minWidth: '40px',
+                            height: '40px',
+                            padding: '0',
                             color: colors.text,
-                            borderColor: colors.border
+                            borderColor: colors.border,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
-                          <Typography variant="button" noWrap style={{ color: colors.text }}>
-                            {t('sharedExport')}
-                          </Typography>
+                          <DownloadIcon />
                         </Button>
                       </div>
                     </div>
@@ -2533,22 +2537,24 @@ const FloatingReportsPopover = ({
                       </div>
                       
                       {/* Export Button */}
-                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                      <div style={{ flex: '0 0 auto', minWidth: 0 }}>
                         <Button
-                          fullWidth
                           variant="outlined"
                           color="primary"
                           disabled={isSummaryDisabled() || summaryItems.length === 0}
                           onClick={exportSummaryReport}
-                          startIcon={<DownloadIcon />}
                           style={{ 
+                            minWidth: '40px',
+                            height: '40px',
+                            padding: '0',
                             color: colors.text,
-                            borderColor: colors.border
+                            borderColor: colors.border,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
-                          <Typography variant="button" noWrap style={{ color: colors.text }}>
-                            {t('sharedExport')}
-                          </Typography>
+                          <DownloadIcon />
                         </Button>
                       </div>
                     </div>
@@ -2948,22 +2954,24 @@ const FloatingReportsPopover = ({
                       </div>
                       
                       {/* Export Button */}
-                      <div style={{ flex: '1 1 50%', minWidth: 0 }}>
+                      <div style={{ flex: '0 0 auto', minWidth: 0 }}>
                         <Button
-                          fullWidth
                           variant="outlined"
                           color="primary"
                           disabled={isPositionsDisabled() || positionsItems.length === 0}
                           onClick={exportPositionsReport}
-                          startIcon={<DownloadIcon />}
                           style={{ 
+                            minWidth: '40px',
+                            height: '40px',
+                            padding: '0',
                             color: colors.text,
-                            borderColor: colors.border
+                            borderColor: colors.border,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
-                          <Typography variant="button" noWrap style={{ color: colors.text }}>
-                            {t('sharedExport')}
-                          </Typography>
+                          <DownloadIcon />
                         </Button>
                       </div>
                     </div>
