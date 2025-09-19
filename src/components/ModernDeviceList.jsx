@@ -4,14 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { devicesActions } from '../store';
 import DeviceCard from './DeviceCard';
 import { Input } from './ui/input';
-import { Search, Filter, Grid, List } from 'lucide-react';
+import { Search, Filter, Grid, List, Menu } from 'lucide-react';
 import { Button } from './ui/button';
+import { useMediaQuery } from '../common/util/hooks';
 
 const ModernDeviceList = ({ devices, positions }) => {
   const dispatch = useDispatch();
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [viewMode, setViewMode] = React.useState('grid'); // 'grid' or 'list'
+  const desktop = useMediaQuery('(min-width: 1024px)');
 
   const filteredDevices = devices.filter(device =>
     device.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,6 +100,51 @@ const ModernDeviceList = ({ devices, positions }) => {
           </motion.div>
         )}
       </div>
+
+      {/* Floating Action Button for Mobile Drawer */}
+      {!desktop && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
+          onClick={() => console.log('Drawer opened')}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: '#3b82f6',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 10,
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.1)';
+            e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+          }}
+        >
+          <Menu 
+            style={{ 
+              width: '24px', 
+              height: '24px', 
+              color: 'white' 
+            }} 
+          />
+        </motion.button>
+      )}
+
     </div>
   );
 };

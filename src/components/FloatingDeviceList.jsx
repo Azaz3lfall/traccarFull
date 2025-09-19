@@ -25,7 +25,8 @@ import {
   AlertTriangle,
   Gauge,
   Check,
-  ChevronDown
+  ChevronDown,
+  Menu
 } from 'lucide-react';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
@@ -46,7 +47,8 @@ const FloatingDeviceList = ({
   desktop,
   isMenuExpanded,
   isVisible,
-  geofencesPopoverVisible
+  geofencesPopoverVisible,
+  onDrawerOpen
 }) => {
   
   const dispatch = useDispatch();
@@ -1089,6 +1091,50 @@ const FloatingDeviceList = ({
             </div>
           )}
         </div>
+        
+        {/* Floating Action Button for Mobile Drawer */}
+        {!desktop && onDrawerOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            onClick={onDrawerOpen}
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              right: '20px',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: colors.primary,
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 10,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)';
+              e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            }}
+          >
+            <Menu 
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                color: 'white' 
+              }} 
+            />
+          </motion.button>
+        )}
         
         {/* Removed Footer with Add Device Button */}
       </Card>

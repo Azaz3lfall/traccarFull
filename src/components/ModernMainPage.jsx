@@ -4,6 +4,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { devicesActions } from '../store';
 import ModernDeviceList from './ModernDeviceList';
+import DrawerMenu from './DrawerMenu';
 import { useAttributePreference } from '../common/util/preferences';
 import useFilter from '../main/useFilter';
 import usePersistedState from '../common/util/usePersistedState';
@@ -37,8 +38,16 @@ const ModernMainPage = () => {
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(desktop);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
+  const onDrawerOpen = useCallback(() => setDrawerOpen(true), []);
+  const onDrawerClose = useCallback(() => setDrawerOpen(false), []);
+  const onNavigate = useCallback((route) => {
+    // Handle navigation to different routes
+    console.log('Navigate to:', route);
+    // You can implement navigation logic here
+  }, []);
 
   useEffect(() => {
     if (!desktop && mapOnSelect && selectedDeviceId) {
@@ -154,6 +163,18 @@ const ModernMainPage = () => {
           position={selectedPosition}
           onClose={() => dispatch(devicesActions.selectId(null))}
           desktopPadding={desktop ? 320 : 0}
+        />
+      )}
+
+      {/* Drawer Menu for Mobile */}
+      {!desktop && (
+        <DrawerMenu
+          isOpen={drawerOpen}
+          onClose={onDrawerClose}
+          onNavigate={onNavigate}
+          onEventsClick={onEventsClick}
+          onDevicesClick={() => setSidebarOpen(true)}
+          onSettingsClick={() => console.log('Settings clicked')}
         />
       )}
     </div>

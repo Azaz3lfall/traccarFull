@@ -5,25 +5,63 @@ class ProgressTracker {
     this.progressBar = null;
     this.progressText = null;
     this.loadingSteps = [
-      { step: 10, text: 'Initializing...' },
-      { step: 25, text: 'Loading modules...' },
-      { step: 40, text: 'Connecting to server...' },
-      { step: 60, text: 'Loading data...' },
-      { step: 80, text: 'Rendering interface...' },
-      { step: 95, text: 'Finalizing...' },
-      { step: 100, text: 'Complete!' }
+      { step: 10, textKey: 'loadingInitializing' },
+      { step: 25, textKey: 'loadingModules' },
+      { step: 40, textKey: 'loadingConnecting' },
+      { step: 60, textKey: 'loadingData' },
+      { step: 80, textKey: 'loadingRendering' },
+      { step: 95, textKey: 'loadingFinalizing' },
+      { step: 100, textKey: 'loadingComplete' }
     ];
     this.currentStepIndex = 0;
+    this.translations = null;
     this.init();
   }
 
   init() {
+    // Load translations first
+    this.loadTranslations();
+    
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.setupElements());
     } else {
       this.setupElements();
     }
+  }
+
+  async loadTranslations() {
+    try {
+      // Get language from localStorage or default to 'en'
+      const language = localStorage.getItem('language') || 'en';
+      
+      // Load the appropriate translation file
+      const response = await fetch(`/src/resources/l10n/${language}.json`);
+      if (response.ok) {
+        this.translations = await response.json();
+      } else {
+        // Fallback to English if language file not found
+        const fallbackResponse = await fetch('/src/resources/l10n/en.json');
+        this.translations = await fallbackResponse.json();
+      }
+    } catch (error) {
+      console.warn('Failed to load translations, using fallback:', error);
+      // Fallback translations
+      this.translations = {
+        loadingInitializing: 'Initializing...',
+        loadingModules: 'Loading modules...',
+        loadingConnecting: 'Connecting to server...',
+        loadingData: 'Loading data...',
+        loadingRendering: 'Rendering interface...',
+        loadingFinalizing: 'Finalizing...',
+        loadingComplete: 'Complete!',
+        loadingStarting: 'Starting...'
+      };
+    }
+  }
+
+  getTranslation(key) {
+    return this.translations?.[key] || key;
   }
 
   setupElements() {
@@ -37,7 +75,7 @@ class ProgressTracker {
 
   startProgress() {
     // Start with initial progress
-    this.updateProgress(5, 'Starting...');
+    this.updateProgress(5, this.getTranslation('loadingStarting'));
     
     // Simulate loading steps
     this.simulateLoading();
@@ -46,7 +84,7 @@ class ProgressTracker {
   simulateLoading() {
     const step = this.loadingSteps[this.currentStepIndex];
     if (step) {
-      this.updateProgress(step.step, step.text);
+      this.updateProgress(step.step, this.getTranslation(step.textKey));
       this.currentStepIndex++;
       
       // Random delay between steps (100-500ms)
@@ -72,7 +110,7 @@ class ProgressTracker {
   }
 
   complete() {
-    this.updateProgress(100, 'Complete!');
+    this.updateProgress(100, this.getTranslation('loadingComplete'));
     // Hide loader after a short delay
     setTimeout(() => {
       const loader = document.querySelector('.loader');

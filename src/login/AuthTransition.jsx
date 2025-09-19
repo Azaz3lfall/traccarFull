@@ -321,7 +321,7 @@ const AuthTransition = ({ children }) => {
                 fontWeight: '600',
                 color: colors.text
               }}>
-                Server QR Code
+                {t('settingsServer')} QR Code
               </h3>
 
               {/* QR Code */}
@@ -355,7 +355,7 @@ const AuthTransition = ({ children }) => {
                   fontWeight: '500',
                   color: colors.textSecondary
                 }}>
-                  Server URL:
+                  {t('serverUrl')}
                 </p>
                 <p style={{
                   margin: 0,
@@ -399,7 +399,7 @@ const AuthTransition = ({ children }) => {
                 }}
               >
                 {copied ? <Check size={16} /> : <Copy size={16} />}
-                {copied ? 'Copied!' : 'Copy URL'}
+                {copied ? t('copied') : t('copyUrl')}
               </button>
             </motion.div>
           </motion.div>
