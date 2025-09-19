@@ -220,7 +220,7 @@ const FloatingDeviceList = ({
     if (!desktop && selectedDeviceId) {
       setShowOnMobile(false);
       // Inject dummy text to trigger search and reload
-      setKeyword('kkkkkk');
+      setKeyword(' ');
     } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
       // Clear dummy text to trigger reload
