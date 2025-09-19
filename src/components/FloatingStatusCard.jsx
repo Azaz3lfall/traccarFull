@@ -699,10 +699,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               dispatch(devicesActions.selectId(null));
             }}
             style={{
-              position: 'absolute',
-              top: !desktop ? '10px' : '12px',
-              left: !desktop ? '10px' : '12px',
-              zIndex: 10,
+              position: 'fixed',
+              top: !desktop ? '10px' : '20px',
+              left: !desktop ? '10px' : '20px',
+              zIndex: 10000,
               width: '32px',
               height: '32px',
               backgroundColor: 'transparent',
