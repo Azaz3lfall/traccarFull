@@ -5198,22 +5198,7 @@ const MainPage = () => {
                 flexDirection: 'column',
                 gap: '16px',
               }}>
-                {/* Required Section */}
-                <div style={{
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: colors.surface,
-                    borderBottom: `1px solid ${colors.border}`,
-                  }}>
-                    <Typography variant="subtitle1" style={{ color: colors.text, fontWeight: '600' }}>
-                      {t('sharedRequired')}
-                    </Typography>
-                  </div>
-                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Form Fields */}
                     {/* Users Multi-Select */}
                     <Box sx={{ position: 'relative', width: '100%' }}>
                       <TextField
@@ -5364,7 +5349,9 @@ const MainPage = () => {
                         </Box>
                       )}
                     </Box>
-                    <TextField
+
+                {/* Message Fields */}
+                <TextField
                       fullWidth
                       value={announcementData.message.subject || ''}
                       onChange={(e) => setAnnouncementData({ 
@@ -5386,8 +5373,6 @@ const MainPage = () => {
                       label={t('commandMessage')}
                       variant="outlined"
                     />
-                  </div>
-                </div>
               </div>
 
               {/* Footer */}
