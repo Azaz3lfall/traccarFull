@@ -383,7 +383,7 @@ const BriefingPage = () => {
               The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
             </h1>
             <p className="mt-6 text-lg md:text-xl" style={{ color: colors.textSecondary }}>
-              Welcome to the briefing page
+              Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
             </p>
           </div>
         </div>
