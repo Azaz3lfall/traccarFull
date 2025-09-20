@@ -58,12 +58,6 @@ const DrawerMenu = ({
       action: () => onNavigate('users')
     },
     {
-      id: 'geofences',
-      label: t('sharedGeofences'),
-      icon: Shield,
-      action: () => onNavigate('geofences')
-    },
-    {
       id: 'reports',
       label: t('sharedReports'),
       icon: BarChart3,
