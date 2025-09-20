@@ -44,6 +44,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Send as SendIcon,
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useCatch } from '../reactHelper';
