@@ -320,7 +320,6 @@ const BriefingPage = () => {
               transition={{ duration: 0.2, ease: "easeOut" }}
               style={{
                 backgroundColor: colors.surface,
-                borderTop: `1px solid ${colors.border}`,
                 padding: '16px'
               }} className="mobile-menu">
             {navigationItems.map((item) => (
@@ -333,8 +332,7 @@ const BriefingPage = () => {
                   textDecoration: 'none',
                   fontSize: '16px',
                   fontWeight: '500',
-                  padding: '12px 0',
-                  borderBottom: `1px solid ${colors.border}`
+                  padding: '12px 0'
                 }}
                 onClick={() => setShowMobileMenu(false)}
               >
