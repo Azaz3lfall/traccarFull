@@ -546,6 +546,37 @@ const FloatingDeviceList = ({
           gap: '8px',
           alignItems: 'center'
         }}>
+          {/* Mobile Menu Button */}
+          {!desktop && onDrawerOpen && (
+            <button
+              onClick={onDrawerOpen}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: colors.primary,
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = colors.primary;
+              }}
+            >
+              <Menu 
+                size={20} 
+                color={colors.text}
+              />
+            </button>
+          )}
+          
           {/* Search Bar */}
           <div style={{ position: 'relative', flex: 1 }}>
             <Search style={{
@@ -1082,49 +1113,6 @@ const FloatingDeviceList = ({
           )}
         </div>
         
-        {/* Floating Action Button for Mobile Drawer */}
-        {!desktop && onDrawerOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 0.2, delay: 0.1 }}
-            onClick={onDrawerOpen}
-            style={{
-              position: 'absolute',
-              bottom: '20px',
-              right: '20px',
-              width: '56px',
-              height: '56px',
-              borderRadius: '12px',
-              backgroundColor: colors.primary,
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10,
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'scale(1.1)';
-              e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-            }}
-          >
-            <Menu 
-              style={{ 
-                width: '24px', 
-                height: '24px', 
-                color: colors.primary === '#FFFFFF' ? '#1F2937' : 'white' 
-              }} 
-            />
-          </motion.button>
-        )}
         
         {/* Removed Footer with Add Device Button */}
       </Card>
