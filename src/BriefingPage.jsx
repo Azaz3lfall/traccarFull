@@ -386,22 +386,75 @@ const BriefingPage = () => {
         padding: '0 20px',
         boxSizing: 'border-box'
       }}>
-        <div className="flex flex-col md:flex-row gap-8 items-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="hero-container" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '32px',
+          alignItems: 'center',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 20px',
+          width: '100%'
+        }}>
+          <style>{`
+            @media (min-width: 768px) {
+              .hero-container {
+                flex-direction: row !important;
+                align-items: center !important;
+              }
+              .hero-image {
+                width: 50% !important;
+                max-width: none !important;
+              }
+              .hero-text {
+                width: 50% !important;
+                max-width: none !important;
+                text-align: left !important;
+              }
+            }
+          `}</style>
+          
           {/* Left Side - Image Placeholder */}
-          <div className="flex items-center justify-center h-64 md:h-80 lg:h-96 w-full md:w-1/2">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl lg:text-6xl font-bold" style={{ color: colors.textSecondary }}>
+          <div className="hero-image" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '256px',
+            width: '100%',
+            maxWidth: '500px'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                fontSize: '48px',
+                fontWeight: 'bold',
+                color: colors.textSecondary
+              }}>
                 IMAGE
               </div>
             </div>
           </div>
           
           {/* Right Side - Text Content */}
-          <div className="text-center md:text-left w-full md:w-1/2">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: colors.text }}>
+          <div className="hero-text" style={{
+            textAlign: 'center',
+            width: '100%',
+            maxWidth: '600px'
+          }}>
+            <h1 style={{ 
+              fontSize: '24px',
+              fontWeight: 'bold',
+              lineHeight: '1.2',
+              color: colors.text,
+              marginBottom: '16px'
+            }}>
               The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
             </h1>
-            <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg" style={{ color: colors.textSecondary }}>
+            <p style={{ 
+              fontSize: '16px',
+              color: colors.textSecondary,
+              marginBottom: '24px',
+              lineHeight: '1.5'
+            }}>
               Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
             </p>
             <button
@@ -415,8 +468,7 @@ const BriefingPage = () => {
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '500',
-                transition: 'all 0.2s',
-                marginTop: '24px'
+                transition: 'all 0.2s'
               }}
             >
               Get a Quote
