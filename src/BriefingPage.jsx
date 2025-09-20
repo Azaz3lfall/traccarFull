@@ -419,19 +419,16 @@ const BriefingPage = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '256px',
-            width: '100%',
-            maxWidth: '500px'
+            height: '400px',
+            width: '100%'
           }}>
             <img 
               src="/src/resources/images/111111111111.png" 
               alt="Hero Image" 
               style={{ 
-                maxWidth: '100%',
-                maxHeight: '100%',
-                width: 'auto',
-                height: 'auto',
-                objectFit: 'contain'
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
               }}
             />
           </div>
