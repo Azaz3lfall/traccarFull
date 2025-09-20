@@ -375,17 +375,24 @@ const BriefingPage = () => {
         </AnimatePresence>
       </div>
 
-      {/* Main Content */}
-      <div style={{ paddingTop: '64px' }}>
-        <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: colors.background }}>
-      <div className="text-center" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: colors.text }}>
-              The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
-            </h1>
-            <p className="mt-6 text-lg md:text-xl" style={{ color: colors.textSecondary }}>
-              Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
-            </p>
-          </div>
+      {/* Main Content - Full Screen Hero Section */}
+      <div style={{
+        height: 'calc(100vh - 64px)', // 100vh minus topbar height
+        width: '100vw',
+        backgroundColor: colors.background,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 20px',
+        boxSizing: 'border-box'
+      }}>
+        <div className="text-center" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: colors.text }}>
+            The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
+          </h1>
+          <p className="mt-6 text-lg md:text-xl" style={{ color: colors.textSecondary }}>
+            Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
+          </p>
         </div>
       </div>
     </div>
