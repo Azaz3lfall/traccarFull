@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, Key, Mail, Shield, Sun, Moon, QrCode, Lock } from 'lucide-react';
+import { ChevronLeft, User, Key, Mail, Shield, Sun, Moon, Lock } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/button';
@@ -148,16 +148,6 @@ const RegisterPage = () => {
             title={`${t('settingsServer')}: ${window.location.hostname}`}
           >
             <Lock size={18} />
-          </button>
-        )}
-        {!nativeEnvironment && (
-          <button
-            data-control-button
-            style={styles.iconButton}
-            onClick={() => {/* QR Code functionality */}}
-            title="QR Code"
-          >
-            <QrCode size={18} />
           </button>
         )}
         {languageEnabled && (
