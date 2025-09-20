@@ -429,7 +429,7 @@ const BriefingPage = () => {
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                borderRadius: '12px'
+                borderRadius: '8px'
               }}
             />
           </div>
