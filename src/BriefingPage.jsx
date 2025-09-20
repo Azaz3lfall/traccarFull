@@ -414,7 +414,7 @@ const BriefingPage = () => {
             }
           `}</style>
           
-          {/* Left Side - Image Placeholder */}
+          {/* Left Side - Image */}
           <div className="hero-image" style={{
             display: 'flex',
             alignItems: 'center',
@@ -423,15 +423,17 @@ const BriefingPage = () => {
             width: '100%',
             maxWidth: '500px'
           }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ 
-                fontSize: '48px',
-                fontWeight: 'bold',
-                color: colors.textSecondary
-              }}>
-                IMAGE
-              </div>
-            </div>
+            <img 
+              src="/src/resources/images/111111111111.png" 
+              alt="Hero Image" 
+              style={{ 
+                maxWidth: '100%',
+                maxHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+            />
           </div>
           
           {/* Right Side - Text Content */}
