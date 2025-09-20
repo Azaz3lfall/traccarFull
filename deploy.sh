@@ -16,4 +16,5 @@ ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "systemctl resta
 #ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "mkdir -p /opt/traccar/web"
 #scp -i /Users/codeartisan/github_vps_key -r ./build/* root@codeartisan.cloud:/opt/traccar/web
 
+rm -rf build build.tar.gz
 
