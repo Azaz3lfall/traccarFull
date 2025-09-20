@@ -255,24 +255,6 @@ const LoginPage = () => {
             style={styles.iconButton}
             onClick={() => navigate('/change-server')}
               title={`${t('settingsServer')}: ${window.location.hostname}`}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
-            onMouseDown={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseUp={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onFocus={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onBlur={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
           >
             <Lock size={18} />
           </button>
@@ -283,24 +265,6 @@ const LoginPage = () => {
             style={styles.iconButton}
             onClick={() => setShowQr(true)}
             title="QR Code"
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
-            onMouseDown={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseUp={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onFocus={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onBlur={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
           >
             <QrCode size={18} />
           </button>
@@ -312,24 +276,6 @@ const LoginPage = () => {
             style={styles.iconButton}
             onClick={() => setShowLanguagePopover(!showLanguagePopover)}
             title="Language"
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
-            onMouseDown={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onMouseUp={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onFocus={(e) => {
-              e.target.style.backgroundColor = colors.menuHover;
-            }}
-            onBlur={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-            }}
           >
             <ReactCountryFlag
               countryCode={languageList.find(lang => lang.code === language)?.country || 'US'}
@@ -348,24 +294,6 @@ const LoginPage = () => {
           style={styles.iconButton}
           onClick={handleThemeToggle}
           title={currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
         >
           {currentTheme === 'dark' ? (
             <Sun size={18} />
