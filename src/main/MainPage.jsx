@@ -3624,7 +3624,11 @@ const MainPage = () => {
         desktop={desktop}
         isMenuExpanded={isMenuExpanded}
         isVisible={showDevicesPopover}
-        onClose={() => setShowDevicesPopover(false)}
+        onClose={() => {
+          setShowDevicesPopover(false);
+          // Refresh devices when popover closes to ensure device list is updated
+          refreshDevices();
+        }}
       />
 
       {/* Notifications Management Popover */}
