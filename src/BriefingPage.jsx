@@ -4,6 +4,7 @@ import { useLocalization } from './common/components/LocalizationProvider';
 import { useSelector } from 'react-redux';
 import { Sun, Moon } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const BriefingPage = () => {
   const colors = useThemeColors();
@@ -204,24 +205,30 @@ const BriefingPage = () => {
               </button>
 
               {/* Language Popover */}
-              {showLanguagePopover && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '8px',
-                  backgroundColor: colors.surface,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  boxShadow: colors.shadow,
-                  minWidth: '200px',
-                  maxHeight: '300px',
-                  overflowY: 'auto',
-                  zIndex: 1001,
-                  // Ensure it doesn't go off-screen on mobile
-                  maxWidth: 'calc(100vw - 32px)',
-                  transform: 'translateX(0)'
-                }} className="md:max-w-none">
+              <AnimatePresence>
+                {showLanguagePopover && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: '8px',
+                      backgroundColor: colors.surface,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      boxShadow: colors.shadow,
+                      minWidth: '200px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      zIndex: 1001,
+                      // Ensure it doesn't go off-screen on mobile
+                      maxWidth: 'calc(100vw - 32px)',
+                      transform: 'translateX(0)'
+                    }} className="md:max-w-none">
                   {languageList.map((lang) => (
                     <button
                       key={lang.code}
@@ -248,8 +255,9 @@ const BriefingPage = () => {
                       <span>{lang.name}</span>
                     </button>
                   ))}
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Theme Switcher */}
@@ -303,12 +311,18 @@ const BriefingPage = () => {
         </div>
 
         {/* Mobile Navigation Menu */}
-        {showMobileMenu && (
-          <div style={{
-            backgroundColor: colors.surface,
-            borderTop: `1px solid ${colors.border}`,
-            padding: '16px'
-          }} className="mobile-menu">
+        <AnimatePresence>
+          {showMobileMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              style={{
+                backgroundColor: colors.surface,
+                borderTop: `1px solid ${colors.border}`,
+                padding: '16px'
+              }} className="mobile-menu">
             {navigationItems.map((item) => (
               <a
                 key={item.id}
@@ -327,8 +341,9 @@ const BriefingPage = () => {
                 {item.label}
               </a>
             ))}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Main Content */}
