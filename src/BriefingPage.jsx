@@ -138,7 +138,7 @@ const BriefingPage = () => {
             flex: '0 0 auto'
           }}>
             {/* Language Switcher */}
-            <div ref={languageRef} style={{ position: 'relative' }}>
+            <div ref={languageRef} style={{ position: 'relative', display: 'inline-block' }}>
               <button
                 onClick={() => setShowLanguagePopover(!showLanguagePopover)}
                 style={{
@@ -165,21 +165,22 @@ const BriefingPage = () => {
               {/* Language Popover */}
               {showLanguagePopover && (
                 <div style={{
-                  position: 'fixed',
-                  top: '72px', // 64px (header height) + 8px margin
-                  right: '16px',
-                  left: '16px', // Full width on mobile
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
                   backgroundColor: colors.surface,
                   border: `1px solid ${colors.border}`,
                   borderRadius: '8px',
                   boxShadow: colors.shadow,
                   minWidth: '200px',
-                  maxWidth: '300px',
                   maxHeight: '300px',
                   overflowY: 'auto',
                   zIndex: 1001,
-                  margin: '0 auto' // Center on larger screens
-                }} className="md:left-auto md:max-w-none">
+                  // Ensure it doesn't go off-screen on mobile
+                  maxWidth: 'calc(100vw - 32px)',
+                  transform: 'translateX(0)'
+                }} className="md:max-w-none">
                   {languageList.map((lang) => (
                     <button
                       key={lang.code}
