@@ -296,7 +296,7 @@ const BriefingPage = () => {
               onClick={handleLogin}
               style={{
                 padding: '8px 16px',
-                borderRadius: '8px',
+                borderRadius: '4px',
                 border: 'none',
                 backgroundColor: '#0f78ab',
                 color: 'white',
