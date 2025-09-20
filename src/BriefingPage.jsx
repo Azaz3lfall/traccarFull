@@ -378,9 +378,11 @@ const BriefingPage = () => {
       {/* Main Content */}
       <div style={{ paddingTop: '64px' }}>
         <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: colors.background }}>
-      <div className="text-center">
-            <h1 className="text-4xl font-bold" style={{ color: colors.text }}>Briefing</h1>
-            <p className="mt-4 text-lg" style={{ color: colors.textSecondary }}>
+      <div className="text-center" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: colors.text }}>
+              The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
+            </h1>
+            <p className="mt-6 text-lg md:text-xl" style={{ color: colors.textSecondary }}>
               Welcome to the briefing page
             </p>
           </div>
