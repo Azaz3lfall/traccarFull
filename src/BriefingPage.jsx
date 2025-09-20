@@ -379,7 +379,7 @@ const BriefingPage = () => {
       <div style={{
         height: 'calc(100vh - 64px)', // 100vh minus topbar height
         width: '100vw',
-        backgroundColor: colors.background,
+        backgroundColor: 'red',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
