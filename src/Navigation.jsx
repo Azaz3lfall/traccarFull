@@ -119,8 +119,8 @@ const Navigation = () => {
       <Route path="/register" element={<AuthTransition><RegisterPage /></AuthTransition>} />
       <Route path="/reset-password" element={<AuthTransition><ResetPasswordPage /></AuthTransition>} />
       <Route path="/change-server" element={<ChangeServerPage />} />
+      <Route path="/briefing" element={<BriefingPage />} />
       <Route path="/" element={<App />}>
-        <Route path="briefing" element={<BriefingPage />} />
         <Route index element={<MainPage />} />
 
         <Route path="position/:id" element={<PositionPage />} />
