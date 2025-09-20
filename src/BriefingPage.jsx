@@ -132,7 +132,6 @@ const BriefingPage = () => {
 
           {/* Middle - Navigation (Desktop) */}
           <nav style={{
-            display: 'flex',
             alignItems: 'center',
             gap: '32px'
           }} className="hidden md:flex">
@@ -277,12 +276,11 @@ const BriefingPage = () => {
                 backgroundColor: 'transparent',
                 color: colors.textSecondary,
                 cursor: 'pointer',
-                display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.2s'
               }}
-              className="md:hidden"
+              className="flex md:hidden"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -296,11 +294,10 @@ const BriefingPage = () => {
         {/* Mobile Navigation Menu */}
         {showMobileMenu && (
           <div style={{
-            display: 'block',
             backgroundColor: colors.surface,
             borderTop: `1px solid ${colors.border}`,
             padding: '16px'
-          }} className="md:hidden">
+          }} className="block md:hidden">
             {navigationItems.map((item) => (
               <a
                 key={item.id}
