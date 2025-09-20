@@ -720,16 +720,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 msUserSelect: 'none'
               })
             }}
-            onMouseEnter={(e) => {
-              if (desktop) {
-                e.target.style.transform = 'scale(1.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (desktop) {
-                e.target.style.transform = 'scale(1)';
-              }
-            }}
           >
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
@@ -752,12 +742,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'scale(1.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'scale(1)';
               }}
             >
               <InfoOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
@@ -1111,16 +1095,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   boxSizing: 'border-box',
                   opacity: (isLockOpenLoading || !selectedDeviceId) ? 0.5 : 1
                 }}
-                onMouseEnter={(e) => {
-                  if (!isLockOpenLoading && selectedDeviceId) {
-                  e.target.style.backgroundColor = colors.hover;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLockOpenLoading && selectedDeviceId) {
-                  e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
               >
                 {isLockOpenLoading ? (
                   <Loader2 size={16} color={colors.textSecondary} style={{ animation: 'spin 1s linear infinite' }} />
@@ -1148,16 +1122,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   boxSizing: 'border-box',
                   opacity: (isLockClosedLoading || !selectedDeviceId) ? 0.5 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLockClosedLoading && selectedDeviceId) {
-                  e.target.style.backgroundColor = colors.hover;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLockClosedLoading && selectedDeviceId) {
-                  e.target.style.backgroundColor = 'transparent';
-                  }
                 }}
               >
                 {isLockClosedLoading ? (
@@ -1204,12 +1168,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                     boxSizing: 'border-box'
                   }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
-                  }}
                 >
                   <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
                 </button>
@@ -1236,12 +1194,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   boxSizing: 'border-box'
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                }}
               >
                 <UploadIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
@@ -1266,16 +1218,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                   boxSizing: 'border-box',
                   opacity: (isAnchorLoading || !position) ? 0.5 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!isAnchorLoading && position) {
-                    e.target.style.backgroundColor = isAnchored ? '#A7F3D0' : colors.hover;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isAnchorLoading && position) {
-                    e.target.style.backgroundColor = isAnchored ? '#D1FAE5' : 'transparent';
-                  }
                 }}
               >
                 {isAnchorLoading ? (
@@ -1372,20 +1314,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                               justifyContent: 'center',
                               padding: '2px'
                             }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = colors.secondary;
-                              e.target.style.borderColor = colors.border;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = 'transparent';
-                              e.target.style.borderColor = colors.border;
-                            }}
-                            onMouseDown={(e) => {
-                              e.target.style.backgroundColor = colors.hover;
-                            }}
-                            onMouseUp={(e) => {
-                              e.target.style.backgroundColor = colors.secondary;
-                            }}
                           >
                             <Settings size={14} color={colors.textSecondary} />
                           </button>
@@ -1468,12 +1396,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = colors.secondary;
                   }}
                 >
                   <X size={16} color={colors.textSecondary} />
