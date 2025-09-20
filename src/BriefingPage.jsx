@@ -462,9 +462,12 @@ const BriefingPage = () => {
             }}>
               Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
             </p>
-            <button
-              onClick={() => {/* TODO: Add quote functionality */}}
+            <a
+              href="https://wa.me/+5511934251920"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
+                display: 'inline-block',
                 padding: '8px 16px',
                 borderRadius: '4px',
                 border: 'none',
@@ -473,11 +476,12 @@ const BriefingPage = () => {
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '500',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                textDecoration: 'none'
               }}
             >
               Get a Quote
-            </button>
+            </a>
           </div>
         </div>
       </div>
