@@ -57,11 +57,22 @@ const BriefingPage = () => {
   ];
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
+    <div style={{
+      minHeight: '100vh',
       backgroundColor: colors.background,
-      color: colors.text 
+      color: colors.text
     }}>
+      <style>{`
+        @media (min-width: 768px) {
+          .desktop-nav { display: flex !important; }
+          .mobile-hamburger { display: none !important; }
+          .mobile-menu { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          .desktop-nav { display: none !important; }
+          .mobile-hamburger { display: flex !important; }
+        }
+      `}</style>
       {/* Language Popover Backdrop */}
       {showLanguagePopover && (
         <div
@@ -134,7 +145,7 @@ const BriefingPage = () => {
           <nav style={{
             alignItems: 'center',
             gap: '32px'
-          }} className="hidden md:flex">
+          }} className="desktop-nav">
             {navigationItems.map((item) => (
               <a
                 key={item.id}
@@ -280,7 +291,7 @@ const BriefingPage = () => {
                 justifyContent: 'center',
                 transition: 'all 0.2s'
               }}
-              className="flex md:hidden"
+              className="mobile-hamburger"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -297,7 +308,7 @@ const BriefingPage = () => {
             backgroundColor: colors.surface,
             borderTop: `1px solid ${colors.border}`,
             padding: '16px'
-          }} className="block md:hidden">
+          }} className="mobile-menu">
             {navigationItems.map((item) => (
               <a
                 key={item.id}
