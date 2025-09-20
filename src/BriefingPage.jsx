@@ -386,9 +386,9 @@ const BriefingPage = () => {
         padding: '0 20px',
         boxSizing: 'border-box'
       }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Left Column - Image Placeholder */}
-          <div className="flex items-center justify-center h-64 md:h-80 lg:h-96 order-1 md:order-1">
+        <div className="flex flex-col md:flex-row gap-8 items-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Left Side - Image Placeholder */}
+          <div className="flex items-center justify-center h-64 md:h-80 lg:h-96 w-full md:w-1/2">
             <div className="text-center">
               <div className="text-4xl md:text-5xl lg:text-6xl font-bold" style={{ color: colors.textSecondary }}>
                 IMAGE
@@ -396,8 +396,8 @@ const BriefingPage = () => {
             </div>
           </div>
           
-          {/* Right Column - Text Content */}
-          <div className="text-center md:text-left order-2 md:order-2">
+          {/* Right Side - Text Content */}
+          <div className="text-center md:text-left w-full md:w-1/2">
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: colors.text }}>
               The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
             </h1>
