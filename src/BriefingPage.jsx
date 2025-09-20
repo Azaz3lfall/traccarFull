@@ -420,7 +420,9 @@ const BriefingPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             height: '400px',
-            width: '100%'
+            width: '100%',
+            borderRadius: '8px',
+            overflow: 'hidden'
           }}>
             <img 
               src="/src/resources/images/tela.png" 
@@ -428,8 +430,7 @@ const BriefingPage = () => {
               style={{ 
                 width: '100%',
                 height: '100%',
-                objectFit: 'contain',
-                borderRadius: '8px'
+                objectFit: 'contain'
               }}
             />
           </div>
