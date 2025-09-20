@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, Key, Mail, Shield, Sun, Moon, Lock } from 'lucide-react';
+import { ChevronLeft, User, Key, Mail, Shield, Sun, Moon, QrCode, Lock, X } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
 import { motion, AnimatePresence } from 'framer-motion';
+import QRCode from 'react-qr-code';
 import { Button } from '../components/ui/button';
 import LoginLayout from './LoginLayout';
 import LogoImage from './LogoImage';
@@ -32,6 +33,7 @@ const RegisterPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
+  const [showQr, setShowQr] = useState(false);
 
   useEffectAsync(async () => {
     if (totpForce) {
@@ -148,6 +150,16 @@ const RegisterPage = () => {
             title={`${t('settingsServer')}: ${window.location.hostname}`}
           >
             <Lock size={18} />
+          </button>
+        )}
+        {!nativeEnvironment && (
+          <button
+            data-control-button
+            style={styles.iconButton}
+            onClick={() => setShowQr(true)}
+            title="QR Code"
+          >
+            <QrCode size={18} />
           </button>
         )}
         {languageEnabled && (
@@ -517,6 +529,152 @@ const RegisterPage = () => {
                 )}
               </button>
             ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQr && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '20px'
+            }}
+            onClick={() => setShowQr(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -50 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+              style={{
+                backgroundColor: colors.surface,
+                padding: '24px',
+                borderRadius: '16px',
+                textAlign: 'center',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: `1px solid ${colors.border}`,
+                position: 'relative'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowQr(false)}
+                style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'none',
+                  border: 'none',
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={20} />
+              </button>
+
+              {/* Title */}
+              <h3 style={{
+                margin: '0 0 16px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text
+              }}>
+                {t('settingsServer')} QR Code
+              </h3>
+
+              {/* QR Code */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '16px',
+                padding: '16px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <QRCode
+                  value={window.location.origin}
+                  size={200}
+                  style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                />
+              </div>
+
+              {/* Server URL */}
+              <div style={{
+                marginBottom: '16px',
+                padding: '12px',
+                backgroundColor: colors.secondary,
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <p style={{
+                  margin: '0 0 8px 0',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: colors.textSecondary
+                }}>
+                  {t('serverUrl')}
+                </p>
+                <p style={{
+                  margin: 0,
+                  fontSize: '12px',
+                  color: colors.text,
+                  wordBreak: 'break-all',
+                  fontFamily: 'monospace'
+                }}>
+                  {window.location.origin}
+                </p>
+              </div>
+
+              {/* Copy button */}
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.origin);
+                    setSnackbarOpen(true);
+                    setTimeout(() => setSnackbarOpen(false), snackBarDurationShortMs);
+                  } catch (err) {
+                    console.error('Failed to copy: ', err);
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: colors.primary,
+                  color: colors.primary === '#FFFFFF' ? '#1F2937' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {t('sharedCopy')}
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
