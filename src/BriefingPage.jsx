@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme as useCustomTheme, useThemeColors } from './common/components/ThemeProvider';
-import { useLocalization } from './common/components/LocalizationProvider';
+import { useLocalization, useTranslation } from './common/components/LocalizationProvider';
 import { useSelector } from 'react-redux';
 import { Sun, Moon } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const BriefingPage = () => {
   const navigate = useNavigate();
+  const t = useTranslation();
   const colors = useThemeColors();
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
   const { languages, language, setLocalLanguage } = useLocalization();
@@ -306,7 +307,7 @@ const BriefingPage = () => {
                 transition: 'all 0.2s'
               }}
             >
-              Login
+              {t('loginLogin')}
             </button>
 
             {/* Mobile Menu Button */}
