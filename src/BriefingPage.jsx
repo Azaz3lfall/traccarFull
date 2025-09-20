@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTheme as useCustomTheme, useThemeColors } from './common/components/ThemeProvider';
 import { useLocalization } from './common/components/LocalizationProvider';
 import LogoImage from './login/LogoImage';
@@ -11,6 +11,7 @@ const BriefingPage = () => {
   const { languages, language, setLocalLanguage } = useLocalization();
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const languageRef = useRef(null);
 
   const languageList = Object.entries(languages).map((values) => ({ 
     code: values[0], 
@@ -27,6 +28,23 @@ const BriefingPage = () => {
     setShowLanguagePopover(false);
   };
 
+  // Close language popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (languageRef.current && !languageRef.current.contains(event.target)) {
+        setShowLanguagePopover(false);
+      }
+    };
+
+    if (showLanguagePopover) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLanguagePopover]);
+
   const navigationItems = [
     { id: 'home', label: 'Home', href: '#home' },
     { id: 'features', label: 'Features', href: '#features' },
@@ -39,6 +57,22 @@ const BriefingPage = () => {
       backgroundColor: colors.background,
       color: colors.text 
     }}>
+      {/* Language Popover Backdrop */}
+      {showLanguagePopover && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+            backgroundColor: 'transparent'
+          }}
+          onClick={() => setShowLanguagePopover(false)}
+        />
+      )}
+
       {/* Fixed Top Bar */}
       <div style={{
         position: 'fixed',
@@ -104,7 +138,7 @@ const BriefingPage = () => {
             flex: '0 0 auto'
           }}>
             {/* Language Switcher */}
-            <div style={{ position: 'relative' }}>
+            <div ref={languageRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowLanguagePopover(!showLanguagePopover)}
                 style={{
@@ -131,17 +165,21 @@ const BriefingPage = () => {
               {/* Language Popover */}
               {showLanguagePopover && (
                 <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '8px',
+                  position: 'fixed',
+                  top: '72px', // 64px (header height) + 8px margin
+                  right: '16px',
+                  left: '16px', // Full width on mobile
                   backgroundColor: colors.surface,
                   border: `1px solid ${colors.border}`,
                   borderRadius: '8px',
                   boxShadow: colors.shadow,
                   minWidth: '200px',
-                  zIndex: 1001
-                }}>
+                  maxWidth: '300px',
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  zIndex: 1001,
+                  margin: '0 auto' // Center on larger screens
+                }} className="md:left-auto md:max-w-none">
                   {languageList.map((lang) => (
                     <button
                       key={lang.code}
