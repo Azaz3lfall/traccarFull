@@ -1085,7 +1085,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
-              justifyContent: 'space-between',
+              justifyContent: 'space-around',
               gap: '4px',
               width: '100%',
               marginTop: !desktop ? '12px' : '0px',
