@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTheme as useCustomTheme, useThemeColors } from './common/components/ThemeProvider';
 import { useLocalization } from './common/components/LocalizationProvider';
-import LogoImage from './login/LogoImage';
+import { useSelector } from 'react-redux';
 import { Sun, Moon } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
 
@@ -9,6 +9,11 @@ const BriefingPage = () => {
   const colors = useThemeColors();
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
   const { languages, language, setLocalLanguage } = useLocalization();
+  
+  // Get logo from Redux store
+  const logo = useSelector((state) => state.session.server?.attributes?.logo);
+  const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
+  const logoUrl = logo || logoInverted;
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const languageRef = useRef(null);
@@ -95,8 +100,34 @@ const BriefingPage = () => {
           justifyContent: 'space-between'
         }}>
           {/* Left Side - Logo */}
-          <div style={{ flex: '0 0 auto' }}>
-            <LogoImage />
+          <div style={{ 
+            flex: '0 0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%'
+          }}>
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt="Server Logo" 
+                style={{ 
+                  maxWidth: '120px',
+                  maxHeight: '40px',
+                  width: 'auto',
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              <div style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text,
+                padding: '0 8px'
+              }}>
+                Traccar
+              </div>
+            )}
           </div>
 
           {/* Middle - Navigation (Desktop) */}
