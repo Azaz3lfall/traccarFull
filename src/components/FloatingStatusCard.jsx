@@ -1092,17 +1092,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
               gap: '4px',
               width: '100%',
               marginTop: !desktop ? '12px' : '0px',
-              minHeight: !desktop ? '50px' : '42px'
+              minHeight: !desktop ? '58px' : '42px'
             }}>
               {/* Button 1 - Lock Open (Outlined) */}
               <button
                 onClick={handleLockOpen}
                 disabled={isLockOpenLoading || !selectedDeviceId}
                 style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -1137,10 +1137,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 onClick={handleLockClosed}
                 disabled={isLockClosedLoading || !selectedDeviceId}
                 style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -1170,51 +1170,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 )}
               </button>
               
-              {/* Button 3 - Refresh (Outlined) */}
-              <button
-           onClick={(e) => {
-             e.stopPropagation(); // Prevent event bubbling to map
-             
-             // Store the current deviceId for replay
-             setReplayDeviceId(selectedDeviceId);
-             
-             // Hide device list but keep device selection
-             onHideDeviceList();
-             
-             // Initialize form with current time
-             const now = dayjs();
-             setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
-             setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
-             
-             // Show popover and close device list
-             setShowReplayPopover(true);
-             onHideDeviceList();
-             
-           }}
-                style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.textSecondary}`,
-                  backgroundColor: 'transparent',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                  boxSizing: 'border-box'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                }}
-              >
-                <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
-              </button>
+              {/* Button 3 - Refresh (Outlined) - Hidden on mobile */}
+              {desktop && (
+                <button
+             onClick={(e) => {
+               e.stopPropagation(); // Prevent event bubbling to map
+               
+               // Store the current deviceId for replay
+               setReplayDeviceId(selectedDeviceId);
+               
+               // Hide device list but keep device selection
+               onHideDeviceList();
+               
+               // Initialize form with current time
+               const now = dayjs();
+               setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
+               setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
+               
+               // Show popover and close device list
+               setShowReplayPopover(true);
+               onHideDeviceList();
+               
+             }}
+                  style={{
+                    width: '42px',
+                    height: '42px',
+                    minWidth: '42px',
+                    minHeight: '42px',
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.textSecondary}`,
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.hover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                </button>
+              )}
               
               {/* Button 4 - Send Commands (Outlined) */}
               <button
@@ -1223,10 +1225,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   setShowCommandDialog(true);
                 }}
                 style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -1254,10 +1256,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                   setShowShareDialog(true);
                 }}
                 style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
                   borderRadius: '8px',
                   border: `1px solid ${colors.textSecondary}`,
                   backgroundColor: 'transparent',
@@ -1283,10 +1285,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                 onClick={handleAnchorClick}
                 disabled={isAnchorLoading || !position}
                 style={{
-                  width: !desktop ? '50px' : '42px',
-                  height: !desktop ? '50px' : '42px',
-                  minWidth: !desktop ? '50px' : '42px',
-                  minHeight: !desktop ? '50px' : '42px',
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
                   borderRadius: '8px',
                   border: `1px solid ${isAnchored ? '#10B981' : colors.textSecondary}`,
                   backgroundColor: isAnchored ? '#D1FAE5' : 'transparent',
