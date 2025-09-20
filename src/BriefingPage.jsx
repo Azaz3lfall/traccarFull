@@ -423,7 +423,7 @@ const BriefingPage = () => {
             width: '100%'
           }}>
             <img 
-              src="/src/resources/images/111111111111.png" 
+              src="/src/resources/images/tela.png" 
               alt="Hero Image" 
               style={{ 
                 width: '100%',
