@@ -2316,28 +2316,7 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => setShowUserPopover(!showUserPopover)}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.outline = 'none';
-            e.target.style.boxShadow = 'none';
-          }}>
+>
           <Avatar style={{ width: '28px', height: '28px', userSelect: 'none', pointerEvents: 'none' }}>
             {user?.attributes?.avatar && (
               <AvatarImage src={user.attributes.avatar} alt="User" />
@@ -2375,25 +2354,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={() => setShowEventsPopover(!showEventsPopover)}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={() => setShowEventsPopover(!showEventsPopover)}>
           <NotificationsOutlinedIcon style={{ fontSize: 22, userSelect: 'none', pointerEvents: 'none' }} />
           {eventsCount > 0 && (
             <motion.div
@@ -2446,25 +2407,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={() => setShowMapSwitcher(!showMapSwitcher)}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={() => setShowMapSwitcher(!showMapSwitcher)}>
           <Map style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
         
@@ -2490,25 +2433,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={handleZoomIn}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={handleZoomIn}>
           <Plus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
         
@@ -2534,25 +2459,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={handleZoomOut}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={handleZoomOut}>
           <Minus style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
         
@@ -2580,25 +2487,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={() => setShowSearch(!showSearch)}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={() => setShowSearch(!showSearch)}>
           <Search style={{ fontSize: 18, userSelect: 'none', pointerEvents: 'none' }} />
         </button>
         
@@ -2626,25 +2515,7 @@ const MainPage = () => {
             msUserSelect: 'none',
             boxShadow: 'none !important'
           }}
-          onClick={() => setShowLanguagePopover(!showLanguagePopover)}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}>
+          onClick={() => setShowLanguagePopover(!showLanguagePopover)}>
           <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
             <ReactCountryFlag 
               countryCode={languageList.find(lang => lang.code === language)?.country || 'US'} 
@@ -2677,24 +2548,6 @@ const MainPage = () => {
             MozUserSelect: 'none',
             msUserSelect: 'none',
             boxShadow: 'none !important'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-          }}
-          onMouseDown={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onMouseUp={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onFocus={(e) => {
-            e.target.style.backgroundColor = colors.menuHover;
-          }}
-          onBlur={(e) => {
-            e.target.style.backgroundColor = 'transparent';
           }}>
           {currentTheme === 'light' ? (
             <Moon size={18} color={colors.textSecondary} />
