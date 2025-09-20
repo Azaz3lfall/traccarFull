@@ -38,7 +38,7 @@ const themes = {
     colors: {
       primary: '#FFFFFF',
       secondary: '#F3F4F6',
-      background: '#1F2937',
+      background: '#FFFFFF',
       surface: '#FFFFFF',
       text: '#1F2937',
       textSecondary: '#6B7280',

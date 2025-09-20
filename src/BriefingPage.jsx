@@ -377,9 +377,9 @@ const BriefingPage = () => {
 
       {/* Main Content - Full Screen Hero Section */}
       <div style={{
-        height: 'calc(100vh - 64px)', // 100vh minus topbar height
+        height: '100vh', // Full viewport height
         width: '100vw',
-        backgroundColor: 'red',
+        backgroundColor: colors.background,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
