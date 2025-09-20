@@ -63,6 +63,7 @@ import { generateLoginToken } from './common/components/NativeInterface';
 import { useLocalization } from './common/components/LocalizationProvider';
 import fetchOrThrow from './common/util/fetchOrThrow';
 import AuditPage from './reports/AuditPage';
+import BriefingPage from './BriefingPage';
 
 const Navigation = () => {
   const dispatch = useDispatch();
@@ -118,6 +119,7 @@ const Navigation = () => {
       <Route path="/register" element={<AuthTransition><RegisterPage /></AuthTransition>} />
       <Route path="/reset-password" element={<AuthTransition><ResetPasswordPage /></AuthTransition>} />
       <Route path="/change-server" element={<ChangeServerPage />} />
+      <Route path="/briefing" element={<BriefingPage />} />
       <Route path="/" element={<App />}>
         <Route index element={<MainPage />} />
 
