@@ -103,6 +103,7 @@ const BriefingPage = () => {
         backdropFilter: 'blur(10px)'
       }}>
         <div style={{
+          position: 'relative',
           maxWidth: '1200px',
           margin: '0 auto',
           padding: '0 16px',
@@ -319,8 +320,13 @@ const BriefingPage = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
                 backgroundColor: colors.surface,
-                padding: '16px'
+                padding: '16px',
+                zIndex: 1000
               }} className="mobile-menu">
             {navigationItems.map((item) => (
               <a
