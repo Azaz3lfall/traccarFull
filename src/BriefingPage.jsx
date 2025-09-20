@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme as useCustomTheme, useThemeColors } from './common/components/ThemeProvider';
 import { useLocalization } from './common/components/LocalizationProvider';
 import { useSelector } from 'react-redux';
@@ -7,6 +8,7 @@ import ReactCountryFlag from 'react-country-flag';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const BriefingPage = () => {
+  const navigate = useNavigate();
   const colors = useThemeColors();
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
   const { languages, language, setLocalLanguage } = useLocalization();
@@ -32,6 +34,10 @@ const BriefingPage = () => {
   const handleLanguageChange = (langCode) => {
     setLocalLanguage(langCode);
     setShowLanguagePopover(false);
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   // Close language popover when clicking outside
@@ -283,6 +289,24 @@ const BriefingPage = () => {
               ) : (
                 <Moon size={20} />
               )}
+            </button>
+
+            {/* Login Button */}
+            <button
+              onClick={handleLogin}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: colors.primary,
+                color: colors.primary === '#FFFFFF' ? '#1F2937' : 'white',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+            >
+              Login
             </button>
 
             {/* Mobile Menu Button */}
