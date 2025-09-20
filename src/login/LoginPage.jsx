@@ -774,7 +774,7 @@ const LoginPage = () => {
                   width: '100%',
                   padding: '12px 16px',
                   backgroundColor: copied ? '#10B981' : colors.primary,
-                  color: 'white',
+                  color: copied ? 'white' : (colors.primary === '#FFFFFF' ? '#1F2937' : 'white'),
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '14px',
