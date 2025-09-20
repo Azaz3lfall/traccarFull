@@ -386,13 +386,30 @@ const BriefingPage = () => {
         padding: '0 20px',
         boxSizing: 'border-box'
       }}>
-        <div className="text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight" style={{ color: colors.text }}>
+        <div className="text-center max-md:max-w-sm" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
+          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold leading-tight" style={{ color: colors.text }}>
             The most complete and advanced Traccar customization available, every feature, every language, fully implemented.
           </h1>
-          <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto" style={{ color: colors.textSecondary }}>
+          <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-xl" style={{ color: colors.textSecondary }}>
             Take your tracking business to the next level with a Global fully integrated, performance-optimized, modern Traccar web solution.
           </p>
+          <button
+            onClick={() => {/* TODO: Add quote functionality */}}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              backgroundColor: '#0f78ab',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s',
+              marginTop: '24px'
+            }}
+          >
+            Get a Quote
+          </button>
         </div>
       </div>
     </div>
