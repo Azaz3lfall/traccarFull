@@ -132,10 +132,10 @@ const BriefingPage = () => {
 
           {/* Middle - Navigation (Desktop) */}
           <nav style={{
-            display: 'none',
+            display: 'flex',
             alignItems: 'center',
             gap: '32px'
-          }} className="md:flex">
+          }} className="hidden md:flex">
             {navigationItems.map((item) => (
               <a
                 key={item.id}
@@ -326,7 +326,7 @@ const BriefingPage = () => {
       {/* Main Content */}
       <div style={{ paddingTop: '64px' }}>
         <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: colors.background }}>
-          <div className="text-center">
+      <div className="text-center">
             <h1 className="text-4xl font-bold" style={{ color: colors.text }}>Briefing</h1>
             <p className="mt-4 text-lg" style={{ color: colors.textSecondary }}>
               Welcome to the briefing page
