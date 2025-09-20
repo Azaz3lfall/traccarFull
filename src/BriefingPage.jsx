@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
-import { useLocalization } from '../common/components/LocalizationProvider';
+import { useTheme as useCustomTheme, useThemeColors } from './common/components/ThemeProvider';
+import { useLocalization } from './common/components/LocalizationProvider';
 import LogoImage from './login/LogoImage';
 import { Sun, Moon } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
