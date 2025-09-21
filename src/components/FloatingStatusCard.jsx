@@ -2558,50 +2558,33 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     onClick={handleScreenshot}
                     disabled={replayPositions.length === 0 || isScreenshotting}
                     style={{
-                      width: '48px',
-                      height: '48px',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '50%',
-                      border: `2px solid ${colors.border}`,
-                      backgroundColor: isScreenshotting ? colors.textSecondary : '#10B981', // Green color for visibility
-                      color: '#FFFFFF', // White color for contrast
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      color: isScreenshotting ? colors.textSecondary : colors.text,
                       cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1,
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (replayPositions.length > 0 && !isScreenshotting) {
-                        e.target.style.backgroundColor = '#059669'; // Darker green on hover
-                        e.target.style.transform = 'scale(1.05)';
-                        e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (replayPositions.length > 0 && !isScreenshotting) {
-                        e.target.style.backgroundColor = '#10B981'; // Back to original green
-                        e.target.style.transform = 'scale(1)';
-                        e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-                      }
+                      opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1
                     }}
                     title={isScreenshotting ? t('sharedProcessing') : t('sharedScreenshot')}
                   >
                     {isScreenshotting ? (
                       <div style={{
-                        width: '20px',
-                        height: '20px',
+                        width: '16px',
+                        height: '16px',
                         border: '2px solid transparent',
-                        borderTop: '2px solid #FFFFFF',
+                        borderTop: `2px solid ${colors.text}`,
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite'
                       }} />
                     ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V9Z" stroke="currentColor" strokeWidth="2"/>
-                        <path d="M8 9H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                        <path d="M8 13H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
                       </svg>
                     )}
                   </button>
