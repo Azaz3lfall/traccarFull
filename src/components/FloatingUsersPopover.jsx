@@ -610,7 +610,7 @@ const FloatingUsersPopover = ({
                           </TableCell>
                         </>
                       )}
-                      <TableCell align="center" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                      <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('sharedActions')}
                       </TableCell>
                     </TableRow>
@@ -711,7 +711,7 @@ const FloatingUsersPopover = ({
                               </TableCell>
                             </>
                           )}
-                          <TableCell align="center">
+                          <TableCell align="right">
                             <IconButton
                               onClick={(e) => {
                                 setSelectedUser(user);
