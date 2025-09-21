@@ -588,16 +588,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       const minLat = Math.min(...lats);
       const maxLat = Math.max(...lats);
       
-      // Add some padding around the route
-      const padding = 0.01; // Adjust this value for more/less padding
+      // Calculate tighter bounds with minimal padding
+      const lngRange = maxLng - minLng;
+      const latRange = maxLat - minLat;
+      
+      // Use a percentage of the route size for padding, with minimum values
+      const lngPadding = Math.max(lngRange * 0.05, 0.001); // 5% of route width, min 0.001
+      const latPadding = Math.max(latRange * 0.05, 0.001); // 5% of route height, min 0.001
+      
       const bounds = [
-        [minLng - padding, minLat - padding], // Southwest corner
-        [maxLng + padding, maxLat + padding]  // Northeast corner
+        [minLng - lngPadding, minLat - latPadding], // Southwest corner
+        [maxLng + lngPadding, maxLat + latPadding]  // Northeast corner
       ];
       
-      // Fit map to the route bounds
+      // Fit map to the route bounds with minimal padding
       map.fitBounds(bounds, {
-        padding: 50, // Add padding around the bounds
+        padding: 20, // Reduced padding around the bounds
         duration: 1000 // Animation duration
       });
       
@@ -690,11 +696,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           document.body.appendChild(tempDiv);
           
           try {
-            // Create a temporary map with the same style and data
+            // Create a temporary map with the same style and data, fitted to route bounds
             const tempMap = new (await import('maplibre-gl')).Map({
               container: tempDiv,
               style: map.getStyle(),
-              center: map.getCenter(),
+              center: [(minLng + maxLng) / 2, (minLat + maxLat) / 2], // Center on route
               zoom: map.getZoom(),
               bearing: map.getBearing(),
               pitch: map.getPitch()
@@ -704,6 +710,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             await new Promise(resolve => {
               tempMap.on('idle', resolve);
               setTimeout(resolve, 3000); // Fallback timeout
+            });
+            
+            // Fit the temp map to the same bounds
+            tempMap.fitBounds(bounds, {
+              padding: 20,
+              duration: 0 // No animation for temp map
             });
             
             // Add the same data sources and layers
