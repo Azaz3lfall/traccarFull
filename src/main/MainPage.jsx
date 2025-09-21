@@ -113,7 +113,6 @@ import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttri
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useServerAttributes from '../common/attributes/useServerAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
-import SelectField from '../common/components/SelectField';
 import { MuiFileInput } from 'mui-file-input';
 import { useEffectAsync } from '../reactHelper';
 
@@ -408,6 +407,16 @@ const MainPage = () => {
     queryKey: ['server'],
     queryFn: async () => {
       const response = await fetch('/api/server');
+      return response.json();
+    },
+    enabled: showServerDrawer,
+  });
+
+  // Timezones query
+  const { data: timezones = [] } = useQuery({
+    queryKey: ['timezones'],
+    queryFn: async () => {
+      const response = await fetchOrThrow('/api/server/timezones');
       return response.json();
     },
     enabled: showServerDrawer,
@@ -3813,17 +3822,29 @@ const MainPage = () => {
                             <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
                           </Select>
                         </FormControl>
-                        <SelectField
-                          value={serverData.attributes?.timezone}
-                          onChange={(e) => setServerData({ 
-                            ...serverData, 
-                            attributes: { ...serverData.attributes, timezone: e.target.value } 
-                          })}
-                          endpoint="/api/server/timezones"
-                          keyGetter={(it) => it}
-                          titleGetter={(it) => it}
-                          label={t('sharedTimezone')}
-                        />
+                        <FormControl fullWidth margin="normal">
+                          <InputLabel>{t('sharedTimezone')}</InputLabel>
+                          <Select
+                            label={t('sharedTimezone')}
+                            value={serverData.attributes?.timezone || ''}
+                            onChange={(e) => setServerData({ 
+                              ...serverData, 
+                              attributes: { ...serverData.attributes, timezone: e.target.value } 
+                            })}
+                            MenuProps={{
+                              disablePortal: false,
+                              style: { zIndex: 10005 }
+                            }}
+                            style={{ width: '100%', minWidth: '100%' }}
+                            sx={{ width: '100% !important', minWidth: '100% !important' }}
+                          >
+                            {timezones.map((timezone) => (
+                              <MenuItem key={timezone} value={timezone}>
+                                {timezone}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                         <TextField
                           fullWidth
                           value={serverData.poiLayer || ''}

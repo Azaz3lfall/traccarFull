@@ -19,6 +19,7 @@ const SelectField = ({
   titleGetter = (item) => item.name,
   zIndex = 1000,
   MenuProps = {},
+  ListboxProps = {},
 }) => {
   const [items, setItems] = useState();
 
@@ -80,7 +81,9 @@ const SelectField = ({
                 zIndex: zIndex,
                 backgroundColor: 'var(--mui-palette-background-paper)',
                 border: '1px solid var(--mui-palette-divider)',
+                ...ListboxProps.style,
               },
+              ...ListboxProps,
             }}
           />
         )}

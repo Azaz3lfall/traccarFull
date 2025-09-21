@@ -134,6 +134,40 @@ const FloatingUsersPopover = ({
     enabled: !!userId && isVisible, // Only fetch when userId is provided and popover is visible
   });
 
+  // Fetch timezones
+  const { data: timezones = [], isLoading: timezonesLoading, error: timezonesError } = useQuery({
+    queryKey: ['timezones'],
+    queryFn: async () => {
+      const response = await fetchOrThrow('/api/server/timezones');
+      const data = await response.json();
+      console.log('Timezones loaded:', data);
+      return data;
+    },
+    enabled: isVisible, // Only fetch when popover is visible
+  });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Timezones state:', { timezones, timezonesLoading, timezonesError });
+  }, [timezones, timezonesLoading, timezonesError]);
+
+  // Fallback timezones in case API fails
+  const fallbackTimezones = [
+    'UTC',
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'Asia/Tokyo',
+    'Asia/Shanghai',
+    'Australia/Sydney'
+  ];
+
+  const availableTimezones = timezones.length > 0 ? timezones : fallbackTimezones;
+
   // Auto-open edit dialog when specific user is loaded
   useEffect(() => {
     if (specificUser && userId && isVisible) {
@@ -1148,17 +1182,26 @@ const FloatingUsersPopover = ({
                             <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
                           </Select>
                         </FormControl>
-                        <SelectField
-                          value={editingUser.attributes && editingUser.attributes.timezone}
-                          onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, timezone: e.target.value } })}
-                          endpoint="/api/server/timezones"
-                          keyGetter={(it) => it}
-                          titleGetter={(it) => it}
-                          label={t('sharedTimezone')}
-                          ListboxProps={{
-                            style: { zIndex: 10002 }
-                          }}
-                        />
+                        <FormControl fullWidth>
+                          <InputLabel>{t('sharedTimezone')}</InputLabel>
+                          <Select
+                            label={t('sharedTimezone')}
+                            value={editingUser.attributes && editingUser.attributes.timezone || ''}
+                            onChange={(e) => setEditingUser({ ...editingUser, attributes: { ...editingUser.attributes, timezone: e.target.value } })}
+                            MenuProps={{
+                              disablePortal: false,
+                              style: { zIndex: 10005 }
+                            }}
+                            style={{ width: '100%', minWidth: '100%' }}
+                            sx={{ width: '100% !important', minWidth: '100% !important' }}
+                          >
+                            {availableTimezones.map((timezone) => (
+                              <MenuItem key={timezone} value={timezone}>
+                                {timezone}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                     <TextField
                           value={editingUser.poiLayer || ''}
                       onChange={(e) => setEditingUser({ ...editingUser, poiLayer: e.target.value })}
@@ -1768,17 +1811,29 @@ const FloatingUsersPopover = ({
                                 <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
                               </Select>
                             </FormControl>
-                            <SelectField
-                              value={serverData.attributes?.timezone}
-                              onChange={(e) => setServerData({ 
-                                ...serverData, 
-                                attributes: { ...serverData.attributes, timezone: e.target.value } 
-                              })}
-                              endpoint="/api/server/timezones"
-                              keyGetter={(it) => it}
-                              titleGetter={(it) => it}
-                              label={t('sharedTimezone')}
-                            />
+                            <FormControl fullWidth margin="normal">
+                              <InputLabel>{t('sharedTimezone')}</InputLabel>
+                              <Select
+                                label={t('sharedTimezone')}
+                                value={serverData.attributes?.timezone || ''}
+                                onChange={(e) => setServerData({ 
+                                  ...serverData, 
+                                  attributes: { ...serverData.attributes, timezone: e.target.value } 
+                                })}
+                                MenuProps={{
+                                  disablePortal: false,
+                                  style: { zIndex: 10005 }
+                                }}
+                                style={{ width: '100%', minWidth: '100%' }}
+                                sx={{ width: '100% !important', minWidth: '100% !important' }}
+                              >
+                                {availableTimezones.map((timezone) => (
+                                  <MenuItem key={timezone} value={timezone}>
+                                    {timezone}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                             <TextField
                               fullWidth
                               value={serverData.poiLayer || ''}
