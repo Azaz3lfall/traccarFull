@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import {
+  useState, useEffect, useCallback, useRef, useMemo
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,6 +12,7 @@ import {
 } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
+import { map } from '../map/core/MapView';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useDeviceReadonly } from '../common/util/permissions';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
@@ -39,7 +42,6 @@ import UploadIcon from '@mui/icons-material/Upload';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
-import StopIcon from '@mui/icons-material/Stop';
 import CommandDialog from './CommandDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -51,11 +53,10 @@ import {
   Settings
 } from 'lucide-react';
 import { Card } from './ui/card';
-import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 
 dayjs.extend(relativeTime);
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geofencesPopoverVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList }) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const t = useTranslation();
@@ -94,6 +95,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [currentReplayIndex, setCurrentReplayIndex] = useState(0);
+  const [isScreenshotting, setIsScreenshotting] = useState(false);
   const intervalRef = useRef(null);
   
   // Get replay state from Redux
@@ -569,15 +571,227 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
     }
   }, []);
 
-  const handleStop = useCallback(() => {
-    setIsPlaying(false);
-    setCurrentReplayIndex(0);
-    dispatch(sessionActions.updateCurrentReplayIndex(0));
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+
+  // Screenshot handler
+  const handleScreenshot = useCallback(async () => {
+    if (!replayPositions.length || isScreenshotting) return;
+    
+    setIsScreenshotting(true);
+    
+    try {
+      // Calculate bounding box from all replay positions
+      const lngs = replayPositions.map(p => p.longitude);
+      const lats = replayPositions.map(p => p.latitude);
+      
+      const minLng = Math.min(...lngs);
+      const maxLng = Math.max(...lngs);
+      const minLat = Math.min(...lats);
+      const maxLat = Math.max(...lats);
+      
+      // Add some padding around the route
+      const padding = 0.01; // Adjust this value for more/less padding
+      const bounds = [
+        [minLng - padding, minLat - padding], // Southwest corner
+        [maxLng + padding, maxLat + padding]  // Northeast corner
+      ];
+      
+      // Fit map to the route bounds
+      map.fitBounds(bounds, {
+        padding: 50, // Add padding around the bounds
+        duration: 1000 // Animation duration
+      });
+      
+      // Wait for map to finish rendering and fitting
+      await new Promise(resolve => {
+        map.once('idle', resolve);
+        // Also add a timeout as fallback
+        setTimeout(resolve, 2000);
+      });
+      
+      // Wait a bit more to ensure everything is rendered
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get the map canvas
+      const canvas = map.getCanvas();
+      console.log('Canvas found:', canvas);
+      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+      
+      // Check if canvas is ready and has content
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error('Canvas not ready or has zero dimensions');
+      }
+      
+      // Try to get image data from canvas
+      let dataURL;
+      try {
+        console.log('Attempting map screenshot capture...');
+        
+        // Method 1: Try using map's built-in export functionality
+        console.log('Trying map.getStyle() export...');
+        try {
+          // Get the current map style as a static image
+          const style = map.getStyle();
+          console.log('Map style loaded:', !!style);
+          
+          // Try to export the map as a static image
+          const mapCanvas = map.getCanvas();
+          console.log('Canvas element:', mapCanvas);
+          console.log('Canvas dimensions:', mapCanvas.width, 'x', mapCanvas.height);
+          
+          // Force a repaint and wait
+          map.triggerRepaint();
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Try to get the canvas as a blob first
+          const blob = await new Promise((resolve, reject) => {
+            mapCanvas.toBlob((blob) => {
+              if (blob) {
+                console.log('Blob created, size:', blob.size);
+                resolve(blob);
+              } else {
+                reject(new Error('toBlob returned null'));
+              }
+            }, 'image/png', 1.0);
+          });
+          
+          if (blob && blob.size > 1000) {
+            dataURL = URL.createObjectURL(blob);
+            console.log('Blob method successful, size:', blob.size);
+          } else {
+            throw new Error('Blob too small or null');
+          }
+          
+        } catch (blobError) {
+          console.log('Blob method failed:', blobError.message);
+          
+          // Method 2: Try direct toDataURL
+          console.log('Trying direct toDataURL...');
+          const mapCanvas = map.getCanvas();
+          dataURL = mapCanvas.toDataURL('image/png', 1.0);
+          console.log('Direct toDataURL length:', dataURL.length);
+          
+          if (dataURL.length < 1000) {
+            throw new Error('Direct toDataURL too short');
+          }
+        }
+        
+        // Method 3: If still no success, try a different approach
+        if (!dataURL || dataURL.length < 1000) {
+          console.log('Trying alternative approach...');
+          
+          // Create a new map instance temporarily for export
+          const mapContainer = map.getContainer();
+          const tempDiv = document.createElement('div');
+          tempDiv.style.width = mapContainer.offsetWidth + 'px';
+          tempDiv.style.height = mapContainer.offsetHeight + 'px';
+          tempDiv.style.position = 'absolute';
+          tempDiv.style.top = '-9999px';
+          tempDiv.style.left = '-9999px';
+          document.body.appendChild(tempDiv);
+          
+          try {
+            // Create a temporary map with the same style and data
+            const tempMap = new (await import('maplibre-gl')).Map({
+              container: tempDiv,
+              style: map.getStyle(),
+              center: map.getCenter(),
+              zoom: map.getZoom(),
+              bearing: map.getBearing(),
+              pitch: map.getPitch()
+            });
+            
+            // Wait for the temp map to load
+            await new Promise(resolve => {
+              tempMap.on('idle', resolve);
+              setTimeout(resolve, 3000); // Fallback timeout
+            });
+            
+            // Add the same data sources and layers
+            // const sources = map.getStyle().sources;
+            // const layers = map.getStyle().layers;
+            
+            // Add replay positions as a source
+            tempMap.addSource('replay-positions', {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: replayPositions.map(pos => ({
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [pos.longitude, pos.latitude]
+                  },
+                  properties: {}
+                }))
+              }
+            });
+            
+            // Add a line layer for the route
+            tempMap.addLayer({
+              id: 'replay-route',
+              type: 'line',
+              source: 'replay-positions',
+              layout: {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              paint: {
+                'line-color': '#ff0000',
+                'line-width': 3
+              }
+            });
+            
+            // Wait for rendering
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Capture the temp map
+            const tempCanvas = tempMap.getCanvas();
+            dataURL = tempCanvas.toDataURL('image/png', 1.0);
+            console.log('Temp map DataURL length:', dataURL.length);
+            
+            // Clean up
+            tempMap.remove();
+            document.body.removeChild(tempDiv);
+            
+          } catch (tempMapError) {
+            console.error('Temp map method failed:', tempMapError);
+            if (tempDiv.parentNode) {
+              document.body.removeChild(tempDiv);
+            }
+          }
+        }
+        
+        if (!dataURL || dataURL.length < 1000) {
+          throw new Error('All capture methods failed to produce valid image data');
+        }
+        
+      } catch (canvasError) {
+        console.error('All canvas methods failed:', canvasError);
+        throw new Error('Failed to capture map screenshot: ' + canvasError.message);
+      }
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `route-screenshot-${device?.name || 'device'}-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataURL;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL if we used it
+      if (dataURL.startsWith('blob:')) {
+        URL.revokeObjectURL(dataURL);
+      }
+      
+    } catch (error) {
+      console.error('Failed to capture screenshot:', error);
+      alert(`Failed to capture screenshot: ${error.message}`);
+    } finally {
+      setIsScreenshotting(false);
     }
-  }, [dispatch]);
+  }, [replayPositions, device?.name, isScreenshotting]);
 
   const handleSliderChange = useCallback((event) => {
     const newIndex = parseInt(event.target.value);
@@ -659,6 +873,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   
   return (
     <>
+    <style>
+      {`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}
+    </style>
     <AnimatePresence mode="wait">
       {((selectedDeviceId && device) || (showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
         <motion.div
@@ -2316,6 +2538,56 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
                       <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff"}} />
                     ) : (
                       <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff" }} />
+                    )}
+                  </button>
+
+                  {/* Screenshot Button */}
+                  <button
+                    onClick={handleScreenshot}
+                    disabled={replayPositions.length === 0 || isScreenshotting}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      backgroundColor: isScreenshotting ? colors.textSecondary : colors.primary,
+                      color: colors.surface,
+                      cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (replayPositions.length > 0 && !isScreenshotting) {
+                        e.target.style.backgroundColor = colors.primaryHover;
+                        e.target.style.transform = 'scale(1.05)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (replayPositions.length > 0 && !isScreenshotting) {
+                        e.target.style.backgroundColor = colors.primary;
+                        e.target.style.transform = 'scale(1)';
+                      }
+                    }}
+                    title={isScreenshotting ? t('sharedProcessing') : t('sharedScreenshot')}
+                  >
+                    {isScreenshotting ? (
+                      <div style={{
+                        width: '20px',
+                        height: '20px',
+                        border: '2px solid transparent',
+                        borderTop: '2px solid currentColor',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                    ) : (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9C3 7.11438 3 6.17157 3.58579 5.58579C4.17157 5 5.11438 5 7 5H17C18.8856 5 19.8284 5 20.4142 5.58579C21 6.17157 21 7.11438 21 9V15C21 16.8856 21 17.8284 20.4142 18.4142C19.8284 19 18.8856 19 17 19H7C5.11438 19 4.17157 19 3.58579 18.4142C3 17.8284 3 16.8856 3 15V9Z" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M8 9H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M8 13H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
                     )}
                   </button>
 
