@@ -22,6 +22,7 @@ import {
 
 import { makeStyles } from 'tss-react/mui';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import { useThemeColors } from '../../common/components/ThemeProvider';
 
 const useStyles = makeStyles()((theme) => ({
   details: {
@@ -36,6 +37,7 @@ const useStyles = makeStyles()((theme) => ({
 const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
   const { classes } = useStyles();
   const t = useTranslation();
+  const colors = useThemeColors();
 
   const [key, setKey] = useState();
   const [type, setType] = useState('string');
@@ -143,27 +145,51 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
             onKeyDown={handleKeyDown}
             fullWidth
             autoComplete="off"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: colors.border,
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: colors.primary,
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: colors.primary,
+                  borderWidth: '2px',
+                },
+                '& .MuiInputBase-input': {
+                  color: colors.text,
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: colors.textSecondary,
+                '&.Mui-focused': {
+                  color: colors.primary,
+                },
+              },
+            }}
           />
           {autocompleteOpen && filteredOptions.length > 0 && (
             <Paper
               ref={listRef}
-              sx={(theme) => ({
+              sx={{
                 position: 'fixed',
                 zIndex: 999999,
                 maxHeight: '200px',
                 minWidth: '200px',
                 overflow: 'auto',
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: theme.shape.borderRadius,
-                boxShadow: theme.shadows[8],
-                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                backgroundColor: colors.surface,
                 mt: 0.5,
                 '&::-webkit-scrollbar': {
                   display: 'none',
                 },
                 scrollbarWidth: 'none', // Firefox
                 msOverflowStyle: 'none', // IE and Edge
-              })}
+              }}
               style={{
                 top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
                 left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
@@ -172,45 +198,43 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
             >
               <List 
                 dense
-                sx={(theme) => ({
+                sx={{
                   padding: 0,
                   '& .MuiListItem-root': {
                     padding: '8px 16px',
                     minHeight: '40px',
-                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    borderBottom: `1px solid ${colors.border}`,
                     '&:last-child': {
                       borderBottom: 'none',
                     },
                   }
-                })}
+                }}
               >
                 {filteredOptions.map((option, index) => (
                   <ListItem
                     key={option.key}
                     onClick={() => handleOptionSelect(option)}
-                    sx={(theme) => ({
+                    sx={{
                       cursor: 'pointer',
-                      backgroundColor: index === highlightedIndex ? theme.palette.action.selected : 'transparent',
-                      transition: theme.transitions.create('background-color', {
-                        duration: theme.transitions.duration.short,
-                      }),
+                      backgroundColor: index === highlightedIndex ? colors.hover : 'transparent',
+                      transition: 'background-color 0.2s ease',
                       '&:hover': {
-                        backgroundColor: theme.palette.action.hover
+                        backgroundColor: colors.hover
                       },
                       '&:active': {
-                        backgroundColor: theme.palette.action.selected
+                        backgroundColor: colors.primary + '20'
                       }
-                    })}
+                    }}
                   >
                     <ListItemText 
                       primary={option.name}
-                      sx={(theme) => ({
+                      sx={{
                         '& .MuiListItemText-primary': {
                           fontSize: '14px',
                           fontWeight: 400,
-                          color: theme.palette.text.primary
+                          color: colors.text
                         }
-                      })}
+                      }}
                     />
                   </ListItem>
                 ))}
@@ -222,7 +246,16 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
           fullWidth
           disabled={key in definitions}
         >
-          <InputLabel>{t('sharedType')}</InputLabel>
+          <InputLabel 
+            sx={{ 
+              color: colors.textSecondary,
+              '&.Mui-focused': {
+                color: colors.primary,
+              },
+            }}
+          >
+            {t('sharedType')}
+          </InputLabel>
           <Select
             label={t('sharedType')}
             value={type || 'string'}
@@ -230,6 +263,23 @@ const AddAttributeDialog = ({ open, onResult, definitions, zIndex = 1300 }) => {
             MenuProps={{
               disablePortal: false,
               style: { zIndex: 999999 }
+            }}
+            sx={{
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.border,
+                borderRadius: '8px',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.primary,
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: colors.primary,
+                borderWidth: '2px',
+              },
+              '& .MuiSelect-select': {
+                color: colors.text,
+              },
             }}
           >
             <MenuItem value="string">{t('sharedTypeString')}</MenuItem>

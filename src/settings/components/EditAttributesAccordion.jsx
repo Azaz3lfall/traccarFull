@@ -26,10 +26,12 @@ import {
 } from '../../common/util/converter';
 import useFeatures from '../../common/util/useFeatures';
 import useSettingsStyles from '../common/useSettingsStyles';
+import { useThemeColors } from '../../common/components/ThemeProvider';
 
 const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definitions, focusAttribute, zIndex = 1300 }) => {
   const { classes } = useSettingsStyles();
   const t = useTranslation();
+  const colors = useThemeColors();
 
   const features = useFeatures();
 
@@ -173,17 +175,48 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
             );
           }
           return (
-            <FormControl key={key}>
-              <InputLabel>{getAttributeName(key, subtype)}</InputLabel>
+            <FormControl key={key} fullWidth>
+              <InputLabel 
+                sx={{ 
+                  color: colors.textSecondary,
+                  '&.Mui-focused': {
+                    color: colors.primary,
+                  },
+                }}
+              >
+                {getAttributeName(key, subtype)}
+              </InputLabel>
               <OutlinedInput
                 label={getAttributeName(key, subtype)}
                 type={type === 'number' ? 'number' : 'text'}
                 value={getDisplayValue(value, subtype)}
                 onChange={(e) => updateAttribute(key, e.target.value, type, subtype)}
                 autoFocus={focusAttribute === key}
+                sx={{
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: colors.border,
+                    borderRadius: '8px',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: colors.primary,
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: colors.primary,
+                    borderWidth: '2px',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: colors.text,
+                  },
+                }}
                 endAdornment={(
                   <InputAdornment position="end">
-                    <IconButton size="small" edge="end" onClick={() => deleteAttribute(key)}>
+                    <IconButton 
+                      size="small" 
+                      edge="end" 
+                      onClick={() => deleteAttribute(key)}
+                      sx={{ color: colors.textSecondary }}
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </InputAdornment>
@@ -194,9 +227,17 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
         })}
         <Button
           variant="outlined"
-          color="primary"
           onClick={() => setAddDialogShown(true)}
           startIcon={<AddIcon />}
+          sx={{
+            borderColor: colors.border,
+            color: colors.text,
+            borderRadius: '8px',
+            '&:hover': {
+              borderColor: colors.primary,
+              backgroundColor: `${colors.primary}10`,
+            },
+          }}
         >
           {t('sharedAdd')}
         </Button>
