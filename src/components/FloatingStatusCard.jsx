@@ -2561,9 +2561,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       width: '40px',
                       height: '40px',
                       borderRadius: '50%',
-                      border: 'none',
+                      border: `1px solid ${colors.textSecondary}`,
                       backgroundColor: 'transparent',
-                      color: isScreenshotting ? colors.textSecondary : colors.text,
+                      color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
                       cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -2577,7 +2577,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         width: '16px',
                         height: '16px',
                         border: '2px solid transparent',
-                        borderTop: `2px solid ${colors.text}`,
+                        borderTop: `2px solid ${colors.textSecondary}`,
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite'
                       }} />
