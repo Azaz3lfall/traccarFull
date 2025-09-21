@@ -15,9 +15,6 @@ import {
   Menu,
   MenuItem,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Typography,
   Box,
   Chip,
@@ -182,8 +179,7 @@ const FloatingGeofencesPopover = ({
       // Invalidate query to refresh popover list
       queryClient.invalidateQueries(['geofences']);
       
-      setDeleteDialog(false);
-      setGeofenceToDelete(null);
+      cancelDelete();
     },
     onError: (error) => {
       console.error('Delete geofence error:', error);
@@ -293,6 +289,19 @@ const FloatingGeofencesPopover = ({
     setGeofenceToDelete(geofence);
     setDeleteDialog(true);
     setAnchorEl(null);
+  };
+
+  // Handle confirm delete
+  const confirmDelete = () => {
+    if (geofenceToDelete) {
+      deleteGeofenceMutation.mutate(geofenceToDelete.id);
+    }
+  };
+
+  // Handle cancel delete
+  const cancelDelete = () => {
+    setDeleteDialog(false);
+    setGeofenceToDelete(null);
   };
 
 
@@ -1206,7 +1215,7 @@ const FloatingGeofencesPopover = ({
                             {geofence.description || t('sharedNoDescription')}
                           </Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="right">
                           <IconButton
                             size="small"
                             onClick={(e) => {
@@ -1373,48 +1382,117 @@ const FloatingGeofencesPopover = ({
           </DialogActions>
         </Dialog>
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog
-          open={deleteDialog}
-          onClose={() => setDeleteDialog(false)}
-          style={{ zIndex: 10004 }}
-          PaperProps={{
-            style: {
-              backgroundColor: colors.surface,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '12px',
-              zIndex: 10004,
-            },
-          }}
-        >
-          <DialogTitle style={{ color: colors.text, padding: '16px 20px' }}>
-            {t('sharedConfirmDelete')}
-          </DialogTitle>
-          <DialogContent style={{ color: colors.text, padding: '0 20px' }}>
-            <Typography variant="body2" style={{ color: colors.textSecondary }}>
-              {t('sharedRemoveConfirm')} "{geofenceToDelete?.name}"?
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setDeleteDialog(false)}
-              style={{ color: colors.textSecondary }}
+        {/* Delete Confirmation Modal - Matching logout style */}
+        <AnimatePresence>
+          {deleteDialog && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10000
+              }}
+              onClick={cancelDelete}
             >
-              {t('sharedCancel')}
-            </Button>
-            <Button
-              onClick={() => deleteGeofenceMutation.mutate(geofenceToDelete?.id)}
-              style={{ color: colors.error }}
-              disabled={deleteGeofenceMutation.isPending}
-            >
-              {deleteGeofenceMutation.isPending ? (
-                <CircularProgress size={16} />
-              ) : (
-                t('sharedRemove')
-              )}
-            </Button>
-          </DialogActions>
-        </Dialog>
+              <motion.div
+                initial={{ y: -50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderRadius: '8px',
+                  padding: '20px',
+                  maxWidth: '400px',
+                  width: '90%',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p style={{
+                  margin: '0 0 20px 0',
+                  fontSize: '16px',
+                  color: colors.text,
+                  lineHeight: '1.5'
+                }}>
+                  {t('sharedDeleteConfirm')} "{geofenceToDelete?.name}"?
+                </p>
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'space-between'
+                }}>
+                  <button
+                    onClick={cancelDelete}
+                    style={{
+                      padding: '8px 16px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '6px',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.color = colors.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                      e.target.style.color = colors.text;
+                    }}
+                  >
+                    {t('sharedCancel')}
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={deleteGeofenceMutation.isPending}
+                    style={{
+                      padding: '8px 16px',
+                      border: '1px solid #FECACA',
+                      borderRadius: '6px',
+                      backgroundColor: '#FEF2F2',
+                      color: '#DC2626',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: deleteGeofenceMutation.isPending ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s',
+                      opacity: deleteGeofenceMutation.isPending ? 0.6 : 1
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!deleteGeofenceMutation.isPending) {
+                        e.target.style.backgroundColor = '#FEE2E2';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!deleteGeofenceMutation.isPending) {
+                        e.target.style.backgroundColor = '#FEF2F2';
+                      }
+                    }}
+                  >
+                    {deleteGeofenceMutation.isPending ? (
+                      <CircularProgress size={16} style={{ color: '#DC2626' }} />
+                    ) : (
+                      t('sharedRemove')
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
