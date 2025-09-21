@@ -2531,25 +2531,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 }}>
                   {/* Fast Backward Button */}
                   <button
-                    onClick={() => setCurrentReplayIndex(prevIndex => Math.max(0, prevIndex - 1))}
+                    onClick={() => {
+                      const newIndex = Math.max(0, currentReplayIndex - 1);
+                      setCurrentReplayIndex(newIndex);
+                      // Update Redux state to trigger map updates
+                      dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
+                    }}
                     disabled={replayPositions.length === 0 || currentReplayIndex <= 0}
                     style={{
-                      width: '36px',
-                      height: '36px',
+                      width: '32px',
+                      height: '32px',
                       borderRadius: '50%',
-                      border: 'none',
+                      border: `1px solid ${colors.textSecondary}`,
                       backgroundColor: colors.background,
                       color: colors.textSecondary,
                       cursor: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 0.5 : 1,
-                      border: `1px solid ${colors.textSecondary}`
+                      opacity: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 0.5 : 1
                     }}
                     title={t('sharedFastBackward')}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M11 19V5L5 12L11 19Z" fill="currentColor"/>
                       <path d="M19 19V5L13 12L19 19Z" fill="currentColor"/>
                     </svg>
@@ -2577,6 +2581,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     ) : (
                       <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff" }} />
                     )}
+                  </button>
+
+                  {/* Fast Forward Button */}
+                  <button
+                    onClick={() => {
+                      const newIndex = Math.min(replayPositions.length - 1, currentReplayIndex + 1);
+                      setCurrentReplayIndex(newIndex);
+                      // Update Redux state to trigger map updates
+                      dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
+                    }}
+                    disabled={replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      border: `1px solid ${colors.textSecondary}`,
+                      backgroundColor: colors.background,
+                      color: colors.textSecondary,
+                      cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 0.5 : 1
+                    }}
+                    title={t('sharedFastForward')}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13 5V19L19 12L13 5Z" fill="currentColor"/>
+                      <path d="M5 5V19L11 12L5 5Z" fill="currentColor"/>
+                    </svg>
                   </button>
 
                   {/* Screenshot Button */}
@@ -2613,32 +2647,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
                       </svg>
                     )}
-                  </button>
-
-                  {/* Fast Forward Button */}
-                  <button
-                    onClick={() => setCurrentReplayIndex(prevIndex => Math.min(replayPositions.length - 1, prevIndex + 1))}
-                    disabled={replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      border: 'none',
-                      backgroundColor: colors.background,
-                      color: colors.textSecondary,
-                      cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 0.5 : 1,
-                      border: `1px solid ${colors.textSecondary}`
-                    }}
-                    title={t('sharedFastForward')}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13 5V19L19 12L13 5Z" fill="currentColor"/>
-                      <path d="M5 5V19L11 12L5 5Z" fill="currentColor"/>
-                    </svg>
                   </button>
 
                   {/* Speed Control */}
