@@ -183,6 +183,7 @@ const MainPage = () => {
   const [showGroupsPopover, setShowGroupsPopover] = useState(false);
   const [showDevicesPopover, setShowDevicesPopover] = useState(false);
   const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
+  const [showReplayPopover, setShowReplayPopover] = useState(false);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
   const [preferencesAttributes, setPreferencesAttributes] = useState({});
@@ -776,7 +777,6 @@ const MainPage = () => {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
-  const [showReplayPopover, setShowReplayPopover] = useState(false);
 
 
   const onMapClick = useCallback(() => {

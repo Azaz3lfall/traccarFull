@@ -56,22 +56,27 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         <MapGeofence />
         <MapAccuracy positions={filteredPositions} />
         <MapLiveRoutes />
-        <MapPositions
-          positions={mapPositions}
-          onMarkerClick={onMarkerClick}
-          selectedPosition={selectedPosition}
-          showStatus
-        />
-        <MapDefaultCamera />
-        <MapSelectedDevice />
-        <PoiMap />
         {/* Replay components - only show when we have replay positions */}
         {replayPositions.length > 0 && (
           <>
             <MapRoutePath positions={replayPositions} />
             <MapRoutePoints positions={replayPositions} />
-            <MapReplayCamera position={mapPositions[0]} />
           </>
+        )}
+        <MapDefaultCamera />
+        <MapSelectedDevice />
+        <PoiMap />
+        {/* MapPositions always last to ensure vehicle markers appear on top */}
+        <MapPositions
+          key={`positions-${replayPositions.length > 0 ? 'replay' : 'normal'}`}
+          positions={mapPositions}
+          onMarkerClick={onMarkerClick}
+          selectedPosition={selectedPosition}
+          showStatus
+        />
+        {/* Replay camera - always last to ensure proper positioning */}
+        {replayPositions.length > 0 && (
+          <MapReplayCamera position={mapPositions[0]} />
         )}
       </MapView>
       <MapScale />

@@ -335,10 +335,13 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         type: 'FeatureCollection',
         features: selectedFeatures,
       });
+
+      // Re-add layers to ensure they're on top after data update
+      addLayers();
     };
 
     updateData();
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers]);
 
   return null;
 };

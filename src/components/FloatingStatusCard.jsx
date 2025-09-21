@@ -111,8 +111,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   const deviceReadonly = useDeviceReadonly();
   
   // Get current device and position
-  // In replay mode, use replay data; otherwise use real-time websocket data
-  const device = selectedDeviceId ? devices[selectedDeviceId] : null;
+  // In replay mode, use replay device; otherwise use selected device
+  const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
   
   // Sync local state with Redux state
   useEffect(() => {
@@ -639,11 +639,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   }, [showReplayPopover, replayPositions.length]);
 
   // Close replay popover when status card is closed (selectedDeviceId becomes null)
+  // But not when we're intentionally entering replay mode (replayDeviceId is set)
   useEffect(() => {
-    if (!selectedDeviceId && showReplayPopover) {
+    if (!selectedDeviceId && showReplayPopover && !replayDeviceId) {
       handleCloseReplayPopover();
     }
-  }, [selectedDeviceId, showReplayPopover, handleCloseReplayPopover]);
+  }, [selectedDeviceId, showReplayPopover, replayDeviceId, handleCloseReplayPopover]);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -659,7 +660,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, geof
   return (
     <>
     <AnimatePresence mode="wait">
-      {selectedDeviceId && device && (
+      {((selectedDeviceId && device) || (showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
         <motion.div
           key={`status-card-${selectedDeviceId}`}
           initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
