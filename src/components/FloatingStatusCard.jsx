@@ -43,6 +43,7 @@ import AnchorIcon from '@mui/icons-material/Anchor';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import CommandDialog from './CommandDialog';
+import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -50,7 +51,8 @@ import {
   X,
   ChevronLeft,
   Loader2,
-  Settings
+  Settings,
+  Share
 } from 'lucide-react';
 import { Card } from './ui/card';
 
@@ -74,6 +76,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [showCommandDialog, setShowCommandDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [isAnchored, setIsAnchored] = useState(false);
   const [anchorGeofenceId, setAnchorGeofenceId] = useState(null);
   const [isAnchorLoading, setIsAnchorLoading] = useState(false);
@@ -1433,6 +1436,30 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 <UploadIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
+              {/* Button 5 - Share (Outlined) */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowShareDialog(true);
+                }}
+                style={{
+                  width: !desktop ? '58px' : '42px',
+                  height: !desktop ? '58px' : '42px',
+                  minWidth: !desktop ? '58px' : '42px',
+                  minHeight: !desktop ? '58px' : '42px',
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.textSecondary}`,
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <Share style={{ width: '20px', height: '20px', color: colors.textSecondary }} />
+              </button>
               
               {/* Button 6 - Anchor (Outlined) */}
               <button
@@ -2115,6 +2142,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         deviceId={device?.id}
       />
       
+      {/* Share Dialog */}
+      <ShareDialog
+        open={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
+        deviceId={device?.id}
+      />
 
       {/* Success Message Snackbar */}
       {showSuccessMessage && (
