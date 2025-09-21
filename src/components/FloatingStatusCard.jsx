@@ -2539,8 +2539,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}
                     disabled={replayPositions.length === 0 || currentReplayIndex <= 0}
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '50%',
                       border: `1px solid ${colors.textSecondary}`,
                       backgroundColor: colors.background,
@@ -2553,7 +2553,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}
                     title={t('sharedFastBackward')}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M11 19V5L5 12L11 19Z" fill="currentColor"/>
                       <path d="M19 19V5L13 12L19 19Z" fill="currentColor"/>
                     </svg>
@@ -2593,8 +2593,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}
                     disabled={replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1}
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '50%',
                       border: `1px solid ${colors.textSecondary}`,
                       backgroundColor: colors.background,
@@ -2607,7 +2607,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}
                     title={t('sharedFastForward')}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M13 5V19L19 12L13 5Z" fill="currentColor"/>
                       <path d="M5 5V19L11 12L5 5Z" fill="currentColor"/>
                     </svg>
