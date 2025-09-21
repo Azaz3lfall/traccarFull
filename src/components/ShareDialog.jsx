@@ -27,7 +27,6 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
       expiration.setHours(expiration.getHours() + 24);
       const expirationISO = expiration.toISOString();
       
-      console.log('Sharing device:', { deviceId, expiration: expirationISO });
       
       const response = await fetchOrThrow('/api/devices/share', {
         method: 'POST',
@@ -43,12 +42,10 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
 
       if (response.ok) {
         const responseText = await response.text();
-        console.log('Share response:', responseText);
         
         // Build share URL with server address and token
         const serverAddress = window.location.origin;
         const url = `${serverAddress}?token=${responseText}`;
-        console.log('Share URL:', url);
         
         setShareUrl(url);
         setResult({ type: 'success', message: t('deviceShared') });

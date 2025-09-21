@@ -45,7 +45,6 @@ const ModernMainPage = () => {
   const onDrawerClose = useCallback(() => setDrawerOpen(false), []);
   const onNavigate = useCallback((route) => {
     // Handle navigation to different routes
-    console.log('Navigate to:', route);
     // You can implement navigation logic here
   }, []);
 

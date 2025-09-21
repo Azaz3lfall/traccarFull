@@ -103,13 +103,11 @@ export const mapImages = {};
 // Theme colors are no longer needed since we're not tinting icons
 
 export default async () => {
-  console.log('Loading map images...');
   const background = await loadImage(backgroundSvg);
   mapImages.background = await prepareIcon(background);
   mapImages.direction = await prepareIconWithShadow(await loadImage(directionSvg));
   mapImages['device-name-bg'] = await prepareIcon(background, await loadImage(deviceNameBgSvg));
   
-  console.log('Loading device icons...');
   await Promise.all(Object.keys(mapIcons).map(async (category) => {
     const results = [];
     ['info', 'success', 'error', 'neutral'].forEach((color) => {
@@ -120,5 +118,4 @@ export default async () => {
     await Promise.all(results);
   }));
   
-  console.log('Map images loaded:', Object.keys(mapImages));
 };

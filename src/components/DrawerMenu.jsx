@@ -28,7 +28,6 @@ const DrawerMenu = ({
   onDevicesClick,
   onSettingsClick 
 }) => {
-  console.log('DrawerMenu component called with isOpen:', isOpen);
   const t = useTranslation();
   const colors = useThemeColors();
 
@@ -109,13 +108,11 @@ const DrawerMenu = ({
     }
   };
 
-  console.log('DrawerMenu render - isOpen:', isOpen);
   
   return (
     <AnimatePresence>
       {isOpen && (
         (() => {
-          console.log('DrawerMenu rendering content...');
           return true;
         })() &&
         <>

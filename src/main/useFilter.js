@@ -32,7 +32,6 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
 
     // Quick path for no filters - just return all devices
     if (!keyword && !filter.statuses.length && !filter.groups.length && !filterSort) {
-      console.log('useFilter: No filters applied, returning all devices');
       const allDevices = Object.values(devices);
       setFilteredDevices(allDevices);
       setFilteredPositions(filterMap
@@ -77,13 +76,6 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
           break;
       }
     }
-    
-    console.log('useFilter: Filtering devices', { 
-      totalDevices: Object.keys(devices).length, 
-      filteredCount: filtered.length,
-      keyword,
-      filter 
-    });
     
     setFilteredDevices(filtered);
     setFilteredPositions(filterMap

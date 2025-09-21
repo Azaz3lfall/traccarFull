@@ -140,7 +140,6 @@ const FloatingUsersPopover = ({
     queryFn: async () => {
       const response = await fetchOrThrow('/api/server/timezones');
       const data = await response.json();
-      console.log('Timezones loaded:', data);
       return data;
     },
     enabled: isVisible, // Only fetch when popover is visible
@@ -148,7 +147,6 @@ const FloatingUsersPopover = ({
 
   // Debug logging
   useEffect(() => {
-    console.log('Timezones state:', { timezones, timezonesLoading, timezonesError });
   }, [timezones, timezonesLoading, timezonesError]);
 
   // Fallback timezones in case API fails

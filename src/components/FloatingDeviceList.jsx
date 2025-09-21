@@ -462,7 +462,6 @@ const FloatingDeviceList = ({
   
   // Don't render anything if we don't have proper data
   if (!filteredDevices || !Array.isArray(filteredDevices)) {
-    console.log('FloatingDeviceList: No filteredDevices data', { filteredDevices, showOnMobile, desktop });
     return (
       <div style={{
         display: 'flex',
@@ -476,15 +475,6 @@ const FloatingDeviceList = ({
         <p style={{ fontSize: '14px', margin: 0 }}>Loading devices...</p>
       </div>
     );
-  }
-
-  // Debug logging for mobile visibility issues
-  if (!desktop && showOnMobile) {
-    console.log('FloatingDeviceList: Mobile visible', { 
-      filteredDevicesLength: filteredDevices.length, 
-      showOnMobile, 
-      isVisible 
-    });
   }
 
   // TanStack Virtual setup

@@ -196,11 +196,9 @@ const FloatingGeofencesPopover = ({
 
   // Handle save geofence - validates name and creates geofence
   const handleSave = () => {
-    console.log('Save button clicked', { isAddMode, geofenceName, center, radius, clickCount, circleDrawingMode });
     
     // Only proceed if we're in Save mode (not Add mode)
     if (isAddMode) {
-      console.log('In Add mode, doing nothing');
       return; // Do nothing if in Add mode
     }
 
@@ -216,7 +214,6 @@ const FloatingGeofencesPopover = ({
     const hasPolygon = polygonPoints && polygonPoints.length >= 3;
     
     if (!hasCircle && !hasPolyline && !hasPolygon) {
-      console.log('No completed geofence to save', { center, radius, polylinePoints, polygonPoints });
       dispatch(errorsActions.push(t('sharedRequired')));
       return;
     }
@@ -260,7 +257,6 @@ const FloatingGeofencesPopover = ({
       };
     }
     
-    console.log('Creating geofence:', newGeofence);
     
     // Use the existing mutation to create the geofence
     createGeofenceMutation.mutate(newGeofence);

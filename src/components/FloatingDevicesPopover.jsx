@@ -151,7 +151,6 @@ const FloatingDevicesPopover = ({
       return result;
     },
     onSuccess: (data) => {
-      console.log('Device created successfully:', data);
       queryClient.invalidateQueries(['devices']);
       dispatch(devicesActions.update([data]));
       setEditDialog(false);
@@ -166,10 +165,6 @@ const FloatingDevicesPopover = ({
   // Update device mutation
   const updateDeviceMutation = useMutation({
     mutationFn: async ({ id, deviceData }) => {
-      console.log('=== UPDATE DEVICE DEBUG ===');
-      console.log('Device ID:', id);
-      console.log('Device data to update:', deviceData);
-      console.log('API URL:', `/api/devices/${id}`);
       
       try {
         const response = await fetchOrThrow(`/api/devices/${id}`, {
@@ -178,8 +173,6 @@ const FloatingDevicesPopover = ({
           body: JSON.stringify(deviceData),
         });
         
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
         
         if (!response.ok) {
           const errorText = await response.text();
@@ -188,7 +181,6 @@ const FloatingDevicesPopover = ({
         }
         
         const result = await response.json();
-        console.log('Update device response:', result);
         return result;
       } catch (error) {
         console.error('Update device fetch error:', error);
@@ -196,7 +188,6 @@ const FloatingDevicesPopover = ({
       }
     },
     onSuccess: (data) => {
-      console.log('Device updated successfully:', data);
       queryClient.invalidateQueries(['devices']);
       dispatch(devicesActions.update([data]));
       setEditDialog(false);
@@ -230,13 +221,10 @@ const FloatingDevicesPopover = ({
     }
 
 
-    console.log('Saving device:', editingDevice);
 
     if (editingDevice.id) {
-      console.log('Updating existing device with ID:', editingDevice.id);
       updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: editingDevice });
     } else {
-      console.log('Creating new device');
       createDeviceMutation.mutate(editingDevice);
     }
   };
