@@ -2561,26 +2561,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      border: 'none',
-                      backgroundColor: isScreenshotting ? colors.textSecondary : colors.primary,
-                      color: colors.surface,
+                      border: `2px solid ${colors.border}`,
+                      backgroundColor: isScreenshotting ? colors.textSecondary : '#10B981', // Green color for visibility
+                      color: '#FFFFFF', // White color for contrast
                       cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1,
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                     }}
                     onMouseEnter={(e) => {
                       if (replayPositions.length > 0 && !isScreenshotting) {
-                        e.target.style.backgroundColor = colors.primaryHover;
+                        e.target.style.backgroundColor = '#059669'; // Darker green on hover
                         e.target.style.transform = 'scale(1.05)';
+                        e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (replayPositions.length > 0 && !isScreenshotting) {
-                        e.target.style.backgroundColor = colors.primary;
+                        e.target.style.backgroundColor = '#10B981'; // Back to original green
                         e.target.style.transform = 'scale(1)';
+                        e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
                       }
                     }}
                     title={isScreenshotting ? t('sharedProcessing') : t('sharedScreenshot')}
@@ -2590,7 +2593,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         width: '20px',
                         height: '20px',
                         border: '2px solid transparent',
-                        borderTop: '2px solid currentColor',
+                        borderTop: '2px solid #FFFFFF',
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite'
                       }} />
