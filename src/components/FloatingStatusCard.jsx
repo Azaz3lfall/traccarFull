@@ -2562,7 +2562,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       height: '40px',
                       borderRadius: '50%',
                       border: `1px solid ${colors.textSecondary}`,
-                      backgroundColor: 'transparent',
+                      backgroundColor: colors.background,
                       color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
                       cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
                       display: 'flex',
