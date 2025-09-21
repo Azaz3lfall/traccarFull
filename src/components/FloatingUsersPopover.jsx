@@ -829,14 +829,14 @@ const FloatingUsersPopover = ({
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <p style={{
-                    margin: '0 0 20px 0',
-                    fontSize: '16px',
-                    color: colors.text,
-                    lineHeight: '1.5'
-                  }}>
-                    {t('sharedRemoveConfirm')} "{userToDelete?.name}"?
-                  </p>
+               <p style={{
+                 margin: '0 0 20px 0',
+                 fontSize: '16px',
+                 color: colors.text,
+                 lineHeight: '1.5'
+               }}>
+                 {t('sharedDeleteConfirm')} "{userToDelete?.name}"?
+               </p>
                   <div style={{
                     display: 'flex',
                     gap: '12px',
