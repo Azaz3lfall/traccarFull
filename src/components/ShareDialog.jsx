@@ -72,11 +72,42 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          } else {
+            throw new Error('Copy command failed');
+          }
+        } catch (fallbackError) {
+          console.error('Fallback copy failed:', fallbackError);
+          // Show URL in a prompt as last resort
+          prompt('Copy this URL:', shareUrl);
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
     } catch (error) {
       console.error('Failed to copy URL:', error);
+      // Show URL in a prompt as last resort
+      prompt('Copy this URL:', shareUrl);
     }
   };
 
