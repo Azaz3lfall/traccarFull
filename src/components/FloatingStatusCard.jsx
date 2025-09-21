@@ -42,6 +42,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ShareIcon from '@mui/icons-material/Share';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -51,8 +52,7 @@ import {
   X,
   ChevronLeft,
   Loader2,
-  Settings,
-  Share
+  Settings
 } from 'lucide-react';
 import { Card } from './ui/card';
 
@@ -1458,7 +1458,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   boxSizing: 'border-box'
                 }}
               >
-                <Share style={{ width: '20px', height: '20px', color: colors.textSecondary }} />
+                <ShareIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
               
               {/* Button 6 - Anchor (Outlined) */}
