@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Fjern",
   "sharedRemoveConfirm": "Fjern enhed?",
+  "sharedDeleteConfirm": "Vil du virkelig slette",
   "sharedRequired": "Krævet",
   "sharedSave": "Gem",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Bruger grænse",
   "sharedTimeline": "Tidslinje",
-  "commandConfirm": "Trackeren skal være i et område med god 4G-dækning for at modtage kommandoen."
-,
+  "commandConfirm": "Trackeren skal være i et område med god 4G-dækning for at modtage kommandoen.",
   "serverUrl": "Server-URL:",
   "copyUrl": "Kopier URL",
-  "copied": "Kopieret!"
-,
+  "copied": "Kopieret!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Kaldır",
   "sharedRemoveConfirm": "Öğeyi kaldır",
+  "sharedDeleteConfirm": "Gerçekten silmek istiyor musunuz",
   "sharedRequired": "Gerekli",
   "sharedSave": "Kaydet",
   "sharedSaved": "Saved",

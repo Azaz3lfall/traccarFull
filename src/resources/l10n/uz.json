@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Ўчириш",
   "sharedRemoveConfirm": "Элементни ўчирайми?",
+  "sharedDeleteConfirm": "Haqiqatan ham o'chirmoqchimisiz",
   "sharedRequired": "Required",
   "sharedSave": "Сақлаш",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Калит",
   "userUserLimit": "Фойдаланувчини чегаралаш",
   "sharedTimeline": "Vaqt chizig'i",
-  "commandConfirm": "Buyruqni olish uchun treker yaxshi 4G qamrovi bo'lgan mintaqada bo'lishi kerak."
-,
+  "commandConfirm": "Buyruqni olish uchun treker yaxshi 4G qamrovi bo'lgan mintaqada bo'lishi kerak.",
   "serverUrl": "Server URL manzili:",
   "copyUrl": "URL-ni nusxalash",
-  "copied": "Nusxalandi!"
-,
+  "copied": "Nusxalandi!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

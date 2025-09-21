@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Kod",
   "sharedRemove": "Ukloni",
   "sharedRemoveConfirm": "Ukloniti jedinicu?",
+  "sharedDeleteConfirm": "Да ли стварно желите да обришете",
   "sharedRequired": "Obavezno",
   "sharedSave": "Sačuvaj",
   "sharedSaved": "Sačuvano",
@@ -639,12 +640,10 @@
   "userToken": "Znak",
   "userUserLimit": "Limit korisnika",
   "sharedTimeline": "Временска линија",
-  "commandConfirm": "Трекер мора бити у региону са добром 4G покривеношћу да би примио команду."
-,
+  "commandConfirm": "Трекер мора бити у региону са добром 4G покривеношћу да би примио команду.",
   "serverUrl": "URL сервера:",
   "copyUrl": "Копирај URL",
-  "copied": "Копирано!"
-,
+  "copied": "Копирано!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

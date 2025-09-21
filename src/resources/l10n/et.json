@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Remove",
   "sharedRemoveConfirm": "Remove item?",
+  "sharedDeleteConfirm": "Kas soovite tõesti kustutada",
   "sharedRequired": "Required",
   "sharedSave": "Save",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "User Limit",
   "sharedTimeline": "Ajajoon",
-  "commandConfirm": "Jälgija peab olema piirkonnas hea 4G kattega, et käsk vastu võtta."
-,
+  "commandConfirm": "Jälgija peab olema piirkonnas hea 4G kattega, et käsk vastu võtta.",
   "serverUrl": "Serveri URL:",
   "copyUrl": "Kopeeri URL",
-  "copied": "Kopeeritud!"
-,
+  "copied": "Kopeeritud!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

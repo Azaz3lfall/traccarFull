@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Удалить",
   "sharedRemoveConfirm": "Удалить элемент?",
+  "sharedDeleteConfirm": "Вы действительно хотите удалить",
   "sharedRequired": "Обязательные",
   "sharedSave": "Сохранить",
   "sharedSaved": "Сохранено",

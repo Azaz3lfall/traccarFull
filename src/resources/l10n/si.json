@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "ඉවත් කරන්න",
   "sharedRemoveConfirm": "අයිතමය ඉවත් කරන්නද?",
+  "sharedDeleteConfirm": "ඔබට සැබවින්ම මකා දැමීමට අවශ්‍යද",
   "sharedRequired": "අවශයි",
   "sharedSave": "සුරකින්න",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "ටෝකනය",
   "userUserLimit": "පරිශීලක සීමාව",
   "sharedTimeline": "කාල රේඛාව",
-  "commandConfirm": "විධානය ලබා ගැනීම සඳහා ට්‍රැකරය 4G ආවරණය හොඳින් ඇති කලාපයක පිහිටිය යුතුය."
-,
+  "commandConfirm": "විධානය ලබා ගැනීම සඳහා ට්‍රැකරය 4G ආවරණය හොඳින් ඇති කලාපයක පිහිටිය යුතුය.",
   "serverUrl": "සේවාදායක URL:",
   "copyUrl": "URL පිටපත් කරන්න",
-  "copied": "පිටපත් කරන ලදී!"
-,
+  "copied": "පිටපත් කරන ලදී!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

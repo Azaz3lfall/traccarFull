@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Ondoa",
   "sharedRemoveConfirm": "Ondoa kipengee",
+  "sharedDeleteConfirm": "Je, unataka kweli kufuta",
   "sharedRequired": "Inahitajika",
   "sharedSave": "Hifadhi",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Ishara",
   "userUserLimit": "Kikomom cha watumiaji",
   "sharedTimeline": "Mstari wa wakati",
-  "commandConfirm": "Kifuatiliaji anahitaji kuwa katika eneo lenye chanjo nzuri ya 4G ili kupokea amri."
-,
+  "commandConfirm": "Kifuatiliaji anahitaji kuwa katika eneo lenye chanjo nzuri ya 4G ili kupokea amri.",
   "serverUrl": "URL ya Seva:",
   "copyUrl": "Nakili URL",
-  "copied": "Imenakiliwa!"
-,
+  "copied": "Imenakiliwa!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

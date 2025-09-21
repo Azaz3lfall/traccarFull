@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "წაშლა",
   "sharedRemoveConfirm": "გსურთ წაშლა ?",
+  "sharedDeleteConfirm": "ნამდვილად გინდათ წაშლა",
   "sharedRequired": "სავალდებულოა",
   "sharedSave": "შენახვა",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "ტოკენი",
   "userUserLimit": "მომხმარებლის ლიმიტი",
   "sharedTimeline": "დროის ხაზი",
-  "commandConfirm": "ტრეკერს უნდა იყოს კარგი 4G დაფარვის მქონე რეგიონში ბრძანების მისაღებად."
-,
+  "commandConfirm": "ტრეკერს უნდა იყოს კარგი 4G დაფარვის მქონე რეგიონში ბრძანების მისაღებად.",
   "serverUrl": "სერვერის URL:",
   "copyUrl": "URL-ის კოპირება",
-  "copied": "კოპირებულია!"
-,
+  "copied": "კოპირებულია!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

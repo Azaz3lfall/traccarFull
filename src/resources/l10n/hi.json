@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "हटाएं",
   "sharedRemoveConfirm": "आइटम हटाएं ?",
+  "sharedDeleteConfirm": "क्या आप वास्तव में हटाना चाहते हैं",
   "sharedRequired": "अपेक्षित",
   "sharedSave": "सुरक्षित करें",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "टोकन",
   "userUserLimit": "उपयोगकर्ता सीमा",
   "sharedTimeline": "समयरेखा",
-  "commandConfirm": "कमांड प्राप्त करने के लिए ट्रैकर को अच्छे 4G कवरेज वाले क्षेत्र में होना चाहिए।"
-,
+  "commandConfirm": "कमांड प्राप्त करने के लिए ट्रैकर को अच्छे 4G कवरेज वाले क्षेत्र में होना चाहिए।",
   "serverUrl": "सर्वर URL:",
   "copyUrl": "URL कॉपी करें",
-  "copied": "कॉपी हो गया!"
-,
+  "copied": "कॉपी हो गया!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

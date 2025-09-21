@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "ລົບອອກ",
   "sharedRemoveConfirm": "ລົບລາຍການນີ້ບໍ່?",
+  "sharedDeleteConfirm": "ທ່ານຕ້ອງການລຶບຈິງໆ ບໍ່",
   "sharedRequired": "Required",
   "sharedSave": "ບັນທຶກ",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "User Limit",
   "sharedTimeline": "ເສັ້ນເວລາ",
-  "commandConfirm": "ຕົວຕິດຕາມຕ້ອງຢູ່ໃນພື້ນທີ່ທີ່ມີການປົກຫຸ້ມ 4G ທີ່ດີເພື່ອຮັບຄຳສັ່ງ."
-,
+  "commandConfirm": "ຕົວຕິດຕາມຕ້ອງຢູ່ໃນພື້ນທີ່ທີ່ມີການປົກຫຸ້ມ 4G ທີ່ດີເພື່ອຮັບຄຳສັ່ງ.",
   "serverUrl": "URL ເຊີເວີ:",
   "copyUrl": "ສຳເນົາ URL",
-  "copied": "ສຳເນົາແລ້ວ!"
-,
+  "copied": "ສຳເນົາແລ້ວ!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "অপসারণ করুন",
   "sharedRemoveConfirm": "আইটেম অপসারণ?",
+  "sharedDeleteConfirm": "আপনি কি সত্যিই মুছে ফেলতে চান",
   "sharedRequired": "অবশ্যক",
   "sharedSave": " সংরক্ষণ করুন",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "টোকেন",
   "userUserLimit": "ব্যবহারকারীর সীমা",
   "sharedTimeline": "সময়রেখা",
-  "commandConfirm": "কমান্ড গ্রহণের জন্য ট্র্যাকারকে ভাল 4G কভারেজ সহ একটি অঞ্চলে থাকতে হবে।"
-,
+  "commandConfirm": "কমান্ড গ্রহণের জন্য ট্র্যাকারকে ভাল 4G কভারেজ সহ একটি অঞ্চলে থাকতে হবে।",
   "serverUrl": "সার্ভার URL:",
   "copyUrl": "URL কপি করুন",
-  "copied": "কপি হয়েছে!"
-,
+  "copied": "কপি হয়েছে!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

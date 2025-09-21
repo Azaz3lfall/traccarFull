@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "நீக்குக",
   "sharedRemoveConfirm": "நீக்கம் உறுதி செய்?",
+  "sharedDeleteConfirm": "நீங்கள் உண்மையில் நீக்க விரும்புகிறீர்களா",
   "sharedRequired": "தேவையான",
   "sharedSave": "சேமி",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "டோக்கன் ",
   "userUserLimit": "பயனர் வரம்பு",
   "sharedTimeline": "நேரக்கோடு",
-  "commandConfirm": "கட்டளையைப் பெற ட்ராக்கர் நல்ல 4G கவரேஜ் உள்ள பிராந்தியத்தில் இருக்க வேண்டும்."
-,
+  "commandConfirm": "கட்டளையைப் பெற ட்ராக்கர் நல்ல 4G கவரேஜ் உள்ள பிராந்தியத்தில் இருக்க வேண்டும்.",
   "serverUrl": "சர்வர் URL:",
   "copyUrl": "URL ஐ நகலெடுக்கவும்",
-  "copied": "நகலெடுக்கப்பட்டது!"
-,
+  "copied": "நகலெடுக்கப்பட்டது!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

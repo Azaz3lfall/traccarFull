@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Verwyder",
   "sharedRemoveConfirm": "Verwyder item",
+  "sharedDeleteConfirm": "Wil jy regtig verwyder",
   "sharedRequired": "Word Vereis",
   "sharedSave": "Stoor",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Gebruiker Limiet",
   "sharedTimeline": "Tydlyn",
-  "commandConfirm": "Die tracker moet in 'n streek met goeie 4G-dekking wees om die opdrag te ontvang."
-,
+  "commandConfirm": "Die tracker moet in 'n streek met goeie 4G-dekking wees om die opdrag te ontvang.",
   "serverUrl": "Bediener URL:",
   "copyUrl": "Kopieer URL",
-  "copied": "Gekopieer!"
-,
+  "copied": "Gekopieer!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

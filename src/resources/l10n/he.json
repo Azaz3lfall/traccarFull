@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "הסרה",
   "sharedRemoveConfirm": "הסרת פריט",
+  "sharedDeleteConfirm": "האם אתה באמת רוצה למחוק",
   "sharedRequired": "נדרש",
   "sharedSave": "שמירה",
   "sharedSaved": "נשמר",
@@ -639,12 +640,10 @@
   "userToken": "אסימון",
   "userUserLimit": "מגבלת משתמשים",
   "sharedTimeline": "ציר זמן",
-  "commandConfirm": "המעקב צריך להיות באזור עם כיסוי 4G טוב כדי לקבל את הפקודה."
-,
+  "commandConfirm": "המעקב צריך להיות באזור עם כיסוי 4G טוב כדי לקבל את הפקודה.",
   "serverUrl": "כתובת שרת:",
   "copyUrl": "העתק כתובת",
-  "copied": "הועתק!"
-,
+  "copied": "הועתק!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

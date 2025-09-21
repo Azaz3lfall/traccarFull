@@ -575,6 +575,7 @@
   "sharedQrCode": "二维码",
   "sharedRemove": "删除",
   "sharedRemoveConfirm": "删除选中项？",
+  "sharedDeleteConfirm": "您确定要删除",
   "sharedRequired": "必填",
   "sharedSave": "保存",
   "sharedSaved": "已保存",

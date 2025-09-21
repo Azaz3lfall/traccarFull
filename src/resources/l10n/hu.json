@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Törlés",
   "sharedRemoveConfirm": "Biztosan törli?",
+  "sharedDeleteConfirm": "Valóban törölni szeretné",
   "sharedRequired": "Kötelező",
   "sharedSave": "Mentés",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Felhasználólimit",
   "sharedTimeline": "Idővonal",
-  "commandConfirm": "A trackernek jó 4G lefedettségű régióban kell lennie a parancs fogadásához."
-,
+  "commandConfirm": "A trackernek jó 4G lefedettségű régióban kell lennie a parancs fogadásához.",
   "serverUrl": "Szerver URL:",
   "copyUrl": "URL másolása",
-  "copied": "Másolva!"
-,
+  "copied": "Másolva!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

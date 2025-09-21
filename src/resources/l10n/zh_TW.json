@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "移除",
   "sharedRemoveConfirm": "確認要移除嗎？",
+  "sharedDeleteConfirm": "您確定要刪除",
   "sharedRequired": "必需",
   "sharedSave": "存檔",
   "sharedSaved": "已儲存",

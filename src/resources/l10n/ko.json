@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "제거",
   "sharedRemoveConfirm": "제거 하시겠습니까?",
+  "sharedDeleteConfirm": "정말로 삭제하시겠습니까",
   "sharedRequired": "필수",
   "sharedSave": "저장",
   "sharedSaved": "Saved",

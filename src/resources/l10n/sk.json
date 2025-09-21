@@ -575,6 +575,7 @@
   "sharedQrCode": "QR kód",
   "sharedRemove": "Odstrániť",
   "sharedRemoveConfirm": "Odstrániť položku?",
+  "sharedDeleteConfirm": "Naozaj chcete vymazať",
   "sharedRequired": "Požadované",
   "sharedSave": "Uložiť",
   "sharedSaved": "Uložené",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Obmedzenie používateľov",
   "sharedTimeline": "Časová os",
-  "commandConfirm": "Tracker musí byť v oblasti s dobrým 4G pokrytím, aby mohol prijať príkaz."
-,
+  "commandConfirm": "Tracker musí byť v oblasti s dobrým 4G pokrytím, aby mohol prijať príkaz.",
   "serverUrl": "URL servera:",
   "copyUrl": "Kopírovať URL",
-  "copied": "Skopírované!"
-,
+  "copied": "Skopírované!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

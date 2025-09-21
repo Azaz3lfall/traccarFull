@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "ลบรายการ",
   "sharedRemoveConfirm": "ยืนยันลบรายการ",
+  "sharedDeleteConfirm": "คุณต้องการลบจริงๆ หรือไม่",
   "sharedRequired": "ต้องระบุ",
   "sharedSave": "จัดเก็บแฟ้มข้อมูล",
   "sharedSaved": "บันทึกแล้ว",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "ขีดจำกัดผู้ใช้",
   "sharedTimeline": "ไทม์ไลน์",
-  "commandConfirm": "ตัวติดตามต้องอยู่ในพื้นที่ที่มีการครอบคลุม 4G ที่ดีเพื่อรับคำสั่ง"
-,
+  "commandConfirm": "ตัวติดตามต้องอยู่ในพื้นที่ที่มีการครอบคลุม 4G ที่ดีเพื่อรับคำสั่ง",
   "serverUrl": "URL เซิร์ฟเวอร์:",
   "copyUrl": "คัดลอก URL",
-  "copied": "คัดลอกแล้ว!"
-,
+  "copied": "คัดลอกแล้ว!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Ջնջել",
   "sharedRemoveConfirm": "Հեռացնե՞լ տարրը",
+  "sharedDeleteConfirm": "Իսկապես ուզու՞մ եք ջնջել",
   "sharedRequired": "Պահանջվող",
   "sharedSave": "Պահպանել",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "User Limit",
   "sharedTimeline": "Ժամանակային գիծ",
-  "commandConfirm": "Հետևիչը պետք է լինի 4G լավ ծածկույթ ունեցող տարածաշրջանում՝ հրամանը ստանալու համար:"
-,
+  "commandConfirm": "Հետևիչը պետք է լինի 4G լավ ծածկույթ ունեցող տարածաշրջանում՝ հրամանը ստանալու համար:",
   "serverUrl": "Սերվերի URL:",
   "copyUrl": "Պատճենել URL",
-  "copied": "Պատճենված է!"
-,
+  "copied": "Պատճենված է!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Eliminar",
   "sharedRemoveConfirm": "Eliminar element?",
+  "sharedDeleteConfirm": "Realment voleu eliminar",
   "sharedRequired": "Obligatori",
   "sharedSave": "Guardar",
   "sharedSaved": "Desat",
@@ -639,12 +640,10 @@
   "userToken": "Token Accés",
   "userUserLimit": "Límit d\\'usuaris",
   "sharedTimeline": "Línia de temps",
-  "commandConfirm": "El rastrejador ha d'estar en una regió amb bona cobertura 4G per rebre la comanda."
-,
+  "commandConfirm": "El rastrejador ha d'estar en una regió amb bona cobertura 4G per rebre la comanda.",
   "serverUrl": "URL del servidor:",
   "copyUrl": "Copia URL",
-  "copied": "Copiat!"
-,
+  "copied": "Copiat!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

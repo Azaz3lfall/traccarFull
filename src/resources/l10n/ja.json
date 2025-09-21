@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "削除",
   "sharedRemoveConfirm": "アイテムを削除しますか?",
+  "sharedDeleteConfirm": "本当に削除しますか",
   "sharedRequired": "必須項目",
   "sharedSave": "保存",
   "sharedSaved": "Saved",

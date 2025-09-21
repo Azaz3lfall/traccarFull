@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Pašalinti",
   "sharedRemoveConfirm": "Pašalinti objektą?",
+  "sharedDeleteConfirm": "Ar tikrai norite ištrinti",
   "sharedRequired": "Privalomas",
   "sharedSave": "Išsaugoti",
   "sharedSaved": "Įrašyta",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Vartotojo limitas",
   "sharedTimeline": "Laiko juosta",
-  "commandConfirm": "Seklys turi būti regione su geru 4G aprėpimu, kad gautų komandą."
-,
+  "commandConfirm": "Seklys turi būti regione su geru 4G aprėpimu, kad gautų komandą.",
   "serverUrl": "Serverio URL:",
   "copyUrl": "Kopijuoti URL",
-  "copied": "Nukopijuota!"
-,
+  "copied": "Nukopijuota!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

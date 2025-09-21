@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "پاک کردن",
   "sharedRemoveConfirm": "پاک کردن آیتم",
+  "sharedDeleteConfirm": "آیا واقعاً می‌خواهید حذف کنید",
   "sharedRequired": "ضروری",
   "sharedSave": "ذخيره",
   "sharedSaved": "ذخیره شد",
@@ -639,12 +640,10 @@
   "userToken": "رمز یکبار",
   "userUserLimit": "محدودیت کاربر",
   "sharedTimeline": "خط زمانی",
-  "commandConfirm": "ردیاب باید در منطقه‌ای با پوشش 4G خوب باشد تا دستور را دریافت کند."
-,
+  "commandConfirm": "ردیاب باید در منطقه‌ای با پوشش 4G خوب باشد تا دستور را دریافت کند.",
   "serverUrl": "آدرس سرور:",
   "copyUrl": "کپی آدرس",
-  "copied": "کپی شد!"
-,
+  "copied": "کپی شد!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

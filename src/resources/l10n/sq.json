@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Hiq",
   "sharedRemoveConfirm": "Hiq skedarin",
+  "sharedDeleteConfirm": "A doni vërtet të fshish",
   "sharedRequired": "Required",
   "sharedSave": "Ruaj",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "User Limit",
   "sharedTimeline": "Koha",
-  "commandConfirm": "Gjurmuesi duhet të jetë në një rajon me mbulim të mirë 4G për të marrë komandën."
-,
+  "commandConfirm": "Gjurmuesi duhet të jetë në një rajon me mbulim të mirë 4G për të marrë komandën.",
   "serverUrl": "URL e serverit:",
   "copyUrl": "Kopjo URL",
-  "copied": "Kopjuar!"
-,
+  "copied": "Kopjuar!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

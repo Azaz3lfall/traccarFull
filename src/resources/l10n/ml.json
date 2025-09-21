@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "നീക്കം ചെയ്യുക",
   "sharedRemoveConfirm": "ഐറ്റം നീക്കം ചെയ്യട്ടെ ?",
+  "sharedDeleteConfirm": "നിങ്ങൾക്ക് ശരിക്കും ഇല്ലാതാക്കണോ",
   "sharedRequired": "അനിവാര്യം",
   "sharedSave": "സേവ്",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "User Limit",
   "sharedTimeline": "കാലഗതി",
-  "commandConfirm": "കമാൻഡ് സ്വീകരിക്കാൻ ട്രാക്കർ നല്ല 4G കവറേജ് ഉള്ള പ്രദേശത്ത് ഉണ്ടായിരിക്കണം."
-,
+  "commandConfirm": "കമാൻഡ് സ്വീകരിക്കാൻ ട്രാക്കർ നല്ല 4G കവറേജ് ഉള്ള പ്രദേശത്ത് ഉണ്ടായിരിക്കണം.",
   "serverUrl": "സെർവർ URL:",
   "copyUrl": "URL പകർത്തുക",
-  "copied": "പകർത്തി!"
-,
+  "copied": "പകർത്തി!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

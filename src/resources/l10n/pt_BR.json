@@ -576,6 +576,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Remover",
   "sharedRemoveConfirm": "Remover item?",
+  "sharedDeleteConfirm": "Tem certeza de que deseja excluir",
   "sharedRequired": "Necessário",
   "sharedSave": "Salvar",
   "sharedSaved": "Salvo",

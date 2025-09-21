@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Radera",
   "sharedRemoveConfirm": "Radera objekt?",
+  "sharedDeleteConfirm": "Vill du verkligen ta bort",
   "sharedRequired": "Nödvändig",
   "sharedSave": "Spara",
   "sharedSaved": "Saved",

@@ -13,6 +13,7 @@
   "sharedEdit": "Edit",
   "sharedRemove": "Remove",
   "sharedRemoveConfirm": "Remove item?",
+  "sharedDeleteConfirm": "Do you really want to delete",
   "sharedNoData": "No data",
   "sharedSubject": "Subject",
   "sharedYes": "Yes",

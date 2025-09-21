@@ -575,6 +575,7 @@
   "sharedQrCode": "QR κωδικός",
   "sharedRemove": "Κατάργηση",
   "sharedRemoveConfirm": "Κατάργηση στοιχείου;",
+  "sharedDeleteConfirm": "Θέλετε πραγματικά να διαγράψετε",
   "sharedRequired": "Απαραίτητο",
   "sharedSave": "Αποθήκευση",
   "sharedSaved": "Αποθηκεύτηκε",
@@ -639,12 +640,10 @@
   "userToken": "Διακριτικό πρόσβασης",
   "userUserLimit": "Όριο χρήστη",
   "sharedTimeline": "Χρονολόγιο",
-  "commandConfirm": "Ο παρακολουθητής πρέπει να βρίσκεται σε μια περιοχή με καλή κάλυψη 4G για να λάβει την εντολή."
-,
+  "commandConfirm": "Ο παρακολουθητής πρέπει να βρίσκεται σε μια περιοχή με καλή κάλυψη 4G για να λάβει την εντολή.",
   "serverUrl": "URL διακομιστή:",
   "copyUrl": "Αντιγραφή URL",
-  "copied": "Αντιγράφηκε!"
-,
+  "copied": "Αντιγράφηκε!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

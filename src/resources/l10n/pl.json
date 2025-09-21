@@ -575,6 +575,7 @@
   "sharedQrCode": "Kod QR",
   "sharedRemove": "Usuń",
   "sharedRemoveConfirm": "Usunąć obiekt?",
+  "sharedDeleteConfirm": "Czy na pewno chcesz usunąć",
   "sharedRequired": "Wymagane",
   "sharedSave": "Zapisz",
   "sharedSaved": "Zapisane",

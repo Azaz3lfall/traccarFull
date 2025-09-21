@@ -28,10 +28,6 @@ import {
   FormControl,
   InputLabel,
   Checkbox,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -165,6 +161,21 @@ const FloatingCommandsPopover = ({
     setAnchorEl(null);
   };
 
+  // Handle delete confirmation
+  const confirmDelete = () => {
+    if (commandToDelete) {
+      deleteCommandMutation.mutate(commandToDelete.id);
+    }
+    setDeleteDialog(false);
+    setCommandToDelete(null);
+  };
+
+  // Handle delete cancellation
+  const cancelDelete = () => {
+    setDeleteDialog(false);
+    setCommandToDelete(null);
+  };
+
   // Mutations
   const createCommandMutation = useMutation({
     mutationFn: async (commandData) => {
@@ -204,8 +215,6 @@ const FloatingCommandsPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commands'] });
-      setDeleteDialog(false);
-      setCommandToDelete(null);
     },
   });
 
@@ -612,48 +621,117 @@ const FloatingCommandsPopover = ({
               ))}
           </Menu>
 
-          {/* Delete Confirmation Dialog */}
-          <Dialog
-            open={deleteDialog}
-            onClose={() => setDeleteDialog(false)}
-            style={{ zIndex: 10003 }}
-            PaperProps={{
-              style: {
-                backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
-                borderRadius: '12px',
-                zIndex: 10003,
-              },
-            }}
-          >
-            <DialogTitle style={{ color: colors.text }}>
-              {t('sharedRemove')} {commandToDelete?.description}
-            </DialogTitle>
-            <DialogContent>
-              <Typography style={{ color: colors.textSecondary }}>
-                {t('sharedRemoveConfirm')} "{commandToDelete?.description}"?
-              </Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => setDeleteDialog(false)}
-                style={{ color: colors.textSecondary }}
+          {/* Delete Confirmation Modal - Matching logout style */}
+          <AnimatePresence>
+            {deleteDialog && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10000
+                }}
+                onClick={cancelDelete}
               >
-                {t('sharedCancel')}
-              </Button>
-              <Button
-                onClick={() => deleteCommandMutation.mutate(commandToDelete.id)}
-                style={{ color: colors.error }}
-                disabled={deleteCommandMutation.isPending}
-              >
-                {deleteCommandMutation.isPending ? (
-                  <CircularProgress size={16} />
-                ) : (
-                  t('sharedRemove')
-                )}
-              </Button>
-            </DialogActions>
-          </Dialog>
+                <motion.div
+                  initial={{ y: -50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -50, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderRadius: '8px',
+                    padding: '20px',
+                    maxWidth: '400px',
+                    width: '90%',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <p style={{
+                    margin: '0 0 20px 0',
+                    fontSize: '16px',
+                    color: colors.text,
+                    lineHeight: '1.5'
+                  }}>
+                    {t('sharedRemoveConfirm')} "{commandToDelete?.description}"?
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'space-between'
+                  }}>
+                    <button
+                      onClick={cancelDelete}
+                      style={{
+                        padding: '8px 16px',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '6px',
+                        backgroundColor: colors.secondary,
+                        color: colors.text,
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                        e.target.style.color = colors.text;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                        e.target.style.color = colors.text;
+                      }}
+                    >
+                      {t('sharedCancel')}
+                    </button>
+                    <button
+                      onClick={confirmDelete}
+                      disabled={deleteCommandMutation.isPending}
+                      style={{
+                        padding: '8px 16px',
+                        border: '1px solid #FECACA',
+                        borderRadius: '6px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: deleteCommandMutation.isPending ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s',
+                        opacity: deleteCommandMutation.isPending ? 0.6 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!deleteCommandMutation.isPending) {
+                          e.target.style.backgroundColor = '#FEE2E2';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!deleteCommandMutation.isPending) {
+                          e.target.style.backgroundColor = '#FEF2F2';
+                        }
+                      }}
+                    >
+                      {deleteCommandMutation.isPending ? (
+                        <CircularProgress size={16} style={{ color: '#DC2626' }} />
+                      ) : (
+                        t('sharedRemove')
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Edit Command Drawer */}
           <AnimatePresence>

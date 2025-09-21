@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Silmək",
   "sharedRemoveConfirm": "Elementi silmək?",
+  "sharedDeleteConfirm": "Həqiqətən silmək istəyirsiniz",
   "sharedRequired": "Məcburi",
   "sharedSave": "Yadda saxlamaq",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Açar",
   "userUserLimit": "İstifadəçilərin  məhdudiyyəti",
   "sharedTimeline": "Zaman xətti",
-  "commandConfirm": "İzleyicinin əmri qəbul etmək üçün yaxşı 4G əhatə dairəsində olması lazımdır."
-,
+  "commandConfirm": "İzleyicinin əmri qəbul etmək üçün yaxşı 4G əhatə dairəsində olması lazımdır.",
   "serverUrl": "Server URL-si:",
   "copyUrl": "URL-i kopyala",
-  "copied": "Kopyalandı!"
-,
+  "copied": "Kopyalandı!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

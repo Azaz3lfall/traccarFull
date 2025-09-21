@@ -576,6 +576,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Effacer",
   "sharedRemoveConfirm": "Effacer objet?",
+  "sharedDeleteConfirm": "Voulez-vous vraiment supprimer",
   "sharedRequired": "Requis",
   "sharedSave": "Enregistrer",
   "sharedSaved": "Sauvé",

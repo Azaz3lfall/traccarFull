@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Verwijderen",
   "sharedRemoveConfirm": "Item verwijderen?",
+  "sharedDeleteConfirm": "Weet je zeker dat je wilt verwijderen",
   "sharedRequired": "Verplicht",
   "sharedSave": "Opslaan",
   "sharedSaved": "Opgeslagen",

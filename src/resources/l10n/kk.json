@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "Жою",
   "sharedRemoveConfirm": "Элементті жою?",
+  "sharedDeleteConfirm": "Шынымен жойғыңыз келе ме",
   "sharedRequired": "Міндетті",
   "sharedSave": "Сақтау",
   "sharedSaved": "Saved",
@@ -639,12 +640,10 @@
   "userToken": "Кілт",
   "userUserLimit": "Қолданушылар Лимиті",
   "sharedTimeline": "Уақыт сызығы",
-  "commandConfirm": "Трекер команданы алу үшін жақсы 4G қамтуы бар аймақта болуы керек."
-,
+  "commandConfirm": "Трекер команданы алу үшін жақсы 4G қамтуы бар аймақта болуы керек.",
   "serverUrl": "Сервер URL:",
   "copyUrl": "URL көшіру",
-  "copied": "Көшірілді!"
-,
+  "copied": "Көшірілді!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -652,7 +651,6 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
+  "loadingStarting": "Starting...",
   "sharedMenu": "Menu"
 }

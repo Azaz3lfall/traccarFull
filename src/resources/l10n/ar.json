@@ -575,6 +575,7 @@
   "sharedQrCode": "QR Code",
   "sharedRemove": "حذف",
   "sharedRemoveConfirm": "حذف العنصر؟",
+  "sharedDeleteConfirm": "هل تريد حقاً حذف",
   "sharedRequired": "اجباري",
   "sharedSave": "حفظ",
   "sharedSaved": "Saved",
