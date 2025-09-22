@@ -88,3 +88,14 @@
   }
 }
 
+/* Added custom gradient utilities for the hero section */
+.gradient-hero {
+  background: linear-gradient(135deg, oklch(0.65 0.25 240) 0%, oklch(0.7 0.3 280) 50%, oklch(0.75 0.25 30) 100%);
+}
+
+.gradient-mesh {
+  background-image: radial-gradient(circle at 20% 80%, oklch(0.65 0.25 240 / 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, oklch(0.75 0.25 30 / 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, oklch(0.7 0.3 280 / 0.2) 0%, transparent 50%);
+}
+
