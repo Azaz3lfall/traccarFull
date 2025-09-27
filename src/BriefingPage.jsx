@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import fallbackLogo from './resources/images/image170.png?inline';
 
 const BriefingPage = () => {
     const logo = useSelector((state) => state.session.server?.attributes?.logo);
@@ -51,9 +52,9 @@ const BriefingPage = () => {
                         {(() => {
                             const logoUrl = logo || logoInverted;
                             
-                            return logoUrl ? (
+                            return (
                                 <img 
-                                    src={logoUrl} 
+                                    src={logoUrl || fallbackLogo} 
                                     alt="Server Logo" 
                                     style={{ 
                                         maxHeight: '50px',
@@ -62,19 +63,10 @@ const BriefingPage = () => {
                                         height: 'auto',
                                         objectFit: 'contain'
                                     }}
+                                    onError={(e) => {
+                                        e.target.src = fallbackLogo;
+                                    }}
                                 />
-                            ) : (
-                                <div style={{
-                                    height: '40px',
-                                    width: '40px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <span style={{ color: 'white', fontSize: '1.2rem', fontWeight: 'bold' }}>T</span>
-                                </div>
                             );
                         })()}
                     </div>

@@ -18,6 +18,7 @@ import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useCatch } from '../reactHelper';
 import { nativePostMessage } from '../common/components/NativeInterface';
+import fallbackLogo from '../resources/images/image170.png?inline';
 import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
@@ -907,9 +908,9 @@ const MainPage = () => {
                 {(() => {
                   const logoUrl = logo || logoInverted;
                   
-                  return logoUrl ? (
+                  return (
                     <img 
-                      src={logoUrl} 
+                      src={logoUrl || fallbackLogo} 
                       alt="Server Logo" 
                       style={{ 
                         maxWidth: '100%',
@@ -918,9 +919,10 @@ const MainPage = () => {
                         height: 'auto',
                         objectFit: 'contain'
                       }}
+                      onError={(e) => {
+                        e.target.src = fallbackLogo;
+                      }}
                     />
-                  ) : (
-                    <ChevronRight size={18} color={colors.textSecondary} />
                   );
                 })()}
               </div>
@@ -939,9 +941,9 @@ const MainPage = () => {
                   {(() => {
                     const logoUrl = logo || logoInverted;
                     
-                    return logoUrl ? (
+                    return (
                       <img 
-                        src={logoUrl} 
+                        src={logoUrl || fallbackLogo} 
                         alt="Server Logo" 
                         style={{ 
                           maxWidth: '100%',
@@ -950,8 +952,11 @@ const MainPage = () => {
                           height: 'auto',
                           objectFit: 'contain'
                         }}
+                        onError={(e) => {
+                          e.target.src = fallbackLogo;
+                        }}
                       />
-                    ) : null;
+                    );
                   })()}
                 </div>
                 <ChevronLeft size={18} color={colors.textSecondary} />
@@ -5321,9 +5326,9 @@ const MainPage = () => {
                 {(() => {
                   const logoUrl = logo || logoInverted;
                   
-                  return logoUrl ? (
+                  return (
                     <img 
-                      src={logoUrl} 
+                      src={logoUrl || fallbackLogo} 
                       alt="Server Logo" 
                       style={{ 
                         maxWidth: '100%',
@@ -5332,16 +5337,10 @@ const MainPage = () => {
                         height: 'auto',
                         objectFit: 'contain'
                       }}
+                      onError={(e) => {
+                        e.target.src = fallbackLogo;
+                      }}
                     />
-                  ) : (
-                    <h2 style={{ 
-                      margin: 0, 
-                      fontSize: '20px', 
-                      fontWeight: '600',
-                      color: colors.text 
-                    }}>
-                      Menu
-                    </h2>
                   );
                 })()}
               </div>

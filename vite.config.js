@@ -20,6 +20,7 @@ export default defineConfig(() => {
     },
     build: {
       outDir: 'build',
+      assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg'],
     },
     plugins: [
     svgr(),

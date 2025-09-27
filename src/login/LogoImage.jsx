@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import fallbackLogo from '../resources/images/image170.png?inline';
 
 const LogoImage = ({ color }) => {
   const logo = useSelector((state) => state.session.server?.attributes?.logo);
@@ -9,19 +10,20 @@ const LogoImage = ({ color }) => {
   
   return (
     <div className="flex justify-center items-center p-4">
-      {logoUrl ? (
-        <img 
-          src={logoUrl} 
-          alt="Server Logo" 
-          className="w-auto h-auto object-contain"
-          style={{ 
-            maxWidth: '300px', 
-            maxHeight: '100px',
-            width: 'auto',
-            height: 'auto'
-          }}
-        />
-      ) : null}
+      <img 
+        src={logoUrl || fallbackLogo} 
+        alt="Server Logo" 
+        className="w-auto h-auto object-contain"
+        style={{ 
+          maxWidth: '300px', 
+          maxHeight: '100px',
+          width: 'auto',
+          height: 'auto'
+        }}
+        onError={(e) => {
+          e.target.src = fallbackLogo;
+        }}
+      />
     </div>
   );
 };
