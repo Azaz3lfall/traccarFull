@@ -63,23 +63,11 @@ const FloatingDeviceList = ({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
   
-  // Force re-render when colors change (less aggressive on mobile)
-  useEffect(() => {
-    if (desktop) {
-      setForceUpdate(prev => prev + 1);
-    }
-  }, [colors.background, colors.surface, colors.text, colors.border, desktop]);
-
-  // Create a key that changes when theme changes to force virtualizer re-mount
+  // Simplified key management - only change when showOnMobile changes
   const virtualizerContainerKey = useMemo(() => {
-    // On mobile, use a simpler key to reduce re-mounts
-    if (!desktop) {
-      return `virtualizer-mobile-${showOnMobile}`;
-    }
-    return `virtualizer-${forceUpdate}-${colors.background}-${colors.surface}-${colors.text}-${showOnMobile}`;
-  }, [forceUpdate, colors.background, colors.surface, colors.text, showOnMobile, desktop]);
+    return `virtualizer-${showOnMobile}`;
+  }, [showOnMobile]);
   const filterButtonRef = useRef(null);
   const filterPopupRef = useRef(null);
   const sortDropdownRef = useRef(null);
@@ -221,7 +209,7 @@ const FloatingDeviceList = ({
   }, [desktop, selectedDeviceId]);
   
 
-  // Memoized device row component for virtualized rendering
+  // Optimized device row component for virtualized rendering
   const DeviceRow = useCallback(({ index, style, data }) => {
     if (!data || !data.devices || !Array.isArray(data.devices) || index >= data.devices.length || !data.devices[index]) {
       return <div style={style} />;
@@ -457,7 +445,7 @@ const FloatingDeviceList = ({
         </motion.div>
       </div>
     );
-  }, [colors, devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
+  }, [devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
   // Note: Data is now passed directly to List component for better performance
   
   // Don't render anything if we don't have proper data
@@ -477,26 +465,16 @@ const FloatingDeviceList = ({
     );
   }
 
-  // TanStack Virtual setup
+  // TanStack Virtual setup - simplified for better performance
   const virtualizer = useVirtualizer({
     count: filteredDevices.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 105, // Estimated height of each device row (no overlapping)
-    overscan: !desktop ? 2 : 5, // Reduce overscan on mobile for better performance
+    estimateSize: () => 105, // Estimated height of each device row
+    overscan: 3, // Fixed overscan for consistent performance
   });
 
-  // Force re-render when colors change by using colors in the virtualizer items
-  const virtualizerItems = useMemo(() => {
-    return virtualizer.getVirtualItems().map((virtualItem) => {
-      const device = filteredDevices[virtualItem.index];
-      return {
-        ...virtualItem,
-        device,
-        // Only include colors and forceUpdate on desktop to reduce mobile re-renders
-        ...(desktop ? { colors, forceUpdate } : {})
-      };
-    });
-  }, [virtualizer, filteredDevices, desktop, colors, forceUpdate]);
+  // Simplified virtualizer items - no complex memoization
+  const virtualizerItems = virtualizer.getVirtualItems();
 
   // Debug logging removed for performance
   
@@ -1059,7 +1037,7 @@ const FloatingDeviceList = ({
                 }}
               >
                 {virtualizerItems.map((virtualItem) => {
-                  const device = virtualItem.device;
+                  const device = filteredDevices[virtualItem.index];
                   return (
                     <div
                       key={`device-${device.id || 'unknown'}-${virtualItem.index}`}
