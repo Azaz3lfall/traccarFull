@@ -445,7 +445,7 @@ const FloatingDeviceList = ({
         </motion.div>
       </div>
     );
-  }, [devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
+  }, [colors, devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
   // Note: Data is now passed directly to List component for better performance
   
   // Don't render anything if we don't have proper data
@@ -470,7 +470,7 @@ const FloatingDeviceList = ({
     count: filteredDevices.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 105, // Estimated height of each device row
-    overscan: 3, // Fixed overscan for consistent performance
+    overscan: 6, // Fixed overscan for consistent performance
   });
 
   // Simplified virtualizer items - no complex memoization
