@@ -12,34 +12,7 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       return;
     }
 
-    // On mobile, do basic filtering but skip complex operations
-    if (!desktop) {
-      let filtered = Object.values(devices);
-      
-      // Only apply keyword search on mobile (most common use case)
-      if (keyword) {
-        const lowerCaseKeyword = keyword.toLowerCase();
-        filtered = filtered.filter((device) => 
-          [device.name, device.uniqueId, device.phone, device.model, device.contact]
-            .some((s) => s && s.toLowerCase().includes(lowerCaseKeyword))
-        );
-      }
-      
-      setFilteredDevices(filtered);
-      setFilteredPositions(Object.values(positions));
-      return;
-    }
-
-    // Quick path for no filters - just return all devices
-    if (!keyword && !filter.statuses.length && !filter.groups.length && !filterSort) {
-      const allDevices = Object.values(devices);
-      setFilteredDevices(allDevices);
-      setFilteredPositions(filterMap
-        ? allDevices.map((device) => positions[device.id]).filter(Boolean)
-        : Object.values(positions));
-      return;
-    }
-
+    // Apply all filters on both desktop and mobile
     const deviceGroups = (device) => {
       const groupIds = [];
       let { groupId } = device;
@@ -50,7 +23,7 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       return groupIds;
     };
 
-    const filtered = Object.values(devices)
+    let filtered = Object.values(devices)
       .filter((device) => !filter.statuses.length || filter.statuses.includes(device.status))
       .filter((device) => !filter.groups.length || deviceGroups(device).some((id) => filter.groups.includes(id)))
       .filter((device) => {
@@ -81,5 +54,7 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
     setFilteredPositions(filterMap
       ? filtered.map((device) => positions[device.id]).filter(Boolean)
       : Object.values(positions));
+    return;
+
   }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions, desktop]);
 };
