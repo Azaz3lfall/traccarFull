@@ -126,6 +126,11 @@ const FloatingDevicesPopover = ({
   });
 
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchKeyword]);
+
   // Filter devices based on search keyword
   const filteredDevices = devices.filter(device =>
     device.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
