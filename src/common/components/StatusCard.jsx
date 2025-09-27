@@ -143,7 +143,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
 
   const handleRemove = useCatch(async (removed) => {
     if (removed) {
-      const response = await fetchOrThrow('/api/devices');
+      const response = await fetchOrThrow('/api/devices?all=true');
       dispatch(devicesActions.refresh(await response.json()));
     }
     setRemoving(false);

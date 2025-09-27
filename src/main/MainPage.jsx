@@ -787,7 +787,7 @@ const MainPage = () => {
   // Refresh devices when device list becomes visible
   const refreshDevices = useCallback(async () => {
     try {
-      const response = await fetchOrThrow('/api/devices');
+      const response = await fetchOrThrow('/api/devices?all=true');
       const devicesData = await response.json();
       dispatch(devicesActions.refresh(devicesData));
     } catch (error) {

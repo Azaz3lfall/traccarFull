@@ -60,7 +60,7 @@ const SocketController = () => {
       dispatch(sessionActions.updateSocket(false));
       if (event.code !== logoutCode) {
         try {
-          const devicesResponse = await fetch('/api/devices');
+          const devicesResponse = await fetch('/api/devices?all=true');
           if (devicesResponse.ok) {
             dispatch(devicesActions.update(await devicesResponse.json()));
           }
@@ -101,7 +101,7 @@ const SocketController = () => {
 
   useEffectAsync(async () => {
     if (authenticated) {
-      const response = await fetchOrThrow('/api/devices');
+      const response = await fetchOrThrow('/api/devices?all=true');
       dispatch(devicesActions.refresh(await response.json()));
       nativePostMessage('authenticated');
       connectSocket();

@@ -32,7 +32,7 @@ const DeviceList = ({ devices }) => {
   }, []);
 
   useEffectAsync(async () => {
-    const response = await fetchOrThrow('/api/devices');
+    const response = await fetchOrThrow('/api/devices?all=true');
     dispatch(devicesActions.refresh(await response.json()));
   }, []);
 

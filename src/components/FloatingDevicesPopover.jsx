@@ -98,7 +98,7 @@ const FloatingDevicesPopover = ({
   const { data: devices = [], isLoading, error } = useQuery({
     queryKey: ['devices'],
     queryFn: async () => {
-      const response = await fetchOrThrow('/api/devices');
+      const response = await fetchOrThrow('/api/devices?all=true');
       const data = await response.json();
       return data;
     },

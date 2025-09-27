@@ -116,7 +116,7 @@ const FloatingComputedAttributesPopover = ({
   useEffectAsync(async () => {
     if (isVisible) {
       try {
-        const response = await fetchOrThrow('/api/devices');
+        const response = await fetchOrThrow('/api/devices?all=true');
         setDevices(await response.json());
       } catch (error) {
         console.error('Failed to load devices:', error);
