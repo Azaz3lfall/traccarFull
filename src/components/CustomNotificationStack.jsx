@@ -11,6 +11,7 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
   const t = useTranslation();
   const colors = useThemeColors();
   const devices = useSelector((state) => state.devices.items);
+  const positions = useSelector((state) => state.session.positions);
   const [visibleNotifications, setVisibleNotifications] = useState([]);
   const timeoutRefs = useRef({});
 
@@ -69,8 +70,20 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
   };
 
   const getAddress = (event) => {
-    // Extract address from event if available
-    return event.attributes?.address || null;
+    // Get address from device's current position
+    if (!event?.deviceId || !positions) return null;
+    const position = positions[event.deviceId];
+    const address = position?.address || null;
+    
+    // Debug logging
+    console.log('Address debug:', {
+      deviceId: event.deviceId,
+      position: position,
+      address: address,
+      positions: positions
+    });
+    
+    return address;
   };
 
   const formatEventType = (event) => {
@@ -98,10 +111,11 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
       maxWidth: '400px',
       pointerEvents: 'none'
     }}>
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {visibleNotifications.map((notification, index) => (
           <motion.div
             key={notification.id}
+            layout
             initial={{ opacity: 0, y: 100, scale: 0.8 }}
             animate={{ 
               opacity: 1, 
@@ -112,13 +126,21 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
               opacity: 0, 
               y: 100, 
               scale: 0.8,
-              transition: { duration: 0.2 }
+              transition: { 
+                duration: 0.3,
+                ease: "easeInOut"
+              }
             }}
             transition={{ 
               type: "spring", 
               stiffness: 300, 
               damping: 30,
-              duration: 0.3
+              duration: 0.3,
+              layout: {
+                type: "spring",
+                stiffness: 300,
+                damping: 30
+              }
             }}
             style={{
               backgroundColor: colors.surface,
@@ -149,31 +171,21 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
 
             {/* Device Name - Header */}
             <div style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: colors.text,
-              marginBottom: '6px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: colors.textSecondary,
+              marginBottom: '4px',
               paddingRight: '24px' // Space for close button
             }}>
               {getDeviceName(notification.deviceId)}
             </div>
             
-            {/* Device ID - Second Line */}
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '500',
-              color: colors.textSecondary,
-              marginBottom: '6px'
-            }}>
-              {notification.deviceId}
-            </div>
-            
-            {/* Address - Third Line (if available) */}
+            {/* Address - Second Line (if available) */}
             {getAddress(notification) && (
               <div style={{
-                fontSize: '12px',
-                color: colors.textSecondary,
-                marginBottom: '6px',
+                fontSize: '11px',
+                color: '#9CA3AF',
+                marginBottom: '4px',
                 fontStyle: 'italic',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -183,13 +195,13 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
               </div>
             )}
             
-            {/* Event Type and Time - Fourth Line */}
+            {/* Event Type and Time - Third Line */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              fontSize: '13px',
-              color: colors.textSecondary
+              fontSize: '12px',
+              color: '#9CA3AF'
             }}>
               <span style={{ fontWeight: '500' }}>
                 {formatEventType(notification)}
