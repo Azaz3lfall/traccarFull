@@ -448,17 +448,6 @@ const FloatingDevicesPopover = ({
                     }
                   }}
                 />
-                <div style={{
-                  fontSize: '12px',
-                  color: '#ff0000',
-                  marginTop: '8px',
-                  textAlign: 'right',
-                  backgroundColor: '#ffff00',
-                  padding: '4px',
-                  border: '2px solid #000000'
-                }}>
-                  DEBUG: {filteredDevices ? filteredDevices.length : 'NO FILTERED DEVICES'}
-                </div>
               </div>
             </div>
 
