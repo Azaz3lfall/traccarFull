@@ -39,14 +39,26 @@ const SocketController = () => {
         || (e.type === 'alarm' && soundAlarms.includes(e.attributes.alarm)))) {
       new Audio(alarm).play();
     }
-    setNotifications(events.map((event) => ({
-      id: event.id,
-      deviceId: event.deviceId,
-      type: event.type,
-      attributes: event.attributes,
-      eventTime: event.eventTime,
-      show: true,
-    })));
+    setNotifications(prev => {
+      const newNotifications = events.map((event) => ({
+        id: event.id,
+        deviceId: event.deviceId,
+        type: event.type,
+        attributes: event.attributes,
+        eventTime: event.eventTime,
+        show: true,
+      }));
+      
+      // Filter out any existing notifications with the same ID to prevent duplicates
+      const existingIds = new Set(prev.map(n => n.id));
+      const uniqueNewNotifications = newNotifications.filter(n => !existingIds.has(n.id));
+      
+      // Keep existing notifications and add only new unique ones
+      const combined = [...prev, ...uniqueNewNotifications];
+      
+      // Keep only the 10 most recent notifications to prevent memory issues
+      return combined.slice(-10);
+    });
   }, [features, dispatch, soundEvents, soundAlarms]);
 
   const connectSocket = () => {
@@ -162,7 +174,7 @@ const SocketController = () => {
   }, [authenticated]);
 
   const handleRemoveNotification = (id) => {
-    setNotifications(notifications.filter((e) => e.id !== id));
+    setNotifications(prev => prev.filter((e) => e.id !== id));
   };
 
   return (

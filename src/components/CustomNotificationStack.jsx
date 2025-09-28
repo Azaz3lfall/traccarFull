@@ -14,20 +14,39 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
   const [visibleNotifications, setVisibleNotifications] = useState([]);
   const timeoutRefs = useRef({});
 
-  // Auto-remove notifications after 15 seconds
+  // Auto-remove notifications after 5 seconds
   useEffect(() => {
     notifications.forEach((notification) => {
       if (notification.show && !timeoutRefs.current[notification.id]) {
         timeoutRefs.current[notification.id] = setTimeout(() => {
           onRemove(notification.id);
-        }, 15000); // 15 seconds
+        }, 5000); // 5 seconds
+      }
+    });
+    
+    // Clean up timeouts for removed notifications
+    const currentIds = new Set(notifications.map(n => n.id));
+    Object.keys(timeoutRefs.current).forEach(id => {
+      if (!currentIds.has(parseInt(id))) {
+        clearTimeout(timeoutRefs.current[id]);
+        delete timeoutRefs.current[id];
       }
     });
   }, [notifications, onRemove]);
 
   // Update visible notifications when notifications change
   useEffect(() => {
-    setVisibleNotifications(notifications.filter(n => n.show));
+    const visible = notifications.filter(n => n.show);
+    // Remove duplicates by ID and keep only the 5 most recent notifications
+    const unique = visible.reduce((acc, current) => {
+      const existing = acc.find(item => item.id === current.id);
+      if (!existing) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+    const limited = unique.slice(-5);
+    setVisibleNotifications(limited);
   }, [notifications]);
 
   // Clean up timeouts when component unmounts
@@ -70,11 +89,11 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
   return (
     <div style={{
       position: 'fixed',
-      top: '20px',
+      bottom: '20px',
       right: '20px',
       zIndex: 10000,
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: 'column-reverse', // Reverse so newest appear at bottom
       gap: '8px',
       maxWidth: '400px',
       pointerEvents: 'none'
@@ -83,16 +102,15 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
         {visibleNotifications.map((notification, index) => (
           <motion.div
             key={notification.id}
-            initial={{ opacity: 0, x: 300, scale: 0.8 }}
+            initial={{ opacity: 0, y: 100, scale: 0.8 }}
             animate={{ 
               opacity: 1, 
-              x: 0, 
-              scale: 1,
-              y: index * (120 + 8) // Stack with margin
+              y: 0, 
+              scale: 1
             }}
             exit={{ 
               opacity: 0, 
-              x: 300, 
+              y: 100, 
               scale: 0.8,
               transition: { duration: 0.2 }
             }}

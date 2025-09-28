@@ -7,8 +7,14 @@ const { reducer, actions } = createSlice({
   },
   reducers: {
     add(state, action) {
-      state.items.unshift(...action.payload);
-      state.items.splice(50);
+      const newEvents = action.payload;
+      const existingIds = new Set(state.items.map(item => item.id));
+      const uniqueNewEvents = newEvents.filter(event => !existingIds.has(event.id));
+      
+      if (uniqueNewEvents.length > 0) {
+        state.items.unshift(...uniqueNewEvents);
+        state.items.splice(50);
+      }
     },
     delete(state, action) {
       state.items = state.items.filter((item) => item.id !== action.payload.id);
