@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Gaýtadan satyjy",
+  "resellerCompanyName": "Kompaniýaň ady",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "Programma URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Hasap e-poçta",
+  "resellerSupportEmail": "Goldaw e-poçta",
+  "resellerLimit": "Gaýtadan satyjynyň çägi"
 }

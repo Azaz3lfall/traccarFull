@@ -195,6 +195,20 @@ const MainPage = () => {
   const [popupInfoOpen, setPopupInfoOpen] = useState(false);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
+  const [showResellerDrawer, setShowResellerDrawer] = useState(false);
+  const [resellerData, setResellerData] = useState({
+    currentDomain: window.location.hostname,
+    parentUserId: '',
+    parentUser: '',
+    parentEmail: '',
+    companyName: '',
+    logo: '',
+    url: '',
+    whatsapp: '',
+    billingEmail: '',
+    supportEmail: '',
+    resellerLimit: ''
+  });
   const [announcementData, setAnnouncementData] = useState({
     users: [],
     notificator: '',
@@ -441,6 +455,19 @@ const MainPage = () => {
       });
     }
   }, [showAnnouncementDrawer]);
+
+  // Update reseller data when drawer opens
+  useEffect(() => {
+    if (showResellerDrawer && user) {
+      setResellerData(prev => ({
+        ...prev,
+        currentDomain: window.location.hostname,
+        parentUserId: user.id || '',
+        parentUser: user.name || '',
+        parentEmail: user.email || ''
+      }));
+    }
+  }, [showResellerDrawer, user]);
 
   // Fetch users data
   useEffectAsync(async () => {
@@ -2179,6 +2206,74 @@ const MainPage = () => {
                   lineHeight: '1.5'
                 }}>
                   {t('settingsUsers')}
+                </span>
+              )}
+            </div>
+          )}
+          
+          {/* Manager Section - Reseller Management */}
+          {manager && (
+            <div style={{
+              width: '100%',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              borderRadius: '0px',
+              paddingLeft: isMenuExpanded ? '12px' : '0px',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-reseller');
+              if (tooltip) tooltip.remove();
+              setShowResellerDrawer(true);
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+              if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const tooltip = document.createElement('div');
+                tooltip.textContent = t('settingsReseller');
+                tooltip.id = 'menu-tooltip-reseller';
+                tooltip.style.cssText = `
+                  position: fixed;
+                  left: ${rect.right + 8}px;
+                  top: ${rect.top + rect.height / 2}px;
+                  transform: translateY(-50%);
+                  background: ${colors.menuText};
+                  color: ${colors.menuSurface};
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  white-space: nowrap;
+                  z-index: 10001;
+                  pointer-events: none;
+                  box-shadow: ${colors.menuShadow};
+                `;
+                document.body.appendChild(tooltip);
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-reseller');
+                if (tooltip) tooltip.remove();
+              }
+            }}>
+              <FolderIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              {isMenuExpanded && (
+                <span style={{
+                  marginLeft: '12px',
+                  color: colors.textSecondary,
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '1.5'
+                }}>
+                  {t('settingsReseller')}
                 </span>
               )}
             </div>
@@ -4157,6 +4252,295 @@ const MainPage = () => {
         )}
       </AnimatePresence>
 
+      {/* Reseller Drawer */}
+      <AnimatePresence>
+        {showResellerDrawer && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowResellerDrawer(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 9999,
+              }}
+            />
+            
+            {/* Reseller Drawer */}
+            <motion.div
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                width: desktop ? '400px' : '100vw',
+                height: '100vh',
+                backgroundColor: colors.surface,
+                borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
+                zIndex: 10000,
+                boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Drawer Header */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => setShowResellerDrawer(false)}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    {t('settingsReseller')}
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Drawer Content */}
+              <div style={{ 
+                flex: 1, 
+                overflow: 'auto', 
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}>
+                <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px' }}>
+                  {t('settingsReseller')}
+                </Typography>
+                <Typography variant="body2" style={{ color: colors.textSecondary, marginBottom: '16px' }}>
+                  Manage reseller files and configurations
+                </Typography>
+                
+                {/* Hidden fields */}
+                <input type="hidden" value={resellerData.currentDomain} name="currentDomain" />
+                <input type="hidden" value={resellerData.parentUserId} name="parentUserId" />
+                <input type="hidden" value={resellerData.parentUser} name="parentUser" />
+                <input type="hidden" value={resellerData.parentEmail} name="parentEmail" />
+                
+                {/* Editable fields */}
+                <TextField
+                  fullWidth
+                  value={resellerData.companyName}
+                  onChange={(e) => setResellerData({ ...resellerData, companyName: e.target.value })}
+                  label={t('resellerCompanyName')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.logo}
+                  onChange={(e) => setResellerData({ ...resellerData, logo: e.target.value })}
+                  label={t('resellerLogotype')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.url}
+                  onChange={(e) => setResellerData({ ...resellerData, url: e.target.value })}
+                  label={t('resellerAppUrl')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.whatsapp}
+                  onChange={(e) => setResellerData({ ...resellerData, whatsapp: e.target.value })}
+                  label={t('resellerWhatsapp')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.billingEmail}
+                  onChange={(e) => setResellerData({ ...resellerData, billingEmail: e.target.value })}
+                  label={t('resellerBillingEmail')}
+                  type="email"
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.supportEmail}
+                  onChange={(e) => setResellerData({ ...resellerData, supportEmail: e.target.value })}
+                  label={t('resellerSupportEmail')}
+                  type="email"
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.resellerLimit}
+                  onChange={(e) => setResellerData({ ...resellerData, resellerLimit: e.target.value })}
+                  label={t('resellerLimit')}
+                  type="number"
+                  required
+                  inputProps={{ min: 1 }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+              </div>
+
+              {/* Drawer Footer */}
+              <div style={{
+                padding: '16px 20px',
+                borderTop: `1px solid ${colors.border}`,
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+                backgroundColor: colors.surface,
+              }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setShowResellerDrawer(false)}
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.text,
+                  }}
+                >
+                  {t('sharedCancel')}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    // Create JSON object with all reseller fields
+                    const resellerJson = {
+                      currentDomain: resellerData.currentDomain,
+                      parentUserId: resellerData.parentUserId,
+                      parentUser: resellerData.parentUser,
+                      parentEmail: resellerData.parentEmail,
+                      companyName: resellerData.companyName,
+                      logotype: resellerData.logo,
+                      appUrl: resellerData.url,
+                      whatsapp: resellerData.whatsapp,
+                      billingEmail: resellerData.billingEmail,
+                      supportEmail: resellerData.supportEmail,
+                      resellerLimit: parseInt(resellerData.resellerLimit) || 0,
+                      timestamp: new Date().toISOString(),
+                      createdBy: user?.name || 'Unknown',
+                      createdById: user?.id || null
+                    };
+                    
+                    console.log('Reseller JSON Object:', JSON.stringify(resellerJson, null, 2));
+                    console.log('Reseller Data (raw):', resellerData);
+                    
+                    setShowResellerDrawer(false);
+                  }}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                  }}
+                >
+                  {t('sharedSave')}
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Preferences Drawer */}
       <AnimatePresence>
         {showPreferencesDrawer && (
@@ -5944,6 +6328,46 @@ const MainPage = () => {
                     >
                       <PeopleIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsUsers')}
+                    </button>
+                  )}
+
+                  {/* Reseller Management */}
+                  {manager && (
+                    <button
+                      onClick={() => {
+                        setShowResellerDrawer(true);
+                        setDrawerOpen(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '12px 20px',
+                        background: 'none',
+                        border: 'none',
+                        outline: 'none',
+                        boxShadow: 'none',
+                        borderRadius: '0',
+                        margin: '0',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        color: colors.text,
+                        fontSize: '14px',
+                        fontWeight: '400',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = colors.menuHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <FolderIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      {t('settingsReseller')}
                     </button>
                   )}
 

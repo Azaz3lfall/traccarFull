@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Forhandler",
+  "resellerCompanyName": "Firmanavn",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "App URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Fakturerings-e-mail",
+  "resellerSupportEmail": "Support-e-mail",
+  "resellerLimit": "Forhandler Grænse"
 }

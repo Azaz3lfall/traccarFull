@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "পুনঃবিক্রেতা",
+  "resellerCompanyName": "কোম্পানির নাম",
+  "resellerLogotype": "লোগো",
+  "resellerAppUrl": "অ্যাপ URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "বিলিং ইমেইল",
+  "resellerSupportEmail": "সাপোর্ট ইমেইল",
+  "resellerLimit": "পুনঃবিক্রেতা সীমা"
 }

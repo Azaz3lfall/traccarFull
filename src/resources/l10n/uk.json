@@ -640,12 +640,10 @@
   "userToken": "Ключ",
   "userUserLimit": "Обмеження користувачів",
   "sharedTimeline": "Часова лінія",
-  "commandConfirm": "Трекер повинен знаходитися в регіоні з хорошим покриттям 4G для отримання команди."
-,
+  "commandConfirm": "Трекер повинен знаходитися в регіоні з хорошим покриттям 4G для отримання команди.",
   "serverUrl": "URL сервера:",
   "copyUrl": "Копіювати URL",
-  "copied": "Скопійовано!"
-,
+  "copied": "Скопійовано!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Реселлер",
+  "resellerCompanyName": "Назва компанії",
+  "resellerLogotype": "Логотип",
+  "resellerAppUrl": "URL додатку",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail для виставлення рахунків",
+  "resellerSupportEmail": "E-mail підтримки",
+  "resellerLimit": "Ліміт Реселера"
 }

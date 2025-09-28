@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Forhandlar",
+  "resellerCompanyName": "Firmanamn",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "App URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Fakturerings-e-post",
+  "resellerSupportEmail": "Støtte-e-post",
+  "resellerLimit": "Forhandlar Grense"
 }

@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Yenidən Satıcı",
+  "resellerCompanyName": "Şirkət Adı",
+  "resellerLogotype": "Loqotip",
+  "resellerAppUrl": "Tətbiq URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Faktura E-poçtu",
+  "resellerSupportEmail": "Dəstək E-poçtu",
+  "resellerLimit": "Yenidən Satıcı Limiti"
 }

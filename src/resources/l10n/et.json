@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Edasimüüja",
+  "resellerCompanyName": "Ettevõtte nimi",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "Rakenduse URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Arvelduse e-post",
+  "resellerSupportEmail": "Toe e-post",
+  "resellerLimit": "Edasimüüja Limiit"
 }

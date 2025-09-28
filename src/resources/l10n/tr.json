@@ -640,12 +640,10 @@
   "userToken": "Kullanıcı Anahtarı",
   "userUserLimit": "Kullanıcı Limiti",
   "sharedTimeline": "Zaman çizelgesi",
-  "commandConfirm": "Tracker'ın komutu alabilmesi için iyi 4G kapsama alanı olan bir bölgede olması gerekir."
-,
+  "commandConfirm": "Tracker'ın komutu alabilmesi için iyi 4G kapsama alanı olan bir bölgede olması gerekir.",
   "serverUrl": "Sunucu URL:",
   "copyUrl": "URL'yi Kopyala",
-  "copied": "Kopyalandı!"
-,
+  "copied": "Kopyalandı!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Bayi",
+  "resellerCompanyName": "Şirket adı",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "Uygulama URL'si",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Faturalama e-postası",
+  "resellerSupportEmail": "Destek e-postası",
+  "resellerLimit": "Bayi Limiti"
 }

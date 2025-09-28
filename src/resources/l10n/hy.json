@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Վերավաճառող",
+  "resellerCompanyName": "Ընկերության անուն",
+  "resellerLogotype": "Լոգո",
+  "resellerAppUrl": "Հավելվածի URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Հաշիվ-ապրանքագիր էլ. փոստ",
+  "resellerSupportEmail": "Աջակցության էլ. փոստ",
+  "resellerLimit": "Վերավաճառողի Սահման"
 }

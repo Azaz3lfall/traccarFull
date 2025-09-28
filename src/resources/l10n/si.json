@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "නැවත විකුණන්නා",
+  "resellerCompanyName": "සමාගමේ නම",
+  "resellerLogotype": "ලෝගෝ",
+  "resellerAppUrl": "ඇප් URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "බිල්පත් ඊමේල්",
+  "resellerSupportEmail": "සහාය ඊමේල්",
+  "resellerLimit": "නැවත විකුණන්නා සීමාව"
 }

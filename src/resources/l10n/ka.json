@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "გადამყიდველი",
+  "resellerCompanyName": "კომპანიის სახელი",
+  "resellerLogotype": "ლოგო",
+  "resellerAppUrl": "აპლიკაციის URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "ბილინგის ელ.ფოსტა",
+  "resellerSupportEmail": "მხარდაჭერის ელ.ფოსტა",
+  "resellerLimit": "გადამყიდველის ლიმიტი"
 }

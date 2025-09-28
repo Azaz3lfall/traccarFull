@@ -640,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Gebruikerlimiet",
   "sharedTimeline": "Tijdlijn",
-  "commandConfirm": "De tracker moet zich in een regio met goede 4G-dekking bevinden om het commando te ontvangen."
-,
+  "commandConfirm": "De tracker moet zich in een regio met goede 4G-dekking bevinden om het commando te ontvangen.",
   "serverUrl": "Server-URL:",
   "copyUrl": "URL kopiëren",
-  "copied": "Gekopieerd!"
-,
+  "copied": "Gekopieerd!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Wederverkoper",
+  "resellerCompanyName": "Bedrijfsnaam",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "App URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Facturerings-e-mail",
+  "resellerSupportEmail": "Ondersteuning e-mail",
+  "resellerLimit": "Wederverkoper Limiet"
 }

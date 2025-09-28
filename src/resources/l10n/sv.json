@@ -640,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Användarbegränsning",
   "sharedTimeline": "Tidslinje",
-  "commandConfirm": "Trackern måste vara i en region med bra 4G-täckning för att ta emot kommandot."
-,
+  "commandConfirm": "Trackern måste vara i en region med bra 4G-täckning för att ta emot kommandot.",
   "serverUrl": "Server-URL:",
   "copyUrl": "Kopiera URL",
-  "copied": "Kopierat!"
-,
+  "copied": "Kopierat!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Återförsäljare",
+  "resellerCompanyName": "Företagsnamn",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "App URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Fakturerings-e-post",
+  "resellerSupportEmail": "Support-e-post",
+  "resellerLimit": "Återförsäljare Gräns"
 }

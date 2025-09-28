@@ -640,8 +640,7 @@
   "userToken": "Token",
   "userUserLimit": "Limite Utente",
   "sharedTimeline": "Cronologia",
-  "commandConfirm": "Il tracker deve essere in una regione con buona copertura 4G per ricevere il comando."
-,
+  "commandConfirm": "Il tracker deve essere in una regione con buona copertura 4G per ricevere il comando.",
   "serverUrl": "URL del Server:",
   "copyUrl": "Copia URL",
   "copied": "Copiato!",
@@ -652,7 +651,14 @@
   "loadingRendering": "Rendering interfaccia...",
   "loadingFinalizing": "Finalizzazione...",
   "loadingComplete": "Completato!",
-  "loadingStarting": "Avvio..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Avvio...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Rivenditore",
+  "resellerCompanyName": "Nome dell'azienda",
+  "resellerLogotype": "Logotipo",
+  "resellerAppUrl": "URL dell'applicazione",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail di fatturazione",
+  "resellerSupportEmail": "E-mail di supporto",
+  "resellerLimit": "Limite Rivenditore"
 }

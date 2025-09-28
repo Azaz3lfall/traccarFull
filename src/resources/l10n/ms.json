@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Penjual Semula",
+  "resellerCompanyName": "Nama syarikat",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL aplikasi",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mel pengebilan",
+  "resellerSupportEmail": "E-mel sokongan",
+  "resellerLimit": "Had Penjual Semula"
 }

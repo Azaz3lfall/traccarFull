@@ -640,12 +640,10 @@
   "userTermsPrompt": "Ao clicar em Aceitar, você concorda com nossos Termos de Serviço e confirma que leu nossa Política de Privacidade.",
   "userToken": "Token",
   "userUserLimit": "Limite de Usuários",
-  "sharedTimeline": "Linha do tempo"
-,
+  "sharedTimeline": "Linha do tempo",
   "serverUrl": "URL do Servidor:",
   "copyUrl": "Copiar URL",
-  "copied": "Copiado!"
-,
+  "copied": "Copiado!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Revendedor",
+  "resellerCompanyName": "Nome da empresa",
+  "resellerLogotype": "Logotipo",
+  "resellerAppUrl": "URL da aplicação",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail de faturamento",
+  "resellerSupportEmail": "E-mail de suporte",
+  "resellerLimit": "Limite Revendedor"
 }

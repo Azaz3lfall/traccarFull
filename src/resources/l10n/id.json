@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Penjual Ulang",
+  "resellerCompanyName": "Nama perusahaan",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL aplikasi",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Email penagihan",
+  "resellerSupportEmail": "Email dukungan",
+  "resellerLimit": "Batas Penjual Ulang"
 }

@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "പുനർവിൽപ്പനക്കാരൻ",
+  "resellerCompanyName": "കമ്പനിയുടെ പേര്",
+  "resellerLogotype": "ലോഗോ",
+  "resellerAppUrl": "ആപ്പ് URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "ബില്ലിംഗ് ഇമെയിൽ",
+  "resellerSupportEmail": "സപ്പോർട്ട് ഇമെയിൽ",
+  "resellerLimit": "പുനർവിൽപ്പനക്കാരന്റെ പരിധി"
 }

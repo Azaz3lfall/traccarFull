@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Prodejce",
+  "resellerCompanyName": "Název společnosti",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL aplikace",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Fakturační e-mail",
+  "resellerSupportEmail": "Podpůrný e-mail",
+  "resellerLimit": "Limit Prodejce"
 }

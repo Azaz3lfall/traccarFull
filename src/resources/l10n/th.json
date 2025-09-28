@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "ผู้ค้าปลีก",
+  "resellerCompanyName": "ชื่อบริษัท",
+  "resellerLogotype": "โลโก้",
+  "resellerAppUrl": "URL แอป",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "อีเมลเรียกเก็บเงิน",
+  "resellerSupportEmail": "อีเมลสนับสนุน",
+  "resellerLimit": "ขีดจำกัดผู้ค้าปลีก"
 }

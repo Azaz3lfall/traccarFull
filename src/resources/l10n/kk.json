@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Қайта сатушы",
+  "resellerCompanyName": "Компания атауы",
+  "resellerLogotype": "Логотип",
+  "resellerAppUrl": "Қосымша URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Есептеу электрондық поштасы",
+  "resellerSupportEmail": "Қолдау электрондық поштасы",
+  "resellerLimit": "Қайта сатушы шегі"
 }

@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Преподавател",
+  "resellerCompanyName": "Име на компанията",
+  "resellerLogotype": "Логотип",
+  "resellerAppUrl": "URL на приложението",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Имейл за фактуриране",
+  "resellerSupportEmail": "Имейл за поддръжка",
+  "resellerLimit": "Лимит на препродавач"
 }

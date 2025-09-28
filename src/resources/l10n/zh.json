@@ -640,12 +640,10 @@
   "userToken": "令牌",
   "userUserLimit": "用户限制",
   "sharedTimeline": "时间线",
-  "commandConfirm": "跟踪器需要在4G覆盖良好的区域才能接收命令。"
-,
+  "commandConfirm": "跟踪器需要在4G覆盖良好的区域才能接收命令。",
   "serverUrl": "服务器URL:",
   "copyUrl": "复制URL",
-  "copied": "已复制!"
-,
+  "copied": "已复制!",
   "loadingInitializing": "初始化中...",
   "loadingModules": "加载模块...",
   "loadingConnecting": "连接服务器...",
@@ -653,7 +651,14 @@
   "loadingRendering": "渲染界面...",
   "loadingFinalizing": "完成中...",
   "loadingComplete": "完成!",
-  "loadingStarting": "启动中..."
-,
-  "sharedMenu": "菜单"
+  "loadingStarting": "启动中...",
+  "sharedMenu": "菜单",
+  "settingsReseller": "经销商",
+  "resellerCompanyName": "公司名称",
+  "resellerLogotype": "标志",
+  "resellerAppUrl": "应用URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "账单邮箱",
+  "resellerSupportEmail": "支持邮箱",
+  "resellerLimit": "经销商限制"
 }

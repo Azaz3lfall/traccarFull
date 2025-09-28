@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "மறுவிற்பனையாளர்",
+  "resellerCompanyName": "நிறுவனத்தின் பெயர்",
+  "resellerLogotype": "லோகோ",
+  "resellerAppUrl": "ஆப் URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "பில் இமெயில்",
+  "resellerSupportEmail": "ஆதரவு இமெயில்",
+  "resellerLimit": "மறுவிற்பனையாளர் வரம்பு"
 }

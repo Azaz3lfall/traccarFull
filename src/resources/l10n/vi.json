@@ -640,12 +640,10 @@
   "userToken": "Token",
   "userUserLimit": "Hạn chế người dùng",
   "sharedTimeline": "Dòng thời gian",
-  "commandConfirm": "Trình theo dõi cần ở trong khu vực có phủ sóng 4G tốt để nhận lệnh."
-,
+  "commandConfirm": "Trình theo dõi cần ở trong khu vực có phủ sóng 4G tốt để nhận lệnh.",
   "serverUrl": "URL máy chủ:",
   "copyUrl": "Sao chép URL",
-  "copied": "Đã sao chép!"
-,
+  "copied": "Đã sao chép!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Nhà phân phối",
+  "resellerCompanyName": "Tên công ty",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL ứng dụng",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Email thanh toán",
+  "resellerSupportEmail": "Email hỗ trợ",
+  "resellerLimit": "Giới hạn Nhà phân phối"
 }

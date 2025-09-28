@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Rishitës",
+  "resellerCompanyName": "Emri i kompanisë",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL e aplikacionit",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Email faturimi",
+  "resellerSupportEmail": "Email mbështetje",
+  "resellerLimit": "Kufiri Rishitësit"
 }

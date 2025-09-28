@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Revânzător",
+  "resellerCompanyName": "Numele companiei",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL aplicație",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail facturare",
+  "resellerSupportEmail": "E-mail suport",
+  "resellerLimit": "Limita Revânzător"
 }

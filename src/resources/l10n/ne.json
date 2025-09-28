@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "पुनर्विक्रेता",
+  "resellerCompanyName": "कम्पनीको नाम",
+  "resellerLogotype": "लोगो",
+  "resellerAppUrl": "एप URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "बिलिङ इमेल",
+  "resellerSupportEmail": "सहयोग इमेल",
+  "resellerLimit": "पुनर्विक्रेता सीमा"
 }

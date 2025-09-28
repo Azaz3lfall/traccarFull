@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "អ្នកលក់ឡើងវិញ",
+  "resellerCompanyName": "ឈ្មោះក្រុមហ៊ុន",
+  "resellerLogotype": "ឡូហ្គោ",
+  "resellerAppUrl": "URL កម្មវិធី",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "អ៊ីមែលចេញវិក្កយបត្រ",
+  "resellerSupportEmail": "អ៊ីមែលជំនួយ",
+  "resellerLimit": "ដែនកំណត់អ្នកលក់ឡើងវិញ"
 }

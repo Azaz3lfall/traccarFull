@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Preprodavač",
+  "resellerCompanyName": "Naziv tvrtke",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "URL aplikacije",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail za naplatu",
+  "resellerSupportEmail": "E-mail za podršku",
+  "resellerLimit": "Limit Preprodavača"
 }

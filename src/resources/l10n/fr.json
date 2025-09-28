@@ -651,7 +651,14 @@
   "loadingRendering": "Rendu de l'interface...",
   "loadingFinalizing": "Finalisation...",
   "loadingComplete": "Terminé!",
-  "loadingStarting": "Démarrage..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Démarrage...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Revendeur",
+  "resellerCompanyName": "Nom de l'entreprise",
+  "resellerLogotype": "Logotype",
+  "resellerAppUrl": "URL de l'application",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail de facturation",
+  "resellerSupportEmail": "E-mail de support",
+  "resellerLimit": "Limite Revendeur"
 }

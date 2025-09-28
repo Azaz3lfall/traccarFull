@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Jälleenmyyjä",
+  "resellerCompanyName": "Yrityksen nimi",
+  "resellerLogotype": "Logo",
+  "resellerAppUrl": "Sovelluksen URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Laskutussähköposti",
+  "resellerSupportEmail": "Tukisähköposti",
+  "resellerLimit": "Jälleenmyyjä Raja"
 }

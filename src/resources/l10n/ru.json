@@ -640,12 +640,10 @@
   "userToken": "Ключ",
   "userUserLimit": "Лимит пользователей",
   "sharedTimeline": "Временная шкала",
-  "commandConfirm": "Трекер должен находиться в регионе с хорошим покрытием 4G для получения команды."
-,
+  "commandConfirm": "Трекер должен находиться в регионе с хорошим покрытием 4G для получения команды.",
   "serverUrl": "URL сервера:",
   "copyUrl": "Копировать URL",
-  "copied": "Скопировано!"
-,
+  "copied": "Скопировано!",
   "loadingInitializing": "Инициализация...",
   "loadingModules": "Загрузка модулей...",
   "loadingConnecting": "Подключение к серверу...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Отрисовка интерфейса...",
   "loadingFinalizing": "Завершение...",
   "loadingComplete": "Готово!",
-  "loadingStarting": "Запуск..."
-,
-  "sharedMenu": "Меню"
+  "loadingStarting": "Запуск...",
+  "sharedMenu": "Меню",
+  "settingsReseller": "Реселлер",
+  "resellerCompanyName": "Название компании",
+  "resellerLogotype": "Логотип",
+  "resellerAppUrl": "URL приложения",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail для выставления счетов",
+  "resellerSupportEmail": "E-mail поддержки",
+  "resellerLimit": "Лимит Реселлера"
 }

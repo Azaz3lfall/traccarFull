@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Mfanyabiashara",
+  "resellerCompanyName": "Jina la kampuni",
+  "resellerLogotype": "Alama",
+  "resellerAppUrl": "URL ya programu",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Barua pepe ya malipo",
+  "resellerSupportEmail": "Barua pepe ya msaada",
+  "resellerLimit": "Kikomo cha Mfanyabiashara"
 }

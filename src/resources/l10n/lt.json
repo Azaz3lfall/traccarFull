@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Perpardavėjas",
+  "resellerCompanyName": "Įmonės pavadinimas",
+  "resellerLogotype": "Logotipas",
+  "resellerAppUrl": "Programėlės URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Sąskaitų el. paštas",
+  "resellerSupportEmail": "Palaikymo el. paštas",
+  "resellerLimit": "Perpardavėjo Limitas"
 }

@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Επανπωλητής",
+  "resellerCompanyName": "Όνομα εταιρείας",
+  "resellerLogotype": "Λογότυπο",
+  "resellerAppUrl": "URL εφαρμογής",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Email χρέωσης",
+  "resellerSupportEmail": "Email υποστήριξης",
+  "resellerLimit": "Όριο Επανπωλητή"
 }

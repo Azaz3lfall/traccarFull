@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "فروشنده مجدد",
+  "resellerCompanyName": "نام شرکت",
+  "resellerLogotype": "لوگو",
+  "resellerAppUrl": "آدرس اپلیکیشن",
+  "resellerWhatsapp": "واتساپ",
+  "resellerBillingEmail": "ایمیل صورتحساب",
+  "resellerSupportEmail": "ایمیل پشتیبانی",
+  "resellerLimit": "محدودیت فروشنده مجدد"
 }

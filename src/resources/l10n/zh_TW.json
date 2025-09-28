@@ -640,12 +640,10 @@
   "userToken": "簽證",
   "userUserLimit": "用戶限制",
   "sharedTimeline": "時間軸",
-  "commandConfirm": "追蹤器需要在4G覆蓋良好的區域才能接收命令。"
-,
+  "commandConfirm": "追蹤器需要在4G覆蓋良好的區域才能接收命令。",
   "serverUrl": "伺服器URL:",
   "copyUrl": "複製URL",
-  "copied": "已複製!"
-,
+  "copied": "已複製!",
   "loadingInitializing": "初始化中...",
   "loadingModules": "載入模組...",
   "loadingConnecting": "連接伺服器...",
@@ -653,7 +651,14 @@
   "loadingRendering": "渲染介面...",
   "loadingFinalizing": "完成中...",
   "loadingComplete": "完成!",
-  "loadingStarting": "啟動中..."
-,
-  "sharedMenu": "選單"
+  "loadingStarting": "啟動中...",
+  "sharedMenu": "選單",
+  "settingsReseller": "經銷商",
+  "resellerCompanyName": "公司名稱",
+  "resellerLogotype": "標誌",
+  "resellerAppUrl": "應用程式URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "帳單電子郵件",
+  "resellerSupportEmail": "支援電子郵件",
+  "resellerLimit": "經銷商限制"
 }

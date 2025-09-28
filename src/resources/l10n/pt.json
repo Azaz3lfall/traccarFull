@@ -640,8 +640,7 @@
   "userTermsPrompt": "Ao clicar em Aceitar, concorda com os nossos Termos de Serviço e confirma que leu a nossa Política de Privacidade.",
   "userToken": "Símbolo",
   "userUserLimit": "Limite de Utilizadores",
-  "commandConfirm": "O rastreador precisa estar numa região com boa cobertura 4G para receber o comando."
-,
+  "commandConfirm": "O rastreador precisa estar numa região com boa cobertura 4G para receber o comando.",
   "serverUrl": "URL do Servidor:",
   "copyUrl": "Copiar URL",
   "copied": "Copiado!",
@@ -652,7 +651,14 @@
   "loadingRendering": "Renderizando interface...",
   "loadingFinalizing": "Finalizando...",
   "loadingComplete": "Completo!",
-  "loadingStarting": "Iniciando..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Iniciando...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "Revendedor",
+  "resellerCompanyName": "Nome da empresa",
+  "resellerLogotype": "Logotipo",
+  "resellerAppUrl": "URL da aplicação",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "E-mail de faturação",
+  "resellerSupportEmail": "E-mail de suporte",
+  "resellerLimit": "Limite Revendedor"
 }

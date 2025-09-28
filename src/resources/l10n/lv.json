@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "Pārdevējs",
+  "resellerCompanyName": "Uzņēmuma nosaukums",
+  "resellerLogotype": "Logotips",
+  "resellerAppUrl": "Lietotnes URL",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "Norēķinu e-pasts",
+  "resellerSupportEmail": "Atbalsta e-pasts",
+  "resellerLimit": "Pārdevēja Limits"
 }

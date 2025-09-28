@@ -640,12 +640,10 @@
   "userToken": "رمز",
   "userUserLimit": "الحد الأقصى للمستخدمين",
   "sharedTimeline": "الجدول الزمني",
-  "commandConfirm": "يجب أن يكون المتتبع في منطقة ذات تغطية 4G جيدة لاستقبال الأمر."
-,
+  "commandConfirm": "يجب أن يكون المتتبع في منطقة ذات تغطية 4G جيدة لاستقبال الأمر.",
   "serverUrl": "رابط الخادم:",
   "copyUrl": "نسخ الرابط",
-  "copied": "تم النسخ!"
-,
+  "copied": "تم النسخ!",
   "loadingInitializing": "Initializing...",
   "loadingModules": "Loading modules...",
   "loadingConnecting": "Connecting to server...",
@@ -653,7 +651,14 @@
   "loadingRendering": "Rendering interface...",
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
-  "loadingStarting": "Starting..."
-,
-  "sharedMenu": "Menu"
+  "loadingStarting": "Starting...",
+  "sharedMenu": "Menu",
+  "settingsReseller": "موزع",
+  "resellerCompanyName": "اسم الشركة",
+  "resellerLogotype": "الشعار",
+  "resellerAppUrl": "رابط التطبيق",
+  "resellerWhatsapp": "واتساب",
+  "resellerBillingEmail": "بريد الفواتير",
+  "resellerSupportEmail": "بريد الدعم",
+  "resellerLimit": "حد الموزع"
 }

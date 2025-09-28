@@ -652,5 +652,13 @@
   "loadingFinalizing": "Finalizing...",
   "loadingComplete": "Complete!",
   "loadingStarting": "Starting...",
-  "sharedMenu": "Menu"
+  "sharedMenu": "Menu",
+  "settingsReseller": "מוכר מחדש",
+  "resellerCompanyName": "שם החברה",
+  "resellerLogotype": "לוגו",
+  "resellerAppUrl": "כתובת האפליקציה",
+  "resellerWhatsapp": "WhatsApp",
+  "resellerBillingEmail": "אימייל חיוב",
+  "resellerSupportEmail": "אימייל תמיכה",
+  "resellerLimit": "מגבלת מוכר מחדש"
 }
