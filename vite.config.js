@@ -8,8 +8,11 @@ import path from 'path';
 
 export default defineConfig(() => {
   // You can change these URLs to point to your Traccar server
-  const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://cloud.absmultipla.com.br';
-  const WS_BASE_URL = process.env.VITE_WS_BASE_URL || 'wss://cloud.absmultipla.com.br';
+  // const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://cloud.absmultipla.com.br';
+  // const WS_BASE_URL = process.env.VITE_WS_BASE_URL || 'wss://cloud.absmultipla.com.br';
+
+  const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://gps.codeartisan.cloud';
+  const WS_BASE_URL = process.env.VITE_WS_BASE_URL || 'wss://gps.codeartisan.cloud';
 
   return {
     server: {
