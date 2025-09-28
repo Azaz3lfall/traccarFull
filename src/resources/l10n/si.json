@@ -667,5 +667,6 @@
   "resellerUser": "නැවත විකුණන්නා පරිශීලක",
   "resellerEmail": "නැවත විකුණන්නා ඊමේල්",
   "deviceLimit": "උපකරණ සීමාව",
-  "userLimit": "පරිශීලක සීමාව"
+  "userLimit": "පරිශීලක සීමාව",
+  "resellerPanel": "නැවත විකුණන්නාගේ පැනලය"
 }

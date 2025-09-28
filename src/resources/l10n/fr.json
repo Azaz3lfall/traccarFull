@@ -667,5 +667,6 @@
   "resellerUser": "Utilisateur Revendeur",
   "resellerEmail": "E-mail Revendeur",
   "deviceLimit": "Limite d'Appareil",
-  "userLimit": "Limite d'Utilisateur"
+  "userLimit": "Limite d'Utilisateur",
+  "resellerPanel": "Panneau Revendeur"
 }

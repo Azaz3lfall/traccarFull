@@ -667,5 +667,6 @@
   "resellerUser": "Người dùng Đại lý",
   "resellerEmail": "E-mail Đại lý",
   "deviceLimit": "Giới hạn Thiết bị",
-  "userLimit": "Giới hạn Người dùng"
+  "userLimit": "Giới hạn Người dùng",
+  "resellerPanel": "Bảng điều khiển Đại lý"
 }

@@ -667,5 +667,6 @@
   "resellerUser": "کاربر فروشنده",
   "resellerEmail": "ایمیل فروشنده",
   "deviceLimit": "محدودیت دستگاه",
-  "userLimit": "محدودیت کاربر"
+  "userLimit": "محدودیت کاربر",
+  "resellerPanel": "پنل فروشنده"
 }

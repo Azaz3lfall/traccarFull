@@ -667,5 +667,6 @@
   "resellerUser": "Fornyingsseljar Brukar",
   "resellerEmail": "Fornyingsseljar E-post",
   "deviceLimit": "Eininggrense",
-  "userLimit": "Brukargrense"
+  "userLimit": "Brukargrense",
+  "resellerPanel": "Fornyingsseljar Panel"
 }

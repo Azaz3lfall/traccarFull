@@ -667,5 +667,6 @@
   "resellerUser": "रीसेलर यूजर",
   "resellerEmail": "रीसेलर ईमेल",
   "deviceLimit": "डिवाइस सीमा",
-  "userLimit": "यूजर सीमा"
+  "userLimit": "यूजर सीमा",
+  "resellerPanel": "रीसेलर पैनल"
 }

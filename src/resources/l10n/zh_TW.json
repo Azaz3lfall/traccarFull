@@ -667,5 +667,6 @@
   "resellerUser": "經銷商用戶",
   "resellerEmail": "經銷商電子郵件",
   "deviceLimit": "設備限制",
-  "userLimit": "用戶限制"
+  "userLimit": "用戶限制",
+  "resellerPanel": "經銷商面板"
 }

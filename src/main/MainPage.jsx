@@ -2250,7 +2250,7 @@ const MainPage = () => {
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
-                tooltip.textContent = t('settingsReseller');
+                tooltip.textContent = t('resellerPanel');
                 tooltip.id = 'menu-tooltip-reseller';
                 tooltip.style.cssText = `
                   position: fixed;
@@ -2288,7 +2288,7 @@ const MainPage = () => {
                   whiteSpace: 'nowrap',
                   lineHeight: '1.5'
                 }}>
-                  {t('settingsReseller')}
+                  {t('resellerPanel')}
                 </span>
               )}
             </div>
@@ -4325,7 +4325,7 @@ const MainPage = () => {
                     <ChevronLeftIcon fontSize="small" />
                   </IconButton>
                   <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    {t('settingsReseller')}
+                    {t('resellerPanel')}
                   </Typography>
                 </div>
               </div>
@@ -4340,7 +4340,7 @@ const MainPage = () => {
                 gap: '16px',
               }}>
                 <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px' }}>
-                  {t('settingsReseller')}
+                  {t('resellerPanel')}
                 </Typography>
                 <Typography variant="body2" style={{ color: colors.textSecondary, marginBottom: '16px' }}>
                   Manage reseller files and configurations
@@ -6578,7 +6578,7 @@ const MainPage = () => {
                       }}
                     >
                       <FolderIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsReseller')}
+                      {t('resellerPanel')}
                     </button>
                   )}
 

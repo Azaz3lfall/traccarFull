@@ -667,5 +667,6 @@
   "resellerUser": "Uživatel Prodejce",
   "resellerEmail": "E-mail Prodejce",
   "deviceLimit": "Limit Zařízení",
-  "userLimit": "Limit Uživatelů"
+  "userLimit": "Limit Uživatelů",
+  "resellerPanel": "Panel Prodejce"
 }

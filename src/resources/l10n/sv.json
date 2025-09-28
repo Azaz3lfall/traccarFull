@@ -667,5 +667,6 @@
   "resellerUser": "Återförsäljare Användare",
   "resellerEmail": "Återförsäljare E-post",
   "deviceLimit": "Enhetsgräns",
-  "userLimit": "Användargräns"
+  "userLimit": "Användargräns",
+  "resellerPanel": "Återförsäljare Panel"
 }

@@ -667,5 +667,6 @@
   "resellerUser": "リセラーユーザー",
   "resellerEmail": "リセラーEメール",
   "deviceLimit": "デバイス制限",
-  "userLimit": "ユーザー制限"
+  "userLimit": "ユーザー制限",
+  "resellerPanel": "リセラーパネル"
 }

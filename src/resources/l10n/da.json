@@ -667,5 +667,6 @@
   "resellerUser": "Forhandler Bruger",
   "resellerEmail": "Forhandler E-mail",
   "deviceLimit": "Enhedsgrænse",
-  "userLimit": "Brugergrænse"
+  "userLimit": "Brugergrænse",
+  "resellerPanel": "Forhandler Panel"
 }

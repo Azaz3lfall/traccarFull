@@ -667,5 +667,6 @@
   "resellerUser": "Pārdevēja Lietotājs",
   "resellerEmail": "Pārdevēja E-pasts",
   "deviceLimit": "Ierīces Ierobežojums",
-  "userLimit": "Lietotāja Ierobežojums"
+  "userLimit": "Lietotāja Ierobežojums",
+  "resellerPanel": "Pārdevēja Panelis"
 }

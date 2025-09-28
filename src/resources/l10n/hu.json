@@ -667,5 +667,6 @@
   "resellerUser": "Viszonteladó Felhasználó",
   "resellerEmail": "Viszonteladó E-mail",
   "deviceLimit": "Eszköz Limite",
-  "userLimit": "Felhasználó Limite"
+  "userLimit": "Felhasználó Limite",
+  "resellerPanel": "Viszonteladó Panel"
 }

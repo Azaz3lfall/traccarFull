@@ -667,5 +667,6 @@
   "resellerUser": "Usuari Revendedor",
   "resellerEmail": "Correu del Revendedor",
   "deviceLimit": "Límit de Dispositiu",
-  "userLimit": "Límit d'Usuari"
+  "userLimit": "Límit d'Usuari",
+  "resellerPanel": "Panell de Revendedor"
 }

@@ -667,5 +667,6 @@
   "resellerUser": "Pengguna Penjual Semula",
   "resellerEmail": "E-mel Penjual Semula",
   "deviceLimit": "Had Peranti",
-  "userLimit": "Had Pengguna"
+  "userLimit": "Had Pengguna",
+  "resellerPanel": "Panel Penjual Semula"
 }

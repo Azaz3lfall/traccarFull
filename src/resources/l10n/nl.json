@@ -667,5 +667,6 @@
   "resellerUser": "Wederverkoper Gebruiker",
   "resellerEmail": "Wederverkoper E-mail",
   "deviceLimit": "Apparaat Limiet",
-  "userLimit": "Gebruiker Limiet"
+  "userLimit": "Gebruiker Limiet",
+  "resellerPanel": "Wederverkoper Paneel"
 }

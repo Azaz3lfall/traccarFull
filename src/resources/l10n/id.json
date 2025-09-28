@@ -667,5 +667,6 @@
   "resellerUser": "Pengguna Penjual Ulang",
   "resellerEmail": "Email Penjual Ulang",
   "deviceLimit": "Batas Perangkat",
-  "userLimit": "Batas Pengguna"
+  "userLimit": "Batas Pengguna",
+  "resellerPanel": "Panel Penjual Ulang"
 }

@@ -667,5 +667,6 @@
   "resellerUser": "Përdorues Rishitës",
   "resellerEmail": "E-mail Rishitës",
   "deviceLimit": "Kufiri i Pajisjes",
-  "userLimit": "Kufiri i Përdoruesit"
+  "userLimit": "Kufiri i Përdoruesit",
+  "resellerPanel": "Paneli Rishitësit"
 }

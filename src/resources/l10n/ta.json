@@ -667,5 +667,6 @@
   "resellerUser": "மறுவிற்பனையாளர் பயனர்",
   "resellerEmail": "மறுவிற்பனையாளர் மின்னஞ்சல்",
   "deviceLimit": "சாதன வரம்பு",
-  "userLimit": "பயனர் வரம்பு"
+  "userLimit": "பயனர் வரம்பு",
+  "resellerPanel": "மறுவிற்பனையாளர் பேனல்"
 }

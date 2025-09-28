@@ -667,5 +667,6 @@
   "resellerUser": "Uudelleenmyyjä Käyttäjä",
   "resellerEmail": "Uudelleenmyyjä Sähköposti",
   "deviceLimit": "Laitteen Raja",
-  "userLimit": "Käyttäjän Raja"
+  "userLimit": "Käyttäjän Raja",
+  "resellerPanel": "Uudelleenmyyjä Paneeli"
 }

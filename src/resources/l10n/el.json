@@ -667,5 +667,6 @@
   "resellerUser": "Χρήστης Επανπωλητή",
   "resellerEmail": "E-mail Επανπωλητή",
   "deviceLimit": "Όριο Συσκευής",
-  "userLimit": "Όριο Χρήστη"
+  "userLimit": "Όριο Χρήστη",
+  "resellerPanel": "Πίνακας Επανπωλητή"
 }

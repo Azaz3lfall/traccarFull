@@ -667,5 +667,6 @@
   "resellerUser": "리셀러 사용자",
   "resellerEmail": "리셀러 이메일",
   "deviceLimit": "디바이스 제한",
-  "userLimit": "사용자 제한"
+  "userLimit": "사용자 제한",
+  "resellerPanel": "리셀러 패널"
 }

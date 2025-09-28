@@ -667,5 +667,6 @@
   "resellerUser": "经销商用户",
   "resellerEmail": "经销商邮箱",
   "deviceLimit": "设备限制",
-  "userLimit": "用户限制"
+  "userLimit": "用户限制",
+  "resellerPanel": "经销商面板"
 }

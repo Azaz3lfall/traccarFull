@@ -667,5 +667,6 @@
   "resellerUser": "Korisnik Preprodavač",
   "resellerEmail": "E-mail Preprodavača",
   "deviceLimit": "Ograničenje Uređaja",
-  "userLimit": "Ograničenje Korisnika"
+  "userLimit": "Ograničenje Korisnika",
+  "resellerPanel": "Panel Preprodavača"
 }

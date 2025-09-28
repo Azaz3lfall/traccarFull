@@ -667,5 +667,6 @@
   "resellerUser": "Perpardavėjo Vartotojas",
   "resellerEmail": "Perpardavėjo El. paštas",
   "deviceLimit": "Įrenginio Limitas",
-  "userLimit": "Vartotojo Limitas"
+  "userLimit": "Vartotojo Limitas",
+  "resellerPanel": "Perpardavėjo Panele"
 }

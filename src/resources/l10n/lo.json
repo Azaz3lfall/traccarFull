@@ -667,5 +667,6 @@
   "resellerUser": "ຜູ້ໃຊ້ຜູ້ຂາຍຄືນ",
   "resellerEmail": "ອີເມວຜູ້ຂາຍຄືນ",
   "deviceLimit": "ຂີດຈຳກັດອຸປະກອນ",
-  "userLimit": "ຂີດຈຳກັດຜູ້ໃຊ້"
+  "userLimit": "ຂີດຈຳກັດຜູ້ໃຊ້",
+  "resellerPanel": "ກະດານຜູ້ຂາຍຄືນ"
 }

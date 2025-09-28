@@ -667,5 +667,6 @@
   "resellerUser": "Utilizator Revânzător",
   "resellerEmail": "E-mail Revânzător",
   "deviceLimit": "Limita Dispozitiv",
-  "userLimit": "Limita Utilizator"
+  "userLimit": "Limita Utilizator",
+  "resellerPanel": "Panou Revânzător"
 }

@@ -667,5 +667,6 @@
   "resellerUser": "Uporabnik Preprodajalca",
   "resellerEmail": "E-pošta Preprodajalca",
   "deviceLimit": "Omejitev Naprave",
-  "userLimit": "Omejitev Uporabnika"
+  "userLimit": "Omejitev Uporabnika",
+  "resellerPanel": "Panel Preprodajalca"
 }

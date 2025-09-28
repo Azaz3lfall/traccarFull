@@ -667,5 +667,6 @@
   "resellerUser": "ผู้ใช้ตัวแทนจำหน่าย",
   "resellerEmail": "อีเมลตัวแทนจำหน่าย",
   "deviceLimit": "ขีดจำกัดอุปกรณ์",
-  "userLimit": "ขีดจำกัดผู้ใช้"
+  "userLimit": "ขีดจำกัดผู้ใช้",
+  "resellerPanel": "แผงตัวแทนจำหน่าย"
 }

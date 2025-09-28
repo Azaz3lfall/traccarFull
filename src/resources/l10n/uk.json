@@ -667,5 +667,6 @@
   "resellerUser": "Користувач Реселера",
   "resellerEmail": "E-mail Реселера",
   "deviceLimit": "Ліміт Пристроїв",
-  "userLimit": "Ліміт Користувачів"
+  "userLimit": "Ліміт Користувачів",
+  "resellerPanel": "Панель Реселера"
 }

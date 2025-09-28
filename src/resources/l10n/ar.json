@@ -667,5 +667,6 @@
   "resellerUser": "مستخدم الموزع",
   "resellerEmail": "بريد الموزع الإلكتروني",
   "deviceLimit": "حد الجهاز",
-  "userLimit": "حد المستخدم"
+  "userLimit": "حد المستخدم",
+  "resellerPanel": "لوحة الموزع"
 }

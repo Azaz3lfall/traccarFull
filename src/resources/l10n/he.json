@@ -667,5 +667,6 @@
   "resellerUser": "משתמש מוכר",
   "resellerEmail": "אימייל מוכר",
   "deviceLimit": "הגבלת מכשיר",
-  "userLimit": "הגבלת משתמש"
+  "userLimit": "הגבלת משתמש",
+  "resellerPanel": "לוח מוכר"
 }

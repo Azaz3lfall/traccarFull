@@ -667,5 +667,6 @@
   "resellerUser": "Edasimüüja Kasutaja",
   "resellerEmail": "Edasimüüja E-post",
   "deviceLimit": "Seadme Limiit",
-  "userLimit": "Kasutaja Limiit"
+  "userLimit": "Kasutaja Limiit",
+  "resellerPanel": "Edasimüüja Paneel"
 }
