@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Support-E-Mail",
   "resellerLimit": "Wiederverkäufer Limit",
   "sharedError": "Fehler",
-  "sharedRequiredFields": "Pflichtfelder fehlen"
+  "sharedRequiredFields": "Pflichtfelder fehlen",
+  "resellerId": "Wiederverkäufer ID",
+  "resellerUser": "Wiederverkäufer Benutzer",
+  "resellerEmail": "Wiederverkäufer E-Mail",
+  "deviceLimit": "Geräte-Limit",
+  "userLimit": "Benutzer-Limit"
 }

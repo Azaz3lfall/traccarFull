@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-mail de support",
   "resellerLimit": "Limite Revendeur",
   "sharedError": "Erreur",
-  "sharedRequiredFields": "Champs obligatoires manquants"
+  "sharedRequiredFields": "Champs obligatoires manquants",
+  "resellerId": "ID Revendeur",
+  "resellerUser": "Utilisateur Revendeur",
+  "resellerEmail": "E-mail Revendeur",
+  "deviceLimit": "Limite d'Appareil",
+  "userLimit": "Limite d'Utilisateur"
 }

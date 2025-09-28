@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Atbalsta e-pasts",
   "resellerLimit": "Pārdevēja Limits",
   "sharedError": "Kļūda",
-  "sharedRequiredFields": "Trūkst obligātie lauki"
+  "sharedRequiredFields": "Trūkst obligātie lauki",
+  "resellerId": "Pārdevēja ID",
+  "resellerUser": "Pārdevēja Lietotājs",
+  "resellerEmail": "Pārdevēja E-pasts",
+  "deviceLimit": "Ierīces Ierobežojums",
+  "userLimit": "Lietotāja Ierobežojums"
 }

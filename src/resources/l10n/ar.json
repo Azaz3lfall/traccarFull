@@ -662,5 +662,10 @@
   "resellerSupportEmail": "بريد الدعم",
   "resellerLimit": "حد الموزع",
   "sharedError": "خطأ",
-  "sharedRequiredFields": "الحقول المطلوبة مفقودة"
+  "sharedRequiredFields": "الحقول المطلوبة مفقودة",
+  "resellerId": "معرف الموزع",
+  "resellerUser": "مستخدم الموزع",
+  "resellerEmail": "بريد الموزع الإلكتروني",
+  "deviceLimit": "حد الجهاز",
+  "userLimit": "حد المستخدم"
 }

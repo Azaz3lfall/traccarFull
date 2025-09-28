@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Qo'llab-quvvatlash elektron pochtasi",
   "resellerLimit": "Qayta sotuvchi chegarasi",
   "sharedError": "Xatolik",
-  "sharedRequiredFields": "Majburiy maydonlar yo'q"
+  "sharedRequiredFields": "Majburiy maydonlar yo'q",
+  "resellerId": "Qayta Sotuvchi ID",
+  "resellerUser": "Qayta Sotuvchi Foydalanuvchi",
+  "resellerEmail": "Qayta Sotuvchi E-pochta",
+  "deviceLimit": "Qurilma Chegarasi",
+  "userLimit": "Foydalanuvchi Chegarasi"
 }

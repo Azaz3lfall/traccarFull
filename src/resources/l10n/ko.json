@@ -662,5 +662,10 @@
   "resellerSupportEmail": "지원 이메일",
   "resellerLimit": "재판매업자 제한",
   "sharedError": "오류",
-  "sharedRequiredFields": "필수 필드가 누락되었습니다"
+  "sharedRequiredFields": "필수 필드가 누락되었습니다",
+  "resellerId": "리셀러 ID",
+  "resellerUser": "리셀러 사용자",
+  "resellerEmail": "리셀러 이메일",
+  "deviceLimit": "디바이스 제한",
+  "userLimit": "사용자 제한"
 }

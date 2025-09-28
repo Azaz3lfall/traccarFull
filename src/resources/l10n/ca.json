@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Correu de suport",
   "resellerLimit": "Límit de Revenedor",
   "sharedError": "Error",
-  "sharedRequiredFields": "Falten camps obligatoris"
+  "sharedRequiredFields": "Falten camps obligatoris",
+  "resellerId": "ID de Revendedor",
+  "resellerUser": "Usuari Revendedor",
+  "resellerEmail": "Correu del Revendedor",
+  "deviceLimit": "Límit de Dispositiu",
+  "userLimit": "Límit d'Usuari"
 }

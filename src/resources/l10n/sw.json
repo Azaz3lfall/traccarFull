@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Barua pepe ya msaada",
   "resellerLimit": "Kikomo cha Mfanyabiashara",
   "sharedError": "Hitilafu",
-  "sharedRequiredFields": "Sehemu za lazima hazipo"
+  "sharedRequiredFields": "Sehemu za lazima hazipo",
+  "resellerId": "ID ya Mfanyabiashara",
+  "resellerUser": "Mtumiaji wa Mfanyabiashara",
+  "resellerEmail": "Barua pepe ya Mfanyabiashara",
+  "deviceLimit": "Kikomo cha Kifaa",
+  "userLimit": "Kikomo cha Mtumiaji"
 }

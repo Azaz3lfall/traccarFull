@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-mail підтримки",
   "resellerLimit": "Ліміт Реселера",
   "sharedError": "Помилка",
-  "sharedRequiredFields": "Відсутні обов'язкові поля"
+  "sharedRequiredFields": "Відсутні обов'язкові поля",
+  "resellerId": "ID Реселера",
+  "resellerUser": "Користувач Реселера",
+  "resellerEmail": "E-mail Реселера",
+  "deviceLimit": "Ліміт Пристроїв",
+  "userLimit": "Ліміт Користувачів"
 }

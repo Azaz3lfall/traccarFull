@@ -662,5 +662,10 @@
   "resellerSupportEmail": "ایمیل پشتیبانی",
   "resellerLimit": "محدودیت فروشنده مجدد",
   "sharedError": "خطا",
-  "sharedRequiredFields": "فیلدهای اجباری موجود نیست"
+  "sharedRequiredFields": "فیلدهای اجباری موجود نیست",
+  "resellerId": "شناسه فروشنده",
+  "resellerUser": "کاربر فروشنده",
+  "resellerEmail": "ایمیل فروشنده",
+  "deviceLimit": "محدودیت دستگاه",
+  "userLimit": "محدودیت کاربر"
 }

@@ -662,5 +662,10 @@
   "resellerSupportEmail": "支持邮箱",
   "resellerLimit": "经销商限制",
   "sharedError": "错误",
-  "sharedRequiredFields": "缺少必填字段"
+  "sharedRequiredFields": "缺少必填字段",
+  "resellerId": "经销商ID",
+  "resellerUser": "经销商用户",
+  "resellerEmail": "经销商邮箱",
+  "deviceLimit": "设备限制",
+  "userLimit": "用户限制"
 }

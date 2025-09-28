@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Palaikymo el. paštas",
   "resellerLimit": "Perpardavėjo Limitas",
   "sharedError": "Klaida",
-  "sharedRequiredFields": "Trūksta privalomų laukų"
+  "sharedRequiredFields": "Trūksta privalomų laukų",
+  "resellerId": "Perpardavėjo ID",
+  "resellerUser": "Perpardavėjo Vartotojas",
+  "resellerEmail": "Perpardavėjo El. paštas",
+  "deviceLimit": "Įrenginio Limitas",
+  "userLimit": "Vartotojo Limitas"
 }

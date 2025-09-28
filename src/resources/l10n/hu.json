@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Támogatási e-mail",
   "resellerLimit": "Viszonteladó Limite",
   "sharedError": "Hiba",
-  "sharedRequiredFields": "Kötelező mezők hiányoznak"
+  "sharedRequiredFields": "Kötelező mezők hiányoznak",
+  "resellerId": "Viszonteladó ID",
+  "resellerUser": "Viszonteladó Felhasználó",
+  "resellerEmail": "Viszonteladó E-mail",
+  "deviceLimit": "Eszköz Limite",
+  "userLimit": "Felhasználó Limite"
 }

@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Toe e-post",
   "resellerLimit": "Edasimüüja Limiit",
   "sharedError": "Viga",
-  "sharedRequiredFields": "Kohustuslikud väljad puuduvad"
+  "sharedRequiredFields": "Kohustuslikud väljad puuduvad",
+  "resellerId": "Edasimüüja ID",
+  "resellerUser": "Edasimüüja Kasutaja",
+  "resellerEmail": "Edasimüüja E-post",
+  "deviceLimit": "Seadme Limiit",
+  "userLimit": "Kasutaja Limiit"
 }

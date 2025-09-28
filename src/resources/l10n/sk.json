@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Podporný e-mail",
   "resellerLimit": "Limit Predajcu",
   "sharedError": "Chyba",
-  "sharedRequiredFields": "Chýbajú povinné polia"
+  "sharedRequiredFields": "Chýbajú povinné polia",
+  "resellerId": "ID Predajcu",
+  "resellerUser": "Používateľ Predajcu",
+  "resellerEmail": "E-mail Predajcu",
+  "deviceLimit": "Limit Zariadenia",
+  "userLimit": "Limit Používateľa"
 }

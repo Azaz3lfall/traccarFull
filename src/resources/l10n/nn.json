@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Støtte-e-post",
   "resellerLimit": "Forhandlar Grense",
   "sharedError": "Feil",
-  "sharedRequiredFields": "Påkravde felt manglar"
+  "sharedRequiredFields": "Påkravde felt manglar",
+  "resellerId": "Fornyingsseljar ID",
+  "resellerUser": "Fornyingsseljar Brukar",
+  "resellerEmail": "Fornyingsseljar E-post",
+  "deviceLimit": "Eininggrense",
+  "userLimit": "Brukargrense"
 }

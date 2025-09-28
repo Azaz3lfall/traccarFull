@@ -201,13 +201,18 @@ const MainPage = () => {
     parentUserId: '',
     parentUser: '',
     parentEmail: '',
+    resellerId: '',
+    resellerUser: '',
+    resellerEmail: '',
     companyName: '',
     logo: '',
     url: '',
     whatsapp: '',
     billingEmail: '',
     supportEmail: '',
-    resellerLimit: ''
+    resellerLimit: '',
+    deviceLimit: '',
+    userLimit: ''
   });
   const [resellerErrors, setResellerErrors] = useState([]);
   const [announcementData, setAnnouncementData] = useState({
@@ -4350,6 +4355,67 @@ const MainPage = () => {
                 {/* Editable fields */}
                 <TextField
                   fullWidth
+                  value={resellerData.resellerId}
+                  onChange={(e) => handleResellerFieldChange('resellerId', e.target.value)}
+                  label={t('resellerId')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.resellerUser}
+                  onChange={(e) => handleResellerFieldChange('resellerUser', e.target.value)}
+                  label={t('resellerUser')}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.resellerEmail}
+                  onChange={(e) => handleResellerFieldChange('resellerEmail', e.target.value)}
+                  label={t('resellerEmail')}
+                  type="email"
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
                   value={resellerData.companyName}
                   onChange={(e) => handleResellerFieldChange('companyName', e.target.value)}
                   label={t('resellerCompanyName')}
@@ -4492,6 +4558,50 @@ const MainPage = () => {
                   }}
                 />
                 
+                <TextField
+                  fullWidth
+                  value={resellerData.deviceLimit}
+                  onChange={(e) => handleResellerFieldChange('deviceLimit', e.target.value)}
+                  label={t('deviceLimit')}
+                  type="number"
+                  required
+                  inputProps={{ min: 1 }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  value={resellerData.userLimit}
+                  onChange={(e) => handleResellerFieldChange('userLimit', e.target.value)}
+                  label={t('userLimit')}
+                  type="number"
+                  required
+                  inputProps={{ min: 1 }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
+                  }}
+                />
+                
                 {/* Error Messages - Below Form Fields */}
                 {resellerErrors.length > 0 && (
                   <div style={{
@@ -4539,13 +4649,18 @@ const MainPage = () => {
                     
                     // Validate required fields
                     const requiredFields = [
+                      { key: 'resellerId', label: t('resellerId') },
+                      { key: 'resellerUser', label: t('resellerUser') },
+                      { key: 'resellerEmail', label: t('resellerEmail') },
                       { key: 'companyName', label: t('resellerCompanyName') },
                       { key: 'logo', label: t('resellerLogotype') },
                       { key: 'url', label: t('resellerAppUrl') },
                       { key: 'whatsapp', label: t('resellerWhatsapp') },
                       { key: 'billingEmail', label: t('resellerBillingEmail') },
                       { key: 'supportEmail', label: t('resellerSupportEmail') },
-                      { key: 'resellerLimit', label: t('resellerLimit') }
+                      { key: 'resellerLimit', label: t('resellerLimit') },
+                      { key: 'deviceLimit', label: t('deviceLimit') },
+                      { key: 'userLimit', label: t('userLimit') }
                     ];
 
                     requiredFields.forEach(field => {
@@ -4557,6 +4672,9 @@ const MainPage = () => {
 
                     // Validate email format
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (resellerData.resellerEmail && !emailRegex.test(resellerData.resellerEmail)) {
+                      errors.push(`${t('resellerEmail')} has invalid format`);
+                    }
                     if (resellerData.billingEmail && !emailRegex.test(resellerData.billingEmail)) {
                       errors.push(`${t('resellerBillingEmail')} has invalid format`);
                     }
@@ -4564,11 +4682,23 @@ const MainPage = () => {
                       errors.push(`${t('resellerSupportEmail')} has invalid format`);
                     }
 
-                    // Validate reseller limit is a positive number
+                    // Validate number fields are positive
                     if (resellerData.resellerLimit) {
                       const limit = parseInt(resellerData.resellerLimit);
                       if (isNaN(limit) || limit < 1) {
                         errors.push(`${t('resellerLimit')} must be a positive number`);
+                      }
+                    }
+                    if (resellerData.deviceLimit) {
+                      const limit = parseInt(resellerData.deviceLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('deviceLimit')} must be a positive number`);
+                      }
+                    }
+                    if (resellerData.userLimit) {
+                      const limit = parseInt(resellerData.userLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('userLimit')} must be a positive number`);
                       }
                     }
 
@@ -4587,6 +4717,9 @@ const MainPage = () => {
                       parentUserId: resellerData.parentUserId,
                       parentUser: resellerData.parentUser,
                       parentEmail: resellerData.parentEmail,
+                      resellerId: resellerData.resellerId.trim(),
+                      resellerUser: resellerData.resellerUser.trim(),
+                      resellerEmail: resellerData.resellerEmail.trim(),
                       companyName: resellerData.companyName.trim(),
                       logotype: resellerData.logo.trim(),
                       appUrl: resellerData.url.trim(),
@@ -4594,6 +4727,8 @@ const MainPage = () => {
                       billingEmail: resellerData.billingEmail.trim(),
                       supportEmail: resellerData.supportEmail.trim(),
                       resellerLimit: parseInt(resellerData.resellerLimit) || 0,
+                      deviceLimit: parseInt(resellerData.deviceLimit) || 0,
+                      userLimit: parseInt(resellerData.userLimit) || 0,
                       timestamp: new Date().toISOString(),
                       createdBy: user?.name || 'Unknown',
                       createdById: user?.id || null

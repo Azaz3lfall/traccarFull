@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Goldaw e-poçta",
   "resellerLimit": "Gaýtadan satyjynyň çägi",
   "sharedError": "Ýalňyşlyk",
-  "sharedRequiredFields": "Hökmany meýdanlar ýok"
+  "sharedRequiredFields": "Hökmany meýdanlar ýok",
+  "resellerId": "Dyn Satyjy ID",
+  "resellerUser": "Dyn Satyjy Ulanyjy",
+  "resellerEmail": "Dyn Satyjy E-poçta",
+  "deviceLimit": "Enjamyň Çägi",
+  "userLimit": "Ulanyjynyň Çägi"
 }

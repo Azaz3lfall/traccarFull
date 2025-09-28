@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Дэмжлэгийн имэйл",
   "resellerLimit": "Дахин худалдагчийн хязгаар",
   "sharedError": "Алдаа",
-  "sharedRequiredFields": "Шаардлагатай талбарууд дутуу байна"
+  "sharedRequiredFields": "Шаардлагатай талбарууд дутуу байна",
+  "resellerId": "Дахин худалдагч ID",
+  "resellerUser": "Дахин худалдагч Хэрэглэгч",
+  "resellerEmail": "Дахин худалдагч И-мэйл",
+  "deviceLimit": "Төхөөрөмжийн Хязгаар",
+  "userLimit": "Хэрэглэгчийн Хязгаар"
 }

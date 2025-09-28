@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-pošta za podporo",
   "resellerLimit": "Omejitev Preprodajalca",
   "sharedError": "Napaka",
-  "sharedRequiredFields": "Manjkajo obvezna polja"
+  "sharedRequiredFields": "Manjkajo obvezna polja",
+  "resellerId": "ID Preprodajalca",
+  "resellerUser": "Uporabnik Preprodajalca",
+  "resellerEmail": "E-pošta Preprodajalca",
+  "deviceLimit": "Omejitev Naprave",
+  "userLimit": "Omejitev Uporabnika"
 }

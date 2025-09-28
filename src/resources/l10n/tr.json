@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Destek e-postası",
   "resellerLimit": "Bayi Limiti",
   "sharedError": "Hata",
-  "sharedRequiredFields": "Gerekli alanlar eksik"
+  "sharedRequiredFields": "Gerekli alanlar eksik",
+  "resellerId": "Bayi ID",
+  "resellerUser": "Bayi Kullanıcı",
+  "resellerEmail": "Bayi E-posta",
+  "deviceLimit": "Cihaz Limiti",
+  "userLimit": "Kullanıcı Limiti"
 }

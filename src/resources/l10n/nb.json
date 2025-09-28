@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Støtte-e-post",
   "resellerLimit": "Forhandler Grense",
   "sharedError": "Feil",
-  "sharedRequiredFields": "Påkrevde felt mangler"
+  "sharedRequiredFields": "Påkrevde felt mangler",
+  "resellerId": "Forhandler ID",
+  "resellerUser": "Forhandler Bruker",
+  "resellerEmail": "Forhandler E-post",
+  "deviceLimit": "Enhetsgrense",
+  "userLimit": "Brugergrense"
 }

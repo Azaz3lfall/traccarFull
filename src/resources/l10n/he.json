@@ -662,5 +662,10 @@
   "resellerSupportEmail": "אימייל תמיכה",
   "resellerLimit": "מגבלת מוכר מחדש",
   "sharedError": "שגיאה",
-  "sharedRequiredFields": "שדות חובה חסרים"
+  "sharedRequiredFields": "שדות חובה חסרים",
+  "resellerId": "מזהה מוכר",
+  "resellerUser": "משתמש מוכר",
+  "resellerEmail": "אימייל מוכר",
+  "deviceLimit": "הגבלת מכשיר",
+  "userLimit": "הגבלת משתמש"
 }

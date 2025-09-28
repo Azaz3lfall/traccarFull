@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Tukisähköposti",
   "resellerLimit": "Jälleenmyyjä Raja",
   "sharedError": "Virhe",
-  "sharedRequiredFields": "Pakolliset kentät puuttuvat"
+  "sharedRequiredFields": "Pakolliset kentät puuttuvat",
+  "resellerId": "Uudelleenmyyjä ID",
+  "resellerUser": "Uudelleenmyyjä Käyttäjä",
+  "resellerEmail": "Uudelleenmyyjä Sähköposti",
+  "deviceLimit": "Laitteen Raja",
+  "userLimit": "Käyttäjän Raja"
 }

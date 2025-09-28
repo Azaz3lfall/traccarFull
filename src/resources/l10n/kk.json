@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Қолдау электрондық поштасы",
   "resellerLimit": "Қайта сатушы шегі",
   "sharedError": "Қате",
-  "sharedRequiredFields": "Міндетті өрістер жоқ"
+  "sharedRequiredFields": "Міндетті өрістер жоқ",
+  "resellerId": "Қайта сатушы ID",
+  "resellerUser": "Қайта сатушы Пайдаланушы",
+  "resellerEmail": "Қайта сатушы Эл.пошта",
+  "deviceLimit": "Құрылғы Шектеуі",
+  "userLimit": "Пайдаланушы Шектеуі"
 }

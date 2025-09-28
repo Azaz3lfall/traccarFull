@@ -662,5 +662,10 @@
   "resellerSupportEmail": "সাপোর্ট ইমেইল",
   "resellerLimit": "পুনঃবিক্রেতা সীমা",
   "sharedError": "ত্রুটি",
-  "sharedRequiredFields": "প্রয়োজনীয় ক্ষেত্র অনুপস্থিত"
+  "sharedRequiredFields": "প্রয়োজনীয় ক্ষেত্র অনুপস্থিত",
+  "resellerId": "রিসেলার আইডি",
+  "resellerUser": "রিসেলার ইউজার",
+  "resellerEmail": "রিসেলার ইমেইল",
+  "deviceLimit": "ডিভাইস সীমা",
+  "userLimit": "ইউজার সীমা"
 }

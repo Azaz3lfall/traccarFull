@@ -662,5 +662,10 @@
   "resellerSupportEmail": "อีเมลสนับสนุน",
   "resellerLimit": "ขีดจำกัดผู้ค้าปลีก",
   "sharedError": "ข้อผิดพลาด",
-  "sharedRequiredFields": "ฟิลด์ที่จำเป็นหายไป"
+  "sharedRequiredFields": "ฟิลด์ที่จำเป็นหายไป",
+  "resellerId": "รหัสตัวแทนจำหน่าย",
+  "resellerUser": "ผู้ใช้ตัวแทนจำหน่าย",
+  "resellerEmail": "อีเมลตัวแทนจำหน่าย",
+  "deviceLimit": "ขีดจำกัดอุปกรณ์",
+  "userLimit": "ขีดจำกัดผู้ใช้"
 }

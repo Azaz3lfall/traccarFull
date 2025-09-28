@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Dəstək E-poçtu",
   "resellerLimit": "Yenidən Satıcı Limiti",
   "sharedError": "Xəta",
-  "sharedRequiredFields": "Tələb olunan sahələr çatışmır"
+  "sharedRequiredFields": "Tələb olunan sahələr çatışmır",
+  "resellerId": "Yenidən Satıcı ID",
+  "resellerUser": "Yenidən Satıcı İstifadəçi",
+  "resellerEmail": "Yenidən Satıcı E-poçt",
+  "deviceLimit": "Cihaz Limiti",
+  "userLimit": "İstifadəçi Limiti"
 }

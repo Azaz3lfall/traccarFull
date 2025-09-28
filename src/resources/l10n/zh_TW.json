@@ -662,5 +662,10 @@
   "resellerSupportEmail": "支援電子郵件",
   "resellerLimit": "經銷商限制",
   "sharedError": "錯誤",
-  "sharedRequiredFields": "缺少必填欄位"
+  "sharedRequiredFields": "缺少必填欄位",
+  "resellerId": "經銷商ID",
+  "resellerUser": "經銷商用戶",
+  "resellerEmail": "經銷商電子郵件",
+  "deviceLimit": "設備限制",
+  "userLimit": "用戶限制"
 }

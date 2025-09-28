@@ -662,5 +662,10 @@
   "resellerSupportEmail": "ອີເມວສະໜັບສະໜູນ",
   "resellerLimit": "ຂີດຈຳກັດຜູ້ຂາຍຄືນ",
   "sharedError": "ຂໍ້ຜິດພາດ",
-  "sharedRequiredFields": "ຊ່ອງຂໍ້ມູນທີ່ຈຳເປັນຂາດຫາຍ"
+  "sharedRequiredFields": "ຊ່ອງຂໍ້ມູນທີ່ຈຳເປັນຂາດຫາຍ",
+  "resellerId": "ລະຫັດຜູ້ຂາຍຄືນ",
+  "resellerUser": "ຜູ້ໃຊ້ຜູ້ຂາຍຄືນ",
+  "resellerEmail": "ອີເມວຜູ້ຂາຍຄືນ",
+  "deviceLimit": "ຂີດຈຳກັດອຸປະກອນ",
+  "userLimit": "ຂີດຈຳກັດຜູ້ໃຊ້"
 }

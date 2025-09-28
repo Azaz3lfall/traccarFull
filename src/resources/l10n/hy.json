@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Աջակցության էլ. փոստ",
   "resellerLimit": "Վերավաճառողի Սահման",
   "sharedError": "Սխալ",
-  "sharedRequiredFields": "Պարտադիր դաշտերը բացակայում են"
+  "sharedRequiredFields": "Պարտադիր դաշտերը բացակայում են",
+  "resellerId": "Վերավաճառող ID",
+  "resellerUser": "Վերավաճառող Օգտագործող",
+  "resellerEmail": "Վերավաճառող Էլ. Փոստ",
+  "deviceLimit": "Սարքի Սահմանափակում",
+  "userLimit": "Օգտագործողի Սահմանափակում"
 }

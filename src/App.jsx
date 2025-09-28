@@ -19,6 +19,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const App = () => {
+  // Force refresh to clear Box reference
   const { classes } = useStyles();
   const theme = useTheme();
   const dispatch = useDispatch();

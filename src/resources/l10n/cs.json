@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Podpůrný e-mail",
   "resellerLimit": "Limit Prodejce",
   "sharedError": "Chyba",
-  "sharedRequiredFields": "Chybí povinná pole"
+  "sharedRequiredFields": "Chybí povinná pole",
+  "resellerId": "ID Prodejce",
+  "resellerUser": "Uživatel Prodejce",
+  "resellerEmail": "E-mail Prodejce",
+  "deviceLimit": "Limit Zařízení",
+  "userLimit": "Limit Uživatelů"
 }

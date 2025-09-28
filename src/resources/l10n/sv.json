@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Support-e-post",
   "resellerLimit": "Återförsäljare Gräns",
   "sharedError": "Fel",
-  "sharedRequiredFields": "Obligatoriska fält saknas"
+  "sharedRequiredFields": "Obligatoriska fält saknas",
+  "resellerId": "Återförsäljare ID",
+  "resellerUser": "Återförsäljare Användare",
+  "resellerEmail": "Återförsäljare E-post",
+  "deviceLimit": "Enhetsgräns",
+  "userLimit": "Användargräns"
 }

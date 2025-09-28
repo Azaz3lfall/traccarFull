@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Support-e-mail",
   "resellerLimit": "Forhandler Grænse",
   "sharedError": "Fejl",
-  "sharedRequiredFields": "Påkrævede felter mangler"
+  "sharedRequiredFields": "Påkrævede felter mangler",
+  "resellerId": "Forhandler ID",
+  "resellerUser": "Forhandler Bruger",
+  "resellerEmail": "Forhandler E-mail",
+  "deviceLimit": "Enhedsgrænse",
+  "userLimit": "Brugergrænse"
 }

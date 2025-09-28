@@ -661,6 +661,11 @@
   "resellerBillingEmail": "Billing Email",
   "resellerSupportEmail": "Support Email",
   "resellerLimit": "Reseller Limit",
+  "resellerId": "Reseller ID",
+  "resellerUser": "Reseller User",
+  "resellerEmail": "Reseller Email",
+  "deviceLimit": "Device Limit",
+  "userLimit": "User Limit",
   "sharedError": "Error",
   "sharedRequiredFields": "Required fields missing"
 }

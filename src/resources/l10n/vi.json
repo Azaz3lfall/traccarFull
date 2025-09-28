@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Email hỗ trợ",
   "resellerLimit": "Giới hạn Nhà phân phối",
   "sharedError": "Lỗi",
-  "sharedRequiredFields": "Thiếu các trường bắt buộc"
+  "sharedRequiredFields": "Thiếu các trường bắt buộc",
+  "resellerId": "ID Đại lý",
+  "resellerUser": "Người dùng Đại lý",
+  "resellerEmail": "E-mail Đại lý",
+  "deviceLimit": "Giới hạn Thiết bị",
+  "userLimit": "Giới hạn Người dùng"
 }

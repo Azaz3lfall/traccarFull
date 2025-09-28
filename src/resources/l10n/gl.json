@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Correo de soporte",
   "resellerLimit": "Límite Revendedor",
   "sharedError": "Erro",
-  "sharedRequiredFields": "Faltan campos obrigatorios"
+  "sharedRequiredFields": "Faltan campos obrigatorios",
+  "resellerId": "ID Revendedor",
+  "resellerUser": "Usuario Revendedor",
+  "resellerEmail": "Correo do Revendedor",
+  "deviceLimit": "Límite de Dispositivo",
+  "userLimit": "Límite de Usuario"
 }

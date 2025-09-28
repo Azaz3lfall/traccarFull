@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Имейл за поддръжка",
   "resellerLimit": "Лимит на препродавач",
   "sharedError": "Грешка",
-  "sharedRequiredFields": "Липсват задължителни полета"
+  "sharedRequiredFields": "Липсват задължителни полета",
+  "resellerId": "ID на Препродавач",
+  "resellerUser": "Потребител Препродавач",
+  "resellerEmail": "Имейл на Препродавач",
+  "deviceLimit": "Лимит на Устройство",
+  "userLimit": "Лимит на Потребител"
 }

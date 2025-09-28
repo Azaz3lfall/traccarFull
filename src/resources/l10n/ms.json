@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-mel sokongan",
   "resellerLimit": "Had Penjual Semula",
   "sharedError": "Ralat",
-  "sharedRequiredFields": "Medan wajib tidak ada"
+  "sharedRequiredFields": "Medan wajib tidak ada",
+  "resellerId": "ID Penjual Semula",
+  "resellerUser": "Pengguna Penjual Semula",
+  "resellerEmail": "E-mel Penjual Semula",
+  "deviceLimit": "Had Peranti",
+  "userLimit": "Had Pengguna"
 }

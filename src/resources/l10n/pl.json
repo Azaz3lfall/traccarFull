@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-mail wsparcia",
   "resellerLimit": "Limit Sprzedawcy",
   "sharedError": "Błąd",
-  "sharedRequiredFields": "Brakuje wymaganych pól"
+  "sharedRequiredFields": "Brakuje wymaganych pól",
+  "resellerId": "ID Sprzedawcy",
+  "resellerUser": "Użytkownik Sprzedawcy",
+  "resellerEmail": "E-mail Sprzedawcy",
+  "deviceLimit": "Limit Urządzenia",
+  "userLimit": "Limit Użytkownika"
 }

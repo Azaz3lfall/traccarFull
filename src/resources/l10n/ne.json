@@ -662,5 +662,10 @@
   "resellerSupportEmail": "सहयोग इमेल",
   "resellerLimit": "पुनर्विक्रेता सीमा",
   "sharedError": "त्रुटि",
-  "sharedRequiredFields": "आवश्यक फिल्डहरू छैनन्"
+  "sharedRequiredFields": "आवश्यक फिल्डहरू छैनन्",
+  "resellerId": "पुनर्विक्रेता ID",
+  "resellerUser": "पुनर्विक्रेता प्रयोगकर्ता",
+  "resellerEmail": "पुनर्विक्रेता इमेल",
+  "deviceLimit": "यन्त्र सीमा",
+  "userLimit": "प्रयोगकर्ता सीमा"
 }

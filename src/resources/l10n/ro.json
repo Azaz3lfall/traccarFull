@@ -662,5 +662,10 @@
   "resellerSupportEmail": "E-mail suport",
   "resellerLimit": "Limita Revânzător",
   "sharedError": "Eroare",
-  "sharedRequiredFields": "Câmpuri obligatorii lipsesc"
+  "sharedRequiredFields": "Câmpuri obligatorii lipsesc",
+  "resellerId": "ID Revânzător",
+  "resellerUser": "Utilizator Revânzător",
+  "resellerEmail": "E-mail Revânzător",
+  "deviceLimit": "Limita Dispozitiv",
+  "userLimit": "Limita Utilizator"
 }

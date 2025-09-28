@@ -662,5 +662,10 @@
   "resellerSupportEmail": "සහාය ඊමේල්",
   "resellerLimit": "නැවත විකුණන්නා සීමාව",
   "sharedError": "දෝෂය",
-  "sharedRequiredFields": "අවශ්‍ය ක්ෂේත්‍ර නැත"
+  "sharedRequiredFields": "අවශ්‍ය ක්ෂේත්‍ර නැත",
+  "resellerId": "නැවත විකුණන්නා ID",
+  "resellerUser": "නැවත විකුණන්නා පරිශීලක",
+  "resellerEmail": "නැවත විකුණන්නා ඊමේල්",
+  "deviceLimit": "උපකරණ සීමාව",
+  "userLimit": "පරිශීලක සීමාව"
 }

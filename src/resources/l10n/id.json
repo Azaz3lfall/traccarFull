@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Email dukungan",
   "resellerLimit": "Batas Penjual Ulang",
   "sharedError": "Kesalahan",
-  "sharedRequiredFields": "Bidang wajib tidak ada"
+  "sharedRequiredFields": "Bidang wajib tidak ada",
+  "resellerId": "ID Penjual Ulang",
+  "resellerUser": "Pengguna Penjual Ulang",
+  "resellerEmail": "Email Penjual Ulang",
+  "deviceLimit": "Batas Perangkat",
+  "userLimit": "Batas Pengguna"
 }

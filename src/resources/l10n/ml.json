@@ -662,5 +662,10 @@
   "resellerSupportEmail": "സപ്പോർട്ട് ഇമെയിൽ",
   "resellerLimit": "പുനർവിൽപ്പനക്കാരന്റെ പരിധി",
   "sharedError": "പിശക്",
-  "sharedRequiredFields": "ആവശ്യമായ ഫീൽഡുകൾ കാണുന്നില്ല"
+  "sharedRequiredFields": "ആവശ്യമായ ഫീൽഡുകൾ കാണുന്നില്ല",
+  "resellerId": "റീസെല്ലർ ഐഡി",
+  "resellerUser": "റീസെല്ലർ ഉപയോക്താവ്",
+  "resellerEmail": "റീസെല്ലർ ഇമെയിൽ",
+  "deviceLimit": "ഉപകരണ പരിധി",
+  "userLimit": "ഉപയോക്തൃ പരിധി"
 }

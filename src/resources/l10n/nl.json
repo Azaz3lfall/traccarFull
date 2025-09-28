@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Ondersteuning e-mail",
   "resellerLimit": "Wederverkoper Limiet",
   "sharedError": "Fout",
-  "sharedRequiredFields": "Verplichte velden ontbreken"
+  "sharedRequiredFields": "Verplichte velden ontbreken",
+  "resellerId": "Wederverkoper ID",
+  "resellerUser": "Wederverkoper Gebruiker",
+  "resellerEmail": "Wederverkoper E-mail",
+  "deviceLimit": "Apparaat Limiet",
+  "userLimit": "Gebruiker Limiet"
 }

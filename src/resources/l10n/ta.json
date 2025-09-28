@@ -662,5 +662,10 @@
   "resellerSupportEmail": "ஆதரவு இமெயில்",
   "resellerLimit": "மறுவிற்பனையாளர் வரம்பு",
   "sharedError": "பிழை",
-  "sharedRequiredFields": "தேவையான புலங்கள் இல்லை"
+  "sharedRequiredFields": "தேவையான புலங்கள் இல்லை",
+  "resellerId": "மறுவிற்பனையாளர் ஐடி",
+  "resellerUser": "மறுவிற்பனையாளர் பயனர்",
+  "resellerEmail": "மறுவிற்பனையாளர் மின்னஞ்சல்",
+  "deviceLimit": "சாதன வரம்பு",
+  "userLimit": "பயனர் வரம்பு"
 }

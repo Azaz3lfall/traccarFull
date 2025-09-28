@@ -662,5 +662,10 @@
   "resellerSupportEmail": "サポートメール",
   "resellerLimit": "再販業者制限",
   "sharedError": "エラー",
-  "sharedRequiredFields": "必須フィールドが不足しています"
+  "sharedRequiredFields": "必須フィールドが不足しています",
+  "resellerId": "リセラーID",
+  "resellerUser": "リセラーユーザー",
+  "resellerEmail": "リセラーEメール",
+  "deviceLimit": "デバイス制限",
+  "userLimit": "ユーザー制限"
 }

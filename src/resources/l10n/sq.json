@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Email mbështetje",
   "resellerLimit": "Kufiri Rishitësit",
   "sharedError": "Gabim",
-  "sharedRequiredFields": "Fushat e detyrueshme mungojnë"
+  "sharedRequiredFields": "Fushat e detyrueshme mungojnë",
+  "resellerId": "ID Rishitësit",
+  "resellerUser": "Përdorues Rishitës",
+  "resellerEmail": "E-mail Rishitës",
+  "deviceLimit": "Kufiri i Pajisjes",
+  "userLimit": "Kufiri i Përdoruesit"
 }

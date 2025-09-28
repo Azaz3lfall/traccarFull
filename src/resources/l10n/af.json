@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Ondersteuning E-pos",
   "resellerLimit": "Herverkoper Limiet",
   "sharedError": "Fout",
-  "sharedRequiredFields": "Verpligte velde ontbreek"
+  "sharedRequiredFields": "Verpligte velde ontbreek",
+  "resellerId": "Herverkoper ID",
+  "resellerUser": "Herverkoper Gebruiker",
+  "resellerEmail": "Herverkoper E-pos",
+  "deviceLimit": "Toestel Limiet",
+  "userLimit": "Gebruiker Limiet"
 }

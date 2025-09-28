@@ -662,5 +662,10 @@
   "resellerSupportEmail": "Email υποστήριξης",
   "resellerLimit": "Όριο Επανπωλητή",
   "sharedError": "Σφάλμα",
-  "sharedRequiredFields": "Λείπουν υποχρεωτικά πεδία"
+  "sharedRequiredFields": "Λείπουν υποχρεωτικά πεδία",
+  "resellerId": "ID Επανπωλητή",
+  "resellerUser": "Χρήστης Επανπωλητή",
+  "resellerEmail": "E-mail Επανπωλητή",
+  "deviceLimit": "Όριο Συσκευής",
+  "userLimit": "Όριο Χρήστη"
 }

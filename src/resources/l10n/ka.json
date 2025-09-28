@@ -662,5 +662,10 @@
   "resellerSupportEmail": "მხარდაჭერის ელ.ფოსტა",
   "resellerLimit": "გადამყიდველის ლიმიტი",
   "sharedError": "შეცდომა",
-  "sharedRequiredFields": "აუცილებელი ველები არ არის"
+  "sharedRequiredFields": "აუცილებელი ველები არ არის",
+  "resellerId": "გადამყიდველი ID",
+  "resellerUser": "გადამყიდველი მომხმარებელი",
+  "resellerEmail": "გადამყიდველი ელ.ფოსტა",
+  "deviceLimit": "მოწყობილობის ლიმიტი",
+  "userLimit": "მომხმარებლის ლიმიტი"
 }

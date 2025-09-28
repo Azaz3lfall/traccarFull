@@ -662,5 +662,10 @@
   "resellerSupportEmail": "सहायता ईमेल",
   "resellerLimit": "पुनर्विक्रेता सीमा",
   "sharedError": "त्रुटि",
-  "sharedRequiredFields": "आवश्यक फ़ील्ड गुम हैं"
+  "sharedRequiredFields": "आवश्यक फ़ील्ड गुम हैं",
+  "resellerId": "रीसेलर आईडी",
+  "resellerUser": "रीसेलर यूजर",
+  "resellerEmail": "रीसेलर ईमेल",
+  "deviceLimit": "डिवाइस सीमा",
+  "userLimit": "यूजर सीमा"
 }

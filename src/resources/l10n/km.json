@@ -662,5 +662,10 @@
   "resellerSupportEmail": "អ៊ីមែលជំនួយ",
   "resellerLimit": "ដែនកំណត់អ្នកលក់ឡើងវិញ",
   "sharedError": "កំហុស",
-  "sharedRequiredFields": "វាលចាំបាច់បាត់"
+  "sharedRequiredFields": "វាលចាំបាច់បាត់",
+  "resellerId": "លេខសម្គាល់អ្នកលក់ឡើងវិញ",
+  "resellerUser": "អ្នកប្រើអ្នកលក់ឡើងវិញ",
+  "resellerEmail": "អ៊ីមែលអ្នកលក់ឡើងវិញ",
+  "deviceLimit": "ដែនកំណត់ឧបករណ៍",
+  "userLimit": "ដែនកំណត់អ្នកប្រើ"
 }
