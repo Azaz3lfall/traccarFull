@@ -581,14 +581,14 @@ const FloatingDeviceList = ({
             {/* Device count */}
             <div style={{
               position: 'absolute',
-              right: '50px',
+              right: '35px',
               top: '50%',
               transform: 'translateY(-50%)',
-              fontSize: '12px',
+              fontSize: '10px',
               color: colors.textSecondary,
               backgroundColor: colors.surface,
-              padding: '2px 6px',
-              borderRadius: '4px',
+              padding: '1px 4px',
+              borderRadius: '3px',
               border: `1px solid ${colors.border}`
             }}>
               {filteredDevices.length}
