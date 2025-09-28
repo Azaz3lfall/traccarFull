@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Тооцооны имэйл",
   "resellerSupportEmail": "Дэмжлэгийн имэйл",
-  "resellerLimit": "Дахин худалдагчийн хязгаар"
+  "resellerLimit": "Дахин худалдагчийн хязгаар",
+  "sharedError": "Алдаа",
+  "sharedRequiredFields": "Шаардлагатай талбарууд дутуу байна"
 }

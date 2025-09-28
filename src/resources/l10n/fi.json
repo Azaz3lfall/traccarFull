@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Laskutussähköposti",
   "resellerSupportEmail": "Tukisähköposti",
-  "resellerLimit": "Jälleenmyyjä Raja"
+  "resellerLimit": "Jälleenmyyjä Raja",
+  "sharedError": "Virhe",
+  "sharedRequiredFields": "Pakolliset kentät puuttuvat"
 }

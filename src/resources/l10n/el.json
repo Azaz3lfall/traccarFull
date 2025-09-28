@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Email χρέωσης",
   "resellerSupportEmail": "Email υποστήριξης",
-  "resellerLimit": "Όριο Επανπωλητή"
+  "resellerLimit": "Όριο Επανπωλητή",
+  "sharedError": "Σφάλμα",
+  "sharedRequiredFields": "Λείπουν υποχρεωτικά πεδία"
 }

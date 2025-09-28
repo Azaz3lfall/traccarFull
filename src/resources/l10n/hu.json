@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Számlázási e-mail",
   "resellerSupportEmail": "Támogatási e-mail",
-  "resellerLimit": "Viszonteladó Limite"
+  "resellerLimit": "Viszonteladó Limite",
+  "sharedError": "Hiba",
+  "sharedRequiredFields": "Kötelező mezők hiányoznak"
 }

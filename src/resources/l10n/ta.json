@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "பில் இமெயில்",
   "resellerSupportEmail": "ஆதரவு இமெயில்",
-  "resellerLimit": "மறுவிற்பனையாளர் வரம்பு"
+  "resellerLimit": "மறுவிற்பனையாளர் வரம்பு",
+  "sharedError": "பிழை",
+  "sharedRequiredFields": "தேவையான புலங்கள் இல்லை"
 }

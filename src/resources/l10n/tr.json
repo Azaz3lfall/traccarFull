@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Faturalama e-postası",
   "resellerSupportEmail": "Destek e-postası",
-  "resellerLimit": "Bayi Limiti"
+  "resellerLimit": "Bayi Limiti",
+  "sharedError": "Hata",
+  "sharedRequiredFields": "Gerekli alanlar eksik"
 }

@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "อีเมลเรียกเก็บเงิน",
   "resellerSupportEmail": "อีเมลสนับสนุน",
-  "resellerLimit": "ขีดจำกัดผู้ค้าปลีก"
+  "resellerLimit": "ขีดจำกัดผู้ค้าปลีก",
+  "sharedError": "ข้อผิดพลาด",
+  "sharedRequiredFields": "ฟิลด์ที่จำเป็นหายไป"
 }

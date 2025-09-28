@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Correu de facturació",
   "resellerSupportEmail": "Correu de suport",
-  "resellerLimit": "Límit de Revenedor"
+  "resellerLimit": "Límit de Revenedor",
+  "sharedError": "Error",
+  "sharedRequiredFields": "Falten camps obligatoris"
 }

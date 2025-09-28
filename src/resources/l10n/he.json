@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "אימייל חיוב",
   "resellerSupportEmail": "אימייל תמיכה",
-  "resellerLimit": "מגבלת מוכר מחדש"
+  "resellerLimit": "מגבלת מוכר מחדש",
+  "sharedError": "שגיאה",
+  "sharedRequiredFields": "שדות חובה חסרים"
 }

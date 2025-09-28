@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "बिलिंग ईमेल",
   "resellerSupportEmail": "सहायता ईमेल",
-  "resellerLimit": "पुनर्विक्रेता सीमा"
+  "resellerLimit": "पुनर्विक्रेता सीमा",
+  "sharedError": "त्रुटि",
+  "sharedRequiredFields": "आवश्यक फ़ील्ड गुम हैं"
 }

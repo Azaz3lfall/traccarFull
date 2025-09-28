@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "帳單電子郵件",
   "resellerSupportEmail": "支援電子郵件",
-  "resellerLimit": "經銷商限制"
+  "resellerLimit": "經銷商限制",
+  "sharedError": "錯誤",
+  "sharedRequiredFields": "缺少必填欄位"
 }

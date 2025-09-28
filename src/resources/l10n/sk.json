@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Fakturačný e-mail",
   "resellerSupportEmail": "Podporný e-mail",
-  "resellerLimit": "Limit Predajcu"
+  "resellerLimit": "Limit Predajcu",
+  "sharedError": "Chyba",
+  "sharedRequiredFields": "Chýbajú povinné polia"
 }

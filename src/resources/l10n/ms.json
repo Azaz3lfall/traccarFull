@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "E-mel pengebilan",
   "resellerSupportEmail": "E-mel sokongan",
-  "resellerLimit": "Had Penjual Semula"
+  "resellerLimit": "Had Penjual Semula",
+  "sharedError": "Ralat",
+  "sharedRequiredFields": "Medan wajib tidak ada"
 }

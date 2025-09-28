@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "E-mail для выставления счетов",
   "resellerSupportEmail": "E-mail поддержки",
-  "resellerLimit": "Лимит Реселлера"
+  "resellerLimit": "Лимит Реселлера",
+  "sharedError": "Ошибка",
+  "sharedRequiredFields": "Отсутствуют обязательные поля"
 }

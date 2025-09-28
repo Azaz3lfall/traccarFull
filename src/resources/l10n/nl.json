@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Facturerings-e-mail",
   "resellerSupportEmail": "Ondersteuning e-mail",
-  "resellerLimit": "Wederverkoper Limiet"
+  "resellerLimit": "Wederverkoper Limiet",
+  "sharedError": "Fout",
+  "sharedRequiredFields": "Verplichte velden ontbreken"
 }

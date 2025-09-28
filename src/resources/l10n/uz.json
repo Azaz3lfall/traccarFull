@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Hisob-kitob elektron pochtasi",
   "resellerSupportEmail": "Qo'llab-quvvatlash elektron pochtasi",
-  "resellerLimit": "Qayta sotuvchi chegarasi"
+  "resellerLimit": "Qayta sotuvchi chegarasi",
+  "sharedError": "Xatolik",
+  "sharedRequiredFields": "Majburiy maydonlar yo'q"
 }

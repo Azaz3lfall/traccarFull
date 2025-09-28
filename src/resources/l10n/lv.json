@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Norēķinu e-pasts",
   "resellerSupportEmail": "Atbalsta e-pasts",
-  "resellerLimit": "Pārdevēja Limits"
+  "resellerLimit": "Pārdevēja Limits",
+  "sharedError": "Kļūda",
+  "sharedRequiredFields": "Trūkst obligātie lauki"
 }

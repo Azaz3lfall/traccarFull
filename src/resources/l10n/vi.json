@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Email thanh toán",
   "resellerSupportEmail": "Email hỗ trợ",
-  "resellerLimit": "Giới hạn Nhà phân phối"
+  "resellerLimit": "Giới hạn Nhà phân phối",
+  "sharedError": "Lỗi",
+  "sharedRequiredFields": "Thiếu các trường bắt buộc"
 }

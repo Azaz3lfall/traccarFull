@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Հաշիվ-ապրանքագիր էլ. փոստ",
   "resellerSupportEmail": "Աջակցության էլ. փոստ",
-  "resellerLimit": "Վերավաճառողի Սահման"
+  "resellerLimit": "Վերավաճառողի Սահման",
+  "sharedError": "Սխալ",
+  "sharedRequiredFields": "Պարտադիր դաշտերը բացակայում են"
 }

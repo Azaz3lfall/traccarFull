@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Rechnungs-E-Mail",
   "resellerSupportEmail": "Support-E-Mail",
-  "resellerLimit": "Wiederverkäufer Limit"
+  "resellerLimit": "Wiederverkäufer Limit",
+  "sharedError": "Fehler",
+  "sharedRequiredFields": "Pflichtfelder fehlen"
 }

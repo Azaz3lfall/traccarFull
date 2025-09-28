@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "账单邮箱",
   "resellerSupportEmail": "支持邮箱",
-  "resellerLimit": "经销商限制"
+  "resellerLimit": "经销商限制",
+  "sharedError": "错误",
+  "sharedRequiredFields": "缺少必填字段"
 }

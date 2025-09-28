@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Fakturerings-e-post",
   "resellerSupportEmail": "Støtte-e-post",
-  "resellerLimit": "Forhandlar Grense"
+  "resellerLimit": "Forhandlar Grense",
+  "sharedError": "Feil",
+  "sharedRequiredFields": "Påkravde felt manglar"
 }

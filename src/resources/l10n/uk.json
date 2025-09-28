@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "E-mail для виставлення рахунків",
   "resellerSupportEmail": "E-mail підтримки",
-  "resellerLimit": "Ліміт Реселера"
+  "resellerLimit": "Ліміт Реселера",
+  "sharedError": "Помилка",
+  "sharedRequiredFields": "Відсутні обов'язкові поля"
 }

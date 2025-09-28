@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "බිල්පත් ඊමේල්",
   "resellerSupportEmail": "සහාය ඊමේල්",
-  "resellerLimit": "නැවත විකුණන්නා සීමාව"
+  "resellerLimit": "නැවත විකුණන්නා සීමාව",
+  "sharedError": "දෝෂය",
+  "sharedRequiredFields": "අවශ්‍ය ක්ෂේත්‍ර නැත"
 }

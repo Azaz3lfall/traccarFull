@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "ബില്ലിംഗ് ഇമെയിൽ",
   "resellerSupportEmail": "സപ്പോർട്ട് ഇമെയിൽ",
-  "resellerLimit": "പുനർവിൽപ്പനക്കാരന്റെ പരിധി"
+  "resellerLimit": "പുനർവിൽപ്പനക്കാരന്റെ പരിധി",
+  "sharedError": "പിശക്",
+  "sharedRequiredFields": "ആവശ്യമായ ഫീൽഡുകൾ കാണുന്നില്ല"
 }

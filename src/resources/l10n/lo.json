@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "ອີເມວໃບເກັບເງິນ",
   "resellerSupportEmail": "ອີເມວສະໜັບສະໜູນ",
-  "resellerLimit": "ຂີດຈຳກັດຜູ້ຂາຍຄືນ"
+  "resellerLimit": "ຂີດຈຳກັດຜູ້ຂາຍຄືນ",
+  "sharedError": "ຂໍ້ຜິດພາດ",
+  "sharedRequiredFields": "ຊ່ອງຂໍ້ມູນທີ່ຈຳເປັນຂາດຫາຍ"
 }

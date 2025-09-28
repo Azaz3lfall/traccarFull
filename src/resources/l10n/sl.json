@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "E-pošta za obračun",
   "resellerSupportEmail": "E-pošta za podporo",
-  "resellerLimit": "Omejitev Preprodajalca"
+  "resellerLimit": "Omejitev Preprodajalca",
+  "sharedError": "Napaka",
+  "sharedRequiredFields": "Manjkajo obvezna polja"
 }

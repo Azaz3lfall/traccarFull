@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "អ៊ីមែលចេញវិក្កយបត្រ",
   "resellerSupportEmail": "អ៊ីមែលជំនួយ",
-  "resellerLimit": "ដែនកំណត់អ្នកលក់ឡើងវិញ"
+  "resellerLimit": "ដែនកំណត់អ្នកលក់ឡើងវិញ",
+  "sharedError": "កំហុស",
+  "sharedRequiredFields": "វាលចាំបាច់បាត់"
 }

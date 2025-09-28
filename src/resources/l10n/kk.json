@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Есептеу электрондық поштасы",
   "resellerSupportEmail": "Қолдау электрондық поштасы",
-  "resellerLimit": "Қайта сатушы шегі"
+  "resellerLimit": "Қайта сатушы шегі",
+  "sharedError": "Қате",
+  "sharedRequiredFields": "Міндетті өрістер жоқ"
 }

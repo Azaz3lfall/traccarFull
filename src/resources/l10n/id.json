@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Email penagihan",
   "resellerSupportEmail": "Email dukungan",
-  "resellerLimit": "Batas Penjual Ulang"
+  "resellerLimit": "Batas Penjual Ulang",
+  "sharedError": "Kesalahan",
+  "sharedRequiredFields": "Bidang wajib tidak ada"
 }

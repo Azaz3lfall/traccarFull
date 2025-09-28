@@ -660,5 +660,7 @@
   "resellerWhatsapp": "واتساپ",
   "resellerBillingEmail": "ایمیل صورتحساب",
   "resellerSupportEmail": "ایمیل پشتیبانی",
-  "resellerLimit": "محدودیت فروشنده مجدد"
+  "resellerLimit": "محدودیت فروشنده مجدد",
+  "sharedError": "خطا",
+  "sharedRequiredFields": "فیلدهای اجباری موجود نیست"
 }

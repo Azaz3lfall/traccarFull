@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "E-mail facturare",
   "resellerSupportEmail": "E-mail suport",
-  "resellerLimit": "Limita Revânzător"
+  "resellerLimit": "Limita Revânzător",
+  "sharedError": "Eroare",
+  "sharedRequiredFields": "Câmpuri obligatorii lipsesc"
 }

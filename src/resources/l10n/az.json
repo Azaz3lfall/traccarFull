@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Faktura E-poçtu",
   "resellerSupportEmail": "Dəstək E-poçtu",
-  "resellerLimit": "Yenidən Satıcı Limiti"
+  "resellerLimit": "Yenidən Satıcı Limiti",
+  "sharedError": "Xəta",
+  "sharedRequiredFields": "Tələb olunan sahələr çatışmır"
 }

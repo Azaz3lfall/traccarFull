@@ -660,5 +660,7 @@
   "resellerWhatsapp": "واتساب",
   "resellerBillingEmail": "بريد الفواتير",
   "resellerSupportEmail": "بريد الدعم",
-  "resellerLimit": "حد الموزع"
+  "resellerLimit": "حد الموزع",
+  "sharedError": "خطأ",
+  "sharedRequiredFields": "الحقول المطلوبة مفقودة"
 }

@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Hasap e-poçta",
   "resellerSupportEmail": "Goldaw e-poçta",
-  "resellerLimit": "Gaýtadan satyjynyň çägi"
+  "resellerLimit": "Gaýtadan satyjynyň çägi",
+  "sharedError": "Ýalňyşlyk",
+  "sharedRequiredFields": "Hökmany meýdanlar ýok"
 }

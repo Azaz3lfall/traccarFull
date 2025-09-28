@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "ბილინგის ელ.ფოსტა",
   "resellerSupportEmail": "მხარდაჭერის ელ.ფოსტა",
-  "resellerLimit": "გადამყიდველის ლიმიტი"
+  "resellerLimit": "გადამყიდველის ლიმიტი",
+  "sharedError": "შეცდომა",
+  "sharedRequiredFields": "აუცილებელი ველები არ არის"
 }

@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "請求メール",
   "resellerSupportEmail": "サポートメール",
-  "resellerLimit": "再販業者制限"
+  "resellerLimit": "再販業者制限",
+  "sharedError": "エラー",
+  "sharedRequiredFields": "必須フィールドが不足しています"
 }

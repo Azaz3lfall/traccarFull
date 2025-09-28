@@ -209,6 +209,7 @@ const MainPage = () => {
     supportEmail: '',
     resellerLimit: ''
   });
+  const [resellerErrors, setResellerErrors] = useState([]);
   const [announcementData, setAnnouncementData] = useState({
     users: [],
     notificator: '',
@@ -466,8 +467,17 @@ const MainPage = () => {
         parentUser: user.name || '',
         parentEmail: user.email || ''
       }));
+      setResellerErrors([]); // Clear errors when drawer opens
     }
   }, [showResellerDrawer, user]);
+
+  // Clear errors when user starts typing
+  const handleResellerFieldChange = (field, value) => {
+    setResellerData(prev => ({ ...prev, [field]: value }));
+    if (resellerErrors.length > 0) {
+      setResellerErrors([]);
+    }
+  };
 
   // Fetch users data
   useEffectAsync(async () => {
@@ -4341,7 +4351,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.companyName}
-                  onChange={(e) => setResellerData({ ...resellerData, companyName: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('companyName', e.target.value)}
                   label={t('resellerCompanyName')}
                   required
                   sx={{
@@ -4361,7 +4371,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.logo}
-                  onChange={(e) => setResellerData({ ...resellerData, logo: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('logo', e.target.value)}
                   label={t('resellerLogotype')}
                   required
                   sx={{
@@ -4381,7 +4391,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.url}
-                  onChange={(e) => setResellerData({ ...resellerData, url: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('url', e.target.value)}
                   label={t('resellerAppUrl')}
                   required
                   sx={{
@@ -4401,7 +4411,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.whatsapp}
-                  onChange={(e) => setResellerData({ ...resellerData, whatsapp: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('whatsapp', e.target.value)}
                   label={t('resellerWhatsapp')}
                   required
                   sx={{
@@ -4421,7 +4431,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.billingEmail}
-                  onChange={(e) => setResellerData({ ...resellerData, billingEmail: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('billingEmail', e.target.value)}
                   label={t('resellerBillingEmail')}
                   type="email"
                   required
@@ -4442,7 +4452,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.supportEmail}
-                  onChange={(e) => setResellerData({ ...resellerData, supportEmail: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('supportEmail', e.target.value)}
                   label={t('resellerSupportEmail')}
                   type="email"
                   required
@@ -4463,7 +4473,7 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                   value={resellerData.resellerLimit}
-                  onChange={(e) => setResellerData({ ...resellerData, resellerLimit: e.target.value })}
+                  onChange={(e) => handleResellerFieldChange('resellerLimit', e.target.value)}
                   label={t('resellerLimit')}
                   type="number"
                   required
@@ -4481,6 +4491,26 @@ const MainPage = () => {
                     },
                   }}
                 />
+                
+                {/* Error Messages - Below Form Fields */}
+                {resellerErrors.length > 0 && (
+                  <div style={{
+                    padding: '16px',
+                    border: `2px solid #f44336`,
+                    borderRadius: '8px',
+                    backgroundColor: '#ffebee',
+                    marginTop: '16px'
+                  }}>
+                    <Typography variant="body2" style={{ color: '#d32f2f', fontWeight: '600', marginBottom: '8px' }}>
+                      {t('sharedError')}: {t('sharedRequiredFields')}
+                    </Typography>
+                    {resellerErrors.map((error, index) => (
+                      <Typography key={index} variant="body2" style={{ color: '#d32f2f', marginBottom: '4px' }}>
+                        • {error}
+                      </Typography>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Drawer Footer */}
@@ -4505,18 +4535,64 @@ const MainPage = () => {
                 <Button
                   variant="contained"
                   onClick={() => {
+                    const errors = [];
+                    
+                    // Validate required fields
+                    const requiredFields = [
+                      { key: 'companyName', label: t('resellerCompanyName') },
+                      { key: 'logo', label: t('resellerLogotype') },
+                      { key: 'url', label: t('resellerAppUrl') },
+                      { key: 'whatsapp', label: t('resellerWhatsapp') },
+                      { key: 'billingEmail', label: t('resellerBillingEmail') },
+                      { key: 'supportEmail', label: t('resellerSupportEmail') },
+                      { key: 'resellerLimit', label: t('resellerLimit') }
+                    ];
+
+                    requiredFields.forEach(field => {
+                      const value = resellerData[field.key];
+                      if (!value || (typeof value === 'string' && value.trim() === '')) {
+                        errors.push(field.label);
+                      }
+                    });
+
+                    // Validate email format
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (resellerData.billingEmail && !emailRegex.test(resellerData.billingEmail)) {
+                      errors.push(`${t('resellerBillingEmail')} has invalid format`);
+                    }
+                    if (resellerData.supportEmail && !emailRegex.test(resellerData.supportEmail)) {
+                      errors.push(`${t('resellerSupportEmail')} has invalid format`);
+                    }
+
+                    // Validate reseller limit is a positive number
+                    if (resellerData.resellerLimit) {
+                      const limit = parseInt(resellerData.resellerLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('resellerLimit')} must be a positive number`);
+                      }
+                    }
+
+                    // If there are errors, show them and stop
+                    if (errors.length > 0) {
+                      setResellerErrors(errors);
+                      return;
+                    }
+
+                    // Clear any previous errors
+                    setResellerErrors([]);
+
                     // Create JSON object with all reseller fields
                     const resellerJson = {
                       currentDomain: resellerData.currentDomain,
                       parentUserId: resellerData.parentUserId,
                       parentUser: resellerData.parentUser,
                       parentEmail: resellerData.parentEmail,
-                      companyName: resellerData.companyName,
-                      logotype: resellerData.logo,
-                      appUrl: resellerData.url,
-                      whatsapp: resellerData.whatsapp,
-                      billingEmail: resellerData.billingEmail,
-                      supportEmail: resellerData.supportEmail,
+                      companyName: resellerData.companyName.trim(),
+                      logotype: resellerData.logo.trim(),
+                      appUrl: resellerData.url.trim(),
+                      whatsapp: resellerData.whatsapp.trim(),
+                      billingEmail: resellerData.billingEmail.trim(),
+                      supportEmail: resellerData.supportEmail.trim(),
                       resellerLimit: parseInt(resellerData.resellerLimit) || 0,
                       timestamp: new Date().toISOString(),
                       createdBy: user?.name || 'Unknown',

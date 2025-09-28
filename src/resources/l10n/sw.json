@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Barua pepe ya malipo",
   "resellerSupportEmail": "Barua pepe ya msaada",
-  "resellerLimit": "Kikomo cha Mfanyabiashara"
+  "resellerLimit": "Kikomo cha Mfanyabiashara",
+  "sharedError": "Hitilafu",
+  "sharedRequiredFields": "Sehemu za lazima hazipo"
 }

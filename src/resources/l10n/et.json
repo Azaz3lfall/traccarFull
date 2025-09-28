@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Arvelduse e-post",
   "resellerSupportEmail": "Toe e-post",
-  "resellerLimit": "Edasimüüja Limiit"
+  "resellerLimit": "Edasimüüja Limiit",
+  "sharedError": "Viga",
+  "sharedRequiredFields": "Kohustuslikud väljad puuduvad"
 }

@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Email faturimi",
   "resellerSupportEmail": "Email mbështetje",
-  "resellerLimit": "Kufiri Rishitësit"
+  "resellerLimit": "Kufiri Rishitësit",
+  "sharedError": "Gabim",
+  "sharedRequiredFields": "Fushat e detyrueshme mungojnë"
 }

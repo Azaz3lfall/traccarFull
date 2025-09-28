@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "청구 이메일",
   "resellerSupportEmail": "지원 이메일",
-  "resellerLimit": "재판매업자 제한"
+  "resellerLimit": "재판매업자 제한",
+  "sharedError": "오류",
+  "sharedRequiredFields": "필수 필드가 누락되었습니다"
 }

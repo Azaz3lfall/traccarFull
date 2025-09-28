@@ -660,5 +660,7 @@
   "resellerWhatsapp": "WhatsApp",
   "resellerBillingEmail": "Sąskaitų el. paštas",
   "resellerSupportEmail": "Palaikymo el. paštas",
-  "resellerLimit": "Perpardavėjo Limitas"
+  "resellerLimit": "Perpardavėjo Limitas",
+  "sharedError": "Klaida",
+  "sharedRequiredFields": "Trūksta privalomų laukų"
 }
