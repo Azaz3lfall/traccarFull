@@ -578,6 +578,21 @@ const FloatingDeviceList = ({
                 e.target.style.borderColor = colors.border;
               }}
             />
+            {/* Device count */}
+            <div style={{
+              position: 'absolute',
+              right: '50px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '12px',
+              color: colors.textSecondary,
+              backgroundColor: colors.surface,
+              padding: '2px 6px',
+              borderRadius: '4px',
+              border: `1px solid ${colors.border}`
+            }}>
+              {filteredDevices.length}
+            </div>
             <button
               ref={filterButtonRef}
               type="button"

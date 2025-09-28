@@ -428,25 +428,38 @@ const FloatingDevicesPopover = ({
 
             {/* Search */}
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${colors.border}` }}>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder={t('sharedSearchDevices')}
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
-                }}
-                style={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: colors.secondary,
-                    '& fieldset': { borderColor: colors.border },
-                    '&:hover fieldset': { borderColor: colors.primary },
-                    '&.Mui-focused fieldset': { borderColor: colors.primary },
-                  }
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder={t('sharedSearchDevices')}
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  InputProps={{
+                    startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
+                  }}
+                  style={{
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    }
+                  }}
+                />
+                <div style={{
+                  fontSize: '12px',
+                  color: '#ff0000',
+                  marginTop: '8px',
+                  textAlign: 'right',
+                  backgroundColor: '#ffff00',
+                  padding: '4px',
+                  border: '2px solid #000000'
+                }}>
+                  DEBUG: {filteredDevices ? filteredDevices.length : 'NO FILTERED DEVICES'}
+                </div>
+              </div>
             </div>
 
             {/* Content */}
