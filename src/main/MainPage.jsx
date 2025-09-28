@@ -4562,7 +4562,7 @@ const MainPage = () => {
                   fullWidth
                   value={resellerData.deviceLimit}
                   onChange={(e) => handleResellerFieldChange('deviceLimit', e.target.value)}
-                  label={t('deviceLimit')}
+                  label={t('userDeviceLimit')}
                   type="number"
                   required
                   inputProps={{ min: 1 }}
@@ -4584,7 +4584,7 @@ const MainPage = () => {
                   fullWidth
                   value={resellerData.userLimit}
                   onChange={(e) => handleResellerFieldChange('userLimit', e.target.value)}
-                  label={t('userLimit')}
+                  label={t('userUserLimit')}
                   type="number"
                   required
                   inputProps={{ min: 1 }}
@@ -4659,8 +4659,8 @@ const MainPage = () => {
                       { key: 'billingEmail', label: t('resellerBillingEmail') },
                       { key: 'supportEmail', label: t('resellerSupportEmail') },
                       { key: 'resellerLimit', label: t('resellerLimit') },
-                      { key: 'deviceLimit', label: t('deviceLimit') },
-                      { key: 'userLimit', label: t('userLimit') }
+                      { key: 'deviceLimit', label: t('userDeviceLimit') },
+                      { key: 'userLimit', label: t('userUserLimit') }
                     ];
 
                     requiredFields.forEach(field => {
@@ -4692,13 +4692,13 @@ const MainPage = () => {
                     if (resellerData.deviceLimit) {
                       const limit = parseInt(resellerData.deviceLimit);
                       if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('deviceLimit')} must be a positive number`);
+                        errors.push(`${t('userDeviceLimit')} must be a positive number`);
                       }
                     }
                     if (resellerData.userLimit) {
                       const limit = parseInt(resellerData.userLimit);
                       if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('userLimit')} must be a positive number`);
+                        errors.push(`${t('userUserLimit')} must be a positive number`);
                       }
                     }
 
