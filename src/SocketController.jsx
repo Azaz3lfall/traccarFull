@@ -3,13 +3,12 @@ import {
 } from 'react';
 import { useDispatch, useSelector, connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Snackbar, Alert } from '@mui/material';
 import { devicesActions, sessionActions } from './store';
 import { useCatchCallback, useEffectAsync } from './reactHelper';
-import { snackBarDurationLongMs } from './common/util/duration';
 import alarm from './resources/alarm.mp3';
 import { eventsActions } from './store/events';
 import useFeatures from './common/util/useFeatures';
+import CustomNotificationStack from './components/CustomNotificationStack';
 import { useAttributePreference } from './common/util/preferences';
 import { handleNativeNotificationListeners, nativePostMessage } from './common/components/NativeInterface';
 import fetchOrThrow from './common/util/fetchOrThrow';
@@ -42,7 +41,10 @@ const SocketController = () => {
     }
     setNotifications(events.map((event) => ({
       id: event.id,
-      message: event.attributes.message,
+      deviceId: event.deviceId,
+      type: event.type,
+      attributes: event.attributes,
+      eventTime: event.eventTime,
       show: true,
     })));
   }, [features, dispatch, soundEvents, soundAlarms]);
@@ -159,25 +161,15 @@ const SocketController = () => {
     };
   }, [authenticated]);
 
+  const handleRemoveNotification = (id) => {
+    setNotifications(notifications.filter((e) => e.id !== id));
+  };
+
   return (
-    <>
-      {notifications.map((notification) => (
-        <Snackbar
-          key={notification.id}
-          open={notification.show}
-          autoHideDuration={snackBarDurationLongMs}
-          onClose={() => setNotifications(notifications.filter((e) => e.id !== notification.id))}
-        >
-          <Alert
-            onClose={() => setNotifications(notifications.filter((e) => e.id !== notification.id))}
-            severity="info"
-            variant="filled"
-          >
-            {notification.message}
-          </Alert>
-        </Snackbar>
-      ))}
-    </>
+    <CustomNotificationStack 
+      notifications={notifications}
+      onRemove={handleRemoveNotification}
+    />
   );
 };
 
