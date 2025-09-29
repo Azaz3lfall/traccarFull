@@ -2091,7 +2091,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Server Settings */}
-          {manager && admin && (
+          {admin && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2227,7 +2227,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Reseller Management */}
-          {manager && (
+          {admin && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -6543,7 +6543,7 @@ const MainPage = () => {
                   )}
 
                   {/* Reseller Management */}
-                  {manager && (
+                  {admin && (
                     <button
                       onClick={() => {
                         setShowResellerDrawer(true);
