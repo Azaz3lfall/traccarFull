@@ -131,42 +131,46 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const createClusterSvg = (isDarkMode = false, digitCount = 1) => {
     const backgroundColor = isDarkMode ? '#2d2d2d' : 'white';
-    const borderColor = isDarkMode ? '#404040' : 'black';
+    const borderColor = isDarkMode ? '#404040' : '#999999'; // Light gray border for light theme
+    const ringColor = isDarkMode ? '#404040' : '#cccccc'; // Light gray for light theme
     
-    // Base size is 50px, custom sizing per digit count
+    // Base size is 80px, custom sizing per digit count
     let size;
     switch (digitCount) {
-      case 1: size = 50 + 5; break;   // 55px
-      case 2: size = 50 + 10; break;  // 60px
-      case 3: size = 50 + 30; break;  // 80px
-      case 4: size = 50 + 35; break;  // 85px
-      case 5: size = 50 + 40; break;  // 90px
-      default: size = 50 + 40; break; // 90px for 5+ digits
+      case 1: size = 80 + 10; break;  // 90px
+      case 2: size = 80 + 20; break;  // 100px
+      case 3: size = 80 + 30; break;  // 110px
+      case 4: size = 80 + 40; break;  // 120px
+      case 5: size = 80 + 50; break;  // 130px
+      default: size = 80 + 50; break; // 130px for 5+ digits
     }
     const center = size / 2;
     const radius = center - 3; // 3px padding from edge
     
     const svgString = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background circle -->
       <circle cx="${center}" cy="${center}" r="${radius}" 
               fill="${backgroundColor}" 
-              stroke="${borderColor}" 
-              stroke-width="2"
+              stroke="none"
               filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/>
-      <circle cx="${center}" cy="${center}" r="${radius - 2}" 
+      
+      <!-- Outer ring (theme-aware) -->
+      <circle cx="${center}" cy="${center}" r="${radius}" 
               fill="none" 
-              stroke="${borderColor}" 
-              stroke-width="1"
-              opacity="0.3"/>
-      <circle cx="${center}" cy="${center}" r="${radius - 4}" 
+              stroke="${ringColor}" 
+              stroke-width="6"/>
+      
+      <!-- Inner ring (theme-aware) -->
+      <circle cx="${center}" cy="${center}" r="${radius - 8}" 
               fill="none" 
+              stroke="${ringColor}" 
+              stroke-width="4"/>
+      
+      <!-- Center circle (theme background color) -->
+      <circle cx="${center}" cy="${center}" r="${radius - 12}" 
+              fill="${backgroundColor}" 
               stroke="${borderColor}" 
-              stroke-width="1"
-              opacity="0.2"/>
-      <circle cx="${center}" cy="${center}" r="${radius - 6}" 
-              fill="none" 
-              stroke="${borderColor}" 
-              stroke-width="1"
-              opacity="0.1"/>
+              stroke-width="3"/>
     </svg>`;
     
     const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -250,7 +254,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           "icon-rotate": ["get", "rotation"],
         },
         paint: {
-          'text-color': theme.palette.mode === 'dark' ? 'white' : 'black',
+          'text-color': theme.palette.mode === 'dark' ? 'white' : theme.palette.text.primary,
           'text-halo-color': theme.palette.mode === 'dark' ? '#2d2d2d' : 'white',
           'text-halo-width': 1,
         },
@@ -328,7 +332,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         'text-size': 14,
       },
       paint: {
-        'text-color': theme.palette.mode === 'dark' ? 'white' : 'black',
+        'text-color': theme.palette.mode === 'dark' ? 'white' : theme.palette.text.primary,
         'text-halo-color': theme.palette.mode === 'dark' ? '#2d2d2d' : 'white',
         'text-halo-width': 1,
       },
