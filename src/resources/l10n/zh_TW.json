@@ -671,5 +671,7 @@
   "resellerPanel": "經銷商面板",
   "calendarByTimeRange": "按時間範圍",
   "calendarStartTime": "開始時間",
-  "calendarEndTime": "結束時間"
+  "calendarEndTime": "結束時間",
+  "calendarPeriod1": "期間 1",
+  "calendarPeriod2": "期間 2"
 }

@@ -671,5 +671,7 @@
   "resellerPanel": "रीसेलर पैनल",
   "calendarByTimeRange": "समय सीमा के अनुसार",
   "calendarStartTime": "प्रारंभ समय",
-  "calendarEndTime": "समाप्ति समय"
+  "calendarEndTime": "समाप्ति समय",
+  "calendarPeriod1": "अवधि 1",
+  "calendarPeriod2": "अवधि 2"
 }

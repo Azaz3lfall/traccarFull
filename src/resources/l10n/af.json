@@ -671,5 +671,7 @@
   "resellerPanel": "Herverkoper Paneel",
   "calendarByTimeRange": "Deur tydreeks",
   "calendarStartTime": "Begintyd",
-  "calendarEndTime": "Eindtyd"
+  "calendarEndTime": "Eindtyd",
+  "calendarPeriod1": "Periode 1",
+  "calendarPeriod2": "Periode 2"
 }

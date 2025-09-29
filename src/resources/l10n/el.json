@@ -671,5 +671,7 @@
   "resellerPanel": "Πίνακας Επανπωλητή",
   "calendarByTimeRange": "Κατά χρονικό εύρος",
   "calendarStartTime": "Ώρα έναρξης",
-  "calendarEndTime": "Ώρα λήξης"
+  "calendarEndTime": "Ώρα λήξης",
+  "calendarPeriod1": "Περίοδος 1",
+  "calendarPeriod2": "Περίοδος 2"
 }

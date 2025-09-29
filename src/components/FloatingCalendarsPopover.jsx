@@ -63,8 +63,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [timeRanges, setTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
-      { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+      { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
     ]
   });
 
@@ -305,8 +305,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     setTimeRanges({
       enabled: false,
       periods: [
-        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
       ]
     });
     
@@ -387,7 +387,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
               `DTSTART;${formatCalendarTime(periodStart)}`,
               `DTEND;${formatCalendarTime(periodEnd)}`,
               formatRule(rule),
-              `SUMMARY:${period.name || `Period ${index + 1}`}`,
+              `SUMMARY:${period.name || t(`calendarPeriod${index + 1}`)}`,
               'END:VEVENT'
             );
           }
@@ -454,12 +454,12 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       enabled: events.length > 1,
       periods: events.length > 0 ? events.map((event, index) => ({
         enabled: true,
-        name: event.name || `Period ${index + 1}`,
+        name: event.name || t(`calendarPeriod${index + 1}`),
         startTime: event.startTime || '08:00',
         endTime: event.endTime || '12:00'
       })) : [
-        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
       ]
     };
   };
@@ -472,8 +472,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     const defaultTimeRanges = {
       enabled: false,
       periods: [
-        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
       ]
     };
     
@@ -1417,7 +1417,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                     }}
                                   />
                                 }
-                                label="By timerange"
+                                label={t('calendarByTimeRange')}
                                 sx={{ 
                                   width: '100%',
                                   marginBottom: 1,

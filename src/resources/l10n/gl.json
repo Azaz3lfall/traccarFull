@@ -671,5 +671,7 @@
   "resellerPanel": "Panel Revendedor",
   "calendarByTimeRange": "Por rango de tempo",
   "calendarStartTime": "Hora de inicio",
-  "calendarEndTime": "Hora de finalización"
+  "calendarEndTime": "Hora de finalización",
+  "calendarPeriod1": "Período 1",
+  "calendarPeriod2": "Período 2"
 }

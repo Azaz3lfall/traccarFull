@@ -671,5 +671,7 @@
   "resellerPanel": "לוח מוכר",
   "calendarByTimeRange": "לפי טווח זמן",
   "calendarStartTime": "שעת התחלה",
-  "calendarEndTime": "שעת סיום"
+  "calendarEndTime": "שעת סיום",
+  "calendarPeriod1": "תקופה 1",
+  "calendarPeriod2": "תקופה 2"
 }

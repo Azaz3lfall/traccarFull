@@ -671,5 +671,7 @@
   "resellerPanel": "پنل فروشنده",
   "calendarByTimeRange": "بر اساس محدوده زمانی",
   "calendarStartTime": "زمان شروع",
-  "calendarEndTime": "زمان پایان"
+  "calendarEndTime": "زمان پایان",
+  "calendarPeriod1": "دوره 1",
+  "calendarPeriod2": "دوره 2"
 }

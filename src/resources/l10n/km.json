@@ -671,5 +671,7 @@
   "resellerPanel": "បន្ទះអ្នកលក់ឡើងវិញ",
   "calendarByTimeRange": "តាមជួរពេលវេលា",
   "calendarStartTime": "ពេលវេលាចាប់ផ្តើម",
-  "calendarEndTime": "ពេលវេលាបញ្ចប់"
+  "calendarEndTime": "ពេលវេលាបញ្ចប់",
+  "calendarPeriod1": "រយៈពេល 1",
+  "calendarPeriod2": "រយៈពេល 2"
 }

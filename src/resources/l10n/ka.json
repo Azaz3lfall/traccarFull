@@ -671,5 +671,7 @@
   "resellerPanel": "გადამყიდველის პანელი",
   "calendarByTimeRange": "დროის დიაპაზონით",
   "calendarStartTime": "დაწყების დრო",
-  "calendarEndTime": "დასრულების დრო"
+  "calendarEndTime": "დასრულების დრო",
+  "calendarPeriod1": "პერიოდი 1",
+  "calendarPeriod2": "პერიოდი 2"
 }

@@ -671,5 +671,7 @@
   "resellerPanel": "Wederverkoper Paneel",
   "calendarByTimeRange": "Op tijdbereik",
   "calendarStartTime": "Starttijd",
-  "calendarEndTime": "Eindtijd"
+  "calendarEndTime": "Eindtijd",
+  "calendarPeriod1": "Periode 1",
+  "calendarPeriod2": "Periode 2"
 }

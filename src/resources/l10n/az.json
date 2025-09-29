@@ -671,5 +671,7 @@
   "resellerPanel": "Yenidən Satıcı Paneli",
   "calendarByTimeRange": "Vaxt aralığına görə",
   "calendarStartTime": "Başlama vaxtı",
-  "calendarEndTime": "Bitmə vaxtı"
+  "calendarEndTime": "Bitmə vaxtı",
+  "calendarPeriod1": "Dövr 1",
+  "calendarPeriod2": "Dövr 2"
 }

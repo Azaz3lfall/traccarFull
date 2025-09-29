@@ -671,5 +671,7 @@
   "resellerPanel": "Панел Препродавач",
   "calendarByTimeRange": "По времеви диапазон",
   "calendarStartTime": "Начално време",
-  "calendarEndTime": "Крайно време"
+  "calendarEndTime": "Крайно време",
+  "calendarPeriod1": "Период 1",
+  "calendarPeriod2": "Период 2"
 }

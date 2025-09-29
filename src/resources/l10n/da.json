@@ -671,5 +671,7 @@
   "resellerPanel": "Forhandler Panel",
   "calendarByTimeRange": "Efter tidsinterval",
   "calendarStartTime": "Starttid",
-  "calendarEndTime": "Sluttid"
+  "calendarEndTime": "Sluttid",
+  "calendarPeriod1": "Periode 1",
+  "calendarPeriod2": "Periode 2"
 }

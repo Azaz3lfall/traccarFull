@@ -671,5 +671,7 @@
   "resellerPanel": "لوحة الموزع",
   "calendarByTimeRange": "حسب النطاق الزمني",
   "calendarStartTime": "وقت البداية",
-  "calendarEndTime": "وقت النهاية"
+  "calendarEndTime": "وقت النهاية",
+  "calendarPeriod1": "الفترة 1",
+  "calendarPeriod2": "الفترة 2"
 }

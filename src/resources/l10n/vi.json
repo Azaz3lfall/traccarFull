@@ -671,5 +671,7 @@
   "resellerPanel": "Bảng điều khiển Đại lý",
   "calendarByTimeRange": "Theo khoảng thời gian",
   "calendarStartTime": "Thời gian bắt đầu",
-  "calendarEndTime": "Thời gian kết thúc"
+  "calendarEndTime": "Thời gian kết thúc",
+  "calendarPeriod1": "Giai đoạn 1",
+  "calendarPeriod2": "Giai đoạn 2"
 }

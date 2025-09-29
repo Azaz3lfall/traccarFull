@@ -671,5 +671,7 @@
   "resellerPanel": "Dyn Satyjy paneli",
   "calendarByTimeRange": "Wagt aralygy boýunça",
   "calendarStartTime": "Başlanma wagty",
-  "calendarEndTime": "Gutarýan wagty"
+  "calendarEndTime": "Gutarýan wagty",
+  "calendarPeriod1": "Döwür 1",
+  "calendarPeriod2": "Döwür 2"
 }

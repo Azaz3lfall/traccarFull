@@ -671,5 +671,7 @@
   "resellerPanel": "Paneli Rishitësit",
   "calendarByTimeRange": "Sipas intervalit kohor",
   "calendarStartTime": "Koha e fillimit",
-  "calendarEndTime": "Koha e mbarimit"
+  "calendarEndTime": "Koha e mbarimit",
+  "calendarPeriod1": "Periudha 1",
+  "calendarPeriod2": "Periudha 2"
 }

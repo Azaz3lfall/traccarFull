@@ -671,5 +671,7 @@
   "resellerPanel": "पुनर्विक्रेता प्यानल",
   "calendarByTimeRange": "समय सीमा अनुसार",
   "calendarStartTime": "सुरुको समय",
-  "calendarEndTime": "अन्त्यको समय"
+  "calendarEndTime": "अन्त्यको समय",
+  "calendarPeriod1": "अवधि 1",
+  "calendarPeriod2": "अवधि 2"
 }

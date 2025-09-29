@@ -671,5 +671,7 @@
   "resellerPanel": "Дахин худалдагчийн самбар",
   "calendarByTimeRange": "Цагийн хүрээний дагуу",
   "calendarStartTime": "Эхлэх цаг",
-  "calendarEndTime": "Дуусах цаг"
+  "calendarEndTime": "Дуусах цаг",
+  "calendarPeriod1": "Хугацаа 1",
+  "calendarPeriod2": "Хугацаа 2"
 }

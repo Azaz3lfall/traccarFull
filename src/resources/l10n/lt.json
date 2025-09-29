@@ -671,5 +671,7 @@
   "resellerPanel": "Perpardavėjo Panele",
   "calendarByTimeRange": "Pagal laiko intervalą",
   "calendarStartTime": "Pradžios laikas",
-  "calendarEndTime": "Pabaigos laikas"
+  "calendarEndTime": "Pabaigos laikas",
+  "calendarPeriod1": "Laikotarpis 1",
+  "calendarPeriod2": "Laikotarpis 2"
 }

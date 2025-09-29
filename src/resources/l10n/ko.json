@@ -671,5 +671,7 @@
   "resellerPanel": "리셀러 패널",
   "calendarByTimeRange": "시간 범위별",
   "calendarStartTime": "시작 시간",
-  "calendarEndTime": "종료 시간"
+  "calendarEndTime": "종료 시간",
+  "calendarPeriod1": "기간 1",
+  "calendarPeriod2": "기간 2"
 }

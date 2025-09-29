@@ -671,5 +671,7 @@
   "resellerPanel": "Қайта сатушы панелі",
   "calendarByTimeRange": "Уақыт диапазоны бойынша",
   "calendarStartTime": "Басталу уақыты",
-  "calendarEndTime": "Аяқталу уақыты"
+  "calendarEndTime": "Аяқталу уақыты",
+  "calendarPeriod1": "Кезең 1",
+  "calendarPeriod2": "Кезең 2"
 }

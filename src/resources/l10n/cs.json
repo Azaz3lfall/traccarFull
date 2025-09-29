@@ -671,5 +671,7 @@
   "resellerPanel": "Panel Prodejce",
   "calendarByTimeRange": "Podle časového rozsahu",
   "calendarStartTime": "Čas začátku",
-  "calendarEndTime": "Čas konce"
+  "calendarEndTime": "Čas konce",
+  "calendarPeriod1": "Období 1",
+  "calendarPeriod2": "Období 2"
 }

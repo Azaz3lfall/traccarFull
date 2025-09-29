@@ -671,5 +671,7 @@
   "resellerPanel": "经销商面板",
   "calendarByTimeRange": "按时间范围",
   "calendarStartTime": "开始时间",
-  "calendarEndTime": "结束时间"
+  "calendarEndTime": "结束时间",
+  "calendarPeriod1": "期间 1",
+  "calendarPeriod2": "期间 2"
 }

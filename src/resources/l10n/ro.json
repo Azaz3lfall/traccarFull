@@ -671,5 +671,7 @@
   "resellerPanel": "Panou Revânzător",
   "calendarByTimeRange": "După interval de timp",
   "calendarStartTime": "Ora de început",
-  "calendarEndTime": "Ora de sfârșit"
+  "calendarEndTime": "Ora de sfârșit",
+  "calendarPeriod1": "Perioada 1",
+  "calendarPeriod2": "Perioada 2"
 }

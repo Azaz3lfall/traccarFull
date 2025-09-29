@@ -671,5 +671,7 @@
   "resellerPanel": "Bayi Paneli",
   "calendarByTimeRange": "Zaman aralığına göre",
   "calendarStartTime": "Başlangıç zamanı",
-  "calendarEndTime": "Bitiş zamanı"
+  "calendarEndTime": "Bitiş zamanı",
+  "calendarPeriod1": "Dönem 1",
+  "calendarPeriod2": "Dönem 2"
 }

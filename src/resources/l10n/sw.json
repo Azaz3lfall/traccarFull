@@ -671,5 +671,7 @@
   "resellerPanel": "Paneli ya Mfanyabiashara",
   "calendarByTimeRange": "Kulingana na masafa ya muda",
   "calendarStartTime": "Muda wa kuanza",
-  "calendarEndTime": "Muda wa mwisho"
+  "calendarEndTime": "Muda wa mwisho",
+  "calendarPeriod1": "Kipindi 1",
+  "calendarPeriod2": "Kipindi 2"
 }

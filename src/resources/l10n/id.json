@@ -671,5 +671,7 @@
   "resellerPanel": "Panel Penjual Ulang",
   "calendarByTimeRange": "Berdasarkan rentang waktu",
   "calendarStartTime": "Waktu mulai",
-  "calendarEndTime": "Waktu selesai"
+  "calendarEndTime": "Waktu selesai",
+  "calendarPeriod1": "Periode 1",
+  "calendarPeriod2": "Periode 2"
 }

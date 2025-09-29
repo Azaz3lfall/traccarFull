@@ -671,5 +671,7 @@
   "resellerPanel": "Wiederverkäufer Panel",
   "calendarByTimeRange": "Nach Zeitbereich",
   "calendarStartTime": "Startzeit",
-  "calendarEndTime": "Endzeit"
+  "calendarEndTime": "Endzeit",
+  "calendarPeriod1": "Zeitraum 1",
+  "calendarPeriod2": "Zeitraum 2"
 }

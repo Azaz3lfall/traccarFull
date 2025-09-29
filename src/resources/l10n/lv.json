@@ -671,5 +671,7 @@
   "resellerPanel": "Pārdevēja Panelis",
   "calendarByTimeRange": "Pēc laika diapazona",
   "calendarStartTime": "Sākuma laiks",
-  "calendarEndTime": "Beigu laiks"
+  "calendarEndTime": "Beigu laiks",
+  "calendarPeriod1": "Periods 1",
+  "calendarPeriod2": "Periods 2"
 }

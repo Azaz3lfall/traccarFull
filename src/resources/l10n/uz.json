@@ -671,5 +671,7 @@
   "resellerPanel": "Qayta Sotuvchi paneli",
   "calendarByTimeRange": "Vaqt oralig'i bo'yicha",
   "calendarStartTime": "Boshlanish vaqti",
-  "calendarEndTime": "Tugash vaqti"
+  "calendarEndTime": "Tugash vaqti",
+  "calendarPeriod1": "Davr 1",
+  "calendarPeriod2": "Davr 2"
 }

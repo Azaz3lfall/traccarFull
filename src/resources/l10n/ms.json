@@ -671,5 +671,7 @@
   "resellerPanel": "Panel Penjual Semula",
   "calendarByTimeRange": "Mengikut julat masa",
   "calendarStartTime": "Masa mula",
-  "calendarEndTime": "Masa tamat"
+  "calendarEndTime": "Masa tamat",
+  "calendarPeriod1": "Tempoh 1",
+  "calendarPeriod2": "Tempoh 2"
 }

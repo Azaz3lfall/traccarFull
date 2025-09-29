@@ -671,5 +671,7 @@
   "resellerPanel": "Viszonteladó Panel",
   "calendarByTimeRange": "Időtartam szerint",
   "calendarStartTime": "Kezdési idő",
-  "calendarEndTime": "Befejezési idő"
+  "calendarEndTime": "Befejezési idő",
+  "calendarPeriod1": "Időszak 1",
+  "calendarPeriod2": "Időszak 2"
 }

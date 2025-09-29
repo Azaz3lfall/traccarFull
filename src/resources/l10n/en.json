@@ -671,5 +671,7 @@
   "sharedRequiredFields": "Required fields missing",
   "calendarByTimeRange": "By timerange",
   "calendarStartTime": "Start Time",
-  "calendarEndTime": "End Time"
+  "calendarEndTime": "End Time",
+  "calendarPeriod1": "Period 1",
+  "calendarPeriod2": "Period 2"
 }

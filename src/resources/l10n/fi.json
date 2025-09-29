@@ -671,5 +671,7 @@
   "resellerPanel": "Uudelleenmyyjä Paneeli",
   "calendarByTimeRange": "Aikavälin mukaan",
   "calendarStartTime": "Aloitusaika",
-  "calendarEndTime": "Lopetusaika"
+  "calendarEndTime": "Lopetusaika",
+  "calendarPeriod1": "Jakso 1",
+  "calendarPeriod2": "Jakso 2"
 }

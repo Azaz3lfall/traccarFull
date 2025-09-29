@@ -671,5 +671,7 @@
   "resellerPanel": "Панель Реселера",
   "calendarByTimeRange": "За часовим діапазоном",
   "calendarStartTime": "Час початку",
-  "calendarEndTime": "Час закінчення"
+  "calendarEndTime": "Час закінчення",
+  "calendarPeriod1": "Період 1",
+  "calendarPeriod2": "Період 2"
 }

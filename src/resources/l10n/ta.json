@@ -671,5 +671,7 @@
   "resellerPanel": "மறுவிற்பனையாளர் பேனல்",
   "calendarByTimeRange": "நேர வரம்பு படி",
   "calendarStartTime": "தொடக்க நேரம்",
-  "calendarEndTime": "முடிவு நேரம்"
+  "calendarEndTime": "முடிவு நேரம்",
+  "calendarPeriod1": "காலம் 1",
+  "calendarPeriod2": "காலம் 2"
 }

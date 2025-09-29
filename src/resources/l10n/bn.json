@@ -671,5 +671,7 @@
   "resellerPanel": "রিসেলার প্যানেল",
   "calendarByTimeRange": "সময়ের পরিসর অনুযায়ী",
   "calendarStartTime": "শুরুর সময়",
-  "calendarEndTime": "শেষের সময়"
+  "calendarEndTime": "শেষের সময়",
+  "calendarPeriod1": "পিরিয়ড 1",
+  "calendarPeriod2": "পিরিয়ড 2"
 }

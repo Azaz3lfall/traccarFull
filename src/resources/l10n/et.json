@@ -671,5 +671,7 @@
   "resellerPanel": "Edasimüüja Paneel",
   "calendarByTimeRange": "Ajavahemiku järgi",
   "calendarStartTime": "Algusaeg",
-  "calendarEndTime": "Lõpuaeg"
+  "calendarEndTime": "Lõpuaeg",
+  "calendarPeriod1": "Periood 1",
+  "calendarPeriod2": "Periood 2"
 }

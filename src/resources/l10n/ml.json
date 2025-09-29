@@ -671,5 +671,7 @@
   "resellerPanel": "റീസെല്ലർ പാനൽ",
   "calendarByTimeRange": "സമയ ശ്രേണി അനുസരിച്ച്",
   "calendarStartTime": "ആരംഭ സമയം",
-  "calendarEndTime": "അവസാന സമയം"
+  "calendarEndTime": "അവസാന സമയം",
+  "calendarPeriod1": "കാലയളവ് 1",
+  "calendarPeriod2": "കാലയളവ് 2"
 }
