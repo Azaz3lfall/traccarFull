@@ -129,11 +129,71 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     return svgUrl;
   };
 
+  const createClusterSvg = (isDarkMode = false, digitCount = 1) => {
+    const backgroundColor = isDarkMode ? '#2d2d2d' : 'white';
+    const borderColor = isDarkMode ? '#404040' : 'black';
+    
+    // Base size is 50px, custom sizing per digit count
+    let size;
+    switch (digitCount) {
+      case 1: size = 50 + 5; break;   // 55px
+      case 2: size = 50 + 10; break;  // 60px
+      case 3: size = 50 + 30; break;  // 80px
+      case 4: size = 50 + 35; break;  // 85px
+      case 5: size = 50 + 40; break;  // 90px
+      default: size = 50 + 40; break; // 90px for 5+ digits
+    }
+    const center = size / 2;
+    const radius = center - 3; // 3px padding from edge
+    
+    const svgString = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${center}" cy="${center}" r="${radius}" 
+              fill="${backgroundColor}" 
+              stroke="${borderColor}" 
+              stroke-width="2"
+              filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/>
+      <circle cx="${center}" cy="${center}" r="${radius - 2}" 
+              fill="none" 
+              stroke="${borderColor}" 
+              stroke-width="1"
+              opacity="0.3"/>
+      <circle cx="${center}" cy="${center}" r="${radius - 4}" 
+              fill="none" 
+              stroke="${borderColor}" 
+              stroke-width="1"
+              opacity="0.2"/>
+      <circle cx="${center}" cy="${center}" r="${radius - 6}" 
+              fill="none" 
+              stroke="${borderColor}" 
+              stroke-width="1"
+              opacity="0.1"/>
+    </svg>`;
+    
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    return svgUrl;
+  };
+
   const loadDynamicSvg = async (width) => {
     const isDarkMode = theme.palette.mode === 'dark';
     const imageId = `device-name-bg-${width}-${isDarkMode ? 'dark' : 'light'}`;
     if (!map.hasImage(imageId)) {
       const svgUrl = createDynamicSvg(width, 21, isDarkMode);
+      const img = new Image();
+      img.onload = () => {
+        map.addImage(imageId, img);
+        URL.revokeObjectURL(svgUrl);
+      };
+      img.src = svgUrl;
+    }
+    return imageId;
+  };
+
+  const loadClusterSvg = async (digitCount = 1) => {
+    const isDarkMode = theme.palette.mode === 'dark';
+    const imageId = `cluster-bg-${digitCount}-${isDarkMode ? 'dark' : 'light'}`;
+    if (!map.hasImage(imageId)) {
+      const svgUrl = createClusterSvg(isDarkMode, digitCount);
       const img = new Image();
       img.onload = () => {
         map.addImage(imageId, img);
@@ -248,11 +308,29 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       source: id,
       filter: ['has', 'point_count'],
       layout: {
-        'icon-image': 'background',
+        'icon-image': [
+          'concat',
+          'cluster-bg-',
+          [
+            'case',
+            ['<', ['get', 'point_count'], 10], '1',
+            ['<', ['get', 'point_count'], 100], '2',
+            ['<', ['get', 'point_count'], 1000], '3',
+            ['<', ['get', 'point_count'], 10000], '4',
+            '5'
+          ],
+          '-',
+          theme.palette.mode === 'dark' ? 'dark' : 'light'
+        ],
         'icon-size': iconScale,
         'text-field': '{point_count_abbreviated}',
         'text-font': findFonts(map),
         'text-size': 14,
+      },
+      paint: {
+        'text-color': theme.palette.mode === 'dark' ? 'white' : 'black',
+        'text-halo-color': theme.palette.mode === 'dark' ? '#2d2d2d' : 'white',
+        'text-halo-width': 1,
       },
     });
 
@@ -325,6 +403,9 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       // Load dynamic SVGs for all unique widths
       const uniqueWidths = [...new Set(features.concat(selectedFeatures).map(f => f.properties.svgWidth))];
       await Promise.all(uniqueWidths.map(width => loadDynamicSvg(width)));
+      
+      // Load cluster SVGs for all digit counts (1-5)
+      await Promise.all([1, 2, 3, 4, 5].map(digitCount => loadClusterSvg(digitCount)));
 
       map.getSource(id)?.setData({
         type: 'FeatureCollection',
