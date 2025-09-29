@@ -76,12 +76,7 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
     const address = position?.address || null;
     
     // Debug logging
-    console.log('Address debug:', {
-      deviceId: event.deviceId,
-      position: position,
-      address: address,
-      positions: positions
-    });
+
     
     return address;
   };

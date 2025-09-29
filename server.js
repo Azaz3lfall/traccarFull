@@ -77,14 +77,11 @@ const server = http.createServer((req, res) => {
   }
 
   // Check if file exists
-  console.log(`Requesting: ${pathname}, Full path: ${filePath}`);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.log(`File not found: ${filePath}, serving index.html`);
       // File doesn't exist, serve index.html for SPA routing
       serveIndexHtml(res);
     } else {
-      console.log(`File found: ${filePath}, serving file`);
       // File exists, serve it
       serveFile(filePath, res);
     }
@@ -92,21 +89,15 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Serving files from: ${BUILD_DIR}`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
   server.close(() => {
-    console.log('Process terminated');
   });
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
   server.close(() => {
-    console.log('Process terminated');
   });
 });

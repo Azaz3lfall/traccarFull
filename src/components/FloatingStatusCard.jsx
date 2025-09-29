@@ -622,8 +622,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Get the map canvas
       const canvas = map.getCanvas();
-      console.log('Canvas found:', canvas);
-      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
       
       // Check if canvas is ready and has content
       if (!canvas || canvas.width === 0 || canvas.height === 0) {
@@ -633,19 +631,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Try to get image data from canvas
       let dataURL;
       try {
-        console.log('Attempting map screenshot capture...');
         
         // Method 1: Try using map's built-in export functionality
-        console.log('Trying map.getStyle() export...');
         try {
           // Get the current map style as a static image
           const style = map.getStyle();
-          console.log('Map style loaded:', !!style);
           
           // Try to export the map as a static image
           const mapCanvas = map.getCanvas();
-          console.log('Canvas element:', mapCanvas);
-          console.log('Canvas dimensions:', mapCanvas.width, 'x', mapCanvas.height);
           
           // Force a repaint and wait
           map.triggerRepaint();
@@ -655,7 +648,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           const blob = await new Promise((resolve, reject) => {
             mapCanvas.toBlob((blob) => {
               if (blob) {
-                console.log('Blob created, size:', blob.size);
                 resolve(blob);
               } else {
                 reject(new Error('toBlob returned null'));
@@ -665,19 +657,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           
           if (blob && blob.size > 1000) {
             dataURL = URL.createObjectURL(blob);
-            console.log('Blob method successful, size:', blob.size);
           } else {
             throw new Error('Blob too small or null');
           }
           
         } catch (blobError) {
-          console.log('Blob method failed:', blobError.message);
           
           // Method 2: Try direct toDataURL
-          console.log('Trying direct toDataURL...');
           const mapCanvas = map.getCanvas();
           dataURL = mapCanvas.toDataURL('image/png', 1.0);
-          console.log('Direct toDataURL length:', dataURL.length);
           
           if (dataURL.length < 1000) {
             throw new Error('Direct toDataURL too short');
@@ -686,7 +674,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         
         // Method 3: If still no success, try a different approach
         if (!dataURL || dataURL.length < 1000) {
-          console.log('Trying alternative approach...');
           
           // Create a new map instance temporarily for export
           const mapContainer = map.getContainer();
@@ -762,7 +749,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             // Capture the temp map
             const tempCanvas = tempMap.getCanvas();
             dataURL = tempCanvas.toDataURL('image/png', 1.0);
-            console.log('Temp map DataURL length:', dataURL.length);
             
             // Clean up
             tempMap.remove();

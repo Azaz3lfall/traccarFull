@@ -4734,9 +4734,6 @@ const MainPage = () => {
                       createdById: user?.id || null
                     };
                     
-                    console.log('Reseller JSON Object:', JSON.stringify(resellerJson, null, 2));
-                    console.log('Reseller Data (raw):', resellerData);
-                    
                     setShowResellerDrawer(false);
                   }}
                   style={{
