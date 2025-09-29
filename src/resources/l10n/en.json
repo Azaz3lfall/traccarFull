@@ -668,5 +668,8 @@
   "deviceLimit": "Device Limit",
   "userLimit": "User Limit",
   "sharedError": "Error",
-  "sharedRequiredFields": "Required fields missing"
+  "sharedRequiredFields": "Required fields missing",
+  "calendarByTimeRange": "By timerange",
+  "calendarStartTime": "Start Time",
+  "calendarEndTime": "End Time"
 }
