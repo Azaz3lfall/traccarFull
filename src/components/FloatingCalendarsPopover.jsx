@@ -21,6 +21,8 @@ import {
   Tab,
   Box,
   Chip,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -58,6 +60,27 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [editingCalendar, setEditingCalendar] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [timeRanges, setTimeRanges] = useState({
+    enabled: false,
+    periods: [
+      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+    ]
+  });
+
+  // Update calendar data when timeRanges change
+  useEffect(() => {
+    if (editingCalendar && editingCalendar.type === 'simple') {
+      const startTime = dayjs(editingCalendar.startTime);
+      const endTime = dayjs(editingCalendar.endTime);
+      const rule = { frequency: editingCalendar.frequency, by: editingCalendar.by };
+      
+      if (startTime.isValid() && endTime.isValid()) {
+        const newData = generateCalendarWithTimeRanges(startTime, endTime, rule, timeRanges);
+        setEditingCalendar({ ...editingCalendar, data: newData });
+      }
+    }
+  }, [timeRanges.enabled, timeRanges.periods]);
   
   // Custom dropdown states
   const [recurrenceDropdownOpen, setRecurrenceDropdownOpen] = useState(false);
@@ -126,6 +149,9 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
         setSelectedCalendar(calendar);
         const rule = getCalendarRule(calendar);
         const times = getCalendarTimes(calendar);
+        const lines = getCalendarLines(calendar);
+        const parsedTimeRanges = lines ? parseTimeRanges(lines) : timeRanges;
+        
         setEditingCalendar({ 
           ...calendar, 
           type: getCalendarType(calendar), // UI only field
@@ -135,6 +161,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
           endTime: times.end.format('YYYY-MM-DDTHH:mm'), // UI only field
           attributes: calendar.attributes || {}
         });
+        setTimeRanges(parsedTimeRanges);
         setEditDialog(true);
         setActiveTab(0);
         setAnchorEl(null);
@@ -241,21 +268,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       const endTime = dayjs(editingCalendar.endTime);
       const rule = { frequency: editingCalendar.frequency, by: editingCalendar.by };
       
-      const lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Traccar//NONSGML Traccar//EN',
-        'BEGIN:VEVENT',
-        'UID:00000000-0000-0000-0000-000000000000',
-        `DTSTART;${formatCalendarTime(startTime)}`,
-        `DTEND;${formatCalendarTime(endTime)}`,
-        formatRule(rule),
-        'SUMMARY:Event',
-        'END:VEVENT',
-        'END:VCALENDAR',
-      ];
-      
-      calendarData.data = window.btoa(lines.join('\n'));
+      calendarData.data = generateCalendarWithTimeRanges(startTime, endTime, rule, timeRanges);
     }
 
     if (editingCalendar.id) {
@@ -285,14 +298,26 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   };
 
   const handleAddCalendar = () => {
+    const startTime = dayjs(); // Current datetime
+    const endTime = startTime.add(10, 'years'); // Current datetime + 10 years
+    
+    // Reset timeRanges to default
+    setTimeRanges({
+      enabled: false,
+      periods: [
+        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+      ]
+    });
+    
     setEditingCalendar({
       name: '',
       data: simpleCalendar(),
       type: 'simple', // UI only field
       frequency: 'ONCE', // UI only field
       by: null, // UI only field
-      startTime: dayjs().format('YYYY-MM-DDTHH:mm'), // UI only field
-      endTime: dayjs().add(1, 'hour').format('YYYY-MM-DDTHH:mm'), // UI only field
+      startTime: startTime.format('YYYY-MM-DDTHH:mm'), // UI only field
+      endTime: endTime.format('YYYY-MM-DDTHH:mm'), // UI only field
       attributes: {},
     });
     setEditDialog(true);
@@ -317,32 +342,143 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
 
   const formatRule = (rule) => {
     const by = rule.by && rule.by.join(',');
+    const untilDate = dayjs().add(10, 'years').format('YYYYMMDDTHHmmss') + 'Z';
+    
     switch (rule.frequency) {
       case 'DAILY':
-        return `RRULE:FREQ=${rule.frequency}`;
+        return `RRULE:FREQ=${rule.frequency};UNTIL=${untilDate}`;
       case 'WEEKLY':
-        return `RRULE:FREQ=${rule.frequency};BYDAY=${by || 'SU'}`;
+        return `RRULE:FREQ=${rule.frequency};BYDAY=${by || 'SU'};UNTIL=${untilDate}`;
       case 'MONTHLY':
-        return `RRULE:FREQ=${rule.frequency};BYMONTHDAY=${by || 1}`;
+        return `RRULE:FREQ=${rule.frequency};BYMONTHDAY=${by || 1};UNTIL=${untilDate}`;
       default:
         return 'RRULE:FREQ=DAILY;COUNT=1';
     }
   };
 
+  const generateCalendarWithTimeRanges = (startTime, endTime, rule, timeRanges) => {
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Traccar//NONSGML Traccar//EN',
+    ];
 
-  const simpleCalendar = () => window.btoa([
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Traccar//NONSGML Traccar//EN',
-    'BEGIN:VEVENT',
-    'UID:00000000-0000-0000-0000-000000000000',
-    `DTSTART;${formatCalendarTime(dayjs())}`,
-    `DTEND;${formatCalendarTime(dayjs().add(1, 'hours'))}`,
-    'RRULE:FREQ=DAILY',
-    'SUMMARY:Event',
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\n'));
+
+
+    if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
+      // Generate multiple VEVENT blocks for each time range
+      timeRanges.periods.forEach((period, index) => {
+        if (period.enabled && period.startTime && period.endTime) {
+          // Use the base date from startTime and apply the period times
+          const baseDate = dayjs(startTime);
+          
+          // Parse time strings properly
+          const [startHour, startMinute] = period.startTime.split(':').map(Number);
+          const [endHour, endMinute] = period.endTime.split(':').map(Number);
+          
+          const periodStart = baseDate.clone().hour(startHour).minute(startMinute).second(0);
+          const periodEnd = baseDate.clone().hour(endHour).minute(endMinute).second(0);
+          
+          
+          if (periodStart.isValid() && periodEnd.isValid()) {
+            lines.push(
+              'BEGIN:VEVENT',
+              `UID:00000000-0000-0000-0000-000000000${100 + index}`,
+              `DTSTART;${formatCalendarTime(periodStart)}`,
+              `DTEND;${formatCalendarTime(periodEnd)}`,
+              formatRule(rule),
+              `SUMMARY:${period.name || `Period ${index + 1}`}`,
+              'END:VEVENT'
+            );
+          }
+        }
+      });
+    } else {
+    
+      // Single VEVENT block for regular calendar
+      if (startTime.isValid() && endTime.isValid()) {
+        lines.push(
+          'BEGIN:VEVENT',
+          'UID:00000000-0000-0000-0000-000000000000',
+          `DTSTART;${formatCalendarTime(startTime)}`,
+          `DTEND;${formatCalendarTime(endTime)}`,
+          formatRule(rule),
+          'SUMMARY:Event',
+          'END:VEVENT'
+        );
+      } else {
+        console.error('FloatingCalendarsPopover - Invalid start or end time!', { startTime, endTime });
+      }
+    }
+
+    lines.push('END:VCALENDAR');
+    const result = window.btoa(lines.join('\n'));
+    return result;
+  };
+
+  const parseTimeRanges = (lines) => {
+    const events = [];
+    let currentEvent = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line === 'BEGIN:VEVENT') {
+        currentEvent = {};
+      } else if (line === 'END:VEVENT' && currentEvent) {
+        events.push(currentEvent);
+        currentEvent = null;
+      } else if (currentEvent) {
+        if (line.startsWith('DTSTART;')) {
+          const timeStr = line.split(':')[1];
+          if (timeStr && timeStr !== 'Invalid Date') {
+            const parsedTime = dayjs(timeStr, 'YYYYMMDDTHHmmss');
+            if (parsedTime.isValid()) {
+              currentEvent.startTime = parsedTime.format('HH:mm');
+            }
+          }
+        } else if (line.startsWith('DTEND;')) {
+          const timeStr = line.split(':')[1];
+          if (timeStr && timeStr !== 'Invalid Date') {
+            const parsedTime = dayjs(timeStr, 'YYYYMMDDTHHmmss');
+            if (parsedTime.isValid()) {
+              currentEvent.endTime = parsedTime.format('HH:mm');
+            }
+          }
+        } else if (line.startsWith('SUMMARY:')) {
+          currentEvent.name = line.substring(8);
+        }
+      }
+    }
+    
+    return {
+      enabled: events.length > 1,
+      periods: events.length > 0 ? events.map((event, index) => ({
+        enabled: true,
+        name: event.name || `Period ${index + 1}`,
+        startTime: event.startTime || '08:00',
+        endTime: event.endTime || '12:00'
+      })) : [
+        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+      ]
+    };
+  };
+
+
+  const simpleCalendar = () => {
+    const startTime = dayjs(); // Current datetime
+    const endTime = startTime.add(10, 'years'); // Current datetime + 10 years
+    const rule = { frequency: 'DAILY' };
+    const defaultTimeRanges = {
+      enabled: false,
+      periods: [
+        { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+      ]
+    };
+    
+    return generateCalendarWithTimeRanges(startTime, endTime, rule, defaultTimeRanges);
+  };
 
   // Get calendar data and rule for editing
   const getCalendarLines = (calendar) => {
@@ -365,8 +501,28 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     const startLine = lines.find(line => line.startsWith('DTSTART;'));
     const endLine = lines.find(line => line.startsWith('DTEND;'));
     
-    const start = startLine ? dayjs(startLine.split(':')[1], 'YYYYMMDDTHHmmss') : dayjs();
-    const end = endLine ? dayjs(endLine.split(':')[1], 'YYYYMMDDTHHmmss') : dayjs().add(1, 'hour');
+    let start = dayjs();
+    let end = dayjs().add(1, 'hour');
+    
+    if (startLine) {
+      const timeStr = startLine.split(':')[1];
+      if (timeStr && timeStr !== 'Invalid Date') {
+        const parsedStart = dayjs(timeStr, 'YYYYMMDDTHHmmss');
+        if (parsedStart.isValid()) {
+          start = parsedStart;
+        }
+      }
+    }
+    
+    if (endLine) {
+      const timeStr = endLine.split(':')[1];
+      if (timeStr && timeStr !== 'Invalid Date') {
+        const parsedEnd = dayjs(timeStr, 'YYYYMMDDTHHmmss');
+        if (parsedEnd.isValid()) {
+          end = parsedEnd;
+        }
+      }
+    }
     
     return { start, end };
   };
@@ -1246,6 +1402,108 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                 </div>
                               )}
                             </div>
+                          )}
+
+                          {/* Time Ranges for Weekly Recurrence */}
+                          {editingCalendar?.frequency === 'WEEKLY' && (
+                            <Box>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={timeRanges.enabled}
+                                    onChange={(e) => {
+                                      const newTimeRanges = { ...timeRanges, enabled: e.target.checked };
+                                      setTimeRanges(newTimeRanges);
+                                    }}
+                                  />
+                                }
+                                label="By timerange"
+                                sx={{ 
+                                  width: '100%',
+                                  marginBottom: 1,
+                                  '& .MuiFormControlLabel-label': {
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    color: 'inherit'
+                                  }
+                                }}
+                              />
+                              
+                              {timeRanges.enabled && (
+                                <Box sx={{ ml: 2, mt: 1 }}>
+                                  {timeRanges.periods.map((period, index) => (
+                                    <Box key={index} sx={{ mb: 2, p: 2, border: `1px solid ${colors.border}`, borderRadius: 1 }}>
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            checked={period.enabled}
+                                            onChange={(e) => {
+                                              const newPeriods = [...timeRanges.periods];
+                                              newPeriods[index].enabled = e.target.checked;
+                                              setTimeRanges({ ...timeRanges, periods: newPeriods });
+                                            }}
+                                          />
+                                        }
+                                        label={period.name}
+                                      />
+                                      
+                                      {period.enabled && (
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                                          <TextField
+                                            label={t('calendarStartTime')}
+                                            type="time"
+                                            value={period.startTime}
+                                            onChange={(e) => {
+                                              const newPeriods = [...timeRanges.periods];
+                                              newPeriods[index].startTime = e.target.value;
+                                              setTimeRanges({ ...timeRanges, periods: newPeriods });
+                                            }}
+                                            InputLabelProps={{ shrink: true }}
+                                            size="small"
+                                            sx={{
+                                              '& .MuiOutlinedInput-root': {
+                                                backgroundColor: colors.secondary,
+                                                '& fieldset': { borderColor: colors.border },
+                                                '&:hover fieldset': { borderColor: colors.primary },
+                                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                              },
+                                              '& .MuiInputLabel-root': { 
+                                                color: colors.text,
+                                                '&.Mui-focused': { color: colors.primary }
+                                              },
+                                            }}
+                                          />
+                                          <TextField
+                                            label={t('calendarEndTime')}
+                                            type="time"
+                                            value={period.endTime}
+                                            onChange={(e) => {
+                                              const newPeriods = [...timeRanges.periods];
+                                              newPeriods[index].endTime = e.target.value;
+                                              setTimeRanges({ ...timeRanges, periods: newPeriods });
+                                            }}
+                                            InputLabelProps={{ shrink: true }}
+                                            size="small"
+                                            sx={{
+                                              '& .MuiOutlinedInput-root': {
+                                                backgroundColor: colors.secondary,
+                                                '& fieldset': { borderColor: colors.border },
+                                                '&:hover fieldset': { borderColor: colors.primary },
+                                                '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                              },
+                                              '& .MuiInputLabel-root': { 
+                                                color: colors.text,
+                                                '&.Mui-focused': { color: colors.primary }
+                                              },
+                                            }}
+                                          />
+                                        </Box>
+                                      )}
+                                    </Box>
+                                  ))}
+                                </Box>
+                              )}
+                            </Box>
                           )}
                         </div>
                       )}
