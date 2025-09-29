@@ -668,5 +668,8 @@
   "resellerEmail": "អ៊ីមែលអ្នកលក់ឡើងវិញ",
   "deviceLimit": "ដែនកំណត់ឧបករណ៍",
   "userLimit": "ដែនកំណត់អ្នកប្រើ",
-  "resellerPanel": "បន្ទះអ្នកលក់ឡើងវិញ"
+  "resellerPanel": "បន្ទះអ្នកលក់ឡើងវិញ",
+  "calendarByTimeRange": "តាមជួរពេលវេលា",
+  "calendarStartTime": "ពេលវេលាចាប់ផ្តើម",
+  "calendarEndTime": "ពេលវេលាបញ្ចប់"
 }

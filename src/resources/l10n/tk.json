@@ -668,5 +668,8 @@
   "resellerEmail": "Dyn Satyjy E-poçta",
   "deviceLimit": "Enjamyň Çägi",
   "userLimit": "Ulanyjynyň Çägi",
-  "resellerPanel": "Dyn Satyjy paneli"
+  "resellerPanel": "Dyn Satyjy paneli",
+  "calendarByTimeRange": "Wagt aralygy boýunça",
+  "calendarStartTime": "Başlanma wagty",
+  "calendarEndTime": "Gutarýan wagty"
 }

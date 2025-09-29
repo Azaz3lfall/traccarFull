@@ -668,5 +668,8 @@
   "resellerEmail": "אימייל מוכר",
   "deviceLimit": "הגבלת מכשיר",
   "userLimit": "הגבלת משתמש",
-  "resellerPanel": "לוח מוכר"
+  "resellerPanel": "לוח מוכר",
+  "calendarByTimeRange": "לפי טווח זמן",
+  "calendarStartTime": "שעת התחלה",
+  "calendarEndTime": "שעת סיום"
 }

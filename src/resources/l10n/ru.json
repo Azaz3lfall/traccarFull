@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Реселлера",
   "deviceLimit": "Лимит Устройств",
   "userLimit": "Лимит Пользователей",
-  "resellerPanel": "Панель Реселлера"
+  "resellerPanel": "Панель Реселлера",
+  "calendarByTimeRange": "По временному диапазону",
+  "calendarStartTime": "Время начала",
+  "calendarEndTime": "Время окончания"
 }

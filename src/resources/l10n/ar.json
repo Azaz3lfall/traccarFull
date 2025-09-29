@@ -668,5 +668,8 @@
   "resellerEmail": "بريد الموزع الإلكتروني",
   "deviceLimit": "حد الجهاز",
   "userLimit": "حد المستخدم",
-  "resellerPanel": "لوحة الموزع"
+  "resellerPanel": "لوحة الموزع",
+  "calendarByTimeRange": "حسب النطاق الزمني",
+  "calendarStartTime": "وقت البداية",
+  "calendarEndTime": "وقت النهاية"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Rishitës",
   "deviceLimit": "Kufiri i Pajisjes",
   "userLimit": "Kufiri i Përdoruesit",
-  "resellerPanel": "Paneli Rishitësit"
+  "resellerPanel": "Paneli Rishitësit",
+  "calendarByTimeRange": "Sipas intervalit kohor",
+  "calendarStartTime": "Koha e fillimit",
+  "calendarEndTime": "Koha e mbarimit"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "റീസെല്ലർ ഇമെയിൽ",
   "deviceLimit": "ഉപകരണ പരിധി",
   "userLimit": "ഉപയോക്തൃ പരിധി",
-  "resellerPanel": "റീസെല്ലർ പാനൽ"
+  "resellerPanel": "റീസെല്ലർ പാനൽ",
+  "calendarByTimeRange": "സമയ ശ്രേണി അനുസരിച്ച്",
+  "calendarStartTime": "ആരംഭ സമയം",
+  "calendarEndTime": "അവസാന സമയം"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Revânzător",
   "deviceLimit": "Limita Dispozitiv",
   "userLimit": "Limita Utilizator",
-  "resellerPanel": "Panou Revânzător"
+  "resellerPanel": "Panou Revânzător",
+  "calendarByTimeRange": "După interval de timp",
+  "calendarStartTime": "Ora de început",
+  "calendarEndTime": "Ora de sfârșit"
 }

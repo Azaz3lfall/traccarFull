@@ -668,5 +668,8 @@
   "resellerEmail": "Yenidən Satıcı E-poçt",
   "deviceLimit": "Cihaz Limiti",
   "userLimit": "İstifadəçi Limiti",
-  "resellerPanel": "Yenidən Satıcı Paneli"
+  "resellerPanel": "Yenidən Satıcı Paneli",
+  "calendarByTimeRange": "Vaxt aralığına görə",
+  "calendarStartTime": "Başlama vaxtı",
+  "calendarEndTime": "Bitmə vaxtı"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Viszonteladó E-mail",
   "deviceLimit": "Eszköz Limite",
   "userLimit": "Felhasználó Limite",
-  "resellerPanel": "Viszonteladó Panel"
+  "resellerPanel": "Viszonteladó Panel",
+  "calendarByTimeRange": "Időtartam szerint",
+  "calendarStartTime": "Kezdési idő",
+  "calendarEndTime": "Befejezési idő"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Uudelleenmyyjä Sähköposti",
   "deviceLimit": "Laitteen Raja",
   "userLimit": "Käyttäjän Raja",
-  "resellerPanel": "Uudelleenmyyjä Paneeli"
+  "resellerPanel": "Uudelleenmyyjä Paneeli",
+  "calendarByTimeRange": "Aikavälin mukaan",
+  "calendarStartTime": "Aloitusaika",
+  "calendarEndTime": "Lopetusaika"
 }

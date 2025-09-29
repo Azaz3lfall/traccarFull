@@ -668,5 +668,8 @@
   "resellerEmail": "გადამყიდველი ელ.ფოსტა",
   "deviceLimit": "მოწყობილობის ლიმიტი",
   "userLimit": "მომხმარებლის ლიმიტი",
-  "resellerPanel": "გადამყიდველის პანელი"
+  "resellerPanel": "გადამყიდველის პანელი",
+  "calendarByTimeRange": "დროის დიაპაზონით",
+  "calendarStartTime": "დაწყების დრო",
+  "calendarEndTime": "დასრულების დრო"
 }

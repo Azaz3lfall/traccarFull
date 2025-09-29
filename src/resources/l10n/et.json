@@ -668,5 +668,8 @@
   "resellerEmail": "Edasimüüja E-post",
   "deviceLimit": "Seadme Limiit",
   "userLimit": "Kasutaja Limiit",
-  "resellerPanel": "Edasimüüja Paneel"
+  "resellerPanel": "Edasimüüja Paneel",
+  "calendarByTimeRange": "Ajavahemiku järgi",
+  "calendarStartTime": "Algusaeg",
+  "calendarEndTime": "Lõpuaeg"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Återförsäljare E-post",
   "deviceLimit": "Enhetsgräns",
   "userLimit": "Användargräns",
-  "resellerPanel": "Återförsäljare Panel"
+  "resellerPanel": "Återförsäljare Panel",
+  "calendarByTimeRange": "Efter tidsintervall",
+  "calendarStartTime": "Starttid",
+  "calendarEndTime": "Sluttid"
 }

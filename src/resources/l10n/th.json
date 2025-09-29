@@ -668,5 +668,8 @@
   "resellerEmail": "อีเมลตัวแทนจำหน่าย",
   "deviceLimit": "ขีดจำกัดอุปกรณ์",
   "userLimit": "ขีดจำกัดผู้ใช้",
-  "resellerPanel": "แผงตัวแทนจำหน่าย"
+  "resellerPanel": "แผงตัวแทนจำหน่าย",
+  "calendarByTimeRange": "ตามช่วงเวลา",
+  "calendarStartTime": "เวลาเริ่มต้น",
+  "calendarEndTime": "เวลาสิ้นสุด"
 }

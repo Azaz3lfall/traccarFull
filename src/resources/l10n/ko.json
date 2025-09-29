@@ -668,5 +668,8 @@
   "resellerEmail": "리셀러 이메일",
   "deviceLimit": "디바이스 제한",
   "userLimit": "사용자 제한",
-  "resellerPanel": "리셀러 패널"
+  "resellerPanel": "리셀러 패널",
+  "calendarByTimeRange": "시간 범위별",
+  "calendarStartTime": "시작 시간",
+  "calendarEndTime": "종료 시간"
 }

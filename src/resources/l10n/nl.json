@@ -668,5 +668,8 @@
   "resellerEmail": "Wederverkoper E-mail",
   "deviceLimit": "Apparaat Limiet",
   "userLimit": "Gebruiker Limiet",
-  "resellerPanel": "Wederverkoper Paneel"
+  "resellerPanel": "Wederverkoper Paneel",
+  "calendarByTimeRange": "Op tijdbereik",
+  "calendarStartTime": "Starttijd",
+  "calendarEndTime": "Eindtijd"
 }

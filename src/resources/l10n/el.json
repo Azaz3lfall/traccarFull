@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Επανπωλητή",
   "deviceLimit": "Όριο Συσκευής",
   "userLimit": "Όριο Χρήστη",
-  "resellerPanel": "Πίνακας Επανπωλητή"
+  "resellerPanel": "Πίνακας Επανπωλητή",
+  "calendarByTimeRange": "Κατά χρονικό εύρος",
+  "calendarStartTime": "Ώρα έναρξης",
+  "calendarEndTime": "Ώρα λήξης"
 }

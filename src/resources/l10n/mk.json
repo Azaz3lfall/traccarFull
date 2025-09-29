@@ -668,5 +668,8 @@
   "resellerEmail": "Е-пошта на Препродавач",
   "deviceLimit": "Ограничување на Уред",
   "userLimit": "Ограничување на Корисник",
-  "resellerPanel": "Панел Препродавач"
+  "resellerPanel": "Панел Препродавач",
+  "calendarByTimeRange": "Според временски опсег",
+  "calendarStartTime": "Време на почеток",
+  "calendarEndTime": "Време на крај"
 }

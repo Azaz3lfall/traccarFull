@@ -668,5 +668,8 @@
   "resellerEmail": "Email Penjual Ulang",
   "deviceLimit": "Batas Perangkat",
   "userLimit": "Batas Pengguna",
-  "resellerPanel": "Panel Penjual Ulang"
+  "resellerPanel": "Panel Penjual Ulang",
+  "calendarByTimeRange": "Berdasarkan rentang waktu",
+  "calendarStartTime": "Waktu mulai",
+  "calendarEndTime": "Waktu selesai"
 }

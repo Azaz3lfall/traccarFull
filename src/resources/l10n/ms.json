@@ -668,5 +668,8 @@
   "resellerEmail": "E-mel Penjual Semula",
   "deviceLimit": "Had Peranti",
   "userLimit": "Had Pengguna",
-  "resellerPanel": "Panel Penjual Semula"
+  "resellerPanel": "Panel Penjual Semula",
+  "calendarByTimeRange": "Mengikut julat masa",
+  "calendarStartTime": "Masa mula",
+  "calendarEndTime": "Masa tamat"
 }

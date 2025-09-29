@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail do Revendedor",
   "deviceLimit": "Limite de Dispositivo",
   "userLimit": "Limite de Utilizador",
-  "resellerPanel": "Painel Revendedor"
+  "resellerPanel": "Painel Revendedor",
+  "calendarByTimeRange": "Por intervalo de tempo",
+  "calendarStartTime": "Hora de início",
+  "calendarEndTime": "Hora de fim"
 }

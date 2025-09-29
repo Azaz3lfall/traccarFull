@@ -668,5 +668,8 @@
   "resellerEmail": "Qayta Sotuvchi E-pochta",
   "deviceLimit": "Qurilma Chegarasi",
   "userLimit": "Foydalanuvchi Chegarasi",
-  "resellerPanel": "Qayta Sotuvchi paneli"
+  "resellerPanel": "Qayta Sotuvchi paneli",
+  "calendarByTimeRange": "Vaqt oralig'i bo'yicha",
+  "calendarStartTime": "Boshlanish vaqti",
+  "calendarEndTime": "Tugash vaqti"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "ایمیل فروشنده",
   "deviceLimit": "محدودیت دستگاه",
   "userLimit": "محدودیت کاربر",
-  "resellerPanel": "پنل فروشنده"
+  "resellerPanel": "پنل فروشنده",
+  "calendarByTimeRange": "بر اساس محدوده زمانی",
+  "calendarStartTime": "زمان شروع",
+  "calendarEndTime": "زمان پایان"
 }

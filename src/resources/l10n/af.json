@@ -668,5 +668,8 @@
   "resellerEmail": "Herverkoper E-pos",
   "deviceLimit": "Toestel Limiet",
   "userLimit": "Gebruiker Limiet",
-  "resellerPanel": "Herverkoper Paneel"
+  "resellerPanel": "Herverkoper Paneel",
+  "calendarByTimeRange": "Deur tydreeks",
+  "calendarStartTime": "Begintyd",
+  "calendarEndTime": "Eindtyd"
 }

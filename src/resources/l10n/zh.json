@@ -668,5 +668,8 @@
   "resellerEmail": "经销商邮箱",
   "deviceLimit": "设备限制",
   "userLimit": "用户限制",
-  "resellerPanel": "经销商面板"
+  "resellerPanel": "经销商面板",
+  "calendarByTimeRange": "按时间范围",
+  "calendarStartTime": "开始时间",
+  "calendarEndTime": "结束时间"
 }

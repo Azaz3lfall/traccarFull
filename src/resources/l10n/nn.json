@@ -668,5 +668,8 @@
   "resellerEmail": "Fornyingsseljar E-post",
   "deviceLimit": "Eininggrense",
   "userLimit": "Brukargrense",
-  "resellerPanel": "Fornyingsseljar Panel"
+  "resellerPanel": "Fornyingsseljar Panel",
+  "calendarByTimeRange": "Etter tidsintervall",
+  "calendarStartTime": "Starttid",
+  "calendarEndTime": "Sluttid"
 }

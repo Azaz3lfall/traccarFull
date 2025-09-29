@@ -668,5 +668,8 @@
   "resellerEmail": "Дахин худалдагч И-мэйл",
   "deviceLimit": "Төхөөрөмжийн Хязгаар",
   "userLimit": "Хэрэглэгчийн Хязгаар",
-  "resellerPanel": "Дахин худалдагчийн самбар"
+  "resellerPanel": "Дахин худалдагчийн самбар",
+  "calendarByTimeRange": "Цагийн хүрээний дагуу",
+  "calendarStartTime": "Эхлэх цаг",
+  "calendarEndTime": "Дуусах цаг"
 }

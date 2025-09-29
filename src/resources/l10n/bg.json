@@ -668,5 +668,8 @@
   "resellerEmail": "Имейл на Препродавач",
   "deviceLimit": "Лимит на Устройство",
   "userLimit": "Лимит на Потребител",
-  "resellerPanel": "Панел Препродавач"
+  "resellerPanel": "Панел Препродавач",
+  "calendarByTimeRange": "По времеви диапазон",
+  "calendarStartTime": "Начално време",
+  "calendarEndTime": "Крайно време"
 }

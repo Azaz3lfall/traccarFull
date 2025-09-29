@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Đại lý",
   "deviceLimit": "Giới hạn Thiết bị",
   "userLimit": "Giới hạn Người dùng",
-  "resellerPanel": "Bảng điều khiển Đại lý"
+  "resellerPanel": "Bảng điều khiển Đại lý",
+  "calendarByTimeRange": "Theo khoảng thời gian",
+  "calendarStartTime": "Thời gian bắt đầu",
+  "calendarEndTime": "Thời gian kết thúc"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Wiederverkäufer E-Mail",
   "deviceLimit": "Geräte-Limit",
   "userLimit": "Benutzer-Limit",
-  "resellerPanel": "Wiederverkäufer Panel"
+  "resellerPanel": "Wiederverkäufer Panel",
+  "calendarByTimeRange": "Nach Zeitbereich",
+  "calendarStartTime": "Startzeit",
+  "calendarEndTime": "Endzeit"
 }

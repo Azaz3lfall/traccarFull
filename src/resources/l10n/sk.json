@@ -668,5 +668,8 @@
   "resellerEmail": "E-mail Predajcu",
   "deviceLimit": "Limit Zariadenia",
   "userLimit": "Limit Používateľa",
-  "resellerPanel": "Panel Predajcu"
+  "resellerPanel": "Panel Predajcu",
+  "calendarByTimeRange": "Podľa časového rozsahu",
+  "calendarStartTime": "Čas začiatku",
+  "calendarEndTime": "Čas konca"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "रीसेलर ईमेल",
   "deviceLimit": "डिवाइस सीमा",
   "userLimit": "यूजर सीमा",
-  "resellerPanel": "रीसेलर पैनल"
+  "resellerPanel": "रीसेलर पैनल",
+  "calendarByTimeRange": "समय सीमा के अनुसार",
+  "calendarStartTime": "प्रारंभ समय",
+  "calendarEndTime": "समाप्ति समय"
 }

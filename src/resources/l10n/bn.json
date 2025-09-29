@@ -668,5 +668,8 @@
   "resellerEmail": "রিসেলার ইমেইল",
   "deviceLimit": "ডিভাইস সীমা",
   "userLimit": "ইউজার সীমা",
-  "resellerPanel": "রিসেলার প্যানেল"
+  "resellerPanel": "রিসেলার প্যানেল",
+  "calendarByTimeRange": "সময়ের পরিসর অনুযায়ী",
+  "calendarStartTime": "শুরুর সময়",
+  "calendarEndTime": "শেষের সময়"
 }

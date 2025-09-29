@@ -668,5 +668,8 @@
   "resellerEmail": "リセラーEメール",
   "deviceLimit": "デバイス制限",
   "userLimit": "ユーザー制限",
-  "resellerPanel": "リセラーパネル"
+  "resellerPanel": "リセラーパネル",
+  "calendarByTimeRange": "時間範囲別",
+  "calendarStartTime": "開始時間",
+  "calendarEndTime": "終了時間"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "ອີເມວຜູ້ຂາຍຄືນ",
   "deviceLimit": "ຂີດຈຳກັດອຸປະກອນ",
   "userLimit": "ຂີດຈຳກັດຜູ້ໃຊ້",
-  "resellerPanel": "ກະດານຜູ້ຂາຍຄືນ"
+  "resellerPanel": "ກະດານຜູ້ຂາຍຄືນ",
+  "calendarByTimeRange": "ຕາມຊ່ວງເວລາ",
+  "calendarStartTime": "ເວລາເລີ່ມຕົ້ນ",
+  "calendarEndTime": "ເວລາສິ້ນສຸດ"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Қайта сатушы Эл.пошта",
   "deviceLimit": "Құрылғы Шектеуі",
   "userLimit": "Пайдаланушы Шектеуі",
-  "resellerPanel": "Қайта сатушы панелі"
+  "resellerPanel": "Қайта сатушы панелі",
+  "calendarByTimeRange": "Уақыт диапазоны бойынша",
+  "calendarStartTime": "Басталу уақыты",
+  "calendarEndTime": "Аяқталу уақыты"
 }

@@ -668,5 +668,8 @@
   "resellerEmail": "Pārdevēja E-pasts",
   "deviceLimit": "Ierīces Ierobežojums",
   "userLimit": "Lietotāja Ierobežojums",
-  "resellerPanel": "Pārdevēja Panelis"
+  "resellerPanel": "Pārdevēja Panelis",
+  "calendarByTimeRange": "Pēc laika diapazona",
+  "calendarStartTime": "Sākuma laiks",
+  "calendarEndTime": "Beigu laiks"
 }

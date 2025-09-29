@@ -668,5 +668,8 @@
   "resellerEmail": "Barua pepe ya Mfanyabiashara",
   "deviceLimit": "Kikomo cha Kifaa",
   "userLimit": "Kikomo cha Mtumiaji",
-  "resellerPanel": "Paneli ya Mfanyabiashara"
+  "resellerPanel": "Paneli ya Mfanyabiashara",
+  "calendarByTimeRange": "Kulingana na masafa ya muda",
+  "calendarStartTime": "Muda wa kuanza",
+  "calendarEndTime": "Muda wa mwisho"
 }

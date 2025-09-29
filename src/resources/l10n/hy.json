@@ -668,5 +668,8 @@
   "resellerEmail": "Վերավաճառող Էլ. Փոստ",
   "deviceLimit": "Սարքի Սահմանափակում",
   "userLimit": "Օգտագործողի Սահմանափակում",
-  "resellerPanel": "Վերավաճառողի Պանել"
+  "resellerPanel": "Վերավաճառողի Պանել",
+  "calendarByTimeRange": "Ժամանակային միջակայքով",
+  "calendarStartTime": "Սկզբի ժամանակ",
+  "calendarEndTime": "Ավարտի ժամանակ"
 }

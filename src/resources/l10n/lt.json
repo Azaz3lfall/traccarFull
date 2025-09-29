@@ -668,5 +668,8 @@
   "resellerEmail": "Perpardavėjo El. paštas",
   "deviceLimit": "Įrenginio Limitas",
   "userLimit": "Vartotojo Limitas",
-  "resellerPanel": "Perpardavėjo Panele"
+  "resellerPanel": "Perpardavėjo Panele",
+  "calendarByTimeRange": "Pagal laiko intervalą",
+  "calendarStartTime": "Pradžios laikas",
+  "calendarEndTime": "Pabaigos laikas"
 }

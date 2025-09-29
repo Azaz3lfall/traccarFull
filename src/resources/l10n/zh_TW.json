@@ -668,5 +668,8 @@
   "resellerEmail": "經銷商電子郵件",
   "deviceLimit": "設備限制",
   "userLimit": "用戶限制",
-  "resellerPanel": "經銷商面板"
+  "resellerPanel": "經銷商面板",
+  "calendarByTimeRange": "按時間範圍",
+  "calendarStartTime": "開始時間",
+  "calendarEndTime": "結束時間"
 }

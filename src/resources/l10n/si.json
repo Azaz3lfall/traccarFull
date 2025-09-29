@@ -668,5 +668,8 @@
   "resellerEmail": "නැවත විකුණන්නා ඊමේල්",
   "deviceLimit": "උපකරණ සීමාව",
   "userLimit": "පරිශීලක සීමාව",
-  "resellerPanel": "නැවත විකුණන්නාගේ පැනලය"
+  "resellerPanel": "නැවත විකුණන්නාගේ පැනලය",
+  "calendarByTimeRange": "කාල පරාසය අනුව",
+  "calendarStartTime": "ආරම්භක වේලාව",
+  "calendarEndTime": "අවසාන වේලාව"
 }

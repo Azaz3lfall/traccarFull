@@ -668,5 +668,8 @@
   "resellerEmail": "Bayi E-posta",
   "deviceLimit": "Cihaz Limiti",
   "userLimit": "Kullanıcı Limiti",
-  "resellerPanel": "Bayi Paneli"
+  "resellerPanel": "Bayi Paneli",
+  "calendarByTimeRange": "Zaman aralığına göre",
+  "calendarStartTime": "Başlangıç zamanı",
+  "calendarEndTime": "Bitiş zamanı"
 }

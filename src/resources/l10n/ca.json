@@ -668,5 +668,8 @@
   "resellerEmail": "Correu del Revendedor",
   "deviceLimit": "Límit de Dispositiu",
   "userLimit": "Límit d'Usuari",
-  "resellerPanel": "Panell de Revendedor"
+  "resellerPanel": "Panell de Revendedor",
+  "calendarByTimeRange": "Per rang de temps",
+  "calendarStartTime": "Hora d'inici",
+  "calendarEndTime": "Hora de finalització"
 }

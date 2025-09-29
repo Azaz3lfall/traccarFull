@@ -668,5 +668,8 @@
   "resellerEmail": "Forhandler E-mail",
   "deviceLimit": "Enhedsgrænse",
   "userLimit": "Brugergrænse",
-  "resellerPanel": "Forhandler Panel"
+  "resellerPanel": "Forhandler Panel",
+  "calendarByTimeRange": "Efter tidsinterval",
+  "calendarStartTime": "Starttid",
+  "calendarEndTime": "Sluttid"
 }
