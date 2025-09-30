@@ -1,7 +1,8 @@
-import { useId, useCallback, useEffect } from 'react';
+import { useId, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import maplibregl from 'maplibre-gl';
 import { map } from './core/MapView';
 import { formatTime, getStatusColor } from '../common/util/formatter';
 import { mapIconKey } from './core/preloadImages';
@@ -25,6 +26,9 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const mapCluster = useAttributePreference('mapCluster', true);
   const directionType = useAttributePreference('mapDirection', 'selected');
+  
+  // Popup ref for cluster hover
+  const popupRef = useRef(null);
 
 
   const createFeature = (devices, position, selectedPositionId) => {
@@ -81,8 +85,195 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     };
   };
 
-  const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
-  const onMouseLeave = () => map.getCanvas().style.cursor = '';
+  const createClusterPopupHTML = (devices) => {
+    const isDark = theme.palette.mode === 'dark';
+    const bgColor = isDark ? '#1F2937' : '#FFFFFF';
+    const textColor = isDark ? '#F9FAFB' : '#1F2937';
+    const borderColor = isDark ? '#374151' : '#E5E7EB';
+    const hoverColor = isDark ? '#374151' : '#F3F4F6';
+    
+    return `
+      <div style="
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        min-width: 280px;
+        max-width: 400px;
+        max-height: 400px;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      ">
+        <div style="
+          padding: 16px 20px;
+          border-bottom: 1px solid ${borderColor};
+          background: linear-gradient(135deg, rgba(25, 118, 210, 0.1), rgba(76, 175, 80, 0.1));
+        ">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="
+              width: 20px;
+              height: 20px;
+              background: #1976d2;
+              border-radius: 4px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 12px;
+              font-weight: bold;
+            ">🚛</div>
+            <div style="
+              color: ${textColor};
+              font-weight: 600;
+              font-size: 16px;
+              margin: 0;
+            ">Cluster (${devices.length} devices)</div>
+          </div>
+        </div>
+        <div style="max-height: 320px; overflow-y: auto;">
+          ${devices.map((device, index) => `
+            <div style="
+              padding: 12px 20px;
+              border-bottom: ${index < devices.length - 1 ? `1px solid ${borderColor}` : 'none'};
+              transition: background-color 0.2s;
+            " onmouseover="this.style.backgroundColor='${hoverColor}'" onmouseout="this.style.backgroundColor='transparent'">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#9E9E9E'};
+                "></div>
+                <div style="flex: 1;">
+                  <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 4px;
+                  ">
+                    <span style="
+                      color: ${textColor};
+                      font-weight: 500;
+                      font-size: 14px;
+                    ">${device.name}</span>
+                    <span style="
+                      background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#9E9E9E'};
+                      color: white;
+                      padding: 2px 8px;
+                      border-radius: 10px;
+                      font-size: 10px;
+                      font-weight: 500;
+                    ">${device.status}</span>
+                  </div>
+                  ${device.latitude && device.longitude ? `
+                    <div style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      margin-bottom: 4px;
+                    ">
+                      <span style="font-size: 12px;">📍</span>
+                      <span style="
+                        color: ${isDark ? '#9CA3AF' : '#6B7280'};
+                        font-size: 11px;
+                      ">${device.latitude.toFixed(6)}, ${device.longitude.toFixed(6)}</span>
+                    </div>
+                  ` : ''}
+                  ${device.lastUpdate ? `
+                    <div style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    ">
+                      <span style="font-size: 12px;">🕐</span>
+                      <span style="
+                        color: ${isDark ? '#9CA3AF' : '#6B7280'};
+                        font-size: 11px;
+                      ">${formatTime(device.lastUpdate)}</span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  };
+
+  const onMouseEnter = useCallback(async (event) => {
+    map.getCanvas().style.cursor = 'pointer';
+    
+    try {
+      // Get cluster information
+      const features = map.queryRenderedFeatures(event.point, {
+        layers: [clusters],
+      });
+      
+      if (features.length > 0) {
+        const clusterId = features[0].properties.cluster_id;
+        const pointCount = features[0].properties.point_count;
+        
+        // Get all features in the cluster
+        const source = map.getSource(id);
+        if (source && source.getClusterLeaves) {
+          const clusterLeaves = await source.getClusterLeaves(clusterId, pointCount);
+          
+          // Extract device information from cluster leaves
+          const clusterDevices = clusterLeaves
+            .filter(leaf => leaf.properties && leaf.properties.deviceId)
+            .map(leaf => {
+              const device = devices[leaf.properties.deviceId];
+              const position = positions.find(p => p.deviceId === leaf.properties.deviceId);
+              return {
+                id: leaf.properties.deviceId,
+                name: device?.name || `Device ${leaf.properties.deviceId}`,
+                status: device?.status || 'unknown',
+                latitude: position?.latitude,
+                longitude: position?.longitude,
+                lastUpdate: position?.fixTime
+              };
+            })
+            .filter(device => device.id);
+        
+          // Show popup if we have devices to display
+          if (clusterDevices.length > 0) {
+            // Remove existing popup
+            if (popupRef.current) {
+              popupRef.current.remove();
+            }
+            
+            // Create new popup
+            const popup = new maplibregl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+              closeOnMove: false,
+              focusAfterOpen: false,
+              offset: 10
+            });
+            
+            popup.setLngLat(features[0].geometry.coordinates)
+              .setHTML(createClusterPopupHTML(clusterDevices))
+              .addTo(map);
+            
+            popupRef.current = popup;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error showing cluster popup:', error);
+    }
+  }, [clusters, id, devices, positions, theme.palette.mode]);
+
+  const onMouseLeave = useCallback(() => {
+    map.getCanvas().style.cursor = '';
+    
+    // Remove popup
+    if (popupRef.current) {
+      popupRef.current.remove();
+      popupRef.current = null;
+    }
+  }, []);
 
   const onMapClickCallback = useCallback((event) => {
     if (!event.defaultPrevented && onMapClick) {
