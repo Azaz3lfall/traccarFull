@@ -133,66 +133,39 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         <div style="max-height: 320px; overflow-y: auto;">
           ${devices.map((device, index) => `
             <div style="
-              padding: 12px 20px;
+              padding: 4px 12px;
               border-bottom: ${index < devices.length - 1 ? `1px solid ${borderColor}` : 'none'};
               transition: background-color 0.2s;
             " onmouseover="this.style.backgroundColor='${hoverColor}'" onmouseout="this.style.backgroundColor='transparent'">
-              <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
                 <div style="
-                  width: 16px;
-                  height: 16px;
-                  border-radius: 50%;
-                  background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#9E9E9E'};
-                "></div>
-                <div style="flex: 1;">
+                  color: ${textColor};
+                  font-weight: 500;
+                  font-size: 14px;
+                  line-height: 1.4;
+                ">${device.name}</div>
+                ${device.lastUpdate ? `
                   <div style="
                     display: flex;
                     align-items: center;
-                    gap: 8px;
-                    margin-bottom: 4px;
+                    justify-content: space-between;
+                    gap: 12px;
                   ">
                     <span style="
-                      color: ${textColor};
-                      font-weight: 500;
-                      font-size: 14px;
-                    ">${device.name}</span>
+                      color: ${isDark ? '#9CA3AF' : '#6B7280'};
+                      font-size: 12px;
+                      font-weight: 400;
+                    ">${formatTime(device.lastUpdate)}</span>
                     <span style="
                       background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#9E9E9E'};
                       color: white;
-                      padding: 2px 8px;
-                      border-radius: 10px;
+                      padding: 1px 6px;
+                      border-radius: 8px;
                       font-size: 10px;
                       font-weight: 500;
                     ">${device.status}</span>
                   </div>
-                  ${device.latitude && device.longitude ? `
-                    <div style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                      margin-bottom: 4px;
-                    ">
-                      <span style="font-size: 12px;">📍</span>
-                      <span style="
-                        color: ${isDark ? '#9CA3AF' : '#6B7280'};
-                        font-size: 11px;
-                      ">${device.latitude.toFixed(6)}, ${device.longitude.toFixed(6)}</span>
-                    </div>
-                  ` : ''}
-                  ${device.lastUpdate ? `
-                    <div style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                    ">
-                      <span style="font-size: 12px;">🕐</span>
-                      <span style="
-                        color: ${isDark ? '#9CA3AF' : '#6B7280'};
-                        font-size: 11px;
-                      ">${formatTime(device.lastUpdate)}</span>
-                    </div>
-                  ` : ''}
-                </div>
+                ` : ''}
               </div>
             </div>
           `).join('')}
