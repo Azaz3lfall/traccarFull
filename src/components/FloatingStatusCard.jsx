@@ -538,6 +538,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
              dispatch(sessionActions.updateReplayPositions(positions));
              
              if (!positions.length) {
+               // No positions available
              }
       
     } catch (error) {
@@ -635,7 +636,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         // Method 1: Try using map's built-in export functionality
         try {
           // Get the current map style as a static image
-          const style = map.getStyle();
+          // const style = map.getStyle();
           
           // Try to export the map as a static image
           const mapCanvas = map.getCanvas();
@@ -662,6 +663,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           }
           
         } catch (blobError) {
+          // Intentionally unused - fallback to Method 2
+          console.warn('Blob export failed, trying direct toDataURL:', blobError);
           
           // Method 2: Try direct toDataURL
           const mapCanvas = map.getCanvas();
@@ -1576,11 +1579,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         </Card>
       </motion.div>
       )}
+    </AnimatePresence>
 
-      {/* More Details Modal */}
-      <AnimatePresence>
+    {/* More Details Modal */}
+    <AnimatePresence>
         {showDetailsModal && (
           <motion.div
+            key="details-modal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1941,12 +1946,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+    </AnimatePresence>
 
-      {/* Edit Modal */}
-      <AnimatePresence>
+    {/* Edit Modal */}
+    <AnimatePresence>
         {showEditModal && (
           <motion.div
+            key="edit-modal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -2135,9 +2141,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         deviceId={device?.id}
       />
 
-      {/* Success Message Snackbar */}
+    {/* Success Message Snackbar */}
+    <AnimatePresence>
       {showSuccessMessage && (
         <motion.div
+          key="success-message"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
@@ -2172,6 +2180,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     <AnimatePresence>
       {showReplayPopover && (
         <motion.div
+          key="replay-popover"
           initial={{ x: -400, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
@@ -2253,7 +2262,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             }}
           >
             {/* Device Selection - Hidden since device is already selected */}
-            {false && (
+            {/* {false && (
               <div>
                 <label style={{
                   display: 'block',
@@ -2292,7 +2301,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   ))}
                 </select>
               </div>
-            )}
+            )} */}
 
             {/* Period Selection */}
             <div>
@@ -2718,6 +2727,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     <AnimatePresence>
       {showLockOpenConfirmation && (
         <motion.div
+          key="lock-open-confirmation"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -2820,6 +2830,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     <AnimatePresence>
       {showLockClosedConfirmation && (
         <motion.div
+          key="lock-closed-confirmation"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
