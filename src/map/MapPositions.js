@@ -365,33 +365,78 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     return svgUrl;
   };
 
+  // Track loading images to prevent duplicates
+  const loadingImages = new Set();
+  
   const loadDynamicSvg = async (width) => {
     const isDarkMode = theme.palette.mode === 'dark';
     const imageId = `device-name-bg-${width}-${isDarkMode ? 'dark' : 'light'}`;
-    if (!map.hasImage(imageId)) {
-      const svgUrl = createDynamicSvg(width, 21, isDarkMode);
-      const img = new Image();
-      img.onload = () => {
-        map.addImage(imageId, img);
-        URL.revokeObjectURL(svgUrl);
-      };
-      img.src = svgUrl;
+    
+    // Check if image already exists or is currently loading
+    if (map.hasImage(imageId) || loadingImages.has(imageId)) {
+      return imageId;
     }
+    
+    // Mark as loading
+    loadingImages.add(imageId);
+    
+    const svgUrl = createDynamicSvg(width, 21, isDarkMode);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        if (!map.hasImage(imageId)) {
+          map.addImage(imageId, img);
+        }
+        URL.revokeObjectURL(svgUrl);
+      } catch (error) {
+        console.warn('Error adding image to map:', error);
+      } finally {
+        // Remove from loading set
+        loadingImages.delete(imageId);
+      }
+    };
+    img.onerror = () => {
+      console.warn('Error loading image:', imageId);
+      loadingImages.delete(imageId);
+    };
+    img.src = svgUrl;
+    
     return imageId;
   };
 
   const loadClusterSvg = async (digitCount = 1) => {
     const isDarkMode = theme.palette.mode === 'dark';
     const imageId = `cluster-bg-${digitCount}-${isDarkMode ? 'dark' : 'light'}`;
-    if (!map.hasImage(imageId)) {
-      const svgUrl = createClusterSvg(isDarkMode, digitCount);
-      const img = new Image();
-      img.onload = () => {
-        map.addImage(imageId, img);
-        URL.revokeObjectURL(svgUrl);
-      };
-      img.src = svgUrl;
+    
+    // Check if image already exists or is currently loading
+    if (map.hasImage(imageId) || loadingImages.has(imageId)) {
+      return imageId;
     }
+    
+    // Mark as loading
+    loadingImages.add(imageId);
+    
+    const svgUrl = createClusterSvg(isDarkMode, digitCount);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        if (!map.hasImage(imageId)) {
+          map.addImage(imageId, img);
+        }
+        URL.revokeObjectURL(svgUrl);
+      } catch (error) {
+        console.warn('Error adding cluster image to map:', error);
+      } finally {
+        // Remove from loading set
+        loadingImages.delete(imageId);
+      }
+    };
+    img.onerror = () => {
+      console.warn('Error loading cluster image:', imageId);
+      loadingImages.delete(imageId);
+    };
+    img.src = svgUrl;
+    
     return imageId;
   };
 
