@@ -883,9 +883,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       `}
     </style>
     <AnimatePresence mode="wait">
-      {((selectedDeviceId && device) || (showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
+      {((selectedDeviceId && device && !showReplayPopover) || (showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
         <motion.div
-          key={`status-card-${selectedDeviceId}`}
+          key={`status-card-${selectedDeviceId || replayDeviceId}-${showReplayPopover ? 'replay' : 'normal'}`}
           initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
           exit={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
