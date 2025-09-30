@@ -1049,7 +1049,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         borderRadius: '50%',
                         display: device.attributes?.deviceImage ? 'block' : 'none'
                       }} 
-                      src={device.attributes?.deviceImage ? `/api/media/${device.uniqueId}/${device.attributes.deviceImage}` : ''} 
+                      src={device.attributes?.deviceImage ? `/api/media/${device.uniqueId}/${device.attributes.deviceImage}` : undefined} 
                       alt=""
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -1223,7 +1223,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     borderRadius: '50%',
                     display: device.attributes?.deviceImage ? 'block' : 'none'
                   }} 
-                  src={device.attributes?.deviceImage ? `/api/media/${device.uniqueId}/${device.attributes.deviceImage}` : ''} 
+                  src={device.attributes?.deviceImage ? `/api/media/${device.uniqueId}/${device.attributes.deviceImage}` : undefined} 
                   alt=""
                   onError={(e) => {
                     e.target.style.display = 'none';

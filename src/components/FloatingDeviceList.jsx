@@ -276,7 +276,7 @@ const FloatingDeviceList = ({
                         height: '27px',
                         objectFit: 'contain'
                       }} 
-                      src={mapIcons[mapIconKey(device.category)] || ''} 
+                      src={mapIcons[mapIconKey(device.category)] || undefined} 
                       alt="" 
                     />
                   </div>
