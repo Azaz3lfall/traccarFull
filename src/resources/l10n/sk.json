@@ -676,5 +676,7 @@
   "calendarPeriod2": "Obdobie 2",
   "resellerBranding": "Značka",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Oprávnenia"
+  "resellerPermissions": "Oprávnenia",
+  "calendarAddPeriod": "Pridať obdobie",
+  "calendarPeriod": "Obdobie"
 }

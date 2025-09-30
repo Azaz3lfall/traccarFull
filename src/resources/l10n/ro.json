@@ -676,5 +676,7 @@
   "calendarPeriod2": "Perioada 2",
   "resellerBranding": "Identitate",
   "resellerContact": "Contact",
-  "resellerPermissions": "Permisiuni"
+  "resellerPermissions": "Permisiuni",
+  "calendarAddPeriod": "Adăugați perioada",
+  "calendarPeriod": "Perioadă"
 }

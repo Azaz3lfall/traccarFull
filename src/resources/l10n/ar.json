@@ -676,5 +676,7 @@
   "calendarPeriod2": "الفترة 2",
   "resellerBranding": "الهوية التجارية",
   "resellerContact": "اتصال",
-  "resellerPermissions": "أذونات"
+  "resellerPermissions": "أذونات",
+  "calendarAddPeriod": "إضافة فترة",
+  "calendarPeriod": "فترة"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "Davr 2",
   "resellerBranding": "Brend",
   "resellerContact": "Aloqa",
-  "resellerPermissions": "Ruxsatlar"
+  "resellerPermissions": "Ruxsatlar",
+  "calendarAddPeriod": "Davr qo'shing",
+  "calendarPeriod": "Davr"
 }

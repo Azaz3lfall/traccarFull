@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periode 2",
   "resellerBranding": "Merek",
   "resellerContact": "Kontak",
-  "resellerPermissions": "Izin"
+  "resellerPermissions": "Izin",
+  "calendarAddPeriod": "Tambah periode",
+  "calendarPeriod": "Periode"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "পিরিয়ড 2",
   "resellerBranding": "ব্র্যান্ডিং",
   "resellerContact": "যোগাযোগ",
-  "resellerPermissions": "অনুমতি"
+  "resellerPermissions": "অনুমতি",
+  "calendarAddPeriod": "পিরিয়ড যোগ করুন",
+  "calendarPeriod": "পিরিয়ড"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "期間 2",
   "resellerBranding": "品牌",
   "resellerContact": "聯絡",
-  "resellerPermissions": "權限"
+  "resellerPermissions": "權限",
+  "calendarAddPeriod": "新增期間",
+  "calendarPeriod": "期間"
 }

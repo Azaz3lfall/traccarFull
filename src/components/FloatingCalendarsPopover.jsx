@@ -63,8 +63,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [timeRanges, setTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
-      { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
+      { enabled: true, name: `${t('calendarPeriod') || 'Period'} 1`, startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: `${t('calendarPeriod') || 'Period'} 2`, startTime: '14:00', endTime: '18:00' }
     ]
   });
 
@@ -81,6 +81,39 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       }
     }
   }, [timeRanges.enabled, timeRanges.periods]);
+
+  // Helper function to get period name
+  const getPeriodName = (index) => {
+    const periodName = t('calendarPeriod');
+    return periodName && periodName !== 'calendarPeriod' ? `${periodName} ${index}` : `Period ${index}`;
+  };
+
+  // Functions to manage time range periods
+  const addPeriod = () => {
+    const newPeriodIndex = timeRanges.periods.length + 1;
+    const newPeriod = {
+      enabled: true,
+      name: getPeriodName(newPeriodIndex),
+      startTime: '08:00',
+      endTime: '12:00'
+    };
+    
+    setTimeRanges({
+      ...timeRanges,
+      periods: [...timeRanges.periods, newPeriod]
+    });
+  };
+
+  const removePeriod = (index) => {
+    if (timeRanges.periods.length > 1) {
+      const newPeriods = [...timeRanges.periods];
+      newPeriods.splice(index, 1);
+      setTimeRanges({
+        ...timeRanges,
+        periods: newPeriods
+      });
+    }
+  };
   
   // Custom dropdown states
   const [recurrenceDropdownOpen, setRecurrenceDropdownOpen] = useState(false);
@@ -278,12 +311,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     }
   };
 
-  const handleDeleteCalendar = () => {
-    if (calendarToDelete) {
-      deleteCalendarMutation.mutate(calendarToDelete.id);
-    }
-  };
-
   // Handle confirm delete
   const confirmDelete = () => {
     if (calendarToDelete) {
@@ -305,8 +332,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     setTimeRanges({
       enabled: false,
       periods: [
-        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
       ]
     });
     
@@ -366,33 +393,36 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
 
 
     if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
-      // Generate multiple VEVENT blocks for each time range
-      timeRanges.periods.forEach((period, index) => {
-        if (period.enabled && period.startTime && period.endTime) {
-          // Use the base date from startTime and apply the period times
-          const baseDate = dayjs(startTime);
-          
-          // Parse time strings properly
-          const [startHour, startMinute] = period.startTime.split(':').map(Number);
-          const [endHour, endMinute] = period.endTime.split(':').map(Number);
-          
-          const periodStart = baseDate.clone().hour(startHour).minute(startMinute).second(0);
-          const periodEnd = baseDate.clone().hour(endHour).minute(endMinute).second(0);
-          
-          
-          if (periodStart.isValid() && periodEnd.isValid()) {
-            lines.push(
-              'BEGIN:VEVENT',
-              `UID:00000000-0000-0000-0000-000000000${100 + index}`,
-              `DTSTART;${formatCalendarTime(periodStart)}`,
-              `DTEND;${formatCalendarTime(periodEnd)}`,
-              formatRule(rule),
-              `SUMMARY:${period.name || t(`calendarPeriod${index + 1}`)}`,
-              'END:VEVENT'
-            );
+      // Generate VEVENT blocks for each enabled time range
+      const enabledPeriods = timeRanges.periods.filter(period => period.enabled);
+      
+      if (enabledPeriods.length > 0) {
+        enabledPeriods.forEach((period, index) => {
+          if (period.startTime && period.endTime) {
+            // Use the base date from startTime and apply the period times
+            const baseDate = dayjs(startTime);
+            
+            // Parse time strings properly
+            const [startHour, startMinute] = period.startTime.split(':').map(Number);
+            const [endHour, endMinute] = period.endTime.split(':').map(Number);
+            
+            const periodStart = baseDate.clone().hour(startHour).minute(startMinute).second(0);
+            const periodEnd = baseDate.clone().hour(endHour).minute(endMinute).second(0);
+            
+            if (periodStart.isValid() && periodEnd.isValid()) {
+              lines.push(
+                'BEGIN:VEVENT',
+                `UID:00000000-0000-0000-0000-000000000${100 + index}`,
+                `DTSTART;${formatCalendarTime(periodStart)}`,
+                `DTEND;${formatCalendarTime(periodEnd)}`,
+                formatRule(rule),
+                `SUMMARY:${period.name || getPeriodName(index + 1)}`,
+                'END:VEVENT'
+              );
+            }
           }
-        }
-      });
+        });
+      }
     } else {
     
       // Single VEVENT block for regular calendar
@@ -451,15 +481,15 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     }
     
     return {
-      enabled: events.length > 1,
+      enabled: events.length > 0,
       periods: events.length > 0 ? events.map((event, index) => ({
         enabled: true,
-        name: event.name || t(`calendarPeriod${index + 1}`),
+        name: event.name || getPeriodName(index + 1),
         startTime: event.startTime || '08:00',
         endTime: event.endTime || '12:00'
       })) : [
-        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
       ]
     };
   };
@@ -472,8 +502,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     const defaultTimeRanges = {
       enabled: false,
       periods: [
-        { enabled: true, name: t('calendarPeriod1'), startTime: '08:00', endTime: '12:00' },
-        { enabled: false, name: t('calendarPeriod2'), startTime: '14:00', endTime: '18:00' }
+        { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
       ]
     };
     
@@ -498,14 +528,16 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     const lines = getCalendarLines(calendar);
     if (!lines) return { start: dayjs(), end: dayjs().add(1, 'hour') };
     
-    const startLine = lines.find(line => line.startsWith('DTSTART;'));
-    const endLine = lines.find(line => line.startsWith('DTEND;'));
+    // For time ranges, we need to get the base date from the first VEVENT
+    // and set timeRanges from all VEVENTs
+    const firstStartLine = lines.find(line => line.startsWith('DTSTART;'));
+    const firstEndLine = lines.find(line => line.startsWith('DTEND;'));
     
     let start = dayjs();
     let end = dayjs().add(1, 'hour');
     
-    if (startLine) {
-      const timeStr = startLine.split(':')[1];
+    if (firstStartLine) {
+      const timeStr = firstStartLine.split(':')[1];
       if (timeStr && timeStr !== 'Invalid Date') {
         const parsedStart = dayjs(timeStr, 'YYYYMMDDTHHmmss');
         if (parsedStart.isValid()) {
@@ -514,8 +546,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       }
     }
     
-    if (endLine) {
-      const timeStr = endLine.split(':')[1];
+    if (firstEndLine) {
+      const timeStr = firstEndLine.split(':')[1];
       if (timeStr && timeStr !== 'Invalid Date') {
         const parsedEnd = dayjs(timeStr, 'YYYYMMDDTHHmmss');
         if (parsedEnd.isValid()) {
@@ -1413,6 +1445,10 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                     checked={timeRanges.enabled}
                                     onChange={(e) => {
                                       const newTimeRanges = { ...timeRanges, enabled: e.target.checked };
+                                      // Ensure first period is enabled when time ranges are enabled
+                                      if (e.target.checked && newTimeRanges.periods.length > 0) {
+                                        newTimeRanges.periods[0].enabled = true;
+                                      }
                                       setTimeRanges(newTimeRanges);
                                     }}
                                   />
@@ -1430,22 +1466,75 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               />
                               
                               {timeRanges.enabled && (
-                                <Box sx={{ ml: 2, mt: 1 }}>
+                                <Box sx={{ 
+                                  ml: 2, 
+                                  mt: 1,
+                                  maxHeight: '300px',
+                                  overflowY: 'auto',
+                                  '&::-webkit-scrollbar': {
+                                    width: '6px',
+                                  },
+                                  '&::-webkit-scrollbar-track': {
+                                    background: colors.border,
+                                    borderRadius: '3px',
+                                  },
+                                  '&::-webkit-scrollbar-thumb': {
+                                    background: colors.primary,
+                                    borderRadius: '3px',
+                                    '&:hover': {
+                                      background: colors.primary + 'CC',
+                                    },
+                                  },
+                                }}>
                                   {timeRanges.periods.map((period, index) => (
                                     <Box key={index} sx={{ mb: 2, p: 2, border: `1px solid ${colors.border}`, borderRadius: 1 }}>
-                                      <FormControlLabel
-                                        control={
-                                          <Checkbox
-                                            checked={period.enabled}
-                                            onChange={(e) => {
-                                              const newPeriods = [...timeRanges.periods];
-                                              newPeriods[index].enabled = e.target.checked;
-                                              setTimeRanges({ ...timeRanges, periods: newPeriods });
+                                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                        <FormControlLabel
+                                          control={
+                                            <Checkbox
+                                              checked={period.enabled}
+                                              disabled={index === 0 && timeRanges.enabled}
+                                              onChange={(e) => {
+                                                const newPeriods = [...timeRanges.periods];
+                                                newPeriods[index].enabled = e.target.checked;
+                                                setTimeRanges({ ...timeRanges, periods: newPeriods });
+                                              }}
+                                            />
+                                          }
+                                          label={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                              {period.name}
+                                              {index === 0 && timeRanges.enabled && (
+                                                <Chip
+                                                  label={t('sharedRequired')}
+                                                  size="small"
+                                                  color="primary"
+                                                  variant="outlined"
+                                                  sx={{ 
+                                                    fontSize: '10px',
+                                                    height: '20px',
+                                                    '& .MuiChip-label': { px: 0.5 }
+                                                  }}
+                                                />
+                                              )}
+                                            </Box>
+                                          }
+                                        />
+                                        {timeRanges.periods.length > 1 && index > 0 && (
+                                          <IconButton
+                                            size="small"
+                                            onClick={() => removePeriod(index)}
+                                            sx={{
+                                              color: colors.error,
+                                              '&:hover': {
+                                                backgroundColor: colors.error + '20'
+                                              }
                                             }}
-                                          />
-                                        }
-                                        label={period.name}
-                                      />
+                                          >
+                                            <DeleteIcon fontSize="small" />
+                                          </IconButton>
+                                        )}
+                                      </Box>
                                       
                                       {period.enabled && (
                                         <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
@@ -1501,6 +1590,24 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                       )}
                                     </Box>
                                   ))}
+                                  
+                                  {/* Add Period Button */}
+                                  <Button
+                                    variant="outlined"
+                                    startIcon={<AddIcon />}
+                                    onClick={addPeriod}
+                                    sx={{
+                                      width: '100%',
+                                      borderColor: colors.border,
+                                      color: colors.text,
+                                      '&:hover': {
+                                        borderColor: colors.primary,
+                                        backgroundColor: colors.primary + '10'
+                                      }
+                                    }}
+                                  >
+                                    {t('calendarAddPeriod')}
+                                  </Button>
                                 </Box>
                               )}
                             </Box>

@@ -676,5 +676,7 @@
   "calendarPeriod2": "Период 2",
   "resellerBranding": "Бренд",
   "resellerContact": "Контакт",
-  "resellerPermissions": "Дозволи"
+  "resellerPermissions": "Дозволи",
+  "calendarAddPeriod": "Додај период",
+  "calendarPeriod": "Период"
 }

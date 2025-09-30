@@ -676,5 +676,7 @@
   "calendarPeriod2": "ช่วงเวลา 2",
   "resellerBranding": "การสร้างแบรนด์",
   "resellerContact": "ติดต่อ",
-  "resellerPermissions": "สิทธิ์"
+  "resellerPermissions": "สิทธิ์",
+  "calendarAddPeriod": "เพิ่มช่วงเวลา",
+  "calendarPeriod": "ช่วงเวลา"
 }

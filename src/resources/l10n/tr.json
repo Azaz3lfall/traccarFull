@@ -676,5 +676,7 @@
   "calendarPeriod2": "Dönem 2",
   "resellerBranding": "Marka Kimliği",
   "resellerContact": "İletişim",
-  "resellerPermissions": "İzinler"
+  "resellerPermissions": "İzinler",
+  "calendarAddPeriod": "Dönem ekle",
+  "calendarPeriod": "Dönem"
 }

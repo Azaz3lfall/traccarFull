@@ -676,5 +676,7 @@
   "calendarPeriod2": "기간 2",
   "resellerBranding": "브랜딩",
   "resellerContact": "연락처",
-  "resellerPermissions": "권한"
+  "resellerPermissions": "권한",
+  "calendarAddPeriod": "기간 추가",
+  "calendarPeriod": "기간"
 }

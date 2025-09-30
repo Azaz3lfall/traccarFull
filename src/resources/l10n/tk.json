@@ -676,5 +676,7 @@
   "calendarPeriod2": "Döwür 2",
   "resellerBranding": "Brend",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Rugsat"
+  "resellerPermissions": "Rugsat",
+  "calendarAddPeriod": "Döwür goş",
+  "calendarPeriod": "Döwür"
 }

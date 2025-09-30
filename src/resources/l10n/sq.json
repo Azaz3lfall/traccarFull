@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periudha 2",
   "resellerBranding": "Identitet",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Lejet"
+  "resellerPermissions": "Lejet",
+  "calendarAddPeriod": "Shto periudhën",
+  "calendarPeriod": "Periudha"
 }

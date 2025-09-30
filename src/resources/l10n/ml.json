@@ -676,5 +676,7 @@
   "calendarPeriod2": "കാലയളവ് 2",
   "resellerBranding": "ബ്രാൻഡിംഗ്",
   "resellerContact": "ബന്ധം",
-  "resellerPermissions": "അനുമതികൾ"
+  "resellerPermissions": "അനുമതികൾ",
+  "calendarAddPeriod": "കാലയളവ് ചേർക്കുക",
+  "calendarPeriod": "കാലയളവ്"
 }

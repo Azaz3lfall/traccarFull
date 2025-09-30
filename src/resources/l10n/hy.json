@@ -676,5 +676,7 @@
   "calendarPeriod2": "Ժամանակաշրջան 2",
   "resellerBranding": "Բրենդ",
   "resellerContact": "Կապ",
-  "resellerPermissions": "Թույլտվություններ"
+  "resellerPermissions": "Թույլտվություններ",
+  "calendarAddPeriod": "Ավելացնել պարբերություն",
+  "calendarPeriod": "Պարբերություն"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "期間 2",
   "resellerBranding": "ブランディング",
   "resellerContact": "連絡先",
-  "resellerPermissions": "権限"
+  "resellerPermissions": "権限",
+  "calendarAddPeriod": "期間を追加",
+  "calendarPeriod": "期間"
 }

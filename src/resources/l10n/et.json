@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periood 2",
   "resellerBranding": "Bränd",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Õigused"
+  "resellerPermissions": "Õigused",
+  "calendarAddPeriod": "Lisa periood",
+  "calendarPeriod": "Periood"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "პერიოდი 2",
   "resellerBranding": "ბრენდი",
   "resellerContact": "კონტაქტი",
-  "resellerPermissions": "ნებართვები"
+  "resellerPermissions": "ნებართვები",
+  "calendarAddPeriod": "პერიოდის დამატება",
+  "calendarPeriod": "პერიოდი"
 }

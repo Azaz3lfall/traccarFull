@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periods 2",
   "resellerBranding": "Zīmols",
   "resellerContact": "Kontakts",
-  "resellerPermissions": "Atļaujas"
+  "resellerPermissions": "Atļaujas",
+  "calendarAddPeriod": "Pievienot periodu",
+  "calendarPeriod": "Periods"
 }

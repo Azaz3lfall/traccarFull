@@ -676,5 +676,7 @@
   "calendarPeriod2": "Хугацаа 2",
   "resellerBranding": "Брэнд",
   "resellerContact": "Холбоо",
-  "resellerPermissions": "Зөвшөөрөл"
+  "resellerPermissions": "Зөвшөөрөл",
+  "calendarAddPeriod": "Хугацаа нэмэх",
+  "calendarPeriod": "Хугацаа"
 }

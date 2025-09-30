@@ -676,5 +676,7 @@
   "calendarPeriod2": "Περίοδος 2",
   "resellerBranding": "Επωνυμία",
   "resellerContact": "Επικοινωνία",
-  "resellerPermissions": "Δικαιώματα"
+  "resellerPermissions": "Δικαιώματα",
+  "calendarAddPeriod": "Προσθήκη περιόδου",
+  "calendarPeriod": "Περίοδος"
 }

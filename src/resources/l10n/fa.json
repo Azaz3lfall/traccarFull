@@ -676,5 +676,7 @@
   "calendarPeriod2": "دوره 2",
   "resellerBranding": "برندسازی",
   "resellerContact": "تماس",
-  "resellerPermissions": "مجوزها"
+  "resellerPermissions": "مجوزها",
+  "calendarAddPeriod": "افزودن دوره",
+  "calendarPeriod": "دوره"
 }

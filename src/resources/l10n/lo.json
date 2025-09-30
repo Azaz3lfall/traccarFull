@@ -676,5 +676,7 @@
   "calendarPeriod2": "ໄລຍະ 2",
   "resellerBranding": "ຍີ່ຫໍ້",
   "resellerContact": "ຕິດຕໍ່",
-  "resellerPermissions": "ການອະນຍາດ"
+  "resellerPermissions": "ການອະນຍາດ",
+  "calendarAddPeriod": "ເພີ່ມໄລຍະ",
+  "calendarPeriod": "ໄລຍະ"
 }

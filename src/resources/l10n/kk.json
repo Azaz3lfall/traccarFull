@@ -676,5 +676,7 @@
   "calendarPeriod2": "Кезең 2",
   "resellerBranding": "Бренд",
   "resellerContact": "Байланыс",
-  "resellerPermissions": "Рұқсаттар"
+  "resellerPermissions": "Рұқсаттар",
+  "calendarAddPeriod": "Кезең қосу",
+  "calendarPeriod": "Кезең"
 }

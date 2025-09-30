@@ -676,5 +676,7 @@
   "calendarPeriod2": "Időszak 2",
   "resellerBranding": "Márka",
   "resellerContact": "Kapcsolat",
-  "resellerPermissions": "Engedélyek"
+  "resellerPermissions": "Engedélyek",
+  "calendarAddPeriod": "Időszak hozzáadása",
+  "calendarPeriod": "Időszak"
 }

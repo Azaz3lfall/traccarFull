@@ -676,5 +676,7 @@
   "calendarPeriod2": "Razdoblje 2",
   "resellerBranding": "Brending",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Dozvole"
+  "resellerPermissions": "Dozvole",
+  "calendarAddPeriod": "Dodaj razdoblje",
+  "calendarPeriod": "Razdoblje"
 }

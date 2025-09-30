@@ -676,5 +676,7 @@
   "calendarPeriod2": "කාලය 2",
   "resellerBranding": "වෙළඳ නාමය",
   "resellerContact": "සම්බන්ධතා",
-  "resellerPermissions": "අවසර"
+  "resellerPermissions": "අවසර",
+  "calendarAddPeriod": "කාලය එකතු කරන්න",
+  "calendarPeriod": "කාලය"
 }

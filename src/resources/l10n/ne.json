@@ -676,5 +676,7 @@
   "calendarPeriod2": "अवधि 2",
   "resellerBranding": "ब्रान्डिङ",
   "resellerContact": "सम्पर्क",
-  "resellerPermissions": "अनुमति"
+  "resellerPermissions": "अनुमति",
+  "calendarAddPeriod": "अवधि थप्नुहोस्",
+  "calendarPeriod": "अवधि"
 }

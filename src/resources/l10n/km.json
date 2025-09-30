@@ -676,5 +676,7 @@
   "calendarPeriod2": "រយៈពេល 2",
   "resellerBranding": "ពាណិជ្ជសញ្ញា",
   "resellerContact": "ទំនាក់ទំនង",
-  "resellerPermissions": "ការអនុញ្ញាត"
+  "resellerPermissions": "ការអនុញ្ញាត",
+  "calendarAddPeriod": "បន្ថែមរយៈពេល",
+  "calendarPeriod": "រយៈពេល"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "Jakso 2",
   "resellerBranding": "Brändi",
   "resellerContact": "Yhteystiedot",
-  "resellerPermissions": "Käyttöoikeudet"
+  "resellerPermissions": "Käyttöoikeudet",
+  "calendarAddPeriod": "Lisää jakso",
+  "calendarPeriod": "Jakso"
 }

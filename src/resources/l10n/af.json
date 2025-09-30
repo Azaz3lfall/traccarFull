@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periode 2",
   "resellerBranding": "Handelsmerk",
   "resellerContact": "Kontak",
-  "resellerPermissions": "Toestemmings"
+  "resellerPermissions": "Toestemmings",
+  "calendarAddPeriod": "Voeg periode by",
+  "calendarPeriod": "Periode"
 }

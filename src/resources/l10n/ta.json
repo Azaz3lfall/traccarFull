@@ -676,5 +676,7 @@
   "calendarPeriod2": "காலம் 2",
   "resellerBranding": "பிராண்டிங்",
   "resellerContact": "தொடர்பு",
-  "resellerPermissions": "அனுமதிகள்"
+  "resellerPermissions": "அனுமதிகள்",
+  "calendarAddPeriod": "காலத்தைச் சேர்க்கவும்",
+  "calendarPeriod": "காலம்"
 }

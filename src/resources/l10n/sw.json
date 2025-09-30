@@ -676,5 +676,7 @@
   "calendarPeriod2": "Kipindi 2",
   "resellerBranding": "Chapa",
   "resellerContact": "Mawasiliano",
-  "resellerPermissions": "Ruhusa"
+  "resellerPermissions": "Ruhusa",
+  "calendarAddPeriod": "Ongeza kipindi",
+  "calendarPeriod": "Kipindi"
 }

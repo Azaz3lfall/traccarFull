@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periode 2",
   "resellerBranding": "Branding",
   "resellerContact": "Kontakt",
-  "resellerPermissions": "Tilladelser"
+  "resellerPermissions": "Tilladelser",
+  "calendarAddPeriod": "Tilføj periode",
+  "calendarPeriod": "Periode"
 }

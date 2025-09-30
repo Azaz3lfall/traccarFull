@@ -676,5 +676,7 @@
   "calendarPeriod2": "Tempoh 2",
   "resellerBranding": "Jenama",
   "resellerContact": "Hubungi",
-  "resellerPermissions": "Kebenaran"
+  "resellerPermissions": "Kebenaran",
+  "calendarAddPeriod": "Tambah tempoh",
+  "calendarPeriod": "Tempoh"
 }

@@ -675,6 +675,8 @@
   "calendarByTimeRange": "By timerange",
   "calendarStartTime": "Start Time",
   "calendarEndTime": "End Time",
+  "calendarPeriod": "Period",
   "calendarPeriod1": "Period 1",
-  "calendarPeriod2": "Period 2"
+  "calendarPeriod2": "Period 2",
+  "calendarAddPeriod": "Add Period"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "Periode 2",
   "resellerBranding": "Merkidentiteit",
   "resellerContact": "Contact",
-  "resellerPermissions": "Machtigingen"
+  "resellerPermissions": "Machtigingen",
+  "calendarAddPeriod": "Periode toevoegen",
+  "calendarPeriod": "Periode"
 }

@@ -676,5 +676,7 @@
   "calendarPeriod2": "Dövr 2",
   "resellerBranding": "Brend",
   "resellerContact": "Əlaqə",
-  "resellerPermissions": "İcazələr"
+  "resellerPermissions": "İcazələr",
+  "calendarAddPeriod": "Dövr əlavə et",
+  "calendarPeriod": "Dövr"
 }

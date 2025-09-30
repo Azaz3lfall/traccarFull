@@ -676,5 +676,7 @@
   "calendarPeriod2": "תקופה 2",
   "resellerBranding": "מיתוג",
   "resellerContact": "יצירת קשר",
-  "resellerPermissions": "הרשאות"
+  "resellerPermissions": "הרשאות",
+  "calendarAddPeriod": "הוסף תקופה",
+  "calendarPeriod": "תקופה"
 }
