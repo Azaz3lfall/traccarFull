@@ -1,4 +1,9 @@
-import { useId, useCallback, useEffect, useRef } from 'react';
+import {
+  useId,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -29,6 +34,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   
   // Popup ref for cluster hover
   const popupRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
 
 
   const createFeature = (devices, position, selectedPositionId) => {
@@ -88,7 +94,6 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const createClusterPopupHTML = (devices) => {
     const isDark = theme.palette.mode === 'dark';
     const bgColor = isDark ? '#1F2937' : '#FFFFFF';
-    const textColor = isDark ? '#F9FAFB' : '#1F2937';
     const borderColor = isDark ? '#374151' : '#E5E7EB';
     const hoverColor = isDark ? '#374151' : '#F3F4F6';
     
@@ -153,93 +158,107 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const onMouseEnter = useCallback(async (event) => {
     map.getCanvas().style.cursor = 'pointer';
     
-    try {
-      // Get cluster information
-      const features = map.queryRenderedFeatures(event.point, {
-        layers: [clusters],
-      });
-      
-      if (features.length > 0) {
-        const clusterId = features[0].properties.cluster_id;
-        const pointCount = features[0].properties.point_count;
+    // Clear any existing timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    
+    // Set debounce timeout
+    hoverTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Get cluster information
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: [clusters],
+        });
         
-        // Get all features in the cluster
-        const source = map.getSource(id);
-        if (source && source.getClusterLeaves) {
-          const clusterLeaves = await source.getClusterLeaves(clusterId, pointCount);
+        if (features.length > 0) {
+          const clusterId = features[0].properties.cluster_id;
+          const pointCount = features[0].properties.point_count;
           
-          // Extract device information from cluster leaves
-          const clusterDevices = clusterLeaves
-            .filter(leaf => leaf.properties && leaf.properties.deviceId)
-            .map(leaf => {
-              const device = devices[leaf.properties.deviceId];
-              const position = positions.find(p => p.deviceId === leaf.properties.deviceId);
-              return {
-                id: leaf.properties.deviceId,
-                name: device?.name || `Device ${leaf.properties.deviceId}`,
-                status: device?.status || 'unknown',
-                latitude: position?.latitude,
-                longitude: position?.longitude,
-                lastUpdate: position?.fixTime
-              };
-            })
-            .filter(device => device.id);
-        
-          // Show popup if we have devices to display
-          if (clusterDevices.length > 0) {
-            // Remove existing popup
-            if (popupRef.current) {
-              popupRef.current.remove();
-            }
+          // Get all features in the cluster
+          const source = map.getSource(id);
+          if (source && source.getClusterLeaves) {
+            const clusterLeaves = await source.getClusterLeaves(clusterId, pointCount);
             
-            // Create new popup
-            const popup = new maplibregl.Popup({
-              closeButton: false,
-              closeOnClick: false,
-              closeOnMove: false,
-              focusAfterOpen: false,
-              offset: [-20, 10],
-              className: 'custom-cluster-popup'
-            });
-            
-            popup.setLngLat(features[0].geometry.coordinates)
-              .setHTML(createClusterPopupHTML(clusterDevices))
-              .addTo(map);
-            
-            // Add event listeners to the popup for proper mouse interaction
-            const popupElement = popup.getElement();
-            if (popupElement) {
-              popupElement.addEventListener('mouseenter', () => {
-                // Keep popup alive when mouse is over it
-                if (popupRef.current) {
-                  clearTimeout(popupRef.current.hideTimeout);
-                }
+            // Extract device information from cluster leaves
+            const clusterDevices = clusterLeaves
+              .filter(leaf => leaf.properties && leaf.properties.deviceId)
+              .map(leaf => {
+                const device = devices[leaf.properties.deviceId];
+                const position = positions.find(p => p.deviceId === leaf.properties.deviceId);
+                return {
+                  id: leaf.properties.deviceId,
+                  name: device?.name || `Device ${leaf.properties.deviceId}`,
+                  status: device?.status || 'unknown',
+                  latitude: position?.latitude,
+                  longitude: position?.longitude,
+                  lastUpdate: position?.fixTime
+                };
+              })
+              .filter(device => device.id);
+          
+            // Show popup if we have devices to display
+            if (clusterDevices.length > 0) {
+              // Remove existing popup
+              if (popupRef.current) {
+                popupRef.current.remove();
+              }
+              
+              // Create new popup
+              const popup = new maplibregl.Popup({
+                closeButton: false,
+                closeOnClick: false,
+                closeOnMove: false,
+                focusAfterOpen: false,
+                offset: [-20, 10],
+                className: 'custom-cluster-popup'
               });
               
-              popupElement.addEventListener('mouseleave', () => {
-                // Hide popup when mouse leaves it
-                if (popupRef.current) {
-                  popupRef.current.hideTimeout = setTimeout(() => {
-                    if (popupRef.current) {
-                      popupRef.current.remove();
-                      popupRef.current = null;
-                    }
-                  }, 200);
-                }
-              });
+              popup.setLngLat(features[0].geometry.coordinates)
+                .setHTML(createClusterPopupHTML(clusterDevices))
+                .addTo(map);
+              
+              // Add event listeners to the popup for proper mouse interaction
+              const popupElement = popup.getElement();
+              if (popupElement) {
+                popupElement.addEventListener('mouseenter', () => {
+                  // Keep popup alive when mouse is over it
+                  if (popupRef.current) {
+                    clearTimeout(popupRef.current.hideTimeout);
+                  }
+                });
+                
+                popupElement.addEventListener('mouseleave', () => {
+                  // Hide popup when mouse leaves it
+                  if (popupRef.current) {
+                    popupRef.current.hideTimeout = setTimeout(() => {
+                      if (popupRef.current) {
+                        popupRef.current.remove();
+                        popupRef.current = null;
+                      }
+                    }, 200);
+                  }
+                });
+              }
+              
+              popupRef.current = popup;
             }
-            
-            popupRef.current = popup;
           }
         }
+      } catch (error) {
+        console.warn('Error showing cluster popup:', error);
       }
-    } catch (error) {
-      console.warn('Error showing cluster popup:', error);
-    }
+    }, 1000);
   }, [clusters, id, devices, positions, theme.palette.mode]);
 
   const onMouseLeave = useCallback(() => {
     map.getCanvas().style.cursor = '';
+    
+    // Clear any pending hover timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
     
     // Set a timeout to hide popup if mouse doesn't move to it
     if (popupRef.current) {
@@ -599,6 +618,13 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   // Cleanup effect
   useEffect(() => {
     return () => {
+      // Clear hover timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+      
+      // Clear popup
       if (popupRef.current) {
         if (popupRef.current.hideTimeout) {
           clearTimeout(popupRef.current.hideTimeout);
