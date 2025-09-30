@@ -41,7 +41,6 @@ import UsersModal from './UsersModal';
 import { 
   Truck, 
   PieChart, 
-  ChevronRight,
   ChevronLeft,
   Map,
   Check,
@@ -192,6 +191,7 @@ const MainPage = () => {
   const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [activePreferencesTab, setActivePreferencesTab] = useState(0);
+  const [activeResellerTab, setActiveResellerTab] = useState(0);
   const [popupInfoOpen, setPopupInfoOpen] = useState(false);
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
@@ -4339,268 +4339,323 @@ const MainPage = () => {
                 flexDirection: 'column',
                 gap: '16px',
               }}>
-                <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px' }}>
-                  {t('resellerPanel')}
-                </Typography>
-                <Typography variant="body2" style={{ color: colors.textSecondary, marginBottom: '16px' }}>
-                  Manage reseller files and configurations
-                </Typography>
-                
                 {/* Hidden fields */}
                 <input type="hidden" value={resellerData.currentDomain} name="currentDomain" />
                 <input type="hidden" value={resellerData.parentUserId} name="parentUserId" />
                 <input type="hidden" value={resellerData.parentUser} name="parentUser" />
                 <input type="hidden" value={resellerData.parentEmail} name="parentEmail" />
                 
-                {/* Editable fields */}
-                <TextField
-                  fullWidth
-                  value={resellerData.resellerId}
-                  onChange={(e) => handleResellerFieldChange('resellerId', e.target.value)}
-                  label={t('resellerId')}
-                  required
+                {/* Reseller Tabs */}
+                <Tabs
+                  value={activeResellerTab}
+                  onChange={(e, newValue) => setActiveResellerTab(newValue)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  style={{
+                    marginBottom: '16px',
+                  }}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    '& .MuiTab-root': {
+                      color: '#666666',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      textTransform: 'none',
+                      minHeight: '40px',
+                      padding: '8px 16px',
+                      '&.Mui-selected': {
+                        color: '#1976d2',
+                        fontWeight: '600',
+                        backgroundColor: 'transparent',
+                      },
+                      '&:hover': {
+                        color: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                      },
+                      '&.Mui-selected:hover': {
+                        color: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                      },
                     },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
+                    '& .MuiTabs-indicator': {
+                      backgroundColor: '#1976d2',
+                      height: '2px',
                     },
                   }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.resellerUser}
-                  onChange={(e) => handleResellerFieldChange('resellerUser', e.target.value)}
-                  label={t('resellerUser')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.resellerEmail}
-                  onChange={(e) => handleResellerFieldChange('resellerEmail', e.target.value)}
-                  label={t('resellerEmail')}
-                  type="email"
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.companyName}
-                  onChange={(e) => handleResellerFieldChange('companyName', e.target.value)}
-                  label={t('resellerCompanyName')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.logo}
-                  onChange={(e) => handleResellerFieldChange('logo', e.target.value)}
-                  label={t('resellerLogotype')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.url}
-                  onChange={(e) => handleResellerFieldChange('url', e.target.value)}
-                  label={t('resellerAppUrl')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.whatsapp}
-                  onChange={(e) => handleResellerFieldChange('whatsapp', e.target.value)}
-                  label={t('resellerWhatsapp')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.billingEmail}
-                  onChange={(e) => handleResellerFieldChange('billingEmail', e.target.value)}
-                  label={t('resellerBillingEmail')}
-                  type="email"
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.supportEmail}
-                  onChange={(e) => handleResellerFieldChange('supportEmail', e.target.value)}
-                  label={t('resellerSupportEmail')}
-                  type="email"
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.resellerLimit}
-                  onChange={(e) => handleResellerFieldChange('resellerLimit', e.target.value)}
-                  label={t('resellerLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.deviceLimit}
-                  onChange={(e) => handleResellerFieldChange('deviceLimit', e.target.value)}
-                  label={t('userDeviceLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.userLimit}
-                  onChange={(e) => handleResellerFieldChange('userLimit', e.target.value)}
-                  label={t('userUserLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
+                >
+                  <Tab label="Branding" />
+                  <Tab label="Contact" />
+                  <Tab label="Permissions" />
+                </Tabs>
+
+                {/* Tab Content */}
+                <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
+                  {/* Branding Tab */}
+                  {activeResellerTab === 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.resellerId}
+                        onChange={(e) => handleResellerFieldChange('resellerId', e.target.value)}
+                        label={t('resellerId')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.companyName}
+                        onChange={(e) => handleResellerFieldChange('companyName', e.target.value)}
+                        label={t('resellerCompanyName')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.logo}
+                        onChange={(e) => handleResellerFieldChange('logo', e.target.value)}
+                        label={t('resellerLogotype')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.url}
+                        onChange={(e) => handleResellerFieldChange('url', e.target.value)}
+                        label={t('resellerAppUrl')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Contact Tab */}
+                  {activeResellerTab === 1 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.resellerUser}
+                        onChange={(e) => handleResellerFieldChange('resellerUser', e.target.value)}
+                        label={t('resellerUser')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.resellerEmail}
+                        onChange={(e) => handleResellerFieldChange('resellerEmail', e.target.value)}
+                        label={t('resellerEmail')}
+                        type="email"
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.whatsapp}
+                        onChange={(e) => handleResellerFieldChange('whatsapp', e.target.value)}
+                        label={t('resellerWhatsapp')}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.billingEmail}
+                        onChange={(e) => handleResellerFieldChange('billingEmail', e.target.value)}
+                        label={t('resellerBillingEmail')}
+                        type="email"
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.supportEmail}
+                        onChange={(e) => handleResellerFieldChange('supportEmail', e.target.value)}
+                        label={t('resellerSupportEmail')}
+                        type="email"
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Permissions Tab */}
+                  {activeResellerTab === 2 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.resellerLimit}
+                        onChange={(e) => handleResellerFieldChange('resellerLimit', e.target.value)}
+                        label={t('resellerLimit')}
+                        type="number"
+                        required
+                        inputProps={{ min: 1 }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.deviceLimit}
+                        onChange={(e) => handleResellerFieldChange('deviceLimit', e.target.value)}
+                        label={t('userDeviceLimit')}
+                        type="number"
+                        required
+                        inputProps={{ min: 1 }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        value={resellerData.userLimit}
+                        onChange={(e) => handleResellerFieldChange('userLimit', e.target.value)}
+                        label={t('userUserLimit')}
+                        type="number"
+                        required
+                        inputProps={{ min: 1 }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    </div>
+                  )}
+                </Box>
                 
                 {/* Error Messages - Below Form Fields */}
                 {resellerErrors.length > 0 && (
@@ -4711,28 +4766,8 @@ const MainPage = () => {
                     // Clear any previous errors
                     setResellerErrors([]);
 
-                    // Create JSON object with all reseller fields
-                    const resellerJson = {
-                      currentDomain: resellerData.currentDomain,
-                      parentUserId: resellerData.parentUserId,
-                      parentUser: resellerData.parentUser,
-                      parentEmail: resellerData.parentEmail,
-                      resellerId: resellerData.resellerId.trim(),
-                      resellerUser: resellerData.resellerUser.trim(),
-                      resellerEmail: resellerData.resellerEmail.trim(),
-                      companyName: resellerData.companyName.trim(),
-                      logotype: resellerData.logo.trim(),
-                      appUrl: resellerData.url.trim(),
-                      whatsapp: resellerData.whatsapp.trim(),
-                      billingEmail: resellerData.billingEmail.trim(),
-                      supportEmail: resellerData.supportEmail.trim(),
-                      resellerLimit: parseInt(resellerData.resellerLimit) || 0,
-                      deviceLimit: parseInt(resellerData.deviceLimit) || 0,
-                      userLimit: parseInt(resellerData.userLimit) || 0,
-                      timestamp: new Date().toISOString(),
-                      createdBy: user?.name || 'Unknown',
-                      createdById: user?.id || null
-                    };
+                    // TODO: Implement reseller data saving functionality
+                    // const resellerJson = { ... };
                     
                     setShowResellerDrawer(false);
                   }}
