@@ -109,6 +109,30 @@ const MapView = ({ children, selectedMapStyle }) => {
         color: ${linkHoverColor} !important;
         text-decoration: underline !important;
       }
+      
+      /* Custom cluster popup styling */
+      .custom-cluster-popup .maplibregl-popup-content {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        max-width: none !important;
+        width: auto !important;
+      }
+      
+      .custom-cluster-popup {
+        padding: 0 !important;
+      }
+      
+      .custom-cluster-popup .maplibregl-popup-tip {
+        display: none !important;
+      }
+      
+      .custom-cluster-popup .maplibregl-popup-close-button {
+        display: none !important;
+      }
     `;
     document.head.appendChild(style);
     

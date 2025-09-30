@@ -249,12 +249,36 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
               closeOnClick: false,
               closeOnMove: false,
               focusAfterOpen: false,
-              offset: 10
+              offset: [-20, 10],
+              className: 'custom-cluster-popup'
             });
             
             popup.setLngLat(features[0].geometry.coordinates)
               .setHTML(createClusterPopupHTML(clusterDevices))
               .addTo(map);
+            
+            // Add event listeners to the popup for proper mouse interaction
+            const popupElement = popup.getElement();
+            if (popupElement) {
+              popupElement.addEventListener('mouseenter', () => {
+                // Keep popup alive when mouse is over it
+                if (popupRef.current) {
+                  clearTimeout(popupRef.current.hideTimeout);
+                }
+              });
+              
+              popupElement.addEventListener('mouseleave', () => {
+                // Hide popup when mouse leaves it
+                if (popupRef.current) {
+                  popupRef.current.hideTimeout = setTimeout(() => {
+                    if (popupRef.current) {
+                      popupRef.current.remove();
+                      popupRef.current = null;
+                    }
+                  }, 200);
+                }
+              });
+            }
             
             popupRef.current = popup;
           }
@@ -268,10 +292,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const onMouseLeave = useCallback(() => {
     map.getCanvas().style.cursor = '';
     
-    // Remove popup
+    // Set a timeout to hide popup if mouse doesn't move to it
     if (popupRef.current) {
-      popupRef.current.remove();
-      popupRef.current = null;
+      popupRef.current.hideTimeout = setTimeout(() => {
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
+      }, 200);
     }
   }, []);
 
@@ -618,6 +646,19 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
     updateData();
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (popupRef.current) {
+        if (popupRef.current.hideTimeout) {
+          clearTimeout(popupRef.current.hideTimeout);
+        }
+        popupRef.current.remove();
+        popupRef.current = null;
+      }
+    };
+  }, []);
 
   return null;
 };
