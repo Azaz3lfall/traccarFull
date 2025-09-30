@@ -104,32 +104,6 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         overflow: hidden;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       ">
-        <div style="
-          padding: 16px 20px;
-          border-bottom: 1px solid ${borderColor};
-          background: linear-gradient(135deg, rgba(25, 118, 210, 0.1), rgba(76, 175, 80, 0.1));
-        ">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="
-              width: 20px;
-              height: 20px;
-              background: #1976d2;
-              border-radius: 4px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: white;
-              font-size: 12px;
-              font-weight: bold;
-            ">🚛</div>
-            <div style="
-              color: ${textColor};
-              font-weight: 600;
-              font-size: 16px;
-              margin: 0;
-            ">Cluster (${devices.length} devices)</div>
-          </div>
-        </div>
         <div style="max-height: 320px; overflow-y: auto;">
           ${devices.map((device, index) => `
             <div style="
@@ -160,14 +134,12 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
                       font-size: 12px;
                       font-weight: 400;
                     ">${formatTime(device.lastUpdate)}</span>
-                    <span style="
-                      background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#9E9E9E'};
-                      color: white;
-                      padding: 1px 6px;
-                      border-radius: 8px;
-                      font-size: 10px;
-                      font-weight: 500;
-                    ">${device.status}</span>
+                    <div style="
+                      width: 8px;
+                      height: 8px;
+                      border-radius: 50%;
+                      background: ${device.status === 'online' ? '#4CAF50' : device.status === 'offline' ? '#F44336' : '#FF9800'};
+                    "></div>
                   </div>
                 ` : ''}
               </div>
