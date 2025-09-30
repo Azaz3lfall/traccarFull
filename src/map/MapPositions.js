@@ -35,6 +35,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   // Popup ref for cluster hover
   const popupRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
+  const retryTimeoutRef = useRef(null);
 
 
   const createFeature = (devices, position, selectedPositionId) => {
@@ -184,19 +185,25 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
             const clusterDevices = clusterLeaves
               .filter(leaf => leaf.properties && leaf.properties.deviceId)
               .map(leaf => {
-                const device = devices[leaf.properties.deviceId];
-                const position = positions.find(p => p.deviceId === leaf.properties.deviceId);
+                const deviceId = leaf.properties.deviceId;
+                const device = devices[deviceId];
+                const position = positions.find(p => p.deviceId === deviceId);
+                
                 return {
-                  id: leaf.properties.deviceId,
-                  name: device?.name || `Device ${leaf.properties.deviceId}`,
+                  id: deviceId,
+                  name: device?.name || `Device ${deviceId}`,
                   status: device?.status || 'unknown',
-                  latitude: position?.latitude,
-                  longitude: position?.longitude,
-                  lastUpdate: position?.fixTime
+                  latitude: position?.latitude || device?.lastPosition?.latitude,
+                  longitude: position?.longitude || device?.lastPosition?.longitude,
+                  lastUpdate: position?.fixTime || device?.lastUpdate
                 };
-              })
-              .filter(device => device.id);
+              });
           
+            // Debug logging
+            console.log('Cluster devices found:', clusterDevices);
+            console.log('Total devices in store:', Object.keys(devices).length);
+            console.log('Total positions:', positions.length);
+            
             // Show popup if we have devices to display
             if (clusterDevices.length > 0) {
               // Remove existing popup
@@ -242,6 +249,8 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
               }
               
               popupRef.current = popup;
+            } else {
+              console.warn('No devices found in cluster, skipping popup');
             }
           }
         }
@@ -258,6 +267,12 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
+    }
+    
+    // Clear any pending retry timeout
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
     }
     
     // Set a timeout to hide popup if mouse doesn't move to it
@@ -667,6 +682,12 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
         hoverTimeoutRef.current = null;
+      }
+      
+      // Clear retry timeout
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
       }
       
       // Clear popup
