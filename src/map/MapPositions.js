@@ -139,10 +139,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
             " onmouseover="this.style.backgroundColor='${hoverColor}'" onmouseout="this.style.backgroundColor='transparent'">
               <div style="display: flex; flex-direction: column; gap: 6px;">
                 <div style="
-                  color: ${textColor};
+                  color: ${isDark ? '#9CA3AF' : '#6B7280'};
                   font-weight: 500;
                   font-size: 14px;
-                  line-height: 1.4;
+                  line-height: 1.2;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 100%;
                 ">${device.name}</div>
                 ${device.lastUpdate ? `
                   <div style="
