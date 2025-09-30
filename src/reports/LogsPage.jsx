@@ -50,7 +50,7 @@ const LogsPage = () => {
         </TableHead>
         <TableBody>
           {items.map((item, index) => (
-            <TableRow key={index}>
+            <TableRow key={`log-item-${item.id || item.deviceId || index}`}>
               <TableCell className={classes.columnAction} padding="none">
                 {item.deviceId ? (
                   <IconButton color="success" size="small" disabled>

@@ -1487,7 +1487,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                   },
                                 }}>
                                   {timeRanges.periods.map((period, index) => (
-                                    <Box key={index} sx={{ mb: 2, p: 2, border: `1px solid ${colors.border}`, borderRadius: 1 }}>
+                                    <Box key={`period-${index}-${period.name || 'unnamed'}`} sx={{ mb: 2, p: 2, border: `1px solid ${colors.border}`, borderRadius: 1 }}>
                                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                         <FormControlLabel
                                           control={

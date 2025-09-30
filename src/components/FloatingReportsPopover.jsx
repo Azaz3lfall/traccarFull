@@ -3075,7 +3075,7 @@ const FloatingReportsPopover = ({
                       </TableHead>
                       <TableBody>
                         {logs.map((item, index) => (
-                          <TableRow key={index}>
+                          <TableRow key={`log-${item.id || item.deviceId || index}`}>
                             <TableCell style={{ padding: '4px' }}>
                               {item.deviceId ? (
                                 <IconButton color="success" size="small" disabled>

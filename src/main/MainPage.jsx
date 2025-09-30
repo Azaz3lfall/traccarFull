@@ -3028,7 +3028,7 @@ const MainPage = () => {
               }}>
                 {searchResults.map((result, index) => (
                   <div
-                    key={index}
+                    key={`search-${result.id || result.name || index}`}
                     onClick={() => handleSearchResultClick(result)}
                     style={{
                       padding: '12px',
@@ -4707,7 +4707,7 @@ const MainPage = () => {
                       {t('sharedError')}: {t('sharedRequiredFields')}
                     </Typography>
                     {resellerErrors.map((error, index) => (
-                      <Typography key={index} variant="body2" style={{ color: '#d32f2f', marginBottom: '4px' }}>
+                      <Typography key={`reseller-error-${index}-${error.slice(0, 20)}`} variant="body2" style={{ color: '#d32f2f', marginBottom: '4px' }}>
                         • {error}
                       </Typography>
                     ))}
