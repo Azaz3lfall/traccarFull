@@ -30,34 +30,18 @@ class ProgressTracker {
     }
   }
 
-  async loadTranslations() {
-    try {
-      // Get language from localStorage or default to 'en'
-      const language = localStorage.getItem('language') || 'en';
-      
-      // Load the appropriate translation file
-      const response = await fetch(`/src/resources/l10n/${language}.json`);
-      if (response.ok) {
-        this.translations = await response.json();
-      } else {
-        // Fallback to English if language file not found
-        const fallbackResponse = await fetch('/src/resources/l10n/en.json');
-        this.translations = await fallbackResponse.json();
-      }
-    } catch (error) {
-      console.warn('Failed to load translations, using fallback:', error);
-      // Fallback translations
-      this.translations = {
-        loadingInitializing: 'Initializing...',
-        loadingModules: 'Loading modules...',
-        loadingConnecting: 'Connecting to server...',
-        loadingData: 'Loading data...',
-        loadingRendering: 'Rendering interface...',
-        loadingFinalizing: 'Finalizing...',
-        loadingComplete: 'Complete!',
-        loadingStarting: 'Starting...'
-      };
-    }
+  loadTranslations() {
+    // Use hardcoded English strings for loading process
+    this.translations = {
+      loadingInitializing: 'Initializing...',
+      loadingModules: 'Loading modules...',
+      loadingConnecting: 'Connecting to server...',
+      loadingData: 'Loading data...',
+      loadingRendering: 'Rendering interface...',
+      loadingFinalizing: 'Finalizing...',
+      loadingComplete: 'Complete!',
+      loadingStarting: 'Starting...'
+    };
   }
 
   getTranslation(key) {
