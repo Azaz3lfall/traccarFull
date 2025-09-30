@@ -4419,9 +4419,18 @@ const MainPage = () => {
                     },
                   }}
                 >
-                  <Tab label={t('resellerBranding')} />
-                  <Tab label={t('resellerContact')} />
-                  <Tab label={t('resellerPermissions')} />
+                  <Tab label={(() => {
+                    console.log('resellerBranding translation:', t('resellerBranding'));
+                    return t('resellerBranding') || 'Branding';
+                  })()} />
+                  <Tab label={(() => {
+                    console.log('resellerContact translation:', t('resellerContact'));
+                    return t('resellerContact') || 'Contact';
+                  })()} />
+                  <Tab label={(() => {
+                    console.log('resellerPermissions translation:', t('resellerPermissions'));
+                    return t('resellerPermissions') || 'Permissions';
+                  })()} />
                 </Tabs>
 
                 {/* Tab Content */}
