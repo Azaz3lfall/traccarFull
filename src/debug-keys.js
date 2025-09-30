@@ -35,15 +35,17 @@ if (process.env.NODE_ENV === "development") {
       }
     }
     
-    console.log("🗺️ MAP OPERATION:", {
-      arrayLength: this.length,
-      resultLength: result.length,
-      caller: caller.trim(),
-      firstFewItems: this.slice(0, 3),
-      hasKeys: keys.length > 0,
-      keys: keys,
-      duplicateKeys: duplicateKeys
-    });
+    // Only log when duplicates are found
+    if (duplicateKeys.length > 0) {
+      console.warn("🚨 DUPLICATE KEYS FOUND:", {
+        arrayLength: this.length,
+        resultLength: result.length,
+        caller: caller.trim(),
+        firstFewItems: this.slice(0, 3),
+        keys: keys,
+        duplicateKeys: duplicateKeys
+      });
+    }
     
     mapCallCount--;
     return result;
@@ -54,13 +56,6 @@ if (process.env.NODE_ENV === "development") {
       if (props.key === null || props.key === "") {
         console.warn("⚠️ Empty key detected:", { type, props });
       }
-      
-      // Log all keys being created
-      console.log("🔑 KEY CREATED:", {
-        type: type,
-        key: props.key,
-        props: Object.keys(props).slice(0, 5) // First 5 prop names
-      });
     }
     return originalCreateElement(type, props, ...children);
   };
