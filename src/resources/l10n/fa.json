@@ -673,5 +673,8 @@
   "calendarStartTime": "زمان شروع",
   "calendarEndTime": "زمان پایان",
   "calendarPeriod1": "دوره 1",
-  "calendarPeriod2": "دوره 2"
+  "calendarPeriod2": "دوره 2",
+  "resellerBranding": "برندسازی",
+  "resellerContact": "تماس",
+  "resellerPermissions": "مجوزها"
 }

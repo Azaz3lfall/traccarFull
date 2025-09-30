@@ -673,5 +673,8 @@
   "calendarStartTime": "Pradžios laikas",
   "calendarEndTime": "Pabaigos laikas",
   "calendarPeriod1": "Laikotarpis 1",
-  "calendarPeriod2": "Laikotarpis 2"
+  "calendarPeriod2": "Laikotarpis 2",
+  "resellerBranding": "Prekės ženklas",
+  "resellerContact": "Kontaktas",
+  "resellerPermissions": "Leidimai"
 }

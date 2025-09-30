@@ -673,5 +673,8 @@
   "calendarStartTime": "Басталу уақыты",
   "calendarEndTime": "Аяқталу уақыты",
   "calendarPeriod1": "Кезең 1",
-  "calendarPeriod2": "Кезең 2"
+  "calendarPeriod2": "Кезең 2",
+  "resellerBranding": "Бренд",
+  "resellerContact": "Байланыс",
+  "resellerPermissions": "Рұқсаттар"
 }

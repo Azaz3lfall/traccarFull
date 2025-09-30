@@ -673,5 +673,8 @@
   "calendarStartTime": "ពេលវេលាចាប់ផ្តើម",
   "calendarEndTime": "ពេលវេលាបញ្ចប់",
   "calendarPeriod1": "រយៈពេល 1",
-  "calendarPeriod2": "រយៈពេល 2"
+  "calendarPeriod2": "រយៈពេល 2",
+  "resellerBranding": "ពាណិជ្ជសញ្ញា",
+  "resellerContact": "ទំនាក់ទំនង",
+  "resellerPermissions": "ការអនុញ្ញាត"
 }

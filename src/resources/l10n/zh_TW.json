@@ -673,5 +673,8 @@
   "calendarStartTime": "開始時間",
   "calendarEndTime": "結束時間",
   "calendarPeriod1": "期間 1",
-  "calendarPeriod2": "期間 2"
+  "calendarPeriod2": "期間 2",
+  "resellerBranding": "品牌",
+  "resellerContact": "聯絡",
+  "resellerPermissions": "權限"
 }

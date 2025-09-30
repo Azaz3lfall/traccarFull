@@ -673,5 +673,8 @@
   "calendarStartTime": "Време на почеток",
   "calendarEndTime": "Време на крај",
   "calendarPeriod1": "Период 1",
-  "calendarPeriod2": "Период 2"
+  "calendarPeriod2": "Период 2",
+  "resellerBranding": "Бренд",
+  "resellerContact": "Контакт",
+  "resellerPermissions": "Дозволи"
 }

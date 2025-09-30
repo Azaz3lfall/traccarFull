@@ -673,5 +673,8 @@
   "calendarStartTime": "Begintyd",
   "calendarEndTime": "Eindtyd",
   "calendarPeriod1": "Periode 1",
-  "calendarPeriod2": "Periode 2"
+  "calendarPeriod2": "Periode 2",
+  "resellerBranding": "Handelsmerk",
+  "resellerContact": "Kontak",
+  "resellerPermissions": "Toestemmings"
 }

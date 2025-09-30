@@ -673,5 +673,8 @@
   "calendarStartTime": "শুরুর সময়",
   "calendarEndTime": "শেষের সময়",
   "calendarPeriod1": "পিরিয়ড 1",
-  "calendarPeriod2": "পিরিয়ড 2"
+  "calendarPeriod2": "পিরিয়ড 2",
+  "resellerBranding": "ব্র্যান্ডিং",
+  "resellerContact": "যোগাযোগ",
+  "resellerPermissions": "অনুমতি"
 }

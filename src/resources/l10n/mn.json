@@ -673,5 +673,8 @@
   "calendarStartTime": "Эхлэх цаг",
   "calendarEndTime": "Дуусах цаг",
   "calendarPeriod1": "Хугацаа 1",
-  "calendarPeriod2": "Хугацаа 2"
+  "calendarPeriod2": "Хугацаа 2",
+  "resellerBranding": "Брэнд",
+  "resellerContact": "Холбоо",
+  "resellerPermissions": "Зөвшөөрөл"
 }

@@ -673,5 +673,8 @@
   "calendarStartTime": "Час початку",
   "calendarEndTime": "Час закінчення",
   "calendarPeriod1": "Період 1",
-  "calendarPeriod2": "Період 2"
+  "calendarPeriod2": "Період 2",
+  "resellerBranding": "Брендинг",
+  "resellerContact": "Контакт",
+  "resellerPermissions": "Дозволи"
 }

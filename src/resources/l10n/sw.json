@@ -673,5 +673,8 @@
   "calendarStartTime": "Muda wa kuanza",
   "calendarEndTime": "Muda wa mwisho",
   "calendarPeriod1": "Kipindi 1",
-  "calendarPeriod2": "Kipindi 2"
+  "calendarPeriod2": "Kipindi 2",
+  "resellerBranding": "Chapa",
+  "resellerContact": "Mawasiliano",
+  "resellerPermissions": "Ruhusa"
 }

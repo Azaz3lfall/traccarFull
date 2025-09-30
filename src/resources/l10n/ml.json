@@ -673,5 +673,8 @@
   "calendarStartTime": "ആരംഭ സമയം",
   "calendarEndTime": "അവസാന സമയം",
   "calendarPeriod1": "കാലയളവ് 1",
-  "calendarPeriod2": "കാലയളവ് 2"
+  "calendarPeriod2": "കാലയളവ് 2",
+  "resellerBranding": "ബ്രാൻഡിംഗ്",
+  "resellerContact": "ബന്ധം",
+  "resellerPermissions": "അനുമതികൾ"
 }

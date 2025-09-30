@@ -673,5 +673,8 @@
   "calendarStartTime": "Kezdési idő",
   "calendarEndTime": "Befejezési idő",
   "calendarPeriod1": "Időszak 1",
-  "calendarPeriod2": "Időszak 2"
+  "calendarPeriod2": "Időszak 2",
+  "resellerBranding": "Márka",
+  "resellerContact": "Kapcsolat",
+  "resellerPermissions": "Engedélyek"
 }

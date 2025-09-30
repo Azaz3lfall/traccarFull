@@ -673,5 +673,8 @@
   "calendarStartTime": "ආරම්භක වේලාව",
   "calendarEndTime": "අවසාන වේලාව",
   "calendarPeriod1": "කාලය 1",
-  "calendarPeriod2": "කාලය 2"
+  "calendarPeriod2": "කාලය 2",
+  "resellerBranding": "වෙළඳ නාමය",
+  "resellerContact": "සම්බන්ධතා",
+  "resellerPermissions": "අවසර"
 }

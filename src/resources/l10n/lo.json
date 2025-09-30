@@ -673,5 +673,8 @@
   "calendarStartTime": "ເວລາເລີ່ມຕົ້ນ",
   "calendarEndTime": "ເວລາສິ້ນສຸດ",
   "calendarPeriod1": "ໄລຍະ 1",
-  "calendarPeriod2": "ໄລຍະ 2"
+  "calendarPeriod2": "ໄລຍະ 2",
+  "resellerBranding": "ຍີ່ຫໍ້",
+  "resellerContact": "ຕິດຕໍ່",
+  "resellerPermissions": "ການອະນຍາດ"
 }

@@ -673,5 +673,8 @@
   "calendarStartTime": "Waktu mulai",
   "calendarEndTime": "Waktu selesai",
   "calendarPeriod1": "Periode 1",
-  "calendarPeriod2": "Periode 2"
+  "calendarPeriod2": "Periode 2",
+  "resellerBranding": "Branding",
+  "resellerContact": "Contact",
+  "resellerPermissions": "Permissions"
 }

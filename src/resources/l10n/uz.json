@@ -673,5 +673,8 @@
   "calendarStartTime": "Boshlanish vaqti",
   "calendarEndTime": "Tugash vaqti",
   "calendarPeriod1": "Davr 1",
-  "calendarPeriod2": "Davr 2"
+  "calendarPeriod2": "Davr 2",
+  "resellerBranding": "Brend",
+  "resellerContact": "Aloqa",
+  "resellerPermissions": "Ruxsatlar"
 }

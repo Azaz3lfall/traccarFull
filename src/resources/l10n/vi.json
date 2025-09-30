@@ -673,5 +673,8 @@
   "calendarStartTime": "Thời gian bắt đầu",
   "calendarEndTime": "Thời gian kết thúc",
   "calendarPeriod1": "Giai đoạn 1",
-  "calendarPeriod2": "Giai đoạn 2"
+  "calendarPeriod2": "Giai đoạn 2",
+  "resellerBranding": "Nhận diện thương hiệu",
+  "resellerContact": "Liên hệ",
+  "resellerPermissions": "Quyền"
 }

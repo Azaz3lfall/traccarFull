@@ -673,5 +673,8 @@
   "calendarStartTime": "Ora de început",
   "calendarEndTime": "Ora de sfârșit",
   "calendarPeriod1": "Perioada 1",
-  "calendarPeriod2": "Perioada 2"
+  "calendarPeriod2": "Perioada 2",
+  "resellerBranding": "Identitate",
+  "resellerContact": "Contact",
+  "resellerPermissions": "Permisiuni"
 }

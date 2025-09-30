@@ -673,5 +673,8 @@
   "calendarStartTime": "Algusaeg",
   "calendarEndTime": "Lõpuaeg",
   "calendarPeriod1": "Periood 1",
-  "calendarPeriod2": "Periood 2"
+  "calendarPeriod2": "Periood 2",
+  "resellerBranding": "Bränd",
+  "resellerContact": "Kontakt",
+  "resellerPermissions": "Õigused"
 }

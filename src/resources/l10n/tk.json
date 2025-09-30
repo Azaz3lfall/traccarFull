@@ -673,5 +673,8 @@
   "calendarStartTime": "Başlanma wagty",
   "calendarEndTime": "Gutarýan wagty",
   "calendarPeriod1": "Döwür 1",
-  "calendarPeriod2": "Döwür 2"
+  "calendarPeriod2": "Döwür 2",
+  "resellerBranding": "Branding",
+  "resellerContact": "Contact",
+  "resellerPermissions": "Permissions"
 }

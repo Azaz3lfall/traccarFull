@@ -673,5 +673,8 @@
   "calendarStartTime": "தொடக்க நேரம்",
   "calendarEndTime": "முடிவு நேரம்",
   "calendarPeriod1": "காலம் 1",
-  "calendarPeriod2": "காலம் 2"
+  "calendarPeriod2": "காலம் 2",
+  "resellerBranding": "பிராண்டிங்",
+  "resellerContact": "தொடர்பு",
+  "resellerPermissions": "அனுமதிகள்"
 }

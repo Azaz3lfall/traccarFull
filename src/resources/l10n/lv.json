@@ -673,5 +673,8 @@
   "calendarStartTime": "Sākuma laiks",
   "calendarEndTime": "Beigu laiks",
   "calendarPeriod1": "Periods 1",
-  "calendarPeriod2": "Periods 2"
+  "calendarPeriod2": "Periods 2",
+  "resellerBranding": "Zīmols",
+  "resellerContact": "Kontakts",
+  "resellerPermissions": "Atļaujas"
 }

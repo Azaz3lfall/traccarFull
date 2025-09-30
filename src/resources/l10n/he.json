@@ -673,5 +673,8 @@
   "calendarStartTime": "שעת התחלה",
   "calendarEndTime": "שעת סיום",
   "calendarPeriod1": "תקופה 1",
-  "calendarPeriod2": "תקופה 2"
+  "calendarPeriod2": "תקופה 2",
+  "resellerBranding": "Branding",
+  "resellerContact": "Contact",
+  "resellerPermissions": "Permissions"
 }

@@ -673,5 +673,8 @@
   "calendarStartTime": "Vrijeme početka",
   "calendarEndTime": "Vrijeme završetka",
   "calendarPeriod1": "Razdoblje 1",
-  "calendarPeriod2": "Razdoblje 2"
+  "calendarPeriod2": "Razdoblje 2",
+  "resellerBranding": "Brending",
+  "resellerContact": "Kontakt",
+  "resellerPermissions": "Dozvole"
 }

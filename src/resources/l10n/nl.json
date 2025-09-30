@@ -673,5 +673,8 @@
   "calendarStartTime": "Starttijd",
   "calendarEndTime": "Eindtijd",
   "calendarPeriod1": "Periode 1",
-  "calendarPeriod2": "Periode 2"
+  "calendarPeriod2": "Periode 2",
+  "resellerBranding": "Merkidentiteit",
+  "resellerContact": "Contact",
+  "resellerPermissions": "Machtigingen"
 }

@@ -673,5 +673,8 @@
   "calendarStartTime": "시작 시간",
   "calendarEndTime": "종료 시간",
   "calendarPeriod1": "기간 1",
-  "calendarPeriod2": "기간 2"
+  "calendarPeriod2": "기간 2",
+  "resellerBranding": "브랜딩",
+  "resellerContact": "연락처",
+  "resellerPermissions": "권한"
 }

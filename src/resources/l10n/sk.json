@@ -673,5 +673,8 @@
   "calendarStartTime": "Čas začiatku",
   "calendarEndTime": "Čas konca",
   "calendarPeriod1": "Obdobie 1",
-  "calendarPeriod2": "Obdobie 2"
+  "calendarPeriod2": "Obdobie 2",
+  "resellerBranding": "Značka",
+  "resellerContact": "Kontakt",
+  "resellerPermissions": "Oprávnenia"
 }

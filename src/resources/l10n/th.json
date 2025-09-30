@@ -673,5 +673,8 @@
   "calendarStartTime": "เวลาเริ่มต้น",
   "calendarEndTime": "เวลาสิ้นสุด",
   "calendarPeriod1": "ช่วงเวลา 1",
-  "calendarPeriod2": "ช่วงเวลา 2"
+  "calendarPeriod2": "ช่วงเวลา 2",
+  "resellerBranding": "การสร้างแบรนด์",
+  "resellerContact": "ติดต่อ",
+  "resellerPermissions": "สิทธิ์"
 }

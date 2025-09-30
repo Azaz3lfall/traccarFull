@@ -673,5 +673,8 @@
   "calendarStartTime": "सुरुको समय",
   "calendarEndTime": "अन्त्यको समय",
   "calendarPeriod1": "अवधि 1",
-  "calendarPeriod2": "अवधि 2"
+  "calendarPeriod2": "अवधि 2",
+  "resellerBranding": "ब्रान्डिङ",
+  "resellerContact": "सम्पर्क",
+  "resellerPermissions": "अनुमति"
 }

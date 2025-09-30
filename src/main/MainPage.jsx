@@ -4419,9 +4419,9 @@ const MainPage = () => {
                     },
                   }}
                 >
-                  <Tab label="Branding" />
-                  <Tab label="Contact" />
-                  <Tab label="Permissions" />
+                  <Tab label={t('resellerBranding')} />
+                  <Tab label={t('resellerContact')} />
+                  <Tab label={t('resellerPermissions')} />
                 </Tabs>
 
                 {/* Tab Content */}

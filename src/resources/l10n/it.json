@@ -673,5 +673,8 @@
   "calendarStartTime": "Ora di inizio",
   "calendarEndTime": "Ora di fine",
   "calendarPeriod1": "Periodo 1",
-  "calendarPeriod2": "Periodo 2"
+  "calendarPeriod2": "Periodo 2",
+  "resellerBranding": "Identità",
+  "resellerContact": "Contatto",
+  "resellerPermissions": "Permessi"
 }

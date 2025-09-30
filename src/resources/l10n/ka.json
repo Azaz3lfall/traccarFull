@@ -673,5 +673,8 @@
   "calendarStartTime": "დაწყების დრო",
   "calendarEndTime": "დასრულების დრო",
   "calendarPeriod1": "პერიოდი 1",
-  "calendarPeriod2": "პერიოდი 2"
+  "calendarPeriod2": "პერიოდი 2",
+  "resellerBranding": "ბრენდი",
+  "resellerContact": "კონტაქტი",
+  "resellerPermissions": "ნებართვები"
 }

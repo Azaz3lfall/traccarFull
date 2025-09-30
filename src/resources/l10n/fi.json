@@ -673,5 +673,8 @@
   "calendarStartTime": "Aloitusaika",
   "calendarEndTime": "Lopetusaika",
   "calendarPeriod1": "Jakso 1",
-  "calendarPeriod2": "Jakso 2"
+  "calendarPeriod2": "Jakso 2",
+  "resellerBranding": "Brändi",
+  "resellerContact": "Yhteystiedot",
+  "resellerPermissions": "Käyttöoikeudet"
 }

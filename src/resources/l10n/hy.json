@@ -673,5 +673,8 @@
   "calendarStartTime": "Սկզբի ժամանակ",
   "calendarEndTime": "Ավարտի ժամանակ",
   "calendarPeriod1": "Ժամանակաշրջան 1",
-  "calendarPeriod2": "Ժամանակաշրջան 2"
+  "calendarPeriod2": "Ժամանակաշրջան 2",
+  "resellerBranding": "Բրենդ",
+  "resellerContact": "Կապ",
+  "resellerPermissions": "Թույլտվություններ"
 }

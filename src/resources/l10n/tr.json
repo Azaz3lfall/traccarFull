@@ -673,5 +673,8 @@
   "calendarStartTime": "Başlangıç zamanı",
   "calendarEndTime": "Bitiş zamanı",
   "calendarPeriod1": "Dönem 1",
-  "calendarPeriod2": "Dönem 2"
+  "calendarPeriod2": "Dönem 2",
+  "resellerBranding": "Marka Kimliği",
+  "resellerContact": "İletişim",
+  "resellerPermissions": "İzinler"
 }

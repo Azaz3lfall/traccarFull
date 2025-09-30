@@ -673,5 +673,8 @@
   "calendarStartTime": "Hora d'inici",
   "calendarEndTime": "Hora de finalització",
   "calendarPeriod1": "Període 1",
-  "calendarPeriod2": "Període 2"
+  "calendarPeriod2": "Període 2",
+  "resellerBranding": "Identitat",
+  "resellerContact": "Contacte",
+  "resellerPermissions": "Permisos"
 }
