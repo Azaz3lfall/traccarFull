@@ -94,6 +94,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -195,16 +196,44 @@ app.get('/api/resellers', (req, res) => {
 });
 
 // POST endpoint for resellers data
-app.post('/api/resellers', upload.single('image'), async (req, res) => {
+app.post('/api/resellers', upload.any(), async (req, res) => {
   try {
+    console.log('🔍 Request headers:', req.headers['content-type']);
+    console.log('🔍 Request body keys:', Object.keys(req.body || {}));
+    console.log('🔍 Request files:', req.files ? req.files.length : 'none');
+    console.log('🔍 Request body:', JSON.stringify(req.body, null, 2));
+    
     let body;
     
     // Check if request is FormData (with image) or JSON
     if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
-      // Handle FormData - extract resellerData from form
-      body = JSON.parse(req.body.resellerData);
+      // Handle FormData - use individual fields from form data
+      console.log('📝 Processing FormData request');
+      
+      // Extract all fields from FormData
+      body = {
+        currentDomain: req.body.currentDomain,
+        parentUserId: req.body.parentUserId,
+        parentUser: req.body.parentUser,
+        parentEmail: req.body.parentEmail,
+        resellerId: req.body.resellerId,
+        resellerUser: req.body.resellerUser,
+        resellerEmail: req.body.resellerEmail,
+        companyName: req.body.companyName,
+        logotype: req.body.logotype || '', // Will be updated with image URL if image is uploaded
+        appUrl: req.body.appUrl,
+        whatsapp: req.body.whatsapp,
+        billingEmail: req.body.billingEmail,
+        supportEmail: req.body.supportEmail,
+        resellerLimit: parseInt(req.body.resellerLimit) || 0,
+        deviceLimit: parseInt(req.body.deviceLimit) || 0,
+        userLimit: parseInt(req.body.userLimit) || 0,
+        status: req.body.status || 'active',
+        createdAt: req.body.createdAt
+      };
     } else {
       // Handle JSON request
+      console.log('📝 Processing JSON request');
       body = req.body;
     }
     
@@ -225,11 +254,11 @@ app.post('/api/resellers', upload.single('image'), async (req, res) => {
       console.log(`  ${key}:`, value);
     });
     
-    // Validate required fields
+    // Validate required fields (logotype is optional as it will be set from image upload)
     const requiredFields = [
       'currentDomain', 'parentUserId', 'parentUser', 'parentEmail',
       'resellerId', 'resellerUser', 'resellerEmail', 'companyName',
-      'logotype', 'appUrl', 'whatsapp', 'billingEmail', 'supportEmail',
+      'appUrl', 'whatsapp', 'billingEmail', 'supportEmail',
       'resellerLimit', 'deviceLimit', 'userLimit', 'status', 'createdAt'
     ];
     
@@ -348,26 +377,29 @@ app.post('/api/resellers', upload.single('image'), async (req, res) => {
     
     // Process image if provided (after validation passes)
     let imageUrl = body.logotype || '';
-    if (req.file) {
+    if (req.files && req.files.length > 0) {
       try {
-        const appUrl = req.body.appUrl;
-        const parentUserId = req.body.parentUserId;
-        const resellerId = req.body.resellerId;
-        
-        // Generate unique filename for image
-        const imageFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
-        const imagesDir = path.join(__dirname, 'data', 'images');
-        const imagePath = path.join(imagesDir, imageFilename);
-        
-        // Move uploaded file to final location
-        fs.renameSync(req.file.path, imagePath);
-        
-        // Update logotype with relative path
-        imageUrl = `images/${imageFilename}`;
-        body.logotype = imageUrl;
-        
-        console.log('📤 Image processed:', imageFilename);
-        console.log('📁 Saved to:', imagePath);
+        const imageFile = req.files.find(file => file.fieldname === 'image');
+        if (imageFile) {
+          const appUrl = req.body.appUrl;
+          const parentUserId = req.body.parentUserId;
+          const resellerId = req.body.resellerId;
+          
+          // Generate unique filename for image
+          const imageFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
+          const imagesDir = path.join(__dirname, 'data', 'images');
+          const imagePath = path.join(imagesDir, imageFilename);
+          
+          // Move uploaded file to final location
+          fs.renameSync(imageFile.path, imagePath);
+          
+          // Update logotype with relative path
+          imageUrl = `images/${imageFilename}`;
+          body.logotype = imageUrl;
+          
+          console.log('📤 Image processed:', imageFilename);
+          console.log('📁 Saved to:', imagePath);
+        }
       } catch (imageError) {
         console.error('❌ Error processing image:', imageError);
         return res.status(500).json({
@@ -377,7 +409,7 @@ app.post('/api/resellers', upload.single('image'), async (req, res) => {
         });
       }
     }
-
+    
     // Create JSON file with reseller data
     try {
       // Create filename: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
@@ -626,10 +658,10 @@ app.post('/api/domain-lookup', async (req, res) => {
     console.error('❌ Error in domain lookup:', error);
     res.status(500).json({
       error: 'Domain lookup failed',
-      message: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // Generic JSON POST endpoint

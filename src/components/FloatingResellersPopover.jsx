@@ -188,20 +188,22 @@ const FloatingResellersPopover = ({
   // Mutations
   const createResellerMutation = useMutation({
     mutationFn: async (resellerData) => {
-      // Create FormData to send both validation data and image
-      const formData = new FormData();
-      
-      // Add all reseller data as JSON
-      formData.append('resellerData', JSON.stringify(resellerData));
-      
-      // Add image if selected
-      if (selectedImage && resellerData.appUrl) {
-        formData.append('image', selectedImage);
-        formData.append('filename', `${resellerData.appUrl}.png`);
-        formData.append('appUrl', resellerData.appUrl);
-        formData.append('parentUserId', resellerData.parentUserId);
-        formData.append('resellerId', resellerData.resellerId);
-      }
+    // Create FormData to send both validation data and image
+    const formData = new FormData();
+    
+    // Add all reseller data as JSON
+    formData.append('resellerData', JSON.stringify(resellerData));
+    
+    // Add individual fields for backend processing
+    Object.keys(resellerData).forEach(key => {
+      formData.append(key, resellerData[key]);
+    });
+    
+    // Add image if selected
+    if (selectedImage && resellerData.appUrl) {
+      formData.append('image', selectedImage);
+      formData.append('filename', `${resellerData.appUrl}.png`);
+    }
 
       const response = await fetch('http://localhost:3333/api/resellers', {
         method: 'POST',
