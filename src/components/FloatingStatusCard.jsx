@@ -86,6 +86,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [successMessage, setSuccessMessage] = useState('');
   const [showLockOpenConfirmation, setShowLockOpenConfirmation] = useState(false);
   const [showLockClosedConfirmation, setShowLockClosedConfirmation] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
@@ -467,6 +468,71 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     if (!selectedDeviceId || !device) return;
     setShowLockClosedConfirmation(true);
   }, [selectedDeviceId, device]);
+
+  // Device image upload handler
+  const handleImageUpload = useCallback(async (event) => {
+    const file = event.target.files[0];
+    if (!file || !device?.id) return;
+
+    // Check file size (120KB = 120 * 1024 bytes)
+    const maxSize = 120 * 1024;
+    if (file.size > maxSize) {
+      alert(t('deviceImageSizeError', { maxSize: '120KB' }));
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      alert(t('deviceImageTypeError'));
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      // First, upload the image to get the image URL
+      const response = await fetchOrThrow(`/api/devices/${device.id}/image`, {
+        method: 'POST',
+        body: file,
+      });
+      
+      const imageUrl = await response.text();
+      
+      // Load current device data with attributes
+      const deviceResponse = await fetchOrThrow(`/api/devices/${device.id}`);
+      const deviceData = await deviceResponse.json();
+      
+      // Update device attributes with new image
+      const updatedDeviceData = {
+        ...deviceData,
+        attributes: {
+          ...deviceData.attributes,
+          deviceImage: imageUrl
+        }
+      };
+      
+      // Save the updated device data
+      await fetchOrThrow(`/api/devices/${device.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedDeviceData),
+      });
+      
+      // Update Redux store
+      dispatch(devicesActions.update([updatedDeviceData]));
+      
+      // Invalidate queries to refresh UI
+      queryClient.invalidateQueries(['devices']);
+      
+      console.log('Device image updated successfully');
+    } catch (error) {
+      console.error('Error uploading device image:', error);
+      alert(t('deviceImageUploadError'));
+    } finally {
+      setIsUploadingImage(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  }, [device?.id, t, dispatch, queryClient]);
 
   // Clear replay positions when device selection changes
   useEffect(() => {
@@ -885,6 +951,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         }
       `}
     </style>
+    
+    {/* Hidden file input for device image upload */}
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageUpload}
+      style={{ display: 'none' }}
+      id="device-image-upload"
+      disabled={isUploadingImage}
+    />
     <AnimatePresence mode="wait">
       {((selectedDeviceId && device && !showReplayPopover) || (showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
         <motion.div
@@ -1079,25 +1155,39 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       right: '5%',
                       width: '20px',
                       height: '20px',
-                      backgroundColor: colors.primary,
+                      backgroundColor: isUploadingImage ? colors.textSecondary : colors.primary,
                       borderRadius: '4px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      cursor: 'pointer',
+                      cursor: isUploadingImage ? 'not-allowed' : 'pointer',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                       zIndex: 1000,
-                      border: 'none'
+                      border: 'none',
+                      opacity: isUploadingImage ? 0.7 : 1
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Change image clicked - Mobile');
+                      if (!isUploadingImage) {
+                        document.getElementById('device-image-upload').click();
+                      }
                     }}
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <circle cx="12" cy="13" r="4" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    {isUploadingImage ? (
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        border: `2px solid ${colors.background}`,
+                        borderTop: `2px solid ${colors.primary}`,
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="13" r="4" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </div>
                   
                   {/* Speed */}
@@ -1282,25 +1372,39 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   right: !desktop ? '-2px' : '30%',
                   width: !desktop ? '20px' : '24px',
                   height: !desktop ? '20px' : '24px',
-                  backgroundColor: colors.primary,
+                  backgroundColor: isUploadingImage ? colors.textSecondary : colors.primary,
                   borderRadius: !desktop ? '4px' : '6px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
+                  cursor: isUploadingImage ? 'not-allowed' : 'pointer',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                   zIndex: 1000,
-                  border: 'none'
+                  border: 'none',
+                  opacity: isUploadingImage ? 0.7 : 1
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('Change image clicked - Desktop');
+                  if (!isUploadingImage) {
+                    document.getElementById('device-image-upload').click();
+                  }
                 }}
               >
-                <svg width={!desktop ? "12" : "14"} height={!desktop ? "12" : "14"} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="13" r="4" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                {isUploadingImage ? (
+                  <div style={{
+                    width: !desktop ? '8px' : '10px',
+                    height: !desktop ? '8px' : '10px',
+                    border: `2px solid ${colors.background}`,
+                    borderTop: `2px solid ${colors.primary}`,
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                ) : (
+                  <svg width={!desktop ? "12" : "14"} height={!desktop ? "12" : "14"} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="13" r="4" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
               </div>
             </div>
 
