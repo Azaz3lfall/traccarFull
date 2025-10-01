@@ -6,6 +6,7 @@
   "dependencies": {
     "@emotion/cache": "^11.14.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",

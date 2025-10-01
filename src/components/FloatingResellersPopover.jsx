@@ -172,7 +172,7 @@ const FloatingResellersPopover = ({
   };
 
   // Handle save reseller
-  const handleSaveReseller = () => {
+  const handleSaveReseller = async () => {
     if (!editingReseller) return;
 
     // Create payload matching the exact structure you specified
@@ -205,11 +205,33 @@ const FloatingResellersPopover = ({
       console.log(`  ${key}:`, value);
     });
 
-    // TODO: Implement save API call
-    console.log('💾 Ready to save reseller with full payload');
+    // Send data to resellers server on port 3333
+    try {
+      const response = await fetch('http://localhost:3333/api/resellers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fullPayload),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Reseller saved successfully:', result);
+        // TODO: Show success notification
+      } else {
+        const error = await response.json();
+        console.error('❌ Error saving reseller:', error);
+        // TODO: Show error notification
+      }
+    } catch (error) {
+      console.error('❌ Network error saving reseller:', error);
+      // TODO: Show network error notification
+    }
     
-    setEditDialog(false);
-    setEditingReseller(null);
+    // Don't close drawer for now - keep it open for debugging
+    // setEditDialog(false);
+    // setEditingReseller(null);
   };
 
   // Handle closing edit dialog
