@@ -81,6 +81,9 @@ const FloatingResellersPopover = ({
   const [page, setPage] = useState(1);
   const [pageSize] = useState(15);
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageError, setImageError] = useState('');
 
   // Mock data for now - will be replaced with real API calls
   const mockResellers = [
@@ -205,6 +208,21 @@ const FloatingResellersPopover = ({
       console.log(`  ${key}:`, value);
     });
 
+        // Upload image if selected
+        let imageUrl = fullPayload.logotype;
+        if (selectedImage && fullPayload.appUrl) {
+          try {
+            console.log('📤 Uploading image...');
+            imageUrl = await uploadImage(selectedImage, fullPayload.appUrl, fullPayload.parentUserId, fullPayload.resellerId);
+            fullPayload.logotype = imageUrl;
+            console.log('✅ Image uploaded, URL:', imageUrl);
+          } catch (error) {
+            console.error('❌ Image upload failed:', error);
+            setImageError('Image upload failed: ' + error.message);
+            return; // Stop saving if image upload fails
+          }
+        }
+
     // Send data to resellers server on port 3333
     try {
       const response = await fetch('http://localhost:3333/api/resellers', {
@@ -238,6 +256,73 @@ const FloatingResellersPopover = ({
   const handleCloseEditDialog = () => {
     setEditDialog(false);
     setEditingReseller(null);
+    setSelectedImage(null);
+    setImagePreview(null);
+    setImageError('');
+  };
+
+  // Handle image selection
+  const handleImageSelect = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Check file type
+    if (file.type !== 'image/png') {
+      setImageError('Only PNG images are allowed');
+      setSelectedImage(null);
+      setImagePreview(null);
+      return;
+    }
+
+    // Check file size (120KB = 120 * 1024 bytes)
+    const maxSize = 120 * 1024;
+    if (file.size > maxSize) {
+      setImageError('Image size must be less than 120KB');
+      setSelectedImage(null);
+      setImagePreview(null);
+      return;
+    }
+
+    // Clear errors and set image
+    setImageError('');
+    setSelectedImage(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Upload image to server
+  const uploadImage = async (file, appUrl, parentUserId, resellerId) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('filename', `${appUrl}.png`);
+    formData.append('appUrl', appUrl);
+    formData.append('parentUserId', parentUserId);
+    formData.append('resellerId', resellerId);
+
+    try {
+      const response = await fetch('http://localhost:3333/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Image uploaded successfully:', result);
+        return result.url || result.filename;
+      } else {
+        const error = await response.json();
+        console.error('❌ Error uploading image:', error);
+        throw new Error(error.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('❌ Network error uploading image:', error);
+      throw error;
+    }
   };
 
   // Menu actions
@@ -860,25 +945,83 @@ const FloatingResellersPopover = ({
                                   }}
                                 />
                                 
-                                <TextField
-                                  fullWidth
-                                  value={editingReseller.logo || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, logo: e.target.value })}
-                                  label={t('resellerLogotype')}
-                                  required
-                                  sx={{
-                                    '& .MuiOutlinedInputRoot': {
-                                      backgroundColor: colors.secondary,
-                                      '& fieldset': { borderColor: colors.border },
-                                      '&:hover fieldset': { borderColor: colors.primary },
-                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                    },
-                                    '& .MuiInputLabelRoot': {
-                                      color: colors.textSecondary,
-                                      '&.Mui-focused': { color: colors.primary }
-                                    },
-                                  }}
-                                />
+                                {/* Image Upload Field */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                  <input
+                                    type="file"
+                                    accept=".png"
+                                    onChange={handleImageSelect}
+                                    style={{ display: 'none' }}
+                                    id="logotype-upload"
+                                  />
+                                  <label htmlFor="logotype-upload">
+                                    <Button
+                                      variant="outlined"
+                                      component="span"
+                                      fullWidth
+                                      style={{
+                                        borderColor: colors.border,
+                                        color: colors.text,
+                                        height: '56px',
+                                        borderStyle: 'dashed',
+                                      }}
+                                    >
+                                      {selectedImage ? 'Change Logo' : 'Select PNG Logo (Max 120KB)'}
+                                    </Button>
+                                  </label>
+                                  
+                                  {/* Image Preview */}
+                                  {imagePreview && (
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      flexDirection: 'column', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      padding: '12px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '8px',
+                                      backgroundColor: colors.secondary
+                                    }}>
+                                      <img
+                                        src={imagePreview}
+                                        alt="Logo preview"
+                                        style={{
+                                          maxWidth: '120px',
+                                          maxHeight: '120px',
+                                          objectFit: 'contain',
+                                          borderRadius: '4px'
+                                        }}
+                                      />
+                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                        {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
+                                      </Typography>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Error Message */}
+                                  {imageError && (
+                                    <Typography variant="caption" style={{ color: '#f44336' }}>
+                                      {imageError}
+                                    </Typography>
+                                  )}
+                                  
+                                  {/* Current Logo Display */}
+                                  {!imagePreview && editingReseller.logo && (
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      padding: '8px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '8px',
+                                      backgroundColor: colors.secondary
+                                    }}>
+                                      <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                                        Current: {editingReseller.logo}
+                                      </Typography>
+                                    </div>
+                                  )}
+                                </div>
                                 
                                 <TextField
                                   fullWidth

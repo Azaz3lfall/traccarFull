@@ -5,9 +5,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import multer from 'multer';
-import crypto from 'crypto';
-import { glob } from 'glob';
 
 // Load environment variables
 dotenv.config();
@@ -18,43 +15,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 // Use environment PORT or default to 3333
 const PORT = process.env.PORT || 3333;
-
-// Helper function to generate unique filename
-const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => {
-  const timestamp = Date.now().toString();
-  const hash = crypto.createHash('md5').update(timestamp).digest('hex').substring(0, 8);
-  return `${appUrl}_${parentUserId}_${resellerId}_${hash}.${extension}`;
-};
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'data', 'images');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Generate a temporary filename first, we'll rename it after processing
-    const tempFilename = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.png`;
-    cb(null, tempFilename);
-  }
-});
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 120 * 1024, // 120KB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'image/png') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PNG images are allowed'), false);
-    }
-  }
-});
 
 // CORS configuration - Allow all origins (development and production)
 const corsOptions = {
@@ -168,11 +128,11 @@ app.post('/api/resellers', (req, res) => {
     
     // Create JSON file with reseller data
     try {
-      // Create filename: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
-      const filename = generateUniqueFilename(body.appUrl, body.parentUserId, body.resellerId, 'json');
+      // Create filename: reseller_{appUrl}_{parentUserId}_{resellerId}.json
+      const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
       
       // Create data directory if it doesn't exist
-      const dataDir = path.join(__dirname, 'data');
+      const dataDir = path.join(__dirname, '..', '..', 'data');
       if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
         console.log('📁 Created data directory:', dataDir);
@@ -266,163 +226,6 @@ app.delete('/api/resellers/:id', (req, res) => {
     }
 });
 
-// Image upload endpoint
-app.post('/api/upload', upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        error: 'No image file provided',
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Get appUrl from the request body
-    const appUrl = req.body.appUrl;
-    if (!appUrl) {
-      // Delete the temp file if no appUrl provided
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json({
-        error: 'appUrl is required for image upload',
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Create the correct filename using the same pattern as JSON files
-    const parentUserId = req.body.parentUserId || 'unknown';
-    const resellerId = req.body.resellerId || 'unknown';
-    const correctFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
-    const correctPath = path.join(path.dirname(req.file.path), correctFilename);
-    
-    // Check if file already exists and handle it
-    if (fs.existsSync(correctPath)) {
-      // Delete the old file to replace it
-      fs.unlinkSync(correctPath);
-    }
-    
-    // Rename the file from temp name to correct name with retry logic
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        fs.renameSync(req.file.path, correctPath);
-        break; // Success, exit the loop
-      } catch (renameError) {
-        retries--;
-        if (retries === 0) {
-          throw renameError; // Re-throw if all retries failed
-        }
-        // Wait a bit before retrying (for concurrent access issues)
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
-
-    console.log('📤 Image uploaded:', correctFilename);
-    console.log('📁 Saved to:', correctPath);
-    console.log('📏 File size:', req.file.size, 'bytes');
-
-    res.json({
-      success: true,
-      message: 'Image uploaded successfully',
-      filename: correctFilename,
-      url: `images/${correctFilename}`,
-      size: req.file.size,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('❌ Error uploading image:', error);
-    res.status(500).json({
-      error: 'Image upload failed',
-      message: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// Serve uploaded images
-app.use('/images', express.static(path.join(__dirname, 'data', 'images')));
-
-// Domain lookup endpoint - POST to get domain data with base64 image
-app.post('/api/domain-lookup', async (req, res) => {
-  try {
-    const { domain } = req.body;
-    
-    if (!domain) {
-      return res.status(400).json({
-        error: 'Domain is required',
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    console.log('🔍 Looking up domain:', domain);
-
-    // Search for JSON files that contain this domain
-    const dataDir = path.join(__dirname, 'data');
-    const jsonFiles = await glob('*.json', { cwd: dataDir });
-    
-    let domainData = null;
-    let imageBase64 = null;
-
-    // Check each JSON file for matching domain
-    for (const jsonFile of jsonFiles) {
-      try {
-        const filePath = path.join(dataDir, jsonFile);
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const data = JSON.parse(fileContent);
-        
-        // Check if this JSON file contains the domain
-        if (data.appUrl === domain || data.currentDomain === domain) {
-          domainData = data;
-          console.log('✅ Found domain data in:', jsonFile);
-          
-          // Look for corresponding image file
-          const imagePattern = `${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
-          const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
-          
-          if (imageFiles.length > 0) {
-            const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
-            const imageBuffer = fs.readFileSync(imagePath);
-            imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-            console.log('✅ Found image:', imageFiles[0]);
-          }
-          
-          break; // Found the domain, stop searching
-        }
-      } catch (fileError) {
-        console.error('❌ Error reading file:', jsonFile, fileError.message);
-        continue; // Skip this file and continue with others
-      }
-    }
-
-    if (!domainData) {
-      return res.status(404).json({
-        error: 'Domain not found',
-        domain: domain,
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Return domain data with base64 image
-    const response = {
-      success: true,
-      domain: domain,
-      data: domainData,
-      imageBase64: imageBase64,
-      timestamp: new Date().toISOString()
-    };
-
-    console.log('📤 Returning domain data for:', domain);
-    res.json(response);
-
-  } catch (error) {
-    console.error('❌ Error in domain lookup:', error);
-    res.status(500).json({
-      error: 'Domain lookup failed',
-      message: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
 // Generic JSON POST endpoint
 app.post('/api/data', (req, res) => {
     try {
@@ -474,8 +277,6 @@ app.listen(PORT, () => {
   console.log(`   PUT  /api/resellers/:id`);
   console.log(`   DELETE /api/resellers/:id`);
   console.log(`   POST /api/data`);
-  console.log(`   POST /api/upload`);
-  console.log(`   POST /api/domain-lookup`);
   console.log(`\n💡 React app should be running on http://localhost:3000`);
 });
 
