@@ -33,6 +33,7 @@ import FloatingCommandsPopover from '../components/FloatingCommandsPopover';
 import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover';
 import FloatingComputedAttributesPopover from '../components/FloatingComputedAttributesPopover';
 import FloatingCalendarsPopover from '../components/FloatingCalendarsPopover';
+import FloatingResellersPopover from '../components/FloatingResellersPopover';
 import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
@@ -196,6 +197,7 @@ const MainPage = () => {
   const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
   const [showResellerDrawer, setShowResellerDrawer] = useState(false);
+  const [showResellersPopover, setShowResellersPopover] = useState(false);
   const [resellerData, setResellerData] = useState({
     currentDomain: window.location.hostname,
     parentUserId: '',
@@ -2280,7 +2282,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-reseller');
               if (tooltip) tooltip.remove();
-              setShowResellerDrawer(true);
+              setShowResellersPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -3643,6 +3645,14 @@ const MainPage = () => {
           // Refresh devices when popover closes to ensure device list is updated
           refreshDevices();
         }}
+      />
+
+      {/* Resellers Management Popover */}
+      <FloatingResellersPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showResellersPopover}
+        onClose={() => setShowResellersPopover(false)}
       />
 
       {/* Notifications Management Popover */}
@@ -6639,7 +6649,7 @@ const MainPage = () => {
                   {admin && (
                     <button
                       onClick={() => {
-                        setShowResellerDrawer(true);
+                        setShowResellersPopover(true);
                         setDrawerOpen(false);
                       }}
                       style={{
