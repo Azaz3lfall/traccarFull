@@ -53,6 +53,7 @@ import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { resellersActions } from '../store';
+import { useSelector } from 'react-redux';
 
 const FloatingResellersPopover = ({ 
   desktop, 
@@ -67,6 +68,7 @@ const FloatingResellersPopover = ({
   const admin = useAdministrator();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.session.user);
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -173,8 +175,39 @@ const FloatingResellersPopover = ({
   const handleSaveReseller = () => {
     if (!editingReseller) return;
 
+    // Create payload matching the exact structure you specified
+    const fullPayload = {
+      currentDomain: window.location.hostname,
+      parentUserId: user?.id || '',
+      parentUser: user?.name || user?.login || '',
+      parentEmail: user?.email || '',
+      resellerId: editingReseller.resellerId || '',
+      resellerUser: editingReseller.resellerUser || '',
+      resellerEmail: editingReseller.resellerEmail || '',
+      companyName: editingReseller.companyName || '',
+      logotype: editingReseller.logo || '',
+      appUrl: editingReseller.url || '',
+      whatsapp: editingReseller.whatsapp || '',
+      billingEmail: editingReseller.billingEmail || '',
+      supportEmail: editingReseller.supportEmail || '',
+      resellerLimit: parseInt(editingReseller.resellerLimit) || 0,
+      deviceLimit: parseInt(editingReseller.deviceLimit) || 0,
+      userLimit: parseInt(editingReseller.userLimit) || 0,
+      status: 'active',
+      createdAt: new Date().toISOString()
+    };
+
+    // Console log the full payload
+    console.log('🚀 FULL RESELLER PAYLOAD:', fullPayload);
+    console.log('📊 Payload size:', JSON.stringify(fullPayload).length, 'characters');
+    console.log('🔍 Individual field values:');
+    Object.entries(fullPayload).forEach(([key, value]) => {
+      console.log(`  ${key}:`, value);
+    });
+
     // TODO: Implement save API call
-    console.log('Save reseller:', editingReseller);
+    console.log('💾 Ready to save reseller with full payload');
+    
     setEditDialog(false);
     setEditingReseller(null);
   };
@@ -319,10 +352,10 @@ const FloatingResellersPopover = ({
                     </InputAdornment>
                   ),
                 }}
-                style={{
+                sx={{
                   flex: 1,
                   minWidth: '120px',
-                  '& .MuiOutlinedInput-root': {
+                  '& .MuiOutlinedInputRoot': {
                     borderRadius: '8px',
                   },
                 }}
@@ -702,7 +735,7 @@ const FloatingResellersPopover = ({
                           <ChevronLeftIcon fontSize="small" />
                         </IconButton>
                         <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                          {editingReseller?.id ? t('sharedEdit') : t('sharedAdd')} {t('resellerPanel')}
+                          {t('resellerPanel')}
                         </Typography>
                       </div>
                     </div>
@@ -772,13 +805,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerId')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -792,13 +825,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerCompanyName')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -812,13 +845,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerLogotype')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -832,13 +865,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerAppUrl')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -857,13 +890,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerUser')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -878,13 +911,13 @@ const FloatingResellersPopover = ({
                                   type="email"
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -898,13 +931,13 @@ const FloatingResellersPopover = ({
                                   label={t('resellerWhatsapp')}
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -919,13 +952,13 @@ const FloatingResellersPopover = ({
                                   type="email"
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -940,13 +973,13 @@ const FloatingResellersPopover = ({
                                   type="email"
                                   required
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -967,13 +1000,13 @@ const FloatingResellersPopover = ({
                                   required
                                   inputProps={{ min: 1 }}
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -989,13 +1022,13 @@ const FloatingResellersPopover = ({
                                   required
                                   inputProps={{ min: 1 }}
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
@@ -1011,13 +1044,13 @@ const FloatingResellersPopover = ({
                                   required
                                   inputProps={{ min: 1 }}
                                   sx={{
-                                    '& .MuiOutlinedInput-root': {
+                                    '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { borderColor: colors.border },
                                       '&:hover fieldset': { borderColor: colors.primary },
                                       '&.Mui-focused fieldset': { borderColor: colors.primary },
                                     },
-                                    '& .MuiInputLabel-root': {
+                                    '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
