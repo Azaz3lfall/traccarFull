@@ -29,6 +29,7 @@ import {
   FormGroup,
   FormControlLabel,
   Alert,
+  Snackbar,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -84,49 +85,44 @@ const FloatingResellersPopover = ({
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageError, setImageError] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Mock data for now - will be replaced with real API calls
-  const mockResellers = [
-    {
-      id: 1,
-      name: 'Tech Solutions Inc',
-      email: 'admin@techsolutions.com',
-      phone: '+1-555-0123',
-      website: 'https://techsolutions.com',
-      status: 'active',
-      resellerLimit: 10,
-      deviceLimit: 100,
-      userLimit: 50,
-      createdAt: '2024-01-15',
-      logo: '',
-      whatsapp: '+1-555-0123',
-      billingEmail: 'billing@techsolutions.com',
-      supportEmail: 'support@techsolutions.com',
+  // Fetch resellers with TanStack Query
+  const { data: resellersData, isLoading, error, refetch } = useQuery({
+    queryKey: ['resellers', user?.id],
+    queryFn: async () => {
+      if (!user?.id) {
+        throw new Error('User ID is required');
+      }
+      
+      const response = await fetch('http://localhost:3333/api/resellers/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          parentUserId: user.id
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch resellers');
+      }
+
+      const data = await response.json();
+      return data.resellers || [];
     },
-    {
-      id: 2,
-      name: 'GPS Fleet Management',
-      email: 'contact@gpsfleet.com',
-      phone: '+1-555-0456',
-      website: 'https://gpsfleet.com',
-      status: 'inactive',
-      resellerLimit: 5,
-      deviceLimit: 50,
-      userLimit: 25,
-      createdAt: '2024-02-20',
-      logo: '',
-      whatsapp: '+1-555-0456',
-      billingEmail: 'billing@gpsfleet.com',
-      supportEmail: 'support@gpsfleet.com',
-    },
-  ];
+    enabled: isVisible && !!user?.id, // Only fetch when popover is visible and user is logged in
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
 
   // Filter resellers based on search keyword
-  const filteredResellers = mockResellers.filter(reseller =>
-    reseller.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    reseller.email?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    reseller.phone?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    reseller.website?.toLowerCase().includes(searchKeyword.toLowerCase())
+  const filteredResellers = (resellersData || []).filter(reseller =>
+    reseller.companyName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    reseller.appUrl?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    reseller.resellerEmail?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    reseller.resellerUser?.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   // Reset to page 1 when search changes
@@ -136,10 +132,26 @@ const FloatingResellersPopover = ({
 
   // Pagination
   const totalPages = Math.ceil(filteredResellers.length / pageSize);
-  const paginatedResellers = filteredResellers.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const startIndex = (page - 1) * pageSize;
+  const paginatedResellers = filteredResellers.slice(startIndex, startIndex + pageSize);
+
+  // Cleanup effect when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clear query cache when component unmounts
+      queryClient.removeQueries(['resellers']);
+      
+      // Reset all state when component unmounts
+      setSearchKeyword('');
+      setSelectedReseller(null);
+      setAnchorEl(null);
+      setDeleteDialog(false);
+      setResellerToDelete(null);
+      handleCloseEditDialog();
+      setPage(1);
+    };
+  }, [queryClient]);
+
 
   // Handle edit reseller
   const handleEdit = (reseller) => {
@@ -161,8 +173,7 @@ const FloatingResellersPopover = ({
   // Handle delete confirmation
   const confirmDelete = () => {
     if (resellerToDelete) {
-      // TODO: Implement delete API call
-      console.log('Delete reseller:', resellerToDelete.id);
+      deleteResellerMutation.mutate(resellerToDelete.id);
     }
     setDeleteDialog(false);
     setResellerToDelete(null);
@@ -173,6 +184,83 @@ const FloatingResellersPopover = ({
     setDeleteDialog(false);
     setResellerToDelete(null);
   };
+
+  // Mutations
+  const createResellerMutation = useMutation({
+    mutationFn: async (resellerData) => {
+      const response = await fetch('http://localhost:3333/api/resellers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resellerData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create reseller');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      handleCloseEditDialog();
+      setSnackbar({ open: true, message: 'Reseller created successfully', severity: 'success' });
+    },
+    onError: (error) => {
+      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+    },
+  });
+
+  const updateResellerMutation = useMutation({
+    mutationFn: async ({ id, ...resellerData }) => {
+      const response = await fetch(`http://localhost:3333/api/resellers/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resellerData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update reseller');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      handleCloseEditDialog();
+      setSnackbar({ open: true, message: 'Reseller updated successfully', severity: 'success' });
+    },
+    onError: (error) => {
+      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+    },
+  });
+
+  const deleteResellerMutation = useMutation({
+    mutationFn: async (resellerId) => {
+      const response = await fetch(`http://localhost:3333/api/resellers/${resellerId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete reseller');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      setSnackbar({ open: true, message: 'Reseller deleted successfully', severity: 'success' });
+    },
+    onError: (error) => {
+      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+    },
+  });
 
   // Handle save reseller
   const handleSaveReseller = async () => {
@@ -223,33 +311,14 @@ const FloatingResellersPopover = ({
           }
         }
 
-    // Send data to resellers server on port 3333
-    try {
-      const response = await fetch('http://localhost:3333/api/resellers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(fullPayload),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Reseller saved successfully:', result);
-        // TODO: Show success notification
-      } else {
-        const error = await response.json();
-        console.error('❌ Error saving reseller:', error);
-        // TODO: Show error notification
-      }
-    } catch (error) {
-      console.error('❌ Network error saving reseller:', error);
-      // TODO: Show network error notification
+    // Use mutation to save reseller
+    if (editingReseller.id) {
+      // Update existing reseller
+      updateResellerMutation.mutate({ id: editingReseller.id, ...fullPayload });
+    } else {
+      // Create new reseller
+      createResellerMutation.mutate(fullPayload);
     }
-    
-    // Don't close drawer for now - keep it open for debugging
-    // setEditDialog(false);
-    // setEditingReseller(null);
   };
 
   // Handle closing edit dialog
@@ -499,17 +568,29 @@ const FloatingResellersPopover = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {paginatedResellers.length === 0 ? (
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px' }}>
+                          <CircularProgress size={24} />
+                        </TableCell>
+                      </TableRow>
+                    ) : error ? (
+                      <TableRow>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.error }}>
+                          Error loading resellers: {error.message}
+                        </TableCell>
+                      </TableRow>
+                    ) : paginatedResellers.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
-                          {t('sharedNoData')}
+                          {searchKeyword ? 'No resellers found matching your search' : t('sharedNoData')}
                         </TableCell>
                       </TableRow>
                     ) : (
                       <>
                         {paginatedResellers.map((reseller, index) => (
                           <TableRow
-                            key={reseller.id}
+                            key={reseller.resellerId || reseller.id}
                             style={{
                               backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
                               cursor: 'pointer',
@@ -534,11 +615,11 @@ const FloatingResellersPopover = ({
                                   />
                                   <div>
                                     <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                                      {reseller.name || t('sharedUnknown')}
+                                      {reseller.companyName || t('sharedUnknown')}
                                     </Typography>
-                                    {reseller.website && (
+                                    {reseller.appUrl && (
                                       <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                                        {reseller.website}
+                                        {reseller.appUrl}
                                       </Typography>
                                     )}
                                   </div>
@@ -546,12 +627,12 @@ const FloatingResellersPopover = ({
                               </TableCell>
                             )}
                             <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
-                              {reseller.email || '-'}
+                              {reseller.resellerEmail || '-'}
                             </TableCell>
                             {desktop && (
                               <>
                                 <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
-                                  {reseller.phone || '-'}
+                                  {reseller.whatsapp || '-'}
                                 </TableCell>
                                 <TableCell>
                                   <Chip
@@ -1266,6 +1347,22 @@ const FloatingResellersPopover = ({
           </div>
         </motion.div>
       )}
+      
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </AnimatePresence>
   );
 };

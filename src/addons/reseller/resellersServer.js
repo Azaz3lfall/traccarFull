@@ -29,10 +29,8 @@ const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // Images directory is ensured to exist at startup
     const uploadDir = path.join(__dirname, 'data', 'images');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -114,10 +112,83 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API routes
+// GET endpoint for listing resellers (filtered by parentUserId)
+app.post('/api/resellers/list', async (req, res) => {
+  try {
+    const { parentUserId } = req.body;
+    
+    if (!parentUserId) {
+      return res.status(400).json({
+        error: 'parentUserId is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    console.log('🔍 Fetching resellers for parentUserId:', parentUserId);
+
+    // Get all JSON files from data directory
+    const dataDir = path.join(__dirname, 'data');
+    const jsonFiles = await glob('*.json', { cwd: dataDir });
+    
+    const resellers = [];
+    
+    // Process each JSON file
+    for (const jsonFile of jsonFiles) {
+      try {
+        // Parse filename to extract components: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
+        const filenameParts = jsonFile.replace('.json', '').split('_');
+        
+        if (filenameParts.length >= 3) {
+          const fileAppUrl = filenameParts[0];
+          const fileParentUserId = filenameParts[1];
+          const fileResellerId = filenameParts[2];
+          
+          // Filter by parentUserId
+          if (fileParentUserId === parentUserId.toString()) {
+            const filePath = path.join(dataDir, jsonFile);
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            const resellerData = JSON.parse(fileContent);
+            
+            // Add filename info for reference
+            resellerData.filename = jsonFile;
+            resellerData.fileAppUrl = fileAppUrl;
+            resellerData.fileParentUserId = fileParentUserId;
+            resellerData.fileResellerId = fileResellerId;
+            
+            resellers.push(resellerData);
+            console.log('✅ Found reseller:', resellerData.companyName, 'from file:', jsonFile);
+          }
+        }
+      } catch (fileError) {
+        console.error('❌ Error reading file:', jsonFile, fileError.message);
+        continue; // Skip this file and continue with others
+      }
+    }
+
+    console.log(`📊 Found ${resellers.length} resellers for parentUserId: ${parentUserId}`);
+
+    res.json({
+      success: true,
+      parentUserId: parentUserId,
+      count: resellers.length,
+      resellers: resellers,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching resellers list:', error);
+    res.status(500).json({
+      error: 'Failed to fetch resellers list',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Legacy GET endpoint (kept for compatibility)
 app.get('/api/resellers', (req, res) => {
     res.json({
-        message: 'Resellers API is working',
+        message: 'Resellers API is working - Use POST /api/resellers/list with parentUserId',
         method: 'GET',
         timestamp: new Date().toISOString()
     });
@@ -171,12 +242,8 @@ app.post('/api/resellers', (req, res) => {
       // Create filename: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
       const filename = generateUniqueFilename(body.appUrl, body.parentUserId, body.resellerId, 'json');
       
-      // Create data directory if it doesn't exist
+      // Data directory is ensured to exist at startup
       const dataDir = path.join(__dirname, 'data');
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-        console.log('📁 Created data directory:', dataDir);
-      }
       
       // Full file path
       const filePath = path.join(dataDir, filename);
@@ -464,12 +531,43 @@ app.use('*', (req, res) => {
     });
 });
 
+// Ensure required directories exist on startup
+const ensureDirectories = () => {
+  try {
+    const dataDir = path.join(__dirname, 'data');
+    const imagesDir = path.join(__dirname, 'data', 'images');
+    
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+      console.log('📁 Created data directory:', dataDir);
+    } else {
+      console.log('📁 Data directory already exists:', dataDir);
+    }
+    
+    if (!fs.existsSync(imagesDir)) {
+      fs.mkdirSync(imagesDir, { recursive: true });
+      console.log('📁 Created images directory:', imagesDir);
+    } else {
+      console.log('📁 Images directory already exists:', imagesDir);
+    }
+    
+    console.log('✅ All required directories are ready');
+  } catch (error) {
+    console.error('❌ Error creating directories:', error);
+    process.exit(1);
+  }
+};
+
+// Create directories on startup
+ensureDirectories();
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Resellers Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`🔗 API endpoints:`);
   console.log(`   GET  /api/resellers`);
+  console.log(`   POST /api/resellers/list`);
   console.log(`   POST /api/resellers`);
   console.log(`   PUT  /api/resellers/:id`);
   console.log(`   DELETE /api/resellers/:id`);
