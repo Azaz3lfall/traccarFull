@@ -188,20 +188,44 @@ const FloatingResellersPopover = ({
   // Mutations
   const createResellerMutation = useMutation({
     mutationFn: async (resellerData) => {
+      // Create FormData to send both validation data and image
+      const formData = new FormData();
+      
+      // Add all reseller data as JSON
+      formData.append('resellerData', JSON.stringify(resellerData));
+      
+      // Add image if selected
+      if (selectedImage && resellerData.appUrl) {
+        formData.append('image', selectedImage);
+        formData.append('filename', `${resellerData.appUrl}.png`);
+        formData.append('appUrl', resellerData.appUrl);
+        formData.append('parentUserId', resellerData.parentUserId);
+        formData.append('resellerId', resellerData.resellerId);
+      }
+
       const response = await fetch('http://localhost:3333/api/resellers', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(resellerData),
+        body: formData, // Send as FormData instead of JSON
       });
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle domain conflict specifically
+        if (response.status === 409 && error.details) {
+          const { domain, whatsapp, existingReseller } = error.details;
+          
+          if (domain) {
+            throw new Error(`Domain '${domain}' is already registered by ${existingReseller.company} (${existingReseller.email})`);
+          } else if (whatsapp) {
+            throw new Error(`WhatsApp number '${whatsapp}' is already registered by ${existingReseller.company} (${existingReseller.email})`);
+          }
+        }
+        
         throw new Error(error.message || 'Failed to create reseller');
       }
 
-      return response.json();
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resellers'] });
@@ -296,27 +320,12 @@ const FloatingResellersPopover = ({
       console.log(`  ${key}:`, value);
     });
 
-        // Upload image if selected
-        let imageUrl = fullPayload.logotype;
-        if (selectedImage && fullPayload.appUrl) {
-          try {
-            console.log('📤 Uploading image...');
-            imageUrl = await uploadImage(selectedImage, fullPayload.appUrl, fullPayload.parentUserId, fullPayload.resellerId);
-            fullPayload.logotype = imageUrl;
-            console.log('✅ Image uploaded, URL:', imageUrl);
-          } catch (error) {
-            console.error('❌ Image upload failed:', error);
-            setImageError('Image upload failed: ' + error.message);
-            return; // Stop saving if image upload fails
-          }
-        }
-
-    // Use mutation to save reseller
+    // Use mutation to save reseller (validation happens on backend first)
     if (editingReseller.id) {
       // Update existing reseller
       updateResellerMutation.mutate({ id: editingReseller.id, ...fullPayload });
     } else {
-      // Create new reseller
+      // Create new reseller - validation happens first, then image upload
       createResellerMutation.mutate(fullPayload);
     }
   };
@@ -1351,7 +1360,7 @@ const FloatingResellersPopover = ({
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={10000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >

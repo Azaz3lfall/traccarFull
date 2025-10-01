@@ -195,9 +195,18 @@ app.get('/api/resellers', (req, res) => {
 });
 
 // POST endpoint for resellers data
-app.post('/api/resellers', (req, res) => {
+app.post('/api/resellers', upload.single('image'), async (req, res) => {
   try {
-    const { body } = req;
+    let body;
+    
+    // Check if request is FormData (with image) or JSON
+    if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+      // Handle FormData - extract resellerData from form
+      body = JSON.parse(req.body.resellerData);
+    } else {
+      // Handle JSON request
+      body = req.body;
+    }
     
     // Validate required fields (customize as needed)
     if (!body) {
@@ -237,6 +246,138 @@ app.post('/api/resellers', (req, res) => {
     console.log('✅ Reseller data validation passed');
     console.log('💾 Ready to save reseller:', body.companyName);
     
+    // Check if appUrl already exists
+    try {
+      const dataDir = path.join(__dirname, 'data');
+      const jsonFiles = await glob('*.json', { cwd: dataDir });
+      
+      for (const jsonFile of jsonFiles) {
+        try {
+          const filePath = path.join(dataDir, jsonFile);
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const existingReseller = JSON.parse(fileContent);
+          
+          // Check if appUrl already exists
+          if (existingReseller.appUrl === body.appUrl) {
+            console.log('❌ Domain already in use:', body.appUrl);
+            
+            // Mask email and company name for privacy
+            const maskedEmail = existingReseller.resellerEmail ? 
+              existingReseller.resellerEmail.replace(/(.{2}).*(@.*)/, '$1***$2') : 'N/A';
+            const maskedCompany = existingReseller.companyName ? 
+              existingReseller.companyName.substring(0, 3) + '***' : 'N/A';
+            
+            return res.status(409).json({
+              error: 'Domain already in use',
+              message: `The domain '${body.appUrl}' is already registered`,
+              details: {
+                domain: body.appUrl,
+                existingReseller: {
+                  email: maskedEmail,
+                  company: maskedCompany
+                }
+              },
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (fileError) {
+          console.error('❌ Error reading file during domain check:', jsonFile, fileError.message);
+          continue; // Skip this file and continue checking others
+        }
+      }
+      
+      console.log('✅ Domain availability check passed:', body.appUrl);
+    } catch (domainCheckError) {
+      console.error('❌ Error checking domain availability:', domainCheckError);
+      return res.status(500).json({
+        error: 'Domain availability check failed',
+        message: domainCheckError.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Check if WhatsApp number already exists
+    try {
+      const dataDir = path.join(__dirname, 'data');
+      const jsonFiles = await glob('*.json', { cwd: dataDir });
+      
+      for (const jsonFile of jsonFiles) {
+        try {
+          const filePath = path.join(dataDir, jsonFile);
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const existingReseller = JSON.parse(fileContent);
+          
+          // Check if WhatsApp number already exists
+          if (existingReseller.whatsapp === body.whatsapp) {
+            console.log('❌ WhatsApp number already in use:', body.whatsapp);
+            
+            // Mask email and company name for privacy
+            const maskedEmail = existingReseller.resellerEmail ? 
+              existingReseller.resellerEmail.replace(/(.{2}).*(@.*)/, '$1***$2') : 'N/A';
+            const maskedCompany = existingReseller.companyName ? 
+              existingReseller.companyName.substring(0, 3) + '***' : 'N/A';
+            
+            return res.status(409).json({
+              error: 'WhatsApp number already in use',
+              message: `The WhatsApp number '${body.whatsapp}' is already registered`,
+              details: {
+                whatsapp: body.whatsapp,
+                existingReseller: {
+                  email: maskedEmail,
+                  company: maskedCompany
+                }
+              },
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (fileError) {
+          console.error('❌ Error reading file during WhatsApp check:', jsonFile, fileError.message);
+          continue; // Skip this file and continue checking others
+        }
+      }
+      
+      console.log('✅ WhatsApp availability check passed:', body.whatsapp);
+    } catch (whatsappCheckError) {
+      console.error('❌ Error checking WhatsApp availability:', whatsappCheckError);
+      return res.status(500).json({
+        error: 'WhatsApp availability check failed',
+        message: whatsappCheckError.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Process image if provided (after validation passes)
+    let imageUrl = body.logotype || '';
+    if (req.file) {
+      try {
+        const appUrl = req.body.appUrl;
+        const parentUserId = req.body.parentUserId;
+        const resellerId = req.body.resellerId;
+        
+        // Generate unique filename for image
+        const imageFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
+        const imagesDir = path.join(__dirname, 'data', 'images');
+        const imagePath = path.join(imagesDir, imageFilename);
+        
+        // Move uploaded file to final location
+        fs.renameSync(req.file.path, imagePath);
+        
+        // Update logotype with relative path
+        imageUrl = `images/${imageFilename}`;
+        body.logotype = imageUrl;
+        
+        console.log('📤 Image processed:', imageFilename);
+        console.log('📁 Saved to:', imagePath);
+      } catch (imageError) {
+        console.error('❌ Error processing image:', imageError);
+        return res.status(500).json({
+          error: 'Image processing failed',
+          message: imageError.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
     // Create JSON file with reseller data
     try {
       // Create filename: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
@@ -251,6 +392,7 @@ app.post('/api/resellers', (req, res) => {
       // Add metadata to the data
       const fileData = {
         ...body,
+        logotype: imageUrl, // Use processed image URL
         savedAt: new Date().toISOString(),
         filename: filename
       };
