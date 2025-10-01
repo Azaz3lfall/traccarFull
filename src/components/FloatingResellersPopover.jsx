@@ -653,7 +653,7 @@ const FloatingResellersPopover = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    onClick={handleCloseEditDialog}
                     style={{
                       position: 'fixed',
                       top: 0,
@@ -663,15 +663,14 @@ const FloatingResellersPopover = ({
                       backgroundColor: 'rgba(0, 0, 0, 0.5)',
                       zIndex: 9999,
                     }}
-                    onClick={handleCloseEditDialog}
                   />
                   
-                  {/* Drawer */}
+                  {/* Reseller Drawer */}
                   <motion.div
                     initial={{ x: '100%', opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: '100%', opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
                     style={{
                       position: 'fixed',
                       top: 0,
@@ -679,16 +678,16 @@ const FloatingResellersPopover = ({
                       width: desktop ? '400px' : '100vw',
                       height: '100vh',
                       backgroundColor: colors.surface,
-                      borderLeft: `1px solid ${colors.border}`,
+                      borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
                       zIndex: 10000,
+                      boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
                       display: 'flex',
                       flexDirection: 'column',
-                      boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
                     }}
                   >
                     {/* Drawer Header */}
                     <div style={{
-                      padding: '20px 24px',
+                      padding: '16px 20px',
                       borderBottom: `1px solid ${colors.border}`,
                       display: 'flex',
                       alignItems: 'center',
@@ -712,20 +711,20 @@ const FloatingResellersPopover = ({
                     <div style={{ 
                       flex: 1, 
                       overflow: 'auto', 
-                      padding: '0 24px 24px 24px',
+                      padding: '24px',
                       display: 'flex',
                       flexDirection: 'column',
+                      gap: '16px',
                     }}>
                       {editingReseller && (
                         <>
-                          {/* Tabs Navigation */}
+                          {/* Reseller Tabs */}
                           <Tabs
                             value={activeTab}
                             onChange={(e, newValue) => setActiveTab(newValue)}
                             variant="scrollable"
                             scrollButtons="auto"
                             style={{
-                              borderBottom: `1px solid ${colors.border}`,
                               marginBottom: '16px',
                             }}
                             sx={{
@@ -756,39 +755,95 @@ const FloatingResellersPopover = ({
                               },
                             }}
                           >
-                            <Tab label={t('sharedRequired')} />
-                            <Tab label={t('sharedContact')} />
-                            <Tab label={t('sharedLimits')} />
+                            <Tab label={t('resellerBranding')} />
+                            <Tab label={t('resellerContact')} />
+                            <Tab label={t('resellerPermissions')} />
                           </Tabs>
 
                           {/* Tab Content */}
                           <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
-                            {/* Required Tab */}
+                            {/* Branding Tab */}
                             {activeTab === 0 && (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <TextField
-                                  value={editingReseller.name || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, name: e.target.value })}
-                                  label={t('sharedName')}
                                   fullWidth
+                                  value={editingReseller.resellerId || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerId: e.target.value })}
+                                  label={t('resellerId')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
-                                  value={editingReseller.email || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, email: e.target.value })}
-                                  label={t('userEmail')}
                                   fullWidth
+                                  value={editingReseller.companyName || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, companyName: e.target.value })}
+                                  label={t('resellerCompanyName')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
-                                <FormControl fullWidth>
-                                  <InputLabel>{t('sharedStatus')}</InputLabel>
-                                  <Select
-                                    label={t('sharedStatus')}
-                                    value={editingReseller.status || 'active'}
-                                    onChange={(e) => setEditingReseller({ ...editingReseller, status: e.target.value })}
-                                  >
-                                    <MenuItem value="active">{t('sharedActive')}</MenuItem>
-                                    <MenuItem value="inactive">{t('sharedInactive')}</MenuItem>
-                                  </Select>
-                                </FormControl>
+                                
+                                <TextField
+                                  fullWidth
+                                  value={editingReseller.logo || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, logo: e.target.value })}
+                                  label={t('resellerLogotype')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
+                                />
+                                
+                                <TextField
+                                  fullWidth
+                                  value={editingReseller.url || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, url: e.target.value })}
+                                  label={t('resellerAppUrl')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
+                                />
                               </div>
                             )}
 
@@ -796,61 +851,177 @@ const FloatingResellersPopover = ({
                             {activeTab === 1 && (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <TextField
-                                  value={editingReseller.phone || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, phone: e.target.value })}
-                                  label={t('sharedPhone')}
                                   fullWidth
+                                  value={editingReseller.resellerUser || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerUser: e.target.value })}
+                                  label={t('resellerUser')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
-                                  value={editingReseller.website || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, website: e.target.value })}
-                                  label={t('sharedWebsite')}
                                   fullWidth
+                                  value={editingReseller.resellerEmail || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerEmail: e.target.value })}
+                                  label={t('resellerEmail')}
+                                  type="email"
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
+                                  fullWidth
                                   value={editingReseller.whatsapp || ''}
                                   onChange={(e) => setEditingReseller({ ...editingReseller, whatsapp: e.target.value })}
-                                  label="WhatsApp"
-                                  fullWidth
+                                  label={t('resellerWhatsapp')}
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
+                                  fullWidth
                                   value={editingReseller.billingEmail || ''}
                                   onChange={(e) => setEditingReseller({ ...editingReseller, billingEmail: e.target.value })}
-                                  label="Billing Email"
-                                  fullWidth
+                                  label={t('resellerBillingEmail')}
+                                  type="email"
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
+                                  fullWidth
                                   value={editingReseller.supportEmail || ''}
                                   onChange={(e) => setEditingReseller({ ...editingReseller, supportEmail: e.target.value })}
-                                  label="Support Email"
-                                  fullWidth
+                                  label={t('resellerSupportEmail')}
+                                  type="email"
+                                  required
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
                               </div>
                             )}
 
-                            {/* Limits Tab */}
+                            {/* Permissions Tab */}
                             {activeTab === 2 && (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <TextField
-                                  type="number"
-                                  value={editingReseller.resellerLimit || 0}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerLimit: Number(e.target.value) })}
-                                  label="Reseller Limit"
                                   fullWidth
+                                  value={editingReseller.resellerLimit || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerLimit: e.target.value })}
+                                  label={t('resellerLimit')}
+                                  type="number"
+                                  required
+                                  inputProps={{ min: 1 }}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
-                                  type="number"
-                                  value={editingReseller.deviceLimit || 0}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, deviceLimit: Number(e.target.value) })}
-                                  label="Device Limit"
                                   fullWidth
+                                  value={editingReseller.deviceLimit || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, deviceLimit: e.target.value })}
+                                  label={t('userDeviceLimit')}
+                                  type="number"
+                                  required
+                                  inputProps={{ min: 1 }}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
+                                
                                 <TextField
-                                  type="number"
-                                  value={editingReseller.userLimit || 0}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, userLimit: Number(e.target.value) })}
-                                  label="User Limit"
                                   fullWidth
+                                  value={editingReseller.userLimit || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, userLimit: e.target.value })}
+                                  label={t('userUserLimit')}
+                                  type="number"
+                                  required
+                                  inputProps={{ min: 1 }}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    },
+                                  }}
                                 />
                               </div>
                             )}
@@ -861,25 +1032,26 @@ const FloatingResellersPopover = ({
 
                     {/* Drawer Footer */}
                     <div style={{
-                      padding: '20px 24px',
+                      padding: '16px 20px',
                       borderTop: `1px solid ${colors.border}`,
                       display: 'flex',
-                      justifyContent: 'flex-end',
                       gap: '12px',
-                      background: colors.surface,
+                      justifyContent: 'flex-end',
+                      backgroundColor: colors.surface,
                     }}>
                       <Button
+                        variant="outlined"
                         onClick={handleCloseEditDialog}
-                        size="small"
-                        style={{ color: colors.textSecondary }}
+                        style={{
+                          borderColor: colors.border,
+                          color: colors.text,
+                        }}
                       >
                         {t('sharedCancel')}
                       </Button>
                       <Button
-                        onClick={handleSaveReseller}
-                        disabled={!editingReseller?.name || !editingReseller?.email}
-                        size="small"
                         variant="contained"
+                        onClick={handleSaveReseller}
                         style={{
                           backgroundColor: colors.primary,
                           color: colors.text,
