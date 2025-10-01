@@ -173,7 +173,7 @@ const FloatingResellersPopover = ({
   // Handle delete confirmation
   const confirmDelete = () => {
     if (resellerToDelete) {
-      deleteResellerMutation.mutate(resellerToDelete.id);
+      deleteResellerMutation.mutate(resellerToDelete);
     }
     setDeleteDialog(false);
     setResellerToDelete(null);
@@ -267,9 +267,16 @@ const FloatingResellersPopover = ({
   });
 
   const deleteResellerMutation = useMutation({
-    mutationFn: async (resellerId) => {
-      const response = await fetch(`http://localhost:3333/api/resellers/${resellerId}`, {
-        method: 'DELETE',
+    mutationFn: async (reseller) => {
+      const response = await fetch('http://localhost:3333/api/resellers/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appUrl: reseller.appUrl,
+          parentUserId: user?.id
+        }),
       });
 
       if (!response.ok) {

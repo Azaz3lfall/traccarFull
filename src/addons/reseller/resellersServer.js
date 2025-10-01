@@ -485,26 +485,97 @@ app.put('/api/resellers/:id', (req, res) => {
     }
 });
 
-// DELETE endpoint for resellers
-app.delete('/api/resellers/:id', (req, res) => {
-    try {
-        const { id } = req.params;
-
-
-        res.json({
-            success: true,
-            message: `Reseller ${id} deleted successfully`,
-            timestamp: new Date().toISOString()
-        });
-
-    } catch (error) {
-        console.error('Error deleting reseller:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
+// DELETE endpoint for resellers - POST for security
+app.post('/api/resellers/delete', async (req, res) => {
+  try {
+    const { appUrl, parentUserId } = req.body;
+    
+    if (!appUrl || !parentUserId) {
+      return res.status(400).json({
+        error: 'appUrl and parentUserId are required',
+        timestamp: new Date().toISOString()
+      });
     }
+
+    console.log('🗑️ Delete request for:', { appUrl, parentUserId });
+
+    // Find the reseller file that matches both appUrl and parentUserId
+    const dataDir = path.join(__dirname, 'data');
+    const jsonFiles = await glob('*.json', { cwd: dataDir });
+    
+    let resellerFile = null;
+    let resellerData = null;
+    
+    for (const jsonFile of jsonFiles) {
+      try {
+        // Parse filename to extract components: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
+        const filenameParts = jsonFile.replace('.json', '').split('_');
+        
+        if (filenameParts.length >= 3) {
+          const fileAppUrl = filenameParts[0];
+          const fileParentUserId = filenameParts[1];
+          
+          // Check if this file matches the delete request
+          if (fileAppUrl === appUrl && fileParentUserId === parentUserId.toString()) {
+            const filePath = path.join(dataDir, jsonFile);
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            resellerData = JSON.parse(fileContent);
+            resellerFile = jsonFile;
+            break;
+          }
+        }
+      } catch (fileError) {
+        console.error('❌ Error reading file during delete search:', jsonFile, fileError.message);
+        continue;
+      }
+    }
+
+    if (!resellerFile || !resellerData) {
+      return res.status(404).json({
+        error: 'Reseller not found',
+        message: `No reseller found with appUrl '${appUrl}' for user '${parentUserId}'`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    console.log('✅ Found reseller to delete:', resellerData.companyName);
+
+    // Delete the JSON file
+    const jsonFilePath = path.join(dataDir, resellerFile);
+    fs.unlinkSync(jsonFilePath);
+    console.log('🗑️ Deleted JSON file:', jsonFilePath);
+
+    // Delete associated image if it exists
+    if (resellerData.logotype && resellerData.logotype.startsWith('images/')) {
+      const imageFilename = resellerData.logotype.replace('images/', '');
+      const imagePath = path.join(__dirname, 'data', 'images', imageFilename);
+      
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log('🗑️ Deleted image file:', imagePath);
+      } else {
+        console.log('⚠️ Image file not found:', imagePath);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Reseller '${resellerData.companyName}' deleted successfully`,
+      deletedFiles: {
+        json: resellerFile,
+        image: resellerData.logotype || 'none'
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error deleting reseller:', error);
+    res.status(500).json({
+      error: 'Delete failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Image upload endpoint
@@ -744,7 +815,7 @@ app.listen(PORT, () => {
   console.log(`   POST /api/resellers/list`);
   console.log(`   POST /api/resellers`);
   console.log(`   PUT  /api/resellers/:id`);
-  console.log(`   DELETE /api/resellers/:id`);
+  console.log(`   POST /api/resellers/delete`);
   console.log(`   POST /api/data`);
   console.log(`   POST /api/upload`);
   console.log(`   POST /api/domain-lookup`);
