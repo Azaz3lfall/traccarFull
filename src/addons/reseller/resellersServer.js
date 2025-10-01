@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 // Load environment variables
 dotenv.config();
@@ -125,11 +126,42 @@ app.post('/api/resellers', (req, res) => {
     console.log('✅ Reseller data validation passed');
     console.log('💾 Ready to save reseller:', body.companyName);
     
-    // TODO: Add business logic here
-    // - Save to database
-    // - Validate data integrity
-    // - Send notifications
-    // - etc.
+    // Create JSON file with reseller data
+    try {
+      // Create filename: reseller_{appUrl}_{parentUserId}_{resellerId}.json
+      const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
+      
+      // Create data directory if it doesn't exist
+      const dataDir = path.join(__dirname, 'data');
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+        console.log('📁 Created data directory:', dataDir);
+      }
+      
+      // Full file path
+      const filePath = path.join(dataDir, filename);
+      
+      // Add metadata to the data
+      const fileData = {
+        ...body,
+        savedAt: new Date().toISOString(),
+        filename: filename
+      };
+      
+      // Write JSON file
+      fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+      
+      console.log('💾 Reseller data saved to file:', filePath);
+      console.log('📄 Filename:', filename);
+      
+    } catch (fileError) {
+      console.error('❌ Error saving reseller file:', fileError);
+      return res.status(500).json({
+        error: 'File save error',
+        message: fileError.message,
+        timestamp: new Date().toISOString()
+      });
+    }
     
     res.json({
       success: true,
