@@ -578,9 +578,11 @@ const FloatingResellersPopover = ({
                       <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('resellerCompany')}
                       </TableCell>
-                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                        {t('userEmail')}
-                      </TableCell>
+                      {desktop && (
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          {t('userEmail')}
+                        </TableCell>
+                      )}
                       {desktop && (
                         <>
                           <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
@@ -599,19 +601,19 @@ const FloatingResellersPopover = ({
                   <TableBody>
                     {isLoading ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px' }}>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px' }}>
                           <CircularProgress size={24} />
                         </TableCell>
                       </TableRow>
                     ) : error ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px', color: colors.error }}>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.error }}>
                           Error loading resellers: {error.message}
                         </TableCell>
                       </TableRow>
                     ) : paginatedResellers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
+                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
                           {searchKeyword ? 'No resellers found matching your search' : t('sharedNoData')}
                         </TableCell>
                       </TableRow>
@@ -642,11 +644,18 @@ const FloatingResellersPopover = ({
                                     {reseller.appUrl}
                                   </Typography>
                                 )}
+                                {!desktop && (
+                                  <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '11px', display: 'block', marginTop: '2px' }}>
+                                    {reseller.resellerEmail || '-'}
+                                  </Typography>
+                                )}
                               </div>
                             </TableCell>
-                            <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
-                              {reseller.resellerEmail || '-'}
-                            </TableCell>
+                            {desktop && (
+                              <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
+                                {reseller.resellerEmail || '-'}
+                              </TableCell>
+                            )}
                             {desktop && (
                               <>
                                 <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
