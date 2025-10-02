@@ -121,7 +121,7 @@ const resetFavicon = () => {
   try {
     const favicon = document.querySelector('link[rel="icon"]');
     if (favicon) {
-      favicon.href = '/favicon.ico';
+      favicon.href = fallbackLogo;
     }
   } catch (error) {
     console.error('❌ Error resetting favicon:', error);
