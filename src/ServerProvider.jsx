@@ -28,7 +28,6 @@ const ServerProvider = ({
         }
 
         // Fetch reseller branding data
-        console.log('🔍 Checking for reseller branding...');
         const resellerData = await fetchResellerBranding();
         
         if (resellerData) {
@@ -36,11 +35,9 @@ const ServerProvider = ({
           dispatch(sessionActions.updateResellerBranding(resellerData));
           // Apply branding to the page
           applyResellerBranding(resellerData);
-          console.log('✅ Reseller branding loaded and applied');
         } else {
           // Apply fallback branding
           applyFallbackBranding();
-          console.log('ℹ️ Using fallback branding');
         }
       } catch (error) {
         setError(error.message);

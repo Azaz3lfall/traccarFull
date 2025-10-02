@@ -522,9 +522,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Invalidate queries to refresh UI
       queryClient.invalidateQueries(['devices']);
-      
-      console.log('Device image updated successfully');
-    } catch (error) {
+      } catch (error) {
       console.error('Error uploading device image:', error);
       alert(t('deviceImageUploadError'));
     } finally {

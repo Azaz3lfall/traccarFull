@@ -58,9 +58,8 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+
   if (req.body && Object.keys(req.body).length > 0) {
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
   }
   next();
 });
@@ -96,14 +95,7 @@ app.post('/api/resellers', (req, res) => {
       });
     }
 
-    // Console log the reseller data for debugging
-    console.log('🚀 RECEIVED RESELLER DATA:');
-    console.log('📊 Full payload:', JSON.stringify(body, null, 2));
-    console.log('📏 Payload size:', JSON.stringify(body).length, 'characters');
-    console.log('🔍 Field breakdown:');
-    Object.entries(body).forEach(([key, value]) => {
-      console.log(`  ${key}:`, value);
-    });
+
     
     // Validate required fields
     const requiredFields = [
@@ -115,7 +107,6 @@ app.post('/api/resellers', (req, res) => {
     
     const missingFields = requiredFields.filter(field => !body[field] || body[field] === '');
     if (missingFields.length > 0) {
-      console.log('❌ Missing required fields:', missingFields);
       return res.status(400).json({
         error: 'Missing required fields',
         missingFields: missingFields,
@@ -123,8 +114,6 @@ app.post('/api/resellers', (req, res) => {
       });
     }
     
-    console.log('✅ Reseller data validation passed');
-    console.log('💾 Ready to save reseller:', body.companyName);
     
     // Create JSON file with reseller data
     try {
@@ -135,7 +124,6 @@ app.post('/api/resellers', (req, res) => {
       const dataDir = path.join(__dirname, '..', '..', 'data');
       if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
-        console.log('📁 Created data directory:', dataDir);
       }
       
       // Full file path
@@ -151,8 +139,6 @@ app.post('/api/resellers', (req, res) => {
       // Write JSON file
       fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
       
-      console.log('💾 Reseller data saved to file:', filePath);
-      console.log('📄 Filename:', filename);
       
     } catch (fileError) {
       console.error('❌ Error saving reseller file:', fileError);
@@ -269,15 +255,6 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Resellers Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API endpoints:`);
-  console.log(`   GET  /api/resellers`);
-  console.log(`   POST /api/resellers`);
-  console.log(`   PUT  /api/resellers/:id`);
-  console.log(`   DELETE /api/resellers/:id`);
-  console.log(`   POST /api/data`);
-  console.log(`\n💡 React app should be running on http://localhost:3000`);
 });
 
 // Graceful shutdown

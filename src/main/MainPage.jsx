@@ -701,7 +701,7 @@ const MainPage = () => {
       // Create File object
       const file = new File([blob], filename, { type: 'application/json' });
       
-      console.log('Uploading reseller file:', filename);
+    
       
       // Upload to server
       await fetchOrThrow(`/api/server/file/${filename}`, {
@@ -709,7 +709,6 @@ const MainPage = () => {
         body: file,
       });
       
-      console.log('Reseller file uploaded successfully:', filename);
       
     } catch (error) {
       console.error('Reseller file upload failed:', error);
@@ -4844,7 +4843,6 @@ const MainPage = () => {
                     };
                     
                     // Console log the JSON object
-                    console.log('Reseller Data JSON:', JSON.stringify(resellerJson, null, 2));
                     
                     // Upload file to server
                     await handleResellerFileUpload(resellerJson);

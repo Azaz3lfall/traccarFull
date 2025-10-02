@@ -200,9 +200,6 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
               });
           
             // Debug logging
-            console.log('Cluster devices found:', clusterDevices);
-            console.log('Total devices in store:', Object.keys(devices).length);
-            console.log('Total positions:', positions.length);
             
             // Show popup if we have devices to display
             if (clusterDevices.length > 0) {

@@ -7,11 +7,8 @@ import fallbackLogo from '../../resources/images/image170.png?inline';
 export const fetchResellerBranding = async () => {
   try {
     const currentDomain = window.location.hostname;
-    console.log('🔍 Checking reseller branding for domain:', currentDomain);
 
     const requestBody = { domain: currentDomain };
-    console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
-    console.log('📤 Request URL:', 'http://localhost:3333/api/domain-lookup');
 
     const response = await fetch('http://localhost:3333/api/domain-lookup', {
       method: 'POST',
@@ -21,22 +18,16 @@ export const fetchResellerBranding = async () => {
       body: JSON.stringify(requestBody),
     });
 
-    console.log('📥 Response status:', response.status);
-    console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (response.ok) {
       const data = await response.json();
-      console.log('✅ Found reseller branding data:', data);
       return data;
     } else if (response.status === 404) {
-      console.log('ℹ️ No reseller branding found for domain:', currentDomain);
       const errorText = await response.text();
-      console.log('📥 404 Response body:', errorText);
       return null;
     } else {
       console.error('❌ Error fetching reseller branding:', response.status, response.statusText);
       const errorText = await response.text();
-      console.log('📥 Error response body:', errorText);
       return null;
     }
   } catch (error) {
@@ -51,13 +42,11 @@ export const fetchResellerBranding = async () => {
  */
 export const applyResellerBranding = (resellerData) => {
   if (!resellerData || !resellerData.data) {
-    console.log('ℹ️ No reseller data to apply, using fallback');
     applyFallbackBranding();
     return;
   }
 
   const { data, imageBase64 } = resellerData;
-  console.log('🎨 Applying reseller branding:', data.companyName);
 
   // Update page title
   if (data.companyName) {
@@ -77,14 +66,12 @@ export const applyResellerBranding = (resellerData) => {
     }
   }
 
-  console.log('✅ Reseller branding applied successfully');
 };
 
 /**
  * Applies fallback branding when no reseller data is found
  */
 export const applyFallbackBranding = () => {
-  console.log('🎨 Applying fallback branding');
   
   // Reset to default title
   document.title = 'CodeArtisan GPS SaaS';
@@ -122,7 +109,6 @@ const updateFavicon = (base64Image) => {
       document.head.appendChild(favicon);
     }
     
-    console.log('✅ Favicon updated with reseller logo');
   } catch (error) {
     console.error('❌ Error updating favicon:', error);
   }
@@ -137,7 +123,6 @@ const resetFavicon = () => {
     if (favicon) {
       favicon.href = '/favicon.ico';
     }
-    console.log('✅ Favicon reset to default');
   } catch (error) {
     console.error('❌ Error resetting favicon:', error);
   }

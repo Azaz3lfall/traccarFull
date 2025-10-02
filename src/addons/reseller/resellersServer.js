@@ -97,9 +97,8 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+
   if (req.body && Object.keys(req.body).length > 0) {
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
   }
   next();
 });
@@ -125,7 +124,6 @@ app.post('/api/resellers/list', async (req, res) => {
       });
     }
 
-    console.log('🔍 Fetching resellers for parentUserId:', parentUserId);
 
     // Get all JSON files from data directory
     const dataDir = path.join(__dirname, 'data');
@@ -157,7 +155,6 @@ app.post('/api/resellers/list', async (req, res) => {
             resellerData.fileResellerId = fileResellerId;
             
             resellers.push(resellerData);
-            console.log('✅ Found reseller:', resellerData.companyName, 'from file:', jsonFile);
           }
         }
       } catch (fileError) {
@@ -166,7 +163,6 @@ app.post('/api/resellers/list', async (req, res) => {
       }
     }
 
-    console.log(`📊 Found ${resellers.length} resellers for parentUserId: ${parentUserId}`);
 
     res.json({
       success: true,
@@ -198,18 +194,13 @@ app.get('/api/resellers', (req, res) => {
 // POST endpoint for resellers data
 app.post('/api/resellers', upload.any(), async (req, res) => {
   try {
-    console.log('🚨 POST ENDPOINT CALLED - CREATING NEW RESELLER');
-    console.log('🔍 Request headers:', req.headers['content-type']);
-    console.log('🔍 Request body keys:', Object.keys(req.body || {}));
-    console.log('🔍 Request files:', req.files ? req.files.length : 'none');
-    console.log('🔍 Request body:', JSON.stringify(req.body, null, 2));
     
     let body;
     
     // Check if request is FormData (with image) or JSON
     if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
       // Handle FormData - use individual fields from form data
-      console.log('📝 Processing FormData request');
+    
       
       // Extract all fields from FormData
       body = {
@@ -234,7 +225,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       };
     } else {
       // Handle JSON request
-      console.log('📝 Processing JSON request');
       body = req.body;
     }
     
@@ -245,15 +235,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
         timestamp: new Date().toISOString()
       });
     }
-
-    // Console log the reseller data for debugging
-    console.log('🚀 RECEIVED RESELLER DATA:');
-    console.log('📊 Full payload:', JSON.stringify(body, null, 2));
-    console.log('📏 Payload size:', JSON.stringify(body).length, 'characters');
-    console.log('🔍 Field breakdown:');
-    Object.entries(body).forEach(([key, value]) => {
-      console.log(`  ${key}:`, value);
-    });
     
     // Validate required fields (logotype is optional as it will be set from image upload)
     const requiredFields = [
@@ -265,7 +246,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
     
     const missingFields = requiredFields.filter(field => !body[field] || body[field] === '');
     if (missingFields.length > 0) {
-      console.log('❌ Missing required fields:', missingFields);
+    
       return res.status(400).json({
         error: 'Missing required fields',
         missingFields: missingFields,
@@ -273,8 +254,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       });
     }
     
-    console.log('✅ Reseller data validation passed');
-    console.log('💾 Ready to save reseller:', body.companyName);
     
     // Check if appUrl already exists
     try {
@@ -289,7 +268,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           
           // Check if appUrl already exists
           if (existingReseller.appUrl === body.appUrl) {
-            console.log('❌ Domain already in use:', body.appUrl);
             
             // Mask email and company name for privacy
             const maskedEmail = existingReseller.resellerEmail ? 
@@ -316,7 +294,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
         }
       }
       
-      console.log('✅ Domain availability check passed:', body.appUrl);
     } catch (domainCheckError) {
       console.error('❌ Error checking domain availability:', domainCheckError);
       return res.status(500).json({
@@ -339,7 +316,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           
           // Check if WhatsApp number already exists
           if (existingReseller.whatsapp === body.whatsapp) {
-            console.log('❌ WhatsApp number already in use:', body.whatsapp);
             
             // Mask email and company name for privacy
             const maskedEmail = existingReseller.resellerEmail ? 
@@ -366,7 +342,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
         }
       }
       
-      console.log('✅ WhatsApp availability check passed:', body.whatsapp);
     } catch (whatsappCheckError) {
       console.error('❌ Error checking WhatsApp availability:', whatsappCheckError);
       return res.status(500).json({
@@ -398,8 +373,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           imageUrl = `images/${imageFilename}`;
           body.logotype = imageUrl;
           
-          console.log('📤 Image processed:', imageFilename);
-          console.log('📁 Saved to:', imagePath);
         }
       } catch (imageError) {
         console.error('❌ Error processing image:', imageError);
@@ -427,8 +400,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
         imageUrl = `images/${imageFilename}`;
         body.logotype = imageUrl;
         
-        console.log('📤 Base64 image processed:', imageFilename);
-        console.log('📁 Saved to:', imagePath);
       } catch (base64Error) {
         console.error('❌ Error processing base64 image:', base64Error);
         return res.status(500).json({
@@ -461,8 +432,6 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       // Write JSON file
       fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
       
-      console.log('💾 Reseller data saved to file:', filePath);
-      console.log('📄 Filename:', filename);
       
     } catch (fileError) {
       console.error('❌ Error saving reseller file:', fileError);
@@ -496,9 +465,6 @@ app.put('/api/resellers/:id', async (req, res) => {
         const { id } = req.params;
         const { body } = req;
         
-        console.log('🔄 PUT ENDPOINT CALLED - Updating reseller:', id);
-        console.log('📊 Update data:', JSON.stringify(body, null, 2));
-        console.log('🚨 THIS IS PUT ENDPOINT - NO UNIQUENESS CHECKS');
         
         // Find existing reseller first
         const dataDir = path.join(__dirname, 'data');
@@ -539,7 +505,6 @@ app.put('/api/resellers/:id', async (req, res) => {
             });
         }
 
-        console.log('✅ Found existing reseller:', existingReseller.companyName);
         
         // Merge with existing data - keep old values if new ones are empty
         const updatedData = {
@@ -552,12 +517,10 @@ app.put('/api/resellers/:id', async (req, res) => {
             updatedAt: new Date().toISOString()
         };
 
-        console.log('✅ Merged data - keeping old values for empty fields');
         
         // Create data directory if it doesn't exist
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir, { recursive: true });
-            console.log('📁 Created data directory:', dataDir);
         }
         
         // Create filename for the reseller (use merged data)
@@ -575,14 +538,12 @@ app.put('/api/resellers/:id', async (req, res) => {
             const oldFilePath = path.join(dataDir, existingResellerFile);
             if (fs.existsSync(oldFilePath)) {
                 fs.unlinkSync(oldFilePath);
-                console.log('🗑️ Deleted old file:', oldFilePath);
             }
         }
         
         // Write JSON file
         fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
         
-        console.log('✅ Reseller updated successfully:', filePath);
 
         res.json({
             success: true,
@@ -613,7 +574,6 @@ app.post('/api/resellers/delete', async (req, res) => {
       });
     }
 
-    console.log('🗑️ Delete request for:', { appUrl, parentUserId });
 
     // Find the reseller file that matches both appUrl and parentUserId
     const dataDir = path.join(__dirname, 'data');
@@ -631,16 +591,12 @@ app.post('/api/resellers/delete', async (req, res) => {
           const fileAppUrl = filenameParts[1];
           const fileParentUserId = filenameParts[2];
           
-          console.log(`🔍 Checking file ${jsonFile}: appUrl=${fileAppUrl}, parentUserId=${fileParentUserId}`);
-          console.log(`🔍 Looking for: appUrl=${appUrl}, parentUserId=${parentUserId}`);
-          
           // Check if this file matches the delete request
           if (fileAppUrl === appUrl && fileParentUserId === parentUserId.toString()) {
             const filePath = path.join(dataDir, jsonFile);
             const fileContent = fs.readFileSync(filePath, 'utf8');
             resellerData = JSON.parse(fileContent);
             resellerFile = jsonFile;
-            console.log('✅ Found matching reseller file:', jsonFile);
             break;
           }
         }
@@ -658,12 +614,12 @@ app.post('/api/resellers/delete', async (req, res) => {
       });
     }
 
-    console.log('✅ Found reseller to delete:', resellerData.companyName);
+    
 
     // Delete the JSON file
     const jsonFilePath = path.join(dataDir, resellerFile);
     fs.unlinkSync(jsonFilePath);
-    console.log('🗑️ Deleted JSON file:', jsonFilePath);
+
 
     // Delete associated image if it exists
     if (resellerData.logotype && resellerData.logotype.startsWith('images/')) {
@@ -672,9 +628,9 @@ app.post('/api/resellers/delete', async (req, res) => {
       
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
-        console.log('🗑️ Deleted image file:', imagePath);
+
       } else {
-        console.log('⚠️ Image file not found:', imagePath);
+
       }
     }
 
@@ -747,9 +703,9 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       }
     }
 
-    console.log('📤 Image uploaded:', correctFilename);
-    console.log('📁 Saved to:', correctPath);
-    console.log('📏 File size:', req.file.size, 'bytes');
+
+
+
 
     res.json({
       success: true,
@@ -778,29 +734,29 @@ app.post('/api/domain-lookup', async (req, res) => {
   try {
     const { domain } = req.body;
     
-    console.log('🔍 DOMAIN LOOKUP REQUEST:');
-    console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
-    console.log('📥 Headers:', JSON.stringify(req.headers, null, 2));
+
+
+
     
     if (!domain) {
-      console.log('❌ No domain provided in request');
+
       return res.status(400).json({
         error: 'Domain is required',
         timestamp: new Date().toISOString()
       });
     }
 
-    console.log('🔍 Looking up domain:', domain);
+
 
     // Search for JSON files that contain this domain in filename
     const dataDir = path.join(__dirname, 'data');
     const jsonPattern = `reseller_${domain}_*.json`;
     
-    console.log('📁 Data directory:', dataDir);
-    console.log('🔍 Looking for JSON pattern:', jsonPattern);
+
+
     
     const jsonFiles = await glob(jsonPattern, { cwd: dataDir });
-    console.log('📄 Found matching JSON files:', jsonFiles);
+
     
     let domainData = null;
     let imageBase64 = null;
@@ -808,7 +764,7 @@ app.post('/api/domain-lookup', async (req, res) => {
     // If we found matching files, read the first one
     if (jsonFiles.length > 0) {
       const jsonFile = jsonFiles[0]; // Take the first match
-      console.log(`✅ Found domain file: ${jsonFile}`);
+
       
       try {
         const filePath = path.join(dataDir, jsonFile);
@@ -816,31 +772,21 @@ app.post('/api/domain-lookup', async (req, res) => {
         const data = JSON.parse(fileContent);
         
         domainData = data;
-        console.log('✅ Domain data details:', {
-          appUrl: data.appUrl,
-          currentDomain: data.currentDomain,
-          companyName: data.companyName,
-          resellerId: data.resellerId,
-          parentUserId: data.parentUserId
-        });
         
         // Look for corresponding image file using the same pattern
         const imagePattern = `reseller_${domain}_${data.parentUserId}_${data.resellerId}_*.png`;
-        console.log('🖼️ Looking for image pattern:', imagePattern);
+      
         const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
-        console.log('🖼️ Found image files:', imageFiles);
         
         if (imageFiles.length > 0) {
           const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
           const imageBuffer = fs.readFileSync(imagePath);
           imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-          console.log('✅ Found image:', imageFiles[0]);
         }
       } catch (fileError) {
         console.error('❌ Error reading file:', jsonFile, fileError.message);
       }
     } else {
-      console.log(`❌ No JSON files found matching domain: ${domain}`);
     }
 
     if (!domainData) {
@@ -860,7 +806,6 @@ app.post('/api/domain-lookup', async (req, res) => {
       timestamp: new Date().toISOString()
     };
 
-    console.log('📤 Returning domain data for:', domain);
     res.json(response);
 
   } catch (error) {
@@ -922,19 +867,14 @@ const ensureDirectories = () => {
     
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
-      console.log('📁 Created data directory:', dataDir);
     } else {
-      console.log('📁 Data directory already exists:', dataDir);
     }
     
     if (!fs.existsSync(imagesDir)) {
       fs.mkdirSync(imagesDir, { recursive: true });
-      console.log('📁 Created images directory:', imagesDir);
     } else {
-      console.log('📁 Images directory already exists:', imagesDir);
     }
     
-    console.log('✅ All required directories are ready');
   } catch (error) {
     console.error('❌ Error creating directories:', error);
     process.exit(1);
@@ -946,18 +886,7 @@ ensureDirectories();
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Resellers Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API endpoints:`);
-  console.log(`   GET  /api/resellers`);
-  console.log(`   POST /api/resellers/list`);
-  console.log(`   POST /api/resellers`);
-  console.log(`   PUT  /api/resellers/:id`);
-  console.log(`   POST /api/resellers/delete`);
-  console.log(`   POST /api/data`);
-  console.log(`   POST /api/upload`);
-  console.log(`   POST /api/domain-lookup`);
-  console.log(`\n💡 React app should be running on http://localhost:3000`);
+
 });
 
 // Graceful shutdown

@@ -174,8 +174,6 @@ const FloatingResellersPopover = ({
     if (resellerToDelete) {
       deleteResellerMutation.mutate(resellerToDelete);
     }
-    setDeleteDialog(false);
-    setResellerToDelete(null);
   };
 
   // Handle delete cancellation
@@ -285,11 +283,14 @@ const FloatingResellersPopover = ({
         throw new Error(error.message || 'Failed to delete reseller');
       }
 
-      return response.json();
+      const result = await response.json();
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resellers', user?.id] });
       queryClient.refetchQueries({ queryKey: ['resellers', user?.id] });
+      setDeleteDialog(false);
+      setResellerToDelete(null);
       setSnackbar({ open: true, message: t('resellerDeletedSuccess'), severity: 'success' });
     },
     onError: (error) => {
@@ -324,25 +325,12 @@ const FloatingResellersPopover = ({
       createdAt: new Date().toISOString()
     };
 
-    // Console log the full payload
-    console.log('🚀 FULL RESELLER PAYLOAD:', fullPayload);
-    console.log('📊 Payload size:', JSON.stringify(fullPayload).length, 'characters');
-    console.log('🔍 Individual field values:');
-    Object.entries(fullPayload).forEach(([key, value]) => {
-      console.log(`  ${key}:`, value);
-    });
-
-    // Use mutation to save reseller (validation happens on backend first)
-    console.log('🔍 isEditMode:', isEditMode);
-    console.log('🔍 editingReseller object:', editingReseller);
     
     if (isEditMode) {
       // Update existing reseller
-      console.log('🔄 EDITING - calling updateResellerMutation');
       updateResellerMutation.mutate({ id: editingReseller.id || editingReseller.resellerId, ...fullPayload });
     } else {
       // Create new reseller - validation happens first, then image upload
-      console.log('🆕 CREATING - calling createResellerMutation');
       createResellerMutation.mutate(fullPayload);
     }
   };
@@ -408,7 +396,6 @@ const FloatingResellersPopover = ({
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Image uploaded successfully:', result);
         return result.url || result.filename;
       } else {
         const error = await response.json();
