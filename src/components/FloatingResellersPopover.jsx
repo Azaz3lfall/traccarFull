@@ -575,11 +575,9 @@ const FloatingResellersPopover = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow style={{ backgroundColor: colors.surface }}>
-                      {desktop && (
-                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('resellerCompany')}
-                        </TableCell>
-                      )}
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        {t('resellerCompany')}
+                      </TableCell>
                       <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('userEmail')}
                       </TableCell>
@@ -601,19 +599,19 @@ const FloatingResellersPopover = ({
                   <TableBody>
                     {isLoading ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px' }}>
+                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px' }}>
                           <CircularProgress size={24} />
                         </TableCell>
                       </TableRow>
                     ) : error ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.error }}>
+                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px', color: colors.error }}>
                           Error loading resellers: {error.message}
                         </TableCell>
                       </TableRow>
                     ) : paginatedResellers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={desktop ? 5 : 2} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
+                        <TableCell colSpan={desktop ? 5 : 3} align="center" style={{ padding: '20px', color: colors.textSecondary, lineHeight: 0.8, fontSize: '12px' }}>
                           {searchKeyword ? 'No resellers found matching your search' : t('sharedNoData')}
                         </TableCell>
                       </TableRow>
@@ -634,20 +632,18 @@ const FloatingResellersPopover = ({
                             }}
                             sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                           >
-                            {desktop && (
-                              <TableCell>
-                                <div>
-                                  <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                                    {reseller.companyName || t('sharedUnknown')}
+                            <TableCell>
+                              <div>
+                                <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
+                                  {reseller.companyName || t('sharedUnknown')}
+                                </Typography>
+                                {reseller.appUrl && (
+                                  <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
+                                    {reseller.appUrl}
                                   </Typography>
-                                  {reseller.appUrl && (
-                                    <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                                      {reseller.appUrl}
-                                    </Typography>
-                                  )}
-                                </div>
-                              </TableCell>
-                            )}
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
                               {reseller.resellerEmail || '-'}
                             </TableCell>
