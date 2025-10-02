@@ -1026,7 +1026,8 @@ const MainPage = () => {
                   marginBottom: '6px'
                 }}>
                   {(() => {
-                    const logoUrl = logo || logoInverted;
+                    // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
+                    const logoUrl = getLogoUrl() || logo || logoInverted;
                     
                     return (
                       <img 
@@ -1040,7 +1041,9 @@ const MainPage = () => {
                           objectFit: 'contain'
                         }}
                         onError={(e) => {
-                          e.target.src = fallbackLogo;
+                          // Fallback to server logo or default
+                          const fallbackUrl = logo || logoInverted || fallbackLogo;
+                          e.target.src = fallbackUrl;
                         }}
                       />
                     );
