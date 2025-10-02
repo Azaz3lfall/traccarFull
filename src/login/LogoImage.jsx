@@ -1,17 +1,18 @@
 import { useSelector } from 'react-redux';
-import fallbackLogo from '../resources/images/image170.png?inline';
+import { getLogoUrl } from '../common/util/resellerBranding';
 
 const LogoImage = ({ color }) => {
   const logo = useSelector((state) => state.session.server?.attributes?.logo);
   const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
+  const resellerBranding = useSelector((state) => state.session.resellerBranding);
   
-  // Use server logo or inverted logo only
-  const logoUrl = logo || logoInverted;
+  // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
+  const logoUrl = getLogoUrl(resellerBranding) || logo || logoInverted;
   
   return (
     <div className="flex justify-center items-center p-4">
       <img 
-        src={logoUrl || fallbackLogo} 
+        src={logoUrl} 
         alt="Server Logo" 
         className="w-auto h-auto object-contain"
         style={{ 
@@ -21,7 +22,9 @@ const LogoImage = ({ color }) => {
           height: 'auto'
         }}
         onError={(e) => {
-          e.target.src = fallbackLogo;
+          // If reseller logo fails, fall back to server logo or default
+          const fallbackUrl = logo || logoInverted || '/favicon.ico';
+          e.target.src = fallbackUrl;
         }}
       />
     </div>

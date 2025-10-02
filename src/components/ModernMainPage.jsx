@@ -23,6 +23,7 @@ const ModernMainPage = () => {
   const mapOnSelect = useAttributePreference('mapOnSelect', true);
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
+  const { companyName } = useResellerBranding();
   const [filteredPositions, setFilteredPositions] = useState([]);
   const selectedPosition = filteredPositions.find((position) => selectedDeviceId && position.deviceId === selectedDeviceId);
 

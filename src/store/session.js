@@ -12,6 +12,7 @@ const { reducer, actions } = createSlice({
     history: {},
     replayPositions: [],
     currentReplayIndex: 0,
+    resellerBranding: null,
   },
   reducers: {
     updateServer(state, action) {
@@ -53,6 +54,9 @@ const { reducer, actions } = createSlice({
     },
     updateCurrentReplayIndex(state, action) {
       state.currentReplayIndex = action.payload;
+    },
+    updateResellerBranding(state, action) {
+      state.resellerBranding = action.payload;
     },
   },
 });

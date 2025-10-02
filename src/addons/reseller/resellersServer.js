@@ -624,12 +624,15 @@ app.post('/api/resellers/delete', async (req, res) => {
     
     for (const jsonFile of jsonFiles) {
       try {
-        // Parse filename to extract components: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
+        // Parse filename to extract components: reseller_{appUrl}_{parentUserId}_{resellerId}.json
         const filenameParts = jsonFile.replace('.json', '').split('_');
         
-        if (filenameParts.length >= 3) {
-          const fileAppUrl = filenameParts[0];
-          const fileParentUserId = filenameParts[1];
+        if (filenameParts.length >= 4 && filenameParts[0] === 'reseller') {
+          const fileAppUrl = filenameParts[1];
+          const fileParentUserId = filenameParts[2];
+          
+          console.log(`🔍 Checking file ${jsonFile}: appUrl=${fileAppUrl}, parentUserId=${fileParentUserId}`);
+          console.log(`🔍 Looking for: appUrl=${appUrl}, parentUserId=${parentUserId}`);
           
           // Check if this file matches the delete request
           if (fileAppUrl === appUrl && fileParentUserId === parentUserId.toString()) {
@@ -637,6 +640,7 @@ app.post('/api/resellers/delete', async (req, res) => {
             const fileContent = fs.readFileSync(filePath, 'utf8');
             resellerData = JSON.parse(fileContent);
             resellerFile = jsonFile;
+            console.log('✅ Found matching reseller file:', jsonFile);
             break;
           }
         }
@@ -774,7 +778,12 @@ app.post('/api/domain-lookup', async (req, res) => {
   try {
     const { domain } = req.body;
     
+    console.log('🔍 DOMAIN LOOKUP REQUEST:');
+    console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
+    console.log('📥 Headers:', JSON.stringify(req.headers, null, 2));
+    
     if (!domain) {
+      console.log('❌ No domain provided in request');
       return res.status(400).json({
         error: 'Domain is required',
         timestamp: new Date().toISOString()
@@ -787,6 +796,9 @@ app.post('/api/domain-lookup', async (req, res) => {
     const dataDir = path.join(__dirname, 'data');
     const jsonFiles = await glob('*.json', { cwd: dataDir });
     
+    console.log('📁 Data directory:', dataDir);
+    console.log('📄 Found JSON files:', jsonFiles);
+    
     let domainData = null;
     let imageBase64 = null;
 
@@ -797,14 +809,21 @@ app.post('/api/domain-lookup', async (req, res) => {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const data = JSON.parse(fileContent);
         
+        console.log(`🔍 Checking file ${jsonFile}:`);
+        console.log(`  - appUrl: "${data.appUrl}"`);
+        console.log(`  - currentDomain: "${data.currentDomain}"`);
+        console.log(`  - Looking for: "${domain}"`);
+        
         // Check if this JSON file contains the domain
         if (data.appUrl === domain || data.currentDomain === domain) {
           domainData = data;
           console.log('✅ Found domain data in:', jsonFile);
           
           // Look for corresponding image file
-          const imagePattern = `${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
+          const imagePattern = `reseller_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
+          console.log('🖼️ Looking for image pattern:', imagePattern);
           const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
+          console.log('🖼️ Found image files:', imageFiles);
           
           if (imageFiles.length > 0) {
             const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
@@ -814,6 +833,8 @@ app.post('/api/domain-lookup', async (req, res) => {
           }
           
           break; // Found the domain, stop searching
+        } else {
+          console.log(`❌ No match in ${jsonFile}`);
         }
       } catch (fileError) {
         console.error('❌ Error reading file:', jsonFile, fileError.message);

@@ -24,6 +24,9 @@ export default defineConfig(() => {
       },
       proxy: {
         '/api/socket': WS_BASE_URL,
+        '/api/domain-lookup': 'http://localhost:3333',
+        '/api/resellers': 'http://localhost:3333',
+        '/api/upload': 'http://localhost:3333',
         '/api': API_BASE_URL,
       },
     },

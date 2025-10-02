@@ -72,6 +72,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
 import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
 import ReactCountryFlag from 'react-country-flag';
+import { useResellerBranding } from '../common/hooks/useResellerBranding';
 import { 
   Box, 
   TextField, 
@@ -746,6 +747,9 @@ const MainPage = () => {
   const supportLink = useSelector((state) => state.session.server.attributes.support);
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
   
+  // Reseller branding
+  const { getLogoUrl, getCompanyName } = useResellerBranding();
+  
   // Events data for notification badge
   const events = useSelector((state) => state.events.items);
   const eventsCount = events ? events.length : 0;
@@ -987,7 +991,8 @@ const MainPage = () => {
                 marginBottom: '6px'
               }}>
                 {(() => {
-                  const logoUrl = logo || logoInverted;
+                  // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
+                  const logoUrl = getLogoUrl() || logo || logoInverted;
                   
                   return (
                     <img 
@@ -1001,7 +1006,9 @@ const MainPage = () => {
                         objectFit: 'contain'
                       }}
                       onError={(e) => {
-                        e.target.src = fallbackLogo;
+                        // Fallback to server logo or default
+                        const fallbackUrl = logo || logoInverted || fallbackLogo;
+                        e.target.src = fallbackUrl;
                       }}
                     />
                   );
@@ -6022,7 +6029,8 @@ const MainPage = () => {
                 justifyContent: 'flex-start'
               }}>
                 {(() => {
-                  const logoUrl = logo || logoInverted;
+                  // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
+                  const logoUrl = getLogoUrl() || logo || logoInverted;
                   
                   return (
                     <img 
@@ -6036,7 +6044,9 @@ const MainPage = () => {
                         objectFit: 'contain'
                       }}
                       onError={(e) => {
-                        e.target.src = fallbackLogo;
+                        // Fallback to server logo or default
+                        const fallbackUrl = logo || logoInverted || fallbackLogo;
+                        e.target.src = fallbackUrl;
                       }}
                     />
                   );
