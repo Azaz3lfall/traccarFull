@@ -309,8 +309,8 @@ const FloatingResellersPopover = ({
       resellerUser: editingReseller.resellerUser || '',
       resellerEmail: editingReseller.resellerEmail || '',
       companyName: editingReseller.companyName || '',
-      logotype: editingReseller.logo || '',
-      appUrl: editingReseller.url || '',
+      logotype: editingReseller.logotype || editingReseller.logo || '',
+      appUrl: editingReseller.appUrl || editingReseller.url || '',
       whatsapp: editingReseller.whatsapp || '',
       billingEmail: editingReseller.billingEmail || '',
       supportEmail: editingReseller.supportEmail || '',
@@ -330,11 +330,17 @@ const FloatingResellersPopover = ({
     });
 
     // Use mutation to save reseller (validation happens on backend first)
-    if (editingReseller.id) {
+    console.log('🔍 editingReseller.id:', editingReseller.id);
+    console.log('🔍 editingReseller.resellerId:', editingReseller.resellerId);
+    console.log('🔍 editingReseller object:', editingReseller);
+    
+    if (editingReseller.id || editingReseller.resellerId) {
       // Update existing reseller
-      updateResellerMutation.mutate({ id: editingReseller.id, ...fullPayload });
+      console.log('🔄 EDITING - calling updateResellerMutation');
+      updateResellerMutation.mutate({ id: editingReseller.id || editingReseller.resellerId, ...fullPayload });
     } else {
       // Create new reseller - validation happens first, then image upload
+      console.log('🆕 CREATING - calling createResellerMutation');
       createResellerMutation.mutate(fullPayload);
     }
   };
@@ -1124,10 +1130,13 @@ const FloatingResellersPopover = ({
                                 
                                 <TextField
                                   fullWidth
-                                  value={editingReseller.url || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, url: e.target.value })}
+                                  value={editingReseller.appUrl || editingReseller.url || ''}
+                                  onChange={(e) => setEditingReseller({ ...editingReseller, appUrl: e.target.value })}
                                   label={t('resellerAppUrl')}
                                   required
+                                  InputProps={{
+                                    readOnly: editingReseller.id || editingReseller.resellerId
+                                  }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,

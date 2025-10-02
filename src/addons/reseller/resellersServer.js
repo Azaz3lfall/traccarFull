@@ -198,6 +198,7 @@ app.get('/api/resellers', (req, res) => {
 // POST endpoint for resellers data
 app.post('/api/resellers', upload.any(), async (req, res) => {
   try {
+    console.log('🚨 POST ENDPOINT CALLED - CREATING NEW RESELLER');
     console.log('🔍 Request headers:', req.headers['content-type']);
     console.log('🔍 Request body keys:', Object.keys(req.body || {}));
     console.log('🔍 Request files:', req.files ? req.files.length : 'none');
@@ -467,29 +468,63 @@ app.put('/api/resellers/:id', async (req, res) => {
         const { id } = req.params;
         const { body } = req;
         
-        console.log('🔄 PUT ENDPOINT - Updating reseller:', id);
+        console.log('🔄 PUT ENDPOINT CALLED - Updating reseller:', id);
         console.log('📊 Update data:', JSON.stringify(body, null, 2));
+        console.log('🚨 THIS IS PUT ENDPOINT - NO UNIQUENESS CHECKS');
         
-        // Validate required fields
-        const requiredFields = [
-            'currentDomain', 'parentUserId', 'parentUser', 'parentEmail',
-            'resellerId', 'resellerUser', 'resellerEmail', 'companyName',
-            'logotype', 'appUrl', 'whatsapp', 'billingEmail', 'supportEmail',
-            'resellerLimit', 'deviceLimit', 'userLimit', 'status'
-        ];
+        // Find existing reseller first
+        const dataDir = path.join(__dirname, 'data');
+        const jsonFiles = await glob('*.json', { cwd: dataDir });
         
-        const missingFields = requiredFields.filter(field => !body[field] || body[field] === '');
-        if (missingFields.length > 0) {
-            console.log('❌ Missing required fields:', missingFields);
-            return res.status(400).json({
-                error: 'Missing required fields',
-                missingFields: missingFields,
+        let existingReseller = null;
+        let existingResellerFile = null;
+        
+        for (const jsonFile of jsonFiles) {
+            try {
+                const filenameParts = jsonFile.replace('.json', '').split('_');
+                
+                if (filenameParts.length >= 4 && filenameParts[0] === 'reseller') {
+                    const fileParentUserId = filenameParts[2];
+                    const fileResellerId = filenameParts[3];
+                    
+                    // Check if this file matches the update request
+                    if (fileParentUserId === body.parentUserId.toString() && 
+                        fileResellerId === body.resellerId) {
+                        const filePath = path.join(dataDir, jsonFile);
+                        const fileContent = fs.readFileSync(filePath, 'utf8');
+                        existingReseller = JSON.parse(fileContent);
+                        existingResellerFile = jsonFile;
+                        break;
+                    }
+                }
+            } catch (fileError) {
+                console.error('❌ Error reading file during update search:', jsonFile, fileError.message);
+                continue;
+            }
+        }
+
+        if (!existingReseller) {
+            return res.status(404).json({
+                error: 'Reseller not found',
+                message: `No reseller found with resellerId '${body.resellerId}' for user '${body.parentUserId}'`,
                 timestamp: new Date().toISOString()
             });
         }
 
-        // Save the reseller data
-        const dataDir = path.join(__dirname, 'data');
+        console.log('✅ Found existing reseller:', existingReseller.companyName);
+        
+        // Merge with existing data - keep old values if new ones are empty
+        const updatedData = {
+            ...existingReseller,
+            ...body,
+            // Keep old logotype if new one is empty
+            logotype: body.logotype && body.logotype.trim() !== '' ? body.logotype : existingReseller.logotype,
+            // Keep old appUrl if new one is empty
+            appUrl: body.appUrl && body.appUrl.trim() !== '' ? body.appUrl : existingReseller.appUrl,
+            updatedAt: new Date().toISOString()
+        };
+
+        console.log('✅ Merged data - keeping old values for empty fields');
         
         // Create data directory if it doesn't exist
         if (!fs.existsSync(dataDir)) {
@@ -497,16 +532,24 @@ app.put('/api/resellers/:id', async (req, res) => {
             console.log('📁 Created data directory:', dataDir);
         }
         
-        // Create filename for the reseller
-        const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
+        // Create filename for the reseller (use merged data)
+        const filename = `reseller_${updatedData.appUrl}_${updatedData.parentUserId}_${updatedData.resellerId}.json`;
         const filePath = path.join(dataDir, filename);
         
         // Add metadata to the data
         const fileData = {
-            ...body,
-            updatedAt: new Date().toISOString(),
+            ...updatedData,
             filename: filename
         };
+        
+        // Delete old file if filename changed
+        if (existingResellerFile && existingResellerFile !== filename) {
+            const oldFilePath = path.join(dataDir, existingResellerFile);
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlinkSync(oldFilePath);
+                console.log('🗑️ Deleted old file:', oldFilePath);
+            }
+        }
         
         // Write JSON file
         fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
