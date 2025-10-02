@@ -792,54 +792,55 @@ app.post('/api/domain-lookup', async (req, res) => {
 
     console.log('🔍 Looking up domain:', domain);
 
-    // Search for JSON files that contain this domain
+    // Search for JSON files that contain this domain in filename
     const dataDir = path.join(__dirname, 'data');
-    const jsonFiles = await glob('*.json', { cwd: dataDir });
+    const jsonPattern = `reseller_${domain}_*.json`;
     
     console.log('📁 Data directory:', dataDir);
-    console.log('📄 Found JSON files:', jsonFiles);
+    console.log('🔍 Looking for JSON pattern:', jsonPattern);
+    
+    const jsonFiles = await glob(jsonPattern, { cwd: dataDir });
+    console.log('📄 Found matching JSON files:', jsonFiles);
     
     let domainData = null;
     let imageBase64 = null;
 
-    // Check each JSON file for matching domain
-    for (const jsonFile of jsonFiles) {
+    // If we found matching files, read the first one
+    if (jsonFiles.length > 0) {
+      const jsonFile = jsonFiles[0]; // Take the first match
+      console.log(`✅ Found domain file: ${jsonFile}`);
+      
       try {
         const filePath = path.join(dataDir, jsonFile);
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const data = JSON.parse(fileContent);
         
-        console.log(`🔍 Checking file ${jsonFile}:`);
-        console.log(`  - appUrl: "${data.appUrl}"`);
-        console.log(`  - currentDomain: "${data.currentDomain}"`);
-        console.log(`  - Looking for: "${domain}"`);
+        domainData = data;
+        console.log('✅ Domain data details:', {
+          appUrl: data.appUrl,
+          currentDomain: data.currentDomain,
+          companyName: data.companyName,
+          resellerId: data.resellerId,
+          parentUserId: data.parentUserId
+        });
         
-        // Check if this JSON file contains the domain
-        if (data.appUrl === domain || data.currentDomain === domain) {
-          domainData = data;
-          console.log('✅ Found domain data in:', jsonFile);
-          
-          // Look for corresponding image file
-          const imagePattern = `reseller_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
-          console.log('🖼️ Looking for image pattern:', imagePattern);
-          const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
-          console.log('🖼️ Found image files:', imageFiles);
-          
-          if (imageFiles.length > 0) {
-            const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
-            const imageBuffer = fs.readFileSync(imagePath);
-            imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-            console.log('✅ Found image:', imageFiles[0]);
-          }
-          
-          break; // Found the domain, stop searching
-        } else {
-          console.log(`❌ No match in ${jsonFile}`);
+        // Look for corresponding image file using the same pattern
+        const imagePattern = `reseller_${domain}_${data.parentUserId}_${data.resellerId}_*.png`;
+        console.log('🖼️ Looking for image pattern:', imagePattern);
+        const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
+        console.log('🖼️ Found image files:', imageFiles);
+        
+        if (imageFiles.length > 0) {
+          const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
+          const imageBuffer = fs.readFileSync(imagePath);
+          imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+          console.log('✅ Found image:', imageFiles[0]);
         }
       } catch (fileError) {
         console.error('❌ Error reading file:', jsonFile, fileError.message);
-        continue; // Skip this file and continue with others
       }
+    } else {
+      console.log(`❌ No JSON files found matching domain: ${domain}`);
     }
 
     if (!domainData) {

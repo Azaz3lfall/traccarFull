@@ -139,9 +139,6 @@ const FloatingResellersPopover = ({
   // Cleanup effect when component unmounts
   useEffect(() => {
     return () => {
-      // Clear query cache when component unmounts
-      queryClient.removeQueries(['resellers']);
-      
       // Reset all state when component unmounts
       setSearchKeyword('');
       setSelectedReseller(null);
@@ -151,7 +148,7 @@ const FloatingResellersPopover = ({
       handleCloseEditDialog();
       setPage(1);
     };
-  }, [queryClient]);
+  }, []);
 
 
   // Handle edit reseller
@@ -232,7 +229,8 @@ const FloatingResellersPopover = ({
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      queryClient.invalidateQueries({ queryKey: ['resellers', user?.id] });
+      queryClient.refetchQueries({ queryKey: ['resellers', user?.id] });
       handleCloseEditDialog();
       setSnackbar({ open: true, message: t('resellerCreatedSuccess'), severity: 'success' });
     },
@@ -259,7 +257,8 @@ const FloatingResellersPopover = ({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      queryClient.invalidateQueries({ queryKey: ['resellers', user?.id] });
+      queryClient.refetchQueries({ queryKey: ['resellers', user?.id] });
       handleCloseEditDialog();
       setSnackbar({ open: true, message: t('resellerUpdatedSuccess'), severity: 'success' });
     },
@@ -289,7 +288,8 @@ const FloatingResellersPopover = ({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resellers'] });
+      queryClient.invalidateQueries({ queryKey: ['resellers', user?.id] });
+      queryClient.refetchQueries({ queryKey: ['resellers', user?.id] });
       setSnackbar({ open: true, message: t('resellerDeletedSuccess'), severity: 'success' });
     },
     onError: (error) => {
@@ -298,7 +298,8 @@ const FloatingResellersPopover = ({
   });
 
   // Handle save reseller
-  const handleSaveReseller = async () => {
+  const handleSaveReseller = async (e) => {
+    e?.preventDefault(); // Prevent form submission
     if (!editingReseller) return;
 
     // Create payload matching the exact structure you specified
@@ -1359,14 +1360,23 @@ const FloatingResellersPopover = ({
                         {t('sharedCancel')}
                       </Button>
                       <Button
+                        type="button"
                         variant="contained"
                         onClick={handleSaveReseller}
+                        disabled={createResellerMutation.isPending || updateResellerMutation.isPending}
                         style={{
                           backgroundColor: colors.primary,
                           color: colors.text,
                         }}
                       >
-                        {t('sharedSave')}
+                        {(createResellerMutation.isPending || updateResellerMutation.isPending) ? (
+                          <>
+                            <CircularProgress size={16} color="inherit" style={{ marginRight: '8px' }} />
+                            {t('sharedSaving')}
+                          </>
+                        ) : (
+                          t('sharedSave')
+                        )}
                       </Button>
                     </div>
                   </motion.div>
