@@ -678,5 +678,15 @@
   "resellerContact": "联系",
   "resellerPermissions": "权限",
   "calendarAddPeriod": "添加期间",
-  "calendarPeriod": "期间"
+  "calendarPeriod": "期间",
+  "resellerSelectLogo": "选择PNG标志（最大120KB）",
+  "resellerChangeLogo": "更改标志",
+  "resellerImageErrorPngOnly": "只允许PNG图像",
+  "resellerImageErrorSize": "图像大小必须小于120KB",
+  "resellerCreatedSuccess": "经销商创建成功",
+  "resellerUpdatedSuccess": "经销商更新成功",
+  "resellerDeletedSuccess": "经销商删除成功",
+  "resellerCreateError": "创建经销商时出错",
+  "resellerUpdateError": "更新经销商时出错",
+  "resellerDeleteError": "删除经销商时出错"
 }

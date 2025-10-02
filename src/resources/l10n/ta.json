@@ -678,5 +678,15 @@
   "resellerContact": "தொடர்பு",
   "resellerPermissions": "அனுமதிகள்",
   "calendarAddPeriod": "காலத்தைச் சேர்க்கவும்",
-  "calendarPeriod": "காலம்"
+  "calendarPeriod": "காலம்",
+  "resellerSelectLogo": "Select PNG Logo (Max 120KB)",
+  "resellerChangeLogo": "Change Logo",
+  "resellerImageErrorPngOnly": "Only PNG images are allowed",
+  "resellerImageErrorSize": "Image size must be less than 120KB",
+  "resellerCreatedSuccess": "Reseller created successfully",
+  "resellerUpdatedSuccess": "Reseller updated successfully",
+  "resellerDeletedSuccess": "Reseller deleted successfully",
+  "resellerCreateError": "Error creating reseller",
+  "resellerUpdateError": "Error updating reseller",
+  "resellerDeleteError": "Error deleting reseller"
 }

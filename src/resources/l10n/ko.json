@@ -678,5 +678,15 @@
   "resellerContact": "연락처",
   "resellerPermissions": "권한",
   "calendarAddPeriod": "기간 추가",
-  "calendarPeriod": "기간"
+  "calendarPeriod": "기간",
+  "resellerSelectLogo": "PNG 로고 선택 (최대 120KB)",
+  "resellerChangeLogo": "로고 변경",
+  "resellerImageErrorPngOnly": "PNG 이미지만 허용됩니다",
+  "resellerImageErrorSize": "이미지 크기는 120KB 미만이어야 합니다",
+  "resellerCreatedSuccess": "리셀러가 성공적으로 생성되었습니다",
+  "resellerUpdatedSuccess": "리셀러가 성공적으로 업데이트되었습니다",
+  "resellerDeletedSuccess": "리셀러가 성공적으로 삭제되었습니다",
+  "resellerCreateError": "리셀러 생성 중 오류 발생",
+  "resellerUpdateError": "리셀러 업데이트 중 오류 발생",
+  "resellerDeleteError": "리셀러 삭제 중 오류 발생"
 }

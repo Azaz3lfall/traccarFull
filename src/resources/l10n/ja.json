@@ -678,5 +678,15 @@
   "resellerContact": "連絡先",
   "resellerPermissions": "権限",
   "calendarAddPeriod": "期間を追加",
-  "calendarPeriod": "期間"
+  "calendarPeriod": "期間",
+  "resellerSelectLogo": "PNGロゴを選択（最大120KB）",
+  "resellerChangeLogo": "ロゴを変更",
+  "resellerImageErrorPngOnly": "PNG画像のみ許可されています",
+  "resellerImageErrorSize": "画像サイズは120KB未満である必要があります",
+  "resellerCreatedSuccess": "リセラーが正常に作成されました",
+  "resellerUpdatedSuccess": "リセラーが正常に更新されました",
+  "resellerDeletedSuccess": "リセラーが正常に削除されました",
+  "resellerCreateError": "リセラーの作成中にエラーが発生しました",
+  "resellerUpdateError": "リセラーの更新中にエラーが発生しました",
+  "resellerDeleteError": "リセラーの削除中にエラーが発生しました"
 }

@@ -677,6 +677,16 @@
   "resellerBranding": "Identidade Visual",
   "resellerContact": "Contato",
   "resellerPermissions": "Permissões",
+  "resellerSelectLogo": "Selecionar Logo PNG (Máx 120KB)",
+  "resellerChangeLogo": "Alterar Logo",
+  "resellerImageErrorPngOnly": "Apenas imagens PNG são permitidas",
+  "resellerImageErrorSize": "O tamanho da imagem deve ser menor que 120KB",
+  "resellerCreatedSuccess": "Revendedor criado com sucesso",
+  "resellerUpdatedSuccess": "Revendedor atualizado com sucesso",
+  "resellerDeletedSuccess": "Revendedor excluído com sucesso",
+  "resellerCreateError": "Erro ao criar revendedor",
+  "resellerUpdateError": "Erro ao atualizar revendedor",
+  "resellerDeleteError": "Erro ao excluir revendedor",
   "calendarAddPeriod": "Adicionar período",
   "calendarPeriod": "Período"
 }

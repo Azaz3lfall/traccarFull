@@ -678,5 +678,15 @@
   "resellerContact": "اتصال",
   "resellerPermissions": "أذونات",
   "calendarAddPeriod": "إضافة فترة",
-  "calendarPeriod": "فترة"
+  "calendarPeriod": "فترة",
+  "resellerSelectLogo": "اختر شعار PNG (الحد الأقصى 120KB)",
+  "resellerChangeLogo": "تغيير الشعار",
+  "resellerImageErrorPngOnly": "يُسمح بصور PNG فقط",
+  "resellerImageErrorSize": "يجب أن يكون حجم الصورة أقل من 120KB",
+  "resellerCreatedSuccess": "تم إنشاء الموزع بنجاح",
+  "resellerUpdatedSuccess": "تم تحديث الموزع بنجاح",
+  "resellerDeletedSuccess": "تم حذف الموزع بنجاح",
+  "resellerCreateError": "خطأ في إنشاء الموزع",
+  "resellerUpdateError": "خطأ في تحديث الموزع",
+  "resellerDeleteError": "خطأ في حذف الموزع"
 }

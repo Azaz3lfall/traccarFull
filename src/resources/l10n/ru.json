@@ -678,5 +678,15 @@
   "resellerContact": "Контакт",
   "resellerPermissions": "Разрешения",
   "calendarAddPeriod": "Добавить период",
-  "calendarPeriod": "Период"
+  "calendarPeriod": "Период",
+  "resellerSelectLogo": "Выбрать PNG логотип (Макс 120KB)",
+  "resellerChangeLogo": "Изменить логотип",
+  "resellerImageErrorPngOnly": "Разрешены только PNG изображения",
+  "resellerImageErrorSize": "Размер изображения должен быть менее 120KB",
+  "resellerCreatedSuccess": "Реселлер успешно создан",
+  "resellerUpdatedSuccess": "Реселлер успешно обновлен",
+  "resellerDeletedSuccess": "Реселлер успешно удален",
+  "resellerCreateError": "Ошибка создания реселлера",
+  "resellerUpdateError": "Ошибка обновления реселлера",
+  "resellerDeleteError": "Ошибка удаления реселлера"
 }

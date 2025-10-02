@@ -678,5 +678,15 @@
   "resellerContact": "संपर्क",
   "resellerPermissions": "अनुमतियां",
   "calendarAddPeriod": "अवधि जोड़ें",
-  "calendarPeriod": "अवधि"
+  "calendarPeriod": "अवधि",
+  "resellerSelectLogo": "PNG लोगो चुनें (अधिकतम 120KB)",
+  "resellerChangeLogo": "लोगो बदलें",
+  "resellerImageErrorPngOnly": "केवल PNG छवियों की अनुमति है",
+  "resellerImageErrorSize": "छवि का आकार 120KB से कम होना चाहिए",
+  "resellerCreatedSuccess": "रीसेलर सफलतापूर्वक बनाया गया",
+  "resellerUpdatedSuccess": "रीसेलर सफलतापूर्वक अपडेट किया गया",
+  "resellerDeletedSuccess": "रीसेलर सफलतापूर्वक हटाया गया",
+  "resellerCreateError": "रीसेलर बनाते समय त्रुटि",
+  "resellerUpdateError": "रीसेलर अपडेट करते समय त्रुटि",
+  "resellerDeleteError": "रीसेलर हटाते समय त्रुटि"
 }

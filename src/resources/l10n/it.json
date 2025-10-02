@@ -678,5 +678,15 @@
   "resellerContact": "Contatto",
   "resellerPermissions": "Permessi",
   "calendarAddPeriod": "Aggiungi periodo",
-  "calendarPeriod": "Periodo"
+  "calendarPeriod": "Periodo",
+  "resellerSelectLogo": "Seleziona Logo PNG (Max 120KB)",
+  "resellerChangeLogo": "Cambia Logo",
+  "resellerImageErrorPngOnly": "Sono consentite solo immagini PNG",
+  "resellerImageErrorSize": "La dimensione dell'immagine deve essere inferiore a 120KB",
+  "resellerCreatedSuccess": "Rivenditore creato con successo",
+  "resellerUpdatedSuccess": "Rivenditore aggiornato con successo",
+  "resellerDeletedSuccess": "Rivenditore eliminato con successo",
+  "resellerCreateError": "Errore nella creazione del rivenditore",
+  "resellerUpdateError": "Errore nell'aggiornamento del rivenditore",
+  "resellerDeleteError": "Errore nell'eliminazione del rivenditore"
 }

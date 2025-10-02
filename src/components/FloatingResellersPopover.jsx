@@ -234,10 +234,10 @@ const FloatingResellersPopover = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resellers'] });
       handleCloseEditDialog();
-      setSnackbar({ open: true, message: 'Reseller created successfully', severity: 'success' });
+      setSnackbar({ open: true, message: t('resellerCreatedSuccess'), severity: 'success' });
     },
     onError: (error) => {
-      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+      setSnackbar({ open: true, message: `${t('resellerCreateError')}: ${error.message}`, severity: 'error' });
     },
   });
 
@@ -261,10 +261,10 @@ const FloatingResellersPopover = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resellers'] });
       handleCloseEditDialog();
-      setSnackbar({ open: true, message: 'Reseller updated successfully', severity: 'success' });
+      setSnackbar({ open: true, message: t('resellerUpdatedSuccess'), severity: 'success' });
     },
     onError: (error) => {
-      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+      setSnackbar({ open: true, message: `${t('resellerUpdateError')}: ${error.message}`, severity: 'error' });
     },
   });
 
@@ -290,10 +290,10 @@ const FloatingResellersPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resellers'] });
-      setSnackbar({ open: true, message: 'Reseller deleted successfully', severity: 'success' });
+      setSnackbar({ open: true, message: t('resellerDeletedSuccess'), severity: 'success' });
     },
     onError: (error) => {
-      setSnackbar({ open: true, message: `Error: ${error.message}`, severity: 'error' });
+      setSnackbar({ open: true, message: `${t('resellerDeleteError')}: ${error.message}`, severity: 'error' });
     },
   });
 
@@ -363,7 +363,7 @@ const FloatingResellersPopover = ({
 
     // Check file type
     if (file.type !== 'image/png') {
-      setImageError('Only PNG images are allowed');
+      setImageError(t('resellerImageErrorPngOnly'));
       setSelectedImage(null);
       setImagePreview(null);
       return;
@@ -372,7 +372,7 @@ const FloatingResellersPopover = ({
     // Check file size (120KB = 120 * 1024 bytes)
     const maxSize = 120 * 1024;
     if (file.size > maxSize) {
-      setImageError('Image size must be less than 120KB');
+      setImageError(t('resellerImageErrorSize'));
       setSelectedImage(null);
       setImagePreview(null);
       return;
@@ -1078,7 +1078,7 @@ const FloatingResellersPopover = ({
                                         borderStyle: 'dashed',
                                       }}
                                     >
-                                      {selectedImage ? 'Change Logo' : 'Select PNG Logo (Max 120KB)'}
+                                      {selectedImage ? t('resellerChangeLogo') : t('resellerSelectLogo')}
                                     </Button>
                                   </label>
                                   
