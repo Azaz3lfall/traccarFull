@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "Реселлер успешно удален",
   "resellerCreateError": "Ошибка создания реселлера",
   "resellerUpdateError": "Ошибка обновления реселлера",
-  "resellerDeleteError": "Ошибка удаления реселлера"
+  "resellerDeleteError": "Ошибка удаления реселлера",
+  "resellerCompany": "Компания"
 }

@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "Wiederverkäufer erfolgreich gelöscht",
   "resellerCreateError": "Fehler beim Erstellen des Wiederverkäufers",
   "resellerUpdateError": "Fehler beim Aktualisieren des Wiederverkäufers",
-  "resellerDeleteError": "Fehler beim Löschen des Wiederverkäufers"
+  "resellerDeleteError": "Fehler beim Löschen des Wiederverkäufers",
+  "resellerCompany": "Unternehmen"
 }

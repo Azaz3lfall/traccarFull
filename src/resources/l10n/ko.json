@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "리셀러가 성공적으로 삭제되었습니다",
   "resellerCreateError": "리셀러 생성 중 오류 발생",
   "resellerUpdateError": "리셀러 업데이트 중 오류 발생",
-  "resellerDeleteError": "리셀러 삭제 중 오류 발생"
+  "resellerDeleteError": "리셀러 삭제 중 오류 발생",
+  "resellerCompany": "회사"
 }

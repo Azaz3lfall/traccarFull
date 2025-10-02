@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "经销商删除成功",
   "resellerCreateError": "创建经销商时出错",
   "resellerUpdateError": "更新经销商时出错",
-  "resellerDeleteError": "删除经销商时出错"
+  "resellerDeleteError": "删除经销商时出错",
+  "resellerCompany": "公司"
 }

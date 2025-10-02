@@ -678,6 +678,7 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
+  "resellerCompany": "Company",
   "deviceLimit": "Device Limit",
   "userLimit": "User Limit",
   "sharedError": "Error",

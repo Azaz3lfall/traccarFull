@@ -577,7 +577,7 @@ const FloatingResellersPopover = ({
                     <TableRow style={{ backgroundColor: colors.surface }}>
                       {desktop && (
                         <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('sharedName')}
+                          {t('resellerCompany')}
                         </TableCell>
                       )}
                       <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
@@ -636,24 +636,15 @@ const FloatingResellersPopover = ({
                           >
                             {desktop && (
                               <TableCell>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <BusinessIcon
-                                    style={{
-                                      color: colors.primary,
-                                      width: '20px',
-                                      height: '20px',
-                                    }}
-                                  />
-                                  <div>
-                                    <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                                      {reseller.companyName || t('sharedUnknown')}
+                                <div>
+                                  <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
+                                    {reseller.companyName || t('sharedUnknown')}
+                                  </Typography>
+                                  {reseller.appUrl && (
+                                    <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
+                                      {reseller.appUrl}
                                     </Typography>
-                                    {reseller.appUrl && (
-                                      <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                                        {reseller.appUrl}
-                                      </Typography>
-                                    )}
-                                  </div>
+                                  )}
                                 </div>
                               </TableCell>
                             )}
@@ -837,7 +828,7 @@ const FloatingResellersPopover = ({
                       color: colors.text,
                       lineHeight: '1.5'
                     }}>
-                      {t('sharedDeleteConfirm')} "{resellerToDelete?.name}"?
+                      {t('sharedDeleteConfirm')} "{resellerToDelete?.companyName}"?
                     </p>
                     <div style={{
                       display: 'flex',

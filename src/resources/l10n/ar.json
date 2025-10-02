@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "تم حذف الموزع بنجاح",
   "resellerCreateError": "خطأ في إنشاء الموزع",
   "resellerUpdateError": "خطأ في تحديث الموزع",
-  "resellerDeleteError": "خطأ في حذف الموزع"
+  "resellerDeleteError": "خطأ في حذف الموزع",
+  "resellerCompany": "الشركة"
 }

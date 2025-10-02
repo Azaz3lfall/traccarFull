@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "リセラーが正常に削除されました",
   "resellerCreateError": "リセラーの作成中にエラーが発生しました",
   "resellerUpdateError": "リセラーの更新中にエラーが発生しました",
-  "resellerDeleteError": "リセラーの削除中にエラーが発生しました"
+  "resellerDeleteError": "リセラーの削除中にエラーが発生しました",
+  "resellerCompany": "会社"
 }

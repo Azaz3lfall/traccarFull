@@ -688,5 +688,6 @@
   "resellerUpdateError": "Erreur lors de la mise à jour du revendeur",
   "resellerDeleteError": "Erreur lors de la suppression du revendeur",
   "calendarAddPeriod": "Ajouter une période",
-  "calendarPeriod": "Période"
+  "calendarPeriod": "Période",
+  "resellerCompany": "Entreprise"
 }

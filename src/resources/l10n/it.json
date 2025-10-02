@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "Rivenditore eliminato con successo",
   "resellerCreateError": "Errore nella creazione del rivenditore",
   "resellerUpdateError": "Errore nell'aggiornamento del rivenditore",
-  "resellerDeleteError": "Errore nell'eliminazione del rivenditore"
+  "resellerDeleteError": "Errore nell'eliminazione del rivenditore",
+  "resellerCompany": "Azienda"
 }

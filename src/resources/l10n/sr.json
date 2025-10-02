@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "Reseller deleted successfully",
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
-  "resellerDeleteError": "Error deleting reseller"
+  "resellerDeleteError": "Error deleting reseller",
+  "resellerCompany": "Company"
 }

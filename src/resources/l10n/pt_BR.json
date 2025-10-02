@@ -688,5 +688,6 @@
   "resellerDeletedSuccess": "Revendedor excluído com sucesso",
   "resellerCreateError": "Erro ao criar revendedor",
   "resellerUpdateError": "Erro ao atualizar revendedor",
-  "resellerDeleteError": "Erro ao excluir revendedor"
+  "resellerDeleteError": "Erro ao excluir revendedor",
+  "resellerCompany": "Empresa"
 }
