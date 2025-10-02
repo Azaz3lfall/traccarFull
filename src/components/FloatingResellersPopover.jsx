@@ -448,7 +448,7 @@ const FloatingResellersPopover = ({
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isVisible && (
         <motion.div
           key="floating-resellers-popover"
