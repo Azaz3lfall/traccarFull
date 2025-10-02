@@ -136,13 +136,13 @@ app.post('/api/resellers/list', async (req, res) => {
     // Process each JSON file
     for (const jsonFile of jsonFiles) {
       try {
-        // Parse filename to extract components: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
+        // Parse filename to extract components: reseller_{appUrl}_{parentUserId}_{resellerId}.json
         const filenameParts = jsonFile.replace('.json', '').split('_');
         
-        if (filenameParts.length >= 3) {
-          const fileAppUrl = filenameParts[0];
-          const fileParentUserId = filenameParts[1];
-          const fileResellerId = filenameParts[2];
+        if (filenameParts.length >= 4 && filenameParts[0] === 'reseller') {
+          const fileAppUrl = filenameParts[1];
+          const fileParentUserId = filenameParts[2];
+          const fileResellerId = filenameParts[3];
           
           // Filter by parentUserId
           if (fileParentUserId === parentUserId.toString()) {
@@ -462,21 +462,66 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
 });
 
 // PUT endpoint for updating resellers
-app.put('/api/resellers/:id', (req, res) => {
+app.put('/api/resellers/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { body } = req;
+        
+        console.log('🔄 PUT ENDPOINT - Updating reseller:', id);
+        console.log('📊 Update data:', JSON.stringify(body, null, 2));
+        
+        // Validate required fields
+        const requiredFields = [
+            'currentDomain', 'parentUserId', 'parentUser', 'parentEmail',
+            'resellerId', 'resellerUser', 'resellerEmail', 'companyName',
+            'logotype', 'appUrl', 'whatsapp', 'billingEmail', 'supportEmail',
+            'resellerLimit', 'deviceLimit', 'userLimit', 'status'
+        ];
+        
+        const missingFields = requiredFields.filter(field => !body[field] || body[field] === '');
+        if (missingFields.length > 0) {
+            console.log('❌ Missing required fields:', missingFields);
+            return res.status(400).json({
+                error: 'Missing required fields',
+                missingFields: missingFields,
+                timestamp: new Date().toISOString()
+            });
+        }
 
+        // Save the reseller data
+        const dataDir = path.join(__dirname, 'data');
+        
+        // Create data directory if it doesn't exist
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+            console.log('📁 Created data directory:', dataDir);
+        }
+        
+        // Create filename for the reseller
+        const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
+        const filePath = path.join(dataDir, filename);
+        
+        // Add metadata to the data
+        const fileData = {
+            ...body,
+            updatedAt: new Date().toISOString(),
+            filename: filename
+        };
+        
+        // Write JSON file
+        fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+        
+        console.log('✅ Reseller updated successfully:', filePath);
 
         res.json({
             success: true,
             message: `Reseller ${id} updated successfully`,
-            data: body,
+            data: fileData,
             timestamp: new Date().toISOString()
         });
 
     } catch (error) {
-        console.error('Error updating reseller:', error);
+        console.error('❌ Error updating reseller:', error);
         res.status(500).json({
             error: 'Internal server error',
             message: error.message,
