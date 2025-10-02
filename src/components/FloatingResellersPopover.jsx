@@ -79,6 +79,7 @@ const FloatingResellersPopover = ({
   const [resellerToDelete, setResellerToDelete] = useState(null);
   const [editDialog, setEditDialog] = useState(false);
   const [editingReseller, setEditingReseller] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(15);
   const [activeTab, setActiveTab] = useState(0);
@@ -158,6 +159,7 @@ const FloatingResellersPopover = ({
     setEditingReseller({
       ...reseller,
     });
+    setIsEditMode(true);
     setActiveTab(0);
     setEditDialog(true);
     setAnchorEl(null);
@@ -330,14 +332,13 @@ const FloatingResellersPopover = ({
     });
 
     // Use mutation to save reseller (validation happens on backend first)
-    console.log('🔍 editingReseller.id:', editingReseller.id);
-    console.log('🔍 editingReseller.resellerId:', editingReseller.resellerId);
+    console.log('🔍 isEditMode:', isEditMode);
     console.log('🔍 editingReseller object:', editingReseller);
     
-    if (editingReseller.id) {
+    if (isEditMode) {
       // Update existing reseller
       console.log('🔄 EDITING - calling updateResellerMutation');
-      updateResellerMutation.mutate({ id: editingReseller.id, ...fullPayload });
+      updateResellerMutation.mutate({ id: editingReseller.id || editingReseller.resellerId, ...fullPayload });
     } else {
       // Create new reseller - validation happens first, then image upload
       console.log('🆕 CREATING - calling createResellerMutation');
@@ -349,6 +350,7 @@ const FloatingResellersPopover = ({
   const handleCloseEditDialog = () => {
     setEditDialog(false);
     setEditingReseller(null);
+    setIsEditMode(false);
     setSelectedImage(null);
     setImagePreview(null);
     setImageError('');
@@ -519,6 +521,7 @@ const FloatingResellersPopover = ({
                       appUrl: '',
                       logotype: ''
                     });
+                    setIsEditMode(false);
                     setActiveTab(0);
                     setEditDialog(true);
                   }}
@@ -1139,7 +1142,7 @@ const FloatingResellersPopover = ({
                                   label={t('resellerAppUrl')}
                                   required
                                   InputProps={{
-                                    readOnly: !!(editingReseller.id)
+                                    readOnly: isEditMode
                                   }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {

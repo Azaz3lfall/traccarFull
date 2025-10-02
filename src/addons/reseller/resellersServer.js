@@ -387,7 +387,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           const resellerId = req.body.resellerId;
           
           // Generate unique filename for image
-          const imageFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
+          const imageFilename = `reseller_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
           const imagesDir = path.join(__dirname, 'data', 'images');
           const imagePath = path.join(imagesDir, imageFilename);
           
@@ -409,12 +409,40 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           timestamp: new Date().toISOString()
         });
       }
+    } else if (body.logotype && body.logotype.startsWith('data:image')) {
+      // Handle base64 image
+      try {
+        const base64Data = body.logotype.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+        const imageFilename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}_${Date.now()}.png`;
+        const imagesDir = path.join(__dirname, 'data', 'images');
+        const imagePath = path.join(imagesDir, imageFilename);
+        
+        // Ensure images directory exists
+        if (!fs.existsSync(imagesDir)) {
+          fs.mkdirSync(imagesDir, { recursive: true });
+        }
+        
+        fs.writeFileSync(imagePath, buffer);
+        imageUrl = `images/${imageFilename}`;
+        body.logotype = imageUrl;
+        
+        console.log('📤 Base64 image processed:', imageFilename);
+        console.log('📁 Saved to:', imagePath);
+      } catch (base64Error) {
+        console.error('❌ Error processing base64 image:', base64Error);
+        return res.status(500).json({
+          error: 'Base64 image processing failed',
+          message: base64Error.message,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
     
     // Create JSON file with reseller data
     try {
-      // Create filename: {appUrl}_{parentUserId}_{resellerId}_{hash}.json
-      const filename = generateUniqueFilename(body.appUrl, body.parentUserId, body.resellerId, 'json');
+      // Create filename: reseller_{appUrl}_{parentUserId}_{resellerId}.json
+      const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
       
       // Data directory is ensured to exist at startup
       const dataDir = path.join(__dirname, 'data');
@@ -690,7 +718,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     // Create the correct filename using the same pattern as JSON files
     const parentUserId = req.body.parentUserId || 'unknown';
     const resellerId = req.body.resellerId || 'unknown';
-    const correctFilename = generateUniqueFilename(appUrl, parentUserId, resellerId, 'png');
+    const correctFilename = `reseller_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
     const correctPath = path.join(path.dirname(req.file.path), correctFilename);
     
     // Check if file already exists and handle it
