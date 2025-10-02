@@ -334,10 +334,10 @@ const FloatingResellersPopover = ({
     console.log('🔍 editingReseller.resellerId:', editingReseller.resellerId);
     console.log('🔍 editingReseller object:', editingReseller);
     
-    if (editingReseller.id || editingReseller.resellerId) {
+    if (editingReseller.id) {
       // Update existing reseller
       console.log('🔄 EDITING - calling updateResellerMutation');
-      updateResellerMutation.mutate({ id: editingReseller.id || editingReseller.resellerId, ...fullPayload });
+      updateResellerMutation.mutate({ id: editingReseller.id, ...fullPayload });
     } else {
       // Create new reseller - validation happens first, then image upload
       console.log('🆕 CREATING - calling createResellerMutation');
@@ -502,6 +502,8 @@ const FloatingResellersPopover = ({
                   startIcon={<AddIcon />}
                   onClick={() => {
                     setEditingReseller({ 
+                      id: null,
+                      resellerId: '',
                       name: '', 
                       email: '', 
                       phone: '',
@@ -514,6 +516,8 @@ const FloatingResellersPopover = ({
                       whatsapp: '',
                       billingEmail: '',
                       supportEmail: '',
+                      appUrl: '',
+                      logotype: ''
                     });
                     setActiveTab(0);
                     setEditDialog(true);
@@ -1135,7 +1139,7 @@ const FloatingResellersPopover = ({
                                   label={t('resellerAppUrl')}
                                   required
                                   InputProps={{
-                                    readOnly: editingReseller.id || editingReseller.resellerId
+                                    readOnly: !!(editingReseller.id)
                                   }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {
