@@ -4512,15 +4512,18 @@ const MainPage = () => {
                   options={resellerUsers}
                   getOptionLabel={(option) => {
                     if (typeof option === 'string') return option;
-                    return option.name || option.email || `User ${option.id}`;
+                    const name = option.name || option.email || `User ${option.id}`;
+                    return `${option.id} - ${name}`;
                   }}
                   value={resellerUsers.find(user => user.id === resellerData.resellerId) || null}
                   onChange={(event, newValue) => {
                     if (typeof newValue === 'string') {
                       // User typed something, find matching user
-                      const matchingUser = resellerUsers.find(user => 
-                        (user.name || user.email || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
-                      );
+                      const matchingUser = resellerUsers.find(user => {
+                        const name = user.name || user.email || `User ${user.id}`;
+                        const displayName = `${user.id} - ${name}`;
+                        return displayName.toLowerCase() === newValue.toLowerCase();
+                      });
                       if (matchingUser) {
                         setResellerData(prev => ({
                           ...prev,
@@ -4562,11 +4565,13 @@ const MainPage = () => {
                     }
                     // Filter from all users when typing
                     return options.filter(option => {
+                      const id = option.id.toString().toLowerCase();
                       const name = (option.name || '').toLowerCase();
                       const email = (option.email || '').toLowerCase();
                       const login = (option.login || '').toLowerCase();
                       const searchValue = inputValue.toLowerCase();
-                      return name.includes(searchValue) || 
+                      return id.includes(searchValue) || 
+                             name.includes(searchValue) || 
                              email.includes(searchValue) || 
                              login.includes(searchValue);
                     });
@@ -4612,7 +4617,7 @@ const MainPage = () => {
                       <Box component="li" key={key} {...otherProps}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
                           <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
-                            {option.name || option.email || `User ${option.id}`}
+                            {option.id} - {option.name || option.email || `User ${option.id}`}
                           </Typography>
                           <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
                             {option.login || option.email || 'No login/email'}
