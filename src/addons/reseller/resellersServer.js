@@ -15,6 +15,10 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define data directory paths
+const DATA_DIR = '/opt/addons/resellers';
+const IMAGES_DIR = path.join(DATA_DIR, 'data', 'images');
+
 const app = express();
 // Use environment PORT or default to 3333
 const PORT = process.env.PORT || 3333;
@@ -30,8 +34,7 @@ const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Images directory is ensured to exist at startup
-    const uploadDir = path.join(__dirname, 'data', 'images');
-    cb(null, uploadDir);
+    cb(null, IMAGES_DIR);
   },
   filename: (req, file, cb) => {
     // Generate a temporary filename first, we'll rename it after processing
@@ -126,7 +129,7 @@ app.post('/api/resellers/list', async (req, res) => {
 
 
     // Get all JSON files from data directory
-    const dataDir = path.join(__dirname, 'data');
+    const dataDir = DATA_DIR;
     const jsonFiles = await glob('*.json', { cwd: dataDir });
     
     const resellers = [];
@@ -257,7 +260,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
     
     // Check if appUrl already exists
     try {
-      const dataDir = path.join(__dirname, 'data');
+      const dataDir = DATA_DIR;
       const jsonFiles = await glob('*.json', { cwd: dataDir });
       
       for (const jsonFile of jsonFiles) {
@@ -305,7 +308,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
 
     // Check if WhatsApp number already exists
     try {
-      const dataDir = path.join(__dirname, 'data');
+      const dataDir = DATA_DIR;
       const jsonFiles = await glob('*.json', { cwd: dataDir });
       
       for (const jsonFile of jsonFiles) {
@@ -363,7 +366,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           
           // Generate unique filename for image
           const imageFilename = `reseller_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
-          const imagesDir = path.join(__dirname, 'data', 'images');
+          const imagesDir = IMAGES_DIR;
           const imagePath = path.join(imagesDir, imageFilename);
           
           // Move uploaded file to final location
@@ -388,7 +391,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
         const base64Data = body.logotype.replace(/^data:image\/\w+;base64,/, "");
         const buffer = Buffer.from(base64Data, 'base64');
         const imageFilename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}_${Date.now()}.png`;
-        const imagesDir = path.join(__dirname, 'data', 'images');
+        const imagesDir = IMAGES_DIR;
         const imagePath = path.join(imagesDir, imageFilename);
         
         // Ensure images directory exists
@@ -416,7 +419,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       const filename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
       
       // Data directory is ensured to exist at startup
-      const dataDir = path.join(__dirname, 'data');
+      const dataDir = DATA_DIR;
       
       // Full file path
       const filePath = path.join(dataDir, filename);
@@ -467,7 +470,7 @@ app.put('/api/resellers/:id', async (req, res) => {
         
         
         // Find existing reseller first
-        const dataDir = path.join(__dirname, 'data');
+        const dataDir = DATA_DIR;
         const jsonFiles = await glob('*.json', { cwd: dataDir });
         
         let existingReseller = null;
@@ -576,7 +579,7 @@ app.post('/api/resellers/delete', async (req, res) => {
 
 
     // Find the reseller file that matches both appUrl and parentUserId
-    const dataDir = path.join(__dirname, 'data');
+    const dataDir = DATA_DIR;
     const jsonFiles = await glob('*.json', { cwd: dataDir });
     
     let resellerFile = null;
@@ -624,7 +627,7 @@ app.post('/api/resellers/delete', async (req, res) => {
     // Delete associated image if it exists
     if (resellerData.logotype && resellerData.logotype.startsWith('images/')) {
       const imageFilename = resellerData.logotype.replace('images/', '');
-      const imagePath = path.join(__dirname, 'data', 'images', imageFilename);
+      const imagePath = path.join(IMAGES_DIR, imageFilename);
       
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
@@ -727,7 +730,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 });
 
 // Serve uploaded images
-app.use('/images', express.static(path.join(__dirname, 'data', 'images')));
+app.use('/images', express.static(IMAGES_DIR));
 
 // Domain lookup endpoint - POST to get domain data with base64 image
 app.post('/api/domain-lookup', async (req, res) => {
@@ -749,7 +752,7 @@ app.post('/api/domain-lookup', async (req, res) => {
 
 
     // Search for JSON files that contain this domain in filename
-    const dataDir = path.join(__dirname, 'data');
+    const dataDir = DATA_DIR;
     const jsonPattern = `reseller_${domain}_*.json`;
     
 
@@ -776,10 +779,10 @@ app.post('/api/domain-lookup', async (req, res) => {
         // Look for corresponding image file using the same pattern
         const imagePattern = `reseller_${domain}_${data.parentUserId}_${data.resellerId}_*.png`;
       
-        const imageFiles = await glob(imagePattern, { cwd: path.join(__dirname, 'data', 'images') });
+        const imageFiles = await glob(imagePattern, { cwd: IMAGES_DIR });
         
         if (imageFiles.length > 0) {
-          const imagePath = path.join(__dirname, 'data', 'images', imageFiles[0]);
+          const imagePath = path.join(IMAGES_DIR, imageFiles[0]);
           const imageBuffer = fs.readFileSync(imagePath);
           imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
         }
@@ -862,21 +865,29 @@ app.use('*', (req, res) => {
 // Ensure required directories exist on startup
 const ensureDirectories = () => {
   try {
-    const dataDir = path.join(__dirname, 'data');
-    const imagesDir = path.join(__dirname, 'data', 'images');
-    
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    } else {
+    // Create main data directory
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      console.log('✅ Created main data directory:', DATA_DIR);
     }
     
-    if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir, { recursive: true });
-    } else {
+    // Create data subdirectory
+    const dataSubDir = path.join(DATA_DIR, 'data');
+    if (!fs.existsSync(dataSubDir)) {
+      fs.mkdirSync(dataSubDir, { recursive: true });
+      console.log('✅ Created data subdirectory:', dataSubDir);
     }
     
+    // Create images directory
+    if (!fs.existsSync(IMAGES_DIR)) {
+      fs.mkdirSync(IMAGES_DIR, { recursive: true });
+      console.log('✅ Created images directory:', IMAGES_DIR);
+    }
+    
+    console.log('✅ All required directories ensured:', DATA_DIR, IMAGES_DIR);
   } catch (error) {
     console.error('❌ Error creating directories:', error);
+    console.error('❌ Make sure the application has write permissions to /opt/addons/resellers');
     process.exit(1);
   }
 };
