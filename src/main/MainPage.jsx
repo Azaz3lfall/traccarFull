@@ -16,6 +16,7 @@ import { useTranslationKeys } from '../common/components/LocalizationProvider';
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { nativePostMessage } from '../common/components/NativeInterface';
 import fallbackLogo from '../resources/images/image170.png?inline';
@@ -501,7 +502,7 @@ const MainPage = () => {
       setResellerUsersError(null);
       
       try {
-        const response = await fetch('/api/users', {
+        const response = await fetch(resellersConfig.ENDPOINTS.USERS, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

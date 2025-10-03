@@ -54,6 +54,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import resellersConfig from '../config/resellersConfig';
 import { resellersActions } from '../store';
 import { useSelector } from 'react-redux';
 
@@ -102,7 +103,7 @@ const FloatingResellersPopover = ({
         throw new Error('User ID is required');
       }
       
-      const response = await fetch('http://localhost:3333/api/resellers/list', {
+      const response = await fetch(resellersConfig.ENDPOINTS.LIST, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +147,7 @@ const FloatingResellersPopover = ({
       setUsersError(null);
       
       try {
-        const response = await fetch('/api/users', {
+        const response = await fetch(resellersConfig.ENDPOINTS.USERS, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -261,7 +262,7 @@ const FloatingResellersPopover = ({
       formData.append('filename', `${resellerData.appUrl}.png`);
     }
 
-      const response = await fetch('http://localhost:3333/api/resellers', {
+      const response = await fetch(resellersConfig.ENDPOINTS.CREATE, {
         method: 'POST',
         body: formData, // Send as FormData instead of JSON
       });
@@ -298,7 +299,7 @@ const FloatingResellersPopover = ({
 
   const updateResellerMutation = useMutation({
     mutationFn: async ({ id, ...resellerData }) => {
-      const response = await fetch(`http://localhost:3333/api/resellers/${id}`, {
+      const response = await fetch(resellersConfig.ENDPOINTS.UPDATE(id), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -326,7 +327,7 @@ const FloatingResellersPopover = ({
 
   const deleteResellerMutation = useMutation({
     mutationFn: async (reseller) => {
-      const response = await fetch('http://localhost:3333/api/resellers/delete', {
+      const response = await fetch(resellersConfig.ENDPOINTS.DELETE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -454,7 +455,7 @@ const FloatingResellersPopover = ({
     formData.append('resellerId', resellerId);
 
     try {
-      const response = await fetch('http://localhost:3333/api/upload', {
+      const response = await fetch(resellersConfig.ENDPOINTS.UPLOAD, {
         method: 'POST',
         body: formData,
       });
