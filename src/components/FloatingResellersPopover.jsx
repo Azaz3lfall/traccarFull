@@ -1116,7 +1116,7 @@ const FloatingResellersPopover = ({
                                   disabled={usersLoading}
                                   open={autocompleteOpen}
                                   onOpen={() => setAutocompleteOpen(true)}
-                                  onClose={() => setAutocompleteOpen(false)}
+                                  onClose={() => setTimeout(() => setAutocompleteOpen(false), 0)}
                                   filterOptions={(options, { inputValue }) => {
                                     if (!inputValue) {
                                       // Show only first 10 users when no input

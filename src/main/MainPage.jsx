@@ -4554,7 +4554,7 @@ const MainPage = () => {
                   disabled={resellerUsersLoading}
                   open={resellerAutocompleteOpen}
                   onOpen={() => setResellerAutocompleteOpen(true)}
-                  onClose={() => setResellerAutocompleteOpen(false)}
+                  onClose={() => setTimeout(() => setResellerAutocompleteOpen(false), 0)}
                   filterOptions={(options, { inputValue }) => {
                     if (!inputValue) {
                       // Show only first 10 users when no input
