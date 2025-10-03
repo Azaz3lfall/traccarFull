@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 rm -rf build build.tar.gz
+# VITE_RESELLERS_SERVER_URL=https://resellers.codeartisan.cloud 
 npm run build
 tar czvf build.tar.gz build
 
@@ -12,6 +13,8 @@ ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "mv /opt/traccar
 ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "ls /opt/traccar/web"
 
 ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "systemctl restart traccar"
+
+
 
 #ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "mkdir -p /opt/traccar/web"
 #scp -i /Users/codeartisan/github_vps_key -r ./build/* root@codeartisan.cloud:/opt/traccar/web

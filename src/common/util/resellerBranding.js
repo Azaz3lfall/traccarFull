@@ -1,4 +1,5 @@
 import fallbackLogo from '../../resources/images/image170.png?inline';
+import resellersConfig from '../../config/resellersConfig';
 
 /**
  * Fetches reseller branding data for the current domain
@@ -10,7 +11,7 @@ export const fetchResellerBranding = async () => {
 
     const requestBody = { domain: currentDomain };
 
-    const response = await fetch('http://localhost:3333/api/domain-lookup', {
+    const response = await fetch(`${resellersConfig.RESELLERS_SERVER_URL}/api/domain-lookup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

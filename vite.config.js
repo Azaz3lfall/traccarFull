@@ -71,7 +71,8 @@ export default defineConfig(() => {
       viteStaticCopy({
         targets: [
           { src: 'node_modules/@mapbox/mapbox-gl-rtl-text/dist/mapbox-gl-rtl-text.js', dest: '' },
-          { src: 'src/addons/**/*', dest: 'addons' },
+          { src: 'src/addons/reseller/resellersServer.mjs', dest: 'addons/reseller' },
+          { src: 'src/addons/reseller/package.json', dest: 'addons/reseller' },
         ],
       }),
     ],

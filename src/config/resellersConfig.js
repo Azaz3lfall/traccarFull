@@ -1,7 +1,10 @@
 // Resellers Server Configuration
 // This file centralizes the resellersServer URL configuration
 
-const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
+// Use environment variable or default to the resellers server domain
+// In development, set VITE_RESELLERS_SERVER_URL=http://localhost:3333
+// In production, uses the separate resellers domain
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
 
 export default {
   RESELLERS_SERVER_URL,
