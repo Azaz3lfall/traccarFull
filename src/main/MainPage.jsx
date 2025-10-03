@@ -226,6 +226,7 @@ const MainPage = () => {
   const [resellerUsers, setResellerUsers] = useState([]);
   const [resellerUsersLoading, setResellerUsersLoading] = useState(false);
   const [resellerUsersError, setResellerUsersError] = useState(null);
+  const [resellerUsersFetched, setResellerUsersFetched] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   
@@ -490,31 +491,45 @@ const MainPage = () => {
     }
   };
 
-  // Function to fetch users for reseller form
-  const fetchResellerUsers = async () => {
-    setResellerUsersLoading(true);
-    setResellerUsersError(null);
-    
-    try {
-      const response = await fetch('/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+  // Debounced fetch users function for reseller form
+  const debouncedFetchResellerUsers = useCallback(() => {
+    const timeoutId = setTimeout(async () => {
+      if (resellerUsersFetched) return; // Only fetch once
+      
+      setResellerUsersLoading(true);
+      setResellerUsersError(null);
+      
+      try {
+        const response = await fetch('/api/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
         }
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        const data = await response.json();
+        // Limit to first 30 users
+        setResellerUsers((data || []).slice(0, 30));
+        setResellerUsersFetched(true);
+      } catch (error) {
+        console.error('Error fetching users for reseller:', error);
+        setResellerUsersError(error.message);
+      } finally {
+        setResellerUsersLoading(false);
       }
+    }, 800);
 
-      const data = await response.json();
-      // Limit to first 30 users
-      setResellerUsers((data || []).slice(0, 30));
-    } catch (error) {
-      console.error('Error fetching users for reseller:', error);
-      setResellerUsersError(error.message);
-    } finally {
-      setResellerUsersLoading(false);
+    return () => clearTimeout(timeoutId);
+  }, [resellerUsersFetched]);
+
+  // Function to trigger debounced fetch
+  const fetchResellerUsers = () => {
+    if (!resellerUsersFetched) {
+      debouncedFetchResellerUsers();
     }
   };
 
@@ -4483,15 +4498,28 @@ const MainPage = () => {
                 <Autocomplete
                   fullWidth
                   options={resellerUsers}
-                  getOptionLabel={(option) => option.name || option.login || `User ${option.id}`}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') return option;
+                    return option.name || option.login || `User ${option.id}`;
+                  }}
                   value={resellerUsers.find(user => user.id === resellerData.resellerId) || null}
                   onChange={(event, newValue) => {
-                    handleResellerFieldChange('resellerId', newValue ? newValue.id : '');
+                    if (typeof newValue === 'string') {
+                      // User typed something, find matching user
+                      const matchingUser = resellerUsers.find(user => 
+                        (user.name || user.login || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
+                      );
+                      handleResellerFieldChange('resellerId', matchingUser ? matchingUser.id : newValue);
+                    } else {
+                      // User selected from dropdown
+                      handleResellerFieldChange('resellerId', newValue ? newValue.id : '');
+                    }
                   }}
-                  onOpen={fetchResellerUsers}
+                  onFocus={fetchResellerUsers}
                   loading={resellerUsersLoading}
                   disabled={resellerUsersLoading}
                   filterOptions={(options, { inputValue }) => {
+                    if (!inputValue) return options;
                     return options.filter(option => {
                       const name = (option.name || option.login || `User ${option.id}`).toLowerCase();
                       const email = (option.email || '').toLowerCase();
@@ -4499,10 +4527,12 @@ const MainPage = () => {
                       return name.includes(searchValue) || email.includes(searchValue);
                     });
                   }}
-                  freeSolo={false}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
+                  freeSolo={true}
+                  selectOnFocus={false}
+                  clearOnBlur={false}
+                  handleHomeEndKeys={true}
+                  autoSelect={false}
+                  autoComplete={false}
                   renderInput={(params) => (
                     <TextField
                       {...params}

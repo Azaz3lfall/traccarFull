@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -91,6 +91,7 @@ const FloatingResellersPopover = ({
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState(null);
+  const [usersFetched, setUsersFetched] = useState(false);
 
   // Fetch resellers with TanStack Query
   const { data: resellersData, isLoading, error, refetch } = useQuery({
@@ -135,31 +136,45 @@ const FloatingResellersPopover = ({
     setPage(1);
   }, [searchKeyword]);
 
-  // Function to fetch users from Traccar API
-  const fetchUsers = async () => {
-    setUsersLoading(true);
-    setUsersError(null);
-    
-    try {
-      const response = await fetch('/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+  // Debounced fetch users function
+  const debouncedFetchUsers = useCallback(() => {
+    const timeoutId = setTimeout(async () => {
+      if (usersFetched) return; // Only fetch once
+      
+      setUsersLoading(true);
+      setUsersError(null);
+      
+      try {
+        const response = await fetch('/api/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
         }
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        const data = await response.json();
+        // Limit to first 30 users
+        setUsers((data || []).slice(0, 30));
+        setUsersFetched(true);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setUsersError(error.message);
+      } finally {
+        setUsersLoading(false);
       }
+    }, 800);
 
-      const data = await response.json();
-      // Limit to first 30 users
-      setUsers((data || []).slice(0, 30));
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setUsersError(error.message);
-    } finally {
-      setUsersLoading(false);
+    return () => clearTimeout(timeoutId);
+  }, [usersFetched]);
+
+  // Function to trigger debounced fetch
+  const fetchUsers = () => {
+    if (!usersFetched) {
+      debouncedFetchUsers();
     }
   };
 
@@ -1036,18 +1051,34 @@ const FloatingResellersPopover = ({
                                 <Autocomplete
                                   fullWidth
                                   options={users}
-                                  getOptionLabel={(option) => option.name || option.login || `User ${option.id}`}
+                                  getOptionLabel={(option) => {
+                                    if (typeof option === 'string') return option;
+                                    return option.name || option.login || `User ${option.id}`;
+                                  }}
                                   value={users.find(user => user.id === editingReseller.resellerId) || null}
                                   onChange={(event, newValue) => {
-                                    setEditingReseller({ 
-                                      ...editingReseller, 
-                                      resellerId: newValue ? newValue.id : '' 
-                                    });
+                                    if (typeof newValue === 'string') {
+                                      // User typed something, find matching user
+                                      const matchingUser = users.find(user => 
+                                        (user.name || user.login || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
+                                      );
+                                      setEditingReseller({ 
+                                        ...editingReseller, 
+                                        resellerId: matchingUser ? matchingUser.id : newValue
+                                      });
+                                    } else {
+                                      // User selected from dropdown
+                                      setEditingReseller({ 
+                                        ...editingReseller, 
+                                        resellerId: newValue ? newValue.id : '' 
+                                      });
+                                    }
                                   }}
-                                  onOpen={fetchUsers}
+                                  onFocus={fetchUsers}
                                   loading={usersLoading}
                                   disabled={usersLoading}
                                   filterOptions={(options, { inputValue }) => {
+                                    if (!inputValue) return options;
                                     return options.filter(option => {
                                       const name = (option.name || option.login || `User ${option.id}`).toLowerCase();
                                       const email = (option.email || '').toLowerCase();
@@ -1055,10 +1086,12 @@ const FloatingResellersPopover = ({
                                       return name.includes(searchValue) || email.includes(searchValue);
                                     });
                                   }}
-                                  freeSolo={false}
-                                  selectOnFocus
-                                  clearOnBlur
-                                  handleHomeEndKeys
+                                  freeSolo={true}
+                                  selectOnFocus={false}
+                                  clearOnBlur={false}
+                                  handleHomeEndKeys={true}
+                                  autoSelect={false}
+                                  autoComplete={false}
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
