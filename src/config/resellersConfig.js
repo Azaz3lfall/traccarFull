@@ -1,7 +1,7 @@
 // Resellers Server Configuration
 // This file centralizes the resellersServer URL configuration
 
-const RESELLERS_SERVER_URL = process.env.REACT_APP_RESELLERS_SERVER_URL || 'http://localhost:3333';
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
 
 export default {
   RESELLERS_SERVER_URL,
