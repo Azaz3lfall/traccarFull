@@ -158,8 +158,8 @@ const FloatingResellersPopover = ({
         }
 
         const data = await response.json();
-        // Limit to first 30 users
-        setUsers((data || []).slice(0, 30));
+        // Limit to first 10 users
+        setUsers((data || []).slice(0, 10));
         setUsersFetched(true);
         
         // Open autocomplete and focus after data loads

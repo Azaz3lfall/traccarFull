@@ -513,8 +513,8 @@ const MainPage = () => {
         }
 
         const data = await response.json();
-        // Limit to first 30 users
-        setResellerUsers((data || []).slice(0, 30));
+        // Limit to first 10 users
+        setResellerUsers((data || []).slice(0, 10));
         setResellerUsersFetched(true);
         
         // Open autocomplete and focus after data loads
