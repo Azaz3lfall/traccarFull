@@ -4599,9 +4599,12 @@ const MainPage = () => {
                     );
                   }}
                   noOptionsText={resellerUsersError ? `${t('sharedError')}: ${resellerUsersError}` : t('sharedNoData')}
-                  PopperComponent={(props) => (
-                    <div {...props} style={{ ...props.style, zIndex: 10001 }} />
-                  )}
+                  PopperComponent={(props) => {
+                    const { disablePortal, anchorEl, ...filteredProps } = props;
+                    return (
+                      <div {...filteredProps} style={{ ...props.style, zIndex: 10001 }} />
+                    );
+                  }}
                   sx={{
                     '& .MuiAutocomplete-popper': {
                       zIndex: '10001 !important',
