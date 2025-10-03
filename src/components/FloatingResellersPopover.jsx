@@ -147,7 +147,7 @@ const FloatingResellersPopover = ({
       setUsersError(null);
       
       try {
-        const response = await fetch(resellersConfig.ENDPOINTS.USERS, {
+        const response = await fetch('/api/users', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

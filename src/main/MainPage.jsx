@@ -502,7 +502,7 @@ const MainPage = () => {
       setResellerUsersError(null);
       
       try {
-        const response = await fetch(resellersConfig.ENDPOINTS.USERS, {
+        const response = await fetch('/api/users', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -4587,8 +4587,8 @@ const MainPage = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label={t('resellerId')}
-                      required
+                  label={t('resellerId')}
+                  required
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -4598,17 +4598,17 @@ const MainPage = () => {
                           </>
                         ),
                       }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: colors.secondary,
+                      '& fieldset': { borderColor: colors.border },
+                      '&:hover fieldset': { borderColor: colors.primary },
+                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: colors.textSecondary,
+                      '&.Mui-focused': { color: colors.primary }
+                    },
                       }}
                     />
                   )}
