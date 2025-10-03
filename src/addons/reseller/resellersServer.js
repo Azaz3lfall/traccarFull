@@ -16,8 +16,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define data directory paths
-const DATA_DIR = '/opt/addons/resellers';
-const IMAGES_DIR = path.join(DATA_DIR, 'data', 'images');
+const DATA_DIR = '/opt/addons/resellers/data';
+const IMAGES_DIR = path.join(DATA_DIR, 'images');
 
 const app = express();
 // Use environment PORT or default to 3333
@@ -865,17 +865,17 @@ app.use('*', (req, res) => {
 // Ensure required directories exist on startup
 const ensureDirectories = () => {
   try {
-    // Create main data directory
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-      console.log('✅ Created main data directory:', DATA_DIR);
+    // Create main resellers directory
+    const mainDir = '/opt/addons/resellers';
+    if (!fs.existsSync(mainDir)) {
+      fs.mkdirSync(mainDir, { recursive: true });
+      console.log('✅ Created main resellers directory:', mainDir);
     }
     
-    // Create data subdirectory
-    const dataSubDir = path.join(DATA_DIR, 'data');
-    if (!fs.existsSync(dataSubDir)) {
-      fs.mkdirSync(dataSubDir, { recursive: true });
-      console.log('✅ Created data subdirectory:', dataSubDir);
+    // Create data directory
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      console.log('✅ Created data directory:', DATA_DIR);
     }
     
     // Create images directory
@@ -884,7 +884,7 @@ const ensureDirectories = () => {
       console.log('✅ Created images directory:', IMAGES_DIR);
     }
     
-    console.log('✅ All required directories ensured:', DATA_DIR, IMAGES_DIR);
+    console.log('✅ All required directories ensured:', mainDir, DATA_DIR, IMAGES_DIR);
   } catch (error) {
     console.error('❌ Error creating directories:', error);
     console.error('❌ Make sure the application has write permissions to /opt/addons/resellers');
