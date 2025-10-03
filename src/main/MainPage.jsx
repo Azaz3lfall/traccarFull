@@ -227,6 +227,7 @@ const MainPage = () => {
   const [resellerUsersLoading, setResellerUsersLoading] = useState(false);
   const [resellerUsersError, setResellerUsersError] = useState(null);
   const [resellerUsersFetched, setResellerUsersFetched] = useState(false);
+  const [resellerAutocompleteOpen, setResellerAutocompleteOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   
@@ -515,6 +516,15 @@ const MainPage = () => {
         // Limit to first 30 users
         setResellerUsers((data || []).slice(0, 30));
         setResellerUsersFetched(true);
+        
+        // Open autocomplete and focus after data loads
+        setResellerAutocompleteOpen(true);
+        setTimeout(() => {
+          const input = document.querySelector('input[aria-autocomplete="list"]');
+          if (input) {
+            input.focus();
+          }
+        }, 100);
       } catch (error) {
         console.error('Error fetching users for reseller:', error);
         setResellerUsersError(error.message);
@@ -4540,6 +4550,9 @@ const MainPage = () => {
                   onFocus={fetchResellerUsers}
                   loading={resellerUsersLoading}
                   disabled={resellerUsersLoading}
+                  open={resellerAutocompleteOpen}
+                  onOpen={() => setResellerAutocompleteOpen(true)}
+                  onClose={() => setResellerAutocompleteOpen(false)}
                   filterOptions={(options, { inputValue }) => {
                     if (!inputValue) return options;
                     return options.filter(option => {

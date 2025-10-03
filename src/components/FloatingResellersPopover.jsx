@@ -92,6 +92,7 @@ const FloatingResellersPopover = ({
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState(null);
   const [usersFetched, setUsersFetched] = useState(false);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
 
   // Fetch resellers with TanStack Query
   const { data: resellersData, isLoading, error, refetch } = useQuery({
@@ -160,6 +161,15 @@ const FloatingResellersPopover = ({
         // Limit to first 30 users
         setUsers((data || []).slice(0, 30));
         setUsersFetched(true);
+        
+        // Open autocomplete and focus after data loads
+        setAutocompleteOpen(true);
+        setTimeout(() => {
+          const input = document.querySelector('input[aria-autocomplete="list"]');
+          if (input) {
+            input.focus();
+          }
+        }, 100);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsersError(error.message);
@@ -1102,6 +1112,9 @@ const FloatingResellersPopover = ({
                                   onFocus={fetchUsers}
                                   loading={usersLoading}
                                   disabled={usersLoading}
+                                  open={autocompleteOpen}
+                                  onOpen={() => setAutocompleteOpen(true)}
+                                  onClose={() => setAutocompleteOpen(false)}
                                   filterOptions={(options, { inputValue }) => {
                                     if (!inputValue) return options;
                                     return options.filter(option => {
