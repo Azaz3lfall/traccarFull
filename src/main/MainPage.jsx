@@ -17,7 +17,6 @@ import { prefixString, unprefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import resellersConfig from '../config/resellersConfig';
-import { useDispatch } from 'react-redux';
 import { resellersActions } from '../store';
 import { useCatch } from '../reactHelper';
 import { nativePostMessage } from '../common/components/NativeInterface';
@@ -312,7 +311,6 @@ const MainPage = () => {
   const user = useSelector((state) => state.session.user);
   const versionApp = import.meta.env.VITE_APP_VERSION;
   const versionServer = useSelector((state) => state.session.server.version);
-  const dispatch = useDispatch();
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
   const logo = useSelector((state) => state.session.server?.attributes?.logo);
