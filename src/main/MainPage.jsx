@@ -223,6 +223,9 @@ const MainPage = () => {
     notificator: '',
     message: { subject: '', body: '' }
   });
+  const [resellerUsers, setResellerUsers] = useState([]);
+  const [resellerUsersLoading, setResellerUsersLoading] = useState(false);
+  const [resellerUsersError, setResellerUsersError] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   
@@ -484,6 +487,34 @@ const MainPage = () => {
     setResellerData(prev => ({ ...prev, [field]: value }));
     if (resellerErrors.length > 0) {
       setResellerErrors([]);
+    }
+  };
+
+  // Function to fetch users for reseller form
+  const fetchResellerUsers = async () => {
+    setResellerUsersLoading(true);
+    setResellerUsersError(null);
+    
+    try {
+      const response = await fetch('/api/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const data = await response.json();
+      // Limit to first 30 users
+      setResellerUsers((data || []).slice(0, 30));
+    } catch (error) {
+      console.error('Error fetching users for reseller:', error);
+      setResellerUsersError(error.message);
+    } finally {
+      setResellerUsersLoading(false);
     }
   };
 
@@ -4449,23 +4480,83 @@ const MainPage = () => {
                   {activeResellerTab === 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       
-                <TextField
+                <Autocomplete
                   fullWidth
-                  value={resellerData.resellerId}
-                  onChange={(e) => handleResellerFieldChange('resellerId', e.target.value)}
-                  label={t('resellerId')}
-                  required
+                  options={resellerUsers}
+                  getOptionLabel={(option) => option.name || option.login || `User ${option.id}`}
+                  value={resellerUsers.find(user => user.id === resellerData.resellerId) || null}
+                  onChange={(event, newValue) => {
+                    handleResellerFieldChange('resellerId', newValue ? newValue.id : '');
+                  }}
+                  onOpen={fetchResellerUsers}
+                  loading={resellerUsersLoading}
+                  disabled={resellerUsersLoading}
+                  filterOptions={(options, { inputValue }) => {
+                    return options.filter(option => {
+                      const name = (option.name || option.login || `User ${option.id}`).toLowerCase();
+                      const email = (option.email || '').toLowerCase();
+                      const searchValue = inputValue.toLowerCase();
+                      return name.includes(searchValue) || email.includes(searchValue);
+                    });
+                  }}
+                  freeSolo={false}
+                  selectOnFocus
+                  clearOnBlur
+                  handleHomeEndKeys
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t('resellerId')}
+                      required
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {resellerUsersLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          '& fieldset': { borderColor: colors.border },
+                          '&:hover fieldset': { borderColor: colors.primary },
+                          '&.Mui-focused fieldset': { borderColor: colors.primary },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: colors.textSecondary,
+                          '&.Mui-focused': { color: colors.primary }
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <Box component="li" key={key} {...otherProps}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+                          <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
+                            {option.name || option.login || `User ${option.id}`}
+                          </Typography>
+                          <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
+                            {option.email || 'No email'}
+                          </Typography>
+                        </div>
+                      </Box>
+                    );
+                  }}
+                  noOptionsText={resellerUsersError ? `${t('sharedError')}: ${resellerUsersError}` : t('sharedNoData')}
+                  PopperComponent={(props) => (
+                    <div {...props} style={{ ...props.style, zIndex: 10001 }} />
+                  )}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    '& .MuiAutocomplete-popper': {
+                      zIndex: '10001 !important',
                     },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
+                    '& .MuiAutocomplete-listbox': {
+                      zIndex: '10001 !important',
+                    }
                   }}
                 />
                 
