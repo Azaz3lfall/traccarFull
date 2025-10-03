@@ -1173,8 +1173,8 @@ const FloatingResellersPopover = ({
                                           ...props.style, 
                                           zIndex: 10001,
                                           position: 'absolute',
-                                          top: '4px !important',
-                                          marginTop: '0px !important'
+                                          top: '100% !important',
+                                          marginTop: '4px !important'
                                         }} 
                                       />
                                     );
@@ -1183,8 +1183,8 @@ const FloatingResellersPopover = ({
                                     '& .MuiAutocomplete-popper': {
                                       zIndex: '10001 !important',
                                       position: 'absolute !important',
-                                      top: '4px !important',
-                                      marginTop: '0px !important',
+                                      top: '100% !important',
+                                      marginTop: '4px !important',
                                     },
                                     '& .MuiAutocomplete-listbox': {
                                       zIndex: '10001 !important',
