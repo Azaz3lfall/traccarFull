@@ -17,6 +17,8 @@ import { prefixString, unprefixString } from '../common/util/stringUtils';
 import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import resellersConfig from '../config/resellersConfig';
+import { useDispatch } from 'react-redux';
+import { resellersActions } from '../store';
 import { useCatch } from '../reactHelper';
 import { nativePostMessage } from '../common/components/NativeInterface';
 import fallbackLogo from '../resources/images/image170.png?inline';
@@ -310,6 +312,8 @@ const MainPage = () => {
   const user = useSelector((state) => state.session.user);
   const versionApp = import.meta.env.VITE_APP_VERSION;
   const versionServer = useSelector((state) => state.session.server.version);
+  const dispatch = useDispatch();
+  const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
   const logo = useSelector((state) => state.session.server?.attributes?.logo);
   const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
@@ -807,6 +811,43 @@ const MainPage = () => {
   
   // Reseller branding
   const { getLogoUrl, getCompanyName } = useResellerBranding();
+
+  // Check if current user is a reseller
+  useEffect(() => {
+    const checkResellerStatus = async () => {
+      if (!user?.id) {
+        dispatch(resellersActions.clearCurrentReseller());
+        return;
+      }
+
+      try {
+        const response = await fetch(resellersConfig.ENDPOINTS.CHECK, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isReseller) {
+            dispatch(resellersActions.setCurrentReseller(data.resellerData));
+          } else {
+            dispatch(resellersActions.clearCurrentReseller());
+          }
+        } else {
+          // User is not a reseller (404 or other error)
+          dispatch(resellersActions.clearCurrentReseller());
+        }
+      } catch (error) {
+        console.error('Error checking reseller status:', error);
+        dispatch(resellersActions.clearCurrentReseller());
+      }
+    };
+
+    checkResellerStatus();
+  }, [user?.id, dispatch]);
   
   // Events data for notification badge
   const events = useSelector((state) => state.events.items);
@@ -2334,7 +2375,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Reseller Management */}
-          {admin && (
+          {(admin || isReseller) && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -6850,7 +6891,7 @@ const MainPage = () => {
                   )}
 
                   {/* Reseller Management */}
-                  {admin && (
+                  {(admin || isReseller) && (
                     <button
                       onClick={() => {
                         setShowResellersPopover(true);

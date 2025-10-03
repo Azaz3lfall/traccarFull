@@ -6,6 +6,8 @@ const resellersSlice = createSlice({
     items: [],
     loading: false,
     error: null,
+    currentReseller: null,
+    isReseller: false,
   },
   reducers: {
     setResellers: (state, action) => {
@@ -32,6 +34,14 @@ const resellersSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setCurrentReseller: (state, action) => {
+      state.currentReseller = action.payload;
+      state.isReseller = !!action.payload;
+    },
+    clearCurrentReseller: (state) => {
+      state.currentReseller = null;
+      state.isReseller = false;
+    },
   },
 });
 
@@ -43,6 +53,8 @@ export const {
   setLoading,
   setError,
   clearError,
+  setCurrentReseller,
+  clearCurrentReseller,
 } = resellersSlice.actions;
 
 export const resellersReducer = resellersSlice.reducer;

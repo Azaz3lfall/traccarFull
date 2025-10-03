@@ -13,6 +13,7 @@ export default {
     UPDATE: (id) => `${RESELLERS_SERVER_URL}/api/resellers/${id}`,
     DELETE: `${RESELLERS_SERVER_URL}/api/resellers/delete`,
     UPLOAD: `${RESELLERS_SERVER_URL}/api/upload`,
+    CHECK: `${RESELLERS_SERVER_URL}/api/reseller-check`,
   }
 };
 

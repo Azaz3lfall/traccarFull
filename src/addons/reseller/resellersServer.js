@@ -732,6 +732,82 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 // Serve uploaded images
 app.use('/images', express.static(IMAGES_DIR));
 
+// Reseller check endpoint - POST to check if user is a reseller
+app.post('/api/reseller-check', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({
+        error: 'User ID is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Get all JSON files from data directory
+    const jsonFiles = await glob('*.json', { cwd: DATA_DIR });
+    
+    // Look for files that match the pattern: reseller_{appUrl}_{parentUserId}_{resellerId}.json
+    // where resellerId matches the current userId
+    const resellerFiles = jsonFiles.filter(filename => {
+      const match = filename.match(/^reseller_(.+)_(\d+)_(\d+)\.json$/);
+      if (match) {
+        const [, appUrl, parentUserId, resellerId] = match;
+        return parseInt(resellerId) === parseInt(userId);
+      }
+      return false;
+    });
+
+    if (resellerFiles.length === 0) {
+      return res.status(404).json({
+        isReseller: false,
+        message: 'User is not a reseller',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Read the first matching reseller file
+    const resellerFile = resellerFiles[0];
+    const filePath = path.join(DATA_DIR, resellerFile);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const resellerData = JSON.parse(fileContent);
+
+    // Return reseller details
+    res.json({
+      isReseller: true,
+      resellerData: {
+        appUrl: resellerData.appUrl,
+        parentUserId: resellerData.parentUserId,
+        parentUser: resellerData.parentUser,
+        parentEmail: resellerData.parentEmail,
+        resellerId: resellerData.resellerId,
+        resellerUser: resellerData.resellerUser,
+        resellerEmail: resellerData.resellerEmail,
+        companyName: resellerData.companyName,
+        logo: resellerData.logo,
+        url: resellerData.url,
+        whatsapp: resellerData.whatsapp,
+        billingEmail: resellerData.billingEmail,
+        supportEmail: resellerData.supportEmail,
+        resellerLimit: resellerData.resellerLimit,
+        deviceLimit: resellerData.deviceLimit,
+        userLimit: resellerData.userLimit,
+        status: resellerData.status,
+        createdAt: resellerData.createdAt
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error checking reseller status:', error);
+    res.status(500).json({
+      error: 'Failed to check reseller status',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Domain lookup endpoint - POST to get domain data with base64 image
 app.post('/api/domain-lookup', async (req, res) => {
   try {
