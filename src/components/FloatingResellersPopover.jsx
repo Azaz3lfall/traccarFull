@@ -163,13 +163,15 @@ const FloatingResellersPopover = ({
         setUsersFetched(true);
         
         // Open autocomplete and focus after data loads
-        setAutocompleteOpen(true);
         setTimeout(() => {
-          const input = document.querySelector('input[aria-autocomplete="list"]');
-          if (input) {
-            input.focus();
-          }
-        }, 100);
+          setAutocompleteOpen(true);
+          setTimeout(() => {
+            const input = document.querySelector('input[aria-autocomplete="list"]');
+            if (input) {
+              input.focus();
+            }
+          }, 100);
+        }, 0);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsersError(error.message);

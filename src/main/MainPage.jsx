@@ -518,13 +518,15 @@ const MainPage = () => {
         setResellerUsersFetched(true);
         
         // Open autocomplete and focus after data loads
-        setResellerAutocompleteOpen(true);
         setTimeout(() => {
-          const input = document.querySelector('input[aria-autocomplete="list"]');
-          if (input) {
-            input.focus();
-          }
-        }, 100);
+          setResellerAutocompleteOpen(true);
+          setTimeout(() => {
+            const input = document.querySelector('input[aria-autocomplete="list"]');
+            if (input) {
+              input.focus();
+            }
+          }, 100);
+        }, 0);
       } catch (error) {
         console.error('Error fetching users for reseller:', error);
         setResellerUsersError(error.message);
