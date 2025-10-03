@@ -158,8 +158,8 @@ const FloatingResellersPopover = ({
         }
 
         const data = await response.json();
-        // Limit to first 10 users
-        setUsers((data || []).slice(0, 10));
+        // Store all users for filtering, but show only first 10 initially
+        setUsers(data || []);
         setUsersFetched(true);
         
         // Open autocomplete and focus after data loads
@@ -1116,7 +1116,11 @@ const FloatingResellersPopover = ({
                                   onOpen={() => setAutocompleteOpen(true)}
                                   onClose={() => setAutocompleteOpen(false)}
                                   filterOptions={(options, { inputValue }) => {
-                                    if (!inputValue) return options;
+                                    if (!inputValue) {
+                                      // Show only first 10 users when no input
+                                      return options.slice(0, 10);
+                                    }
+                                    // Filter from all users when typing
                                     return options.filter(option => {
                                       const name = (option.name || '').toLowerCase();
                                       const email = (option.email || '').toLowerCase();
