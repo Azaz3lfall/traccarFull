@@ -4605,14 +4605,35 @@ const MainPage = () => {
                   PopperComponent={(props) => {
                     const { disablePortal, anchorEl, ...filteredProps } = props;
                     return (
-                      <div {...filteredProps} style={{ ...props.style, zIndex: 10001 }} />
+                      <div 
+                        {...filteredProps} 
+                        style={{ 
+                          ...props.style, 
+                          zIndex: 10001,
+                          position: 'absolute',
+                          top: '4px !important',
+                          marginTop: '0px !important'
+                        }} 
+                      />
                     );
                   }}
                   sx={{
                     '& .MuiAutocomplete-popper': {
                       zIndex: '10001 !important',
+                      position: 'absolute !important',
+                      top: '4px !important',
+                      marginTop: '0px !important',
                     },
                     '& .MuiAutocomplete-listbox': {
+                      zIndex: '10001 !important',
+                      position: 'absolute !important',
+                      top: '0px !important',
+                      marginTop: '0px !important',
+                    },
+                    '& .MuiPaper-root': {
+                      position: 'absolute !important',
+                      top: '0px !important',
+                      marginTop: '0px !important',
                       zIndex: '10001 !important',
                     }
                   }}
