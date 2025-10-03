@@ -4558,6 +4558,7 @@ const MainPage = () => {
                   handleHomeEndKeys={true}
                   autoSelect={false}
                   autoComplete={false}
+                  disablePortal={true}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -4609,10 +4610,7 @@ const MainPage = () => {
                         {...filteredProps} 
                         style={{ 
                           ...props.style, 
-                          zIndex: 10001,
-                          position: 'absolute',
-                          top: '100% !important',
-                          marginTop: '4px !important'
+                          zIndex: 10001
                         }} 
                       />
                     );
@@ -4620,20 +4618,11 @@ const MainPage = () => {
                   sx={{
                     '& .MuiAutocomplete-popper': {
                       zIndex: '10001 !important',
-                      position: 'absolute !important',
-                      top: '100% !important',
-                      marginTop: '4px !important',
                     },
                     '& .MuiAutocomplete-listbox': {
                       zIndex: '10001 !important',
-                      position: 'absolute !important',
-                      top: '0px !important',
-                      marginTop: '0px !important',
                     },
                     '& .MuiPaper-root': {
-                      position: 'absolute !important',
-                      top: '0px !important',
-                      marginTop: '0px !important',
                       zIndex: '10001 !important',
                     }
                   }}

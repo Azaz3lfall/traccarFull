@@ -1120,6 +1120,7 @@ const FloatingResellersPopover = ({
                                   handleHomeEndKeys={true}
                                   autoSelect={false}
                                   autoComplete={false}
+                                  disablePortal={true}
                                   renderInput={(params) => (
                                     <TextField
                                       {...params}
@@ -1164,41 +1165,6 @@ const FloatingResellersPopover = ({
                                     );
                                   }}
                                   noOptionsText={usersError ? `${t('sharedError')}: ${usersError}` : t('sharedNoData')}
-                                  PopperComponent={(props) => {
-                                    const { disablePortal, anchorEl, ...filteredProps } = props;
-                                    return (
-                                      <div 
-                                        {...filteredProps} 
-                                        style={{ 
-                                          ...props.style, 
-                                          zIndex: 10001,
-                                          position: 'absolute',
-                                          top: '100% !important',
-                                          marginTop: '4px !important'
-                                        }} 
-                                      />
-                                    );
-                                  }}
-                                  sx={{
-                                    '& .MuiAutocomplete-popper': {
-                                      zIndex: '10001 !important',
-                                      position: 'absolute !important',
-                                      top: '100% !important',
-                                      marginTop: '4px !important',
-                                    },
-                                    '& .MuiAutocomplete-listbox': {
-                                      zIndex: '10001 !important',
-                                      position: 'absolute !important',
-                                      top: '0px !important',
-                                      marginTop: '0px !important',
-                                    },
-                                    '& .MuiPaper-root': {
-                                      position: 'absolute !important',
-                                      top: '0px !important',
-                                      marginTop: '0px !important',
-                                      zIndex: '10001 !important',
-                                    }
-                                  }}
                                 />
                                 
                                 <TextField
