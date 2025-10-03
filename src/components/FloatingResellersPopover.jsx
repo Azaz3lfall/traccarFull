@@ -166,7 +166,7 @@ const FloatingResellersPopover = ({
       } finally {
         setUsersLoading(false);
       }
-    }, 800);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [usersFetched]);
@@ -349,6 +349,12 @@ const FloatingResellersPopover = ({
   const handleSaveReseller = async (e) => {
     e?.preventDefault(); // Prevent form submission
     if (!editingReseller) return;
+
+    // Validate that a user is selected
+    if (!editingReseller.resellerId || editingReseller.resellerId === '') {
+      setSnackbar({ open: true, message: 'Please select a user for Reseller ID', severity: 'error' });
+      return;
+    }
 
     // Create payload matching the exact structure you specified
     const fullPayload = {
@@ -1053,24 +1059,43 @@ const FloatingResellersPopover = ({
                                   options={users}
                                   getOptionLabel={(option) => {
                                     if (typeof option === 'string') return option;
-                                    return option.name || option.login || `User ${option.id}`;
+                                    return option.name || option.email || `User ${option.id}`;
                                   }}
                                   value={users.find(user => user.id === editingReseller.resellerId) || null}
                                   onChange={(event, newValue) => {
                                     if (typeof newValue === 'string') {
                                       // User typed something, find matching user
                                       const matchingUser = users.find(user => 
-                                        (user.name || user.login || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
+                                        (user.name || user.email || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
                                       );
-                                      setEditingReseller({ 
-                                        ...editingReseller, 
-                                        resellerId: matchingUser ? matchingUser.id : newValue
-                                      });
-                                    } else {
+                                      if (matchingUser) {
+                                        setEditingReseller({ 
+                                          ...editingReseller, 
+                                          resellerId: matchingUser.id,
+                                          resellerUser: matchingUser.login || matchingUser.email,
+                                          resellerEmail: matchingUser.email
+                                        });
+                                      } else {
+                                        setEditingReseller({ 
+                                          ...editingReseller, 
+                                          resellerId: newValue
+                                        });
+                                      }
+                                    } else if (newValue) {
                                       // User selected from dropdown
                                       setEditingReseller({ 
                                         ...editingReseller, 
-                                        resellerId: newValue ? newValue.id : '' 
+                                        resellerId: newValue.id,
+                                        resellerUser: newValue.login || newValue.email,
+                                        resellerEmail: newValue.email
+                                      });
+                                    } else {
+                                      // Cleared selection
+                                      setEditingReseller({ 
+                                        ...editingReseller, 
+                                        resellerId: '',
+                                        resellerUser: '',
+                                        resellerEmail: ''
                                       });
                                     }
                                   }}
@@ -1126,10 +1151,10 @@ const FloatingResellersPopover = ({
                                       <Box component="li" key={key} {...otherProps}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
                                           <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
-                                            {option.name || option.login || `User ${option.id}`}
+                                            {option.name || option.email || `User ${option.id}`}
                                           </Typography>
                                           <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                                            {option.email || 'No email'}
+                                            {option.login || option.email || 'No login/email'}
                                           </Typography>
                                         </div>
                                       </Box>
@@ -1278,9 +1303,11 @@ const FloatingResellersPopover = ({
                                 <TextField
                                   fullWidth
                                   value={editingReseller.resellerUser || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerUser: e.target.value })}
                                   label={t('resellerUser')}
                                   required
+                                  InputProps={{
+                                    readOnly: true
+                                  }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
@@ -1298,10 +1325,12 @@ const FloatingResellersPopover = ({
                                 <TextField
                                   fullWidth
                                   value={editingReseller.resellerEmail || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, resellerEmail: e.target.value })}
                                   label={t('resellerEmail')}
                                   type="email"
                                   required
+                                  InputProps={{
+                                    readOnly: true
+                                  }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,

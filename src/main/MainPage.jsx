@@ -521,7 +521,7 @@ const MainPage = () => {
       } finally {
         setResellerUsersLoading(false);
       }
-    }, 800);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [resellerUsersFetched]);
@@ -4500,19 +4500,41 @@ const MainPage = () => {
                   options={resellerUsers}
                   getOptionLabel={(option) => {
                     if (typeof option === 'string') return option;
-                    return option.name || option.login || `User ${option.id}`;
+                    return option.name || option.email || `User ${option.id}`;
                   }}
                   value={resellerUsers.find(user => user.id === resellerData.resellerId) || null}
                   onChange={(event, newValue) => {
                     if (typeof newValue === 'string') {
                       // User typed something, find matching user
                       const matchingUser = resellerUsers.find(user => 
-                        (user.name || user.login || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
+                        (user.name || user.email || `User ${user.id}`).toLowerCase() === newValue.toLowerCase()
                       );
-                      handleResellerFieldChange('resellerId', matchingUser ? matchingUser.id : newValue);
-                    } else {
+                      if (matchingUser) {
+                        setResellerData(prev => ({
+                          ...prev,
+                          resellerId: matchingUser.id,
+                          resellerUser: matchingUser.login || matchingUser.email,
+                          resellerEmail: matchingUser.email
+                        }));
+                      } else {
+                        handleResellerFieldChange('resellerId', newValue);
+                      }
+                    } else if (newValue) {
                       // User selected from dropdown
-                      handleResellerFieldChange('resellerId', newValue ? newValue.id : '');
+                      setResellerData(prev => ({
+                        ...prev,
+                        resellerId: newValue.id,
+                        resellerUser: newValue.login || newValue.email,
+                        resellerEmail: newValue.email
+                      }));
+                    } else {
+                      // Cleared selection
+                      setResellerData(prev => ({
+                        ...prev,
+                        resellerId: '',
+                        resellerUser: '',
+                        resellerEmail: ''
+                      }));
                     }
                   }}
                   onFocus={fetchResellerUsers}
@@ -4567,10 +4589,10 @@ const MainPage = () => {
                       <Box component="li" key={key} {...otherProps}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
                           <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
-                            {option.name || option.login || `User ${option.id}`}
+                            {option.name || option.email || `User ${option.id}`}
                           </Typography>
                           <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                            {option.email || 'No email'}
+                            {option.login || option.email || 'No login/email'}
                           </Typography>
                         </div>
                       </Box>
@@ -4659,9 +4681,11 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                         value={resellerData.resellerUser}
-                        onChange={(e) => handleResellerFieldChange('resellerUser', e.target.value)}
                         label={t('resellerUser')}
                   required
+                  InputProps={{
+                    readOnly: true
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: colors.secondary,
@@ -4679,10 +4703,12 @@ const MainPage = () => {
                 <TextField
                   fullWidth
                         value={resellerData.resellerEmail}
-                        onChange={(e) => handleResellerFieldChange('resellerEmail', e.target.value)}
                         label={t('resellerEmail')}
                         type="email"
                   required
+                  InputProps={{
+                    readOnly: true
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: colors.secondary,
@@ -4894,6 +4920,11 @@ const MainPage = () => {
                       { key: 'deviceLimit', label: t('userDeviceLimit') },
                       { key: 'userLimit', label: t('userUserLimit') }
                     ];
+
+                    // Special validation for resellerId - must be a valid user ID
+                    if (!resellerData.resellerId || resellerData.resellerId === '' || isNaN(resellerData.resellerId)) {
+                      errors.push(t('resellerId') + ' (must select a valid user)');
+                    }
 
                     requiredFields.forEach(field => {
                       const value = resellerData[field.key];
