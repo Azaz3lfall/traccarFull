@@ -4543,10 +4543,13 @@ const MainPage = () => {
                   filterOptions={(options, { inputValue }) => {
                     if (!inputValue) return options;
                     return options.filter(option => {
-                      const name = (option.name || option.login || `User ${option.id}`).toLowerCase();
+                      const name = (option.name || '').toLowerCase();
                       const email = (option.email || '').toLowerCase();
+                      const login = (option.login || '').toLowerCase();
                       const searchValue = inputValue.toLowerCase();
-                      return name.includes(searchValue) || email.includes(searchValue);
+                      return name.includes(searchValue) || 
+                             email.includes(searchValue) || 
+                             login.includes(searchValue);
                     });
                   }}
                   freeSolo={true}
