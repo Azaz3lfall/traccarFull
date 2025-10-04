@@ -693,12 +693,12 @@
   "deviceImageSizeError": "Afbeeldingsgrootte moet kleiner zijn dan {maxSize}",
   "deviceImageTypeError": "Alleen afbeeldingsbestanden zijn toegestaan",
   "deviceImageUploadError": "Fout bij het uploaden van de afbeelding. Probeer opnieuw.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "CONTROLEER",
+  "domainCheckInstruction": "💡 Voer uw domein in en klik op \"CONTROLEER\" om te bevestigen dat het correct is doorgegeven voordat u opslaat",
+  "domainCheckSuccess": "Domein is geldig en wijst naar: {ipAddress}",
+  "domainCheckError": "Domeincontrole mislukt: {message}",
+  "domainCheckNetworkError": "Fout bij het controleren van het domein. Probeer opnieuw.",
+  "domainCheckEmptyError": "Voer eerst een domein in",
+  "domainCheckSuccessTitle": "Domein is geldig! Wijst naar: {ipAddress}",
+  "domainCheckErrorTitle": "Domeincontrole mislukt: {message}"
 }

@@ -693,12 +693,12 @@
   "deviceImageSizeError": "يجب أن يكون حجم الصورة أقل من {maxSize}",
   "deviceImageTypeError": "يُسمح فقط بملفات الصور",
   "deviceImageUploadError": "خطأ في رفع الصورة. يرجى المحاولة مرة أخرى.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "تحقق",
+  "domainCheckInstruction": "💡 أدخل نطاقك وانقر على \"تحقق\" للتأكد من أنه منتشر بشكل صحيح قبل الحفظ",
+  "domainCheckSuccess": "النطاق صالح ويشير إلى: {ipAddress}",
+  "domainCheckError": "فشل في التحقق من النطاق: {message}",
+  "domainCheckNetworkError": "خطأ في التحقق من النطاق. يرجى المحاولة مرة أخرى.",
+  "domainCheckEmptyError": "يرجى إدخال نطاق أولاً",
+  "domainCheckSuccessTitle": "النطاق صالح! يشير إلى: {ipAddress}",
+  "domainCheckErrorTitle": "فشل في التحقق من النطاق: {message}"
 }

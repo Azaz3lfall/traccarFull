@@ -693,12 +693,12 @@
   "deviceImageSizeError": "이미지 크기는 {maxSize}보다 작아야 합니다",
   "deviceImageTypeError": "이미지 파일만 허용됩니다",
   "deviceImageUploadError": "이미지 업로드 오류입니다. 다시 시도해 주세요.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "확인",
+  "domainCheckInstruction": "💡 도메인을 입력하고 저장하기 전에 올바르게 전파되었는지 확인하려면 \"확인\"을 클릭하세요",
+  "domainCheckSuccess": "도메인이 유효하고 {ipAddress}를 가리킵니다",
+  "domainCheckError": "도메인 확인 실패: {message}",
+  "domainCheckNetworkError": "도메인 확인 중 오류가 발생했습니다. 다시 시도해주세요.",
+  "domainCheckEmptyError": "먼저 도메인을 입력하세요",
+  "domainCheckSuccessTitle": "도메인이 유효합니다! {ipAddress}를 가리킵니다",
+  "domainCheckErrorTitle": "도메인 확인 실패: {message}"
 }

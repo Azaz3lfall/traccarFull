@@ -693,12 +693,12 @@
   "deviceImageSizeError": "图片大小必须小于 {maxSize}",
   "deviceImageTypeError": "只允许图片文件",
   "deviceImageUploadError": "上传图片时出错。请重试。",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "检查",
+  "domainCheckInstruction": "💡 输入您的域名并点击\"检查\"以确认在保存前已正确传播",
+  "domainCheckSuccess": "域名有效并指向: {ipAddress}",
+  "domainCheckError": "域名检查失败: {message}",
+  "domainCheckNetworkError": "检查域名时出错。请重试。",
+  "domainCheckEmptyError": "请先输入域名",
+  "domainCheckSuccessTitle": "域名有效！指向: {ipAddress}",
+  "domainCheckErrorTitle": "域名检查失败: {message}"
 }

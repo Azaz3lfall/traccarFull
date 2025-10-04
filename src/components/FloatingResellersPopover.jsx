@@ -425,6 +425,12 @@ const FloatingResellersPopover = ({
       return;
     }
 
+    // Validate that an image is selected for new resellers
+    if (!isEditMode && (!selectedImage && !editingReseller.logotype && !editingReseller.logo)) {
+      setSnackbar({ open: true, message: t('resellerImageRequired'), severity: 'error' });
+      return;
+    }
+
     // Create payload matching the exact structure you specified
     const fullPayload = {
       currentDomain: window.location.hostname,
@@ -731,9 +737,11 @@ const FloatingResellersPopover = ({
                       </TableRow>
                     ) : (
                       <>
-                        {paginatedResellers.map((reseller, index) => (
+                        {paginatedResellers.map((reseller, index) => {
+                          const uniqueKey = reseller.resellerId || reseller.id || `reseller-${index}`;
+                          return (
                           <TableRow
-                            key={reseller.resellerId || reseller.id}
+                            key={uniqueKey}
                             style={{
                               backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
                               cursor: 'pointer',
@@ -801,7 +809,8 @@ const FloatingResellersPopover = ({
                               </IconButton>
                             </TableCell>
                           </TableRow>
-                        ))}
+                          );
+                        })}
                       </>
                     )}
                   </TableBody>

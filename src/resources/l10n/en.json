@@ -679,6 +679,7 @@
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
   "resellerCompany": "Company",
+  "resellerImageRequired": "Please select a logo image for the reseller",
   "domainCheckButton": "CHECK",
   "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
   "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",

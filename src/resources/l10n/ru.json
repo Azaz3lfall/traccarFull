@@ -693,12 +693,12 @@
   "deviceImageSizeError": "Размер изображения должен быть меньше {maxSize}",
   "deviceImageTypeError": "Разрешены только файлы изображений",
   "deviceImageUploadError": "Ошибка загрузки изображения. Попробуйте снова.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "ПРОВЕРИТЬ",
+  "domainCheckInstruction": "💡 Введите ваш домен и нажмите \"ПРОВЕРИТЬ\", чтобы подтвердить, что он правильно распространяется перед сохранением",
+  "domainCheckSuccess": "Домен действителен и указывает на: {ipAddress}",
+  "domainCheckError": "Ошибка проверки домена: {message}",
+  "domainCheckNetworkError": "Ошибка при проверке домена. Попробуйте снова.",
+  "domainCheckEmptyError": "Сначала введите домен",
+  "domainCheckSuccessTitle": "Домен действителен! Указывает на: {ipAddress}",
+  "domainCheckErrorTitle": "Ошибка проверки домена: {message}"
 }

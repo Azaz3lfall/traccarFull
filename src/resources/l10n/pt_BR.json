@@ -693,12 +693,13 @@
   "deviceImageSizeError": "O tamanho da imagem deve ser menor que {maxSize}",
   "deviceImageTypeError": "Apenas arquivos de imagem são permitidos",
   "deviceImageUploadError": "Erro ao fazer upload da imagem. Tente novamente.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "VERIFICAR",
+  "domainCheckInstruction": "💡 Digite seu domínio e clique em \"VERIFICAR\" para confirmar que está propagado corretamente antes de salvar",
+  "domainCheckSuccess": "Domínio é válido e aponta para: {ipAddress}",
+  "domainCheckError": "Falha na verificação do domínio: {message}",
+  "domainCheckNetworkError": "Erro ao verificar domínio. Tente novamente.",
+  "domainCheckEmptyError": "Digite um domínio primeiro",
+  "domainCheckSuccessTitle": "Domínio é válido! Aponta para: {ipAddress}",
+  "domainCheckErrorTitle": "Falha na verificação do domínio: {message}",
+  "resellerImageRequired": "Por favor, selecione uma imagem de logo para o revendedor"
 }

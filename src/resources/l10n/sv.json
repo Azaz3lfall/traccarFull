@@ -693,12 +693,12 @@
   "deviceImageSizeError": "Bildstorlek måste vara mindre än {maxSize}",
   "deviceImageTypeError": "Endast bildfiler är tillåtna",
   "deviceImageUploadError": "Fel vid uppladdning av bild. Försök igen.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "KONTROLLERA",
+  "domainCheckInstruction": "💡 Ange din domän och klicka på \"KONTROLLERA\" för att bekräfta att den är korrekt spridd innan du sparar",
+  "domainCheckSuccess": "Domänen är giltig och pekar på: {ipAddress}",
+  "domainCheckError": "Domänkontroll misslyckades: {message}",
+  "domainCheckNetworkError": "Fel vid kontroll av domän. Försök igen.",
+  "domainCheckEmptyError": "Ange en domän först",
+  "domainCheckSuccessTitle": "Domänen är giltig! Pekar på: {ipAddress}",
+  "domainCheckErrorTitle": "Domänkontroll misslyckades: {message}"
 }

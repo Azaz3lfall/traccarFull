@@ -700,5 +700,6 @@
   "domainCheckNetworkError": "Error checking domain. Please try again.",
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckErrorTitle": "Domain check failed: {message}",
+  "resellerImageRequired": "Please select a logo image for the reseller"
 }

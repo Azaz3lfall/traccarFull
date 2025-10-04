@@ -693,12 +693,12 @@
   "deviceImageSizeError": "छवि का आकार {maxSize} से कम होना चाहिए",
   "deviceImageTypeError": "केवल छवि फ़ाइलें अनुमतित हैं",
   "deviceImageUploadError": "छवि अपलोड करने में त्रुटि। कृपया पुनः प्रयास करें।",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "जांचें",
+  "domainCheckInstruction": "💡 अपना डोमेन दर्ज करें और सहेजने से पहले यह सही तरीके से प्रचारित है यह सुनिश्चित करने के लिए \"जांचें\" पर क्लिक करें",
+  "domainCheckSuccess": "डोमेन वैध है और इंगित करता है: {ipAddress}",
+  "domainCheckError": "डोमेन जांच विफल: {message}",
+  "domainCheckNetworkError": "डोमेन जांच में त्रुटि। कृपया पुनः प्रयास करें।",
+  "domainCheckEmptyError": "कृपया पहले एक डोमेन दर्ज करें",
+  "domainCheckSuccessTitle": "डोमेन वैध है! इंगित करता है: {ipAddress}",
+  "domainCheckErrorTitle": "डोमेन जांच विफल: {message}"
 }

@@ -693,12 +693,12 @@
   "deviceImageSizeError": "Bildgröße muss kleiner als {maxSize} sein",
   "deviceImageTypeError": "Nur Bilddateien sind erlaubt",
   "deviceImageUploadError": "Fehler beim Hochladen des Bildes. Bitte versuchen Sie es erneut.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "PRÜFEN",
+  "domainCheckInstruction": "💡 Geben Sie Ihre Domain ein und klicken Sie auf \"PRÜFEN\", um zu bestätigen, dass sie korrekt propagiert ist, bevor Sie speichern",
+  "domainCheckSuccess": "Domain ist gültig und zeigt auf: {ipAddress}",
+  "domainCheckError": "Domain-Prüfung fehlgeschlagen: {message}",
+  "domainCheckNetworkError": "Fehler beim Überprüfen der Domain. Bitte versuchen Sie es erneut.",
+  "domainCheckEmptyError": "Bitte geben Sie zuerst eine Domain ein",
+  "domainCheckSuccessTitle": "Domain ist gültig! Zeigt auf: {ipAddress}",
+  "domainCheckErrorTitle": "Domain-Prüfung fehlgeschlagen: {message}"
 }

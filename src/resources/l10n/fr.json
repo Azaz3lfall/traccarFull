@@ -693,12 +693,12 @@
   "deviceImageSizeError": "La taille de l'image doit être inférieure à {maxSize}",
   "deviceImageTypeError": "Seuls les fichiers image sont autorisés",
   "deviceImageUploadError": "Erreur lors du téléchargement de l'image. Veuillez réessayer.",
-  "domainCheckButton": "CHECK",
-  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
-  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
-  "domainCheckError": "Domain check failed: {message}",
-  "domainCheckNetworkError": "Error checking domain. Please try again.",
-  "domainCheckEmptyError": "Please enter a domain first",
-  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
-  "domainCheckErrorTitle": "Domain check failed: {message}"
+  "domainCheckButton": "VÉRIFIER",
+  "domainCheckInstruction": "💡 Entrez votre domaine et cliquez sur \"VÉRIFIER\" pour confirmer qu'il est correctement propagé avant de sauvegarder",
+  "domainCheckSuccess": "Le domaine est valide et pointe vers: {ipAddress}",
+  "domainCheckError": "Échec de la vérification du domaine: {message}",
+  "domainCheckNetworkError": "Erreur lors de la vérification du domaine. Veuillez réessayer.",
+  "domainCheckEmptyError": "Veuillez entrer un domaine d'abord",
+  "domainCheckSuccessTitle": "Le domaine est valide! Pointe vers: {ipAddress}",
+  "domainCheckErrorTitle": "Échec de la vérification du domaine: {message}"
 }
