@@ -10,6 +10,7 @@ import crypto from 'crypto';
 import { glob } from 'glob';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import dns from 'dns';
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +35,49 @@ const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => 
 
 // Promisify exec for async/await usage
 const execAsync = promisify(exec);
+
+// Promisify DNS functions
+const dnsLookup = promisify(dns.lookup);
+
+// Helper function to check domain propagation
+const checkDomainPropagation = async (domain) => {
+  try {
+    console.log(`🔍 Checking domain propagation for: ${domain}`);
+    
+    // Remove protocol if present
+    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    
+    // Check DNS resolution
+    const dnsResult = await dnsLookup(cleanDomain);
+    const ipAddress = dnsResult.address;
+    
+    console.log(`✅ Domain ${cleanDomain} resolves to: ${ipAddress}`);
+    
+    // Try to ping the domain (optional - just for additional verification)
+    try {
+      await execAsync(`ping -c 1 -W 3 ${cleanDomain}`);
+      console.log(`✅ Domain ${cleanDomain} is reachable via ping`);
+    } catch (pingError) {
+      console.log(`⚠️ Ping failed for ${cleanDomain}, but DNS resolution works`);
+    }
+    
+    return {
+      success: true,
+      domain: cleanDomain,
+      ipAddress: ipAddress,
+      message: `Domain is properly propagated and points to ${ipAddress}`
+    };
+    
+  } catch (error) {
+    console.error(`❌ Domain check failed for ${domain}:`, error.message);
+    return {
+      success: false,
+      domain: domain,
+      error: error.message,
+      message: `Domain check failed: ${error.message}`
+    };
+  }
+};
 
 // Helper function to create nginx configuration
 const createNginxConfig = async (appUrl) => {
@@ -316,6 +360,37 @@ app.get('/api/resellers', (req, res) => {
         method: 'GET',
         timestamp: new Date().toISOString()
     });
+});
+
+// Domain checker endpoint
+app.post('/api/check-domain', async (req, res) => {
+  try {
+    const { domain } = req.body;
+    
+    if (!domain || typeof domain !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Domain is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    const result = await checkDomainPropagation(domain);
+    
+    res.json({
+      ...result,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Error checking domain:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // POST endpoint for resellers data

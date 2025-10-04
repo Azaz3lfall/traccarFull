@@ -4,8 +4,8 @@
 // Use environment variable or default to the resellers server domain
 // In development, set VITE_RESELLERS_SERVER_URL=http://localhost:3333
 // In production, uses the separate resellers domain
-const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
-// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://localhost:3333';
+// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://localhost:3333';
 
 export default {
   RESELLERS_SERVER_URL,
@@ -18,6 +18,7 @@ export default {
     DELETE: `${RESELLERS_SERVER_URL}/api/resellers/delete`,
     UPLOAD: `${RESELLERS_SERVER_URL}/api/upload`,
     CHECK: `${RESELLERS_SERVER_URL}/api/reseller-check`,
+    CHECK_DOMAIN: `${RESELLERS_SERVER_URL}/api/check-domain`,
   }
 };
 

@@ -94,6 +94,9 @@ const FloatingResellersPopover = ({
   const [usersError, setUsersError] = useState(null);
   const [usersFetched, setUsersFetched] = useState(false);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [domainCheckResult, setDomainCheckResult] = useState(null);
+  const [isCheckingDomain, setIsCheckingDomain] = useState(false);
+  const [domainValid, setDomainValid] = useState(false);
 
   // Fetch resellers with TanStack Query
   const { data: resellersData, isLoading, error, refetch } = useQuery({
@@ -240,6 +243,58 @@ const FloatingResellersPopover = ({
   const cancelDelete = () => {
     setDeleteDialog(false);
     setResellerToDelete(null);
+  };
+
+  // Handle domain checking
+  const handleCheckDomain = async () => {
+    const domain = editingReseller?.appUrl || editingReseller?.url;
+    if (!domain || domain.trim() === '') {
+      setSnackbar({ open: true, message: 'Please enter a domain first', severity: 'error' });
+      return;
+    }
+
+    setIsCheckingDomain(true);
+    setDomainCheckResult(null);
+    setDomainValid(false);
+
+    try {
+      const response = await fetch(resellersConfig.ENDPOINTS.CHECK_DOMAIN, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ domain: domain.trim() }),
+      });
+
+      const result = await response.json();
+      setDomainCheckResult(result);
+
+      if (result.success) {
+        setDomainValid(true);
+        setSnackbar({ 
+          open: true, 
+          message: `✅ Domain is valid! Points to: ${result.ipAddress}`, 
+          severity: 'success' 
+        });
+      } else {
+        setDomainValid(false);
+        setSnackbar({ 
+          open: true, 
+          message: `❌ Domain check failed: ${result.message}`, 
+          severity: 'error' 
+        });
+      }
+    } catch (error) {
+      console.error('Error checking domain:', error);
+      setDomainValid(false);
+      setSnackbar({ 
+        open: true, 
+        message: 'Error checking domain. Please try again.', 
+        severity: 'error' 
+      });
+    } finally {
+      setIsCheckingDomain(false);
+    }
   };
 
   // Mutations
@@ -409,6 +464,8 @@ const FloatingResellersPopover = ({
     setSelectedImage(null);
     setImagePreview(null);
     setImageError('');
+    setDomainCheckResult(null);
+    setDomainValid(false);
   };
 
   // Handle image selection
@@ -1293,18 +1350,65 @@ const FloatingResellersPopover = ({
                                 <TextField
                                   fullWidth
                                   value={editingReseller.appUrl || editingReseller.url || ''}
-                                  onChange={(e) => setEditingReseller({ ...editingReseller, appUrl: e.target.value })}
+                                  onChange={(e) => {
+                                    setEditingReseller({ ...editingReseller, appUrl: e.target.value });
+                                    // Reset domain validation when URL changes
+                                    setDomainValid(false);
+                                    setDomainCheckResult(null);
+                                  }}
                                   label={t('resellerAppUrl')}
                                   required
                                   InputProps={{
-                                    readOnly: isEditMode
+                                    readOnly: isEditMode,
+                                    endAdornment: !isEditMode && (
+                                      <InputAdornment position="end">
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={handleCheckDomain}
+                                          disabled={isCheckingDomain || !editingReseller?.appUrl?.trim()}
+                                          sx={{
+                                            minWidth: 'auto',
+                                            px: 1,
+                                            py: 0.5,
+                                            fontSize: '0.75rem',
+                                            backgroundColor: domainValid ? colors.success : colors.secondary,
+                                            color: domainValid ? 'white' : colors.textPrimary,
+                                            borderColor: domainValid ? colors.success : colors.border,
+                                            '&:hover': {
+                                              backgroundColor: domainValid ? colors.success : colors.primary,
+                                              borderColor: domainValid ? colors.success : colors.primary,
+                                            },
+                                            '&:disabled': {
+                                              backgroundColor: colors.disabled,
+                                              color: colors.textDisabled,
+                                              borderColor: colors.border,
+                                            }
+                                          }}
+                                        >
+                                          {isCheckingDomain ? (
+                                            <CircularProgress size={16} />
+                                          ) : domainValid ? (
+                                            '✓'
+                                          ) : (
+                                            'CHECK'
+                                          )}
+                                        </Button>
+                                      </InputAdornment>
+                                    )
                                   }}
                                   sx={{
                                     '& .MuiOutlinedInputRoot': {
                                       backgroundColor: colors.secondary,
-                                      '& fieldset': { borderColor: colors.border },
-                                      '&:hover fieldset': { borderColor: colors.primary },
-                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                      '& fieldset': { 
+                                        borderColor: domainValid ? colors.success : colors.border 
+                                      },
+                                      '&:hover fieldset': { 
+                                        borderColor: domainValid ? colors.success : colors.primary 
+                                      },
+                                      '&.Mui-focused fieldset': { 
+                                        borderColor: domainValid ? colors.success : colors.primary 
+                                      },
                                     },
                                     '& .MuiInputLabelRoot': {
                                       color: colors.textSecondary,
@@ -1312,6 +1416,31 @@ const FloatingResellersPopover = ({
                                     },
                                   }}
                                 />
+                                {!isEditMode && (
+                                  <Typography 
+                                    variant="caption" 
+                                    sx={{ 
+                                      color: colors.textSecondary, 
+                                      fontSize: '0.75rem',
+                                      mt: 0.5,
+                                      fontStyle: 'italic'
+                                    }}
+                                  >
+                                    💡 Enter your domain and click "CHECK" to verify it's properly propagated before saving
+                                  </Typography>
+                                )}
+                                {domainCheckResult && (
+                                  <Alert 
+                                    severity={domainCheckResult.success ? 'success' : 'error'}
+                                    sx={{ mt: 1, fontSize: '0.875rem' }}
+                                  >
+                                    {domainCheckResult.success ? (
+                                      `✅ Domain is valid and points to: ${domainCheckResult.ipAddress}`
+                                    ) : (
+                                      `❌ ${domainCheckResult.message}`
+                                    )}
+                                  </Alert>
+                                )}
                               </div>
                             )}
 
@@ -1525,7 +1654,11 @@ const FloatingResellersPopover = ({
                         type="button"
                         variant="contained"
                         onClick={handleSaveReseller}
-                        disabled={createResellerMutation.isPending || updateResellerMutation.isPending}
+                        disabled={
+                          createResellerMutation.isPending || 
+                          updateResellerMutation.isPending ||
+                          (!isEditMode && !domainValid) // Only require domain validation for new resellers
+                        }
                         style={{
                           backgroundColor: colors.primary,
                           color: colors.text,
@@ -1540,6 +1673,20 @@ const FloatingResellersPopover = ({
                           t('sharedSave')
                         )}
                       </Button>
+                      {!isEditMode && !domainValid && (
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: colors.textSecondary, 
+                            fontSize: '0.75rem',
+                            mt: 1,
+                            textAlign: 'center',
+                            display: 'block'
+                          }}
+                        >
+                          ⚠️ Domain validation required for new resellers
+                        </Typography>
+                      )}
                     </div>
                   </motion.div>
                 </>
