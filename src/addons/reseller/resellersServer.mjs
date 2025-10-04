@@ -198,6 +198,59 @@ const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') =>
   }
 };
 
+// Helper function to disable nginx site
+const disableNginxSite = async (appUrl) => {
+  try {
+    const enabledPath = `/etc/nginx/sites-enabled/${appUrl}.conf`;
+    if (fs.existsSync(enabledPath)) {
+      await execAsync(`rm -f ${enabledPath}`);
+      console.log(`✅ Disabled nginx site: ${appUrl}`);
+    } else {
+      console.log(`ℹ️ Nginx site already disabled: ${appUrl}`);
+    }
+  } catch (error) {
+    console.error(`❌ Error disabling nginx site ${appUrl}:`, error);
+    throw error;
+  }
+};
+
+// Helper function to remove nginx configuration
+const removeNginxConfig = async (appUrl) => {
+  try {
+    const configPath = `/etc/nginx/sites-available/${appUrl}.conf`;
+    if (fs.existsSync(configPath)) {
+      await execAsync(`rm -f ${configPath}`);
+      console.log(`✅ Removed nginx configuration: ${appUrl}`);
+    } else {
+      console.log(`ℹ️ Nginx configuration already removed: ${appUrl}`);
+    }
+  } catch (error) {
+    console.error(`❌ Error removing nginx config ${appUrl}:`, error);
+    throw error;
+  }
+};
+
+// Helper function to cleanup nginx for deleted reseller
+const cleanupResellerNginx = async (appUrl) => {
+  try {
+    console.log(`🧹 Cleaning up nginx for deleted reseller: ${appUrl}`);
+
+    // Step 1: Disable the site
+    await disableNginxSite(appUrl);
+
+    // Step 2: Remove the configuration file
+    await removeNginxConfig(appUrl);
+
+    // Step 3: Reload nginx
+    await reloadNginx();
+
+    console.log(`✅ Nginx cleanup completed for ${appUrl}`);
+  } catch (error) {
+    console.error('❌ Error in nginx cleanup (non-blocking):', error.message);
+    // Don't throw - this is non-blocking
+  }
+};
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -828,7 +881,6 @@ app.post('/api/resellers/delete', async (req, res) => {
     const jsonFilePath = path.join(dataDir, resellerFile);
     fs.unlinkSync(jsonFilePath);
 
-
     // Delete associated image if it exists
     if (resellerData.logotype && resellerData.logotype.startsWith('images/')) {
       const imageFilename = resellerData.logotype.replace('images/', '');
@@ -836,18 +888,23 @@ app.post('/api/resellers/delete', async (req, res) => {
       
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
-
-      } else {
-
       }
     }
+
+    // Cleanup nginx configuration for the deleted reseller (non-blocking)
+    cleanupResellerNginx(appUrl);
 
     res.json({
       success: true,
       message: `Reseller '${resellerData.companyName}' deleted successfully`,
       deletedFiles: {
         json: resellerFile,
-        image: resellerData.logotype || 'none'
+        image: resellerData.logotype || 'none',
+        nginx: `${appUrl}.conf`
+      },
+      cleanup: {
+        nginx: 'Configuration removed and nginx reloaded',
+        domain: appUrl
       },
       timestamp: new Date().toISOString()
     });

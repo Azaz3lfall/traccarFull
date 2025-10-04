@@ -692,5 +692,13 @@
   "resellerCompany": "会社",
   "deviceImageSizeError": "画像サイズは{maxSize}より小さくする必要があります",
   "deviceImageTypeError": "画像ファイルのみ許可されています",
-  "deviceImageUploadError": "画像のアップロードでエラーが発生しました。もう一度お試しください。"
+  "deviceImageUploadError": "画像のアップロードでエラーが発生しました。もう一度お試しください。",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

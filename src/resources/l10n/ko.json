@@ -692,5 +692,13 @@
   "resellerCompany": "회사",
   "deviceImageSizeError": "이미지 크기는 {maxSize}보다 작아야 합니다",
   "deviceImageTypeError": "이미지 파일만 허용됩니다",
-  "deviceImageUploadError": "이미지 업로드 오류입니다. 다시 시도해 주세요."
+  "deviceImageUploadError": "이미지 업로드 오류입니다. 다시 시도해 주세요.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

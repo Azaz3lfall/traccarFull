@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "படத்தின் அளவு {maxSize} ஐ விட குறைவாக இருக்க வேண்டும்",
   "deviceImageTypeError": "பட கோப்புகள் மட்டுமே அனுமதிக்கப்படுகின்றன",
-  "deviceImageUploadError": "படத்தை பதிவேற்றுவதில் பிழை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
+  "deviceImageUploadError": "படத்தை பதிவேற்றுவதில் பிழை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

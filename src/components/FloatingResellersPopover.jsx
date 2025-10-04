@@ -250,7 +250,7 @@ const FloatingResellersPopover = ({
   const handleCheckDomain = async () => {
     const domain = editingReseller?.appUrl || editingReseller?.url;
     if (!domain || domain.trim() === '') {
-      setSnackbar({ open: true, message: 'Please enter a domain first', severity: 'error' });
+      setSnackbar({ open: true, message: t('domainCheckEmptyError'), severity: 'error' });
       return;
     }
 
@@ -274,14 +274,14 @@ const FloatingResellersPopover = ({
         setDomainValid(true);
         setSnackbar({ 
           open: true, 
-          message: `✅ Domain is valid! Points to: ${result.ipAddress}`, 
+          message: `✅ ${t('domainCheckSuccessTitle').replace('{ipAddress}', result.ipAddress)}`, 
           severity: 'success' 
         });
       } else {
         setDomainValid(false);
         setSnackbar({ 
           open: true, 
-          message: `❌ Domain check failed: ${result.message}`, 
+          message: `❌ ${t('domainCheckErrorTitle').replace('{message}', result.message)}`, 
           severity: 'error' 
         });
       }
@@ -290,7 +290,7 @@ const FloatingResellersPopover = ({
       setDomainValid(false);
       setSnackbar({ 
         open: true, 
-        message: 'Error checking domain. Please try again.', 
+        message: t('domainCheckNetworkError'), 
         severity: 'error' 
       });
     } finally {
@@ -1392,7 +1392,7 @@ const FloatingResellersPopover = ({
                                           ) : domainValid ? (
                                             <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'white' }} />
                                           ) : (
-                                            'CHECK'
+                                            t('domainCheckButton')
                                           )}
                                         </Button>
                                       </InputAdornment>
@@ -1427,7 +1427,7 @@ const FloatingResellersPopover = ({
                                       fontStyle: 'italic'
                                     }}
                                   >
-                                    💡 Enter your domain and click "CHECK" to verify it's properly propagated before saving
+                                    {t('domainCheckInstruction')}
                                   </Typography>
                                 )}
                                 {domainCheckResult && (
@@ -1436,9 +1436,9 @@ const FloatingResellersPopover = ({
                                     sx={{ mt: 1, fontSize: '0.875rem' }}
                                   >
                                     {domainCheckResult.success ? (
-                                      `✅ Domain is valid and points to: ${domainCheckResult.ipAddress}`
+                                      `✅ ${t('domainCheckSuccess').replace('{ipAddress}', domainCheckResult.ipAddress)}`
                                     ) : (
-                                      `❌ ${domainCheckResult.message}`
+                                      `❌ ${t('domainCheckError').replace('{message}', domainCheckResult.message)}`
                                     )}
                                   </Alert>
                                 )}

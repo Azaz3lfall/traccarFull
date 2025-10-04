@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "Bildestørrelse må være mindre enn {maxSize}",
   "deviceImageTypeError": "Kun bildefiler er tillatt",
-  "deviceImageUploadError": "Feil ved opplasting av bilde. Prøv igjen."
+  "deviceImageUploadError": "Feil ved opplasting av bilde. Prøv igjen.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

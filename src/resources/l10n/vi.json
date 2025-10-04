@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "Kích thước hình ảnh phải nhỏ hơn {maxSize}",
   "deviceImageTypeError": "Chỉ cho phép các tệp hình ảnh",
-  "deviceImageUploadError": "Lỗi khi tải lên hình ảnh. Vui lòng thử lại."
+  "deviceImageUploadError": "Lỗi khi tải lên hình ảnh. Vui lòng thử lại.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

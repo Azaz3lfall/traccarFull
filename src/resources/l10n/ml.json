@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "ചിത്രത്തിന്റെ വലിപ്പം {maxSize} ൽ കുറവായിരിക്കണം",
   "deviceImageTypeError": "ചിത്ര ഫയലുകൾ മാത്രമേ അനുവദനീയമാകൂ",
-  "deviceImageUploadError": "ചിത്രം അപ്‌ലോഡ് ചെയ്യുന്നതിൽ പിശക്. ദയവായി വീണ്ടും ശ്രമിക്കുക."
+  "deviceImageUploadError": "ചിത്രം അപ്‌ലോഡ് ചെയ്യുന്നതിൽ പിശക്. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

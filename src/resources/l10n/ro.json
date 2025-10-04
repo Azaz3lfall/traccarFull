@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "Dimensiunea imaginii trebuie să fie mai mică decât {maxSize}",
   "deviceImageTypeError": "Sunt permise doar fișiere imagine",
-  "deviceImageUploadError": "Eroare la încărcarea imaginii. Vă rugăm să încercați din nou."
+  "deviceImageUploadError": "Eroare la încărcarea imaginii. Vă rugăm să încercați din nou.",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

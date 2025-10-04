@@ -692,5 +692,13 @@
   "resellerCompany": "公司",
   "deviceImageSizeError": "图片大小必须小于 {maxSize}",
   "deviceImageTypeError": "只允许图片文件",
-  "deviceImageUploadError": "上传图片时出错。请重试。"
+  "deviceImageUploadError": "上传图片时出错。请重试。",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }

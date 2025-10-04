@@ -692,5 +692,13 @@
   "resellerCompany": "Company",
   "deviceImageSizeError": "ছবির আকার {maxSize} এর চেয়ে কম হতে হবে",
   "deviceImageTypeError": "শুধুমাত্র ছবির ফাইল অনুমোদিত",
-  "deviceImageUploadError": "ছবি আপলোডে ত্রুটি। দয়া করে আবার চেষ্টা করুন।"
+  "deviceImageUploadError": "ছবি আপলোডে ত্রুটি। দয়া করে আবার চেষ্টা করুন।",
+  "domainCheckButton": "CHECK",
+  "domainCheckInstruction": "💡 Enter your domain and click \"CHECK\" to verify it's properly propagated before saving",
+  "domainCheckSuccess": "Domain is valid and points to: {ipAddress}",
+  "domainCheckError": "Domain check failed: {message}",
+  "domainCheckNetworkError": "Error checking domain. Please try again.",
+  "domainCheckEmptyError": "Please enter a domain first",
+  "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
+  "domainCheckErrorTitle": "Domain check failed: {message}"
 }
