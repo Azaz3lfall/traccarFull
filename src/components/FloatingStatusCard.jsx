@@ -498,7 +498,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       const imageUrl = await response.text();
       
-      // Update device attributes with new image (like in device edit popover)
+      // Update device attributes with new image
       const updatedDeviceData = {
         ...device,
         attributes: {
@@ -507,7 +507,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         }
       };
       
-      // Update Redux store immediately
+      // Save the full device payload to the database
+      await fetchOrThrow(`/api/devices/${device.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedDeviceData),
+      });
+      
+      // Update Redux store
       dispatch(devicesActions.update([updatedDeviceData]));
       
       // Invalidate queries to refresh UI
