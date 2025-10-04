@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "ছবির আকার {maxSize} এর চেয়ে কম হতে হবে",
+  "deviceImageTypeError": "শুধুমাত্র ছবির ফাইল অনুমোদিত",
+  "deviceImageUploadError": "ছবি আপলোডে ত্রুটি। দয়া করে আবার চেষ্টা করুন।"
 }

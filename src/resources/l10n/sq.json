@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Madhësia e imazhit duhet të jetë më e vogël se {maxSize}",
+  "deviceImageTypeError": "Lejohen vetëm skedarë imazhi",
+  "deviceImageUploadError": "Gabim në ngarkimin e imazhit. Ju lutemi provoni përsëri."
 }

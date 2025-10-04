@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Зургийн хэмжээ {maxSize}-аас бага байх ёстой",
+  "deviceImageTypeError": "Зөвхөн зургийн файлууд зөвшөөрөгдөнө",
+  "deviceImageUploadError": "Зургийг байршуулахад алдаа гарлаа. Дахин оролдоно уу."
 }

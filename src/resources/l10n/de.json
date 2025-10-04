@@ -689,5 +689,8 @@
   "resellerCreateError": "Fehler beim Erstellen des Wiederverkäufers",
   "resellerUpdateError": "Fehler beim Aktualisieren des Wiederverkäufers",
   "resellerDeleteError": "Fehler beim Löschen des Wiederverkäufers",
-  "resellerCompany": "Unternehmen"
+  "resellerCompany": "Unternehmen",
+  "deviceImageSizeError": "Bildgröße muss kleiner als {maxSize} sein",
+  "deviceImageTypeError": "Nur Bilddateien sind erlaubt",
+  "deviceImageUploadError": "Fehler beim Hochladen des Bildes. Bitte versuchen Sie es erneut."
 }

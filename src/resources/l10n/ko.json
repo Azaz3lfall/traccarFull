@@ -689,5 +689,8 @@
   "resellerCreateError": "리셀러 생성 중 오류 발생",
   "resellerUpdateError": "리셀러 업데이트 중 오류 발생",
   "resellerDeleteError": "리셀러 삭제 중 오류 발생",
-  "resellerCompany": "회사"
+  "resellerCompany": "회사",
+  "deviceImageSizeError": "이미지 크기는 {maxSize}보다 작아야 합니다",
+  "deviceImageTypeError": "이미지 파일만 허용됩니다",
+  "deviceImageUploadError": "이미지 업로드 오류입니다. 다시 시도해 주세요."
 }

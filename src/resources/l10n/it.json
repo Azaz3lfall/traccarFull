@@ -689,5 +689,8 @@
   "resellerCreateError": "Errore nella creazione del rivenditore",
   "resellerUpdateError": "Errore nell'aggiornamento del rivenditore",
   "resellerDeleteError": "Errore nell'eliminazione del rivenditore",
-  "resellerCompany": "Azienda"
+  "resellerCompany": "Azienda",
+  "deviceImageSizeError": "La dimensione dell'immagine deve essere inferiore a {maxSize}",
+  "deviceImageTypeError": "Sono consentiti solo file immagine",
+  "deviceImageUploadError": "Errore nel caricamento dell'immagine. Riprova."
 }

@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Размерът на изображението трябва да бъде по-малък от {maxSize}",
+  "deviceImageTypeError": "Разрешени са само файлове с изображения",
+  "deviceImageUploadError": "Грешка при качване на изображение. Моля, опитайте отново."
 }

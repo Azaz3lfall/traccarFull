@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Paveikslėlio dydis turi būti mažesnis nei {maxSize}",
+  "deviceImageTypeError": "Leidžiami tik paveikslėlių failai",
+  "deviceImageUploadError": "Klaida įkeliant paveikslėlį. Bandykite dar kartą."
 }

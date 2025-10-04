@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "படத்தின் அளவு {maxSize} ஐ விட குறைவாக இருக்க வேண்டும்",
+  "deviceImageTypeError": "பட கோப்புகள் மட்டுமே அனுமதிக்கப்படுகின்றன",
+  "deviceImageUploadError": "படத்தை பதிவேற்றுவதில் பிழை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
 }

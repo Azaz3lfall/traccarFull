@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "O tamaño da imaxe debe ser menor que {maxSize}",
+  "deviceImageTypeError": "Só se permiten ficheiros de imaxe",
+  "deviceImageUploadError": "Erro ao subir a imaxe. Téntao de novo."
 }

@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Surat ölçegi {maxSize} dan kiçi bolmaly",
+  "deviceImageTypeError": "Diňe surat faýllaryna rugsat berilýär",
+  "deviceImageUploadError": "Surat ýüklemekde ýalňyşlyk. Gaýtadan synanyşyň."
 }

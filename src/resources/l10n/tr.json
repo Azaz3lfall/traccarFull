@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Resim boyutu {maxSize} değerinden küçük olmalıdır",
+  "deviceImageTypeError": "Sadece resim dosyalarına izin verilir",
+  "deviceImageUploadError": "Resim yüklenirken hata oluştu. Lütfen tekrar deneyin."
 }

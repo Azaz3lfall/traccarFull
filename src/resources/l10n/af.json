@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Beeldgrootte moet kleiner wees as {maxSize}",
+  "deviceImageTypeError": "Slegs beeldlêers word toegelaat",
+  "deviceImageUploadError": "Fout met oplaai van beeld. Probeer weer."
 }

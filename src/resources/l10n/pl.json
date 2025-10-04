@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Rozmiar obrazu musi być mniejszy niż {maxSize}",
+  "deviceImageTypeError": "Dozwolone są tylko pliki obrazów",
+  "deviceImageUploadError": "Błąd podczas przesyłania obrazu. Spróbuj ponownie."
 }

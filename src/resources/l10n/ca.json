@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "La mida de la imatge ha de ser menor que {maxSize}",
+  "deviceImageTypeError": "Només es permeten fitxers d'imatge",
+  "deviceImageUploadError": "Error en pujar la imatge. Torneu-ho a provar."
 }

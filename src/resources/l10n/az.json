@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Şəkil ölçüsü {maxSize} dən kiçik olmalıdır",
+  "deviceImageTypeError": "Yalnız şəkil fayllarına icazə verilir",
+  "deviceImageUploadError": "Şəkli yükləməkdə xəta. Zəhmət olmasa yenidən cəhd edin."
 }

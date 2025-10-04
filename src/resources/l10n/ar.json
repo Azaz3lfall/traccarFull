@@ -689,5 +689,8 @@
   "resellerCreateError": "خطأ في إنشاء الموزع",
   "resellerUpdateError": "خطأ في تحديث الموزع",
   "resellerDeleteError": "خطأ في حذف الموزع",
-  "resellerCompany": "الشركة"
+  "resellerCompany": "الشركة",
+  "deviceImageSizeError": "يجب أن يكون حجم الصورة أقل من {maxSize}",
+  "deviceImageTypeError": "يُسمح فقط بملفات الصور",
+  "deviceImageUploadError": "خطأ في رفع الصورة. يرجى المحاولة مرة أخرى."
 }

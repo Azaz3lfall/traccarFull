@@ -17,6 +17,7 @@ import { useAttributePreference, usePreference } from '../common/util/preference
 import { useDeviceReadonly } from '../common/util/permissions';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { useCatch } from '../reactHelper';
 import {
   formatPercentage,
   formatSpeed,
@@ -470,14 +471,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [selectedDeviceId, device]);
 
   // Device image upload handler
-  const handleImageUpload = useCallback(async (event) => {
+  const handleImageUpload = useCatch(async (event) => {
     const file = event.target.files[0];
     if (!file || !device?.id) return;
 
     // Check file size (120KB = 120 * 1024 bytes)
     const maxSize = 120 * 1024;
     if (file.size > maxSize) {
-      alert(t('deviceImageSizeError', { maxSize: '120KB' }));
+      alert(t('deviceImageSizeError').replace('{maxSize}', '120KB'));
       return;
     }
 
@@ -489,7 +490,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
     setIsUploadingImage(true);
     try {
-      // First, upload the image to get the image URL
+      // Upload the image to get the image URL
       const response = await fetchOrThrow(`/api/devices/${device.id}/image`, {
         method: 'POST',
         body: file,
@@ -497,27 +498,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       const imageUrl = await response.text();
       
-      // Load current device data with attributes
-      const deviceResponse = await fetchOrThrow(`/api/devices/${device.id}`);
-      const deviceData = await deviceResponse.json();
-      
-      // Update device attributes with new image
+      // Update device attributes with new image (like in device edit popover)
       const updatedDeviceData = {
-        ...deviceData,
+        ...device,
         attributes: {
-          ...deviceData.attributes,
+          ...device.attributes,
           deviceImage: imageUrl
         }
       };
       
-      // Save the updated device data
-      await fetchOrThrow(`/api/devices/${device.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedDeviceData),
-      });
-      
-      // Update Redux store
+      // Update Redux store immediately
       dispatch(devicesActions.update([updatedDeviceData]));
       
       // Invalidate queries to refresh UI
@@ -530,7 +520,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Reset file input
       event.target.value = '';
     }
-  }, [device?.id, t, dispatch, queryClient]);
+  });
 
   // Clear replay positions when device selection changes
   useEffect(() => {

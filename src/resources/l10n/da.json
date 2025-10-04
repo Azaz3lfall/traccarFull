@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Billedstørrelse skal være mindre end {maxSize}",
+  "deviceImageTypeError": "Kun billedfiler er tilladt",
+  "deviceImageUploadError": "Fejl ved upload af billede. Prøv igen."
 }

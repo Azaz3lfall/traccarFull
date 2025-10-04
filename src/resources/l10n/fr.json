@@ -689,5 +689,8 @@
   "resellerDeleteError": "Erreur lors de la suppression du revendeur",
   "calendarAddPeriod": "Ajouter une période",
   "calendarPeriod": "Période",
-  "resellerCompany": "Entreprise"
+  "resellerCompany": "Entreprise",
+  "deviceImageSizeError": "La taille de l'image doit être inférieure à {maxSize}",
+  "deviceImageTypeError": "Seuls les fichiers image sont autorisés",
+  "deviceImageUploadError": "Erreur lors du téléchargement de l'image. Veuillez réessayer."
 }

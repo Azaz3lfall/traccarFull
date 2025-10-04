@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Суреттің мөлшері {maxSize} кіші болуы керек",
+  "deviceImageTypeError": "Тек сурет файлдары рұқсат етіледі",
+  "deviceImageUploadError": "Суретті жүктеуде қате. Қайталап көріңіз."
 }

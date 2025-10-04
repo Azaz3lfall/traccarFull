@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "छविको आकार {maxSize} भन्दा सानो हुनुपर्छ",
+  "deviceImageTypeError": "केवल छवि फाइलहरू अनुमतित छन्",
+  "deviceImageUploadError": "छवि अपलोड गर्दा त्रुटि। कृपया फेरि प्रयास गर्नुहोस्।"
 }

@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "גודל התמונה חייב להיות קטן מ-{maxSize}",
+  "deviceImageTypeError": "רק קבצי תמונה מותרים",
+  "deviceImageUploadError": "שגיאה בהעלאת התמונה. אנא נסה שוב."
 }

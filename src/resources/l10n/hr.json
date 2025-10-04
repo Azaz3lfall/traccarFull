@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Veličina slike mora biti manja od {maxSize}",
+  "deviceImageTypeError": "Dozvoljene su samo slikovne datoteke",
+  "deviceImageUploadError": "Greška pri učitavanju slike. Molimo pokušajte ponovno."
 }

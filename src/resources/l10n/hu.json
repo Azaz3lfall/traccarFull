@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "A kép mérete kisebb kell legyen, mint {maxSize}",
+  "deviceImageTypeError": "Csak képfájlok engedélyezettek",
+  "deviceImageUploadError": "Hiba a kép feltöltésekor. Kérjük, próbálja újra."
 }

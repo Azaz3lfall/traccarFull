@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Saiz imej mestilah kurang daripada {maxSize}",
+  "deviceImageTypeError": "Hanya fail imej dibenarkan",
+  "deviceImageUploadError": "Ralat memuat naik imej. Sila cuba lagi."
 }

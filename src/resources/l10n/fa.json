@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "اندازه تصویر باید کمتر از {maxSize} باشد",
+  "deviceImageTypeError": "فقط فایل‌های تصویری مجاز هستند",
+  "deviceImageUploadError": "خطا در آپلود تصویر. لطفاً دوباره تلاش کنید."
 }

@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "ទំហំរូបភាពត្រូវតែតូចជាង {maxSize}",
+  "deviceImageTypeError": "អនុញ្ញាតតែឯកសាររូបភាពប៉ុណ្ណោះ",
+  "deviceImageUploadError": "កំហុសក្នុងការផ្ទុករូបភាព។ សូមព្យាយាមម្តងទៀត។"
 }

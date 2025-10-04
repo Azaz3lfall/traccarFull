@@ -689,5 +689,8 @@
   "resellerCreateError": "Ошибка создания реселлера",
   "resellerUpdateError": "Ошибка обновления реселлера",
   "resellerDeleteError": "Ошибка удаления реселлера",
-  "resellerCompany": "Компания"
+  "resellerCompany": "Компания",
+  "deviceImageSizeError": "Размер изображения должен быть меньше {maxSize}",
+  "deviceImageTypeError": "Разрешены только файлы изображений",
+  "deviceImageUploadError": "Ошибка загрузки изображения. Попробуйте снова."
 }

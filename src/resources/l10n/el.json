@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Το μέγεθος της εικόνας πρέπει να είναι μικρότερο από {maxSize}",
+  "deviceImageTypeError": "Επιτρέπονται μόνο αρχεία εικόνων",
+  "deviceImageUploadError": "Σφάλμα κατά την ανέβασμα της εικόνας. Παρακαλώ δοκιμάστε ξανά."
 }

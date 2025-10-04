@@ -689,5 +689,8 @@
   "calendarPeriod": "Period",
   "calendarPeriod1": "Period 1",
   "calendarPeriod2": "Period 2",
-  "calendarAddPeriod": "Add Period"
+  "calendarAddPeriod": "Add Period",
+  "deviceImageSizeError": "Image size must be less than {maxSize}",
+  "deviceImageTypeError": "Only image files are allowed",
+  "deviceImageUploadError": "Error uploading image. Please try again."
 }

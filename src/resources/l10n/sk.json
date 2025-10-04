@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Veľkosť obrázka musí byť menšia ako {maxSize}",
+  "deviceImageTypeError": "Povolené sú len súbory obrázkov",
+  "deviceImageUploadError": "Chyba pri nahrávaní obrázka. Skúste to znovu."
 }

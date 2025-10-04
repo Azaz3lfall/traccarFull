@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Պատկերի չափը պետք է լինի {maxSize}-ից փոքր",
+  "deviceImageTypeError": "Թույլատրվում են միայն պատկերի ֆայլեր",
+  "deviceImageUploadError": "Պատկերը բեռնելիս սխալ: Խնդրում ենք կրկին փորձել:"
 }

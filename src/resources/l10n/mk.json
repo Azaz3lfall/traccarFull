@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Големината на сликата мора да биде помала од {maxSize}",
+  "deviceImageTypeError": "Дозволени се само сликовни датотеки",
+  "deviceImageUploadError": "Грешка при прикачување на слика. Обидете се повторно."
 }

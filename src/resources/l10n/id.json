@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Ukuran gambar harus lebih kecil dari {maxSize}",
+  "deviceImageTypeError": "Hanya file gambar yang diizinkan",
+  "deviceImageUploadError": "Kesalahan mengunggah gambar. Silakan coba lagi."
 }

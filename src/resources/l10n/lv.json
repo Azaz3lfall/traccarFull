@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Attēla izmēram jābūt mazākam par {maxSize}",
+  "deviceImageTypeError": "Atļauti tikai attēlu faili",
+  "deviceImageUploadError": "Kļūda augšupielādējot attēlu. Lūdzu, mēģiniet vēlreiz."
 }

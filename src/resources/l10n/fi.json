@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Kuvan koko on oltava pienempi kuin {maxSize}",
+  "deviceImageTypeError": "Vain kuvatiedostot ovat sallittuja",
+  "deviceImageUploadError": "Virhe kuvan lataamisessa. Yritä uudelleen."
 }

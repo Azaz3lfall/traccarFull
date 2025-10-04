@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Ukubwa wa picha lazima uwe mdogo kuliko {maxSize}",
+  "deviceImageTypeError": "Faili za picha pekee zinaruhusiwa",
+  "deviceImageUploadError": "Hitilafu katika kupakia picha. Tafadhali jaribu tena."
 }

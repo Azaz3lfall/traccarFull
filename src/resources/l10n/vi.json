@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Kích thước hình ảnh phải nhỏ hơn {maxSize}",
+  "deviceImageTypeError": "Chỉ cho phép các tệp hình ảnh",
+  "deviceImageUploadError": "Lỗi khi tải lên hình ảnh. Vui lòng thử lại."
 }

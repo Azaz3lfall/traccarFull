@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Dimensiunea imaginii trebuie să fie mai mică decât {maxSize}",
+  "deviceImageTypeError": "Sunt permise doar fișiere imagine",
+  "deviceImageUploadError": "Eroare la încărcarea imaginii. Vă rugăm să încercați din nou."
 }

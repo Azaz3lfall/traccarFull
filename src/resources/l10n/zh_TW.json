@@ -689,5 +689,8 @@
   "resellerCreateError": "创建经销商时出错",
   "resellerUpdateError": "更新经销商时出错",
   "resellerDeleteError": "删除经销商时出错",
-  "resellerCompany": "公司"
+  "resellerCompany": "公司",
+  "deviceImageSizeError": "圖片大小必須小於 {maxSize}",
+  "deviceImageTypeError": "只允許圖片檔案",
+  "deviceImageUploadError": "上傳圖片時發生錯誤。請重試。"
 }

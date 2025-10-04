@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "Afbeeldingsgrootte moet kleiner zijn dan {maxSize}",
+  "deviceImageTypeError": "Alleen afbeeldingsbestanden zijn toegestaan",
+  "deviceImageUploadError": "Fout bij het uploaden van de afbeelding. Probeer opnieuw."
 }

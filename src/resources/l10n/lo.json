@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "ຂະໜາດຮູບພາບຕ້ອງນ້ອຍກວ່າ {maxSize}",
+  "deviceImageTypeError": "ອະນຸຍາດໃຫ້ແຕ່ໄຟລ໌ຮູບພາບເທົ່ານັ້ນ",
+  "deviceImageUploadError": "ຂໍ້ຜິດພາດໃນການອັບໂລດຮູບພາບ. ກະລຸນາລອງໃໝ່."
 }

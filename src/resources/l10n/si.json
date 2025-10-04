@@ -689,5 +689,8 @@
   "resellerCreateError": "Error creating reseller",
   "resellerUpdateError": "Error updating reseller",
   "resellerDeleteError": "Error deleting reseller",
-  "resellerCompany": "Company"
+  "resellerCompany": "Company",
+  "deviceImageSizeError": "රූපයේ ප්‍රමාණය {maxSize} ට වඩා කුඩා විය යුතුය",
+  "deviceImageTypeError": "රූප ගොනු පමණක් අවසර ඇත",
+  "deviceImageUploadError": "රූපය උඩුගත කිරීමේ දෝෂයකි. කරුණාකර නැවත උත්සාහ කරන්න."
 }
