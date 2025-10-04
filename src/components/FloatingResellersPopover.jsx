@@ -1673,20 +1673,6 @@ const FloatingResellersPopover = ({
                           t('sharedSave')
                         )}
                       </Button>
-                      {!isEditMode && !domainValid && (
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
-                            color: colors.textSecondary, 
-                            fontSize: '0.75rem',
-                            mt: 1,
-                            textAlign: 'center',
-                            display: 'block'
-                          }}
-                        >
-                          ⚠️ Domain validation required for new resellers
-                        </Typography>
-                      )}
                     </div>
                   </motion.div>
                 </>
