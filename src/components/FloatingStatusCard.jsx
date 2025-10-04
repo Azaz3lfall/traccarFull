@@ -484,6 +484,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleImageUpload = useCatch(async (event) => {
     const file = event.target.files[0];
     if (!file || !device?.id) return;
+    
+    // Reset file input value to allow same file selection again
+    event.target.value = '';
 
     // Check file size (120KB = 120 * 1024 bytes)
     const maxSize = 120 * 1024;
@@ -534,8 +537,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       showSnackbar(t('deviceImageUploadError'), 'error');
     } finally {
       setIsUploadingImage(false);
-      // Reset file input
-      event.target.value = '';
     }
   });
 
