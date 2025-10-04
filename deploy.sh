@@ -13,14 +13,12 @@ ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "mv /opt/traccar
 ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "ls /opt/traccar/web"
 
 # Install dependencies and manage resellersServer with PM2
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "source ~/.nvm/nvm.sh && nvm install v22.14.0"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "source ~/.nvm/nvm.sh && nvm use v22.14.0"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "source ~/.nvm/nvm.sh && cd /opt/traccar/web/addons/reseller && yarn"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 stop resellersServer || true"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 delete resellersServer || true"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "cd /opt/traccar/web/addons/reseller && pm2 start /opt/traccar/web/addons/reseller/resellersServer.mjs --name resellersServer"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 save"
-ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 startup"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "source ~/.nvm/nvm.sh && nvm install v22.14.0 && nvm use v22.14.0 && cd /opt/traccar/web/addons/reseller && npm install"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 stop resellersServer || true"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 delete resellersServer || true"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "source ~/.nvm/nvm.sh && nvm use v22.14.0 && cd /opt/traccar/web/addons/reseller && pm2 start /opt/traccar/web/addons/reseller/resellersServer.mjs --name resellersServer"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 save"
+# ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "pm2 startup"
 
 ssh -i /Users/codeartisan/github_vps_key root@codeartisan.cloud "systemctl restart traccar"
 
