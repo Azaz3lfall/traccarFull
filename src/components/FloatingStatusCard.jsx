@@ -4,6 +4,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
+import { Snackbar, Alert } from '@mui/material';
 import {
   devicesActions,
   geofencesActions,
@@ -88,6 +89,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [showLockOpenConfirmation, setShowLockOpenConfirmation] = useState(false);
   const [showLockClosedConfirmation, setShowLockClosedConfirmation] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  
+  const showSnackbar = (message, severity = 'error') => {
+    setSnackbar({ open: true, message, severity });
+  };
+  
+  const hideSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
@@ -478,13 +488,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Check file size (120KB = 120 * 1024 bytes)
     const maxSize = 120 * 1024;
     if (file.size > maxSize) {
-      alert(t('deviceImageSizeError').replace('{maxSize}', '120KB'));
+      showSnackbar(t('deviceImageSizeError').replace('{maxSize}', '120KB'), 'error');
       return;
     }
 
     // Check file type
     if (!file.type.startsWith('image/')) {
-      alert(t('deviceImageTypeError'));
+      showSnackbar(t('deviceImageTypeError'), 'error');
       return;
     }
 
@@ -521,7 +531,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       queryClient.invalidateQueries(['devices']);
       } catch (error) {
       console.error('Error uploading device image:', error);
-      alert(t('deviceImageUploadError'));
+      showSnackbar(t('deviceImageUploadError'), 'error');
     } finally {
       setIsUploadingImage(false);
       // Reset file input
@@ -3085,6 +3095,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         </motion.div>
       )}
     </AnimatePresence>
+    
+    {/* Snackbar for notifications */}
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={hideSnackbar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+    >
+      <Alert
+        onClose={hideSnackbar}
+        severity={snackbar.severity}
+        sx={{ width: '100%' }}
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
     </>
   );
 };
