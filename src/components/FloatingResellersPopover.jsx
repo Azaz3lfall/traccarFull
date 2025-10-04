@@ -737,11 +737,9 @@ const FloatingResellersPopover = ({
                       </TableRow>
                     ) : (
                       <>
-                        {paginatedResellers.map((reseller, index) => {
-                          const uniqueKey = reseller.resellerId || reseller.id || `reseller-${index}`;
-                          return (
+                        {paginatedResellers.map((reseller, index) => (
                           <TableRow
-                            key={uniqueKey}
+                            key={`reseller-${index}`}
                             style={{
                               backgroundColor: index % 2 === 0 ? 'transparent' : colors.secondary,
                               cursor: 'pointer',
@@ -809,8 +807,7 @@ const FloatingResellersPopover = ({
                               </IconButton>
                             </TableCell>
                           </TableRow>
-                          );
-                        })}
+                        ))}
                       </>
                     )}
                   </TableBody>
