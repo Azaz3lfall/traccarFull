@@ -8,6 +8,8 @@ import fs from 'fs';
 import multer from 'multer';
 import crypto from 'crypto';
 import { glob } from 'glob';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +30,128 @@ const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => 
   const timestamp = Date.now().toString();
   const hash = crypto.createHash('md5').update(timestamp).digest('hex').substring(0, 8);
   return `${appUrl}_${parentUserId}_${resellerId}_${hash}.${extension}`;
+};
+
+// Promisify exec for async/await usage
+const execAsync = promisify(exec);
+
+// Helper function to create nginx configuration
+const createNginxConfig = async (appUrl) => {
+  try {
+    const nginxConfig = `server {
+  server_name ${appUrl};
+
+  location / {
+    proxy_pass http://127.0.0.1:8082;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_cache_bypass $http_upgrade;
+  }
+}`;
+
+    // Create nginx sites-available directory if it doesn't exist
+    const sitesAvailableDir = '/etc/nginx/sites-available';
+    if (!fs.existsSync(sitesAvailableDir)) {
+      fs.mkdirSync(sitesAvailableDir, { recursive: true });
+    }
+
+    // Write nginx configuration file
+    const configPath = `${sitesAvailableDir}/${appUrl}.conf`;
+    fs.writeFileSync(configPath, nginxConfig);
+    console.log(`✅ Created nginx config: ${configPath}`);
+
+    return configPath;
+  } catch (error) {
+    console.error('❌ Error creating nginx config:', error);
+    throw error;
+  }
+};
+
+// Helper function to enable nginx site
+const enableNginxSite = async (appUrl) => {
+  try {
+    const sitesEnabledDir = '/etc/nginx/sites-enabled';
+    const configPath = `/etc/nginx/sites-available/${appUrl}.conf`;
+    const symlinkPath = `${sitesEnabledDir}/${appUrl}.conf`;
+
+    // Create sites-enabled directory if it doesn't exist
+    if (!fs.existsSync(sitesEnabledDir)) {
+      fs.mkdirSync(sitesEnabledDir, { recursive: true });
+    }
+
+    // Create symbolic link
+    if (fs.existsSync(symlinkPath)) {
+      fs.unlinkSync(symlinkPath); // Remove existing symlink
+    }
+    fs.symlinkSync(configPath, symlinkPath);
+    console.log(`✅ Enabled nginx site: ${symlinkPath}`);
+
+    return symlinkPath;
+  } catch (error) {
+    console.error('❌ Error enabling nginx site:', error);
+    throw error;
+  }
+};
+
+// Helper function to reload nginx
+const reloadNginx = async () => {
+  try {
+    await execAsync('service nginx reload');
+    console.log('✅ Nginx reloaded successfully');
+  } catch (error) {
+    console.error('❌ Error reloading nginx:', error);
+    throw error;
+  }
+};
+
+// Helper function to setup SSL with certbot
+const setupSSL = async (appUrl, email = 'admin@example.com') => {
+  try {
+    // Run certbot with non-interactive flags
+    const certbotCommand = `certbot --nginx -d ${appUrl} --non-interactive --agree-tos --email ${email} --redirect`;
+    await execAsync(certbotCommand);
+    console.log(`✅ SSL certificate created for ${appUrl}`);
+    
+    // Reload nginx after SSL setup
+    await reloadNginx();
+    console.log('✅ Nginx reloaded after SSL setup');
+  } catch (error) {
+    console.error('❌ Error setting up SSL:', error);
+    throw error;
+  }
+};
+
+// Main function to setup nginx and SSL for a reseller
+const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') => {
+  try {
+    console.log(`🚀 Setting up nginx for reseller: ${appUrl}`);
+    
+    // Step 1: Create nginx configuration
+    await createNginxConfig(appUrl);
+    
+    // Step 2: Enable the site
+    await enableNginxSite(appUrl);
+    
+    // Step 3: Reload nginx
+    await reloadNginx();
+    
+    // Step 4: Setup SSL (with error handling - don't break if SSL fails)
+    try {
+      await setupSSL(appUrl, billingEmail);
+    } catch (sslError) {
+      console.error('⚠️ SSL setup failed (non-blocking):', sslError.message);
+    }
+    
+    console.log(`✅ Nginx setup completed for ${appUrl}`);
+  } catch (error) {
+    console.error('❌ Error in nginx setup (non-blocking):', error.message);
+    // Don't throw - this is non-blocking
+  }
 };
 
 // Configure multer for file uploads
@@ -435,6 +559,8 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       // Write JSON file
       fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
       
+      // Setup nginx configuration and SSL (non-blocking)
+      setupResellerNginx(body.appUrl, body.billingEmail || 'admin@example.com');
       
     } catch (fileError) {
       console.error('❌ Error saving reseller file:', fileError);
@@ -547,6 +673,10 @@ app.put('/api/resellers/:id', async (req, res) => {
         // Write JSON file
         fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
         
+        // Setup nginx configuration and SSL if appUrl was updated (non-blocking)
+        if (body.appUrl && body.appUrl.trim() !== '' && body.appUrl !== existingReseller.appUrl) {
+          setupResellerNginx(body.appUrl, body.billingEmail || existingReseller.billingEmail || 'admin@example.com');
+        }
 
         res.json({
             success: true,
