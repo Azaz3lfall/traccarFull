@@ -45,6 +45,7 @@ import {
   Phone as PhoneIcon,
   Web as WebIcon,
   CheckCircle as CheckIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
   Block as BlockIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
@@ -1389,7 +1390,7 @@ const FloatingResellersPopover = ({
                                           {isCheckingDomain ? (
                                             <CircularProgress size={16} />
                                           ) : domainValid ? (
-                                            '✓'
+                                            <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'white' }} />
                                           ) : (
                                             'CHECK'
                                           )}
