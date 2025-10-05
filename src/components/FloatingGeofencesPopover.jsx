@@ -988,15 +988,16 @@ const FloatingGeofencesPopover = ({
       // Convert language code to Mapbox format (e.g., 'pt_BR' -> 'pt', 'en_US' -> 'en')
       const mapboxLanguage = language.split('_')[0];
       
-      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true&language=${mapboxLanguage}`;
+      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true&language=${mapboxLanguage}&alternatives=true`;
       
       console.log('Fetching route from Mapbox...', request);
       
       const response = await fetch(request);
       const data = await response.json();
       
-             console.log('Mapbox Route Response:', data);
-             setRouteData(data);
+      console.log('Mapbox Route Response:', data);
+      console.log('Number of routes returned:', data.routes ? data.routes.length : 0);
+      setRouteData(data);
              
              // Switch to Route Plan tab after successful route generation
              setRoutePlannerTab(1);
