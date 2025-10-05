@@ -2297,7 +2297,8 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          return costSettings.tollCost.toFixed(2);
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          return (costSettings.tollCost * multiplier).toFixed(2);
                                         })()}
                                       </Typography>
                                     </div>
