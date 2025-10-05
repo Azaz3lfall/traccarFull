@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "检查域名时出错。请重试。",
   "domainCheckEmptyError": "请先输入域名",
   "domainCheckSuccessTitle": "域名有效！指向: {ipAddress}",
-  "domainCheckErrorTitle": "域名检查失败: {message}"
+  "domainCheckErrorTitle": "域名检查失败: {message}",
+  "routePlanner": "Route Planner",
+  "routePlannerBasic": "Basic",
+  "routePlannerEnterStartAddress": "Enter start address...",
+  "routePlannerEnterAddress": "Enter address",
+  "routePlannerEnterEndAddress": "Enter end address...",
+  "routePlannerAddAddress": "Add Address",
+  "routePlannerWaypoints": "Waypoints",
+  "routePlannerRoutePlan": "Route Plan",
+  "routePlannerDistance": "Distance",
+  "routePlannerDuration": "Duration",
+  "routePlannerSteps": "steps",
+  "routePlannerStep": "Step",
+  "routePlannerPlanningRoute": "Planning route...",
+  "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
+  "routePlannerClickToPlan": "Click to plan route",
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
 }

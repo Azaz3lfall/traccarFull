@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "Fout bij het controleren van het domein. Probeer opnieuw.",
   "domainCheckEmptyError": "Voer eerst een domein in",
   "domainCheckSuccessTitle": "Domein is geldig! Wijst naar: {ipAddress}",
-  "domainCheckErrorTitle": "Domeincontrole mislukt: {message}"
+  "domainCheckErrorTitle": "Domeincontrole mislukt: {message}",
+  "routePlanner": "Route Planner",
+  "routePlannerBasic": "Basic",
+  "routePlannerEnterStartAddress": "Enter start address...",
+  "routePlannerEnterAddress": "Enter address",
+  "routePlannerEnterEndAddress": "Enter end address...",
+  "routePlannerAddAddress": "Add Address",
+  "routePlannerWaypoints": "Waypoints",
+  "routePlannerRoutePlan": "Route Plan",
+  "routePlannerDistance": "Distance",
+  "routePlannerDuration": "Duration",
+  "routePlannerSteps": "steps",
+  "routePlannerStep": "Step",
+  "routePlannerPlanningRoute": "Planning route...",
+  "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
+  "routePlannerClickToPlan": "Click to plan route",
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
 }

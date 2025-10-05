@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Marşrut Planlayıcı",
+  "routePlannerBasic": "Əsas",
+  "routePlannerEnterStartAddress": "Başlanğıc ünvanını daxil edin...",
+  "routePlannerEnterAddress": "Ünvanı daxil edin",
+  "routePlannerEnterEndAddress": "Təyinat ünvanını daxil edin...",
+  "routePlannerAddAddress": "Ünvan Əlavə Et",
+  "routePlannerWaypoints": "Dayanacaq Nöqtələri",
+  "routePlannerRoutePlan": "Marşrut Planı",
+  "routePlannerDistance": "Məsafə",
+  "routePlannerDuration": "Müddət",
+  "routePlannerSteps": "addımlar",
+  "routePlannerStep": "Addım",
+  "routePlannerPlanningRoute": "Marşrut planlanır...",
+  "routePlannerSelectAddresses": "Marşrut planlamaq üçün ən azı 2 ünvan seçin",
+  "routePlannerClickToPlan": "Planlamaq üçün klikləyin",
+  "routePlannerNotEnoughWaypoints": "Marşrut planlamaq üçün kifayət qədər dayanacaq nöqtəsi yoxdur"
 }

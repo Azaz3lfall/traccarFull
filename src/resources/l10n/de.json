@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "Fehler beim Überprüfen der Domain. Bitte versuchen Sie es erneut.",
   "domainCheckEmptyError": "Bitte geben Sie zuerst eine Domain ein",
   "domainCheckSuccessTitle": "Domain ist gültig! Zeigt auf: {ipAddress}",
-  "domainCheckErrorTitle": "Domain-Prüfung fehlgeschlagen: {message}"
+  "domainCheckErrorTitle": "Domain-Prüfung fehlgeschlagen: {message}",
+  "routePlanner": "Routenplaner",
+  "routePlannerBasic": "Grundlegend",
+  "routePlannerEnterStartAddress": "Startadresse eingeben...",
+  "routePlannerEnterAddress": "Adresse eingeben",
+  "routePlannerEnterEndAddress": "Zieladresse eingeben...",
+  "routePlannerAddAddress": "Adresse Hinzufügen",
+  "routePlannerWaypoints": "Zwischenstopps",
+  "routePlannerRoutePlan": "Routenplan",
+  "routePlannerDistance": "Entfernung",
+  "routePlannerDuration": "Dauer",
+  "routePlannerSteps": "Schritte",
+  "routePlannerStep": "Schritt",
+  "routePlannerPlanningRoute": "Route wird geplant...",
+  "routePlannerSelectAddresses": "Bitte wählen Sie mindestens 2 Adressen für die Routenplanung",
+  "routePlannerClickToPlan": "Klicken Sie zum Planen der Route",
+  "routePlannerNotEnoughWaypoints": "Nicht genügend Zwischenstopps für Routenplanung"
 }

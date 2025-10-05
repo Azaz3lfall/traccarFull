@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Roete Beplanner",
+  "routePlannerBasic": "Basies",
+  "routePlannerEnterStartAddress": "Voer begin adres in...",
+  "routePlannerEnterAddress": "Voer adres in",
+  "routePlannerEnterEndAddress": "Voer eind adres in...",
+  "routePlannerAddAddress": "Voeg Adres By",
+  "routePlannerWaypoints": "Wegpunte",
+  "routePlannerRoutePlan": "Roete Plan",
+  "routePlannerDistance": "Afstand",
+  "routePlannerDuration": "Duur",
+  "routePlannerSteps": "stappe",
+  "routePlannerStep": "Stap",
+  "routePlannerPlanningRoute": "Beplan roete...",
+  "routePlannerSelectAddresses": "Kies asseblief ten minste 2 adresse om 'n roete te beplan",
+  "routePlannerClickToPlan": "Klik om roete te beplan",
+  "routePlannerNotEnoughWaypoints": "Nie genoeg wegpunte vir roete beplanning nie"
 }

@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Ruteplanlægger",
+  "routePlannerBasic": "Grundlæggende",
+  "routePlannerEnterStartAddress": "Indtast startadresse...",
+  "routePlannerEnterAddress": "Indtast adresse",
+  "routePlannerEnterEndAddress": "Indtast destinationsadresse...",
+  "routePlannerAddAddress": "Tilføj Adresse",
+  "routePlannerWaypoints": "Mellemstoppe",
+  "routePlannerRoutePlan": "Ruteplan",
+  "routePlannerDistance": "Afstand",
+  "routePlannerDuration": "Varighed",
+  "routePlannerSteps": "trin",
+  "routePlannerStep": "Trin",
+  "routePlannerPlanningRoute": "Planlægger rute...",
+  "routePlannerSelectAddresses": "Vælg venligst mindst 2 adresser for at planlægge en rute",
+  "routePlannerClickToPlan": "Klik for at planlægge rute",
+  "routePlannerNotEnoughWaypoints": "Ikke nok mellemstoppe til ruteplanlægning"
 }

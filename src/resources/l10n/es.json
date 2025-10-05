@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "Error al verificar el dominio. Inténtelo de nuevo.",
   "domainCheckEmptyError": "Ingrese un dominio primero",
   "domainCheckSuccessTitle": "¡El dominio es válido! Apunta a: {ipAddress}",
-  "domainCheckErrorTitle": "Error en la verificación del dominio: {message}"
+  "domainCheckErrorTitle": "Error en la verificación del dominio: {message}",
+  "routePlanner": "Planificador de Rutas",
+  "routePlannerBasic": "Básico",
+  "routePlannerEnterStartAddress": "Ingrese la dirección de inicio...",
+  "routePlannerEnterAddress": "Ingrese la dirección",
+  "routePlannerEnterEndAddress": "Ingrese la dirección de destino...",
+  "routePlannerAddAddress": "Agregar Dirección",
+  "routePlannerWaypoints": "Puntos de Parada",
+  "routePlannerRoutePlan": "Plan de Ruta",
+  "routePlannerDistance": "Distancia",
+  "routePlannerDuration": "Duración",
+  "routePlannerSteps": "pasos",
+  "routePlannerStep": "Paso",
+  "routePlannerPlanningRoute": "Planificando ruta...",
+  "routePlannerSelectAddresses": "Por favor, seleccione al menos 2 direcciones para planificar una ruta",
+  "routePlannerClickToPlan": "Haga clic para planificar ruta",
+  "routePlannerNotEnoughWaypoints": "Puntos de parada insuficientes para planificación de ruta"
 }

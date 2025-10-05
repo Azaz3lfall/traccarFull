@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Planificador de Rutes",
+  "routePlannerBasic": "Bàsic",
+  "routePlannerEnterStartAddress": "Introduïu l'adreça d'inici...",
+  "routePlannerEnterAddress": "Introduïu l'adreça",
+  "routePlannerEnterEndAddress": "Introduïu l'adreça de destinació...",
+  "routePlannerAddAddress": "Afegir Adreça",
+  "routePlannerWaypoints": "Punts de Parada",
+  "routePlannerRoutePlan": "Pla de Ruta",
+  "routePlannerDistance": "Distància",
+  "routePlannerDuration": "Durada",
+  "routePlannerSteps": "passos",
+  "routePlannerStep": "Pas",
+  "routePlannerPlanningRoute": "Planificant ruta...",
+  "routePlannerSelectAddresses": "Si us plau, seleccioneu almenys 2 adreces per planificar una ruta",
+  "routePlannerClickToPlan": "Feu clic per planificar ruta",
+  "routePlannerNotEnoughWaypoints": "Punts de parada insuficients per planificar ruta"
 }

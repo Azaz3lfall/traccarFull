@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "রুট প্ল্যানার",
+  "routePlannerBasic": "বেসিক",
+  "routePlannerEnterStartAddress": "শুরু করার ঠিকানা লিখুন...",
+  "routePlannerEnterAddress": "ঠিকানা লিখুন",
+  "routePlannerEnterEndAddress": "গন্তব্যের ঠিকানা লিখুন...",
+  "routePlannerAddAddress": "ঠিকানা যোগ করুন",
+  "routePlannerWaypoints": "পথের বিন্দু",
+  "routePlannerRoutePlan": "রুট পরিকল্পনা",
+  "routePlannerDistance": "দূরত্ব",
+  "routePlannerDuration": "সময়কাল",
+  "routePlannerSteps": "ধাপ",
+  "routePlannerStep": "ধাপ",
+  "routePlannerPlanningRoute": "রুট পরিকল্পনা করা হচ্ছে...",
+  "routePlannerSelectAddresses": "রুট পরিকল্পনার জন্য কমপক্ষে ২টি ঠিকানা নির্বাচন করুন",
+  "routePlannerClickToPlan": "রুট পরিকল্পনার জন্য ক্লিক করুন",
+  "routePlannerNotEnoughWaypoints": "রুট পরিকল্পনার জন্য পর্যাপ্ত পথের বিন্দু নেই"
 }

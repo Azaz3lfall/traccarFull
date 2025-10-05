@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "خطأ في التحقق من النطاق. يرجى المحاولة مرة أخرى.",
   "domainCheckEmptyError": "يرجى إدخال نطاق أولاً",
   "domainCheckSuccessTitle": "النطاق صالح! يشير إلى: {ipAddress}",
-  "domainCheckErrorTitle": "فشل في التحقق من النطاق: {message}"
+  "domainCheckErrorTitle": "فشل في التحقق من النطاق: {message}",
+  "routePlanner": "مخطط المسارات",
+  "routePlannerBasic": "أساسي",
+  "routePlannerEnterStartAddress": "أدخل عنوان البداية...",
+  "routePlannerEnterAddress": "أدخل العنوان",
+  "routePlannerEnterEndAddress": "أدخل عنوان الوجهة...",
+  "routePlannerAddAddress": "إضافة عنوان",
+  "routePlannerWaypoints": "نقاط التوقف",
+  "routePlannerRoutePlan": "خطة المسار",
+  "routePlannerDistance": "المسافة",
+  "routePlannerDuration": "المدة",
+  "routePlannerSteps": "خطوات",
+  "routePlannerStep": "خطوة",
+  "routePlannerPlanningRoute": "تخطيط المسار...",
+  "routePlannerSelectAddresses": "يرجى اختيار عنوانين على الأقل لتخطيط مسار",
+  "routePlannerClickToPlan": "انقر لتخطيط المسار",
+  "routePlannerNotEnoughWaypoints": "نقاط التوقف غير كافية لتخطيط المسار"
 }

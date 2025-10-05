@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Digite um domínio primeiro",
   "domainCheckSuccessTitle": "Domínio é válido! Aponta para: {ipAddress}",
   "domainCheckErrorTitle": "Falha na verificação do domínio: {message}",
-  "resellerImageRequired": "Por favor, selecione uma imagem de logo para o revendedor"
+  "resellerImageRequired": "Por favor, selecione uma imagem de logo para o revendedor",
+  "routePlanner": "Planejador de Rotas",
+  "routePlannerBasic": "Básico",
+  "routePlannerEnterStartAddress": "Digite o endereço de partida...",
+  "routePlannerEnterAddress": "Digite o endereço",
+  "routePlannerEnterEndAddress": "Digite o endereço de destino...",
+  "routePlannerAddAddress": "Adicionar Endereço",
+  "routePlannerWaypoints": "Pontos de Parada",
+  "routePlannerRoutePlan": "Plano da Rota",
+  "routePlannerDistance": "Distância",
+  "routePlannerDuration": "Duração",
+  "routePlannerSteps": "passos",
+  "routePlannerStep": "Passo",
+  "routePlannerPlanningRoute": "Planejando rota...",
+  "routePlannerSelectAddresses": "Por favor, selecione pelo menos 2 endereços para planejar uma rota",
+  "routePlannerClickToPlan": "Clique para planejar rota",
+  "routePlannerNotEnoughWaypoints": "Pontos de parada insuficientes para planejamento de rota"
 }

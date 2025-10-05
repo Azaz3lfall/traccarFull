@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Plánovač Tras",
+  "routePlannerBasic": "Základní",
+  "routePlannerEnterStartAddress": "Zadejte počáteční adresu...",
+  "routePlannerEnterAddress": "Zadejte adresu",
+  "routePlannerEnterEndAddress": "Zadejte cílovou adresu...",
+  "routePlannerAddAddress": "Přidat Adresu",
+  "routePlannerWaypoints": "Zastávky",
+  "routePlannerRoutePlan": "Plán Trasy",
+  "routePlannerDistance": "Vzdálenost",
+  "routePlannerDuration": "Doba",
+  "routePlannerSteps": "kroky",
+  "routePlannerStep": "Krok",
+  "routePlannerPlanningRoute": "Plánování trasy...",
+  "routePlannerSelectAddresses": "Prosím, vyberte alespoň 2 adresy pro plánování trasy",
+  "routePlannerClickToPlan": "Klikněte pro plánování trasy",
+  "routePlannerNotEnoughWaypoints": "Nedostatek zastávek pro plánování trasy"
 }

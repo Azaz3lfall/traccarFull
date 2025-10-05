@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "Fel vid kontroll av domän. Försök igen.",
   "domainCheckEmptyError": "Ange en domän först",
   "domainCheckSuccessTitle": "Domänen är giltig! Pekar på: {ipAddress}",
-  "domainCheckErrorTitle": "Domänkontroll misslyckades: {message}"
+  "domainCheckErrorTitle": "Domänkontroll misslyckades: {message}",
+  "routePlanner": "Route Planner",
+  "routePlannerBasic": "Basic",
+  "routePlannerEnterStartAddress": "Enter start address...",
+  "routePlannerEnterAddress": "Enter address",
+  "routePlannerEnterEndAddress": "Enter end address...",
+  "routePlannerAddAddress": "Add Address",
+  "routePlannerWaypoints": "Waypoints",
+  "routePlannerRoutePlan": "Route Plan",
+  "routePlannerDistance": "Distance",
+  "routePlannerDuration": "Duration",
+  "routePlannerSteps": "steps",
+  "routePlannerStep": "Step",
+  "routePlannerPlanningRoute": "Planning route...",
+  "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
+  "routePlannerClickToPlan": "Click to plan route",
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
 }

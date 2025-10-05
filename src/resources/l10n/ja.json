@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "ドメインのチェック中にエラーが発生しました。再試行してください。",
   "domainCheckEmptyError": "まずドメインを入力してください",
   "domainCheckSuccessTitle": "ドメインは有効です！{ipAddress}を指しています",
-  "domainCheckErrorTitle": "ドメインチェックに失敗しました: {message}"
+  "domainCheckErrorTitle": "ドメインチェックに失敗しました: {message}",
+  "routePlanner": "Route Planner",
+  "routePlannerBasic": "Basic",
+  "routePlannerEnterStartAddress": "Enter start address...",
+  "routePlannerEnterAddress": "Enter address",
+  "routePlannerEnterEndAddress": "Enter end address...",
+  "routePlannerAddAddress": "Add Address",
+  "routePlannerWaypoints": "Waypoints",
+  "routePlannerRoutePlan": "Route Plan",
+  "routePlannerDistance": "Distance",
+  "routePlannerDuration": "Duration",
+  "routePlannerSteps": "steps",
+  "routePlannerStep": "Step",
+  "routePlannerPlanningRoute": "Planning route...",
+  "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
+  "routePlannerClickToPlan": "Click to plan route",
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
 }

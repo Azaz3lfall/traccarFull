@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Планировчик на маршрути",
+  "routePlannerBasic": "Основен",
+  "routePlannerEnterStartAddress": "Въведете начален адрес...",
+  "routePlannerEnterAddress": "Въведете адрес",
+  "routePlannerEnterEndAddress": "Въведете крайен адрес...",
+  "routePlannerAddAddress": "Добави адрес",
+  "routePlannerWaypoints": "Междинни точки",
+  "routePlannerRoutePlan": "План на маршрута",
+  "routePlannerDistance": "Разстояние",
+  "routePlannerDuration": "Продължителност",
+  "routePlannerSteps": "стъпки",
+  "routePlannerStep": "Стъпка",
+  "routePlannerPlanningRoute": "Планиране на маршрут...",
+  "routePlannerSelectAddresses": "Моля, изберете поне 2 адреса за планиране на маршрут",
+  "routePlannerClickToPlan": "Кликнете за планиране на маршрут",
+  "routePlannerNotEnoughWaypoints": "Недостатъчно междинни точки за планиране на маршрут"
 }

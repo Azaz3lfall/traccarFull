@@ -1419,8 +1419,8 @@ const FloatingGeofencesPopover = ({
                 },
               }}
             >
-              <Tab label="Basic" />
-              <Tab label="Route Planner" />
+                <Tab label={t('routePlannerBasic')} />
+                <Tab label={t('routePlanner')} />
             </Tabs>
           </div>
 
@@ -1565,7 +1565,7 @@ const FloatingGeofencesPopover = ({
                   <div style={{ position: 'relative' }}>
                     <input
                       type="text"
-                      placeholder={index === 0 ? 'Enter start address...' : index === fields.length - 1 ? 'Enter end address...' : 'Enter address'}
+                      placeholder={index === 0 ? t('routePlannerEnterStartAddress') : index === fields.length - 1 ? t('routePlannerEnterEndAddress') : t('routePlannerEnterAddress')}
                       value={field.value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       style={{
@@ -1756,7 +1756,7 @@ const FloatingGeofencesPopover = ({
                 }}
               >
                 <span style={{ fontSize: '16px' }}>+</span>
-                Add Address
+                {t('routePlannerAddAddress')}
               </button>
 
               {/* Waypoints Section with Tabs */}
@@ -1791,8 +1791,8 @@ const FloatingGeofencesPopover = ({
                     }
                   }}
                 >
-                  <Tab label="Waypoints" />
-                  <Tab label="Route Plan" />
+                  <Tab label={t('routePlannerWaypoints')} />
+                  <Tab label={t('routePlannerRoutePlan')} />
                 </Tabs>
 
                 {/* Waypoints Tab Content */}
@@ -1922,7 +1922,7 @@ const FloatingGeofencesPopover = ({
                             textAlign: 'center',
                             padding: '40px 20px'
                           }}>
-                            Please select at least 2 addresses to plan a route
+                            {t('routePlannerSelectAddresses')}
                           </Typography>
                         );
                       }
@@ -1937,7 +1937,7 @@ const FloatingGeofencesPopover = ({
                           }}>
                             <CircularProgress size={24} style={{ marginBottom: '16px' }} />
                             <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                              Planning route...
+                              {t('routePlannerPlanningRoute')}
                             </Typography>
                           </div>
                         );
@@ -1984,7 +1984,7 @@ const FloatingGeofencesPopover = ({
                                                 color: colors.text, 
                                                 fontSize: '11px'
                                               }}>
-                                                Distance: {(leg.distance / 1000).toFixed(2)} km
+                                                {t('routePlannerDistance')}: {(leg.distance / 1000).toFixed(2)} km
                                               </Typography>
                                             )}
                                             {leg.duration && (
@@ -1992,7 +1992,7 @@ const FloatingGeofencesPopover = ({
                                                 color: colors.text, 
                                                 fontSize: '11px'
                                               }}>
-                                                Duration: {`${Math.floor(leg.duration / 3600)}:${Math.floor((leg.duration % 3600) / 60).toString().padStart(2, '0')} hr`}
+                                                {t('routePlannerDuration')}: {`${Math.floor(leg.duration / 3600)}:${Math.floor((leg.duration % 3600) / 60).toString().padStart(2, '0')} hr`}
                                               </Typography>
                                             )}
                                           </div>
@@ -2002,7 +2002,7 @@ const FloatingGeofencesPopover = ({
                                               color: colors.textSecondary, 
                                               fontSize: '11px'
                                             }}>
-                                              {leg.steps.length} steps
+                                              {leg.steps.length} {t('routePlannerSteps')}
                                             </Typography>
                                           )}
                                         </div>
@@ -2030,7 +2030,7 @@ const FloatingGeofencesPopover = ({
                                                 fontSize: '12px',
                                                 fontWeight: '500'
                                               }}>
-                                                Step {stepIndex + 1}
+                                                {t('routePlannerStep')} {stepIndex + 1}
                                               </Typography>
                                               
                                               {step.maneuver && step.maneuver.instruction && (
@@ -2080,7 +2080,7 @@ const FloatingGeofencesPopover = ({
                           textAlign: 'center',
                           padding: '40px 20px'
                         }}>
-                          Click to plan route
+                          {t('routePlannerClickToPlan')}
                         </Typography>
                       );
                     })()}

@@ -701,5 +701,21 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
-  "resellerImageRequired": "Please select a logo image for the reseller"
+  "resellerImageRequired": "Please select a logo image for the reseller",
+  "routePlanner": "Σχεδιαστής Διαδρομών",
+  "routePlannerBasic": "Βασικό",
+  "routePlannerEnterStartAddress": "Εισάγετε διεύθυνση έναρξης...",
+  "routePlannerEnterAddress": "Εισάγετε διεύθυνση",
+  "routePlannerEnterEndAddress": "Εισάγετε διεύθυνση προορισμού...",
+  "routePlannerAddAddress": "Προσθήκη Διεύθυνσης",
+  "routePlannerWaypoints": "Σημεία Στάσης",
+  "routePlannerRoutePlan": "Σχέδιο Διαδρομής",
+  "routePlannerDistance": "Απόσταση",
+  "routePlannerDuration": "Διάρκεια",
+  "routePlannerSteps": "βήματα",
+  "routePlannerStep": "Βήμα",
+  "routePlannerPlanningRoute": "Σχεδιασμός διαδρομής...",
+  "routePlannerSelectAddresses": "Παρακαλώ επιλέξτε τουλάχιστον 2 διευθύνσεις για σχεδιασμό διαδρομής",
+  "routePlannerClickToPlan": "Κάντε κλικ για σχεδιασμό διαδρομής",
+  "routePlannerNotEnoughWaypoints": "Ανεπαρκή σημεία στάσης για σχεδιασμό διαδρομής"
 }

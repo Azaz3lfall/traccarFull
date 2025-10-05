@@ -700,5 +700,21 @@
   "domainCheckNetworkError": "도메인 확인 중 오류가 발생했습니다. 다시 시도해주세요.",
   "domainCheckEmptyError": "먼저 도메인을 입력하세요",
   "domainCheckSuccessTitle": "도메인이 유효합니다! {ipAddress}를 가리킵니다",
-  "domainCheckErrorTitle": "도메인 확인 실패: {message}"
+  "domainCheckErrorTitle": "도메인 확인 실패: {message}",
+  "routePlanner": "Route Planner",
+  "routePlannerBasic": "Basic",
+  "routePlannerEnterStartAddress": "Enter start address...",
+  "routePlannerEnterAddress": "Enter address",
+  "routePlannerEnterEndAddress": "Enter end address...",
+  "routePlannerAddAddress": "Add Address",
+  "routePlannerWaypoints": "Waypoints",
+  "routePlannerRoutePlan": "Route Plan",
+  "routePlannerDistance": "Distance",
+  "routePlannerDuration": "Duration",
+  "routePlannerSteps": "steps",
+  "routePlannerStep": "Step",
+  "routePlannerPlanningRoute": "Planning route...",
+  "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
+  "routePlannerClickToPlan": "Click to plan route",
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
 }
