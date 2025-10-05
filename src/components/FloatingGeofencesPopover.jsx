@@ -81,6 +81,7 @@ const FloatingGeofencesPopover = ({
 
   // State management
   const [activeTab, setActiveTab] = useState(0);
+  const [routePlannerTab, setRoutePlannerTab] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [geofenceToDelete, setGeofenceToDelete] = useState(null);
@@ -919,6 +920,10 @@ const FloatingGeofencesPopover = ({
     setActiveTab(newValue);
   };
 
+  const handleRoutePlannerTabChange = (event, newValue) => {
+    setRoutePlannerTab(newValue);
+  };
+
   // Address search functionality for route planner using Mapbox
   const searchAddresses = async (query, fieldId) => {
     if (!query.trim() || query.trim().length < 5) {
@@ -1483,7 +1488,7 @@ const FloatingGeofencesPopover = ({
           )}
 
           {activeTab === 1 && (
-            <div style={{ padding: '12px' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: '12px' }}>
               {/* Unified Field System */}
               {fields.map((field, index) => (
                 <div key={field.id} style={{ marginBottom: '16px' }}>
@@ -1684,18 +1689,53 @@ const FloatingGeofencesPopover = ({
                 Add Address
               </button>
 
-              {/* Route Waypoints Display - Only show if there are waypoints with addresses */}
-              {routeWaypoints.filter(wp => wp && wp.address).length > 0 && (
-                <div style={{ marginTop: '12px' }}>
-                  <Typography variant="body2" style={{ color: colors.text, marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>
-                    Selected Waypoints
-                  </Typography>
-                  <div style={{
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '8px',
-                    backgroundColor: colors.secondary,
-                    padding: '8px'
-                  }}>
+              {/* Waypoints Section with Tabs */}
+              <div style={{ marginTop: '12px' }}>
+                {/* Waypoints Sub-tabs */}
+                <Tabs
+                  value={routePlannerTab}
+                  onChange={handleRoutePlannerTabChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  sx={{
+                    '& .MuiTab-root': {
+                      color: '#666666',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      textTransform: 'none',
+                      minHeight: '40px',
+                      padding: '8px 16px',
+                      '&.Mui-selected': {
+                        color: '#1976d2',
+                        fontWeight: '600',
+                        backgroundColor: 'transparent',
+                      },
+                      '&:hover': {
+                        color: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                      },
+                    },
+                    '& .MuiTabs-indicator': {
+                      backgroundColor: '#1976d2',
+                      height: '2px'
+                    }
+                  }}
+                >
+                  <Tab label="Waypoints" />
+                  <Tab label="Route Plan" />
+                </Tabs>
+
+                {/* Waypoints Tab Content */}
+                {routePlannerTab === 0 && (
+                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {routeWaypoints.filter(wp => wp && wp.address).length > 0 && (
+                      <div style={{
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '8px',
+                        backgroundColor: colors.secondary,
+                        padding: '8px',
+                        marginTop: '8px'
+                      }}>
                     <div style={{ position: 'relative' }}>
                       {routeWaypoints.filter(waypoint => waypoint && waypoint.address).map((waypoint, index) => {
                         const filteredWaypoints = routeWaypoints.filter(wp => wp && wp.address);
@@ -1793,10 +1833,25 @@ const FloatingGeofencesPopover = ({
                           </div>
                         );
                       })}
-                    </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Route Plan Tab Content */}
+                {routePlannerTab === 1 && (
+                  <div style={{ maxHeight: '300px', overflowY: 'auto', padding: '12px' }}>
+                    <Typography variant="body2" style={{ 
+                      color: colors.textSecondary, 
+                      textAlign: 'center',
+                      padding: '40px 20px'
+                    }}>
+                      Route Plan coming soon...
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
