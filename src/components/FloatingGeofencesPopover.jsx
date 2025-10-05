@@ -103,6 +103,15 @@ const FloatingGeofencesPopover = ({
   const [polygonDrawingMode, setPolygonDrawingMode] = useState(false);
   const [polygonPoints, setPolygonPoints] = useState([]);
 
+  // Route planner state
+  const [startAddress, setStartAddress] = useState('');
+  const [endAddress, setEndAddress] = useState('');
+  const [startSearchResults, setStartSearchResults] = useState([]);
+  const [endSearchResults, setEndSearchResults] = useState([]);
+  const [isStartSearching, setIsStartSearching] = useState(false);
+  const [isEndSearching, setIsEndSearching] = useState(false);
+  const [routeWaypoints, setRouteWaypoints] = useState([]);
+
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
     queryKey: ['geofences'],
@@ -905,6 +914,142 @@ const FloatingGeofencesPopover = ({
     setActiveTab(newValue);
   };
 
+  // Address search functionality for route planner
+  const searchAddresses = async (query, isStart) => {
+    if (!query.trim() || query.trim().length < 5) {
+      if (isStart) {
+        setStartSearchResults([]);
+      } else {
+        setEndSearchResults([]);
+      }
+      return;
+    }
+
+    if (isStart) {
+      setIsStartSearching(true);
+    } else {
+      setIsEndSearching(true);
+    }
+
+    try {
+      const request = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=5`;
+      const response = await fetch(request);
+      const geojson = await response.json();
+      
+      const results = geojson.features.map((feature) => {
+        const center = [
+          feature.bbox[0] + (feature.bbox[2] - feature.bbox[0]) / 2,
+          feature.bbox[1] + (feature.bbox[3] - feature.bbox[1]) / 2,
+        ];
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center,
+          },
+          place_name: feature.properties.display_name,
+          properties: feature.properties,
+          text: feature.properties.display_name,
+          place_type: ['place'],
+          center,
+        };
+      });
+      
+      if (isStart) {
+        setStartSearchResults(results);
+      } else {
+        setEndSearchResults(results);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      if (isStart) {
+        setStartSearchResults([]);
+      } else {
+        setEndSearchResults([]);
+      }
+    } finally {
+      if (isStart) {
+        setIsStartSearching(false);
+      } else {
+        setIsEndSearching(false);
+      }
+    }
+  };
+
+  // Handle start address search
+  const handleStartAddressChange = (e) => {
+    const query = e.target.value;
+    setStartAddress(query);
+    
+    // Clear previous timeout
+    clearTimeout(window.startSearchTimeout);
+    
+    // Only search if query has at least 5 characters
+    if (query.trim().length >= 5) {
+      // Debounce search with 800ms delay
+      window.startSearchTimeout = setTimeout(() => {
+        searchAddresses(query, true);
+      }, 800);
+    } else {
+      // Clear results if less than 5 characters
+      setStartSearchResults([]);
+      setIsStartSearching(false);
+    }
+  };
+
+  // Handle end address search
+  const handleEndAddressChange = (e) => {
+    const query = e.target.value;
+    setEndAddress(query);
+    
+    // Clear previous timeout
+    clearTimeout(window.endSearchTimeout);
+    
+    // Only search if query has at least 5 characters
+    if (query.trim().length >= 5) {
+      // Debounce search with 800ms delay
+      window.endSearchTimeout = setTimeout(() => {
+        searchAddresses(query, false);
+      }, 800);
+    } else {
+      // Clear results if less than 5 characters
+      setEndSearchResults([]);
+      setIsEndSearching(false);
+    }
+  };
+
+  // Handle start address selection
+  const handleStartAddressSelect = (result) => {
+    setStartAddress(result.properties?.display_name || result.text);
+    setStartSearchResults([]);
+    // Add to route waypoints
+    setRouteWaypoints(prev => {
+      const newWaypoints = [...prev];
+      newWaypoints[0] = {
+        address: result.properties?.display_name || result.text,
+        coordinates: result.center,
+        type: 'start'
+      };
+      return newWaypoints;
+    });
+  };
+
+  // Handle end address selection
+  const handleEndAddressSelect = (result) => {
+    setEndAddress(result.properties?.display_name || result.text);
+    setEndSearchResults([]);
+    // Add to route waypoints
+    setRouteWaypoints(prev => {
+      const newWaypoints = [...prev];
+      newWaypoints[1] = {
+        address: result.properties?.display_name || result.text,
+        coordinates: result.center,
+        type: 'end'
+      };
+      return newWaypoints;
+    });
+  };
+
   // Reset page when search changes
   useEffect(() => {
     setPage(1);
@@ -1180,13 +1325,274 @@ const FloatingGeofencesPopover = ({
           )}
 
           {activeTab === 1 && (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
-                Route Planner
-              </Typography>
-              <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '14px' }}>
-                Coming soon...
-              </Typography>
+            <div style={{ padding: '20px' }}>
+              {/* Start Address Input */}
+              <div style={{ marginBottom: '20px' }}>
+                <Typography variant="body2" style={{ color: colors.text, marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                  Start Address
+                </Typography>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    placeholder="Enter start address..."
+                    value={startAddress}
+                    onChange={handleStartAddressChange}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: colors.secondary,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      color: colors.text,
+                      fontSize: '14px',
+                      outline: 'none',
+                      paddingRight: isStartSearching ? '40px' : '16px'
+                    }}
+                  />
+                  {isStartSearching && (
+                    <div style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: 'calc(50% - 8px)',
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid transparent',
+                      borderTop: '2px solid #18a9fd',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                  )}
+                </div>
+                
+                {/* Start Address Search Results */}
+                {startSearchResults.length > 0 && (
+                  <div style={{
+                    marginTop: '8px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    backgroundColor: colors.surface
+                  }}>
+                    {startSearchResults.map((result, index) => (
+                      <div
+                        key={`start-search-${result.id || result.name || index}`}
+                        onClick={() => handleStartAddressSelect(result)}
+                        style={{
+                          padding: '12px',
+                          cursor: 'pointer',
+                          borderBottom: index < startSearchResults.length - 1 ? `1px solid ${colors.border}` : 'none',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <div style={{
+                          color: colors.text,
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: '4px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {result.properties?.name || result.properties?.display_name?.split(',')[0]}
+                        </div>
+                        <div style={{
+                          color: colors.textSecondary,
+                          fontSize: '12px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {result.properties?.display_name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Start Address Character Count Message */}
+                {startAddress && startAddress.trim().length > 0 && startAddress.trim().length < 5 && (
+                  <div style={{
+                    marginTop: '8px',
+                    padding: '8px',
+                    color: colors.textSecondary,
+                    fontSize: '12px',
+                    textAlign: 'center'
+                  }}>
+                    Type at least 5 characters to search
+                  </div>
+                )}
+                
+                {/* Start Address No Results */}
+                {startAddress && startAddress.trim().length >= 5 && startSearchResults.length === 0 && !isStartSearching && !routeWaypoints.find(wp => wp.type === 'start') && (
+                  <div style={{
+                    marginTop: '8px',
+                    padding: '8px',
+                    color: colors.textSecondary,
+                    fontSize: '12px',
+                    textAlign: 'center'
+                  }}>
+                    No results found
+                  </div>
+                )}
+              </div>
+
+              {/* End Address Input */}
+              <div style={{ marginBottom: '20px' }}>
+                <Typography variant="body2" style={{ color: colors.text, marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                  End Address
+                </Typography>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    placeholder="Enter end address..."
+                    value={endAddress}
+                    onChange={handleEndAddressChange}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: colors.secondary,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      color: colors.text,
+                      fontSize: '14px',
+                      outline: 'none',
+                      paddingRight: isEndSearching ? '40px' : '16px'
+                    }}
+                  />
+                  {isEndSearching && (
+                    <div style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: 'calc(50% - 8px)',
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid transparent',
+                      borderTop: '2px solid #18a9fd',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                  )}
+                </div>
+                
+                {/* End Address Search Results */}
+                {endSearchResults.length > 0 && (
+                  <div style={{
+                    marginTop: '8px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    backgroundColor: colors.surface
+                  }}>
+                    {endSearchResults.map((result, index) => (
+                      <div
+                        key={`end-search-${result.id || result.name || index}`}
+                        onClick={() => handleEndAddressSelect(result)}
+                        style={{
+                          padding: '12px',
+                          cursor: 'pointer',
+                          borderBottom: index < endSearchResults.length - 1 ? `1px solid ${colors.border}` : 'none',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <div style={{
+                          color: colors.text,
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: '4px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {result.properties?.name || result.properties?.display_name?.split(',')[0]}
+                        </div>
+                        <div style={{
+                          color: colors.textSecondary,
+                          fontSize: '12px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {result.properties?.display_name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* End Address Character Count Message */}
+                {endAddress && endAddress.trim().length > 0 && endAddress.trim().length < 5 && (
+                  <div style={{
+                    marginTop: '8px',
+                    padding: '8px',
+                    color: colors.textSecondary,
+                    fontSize: '12px',
+                    textAlign: 'center'
+                  }}>
+                    Type at least 5 characters to search
+                  </div>
+                )}
+                
+                {/* End Address No Results */}
+                {endAddress && endAddress.trim().length >= 5 && endSearchResults.length === 0 && !isEndSearching && !routeWaypoints.find(wp => wp.type === 'end') && (
+                  <div style={{
+                    marginTop: '8px',
+                    padding: '8px',
+                    color: colors.textSecondary,
+                    fontSize: '12px',
+                    textAlign: 'center'
+                  }}>
+                    No results found
+                  </div>
+                )}
+              </div>
+
+              {/* Route Waypoints Display */}
+              {routeWaypoints.length > 0 && (
+                <div style={{ marginTop: '20px' }}>
+                  <Typography variant="body2" style={{ color: colors.text, marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                    Selected Waypoints
+                  </Typography>
+                  <div style={{
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    backgroundColor: colors.secondary,
+                    padding: '12px'
+                  }}>
+                    {routeWaypoints.map((waypoint, index) => (
+                      <div key={`waypoint-${index}`} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: index < routeWaypoints.length - 1 ? '8px' : '0'
+                      }}>
+                        <div style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: waypoint.type === 'start' ? '#4caf50' : '#f44336'
+                        }} />
+                        <Typography variant="body2" style={{ color: colors.text, fontSize: '12px' }}>
+                          {waypoint.address}
+                        </Typography>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

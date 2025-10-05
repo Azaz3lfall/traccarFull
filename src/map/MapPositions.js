@@ -191,8 +191,8 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
                 
                 return {
                   id: deviceId,
-                  name: device?.name || `Device ${deviceId}`,
-                  status: device?.status || 'unknown',
+                  name: device?.name || device?.uniqueId || device?.model || `Device ${deviceId}`,
+                  status: device?.status || position?.status || 'unknown',
                   latitude: position?.latitude || device?.lastPosition?.latitude,
                   longitude: position?.longitude || device?.lastPosition?.longitude,
                   lastUpdate: position?.fixTime || device?.lastUpdate
