@@ -1069,9 +1069,9 @@ const FloatingGeofencesPopover = ({
         const newWaypoints = [...prev];
         // Swap the waypoints
         [newWaypoints[0], newWaypoints[1]] = [newWaypoints[1], newWaypoints[0]];
-        // Update the types based on new order
-        newWaypoints[0].type = fieldOrder[1] === 'start' ? 'start' : 'end';
-        newWaypoints[1].type = fieldOrder[0] === 'start' ? 'start' : 'end';
+        // The first position (index 0) is always START, second position (index 1) is always END
+        newWaypoints[0].type = 'start';
+        newWaypoints[1].type = 'end';
         return newWaypoints;
       }
       return prev;
@@ -1555,7 +1555,7 @@ const FloatingGeofencesPopover = ({
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          backgroundColor: waypoint.type === 'start' ? '#4caf50' : '#f44336'
+                          backgroundColor: index === 0 ? '#4caf50' : '#f44336' // First position is green (start), second is red (end)
                         }} />
                         <Typography variant="body2" style={{ color: colors.text, fontSize: '12px' }}>
                           {waypoint.address}
