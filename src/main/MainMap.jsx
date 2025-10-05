@@ -16,10 +16,11 @@ import MapOverlay from '../map/overlay/MapOverlay';
 import MapScale from '../map/MapScale';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
+import MapRoutePlanner from '../map/MapRoutePlanner';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
 
-const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0 }) => {
+const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -65,6 +66,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         )}
         <MapDefaultCamera />
         <MapSelectedDevice />
+        <MapRoutePlanner routeData={routePlannerData} />
         <PoiMap />
         {/* MapPositions always last to ensure vehicle markers appear on top */}
         <MapPositions

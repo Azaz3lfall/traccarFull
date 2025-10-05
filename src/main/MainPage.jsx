@@ -959,12 +959,17 @@ const MainPage = () => {
 
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
+  const [routePlannerData, setRoutePlannerData] = useState(null);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
 
 
   const onMapClick = useCallback(() => {
     dispatch(devicesActions.selectId(null));
   }, [dispatch]);
+
+  const handleRouteDataChange = useCallback((routeData) => {
+    setRoutePlannerData(routeData);
+  }, []);
 
   // Refresh devices when device list becomes visible
   const refreshDevices = useCallback(async () => {
@@ -1000,6 +1005,7 @@ const MainPage = () => {
           onMapClick={onMapClick}
           selectedMapStyle={selectedMapStyle}
           currentReplayIndex={currentReplayIndex}
+          routePlannerData={routePlannerData}
         />
       )}
       <div className={classes.sidebar}>
@@ -1012,6 +1018,7 @@ const MainPage = () => {
                 onMapClick={onMapClick}
                 selectedMapStyle={selectedMapStyle}
                 currentReplayIndex={currentReplayIndex}
+                routePlannerData={routePlannerData}
               />
             </div>
           )}
@@ -1024,6 +1031,7 @@ const MainPage = () => {
         isDeviceListVisible={isDeviceListVisible}
         isVisible={geofencesPopoverVisible}
         onClose={() => setGeofencesPopoverVisible(false)}
+        onRouteDataChange={handleRouteDataChange}
       />
       
       <FloatingReportsPopover 

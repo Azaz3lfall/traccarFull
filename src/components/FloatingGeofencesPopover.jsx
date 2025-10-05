@@ -71,7 +71,8 @@ const FloatingGeofencesPopover = ({
   isMenuExpanded, 
   isDeviceListVisible,
   isVisible, 
-  onClose 
+  onClose,
+  onRouteDataChange 
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
@@ -1259,6 +1260,13 @@ const FloatingGeofencesPopover = ({
     const fieldIndex = fields.findIndex(f => f.id === fieldId);
     return routeWaypoints[fieldIndex] && routeWaypoints[fieldIndex].address === fieldValue;
   };
+
+  // Notify parent component when route data changes
+  useEffect(() => {
+    if (onRouteDataChange) {
+      onRouteDataChange(routeData);
+    }
+  }, [routeData, onRouteDataChange]);
 
   // BULLETPROOF synchronization - Rebuild waypoints from fields
   useEffect(() => {
