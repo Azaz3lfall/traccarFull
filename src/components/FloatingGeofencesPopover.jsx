@@ -119,6 +119,9 @@ const FloatingGeofencesPopover = ({
   const [dynamicFieldValues, setDynamicFieldValues] = useState({}); // Track values for dynamic fields
   const [dynamicFieldResults, setDynamicFieldResults] = useState({}); // Track search results for dynamic fields
   const [dynamicFieldSearching, setDynamicFieldSearching] = useState({}); // Track searching state for dynamic fields
+  
+  // Get Mapbox access token from user session
+  const mapboxToken = useSelector(state => state.session.user?.attributes?.mapboxAccessToken);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -922,7 +925,7 @@ const FloatingGeofencesPopover = ({
     setActiveTab(newValue);
   };
 
-  // Address search functionality for route planner
+  // Address search functionality for route planner using Mapbox
   const searchAddresses = async (query, isStart, fieldId = null) => {
     if (!query.trim() || query.trim().length < 5) {
       if (fieldId) {
@@ -944,26 +947,31 @@ const FloatingGeofencesPopover = ({
     }
 
     try {
-      const request = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=5`;
+      if (!mapboxToken) {
+        throw new Error('Mapbox access token not found');
+      }
+
+      const request = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&limit=15&types=place,locality,neighborhood,address,poi`;
       const response = await fetch(request);
-      const geojson = await response.json();
       
-      const results = geojson.features.map((feature) => {
-        const center = [
-          feature.bbox[0] + (feature.bbox[2] - feature.bbox[0]) / 2,
-          feature.bbox[1] + (feature.bbox[3] - feature.bbox[1]) / 2,
-        ];
+      if (!response.ok) {
+        throw new Error(`Mapbox API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      const results = data.features.map((feature) => {
         return {
           type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: center,
+          geometry: feature.geometry,
+          place_name: feature.place_name,
+          properties: {
+            display_name: feature.place_name,
+            ...feature.properties
           },
-          place_name: feature.properties.display_name,
-          properties: feature.properties,
-          text: feature.properties.display_name,
-          place_type: ['place'],
-          center,
+          text: feature.place_name,
+          place_type: feature.place_type,
+          center: feature.center,
         };
       });
       
@@ -1143,10 +1151,17 @@ const FloatingGeofencesPopover = ({
   const handleDynamicFieldChange = (fieldId, value) => {
     setDynamicFieldValues(prev => ({ ...prev, [fieldId]: value }));
     
+    // Clear previous timeout for this field
+    clearTimeout(window[`dynamicSearchTimeout_${fieldId}`]);
+    
     if (value.trim().length >= 5) {
-      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
-      searchAddresses(value, false, fieldId);
+      // Debounce search with 800ms delay
+      window[`dynamicSearchTimeout_${fieldId}`] = setTimeout(() => {
+        setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
+        searchAddresses(value, false, fieldId);
+      }, 800);
     } else {
+      // Clear results if less than 5 characters
       setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
       setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: false }));
     }
@@ -1210,12 +1225,17 @@ const FloatingGeofencesPopover = ({
         return newFields;
       });
       
-      // Update route waypoints
+      // Update route waypoints - only reorder if both waypoints exist
       setRouteWaypoints(prev => {
         const newWaypoints = [...prev];
         const startIndex = currentIndex + 2;
         const endIndex = newIndex + 2;
-        [newWaypoints[startIndex], newWaypoints[endIndex]] = [newWaypoints[endIndex], newWaypoints[startIndex]];
+        
+        // Only swap if both waypoints exist
+        if (newWaypoints[startIndex] && newWaypoints[endIndex]) {
+          [newWaypoints[startIndex], newWaypoints[endIndex]] = [newWaypoints[endIndex], newWaypoints[startIndex]];
+        }
+        
         return newWaypoints;
       });
     }
@@ -1548,133 +1568,133 @@ const FloatingGeofencesPopover = ({
           {/* Tab Content */}
           {activeTab === 0 && (
             <>
-              {/* Search and Add */}
+          {/* Search and Add */}
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${colors.border}` }}>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                  <TextField
-                    fullWidth
-                    placeholder={t('sharedSearch')}
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    size="small"
-                    InputProps={{
-                      startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
-                    }}
-                    style={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '8px'
-                      }
-                    }}
-                  />
-                </div>
-              <Button
-                variant="contained"
-                startIcon={isAddMode ? <AddIcon /> : null}
-                onClick={isAddMode ? handleAdd : handleSave}
-                fullWidth
-                size="small"
-                disabled={!isAddMode && saving}
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '500',
-                  marginBottom: '12px'
-                }}
-              >
-                {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
-              </Button>
-              
-              {/* Geofence Name Input */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
               <TextField
                 fullWidth
+                placeholder={t('sharedSearch')}
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
                 size="small"
-                label={t('sharedName')}
-                value={geofenceName}
-                onChange={(e) => setGeofenceName(e.target.value)}
-                disabled={isAddMode}
-                style={{
-                  marginBottom: '12px'
-                }}
-                InputLabelProps={{
-                  style: { color: colors.text }
-                }}
                 InputProps={{
-                  style: { color: colors.text }
+                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
+                }}
+                    sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px'
+                  }
                 }}
               />
-              
-              {/* Drawing Tools Row */}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <Button
-                  variant={circleDrawingMode ? "contained" : "outlined"}
-                  size="small"
-                  onClick={() => handleDrawingTool('circle')}
-                  disabled={isAddMode}
-                  style={{
-                    color: circleDrawingMode ? '#ffffff' : colors.text,
-                    backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
-                    borderColor: circleDrawingMode ? '#1976d2' : colors.border,
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    minWidth: '48px',
-                    height: '48px',
-                    padding: '0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <CircleIcon fontSize="small" />
-                </Button>
-                <Button
-                  variant={polylineDrawingMode ? "contained" : "outlined"}
-                  size="small"
-                  onClick={() => handleDrawingTool('line')}
-                  disabled={isAddMode}
-                  style={{
-                    color: polylineDrawingMode ? '#ffffff' : colors.text,
-                    backgroundColor: polylineDrawingMode ? '#1976d2' : 'transparent',
-                    borderColor: polylineDrawingMode ? '#1976d2' : colors.border,
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    minWidth: '48px',
-                    height: '48px',
-                    padding: '0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <LineIcon fontSize="small" />
-                </Button>
-                <Button
-                  variant={polygonDrawingMode ? "contained" : "outlined"}
-                  size="small"
-                  onClick={() => handleDrawingTool('polygon')}
-                  disabled={isAddMode}
-                  style={{
-                    color: polygonDrawingMode ? '#ffffff' : colors.text,
-                    backgroundColor: polygonDrawingMode ? '#1976d2' : 'transparent',
-                    borderColor: polygonDrawingMode ? '#1976d2' : colors.border,
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    minWidth: '48px',
-                    height: '48px',
-                    padding: '0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <PolygonIcon fontSize="small" />
-                </Button>
-              </div>
-              </div>
+            </div>
+          <Button
+            variant="contained"
+            startIcon={isAddMode ? <AddIcon /> : null}
+            onClick={isAddMode ? handleAdd : handleSave}
+            fullWidth
+            size="small"
+            disabled={!isAddMode && saving}
+            style={{
+              backgroundColor: colors.primary,
+              color: colors.text,
+              textTransform: 'none',
+              borderRadius: '8px',
+              fontWeight: '500',
+              marginBottom: '12px'
+            }}
+          >
+            {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
+          </Button>
+          
+          {/* Geofence Name Input */}
+          <TextField
+            fullWidth
+            size="small"
+            label={t('sharedName')}
+            value={geofenceName}
+            onChange={(e) => setGeofenceName(e.target.value)}
+            disabled={isAddMode}
+            style={{
+              marginBottom: '12px'
+            }}
+            InputLabelProps={{
+              style: { color: colors.text }
+            }}
+            InputProps={{
+              style: { color: colors.text }
+            }}
+          />
+          
+          {/* Drawing Tools Row */}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              variant={circleDrawingMode ? "contained" : "outlined"}
+              size="small"
+              onClick={() => handleDrawingTool('circle')}
+              disabled={isAddMode}
+              style={{
+                color: circleDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: circleDrawingMode ? '#1976d2' : colors.border,
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: '500',
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <CircleIcon fontSize="small" />
+            </Button>
+            <Button
+              variant={polylineDrawingMode ? "contained" : "outlined"}
+              size="small"
+              onClick={() => handleDrawingTool('line')}
+              disabled={isAddMode}
+              style={{
+                color: polylineDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: polylineDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: polylineDrawingMode ? '#1976d2' : colors.border,
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: '500',
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <LineIcon fontSize="small" />
+            </Button>
+            <Button
+              variant={polygonDrawingMode ? "contained" : "outlined"}
+              size="small"
+              onClick={() => handleDrawingTool('polygon')}
+              disabled={isAddMode}
+              style={{
+                color: polygonDrawingMode ? '#ffffff' : colors.text,
+                backgroundColor: polygonDrawingMode ? '#1976d2' : 'transparent',
+                borderColor: polygonDrawingMode ? '#1976d2' : colors.border,
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: '500',
+                minWidth: '48px',
+                height: '48px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <PolygonIcon fontSize="small" />
+            </Button>
+          </div>
+          </div>
             </>
           )}
 
@@ -1682,7 +1702,9 @@ const FloatingGeofencesPopover = ({
             <div style={{ padding: '12px' }}>
               {/* Dynamic Address Fields based on order */}
               {fieldOrder.map((fieldType, index) => 
-                renderAddressField(fieldType, index === 0)
+                <div key={`field-${fieldType}-${index}`}>
+                  {renderAddressField(fieldType, index === 0)}
+                </div>
               )}
 
               {/* Dynamic Fields */}
@@ -1800,21 +1822,19 @@ const FloatingGeofencesPopover = ({
                   {/* Search Results */}
                   {dynamicFieldResults[fieldId] && dynamicFieldResults[fieldId].length > 0 && (
                     <div style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
                       backgroundColor: colors.background,
                       border: `1px solid ${colors.border}`,
                       borderRadius: '8px',
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                       zIndex: 1000,
                       maxHeight: '200px',
-                      overflowY: 'auto'
+                      overflowY: 'auto',
+                      marginTop: '8px',
+                      width: '100%'
                     }}>
                       {dynamicFieldResults[fieldId].map((result, resultIndex) => (
                         <div
-                          key={resultIndex}
+                          key={`${fieldId}-result-${resultIndex}-${result.properties?.display_name || result.text}`}
                           onClick={() => handleDynamicFieldSelect(fieldId, result)}
                           style={{
                             padding: '12px',
@@ -1886,14 +1906,6 @@ const FloatingGeofencesPopover = ({
                   transition: 'all 0.2s ease',
                   marginBottom: '16px'
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.borderColor = colors.primary;
-                  e.target.style.color = colors.primary;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.borderColor = colors.border;
-                  e.target.style.color = colors.textSecondary;
-                }}
               >
                 <span style={{ fontSize: '16px' }}>+</span>
                 Add Address
@@ -1911,12 +1923,12 @@ const FloatingGeofencesPopover = ({
                     backgroundColor: colors.secondary,
                     padding: '8px'
                   }}>
-                    {routeWaypoints.map((waypoint, index) => (
-                      <div key={`waypoint-${index}`} style={{
+                    {routeWaypoints.filter(waypoint => waypoint && waypoint.address).map((waypoint, index) => (
+                      <div key={`waypoint-${waypoint.address}-${index}`} style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        marginBottom: index < routeWaypoints.length - 1 ? '6px' : '0',
+                        marginBottom: index < routeWaypoints.filter(wp => wp && wp.address).length - 1 ? '6px' : '0',
                         padding: '4px 0'
                       }}>
                         <div style={{
@@ -1965,120 +1977,120 @@ const FloatingGeofencesPopover = ({
 
           {/* Content - Only show for Basic tab */}
           {activeTab === 0 && (
-            <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
-              {isLoading ? (
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '40px',
-                  height: '200px'
-                }}>
-                  <CircularProgress />
-                </div>
-              ) : error ? (
-                <Alert severity="error" style={{ margin: '16px' }}>
-                  {t('sharedError')}
-                </Alert>
-              ) : filteredGeofences.length === 0 ? (
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '40px 20px',
-                  textAlign: 'center'
-                }}>
-                  <Typography variant="body1" style={{ color: colors.textSecondary, marginBottom: '8px' }}>
-                    {searchKeyword ? t('sharedNoResults') : t('sharedNoGeofences')}
-                  </Typography>
-                  <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                    {searchKeyword ? t('sharedTryDifferentSearch') : t('sharedAddFirstGeofence')}
-                  </Typography>
-                </div>
-              ) : (
-                <TableContainer>
-                  <Table>
-                    <TableBody>
-                      {paginatedGeofences.map((geofence) => (
-                        <TableRow 
-                          key={geofence.id} 
-                          hover
-                          onClick={() => handleGeofenceClick(geofence)}
-                          style={{ 
-                            cursor: 'pointer',
-                            '&:hover': {
-                              backgroundColor: colors.hover
-                            }
-                          }}
-                        >
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              {geofence.area.startsWith('CIRCLE') ? (
-                                <CircleIcon 
-                                  style={{ 
-                                    fontSize: '16px', 
-                                    color: geofence.attributes?.color || '#3f51b5' 
-                                  }} 
-                                />
-                              ) : geofence.area.startsWith('LINESTRING') ? (
-                                <LineIcon 
-                                  style={{ 
-                                    fontSize: '16px', 
-                                    color: geofence.attributes?.color || '#3f51b5' 
-                                  }} 
-                                />
-                              ) : geofence.area.startsWith('POLYGON') ? (
-                                <PolygonIcon 
-                                  style={{ 
-                                    fontSize: '16px', 
-                                    color: geofence.attributes?.color || '#3f51b5' 
-                                  }} 
-                                />
-                              ) : (
-                                <div
-                                  style={{
-                                    width: '12px',
-                                    height: '12px',
-                                    borderRadius: '50%',
-                                    backgroundColor: geofence.attributes?.color || '#3f51b5'
-                                  }}
-                                />
-                              )}
-                              <Typography variant="body2" style={{ color: colors.text }}>
-                                {geofence.name}
-                              </Typography>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                              {geofence.description || t('sharedNoDescription')}
+          <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
+            {isLoading ? (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '40px',
+                height: '200px'
+              }}>
+                <CircularProgress />
+              </div>
+            ) : error ? (
+              <Alert severity="error" style={{ margin: '16px' }}>
+                {t('sharedError')}
+              </Alert>
+            ) : filteredGeofences.length === 0 ? (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 20px',
+                textAlign: 'center'
+              }}>
+                <Typography variant="body1" style={{ color: colors.textSecondary, marginBottom: '8px' }}>
+                  {searchKeyword ? t('sharedNoResults') : t('sharedNoGeofences')}
+                </Typography>
+                <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                  {searchKeyword ? t('sharedTryDifferentSearch') : t('sharedAddFirstGeofence')}
+                </Typography>
+              </div>
+            ) : (
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    {paginatedGeofences.map((geofence) => (
+                      <TableRow 
+                        key={geofence.id} 
+                        hover
+                        onClick={() => handleGeofenceClick(geofence)}
+                        style={{ 
+                          cursor: 'pointer',
+                          '&:hover': {
+                            backgroundColor: colors.hover
+                          }
+                        }}
+                      >
+                        <TableCell>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {geofence.area.startsWith('CIRCLE') ? (
+                              <CircleIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : geofence.area.startsWith('LINESTRING') ? (
+                              <LineIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : geofence.area.startsWith('POLYGON') ? (
+                              <PolygonIcon 
+                                style={{ 
+                                  fontSize: '16px', 
+                                  color: geofence.attributes?.color || '#3f51b5' 
+                                }} 
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  borderRadius: '50%',
+                                  backgroundColor: geofence.attributes?.color || '#3f51b5'
+                                }}
+                              />
+                            )}
+                            <Typography variant="body2" style={{ color: colors.text }}>
+                              {geofence.name}
                             </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(geofence);
-                              }}
-                              style={{
-                                color: colors.textSecondary,
-                                '&:hover': {
-                                  color: colors.error
-                                }
-                              }}
-                            >
-                              <DeleteIcon style={{ fontSize: 16 }} />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                            {geofence.description || t('sharedNoDescription')}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(geofence);
+                            }}
+                            style={{
+                              color: colors.textSecondary,
+                              '&:hover': {
+                                color: colors.error
+                              }
+                            }}
+                          >
+                            <DeleteIcon style={{ fontSize: 16 }} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </div>
           )}
 
           {/* Pagination - Only show for Basic tab */}
