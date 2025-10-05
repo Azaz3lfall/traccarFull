@@ -1820,55 +1820,103 @@ const FloatingGeofencesPopover = ({
                     backgroundColor: colors.secondary,
                     padding: '8px'
                   }}>
-                    {routeWaypoints.filter(waypoint => waypoint && waypoint.address).map((waypoint, index) => (
-                      <div key={`waypoint-${waypoint.address}-${index}`} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        marginBottom: index < routeWaypoints.filter(wp => wp && wp.address).length - 1 ? '6px' : '0',
-                        padding: '4px 0'
-                      }}>
-                        <div style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          backgroundColor: index === 0 ? '#4caf50' : index === routeWaypoints.filter(wp => wp && wp.address).length - 1 ? '#f44336' : '#2196f3'
-                        }} />
-                        <Typography variant="body2" style={{ color: colors.text, fontSize: '12px', flex: 1 }}>
-                          {index === 0 ? 'START: ' : index === routeWaypoints.filter(wp => wp && wp.address).length - 1 ? 'END: ' : `WAYPOINT ${index}: `}{waypoint.address}
-                        </Typography>
-                        {/* Only show delete button for non-mandatory fields */}
-                        {index !== 0 && index !== routeWaypoints.filter(wp => wp && wp.address).length - 1 && (
-                          <button
-                            onClick={() => handleDeleteField(fields[index].id)}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            color: colors.textSecondary,
-                            cursor: 'pointer',
-                            borderRadius: '4px',
+                    <div style={{ position: 'relative' }}>
+                      {routeWaypoints.filter(waypoint => waypoint && waypoint.address).map((waypoint, index) => {
+                        const isFirst = index === 0;
+                        const isLast = index === routeWaypoints.filter(wp => wp && wp.address).length - 1;
+                        const isMiddle = !isFirst && !isLast;
+                        
+                        return (
+                          <div key={`waypoint-${waypoint.address}-${index}`} style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '12px',
-                            transition: 'all 0.2s'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = colors.hover;
-                            e.target.style.color = colors.error;
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = 'transparent';
-                            e.target.style.color = colors.textSecondary;
-                          }}
-                        >
-                          <CloseIcon2 style={{ fontSize: '14px' }} />
-                        </button>
-                        )}
-                      </div>
-                    ))}
+                            position: 'relative',
+                            padding: '8px 0',
+                            paddingLeft: '20px'
+                          }}>
+                            {/* Timeline line */}
+                            {!isLast && (
+                              <div style={{
+                                position: 'absolute',
+                                left: '6px',
+                                top: '14px',
+                                bottom: '-14px',
+                                width: '2px',
+                                backgroundColor: isFirst ? '#4caf50' : isLast ? '#f44336' : '#2196f3',
+                                zIndex: 0
+                              }} />
+                            )}
+                            
+                            {/* Timeline dot */}
+                            <div style={{
+                              position: 'absolute',
+                              left: '0',
+                              top: '8px',
+                              width: '14px',
+                              height: '14px',
+                              borderRadius: '50%',
+                              backgroundColor: isFirst ? '#4caf50' : isLast ? '#f44336' : '#2196f3',
+                              border: isFirst ? 'none' : isLast ? 'none' : `2px solid #2196f3`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              zIndex: 1
+                            }}>
+                              {(isFirst || isLast) && (
+                                <div style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  backgroundColor: 'white',
+                                  borderRadius: '50%'
+                                }} />
+                              )}
+                            </div>
+                            
+                            {/* Address text */}
+                            <div style={{ flex: 1, marginRight: '8px' }}>
+                              <Typography variant="body2" style={{ 
+                                color: (isFirst || isLast) ? colors.text : colors.textSecondary, 
+                                fontSize: '12px',
+                                fontWeight: '400'
+                              }}>
+                                {waypoint.address}
+                              </Typography>
+                            </div>
+                            
+                            {/* Delete button for middle waypoints */}
+                            {isMiddle && (
+                              <button
+                                onClick={() => handleDeleteField(fields[index].id)}
+                                style={{
+                                  width: '20px',
+                                  height: '20px',
+                                  border: 'none',
+                                  backgroundColor: 'transparent',
+                                  color: colors.textSecondary,
+                                  cursor: 'pointer',
+                                  borderRadius: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '12px',
+                                  transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = colors.hover;
+                                  e.target.style.color = colors.error;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
+                                  e.target.style.color = colors.textSecondary;
+                                }}
+                              >
+                                <CloseIcon2 style={{ fontSize: '14px' }} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
