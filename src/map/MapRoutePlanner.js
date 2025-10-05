@@ -28,6 +28,8 @@ const MapRoutePlanner = ({ routeData }) => {
       return;
     }
 
+    const coordinates = route.geometry.coordinates;
+
     // Add source for route polyline
     map.addSource(id, {
       type: 'geojson',
@@ -35,7 +37,7 @@ const MapRoutePlanner = ({ routeData }) => {
         type: 'Feature',
         geometry: {
           type: 'LineString',
-          coordinates: route.geometry.coordinates,
+          coordinates: coordinates,
         },
         properties: {},
       },
@@ -116,8 +118,7 @@ const MapRoutePlanner = ({ routeData }) => {
     }
 
     // Adjust camera to fit the route
-    if (route.geometry.coordinates.length > 0) {
-      const coordinates = route.geometry.coordinates;
+    if (coordinates.length > 0) {
       const bounds = coordinates.reduce((bounds, coord) => {
         return [
           [Math.min(bounds[0][0], coord[0]), Math.min(bounds[0][1], coord[1])],
