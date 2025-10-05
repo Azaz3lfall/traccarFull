@@ -1278,10 +1278,8 @@ const FloatingGeofencesPopover = ({
     
     console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
     
-    // Check if waypoints actually changed
+    // Check if waypoints actually changed BEFORE updating state
     const waypointsChanged = JSON.stringify(newWaypoints) !== JSON.stringify(routeWaypoints);
-    
-    setRouteWaypoints(newWaypoints);
     
     // Only clear route data and switch to Waypoints tab when waypoints actually change
     if (waypointsChanged && routeData) {
@@ -1289,6 +1287,8 @@ const FloatingGeofencesPopover = ({
       setRouteData(null);
       setRoutePlannerTab(0); // Switch to Waypoints tab (index 0)
     }
+    
+    setRouteWaypoints(newWaypoints);
   }, [fields]);
 
 
@@ -2174,7 +2174,13 @@ const FloatingGeofencesPopover = ({
                                       color: colors.primary,
                                       fontWeight: '700'
                                     }}>
-                                      {t('routePlannerCalculating')}...
+                                      R$ {(() => {
+                                        const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                        const fuelPrice = 5.50; // Default fuel price
+                                        const consumption = 12; // Default km/L
+                                        const fuelCost = (totalDistance / consumption) * fuelPrice;
+                                        return fuelCost.toFixed(2);
+                                      })()}
                                     </Typography>
                                   </div>
                                   
@@ -2197,7 +2203,12 @@ const FloatingGeofencesPopover = ({
                                       color: colors.primary,
                                       fontWeight: '700'
                                     }}>
-                                      {t('routePlannerCalculating')}...
+                                      R$ {(() => {
+                                        const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                        const tollRate = 0.15; // Default R$/km
+                                        const tollCost = totalDistance * tollRate;
+                                        return tollCost.toFixed(2);
+                                      })()}
                                     </Typography>
                                   </div>
                                   
@@ -2219,7 +2230,16 @@ const FloatingGeofencesPopover = ({
                                       color: 'white',
                                       fontWeight: '700'
                                     }}>
-                                      {t('routePlannerCalculating')}...
+                                      R$ {(() => {
+                                        const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                        const fuelPrice = 5.50; // Default fuel price
+                                        const consumption = 12; // Default km/L
+                                        const tollRate = 0.15; // Default R$/km
+                                        const fuelCost = (totalDistance / consumption) * fuelPrice;
+                                        const tollCost = totalDistance * tollRate;
+                                        const totalCost = fuelCost + tollCost;
+                                        return totalCost.toFixed(2);
+                                      })()}
                                     </Typography>
                                   </div>
                                 </div>
