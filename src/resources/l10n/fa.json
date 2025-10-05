@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "برنامه‌ریزی مسیر...",
   "routePlannerSelectAddresses": "لطفاً حداقل 2 آدرس برای برنامه‌ریزی مسیر انتخاب کنید",
   "routePlannerClickToPlan": "برای برنامه‌ریزی مسیر کلیک کنید",
-  "routePlannerNotEnoughWaypoints": "نقاط توقف کافی برای برنامه‌ریزی مسیر وجود ندارد"
+  "routePlannerNotEnoughWaypoints": "نقاط توقف کافی برای برنامه‌ریزی مسیر وجود ندارد",
+  "routePlannerHandlingFee": "هزینه پردازش"
 }

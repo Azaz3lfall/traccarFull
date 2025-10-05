@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Planuojamas maršrutas...",
   "routePlannerSelectAddresses": "Prašome pasirinkti bent 2 adresus maršruto planavimui",
   "routePlannerClickToPlan": "Spustelėkite maršruto planavimui",
-  "routePlannerNotEnoughWaypoints": "Nepakanka tarpinių stočių maršruto planavimui"
+  "routePlannerNotEnoughWaypoints": "Nepakanka tarpinių stočių maršruto planavimui",
+  "routePlannerHandlingFee": "Apdorojimo Mokestis"
 }

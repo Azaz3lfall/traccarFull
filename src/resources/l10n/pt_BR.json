@@ -727,13 +727,13 @@
   "routePlannerCostSettings": "Configurações de Custo",
   "routePlannerFuelPrice": "Preço do Combustível",
   "routePlannerVehicleConsumption": "Consumo do Veículo",
-  "routePlannerTollCost": "Custo de Pedágio",
   "routePlannerFuelLiters": "Litros de Combustível",
   "routePlannerProfitabilityAnalysis": "Análise de Lucratividade",
   "routePlannerClientPrice": "Preço do Cliente",
   "routePlannerProfit": "Lucro",
   "routePlannerPricePerKm": "Preço por KM",
   "routePlannerRoundTrip": "Ida/Volta",
+  "routePlannerHandlingFee": "Taxa de Manuseio",
   "routePlannerYes": "Sim",
   "routePlannerNo": "Não"
 }

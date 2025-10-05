@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "මාර්ග සැලසුම් කරමින්...",
   "routePlannerSelectAddresses": "මාර්ගයක් සැලසුම් කිරීම සඳහා කරුණාකර අවම වශයෙන් ලිපින 2ක් තෝරන්න",
   "routePlannerClickToPlan": "මාර්ගය සැලසුම් කිරීම සඳහා ක්ලික් කරන්න",
-  "routePlannerNotEnoughWaypoints": "මාර්ග සැලසුම් කිරීම සඳහා ප්‍රමාණවත් මාර්ග ලක්ෂ්‍ය නොමැත"
+  "routePlannerNotEnoughWaypoints": "මාර්ග සැලසුම් කිරීම සඳහා ප්‍රමාණවත් මාර්ග ලක්ෂ්‍ය නොමැත",
+  "routePlannerHandlingFee": "හැසිරවීමේ ගණන"
 }

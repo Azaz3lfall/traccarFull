@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Reittiä suunnitellaan...",
   "routePlannerSelectAddresses": "Valitse vähintään 2 osoitetta reitin suunnittelemiseksi",
   "routePlannerClickToPlan": "Klikkaa reitin suunnittelemiseksi",
-  "routePlannerNotEnoughWaypoints": "Ei tarpeeksi välipysähdyksiä reitin suunnittelemiseksi"
+  "routePlannerNotEnoughWaypoints": "Ei tarpeeksi välipysähdyksiä reitin suunnittelemiseksi",
+  "routePlannerHandlingFee": "Käsittelymaksu"
 }

@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Útvonal tervezése...",
   "routePlannerSelectAddresses": "Kérjük, válasszon legalább 2 címet az útvonal tervezéséhez",
   "routePlannerClickToPlan": "Kattintson az útvonal tervezéséhez",
-  "routePlannerNotEnoughWaypoints": "Nincs elég megálló az útvonal tervezéséhez"
+  "routePlannerNotEnoughWaypoints": "Nincs elég megálló az útvonal tervezéséhez",
+  "routePlannerHandlingFee": "Feldolgozási Díj"
 }

@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "កំពុងរៀបចំផ្លូវ...",
   "routePlannerSelectAddresses": "សូមជ្រើសរើសយ៉ាងហោចណាស់ 2 អាសយដ្ឋានដើម្បីរៀបចំផ្លូវ",
   "routePlannerClickToPlan": "ចុចដើម្បីរៀបចំផ្លូវ",
-  "routePlannerNotEnoughWaypoints": "ចំណុចឈប់មិនគ្រប់គ្រាន់សម្រាប់ការរៀបចំផ្លូវ"
+  "routePlannerNotEnoughWaypoints": "ចំណុចឈប់មិនគ្រប់គ្រាន់សម្រាប់ការរៀបចំផ្លូវ",
+  "routePlannerHandlingFee": "ថ្លៃដំណើរការ"
 }

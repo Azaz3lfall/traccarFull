@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Marshrut rejalashtirilmoqda...",
   "routePlannerSelectAddresses": "Marshrut rejalashtirish uchun kamida 2 ta manzil tanlang",
   "routePlannerClickToPlan": "Marshrut rejalashtirish uchun bosing",
-  "routePlannerNotEnoughWaypoints": "Marshrut rejalashtirish uchun etarli oraliq nuqtalar yo'q"
+  "routePlannerNotEnoughWaypoints": "Marshrut rejalashtirish uchun etarli oraliq nuqtalar yo'q",
+  "routePlannerHandlingFee": "Ishlov Berish Haqi"
 }

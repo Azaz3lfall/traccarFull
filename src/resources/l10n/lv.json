@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Plāno maršrutu...",
   "routePlannerSelectAddresses": "Lūdzu, izvēlieties vismaz 2 adreses maršruta plānošanai",
   "routePlannerClickToPlan": "Noklikšķiniet maršruta plānošanai",
-  "routePlannerNotEnoughWaypoints": "Nepietiek starpstaciju maršruta plānošanai"
+  "routePlannerNotEnoughWaypoints": "Nepietiek starpstaciju maršruta plānošanai",
+  "routePlannerHandlingFee": "Apstrādes Maksa"
 }

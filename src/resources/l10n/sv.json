@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "Planerar rutt...",
   "routePlannerSelectAddresses": "Välj minst 2 adresser för att planera en rutt",
   "routePlannerClickToPlan": "Klicka för att planera rutt",
-  "routePlannerNotEnoughWaypoints": "Inte tillräckligt med vägpunkter för ruttplanering"
+  "routePlannerNotEnoughWaypoints": "Inte tillräckligt med vägpunkter för ruttplanering",
+  "routePlannerHandlingFee": "Hanteringsavgift"
 }

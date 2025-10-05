@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Beplan roete...",
   "routePlannerSelectAddresses": "Kies asseblief ten minste 2 adresse om 'n roete te beplan",
   "routePlannerClickToPlan": "Klik om roete te beplan",
-  "routePlannerNotEnoughWaypoints": "Nie genoeg wegpunte vir roete beplanning nie"
+  "routePlannerNotEnoughWaypoints": "Nie genoeg wegpunte vir roete beplanning nie",
+  "routePlannerHandlingFee": "Handling Fee"
 }

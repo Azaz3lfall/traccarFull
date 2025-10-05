@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Kupanga njia...",
   "routePlannerSelectAddresses": "Tafadhali chagua angalau anwani 2 za kupanga njia",
   "routePlannerClickToPlan": "Bonyeza kupanga njia",
-  "routePlannerNotEnoughWaypoints": "Vituo vya kati vya kutosha vya kupanga njia"
+  "routePlannerNotEnoughWaypoints": "Vituo vya kati vya kutosha vya kupanga njia",
+  "routePlannerHandlingFee": "Handling Fee"
 }

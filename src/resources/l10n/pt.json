@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Planejando rota...",
   "routePlannerSelectAddresses": "Por favor, selecione pelo menos 2 endereços para planejar uma rota",
   "routePlannerClickToPlan": "Clique para planejar rota",
-  "routePlannerNotEnoughWaypoints": "Pontos de parada insuficientes para planejamento de rota"
+  "routePlannerNotEnoughWaypoints": "Pontos de parada insuficientes para planejamento de rota",
+  "routePlannerHandlingFee": "Taxa de Manuseio"
 }

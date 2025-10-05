@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "กำลังวางแผนเส้นทาง...",
   "routePlannerSelectAddresses": "กรุณาเลือกที่อยู่อย่างน้อย 2 ที่อยู่เพื่อวางแผนเส้นทาง",
   "routePlannerClickToPlan": "คลิกเพื่อวางแผนเส้นทาง",
-  "routePlannerNotEnoughWaypoints": "จุดแวะไม่เพียงพอสำหรับการวางแผนเส้นทาง"
+  "routePlannerNotEnoughWaypoints": "จุดแวะไม่เพียงพอสำหรับการวางแผนเส้นทาง",
+  "routePlannerHandlingFee": "ค่าธรรมเนียมการจัดการ"
 }

@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "வழியை திட்டமிடுகிறது...",
   "routePlannerSelectAddresses": "வழியை திட்டமிட குறைந்தது 2 முகவரிகளை தேர்ந்தெடுக்கவும்",
   "routePlannerClickToPlan": "வழியை திட்டமிட கிளிக் செய்யவும்",
-  "routePlannerNotEnoughWaypoints": "வழி திட்டமிட போதுமான வழிநிலை புள்ளிகள் இல்லை"
+  "routePlannerNotEnoughWaypoints": "வழி திட்டமிட போதுமான வழிநிலை புள்ளிகள் இல்லை",
+  "routePlannerHandlingFee": "கையாளுதல் கட்டணம்"
 }

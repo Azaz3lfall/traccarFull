@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "रूट की योजना बना रहे हैं...",
   "routePlannerSelectAddresses": "रूट की योजना के लिए कम से कम 2 पते चुनें",
   "routePlannerClickToPlan": "रूट की योजना के लिए क्लिक करें",
-  "routePlannerNotEnoughWaypoints": "रूट की योजना के लिए पर्याप्त रास्ते के बिंदु नहीं हैं"
+  "routePlannerNotEnoughWaypoints": "रूट की योजना के लिए पर्याप्त रास्ते के बिंदु नहीं हैं",
+  "routePlannerHandlingFee": "हैंडलिंग शुल्क"
 }

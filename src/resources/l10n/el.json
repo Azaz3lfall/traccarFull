@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Σχεδιασμός διαδρομής...",
   "routePlannerSelectAddresses": "Παρακαλώ επιλέξτε τουλάχιστον 2 διευθύνσεις για σχεδιασμό διαδρομής",
   "routePlannerClickToPlan": "Κάντε κλικ για σχεδιασμό διαδρομής",
-  "routePlannerNotEnoughWaypoints": "Ανεπαρκή σημεία στάσης για σχεδιασμό διαδρομής"
+  "routePlannerNotEnoughWaypoints": "Ανεπαρκή σημεία στάσης για σχεδιασμό διαδρομής",
+  "routePlannerHandlingFee": "Χρέωση Επεξεργασίας"
 }

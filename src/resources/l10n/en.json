@@ -727,13 +727,13 @@
   "routePlannerCostSettings": "Cost Settings",
   "routePlannerFuelPrice": "Fuel Price",
   "routePlannerVehicleConsumption": "Vehicle Consumption",
-  "routePlannerTollCost": "Toll Cost",
   "routePlannerFuelLiters": "Fuel Liters",
   "routePlannerProfitabilityAnalysis": "Profitability Analysis",
   "routePlannerClientPrice": "Client Price",
   "routePlannerProfit": "Profit",
   "routePlannerPricePerKm": "Price per KM",
   "routePlannerRoundTrip": "Round Trip",
+  "routePlannerHandlingFee": "Handling Fee",
   "routePlannerYes": "Yes",
   "routePlannerNo": "No"
 }

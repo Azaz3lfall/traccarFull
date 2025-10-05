@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "正在规划路线...",
   "routePlannerSelectAddresses": "请选择至少2个地址来规划路线",
   "routePlannerClickToPlan": "点击规划路线",
-  "routePlannerNotEnoughWaypoints": "途经点不足，无法规划路线"
+  "routePlannerNotEnoughWaypoints": "途经点不足，无法规划路线",
+  "routePlannerHandlingFee": "手续费"
 }

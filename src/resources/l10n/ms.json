@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Merancang laluan...",
   "routePlannerSelectAddresses": "Sila pilih sekurang-kurangnya 2 alamat untuk merancang laluan",
   "routePlannerClickToPlan": "Klik untuk merancang laluan",
-  "routePlannerNotEnoughWaypoints": "Titik perhentian tidak mencukupi untuk merancang laluan"
+  "routePlannerNotEnoughWaypoints": "Titik perhentian tidak mencukupi untuk merancang laluan",
+  "routePlannerHandlingFee": "Handling Fee"
 }

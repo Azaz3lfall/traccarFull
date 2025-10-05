@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Planiranje rute...",
   "routePlannerSelectAddresses": "Molimo odaberite najmanje 2 adrese za planiranje rute",
   "routePlannerClickToPlan": "Kliknite za planiranje rute",
-  "routePlannerNotEnoughWaypoints": "Nedovoljno stajališta za planiranje rute"
+  "routePlannerNotEnoughWaypoints": "Nedovoljno stajališta za planiranje rute",
+  "routePlannerHandlingFee": "Naknada za Rukovanje"
 }

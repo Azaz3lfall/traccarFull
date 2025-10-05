@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Ýol meýilnama...",
   "routePlannerSelectAddresses": "Ýol meýilnama üçin iň az 2 salgy saýlaň",
   "routePlannerClickToPlan": "Ýol meýilnama üçin basyň",
-  "routePlannerNotEnoughWaypoints": "Ýol meýilnama üçin ýeterlik araçyk ýok"
+  "routePlannerNotEnoughWaypoints": "Ýol meýilnama üçin ýeterlik araçyk ýok",
+  "routePlannerHandlingFee": "Handling Fee"
 }

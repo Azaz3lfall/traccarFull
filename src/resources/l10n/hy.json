@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Ճանապարհի պլանավորում...",
   "routePlannerSelectAddresses": "Խնդրում ենք ընտրել առնվազն 2 հասցե ճանապարհի պլանավորման համար",
   "routePlannerClickToPlan": "Կտտացրեք ճանապարհի պլանավորման համար",
-  "routePlannerNotEnoughWaypoints": "Անբավարար կանգառներ ճանապարհի պլանավորման համար"
+  "routePlannerNotEnoughWaypoints": "Անբավարար կանգառներ ճանապարհի պլանավորման համար",
+  "routePlannerHandlingFee": "Մշակման Վճար"
 }

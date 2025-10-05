@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "تخطيط المسار...",
   "routePlannerSelectAddresses": "يرجى اختيار عنوانين على الأقل لتخطيط مسار",
   "routePlannerClickToPlan": "انقر لتخطيط المسار",
-  "routePlannerNotEnoughWaypoints": "نقاط التوقف غير كافية لتخطيط المسار"
+  "routePlannerNotEnoughWaypoints": "نقاط التوقف غير كافية لتخطيط المسار",
+  "routePlannerHandlingFee": "رسوم المعالجة"
 }

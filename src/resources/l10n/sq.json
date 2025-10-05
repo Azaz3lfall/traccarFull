@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Planifikimi i rrugës...",
   "routePlannerSelectAddresses": "Ju lutemi zgjidhni të paktën 2 adresa për të planifikuar një rrugë",
   "routePlannerClickToPlan": "Klikoni për të planifikuar rrugën",
-  "routePlannerNotEnoughWaypoints": "Pika të ndalimit të pamjaftueshme për planifikimin e rrugës"
+  "routePlannerNotEnoughWaypoints": "Pika të ndalimit të pamjaftueshme për planifikimin e rrugës",
+  "routePlannerHandlingFee": "Handling Fee"
 }

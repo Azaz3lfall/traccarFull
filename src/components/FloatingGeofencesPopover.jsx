@@ -93,6 +93,7 @@ const FloatingGeofencesPopover = ({
     consumption: 9,
     tollCost: 15.00,
     pricePerKm: 3.90,
+    handlingFee: 500.00,
     roundTrip: false
   });
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -2352,6 +2353,35 @@ const FloatingGeofencesPopover = ({
                                     {t('routePlannerProfitabilityAnalysis')}
                                   </Typography>
                                   
+                                  {/* Handling Fee Input */}
+                                  <div style={{ marginBottom: '8px' }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '4px',
+                                      fontSize: '11px'
+                                    }}>
+                                      {t('routePlannerHandlingFee')} (R$)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      value={costSettings.handlingFee}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        handlingFee: parseFloat(e.target.value) || 0
+                                      }))}
+                                      style={{ 
+                                        width: '100%',
+                                        '& .MuiOutlinedInput-root': {
+                                          fontSize: '11px'
+                                        }
+                                      }}
+                                      inputProps={{
+                                        style: { fontSize: '11px', padding: '6px 8px' }
+                                      }}
+                                    />
+                                  </div>
+                                  
                                   {/* Price per KM Input */}
                                   <div style={{ marginBottom: '8px' }}>
                                     <Typography variant="body2" style={{ 
@@ -2500,7 +2530,7 @@ const FloatingGeofencesPopover = ({
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
-                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
+                                          const clientPrice = ((totalDistance * costSettings.pricePerKm) + costSettings.handlingFee) * multiplier;
                                           return clientPrice.toFixed(2);
                                         })()}
                                       </Typography>
@@ -2534,7 +2564,7 @@ const FloatingGeofencesPopover = ({
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
-                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
+                                          const clientPrice = ((totalDistance * costSettings.pricePerKm) + costSettings.handlingFee) * multiplier;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           const tollCost = costSettings.tollCost * multiplier;
                                           const totalCost = fuelCost + tollCost;

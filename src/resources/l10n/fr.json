@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "Planification de l'itinéraire...",
   "routePlannerSelectAddresses": "Veuillez sélectionner au moins 2 adresses pour planifier un itinéraire",
   "routePlannerClickToPlan": "Cliquez pour planifier l'itinéraire",
-  "routePlannerNotEnoughWaypoints": "Pas assez de points d'arrêt pour planifier l'itinéraire"
+  "routePlannerNotEnoughWaypoints": "Pas assez de points d'arrêt pour planifier l'itinéraire",
+  "routePlannerHandlingFee": "Frais de Manutention"
 }

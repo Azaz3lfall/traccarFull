@@ -716,5 +716,6 @@
   "routePlannerPlanningRoute": "Route plannen...",
   "routePlannerSelectAddresses": "Selecteer minimaal 2 adressen om een route te plannen",
   "routePlannerClickToPlan": "Klik om route te plannen",
-  "routePlannerNotEnoughWaypoints": "Niet genoeg tussenstops voor routeplanning"
+  "routePlannerNotEnoughWaypoints": "Niet genoeg tussenstops voor routeplanning",
+  "routePlannerHandlingFee": "Behandelingskosten"
 }

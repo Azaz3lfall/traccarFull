@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "मार्ग योजना गर्दै...",
   "routePlannerSelectAddresses": "कृपया मार्ग योजना गर्न कम्तिमा 2 ठेगाना छान्नुहोस्",
   "routePlannerClickToPlan": "मार्ग योजना गर्न क्लिक गर्नुहोस्",
-  "routePlannerNotEnoughWaypoints": "मार्ग योजना गर्न पर्याप्त बिचका बिन्दुहरू छैनन्"
+  "routePlannerNotEnoughWaypoints": "मार्ग योजना गर्न पर्याप्त बिचका बिन्दुहरू छैनन्",
+  "routePlannerHandlingFee": "ह्यान्डलिङ शुल्क"
 }

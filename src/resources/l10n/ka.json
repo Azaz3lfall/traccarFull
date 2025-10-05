@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "მარშრუტის დაგეგმვა...",
   "routePlannerSelectAddresses": "გთხოვთ, აირჩიოთ მინიმუმ 2 მისამართი მარშრუტის დასაგეგმად",
   "routePlannerClickToPlan": "დააჭირეთ მარშრუტის დასაგეგმად",
-  "routePlannerNotEnoughWaypoints": "არასაკმარისი გზის წერტილები მარშრუტის დასაგეგმად"
+  "routePlannerNotEnoughWaypoints": "არასაკმარისი გზის წერტილები მარშრუტის დასაგეგმად",
+  "routePlannerHandlingFee": "მუშაობის საფასური"
 }

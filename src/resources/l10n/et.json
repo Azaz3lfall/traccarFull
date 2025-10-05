@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Marsruudi planeerimine...",
   "routePlannerSelectAddresses": "Palun valige vähemalt 2 aadressi marsruudi planeerimiseks",
   "routePlannerClickToPlan": "Klõpsake marsruudi planeerimiseks",
-  "routePlannerNotEnoughWaypoints": "Pole piisavalt vahepeatusi marsruudi planeerimiseks"
+  "routePlannerNotEnoughWaypoints": "Pole piisavalt vahepeatusi marsruudi planeerimiseks",
+  "routePlannerHandlingFee": "Töötlemistasu"
 }

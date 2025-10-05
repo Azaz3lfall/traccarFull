@@ -717,5 +717,6 @@
   "routePlannerPlanningRoute": "Planowanie trasy...",
   "routePlannerSelectAddresses": "Wybierz co najmniej 2 adresy, aby zaplanować trasę",
   "routePlannerClickToPlan": "Kliknij, aby zaplanować trasę",
-  "routePlannerNotEnoughWaypoints": "Niewystarczająca liczba punktów trasy do planowania"
+  "routePlannerNotEnoughWaypoints": "Niewystarczająca liczba punktów trasy do planowania",
+  "routePlannerHandlingFee": "Opłata za Obsługę"
 }
