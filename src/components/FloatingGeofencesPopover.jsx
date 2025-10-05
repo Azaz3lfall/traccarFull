@@ -2198,7 +2198,8 @@ const FloatingGeofencesPopover = ({
                                       }}>
                                         {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                          return totalDistance.toFixed(2) + ' km';
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          return (totalDistance * multiplier).toFixed(2) + ' km';
                                         })()}
                                       </Typography>
                                     </div>
