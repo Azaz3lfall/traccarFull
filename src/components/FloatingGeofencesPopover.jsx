@@ -2169,6 +2169,38 @@ const FloatingGeofencesPopover = ({
                                     {t('routePlannerCostAnalysis')}
                                   </Typography>
                                   
+                                  {/* Total Distance */}
+                                  <div style={{ 
+                                    marginBottom: '8px',
+                                    padding: '8px',
+                                    backgroundColor: colors.secondary,
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text, 
+                                        fontSize: '11px'
+                                      }}>
+                                        {t('routePlannerDistance')}
+                                      </Typography>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text,
+                                        fontWeight: '600',
+                                        fontSize: '11px'
+                                      }}>
+                                        {(() => {
+                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          return totalDistance.toFixed(2) + ' km';
+                                        })()}
+                                      </Typography>
+                                    </div>
+                                  </div>
+                                  
                                   {/* Fuel Cost */}
                                   <div style={{ 
                                     marginBottom: '8px',
