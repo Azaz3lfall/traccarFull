@@ -1087,14 +1087,19 @@ const FloatingGeofencesPopover = ({
   // Handle field deletion
   const handleDeleteField = (fieldId) => {
     setFields(prev => {
-      const newFields = prev.filter(field => field.id !== fieldId);
+      const fieldIndex = prev.findIndex(f => f.id === fieldId);
       
-      // If we're deleting the first or last field, we need to keep at least 2 fields
-      if (newFields.length < 2) {
-        return prev; // Don't delete if it would leave less than 2 fields
+      // Prevent deletion of first or last field (mandatory start/end)
+      if (fieldIndex === 0 || fieldIndex === prev.length - 1) {
+        return prev; // Don't delete mandatory fields
       }
       
-      return newFields;
+      // Prevent deletion if it would leave less than 2 fields
+      if (prev.length <= 2) {
+        return prev; // Always keep at least 2 fields
+      }
+      
+      return prev.filter(field => field.id !== fieldId);
     });
     
     setRouteWaypoints(prev => {
@@ -1597,7 +1602,7 @@ const FloatingGeofencesPopover = ({
                   <div style={{ position: 'relative' }}>
                     <input
                       type="text"
-                      placeholder={field.id === 'start' ? 'Enter start address...' : field.id === 'end' ? 'Enter end address...' : 'Enter address'}
+                      placeholder={index === 0 ? 'Enter start address...' : index === fields.length - 1 ? 'Enter end address...' : 'Enter address'}
                       value={field.value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       style={{
@@ -1666,8 +1671,8 @@ const FloatingGeofencesPopover = ({
                       </button>
                     </div>
                     
-                    {/* Delete button for non-essential fields */}
-                    {field.id !== 'start' && field.id !== 'end' && (
+                    {/* Delete button for non-essential fields (not first or last) */}
+                    {index !== 0 && index !== fields.length - 1 && (
                       <button
                         onClick={() => handleDeleteField(field.id)}
                       style={{
@@ -1821,13 +1826,15 @@ const FloatingGeofencesPopover = ({
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          backgroundColor: index === 0 ? '#4caf50' : '#f44336' // First position is green (start), second is red (end)
+                          backgroundColor: index === 0 ? '#4caf50' : index === routeWaypoints.filter(wp => wp && wp.address).length - 1 ? '#f44336' : '#2196f3'
                         }} />
                         <Typography variant="body2" style={{ color: colors.text, fontSize: '12px', flex: 1 }}>
-                          {waypoint.address}
+                          {index === 0 ? 'START: ' : index === routeWaypoints.filter(wp => wp && wp.address).length - 1 ? 'END: ' : `WAYPOINT ${index}: `}{waypoint.address}
                         </Typography>
-                        <button
-                          onClick={() => handleDeleteField(fields[index].id)}
+                        {/* Only show delete button for non-mandatory fields */}
+                        {index !== 0 && index !== routeWaypoints.filter(wp => wp && wp.address).length - 1 && (
+                          <button
+                            onClick={() => handleDeleteField(fields[index].id)}
                           style={{
                             width: '20px',
                             height: '20px',
@@ -1853,6 +1860,7 @@ const FloatingGeofencesPopover = ({
                         >
                           <CloseIcon2 style={{ fontSize: '14px' }} />
                         </button>
+                        )}
                       </div>
                     ))}
                   </div>
