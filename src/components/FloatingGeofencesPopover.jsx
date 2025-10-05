@@ -51,6 +51,7 @@ import {
   ChangeHistory as PolygonIcon,
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
+  Close as CloseIcon2,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -1025,7 +1026,7 @@ const FloatingGeofencesPopover = ({
   const handleStartAddressSelect = (result) => {
     setStartAddress(result.properties?.display_name || result.text);
     setStartSearchResults([]);
-    // Add to route waypoints
+    // Add to route waypoints - first position is always start
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
       newWaypoints[0] = {
@@ -1041,7 +1042,7 @@ const FloatingGeofencesPopover = ({
   const handleEndAddressSelect = (result) => {
     setEndAddress(result.properties?.display_name || result.text);
     setEndSearchResults([]);
-    // Add to route waypoints
+    // Add to route waypoints - second position is always end
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
       newWaypoints[1] = {
@@ -1078,6 +1079,41 @@ const FloatingGeofencesPopover = ({
     });
   };
 
+  // Handle waypoint deletion
+  const handleDeleteWaypoint = (index) => {
+    setRouteWaypoints(prev => {
+      const newWaypoints = [...prev];
+      newWaypoints.splice(index, 1);
+      
+      // Update types based on new positions
+      newWaypoints.forEach((waypoint, i) => {
+        waypoint.type = i === 0 ? 'start' : 'end';
+      });
+      
+      // Update input fields based on new waypoints
+      if (newWaypoints.length === 0) {
+        setStartAddress('');
+        setEndAddress('');
+        setStartSearchResults([]);
+        setEndSearchResults([]);
+      } else if (newWaypoints.length === 1) {
+        // Only one waypoint left - it becomes the start
+        setStartAddress(newWaypoints[0].address);
+        setEndAddress('');
+        setStartSearchResults([]);
+        setEndSearchResults([]);
+      } else {
+        // Two waypoints left
+        setStartAddress(newWaypoints[0].address);
+        setEndAddress(newWaypoints[1].address);
+        setStartSearchResults([]);
+        setEndSearchResults([]);
+      }
+      
+      return newWaypoints;
+    });
+  };
+
   // Render address field based on type
   const renderAddressField = (fieldType, isFirst) => {
     const isStart = fieldType === 'start';
@@ -1092,82 +1128,88 @@ const FloatingGeofencesPopover = ({
     const placeholder = isStart ? "Enter start address..." : "Enter end address...";
 
     return (
-      <div style={{ marginBottom: '20px' }}>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <input
-              type="text"
-              placeholder={placeholder}
-              value={address}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                backgroundColor: colors.secondary,
-                border: `1px solid ${colors.border}`,
-                borderRadius: '8px',
-                color: colors.text,
-                fontSize: '14px',
-                outline: 'none',
-                paddingRight: isSearching ? '40px' : '16px'
-              }}
-            />
-            {isSearching && (
-              <div style={{
-                position: 'absolute',
-                right: '12px',
-                top: 'calc(50% - 8px)',
-                width: '16px',
-                height: '16px',
-                border: '2px solid transparent',
-                borderTop: '2px solid #18a9fd',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }} />
-            )}
-          </div>
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            placeholder={placeholder}
+            value={address}
+            onChange={handleChange}
+            style={{
+              width: '100%',
+              padding: '10px 60px 10px 12px', // More space on right for controls
+              backgroundColor: colors.secondary,
+              border: `1px solid ${colors.border}`,
+              borderRadius: '8px',
+              color: colors.text,
+              fontSize: '14px',
+              outline: 'none'
+            }}
+          />
           
-          {/* Reorder buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {/* Reorder buttons inside the field */}
+          <div style={{ 
+            position: 'absolute', 
+            right: '8px', 
+            top: '50%', 
+            transform: 'translateY(-50%)',
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1px' 
+          }}>
             <button
               onClick={() => handleReorderFields('up')}
               disabled={isFirst}
               style={{
-                width: '32px',
-                height: '16px',
+                width: '20px',
+                height: '12px',
                 border: 'none',
-                backgroundColor: isFirst ? colors.border : colors.secondary,
-                color: isFirst ? colors.textSecondary : colors.text,
+                backgroundColor: isFirst ? colors.border : colors.primary,
+                color: isFirst ? colors.textSecondary : '#ffffff',
                 cursor: isFirst ? 'not-allowed' : 'pointer',
-                borderRadius: '4px 4px 0 0',
+                borderRadius: '2px 2px 0 0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                fontSize: '10px'
               }}
             >
-              <ArrowUpIcon style={{ fontSize: '14px' }} />
+              <ArrowUpIcon style={{ fontSize: '10px' }} />
             </button>
             <button
               onClick={() => handleReorderFields('down')}
               disabled={!isFirst}
               style={{
-                width: '32px',
-                height: '16px',
+                width: '20px',
+                height: '12px',
                 border: 'none',
-                backgroundColor: !isFirst ? colors.border : colors.secondary,
-                color: !isFirst ? colors.textSecondary : colors.text,
+                backgroundColor: !isFirst ? colors.border : colors.primary,
+                color: !isFirst ? colors.textSecondary : '#ffffff',
                 cursor: !isFirst ? 'not-allowed' : 'pointer',
-                borderRadius: '0 0 4px 4px',
+                borderRadius: '0 0 2px 2px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                fontSize: '10px'
               }}
             >
-              <ArrowDownIcon style={{ fontSize: '14px' }} />
+              <ArrowDownIcon style={{ fontSize: '10px' }} />
             </button>
           </div>
+          
+          {isSearching && (
+            <div style={{
+              position: 'absolute',
+              right: '32px',
+              top: 'calc(50% - 6px)',
+              width: '12px',
+              height: '12px',
+              border: '2px solid transparent',
+              borderTop: '2px solid #18a9fd',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+          )}
         </div>
         
         {/* Search Results */}
@@ -1236,7 +1278,14 @@ const FloatingGeofencesPopover = ({
         )}
         
         {/* No Results */}
-        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.find(wp => wp.type === fieldType) && (
+        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.find((wp, i) => {
+          // Check if this field has a corresponding waypoint
+          if (isStart) {
+            return i === 0 && wp.address === address;
+          } else {
+            return i === 1 && wp.address === address;
+          }
+        }) && (
           <div style={{
             marginTop: '8px',
             padding: '8px',
@@ -1526,7 +1575,7 @@ const FloatingGeofencesPopover = ({
           )}
 
           {activeTab === 1 && (
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '12px' }}>
               {/* Dynamic Address Fields based on order */}
               {fieldOrder.map((fieldType, index) => 
                 renderAddressField(fieldType, index === 0)
@@ -1534,22 +1583,23 @@ const FloatingGeofencesPopover = ({
 
               {/* Route Waypoints Display */}
               {routeWaypoints.length > 0 && (
-                <div style={{ marginTop: '20px' }}>
-                  <Typography variant="body2" style={{ color: colors.text, marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                <div style={{ marginTop: '12px' }}>
+                  <Typography variant="body2" style={{ color: colors.text, marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>
                     Selected Waypoints
                   </Typography>
                   <div style={{
                     border: `1px solid ${colors.border}`,
                     borderRadius: '8px',
                     backgroundColor: colors.secondary,
-                    padding: '12px'
+                    padding: '8px'
                   }}>
                     {routeWaypoints.map((waypoint, index) => (
                       <div key={`waypoint-${index}`} style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        marginBottom: index < routeWaypoints.length - 1 ? '8px' : '0'
+                        marginBottom: index < routeWaypoints.length - 1 ? '6px' : '0',
+                        padding: '4px 0'
                       }}>
                         <div style={{
                           width: '8px',
@@ -1557,9 +1607,36 @@ const FloatingGeofencesPopover = ({
                           borderRadius: '50%',
                           backgroundColor: index === 0 ? '#4caf50' : '#f44336' // First position is green (start), second is red (end)
                         }} />
-                        <Typography variant="body2" style={{ color: colors.text, fontSize: '12px' }}>
+                        <Typography variant="body2" style={{ color: colors.text, fontSize: '12px', flex: 1 }}>
                           {waypoint.address}
                         </Typography>
+                        <button
+                          onClick={() => handleDeleteWaypoint(index)}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            color: colors.textSecondary,
+                            cursor: 'pointer',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = colors.hover;
+                            e.target.style.color = colors.error;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = colors.textSecondary;
+                          }}
+                        >
+                          <CloseIcon2 style={{ fontSize: '14px' }} />
+                        </button>
                       </div>
                     ))}
                   </div>
