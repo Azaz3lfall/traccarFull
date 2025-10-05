@@ -1010,34 +1010,39 @@ const FloatingGeofencesPopover = ({
   const handleFieldSelect = (fieldId, result) => {
     const address = result.properties?.display_name || result.text;
     
-    setFields(prev => prev.map(field => 
-      field.id === fieldId 
-        ? { ...field, value: address, searchResults: [] }
-        : field
-    ));
-    
-    // Update route waypoints based on field position
-    setRouteWaypoints(prev => {
-      const newWaypoints = [...prev];
-      const fieldIndex = fields.findIndex(f => f.id === fieldId);
+    setFields(prev => {
+      const updatedFields = prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, value: address, searchResults: [] }
+          : field
+      );
       
-      // Determine type based on position
-      let type;
-      if (fieldIndex === 0) {
-        type = 'start';
-      } else if (fieldIndex === fields.length - 1) {
-        type = 'end';
-      } else {
-        type = `waypoint_${fieldIndex}`;
-      }
+      // Update route waypoints based on field position
+      const fieldIndex = updatedFields.findIndex(f => f.id === fieldId);
       
-      newWaypoints[fieldIndex] = {
-        address,
-        coordinates: result.center,
-        type
-      };
+      setRouteWaypoints(prevWaypoints => {
+        const newWaypoints = [...prevWaypoints];
+        
+        // Determine type based on position
+        let type;
+        if (fieldIndex === 0) {
+          type = 'start';
+        } else if (fieldIndex === updatedFields.length - 1) {
+          type = 'end';
+        } else {
+          type = `waypoint_${fieldIndex}`;
+        }
+        
+        newWaypoints[fieldIndex] = {
+          address,
+          coordinates: result.center,
+          type
+        };
+        
+        return newWaypoints;
+      });
       
-      return newWaypoints;
+      return updatedFields;
     });
   };
 
@@ -1051,36 +1056,34 @@ const FloatingGeofencesPopover = ({
       if (newIndex >= 0 && newIndex < newFields.length) {
         // Swap fields
         [newFields[currentIndex], newFields[newIndex]] = [newFields[newIndex], newFields[currentIndex]];
-      }
-      
-      return newFields;
-    });
-    
-    // Update route waypoints to match new field order
-    setRouteWaypoints(prev => {
-      const newWaypoints = [...prev];
-      const fieldIndex = fields.findIndex(f => f.id === fieldId);
-      const newIndex = direction === 'up' ? fieldIndex - 1 : fieldIndex + 1;
-      
-      if (newIndex >= 0 && newIndex < newWaypoints.length && newWaypoints[fieldIndex] && newWaypoints[newIndex]) {
-        // Swap waypoints
-        [newWaypoints[fieldIndex], newWaypoints[newIndex]] = [newWaypoints[newIndex], newWaypoints[fieldIndex]];
         
-        // Update types based on new positions
-        newWaypoints.forEach((waypoint, index) => {
-          if (waypoint) {
-            if (index === 0) {
-              waypoint.type = 'start';
-            } else if (index === newWaypoints.length - 1) {
-              waypoint.type = 'end';
-            } else {
-              waypoint.type = `waypoint_${index}`;
-            }
+        // Update route waypoints to match new field order
+        setRouteWaypoints(prevWaypoints => {
+          const newWaypoints = [...prevWaypoints];
+          
+          if (newWaypoints[currentIndex] && newWaypoints[newIndex]) {
+            // Swap waypoints
+            [newWaypoints[currentIndex], newWaypoints[newIndex]] = [newWaypoints[newIndex], newWaypoints[currentIndex]];
+            
+            // Update types based on new positions
+            newWaypoints.forEach((waypoint, index) => {
+              if (waypoint) {
+                if (index === 0) {
+                  waypoint.type = 'start';
+                } else if (index === newWaypoints.length - 1) {
+                  waypoint.type = 'end';
+                } else {
+                  waypoint.type = `waypoint_${index}`;
+                }
+              }
+            });
           }
+          
+          return newWaypoints;
         });
       }
       
-      return newWaypoints;
+      return newFields;
     });
   };
 
@@ -1099,28 +1102,30 @@ const FloatingGeofencesPopover = ({
         return prev; // Always keep at least 2 fields
       }
       
-      return prev.filter(field => field.id !== fieldId);
-    });
-    
-    setRouteWaypoints(prev => {
-      const fieldIndex = fields.findIndex(f => f.id === fieldId);
-      const newWaypoints = [...prev];
-      newWaypoints.splice(fieldIndex, 1);
+      const newFields = prev.filter(field => field.id !== fieldId);
       
-      // Update types based on new positions
-      newWaypoints.forEach((waypoint, index) => {
-        if (waypoint) {
-          if (index === 0) {
-            waypoint.type = 'start';
-          } else if (index === newWaypoints.length - 1) {
-            waypoint.type = 'end';
-          } else {
-            waypoint.type = `waypoint_${index}`;
+      // Update route waypoints to match new field order
+      setRouteWaypoints(prevWaypoints => {
+        const newWaypoints = [...prevWaypoints];
+        newWaypoints.splice(fieldIndex, 1);
+        
+        // Update types based on new positions
+        newWaypoints.forEach((waypoint, index) => {
+          if (waypoint) {
+            if (index === 0) {
+              waypoint.type = 'start';
+            } else if (index === newWaypoints.length - 1) {
+              waypoint.type = 'end';
+            } else {
+              waypoint.type = `waypoint_${index}`;
+            }
           }
-        }
+        });
+        
+        return newWaypoints;
       });
       
-      return newWaypoints;
+      return newFields;
     });
   };
 
@@ -1136,189 +1141,46 @@ const FloatingGeofencesPopover = ({
     }]);
   };
 
-
-  // Render address field based on type
-  const renderAddressField = (fieldType, isFirst) => {
-    const isStart = fieldType === 'start';
-    const address = isStart ? startAddress : endAddress;
-    const setAddress = isStart ? setStartAddress : setEndAddress;
-    const searchResults = isStart ? startSearchResults : endSearchResults;
-    const setSearchResults = isStart ? setStartSearchResults : setEndSearchResults;
-    const isSearching = isStart ? isStartSearching : isEndSearching;
-    const setIsSearching = isStart ? setIsStartSearching : setIsEndSearching;
-    const handleChange = isStart ? handleStartAddressChange : handleEndAddressChange;
-    const handleSelect = isStart ? handleStartAddressSelect : handleEndAddressSelect;
-    const placeholder = isStart ? "Enter start address..." : "Enter end address...";
-
-    return (
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ position: 'relative' }}>
-          <input
-            type="text"
-            placeholder={placeholder}
-            value={address}
-            onChange={handleChange}
-            style={{
-              width: '100%',
-              padding: '10px 60px 10px 12px', // More space on right for controls
-              backgroundColor: colors.secondary,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '8px',
-              color: colors.text,
-              fontSize: '14px',
-              outline: 'none'
-            }}
-          />
-          
-          {/* Reorder buttons inside the field */}
-          <div style={{ 
-            position: 'absolute', 
-            right: '8px', 
-            top: '50%', 
-            transform: 'translateY(-50%)',
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '1px' 
-          }}>
-            <button
-              onClick={() => handleReorderFields('up')}
-              disabled={isFirst}
-              style={{
-                width: '20px',
-                height: '12px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: isFirst ? colors.textSecondary : colors.text,
-                cursor: isFirst ? 'not-allowed' : 'pointer',
-                borderRadius: '2px 2px 0 0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                opacity: isFirst ? 0.5 : 1,
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <ArrowUpIcon style={{ fontSize: '10px' }} />
-            </button>
-            <button
-              onClick={() => handleReorderFields('down')}
-              disabled={!isFirst}
-              style={{
-                width: '20px',
-                height: '12px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: !isFirst ? colors.textSecondary : colors.text,
-                cursor: !isFirst ? 'not-allowed' : 'pointer',
-                borderRadius: '0 0 2px 2px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                opacity: !isFirst ? 0.5 : 1,
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <ArrowDownIcon style={{ fontSize: '10px' }} />
-            </button>
-          </div>
-          
-          {isSearching && (
-            <div style={{
-              position: 'absolute',
-              right: '32px',
-              top: 'calc(50% - 6px)',
-              width: '12px',
-              height: '12px',
-              border: '2px solid transparent',
-              borderTop: '2px solid #18a9fd',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
-          )}
-        </div>
-        
-        {/* Search Results */}
-        {searchResults.length > 0 && (
-          <div style={{
-            marginTop: '8px',
-            maxHeight: '200px',
-            overflowY: 'auto',
-            border: `1px solid ${colors.border}`,
-            borderRadius: '8px',
-            backgroundColor: colors.surface
-          }}>
-            {searchResults.map((result, index) => (
-              <div
-                key={`${fieldType}-search-${result.id || result.name || index}`}
-                onClick={() => handleSelect(result)}
-                style={{
-                  padding: '12px',
-                  cursor: 'pointer',
-                  borderBottom: index < searchResults.length - 1 ? `1px solid ${colors.border}` : 'none',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.hover;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                }}
-              >
-                <div style={{
-                  color: colors.text,
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  marginBottom: '4px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {result.properties?.name || result.properties?.display_name?.split(',')[0]}
-                </div>
-                <div style={{
-                  color: colors.textSecondary,
-                  fontSize: '12px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {result.properties?.display_name}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Character Count Message */}
-        {address && address.trim().length > 0 && address.trim().length < 5 && (
-          <div style={{
-            marginTop: '8px',
-            padding: '8px',
-            color: colors.textSecondary,
-            fontSize: '12px',
-            textAlign: 'center'
-          }}>
-            Type at least 5 characters to search
-          </div>
-        )}
-        
-        {/* No Results */}
-        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.some(wp => wp && wp.address === address) && (
-          <div style={{
-            marginTop: '8px',
-            padding: '8px',
-            color: colors.textSecondary,
-            fontSize: '12px',
-            textAlign: 'center'
-          }}>
-            No results found
-          </div>
-        )}
-      </div>
-    );
+  // Helper function to check if a field has a corresponding waypoint
+  const hasWaypointForField = (fieldId, fieldValue) => {
+    const fieldIndex = fields.findIndex(f => f.id === fieldId);
+    return routeWaypoints[fieldIndex] && routeWaypoints[fieldIndex].address === fieldValue;
   };
+
+  // Synchronize routeWaypoints with fields array
+  useEffect(() => {
+    // Ensure routeWaypoints array matches fields array length
+    if (routeWaypoints.length !== fields.length) {
+      const newWaypoints = [...routeWaypoints];
+      
+      // If routeWaypoints is shorter, pad with nulls
+      while (newWaypoints.length < fields.length) {
+        newWaypoints.push(null);
+      }
+      
+      // If routeWaypoints is longer, trim it
+      if (newWaypoints.length > fields.length) {
+        newWaypoints.splice(fields.length);
+      }
+      
+      // Update types based on current positions
+      newWaypoints.forEach((waypoint, index) => {
+        if (waypoint) {
+          if (index === 0) {
+            waypoint.type = 'start';
+          } else if (index === newWaypoints.length - 1) {
+            waypoint.type = 'end';
+          } else {
+            waypoint.type = `waypoint_${index}`;
+          }
+        }
+      });
+      
+      setRouteWaypoints(newWaypoints);
+    }
+  }, [fields.length]);
+
+
 
   // Reset page when search changes
   useEffect(() => {
@@ -1629,20 +1491,20 @@ const FloatingGeofencesPopover = ({
                     }}>
                       <button
                         onClick={() => handleReorderField(field.id, 'up')}
-                        disabled={index === 0}
+                        disabled={index === 0 || !field.value || field.value.trim() === ''}
                         style={{
                           width: '20px',
                           height: '12px',
                           border: 'none',
                           backgroundColor: 'transparent',
-                          color: index === 0 ? colors.textSecondary : colors.text,
-                          cursor: index === 0 ? 'not-allowed' : 'pointer',
+                          color: (index === 0 || !field.value || field.value.trim() === '') ? colors.textSecondary : colors.text,
+                          cursor: (index === 0 || !field.value || field.value.trim() === '') ? 'not-allowed' : 'pointer',
                           borderRadius: '2px 2px 0 0',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '10px',
-                          opacity: index === 0 ? 0.5 : 1,
+                          opacity: (index === 0 || !field.value || field.value.trim() === '') ? 0.5 : 1,
                           transition: 'all 0.2s ease'
                         }}
                       >
@@ -1650,20 +1512,20 @@ const FloatingGeofencesPopover = ({
                       </button>
                       <button
                         onClick={() => handleReorderField(field.id, 'down')}
-                        disabled={index === fields.length - 1}
+                        disabled={index === fields.length - 1 || !field.value || field.value.trim() === ''}
                         style={{
                           width: '20px',
                           height: '12px',
                           border: 'none',
                           backgroundColor: 'transparent',
-                          color: index === fields.length - 1 ? colors.textSecondary : colors.text,
-                          cursor: index === fields.length - 1 ? 'not-allowed' : 'pointer',
+                          color: (index === fields.length - 1 || !field.value || field.value.trim() === '') ? colors.textSecondary : colors.text,
+                          cursor: (index === fields.length - 1 || !field.value || field.value.trim() === '') ? 'not-allowed' : 'pointer',
                           borderRadius: '0 0 2px 2px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '10px',
-                          opacity: index === fields.length - 1 ? 0.5 : 1,
+                          opacity: (index === fields.length - 1 || !field.value || field.value.trim() === '') ? 0.5 : 1,
                           transition: 'all 0.2s ease'
                         }}
                       >
@@ -1768,18 +1630,6 @@ const FloatingGeofencesPopover = ({
                     </div>
                   )}
                   
-                  {/* No Results */}
-                  {field.value && field.value.trim().length >= 5 && field.searchResults && field.searchResults.length === 0 && !field.isSearching && !routeWaypoints.some(wp => wp && wp.address === field.value) && (
-                    <div style={{
-                      marginTop: '8px',
-                      padding: '8px',
-                      color: colors.textSecondary,
-                      fontSize: '12px',
-                      textAlign: 'center'
-                    }}>
-                      No results found
-                    </div>
-                  )}
                 </div>
               ))}
 
@@ -1808,8 +1658,8 @@ const FloatingGeofencesPopover = ({
                 Add Address
               </button>
 
-              {/* Route Waypoints Display */}
-              {routeWaypoints.length > 0 && (
+              {/* Route Waypoints Display - Only show if there are waypoints with addresses */}
+              {routeWaypoints.filter(wp => wp && wp.address).length > 0 && (
                 <div style={{ marginTop: '12px' }}>
                   <Typography variant="body2" style={{ color: colors.text, marginBottom: '6px', fontSize: '14px', fontWeight: '500' }}>
                     Selected Waypoints
