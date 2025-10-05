@@ -115,6 +115,10 @@ const FloatingGeofencesPopover = ({
   const [isEndSearching, setIsEndSearching] = useState(false);
   const [routeWaypoints, setRouteWaypoints] = useState([]);
   const [fieldOrder, setFieldOrder] = useState(['start', 'end']); // Track field order
+  const [dynamicFields, setDynamicFields] = useState([]); // Track dynamic fields
+  const [dynamicFieldValues, setDynamicFieldValues] = useState({}); // Track values for dynamic fields
+  const [dynamicFieldResults, setDynamicFieldResults] = useState({}); // Track search results for dynamic fields
+  const [dynamicFieldSearching, setDynamicFieldSearching] = useState({}); // Track searching state for dynamic fields
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -919,9 +923,11 @@ const FloatingGeofencesPopover = ({
   };
 
   // Address search functionality for route planner
-  const searchAddresses = async (query, isStart) => {
+  const searchAddresses = async (query, isStart, fieldId = null) => {
     if (!query.trim() || query.trim().length < 5) {
-      if (isStart) {
+      if (fieldId) {
+        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
+      } else if (isStart) {
         setStartSearchResults([]);
       } else {
         setEndSearchResults([]);
@@ -929,7 +935,9 @@ const FloatingGeofencesPopover = ({
       return;
     }
 
-    if (isStart) {
+    if (fieldId) {
+      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
+    } else if (isStart) {
       setIsStartSearching(true);
     } else {
       setIsEndSearching(true);
@@ -959,20 +967,26 @@ const FloatingGeofencesPopover = ({
         };
       });
       
-      if (isStart) {
+      if (fieldId) {
+        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: results }));
+      } else if (isStart) {
         setStartSearchResults(results);
       } else {
         setEndSearchResults(results);
       }
     } catch (error) {
       console.error('Search error:', error);
-      if (isStart) {
+      if (fieldId) {
+        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
+      } else if (isStart) {
         setStartSearchResults([]);
       } else {
         setEndSearchResults([]);
       }
     } finally {
-      if (isStart) {
+      if (fieldId) {
+        setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: false }));
+      } else if (isStart) {
         setIsStartSearching(false);
       } else {
         setIsEndSearching(false);
@@ -1114,6 +1128,97 @@ const FloatingGeofencesPopover = ({
       
       return newWaypoints;
     });
+  };
+
+  // Add new dynamic field
+  const handleAddDynamicField = () => {
+    const newFieldId = `dynamic_${Date.now()}`;
+    setDynamicFields(prev => [...prev, newFieldId]);
+    setDynamicFieldValues(prev => ({ ...prev, [newFieldId]: '' }));
+    setDynamicFieldResults(prev => ({ ...prev, [newFieldId]: [] }));
+    setDynamicFieldSearching(prev => ({ ...prev, [newFieldId]: false }));
+  };
+
+  // Handle dynamic field value change
+  const handleDynamicFieldChange = (fieldId, value) => {
+    setDynamicFieldValues(prev => ({ ...prev, [fieldId]: value }));
+    
+    if (value.trim().length >= 5) {
+      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
+      searchAddresses(value, false, fieldId);
+    } else {
+      setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
+      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: false }));
+    }
+  };
+
+  // Handle dynamic field address selection
+  const handleDynamicFieldSelect = (fieldId, result) => {
+    setDynamicFieldValues(prev => ({ ...prev, [fieldId]: result.properties?.display_name || result.text }));
+    setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
+    
+    // Add to route waypoints
+    setRouteWaypoints(prev => {
+      const newWaypoints = [...prev];
+      const fieldIndex = dynamicFields.indexOf(fieldId) + 2; // +2 because we have start and end fields
+      newWaypoints[fieldIndex] = {
+        address: result.properties?.display_name || result.text,
+        coordinates: result.center,
+        type: `waypoint_${fieldIndex}`
+      };
+      return newWaypoints;
+    });
+  };
+
+  // Handle dynamic field deletion
+  const handleDeleteDynamicField = (fieldId) => {
+    setDynamicFields(prev => prev.filter(id => id !== fieldId));
+    setDynamicFieldValues(prev => {
+      const newValues = { ...prev };
+      delete newValues[fieldId];
+      return newValues;
+    });
+    setDynamicFieldResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[fieldId];
+      return newResults;
+    });
+    setDynamicFieldSearching(prev => {
+      const newSearching = { ...prev };
+      delete newSearching[fieldId];
+      return newSearching;
+    });
+    
+    // Remove from route waypoints
+    setRouteWaypoints(prev => {
+      const fieldIndex = dynamicFields.indexOf(fieldId) + 2;
+      const newWaypoints = [...prev];
+      newWaypoints.splice(fieldIndex, 1);
+      return newWaypoints;
+    });
+  };
+
+  // Handle dynamic field reordering
+  const handleDynamicFieldReorder = (fieldId, direction) => {
+    const currentIndex = dynamicFields.indexOf(fieldId);
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    
+    if (newIndex >= 0 && newIndex < dynamicFields.length) {
+      setDynamicFields(prev => {
+        const newFields = [...prev];
+        [newFields[currentIndex], newFields[newIndex]] = [newFields[newIndex], newFields[currentIndex]];
+        return newFields;
+      });
+      
+      // Update route waypoints
+      setRouteWaypoints(prev => {
+        const newWaypoints = [...prev];
+        const startIndex = currentIndex + 2;
+        const endIndex = newIndex + 2;
+        [newWaypoints[startIndex], newWaypoints[endIndex]] = [newWaypoints[endIndex], newWaypoints[startIndex]];
+        return newWaypoints;
+      });
+    }
   };
 
   // Render address field based on type
@@ -1579,6 +1684,220 @@ const FloatingGeofencesPopover = ({
               {fieldOrder.map((fieldType, index) => 
                 renderAddressField(fieldType, index === 0)
               )}
+
+              {/* Dynamic Fields */}
+              {dynamicFields.map((fieldId, index) => (
+                <div key={fieldId} style={{ marginBottom: '16px' }}>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      placeholder="Enter address"
+                      value={dynamicFieldValues[fieldId] || ''}
+                      onChange={(e) => handleDynamicFieldChange(fieldId, e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 60px 10px 12px', // Space for controls
+                        backgroundColor: colors.secondary,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '8px',
+                        color: colors.text,
+                        fontSize: '14px',
+                        outline: 'none'
+                      }}
+                    />
+                    
+                    {/* Reorder buttons */}
+                    <div style={{ 
+                      position: 'absolute', 
+                      right: '8px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)',
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '1px' 
+                    }}>
+                      <button
+                        onClick={() => handleDynamicFieldReorder(fieldId, 'up')}
+                        disabled={index === 0}
+                        style={{
+                          width: '20px',
+                          height: '12px',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          color: index === 0 ? colors.textSecondary : colors.text,
+                          cursor: index === 0 ? 'not-allowed' : 'pointer',
+                          borderRadius: '2px 2px 0 0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          opacity: index === 0 ? 0.5 : 1,
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <ArrowUpIcon style={{ fontSize: '10px' }} />
+                      </button>
+                      <button
+                        onClick={() => handleDynamicFieldReorder(fieldId, 'down')}
+                        disabled={index === dynamicFields.length - 1}
+                        style={{
+                          width: '20px',
+                          height: '12px',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          color: index === dynamicFields.length - 1 ? colors.textSecondary : colors.text,
+                          cursor: index === dynamicFields.length - 1 ? 'not-allowed' : 'pointer',
+                          borderRadius: '0 0 2px 2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          opacity: index === dynamicFields.length - 1 ? 0.5 : 1,
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <ArrowDownIcon style={{ fontSize: '10px' }} />
+                      </button>
+                    </div>
+                    
+                    {/* Delete button */}
+                    <button
+                      onClick={() => handleDeleteDynamicField(fieldId)}
+                      style={{
+                        position: 'absolute',
+                        right: '32px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '20px',
+                        height: '20px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: colors.textSecondary,
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px'
+                      }}
+                    >
+                      <CloseIcon2 style={{ fontSize: '12px' }} />
+                    </button>
+                    
+                    {/* Loading spinner */}
+                    {dynamicFieldSearching[fieldId] && (
+                      <div style={{
+                        position: 'absolute',
+                        right: '60px',
+                        top: '50%',
+                        transform: 'translateY(-50%)'
+                      }}>
+                        <CircularProgress size={16} style={{ color: colors.primary }} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Search Results */}
+                  {dynamicFieldResults[fieldId] && dynamicFieldResults[fieldId].length > 0 && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: colors.background,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      zIndex: 1000,
+                      maxHeight: '200px',
+                      overflowY: 'auto'
+                    }}>
+                      {dynamicFieldResults[fieldId].map((result, resultIndex) => (
+                        <div
+                          key={resultIndex}
+                          onClick={() => handleDynamicFieldSelect(fieldId, result)}
+                          style={{
+                            padding: '12px',
+                            cursor: 'pointer',
+                            borderBottom: resultIndex < dynamicFieldResults[fieldId].length - 1 ? `1px solid ${colors.border}` : 'none',
+                            backgroundColor: 'transparent',
+                            transition: 'background-color 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = colors.hover;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          <Typography variant="body2" style={{ color: colors.text, fontSize: '12px' }}>
+                            {result.properties?.display_name || result.text}
+                          </Typography>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Character count message */}
+                  {dynamicFieldValues[fieldId] && dynamicFieldValues[fieldId].trim().length > 0 && dynamicFieldValues[fieldId].trim().length < 5 && (
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '8px',
+                      color: colors.textSecondary,
+                      fontSize: '12px',
+                      textAlign: 'center'
+                    }}>
+                      Type at least 5 characters to search
+                    </div>
+                  )}
+                  
+                  {/* No Results */}
+                  {dynamicFieldValues[fieldId] && dynamicFieldValues[fieldId].trim().length >= 5 && dynamicFieldResults[fieldId] && dynamicFieldResults[fieldId].length === 0 && !dynamicFieldSearching[fieldId] && !routeWaypoints.some(wp => wp.address === dynamicFieldValues[fieldId]) && (
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '8px',
+                      color: colors.textSecondary,
+                      fontSize: '12px',
+                      textAlign: 'center'
+                    }}>
+                      No results found
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Add Field Button */}
+              <button
+                onClick={handleAddDynamicField}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: `2px dashed ${colors.border}`,
+                  borderRadius: '8px',
+                  backgroundColor: 'transparent',
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s ease',
+                  marginBottom: '16px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = colors.primary;
+                  e.target.style.color = colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = colors.border;
+                  e.target.style.color = colors.textSecondary;
+                }}
+              >
+                <span style={{ fontSize: '16px' }}>+</span>
+                Add Address
+              </button>
 
               {/* Route Waypoints Display */}
               {routeWaypoints.length > 0 && (
