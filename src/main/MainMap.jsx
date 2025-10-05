@@ -16,7 +16,7 @@ import MapOverlay from '../map/overlay/MapOverlay';
 import MapScale from '../map/MapScale';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
-import MapRoutePlanner from '../map/MapRoutePlanner';
+import MapRoutePlanner from '../map/MapRoutePlanner.jsx';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
 
