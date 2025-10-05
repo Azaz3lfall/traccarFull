@@ -20,7 +20,7 @@ import MapRoutePlanner from '../map/MapRoutePlanner';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
 
-const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData }) => {
+const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData, selectedRouteIndex = 0, onRouteChange }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -66,7 +66,11 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         )}
         <MapDefaultCamera />
         <MapSelectedDevice />
-        <MapRoutePlanner routeData={routePlannerData} />
+        <MapRoutePlanner 
+          routeData={routePlannerData} 
+          selectedRouteIndex={selectedRouteIndex}
+          onRouteChange={onRouteChange}
+        />
         <PoiMap />
         {/* MapPositions always last to ensure vehicle markers appear on top */}
         <MapPositions

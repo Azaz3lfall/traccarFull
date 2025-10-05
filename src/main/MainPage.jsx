@@ -960,6 +960,7 @@ const MainPage = () => {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
   const [routePlannerData, setRoutePlannerData] = useState(null);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
 
 
@@ -969,6 +970,11 @@ const MainPage = () => {
 
   const handleRouteDataChange = useCallback((routeData) => {
     setRoutePlannerData(routeData);
+    setSelectedRouteIndex(0); // Reset to first route when new data comes in
+  }, []);
+
+  const handleRouteChange = useCallback((routeIndex) => {
+    setSelectedRouteIndex(routeIndex);
   }, []);
 
   // Refresh devices when device list becomes visible
@@ -1006,6 +1012,8 @@ const MainPage = () => {
           selectedMapStyle={selectedMapStyle}
           currentReplayIndex={currentReplayIndex}
           routePlannerData={routePlannerData}
+          selectedRouteIndex={selectedRouteIndex}
+          onRouteChange={handleRouteChange}
         />
       )}
       <div className={classes.sidebar}>
@@ -1019,6 +1027,8 @@ const MainPage = () => {
                 selectedMapStyle={selectedMapStyle}
                 currentReplayIndex={currentReplayIndex}
                 routePlannerData={routePlannerData}
+                selectedRouteIndex={selectedRouteIndex}
+                onRouteChange={handleRouteChange}
               />
             </div>
           )}

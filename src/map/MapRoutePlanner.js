@@ -3,32 +3,37 @@ import { useId, useEffect, useRef } from 'react';
 import { map } from './core/MapView';
 import maplibregl from 'maplibre-gl';
 
-const MapRoutePlanner = ({ routeData }) => {
+const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) => {
   const id = useId();
   const theme = useTheme();
   const markersRef = useRef([]);
+  const routeSourcesRef = useRef([]);
 
   useEffect(() => {
     if (!routeData || !routeData.routes || routeData.routes.length === 0) {
-      // Remove existing route if no route data
-      if (map.getLayer(`${id}-line`)) {
-        map.removeLayer(`${id}-line`);
-      }
-      if (map.getSource(id)) {
-        map.removeSource(id);
-      }
+      // Remove existing routes if no route data
+      routeSourcesRef.current.forEach(sourceId => {
+        if (map.getLayer(`${sourceId}-line`)) {
+          map.removeLayer(`${sourceId}-line`);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+      });
+      routeSourcesRef.current = [];
+      
       // Remove all markers
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
       return;
     }
 
-    const route = routeData.routes[0];
-    if (!route.geometry || !route.geometry.coordinates) {
+    const selectedRoute = routeData.routes[selectedRouteIndex] || routeData.routes[0];
+    if (!selectedRoute.geometry || !selectedRoute.geometry.coordinates) {
       return;
     }
 
-    const coordinates = route.geometry.coordinates;
+    const coordinates = selectedRoute.geometry.coordinates;
 
     // Add source for route polyline
     map.addSource(id, {
@@ -53,9 +58,9 @@ const MapRoutePlanner = ({ routeData }) => {
         'line-cap': 'round',
       },
       paint: {
-        'line-color': '#2196F3', // Blue color
+        'line-color': '#1565C0', // Darker blue color
         'line-width': 4,
-        'line-opacity': 0.8,
+        'line-opacity': 0.9,
       },
     });
 
@@ -67,28 +72,42 @@ const MapRoutePlanner = ({ routeData }) => {
     const startCoord = coordinates[0];
     const endCoord = coordinates[coordinates.length - 1];
     
-    // Add start marker (green)
+    // Add start marker (green circle with arrow)
     const startMarker = document.createElement('div');
-    startMarker.style.width = '20px';
-    startMarker.style.height = '20px';
+    startMarker.style.width = '24px';
+    startMarker.style.height = '24px';
     startMarker.style.borderRadius = '50%';
     startMarker.style.backgroundColor = '#4CAF50'; // Green for start
     startMarker.style.border = '3px solid white';
     startMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+    startMarker.style.display = 'flex';
+    startMarker.style.alignItems = 'center';
+    startMarker.style.justifyContent = 'center';
+    startMarker.style.fontSize = '12px';
+    startMarker.style.fontWeight = 'bold';
+    startMarker.style.color = 'white';
+    startMarker.textContent = 'S';
     
     const startMarkerInstance = new maplibregl.Marker(startMarker)
       .setLngLat(startCoord)
       .addTo(map);
     markersRef.current.push(startMarkerInstance);
 
-    // Add end marker (red)
+    // Add end marker (red circle with arrow)
     const endMarker = document.createElement('div');
-    endMarker.style.width = '20px';
-    endMarker.style.height = '20px';
+    endMarker.style.width = '24px';
+    endMarker.style.height = '24px';
     endMarker.style.borderRadius = '50%';
     endMarker.style.backgroundColor = '#F44336'; // Red for end
     endMarker.style.border = '3px solid white';
     endMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+    endMarker.style.display = 'flex';
+    endMarker.style.alignItems = 'center';
+    endMarker.style.justifyContent = 'center';
+    endMarker.style.fontSize = '12px';
+    endMarker.style.fontWeight = 'bold';
+    endMarker.style.color = 'white';
+    endMarker.textContent = 'E';
     
     const endMarkerInstance = new maplibregl.Marker(endMarker)
       .setLngLat(endCoord)
@@ -102,12 +121,19 @@ const MapRoutePlanner = ({ routeData }) => {
       waypoints.forEach((waypoint, index) => {
         if (waypoint && waypoint.coordinates) {
           const waypointMarker = document.createElement('div');
-          waypointMarker.style.width = '16px';
-          waypointMarker.style.height = '16px';
+          waypointMarker.style.width = '20px';
+          waypointMarker.style.height = '20px';
           waypointMarker.style.borderRadius = '50%';
           waypointMarker.style.backgroundColor = '#FF9800'; // Orange for waypoints
           waypointMarker.style.border = '2px solid white';
           waypointMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+          waypointMarker.style.display = 'flex';
+          waypointMarker.style.alignItems = 'center';
+          waypointMarker.style.justifyContent = 'center';
+          waypointMarker.style.fontSize = '10px';
+          waypointMarker.style.fontWeight = 'bold';
+          waypointMarker.style.color = 'white';
+          waypointMarker.textContent = (index + 1).toString();
           
           const waypointMarkerInstance = new maplibregl.Marker(waypointMarker)
             .setLngLat(waypoint.coordinates)
@@ -143,17 +169,68 @@ const MapRoutePlanner = ({ routeData }) => {
     }
 
     return () => {
-      if (map.getLayer(`${id}-line`)) {
-        map.removeLayer(`${id}-line`);
-      }
-      if (map.getSource(id)) {
-        map.removeSource(id);
-      }
+      // Remove all route sources and layers
+      routeSourcesRef.current.forEach(sourceId => {
+        if (map.getLayer(`${sourceId}-line`)) {
+          map.removeLayer(`${sourceId}-line`);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+      });
+      routeSourcesRef.current = [];
+      
       // Remove all markers
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
     };
-  }, [routeData, theme.palette.primary.main]);
+  }, [routeData, selectedRouteIndex, theme.palette.primary.main]);
+
+  // Render alternative route buttons if multiple routes exist
+  if (routeData && routeData.routes && routeData.routes.length > 1) {
+    return (
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        left: '10px',
+        zIndex: 1000,
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap'
+      }}>
+        {routeData.routes.map((route, index) => (
+          <button
+            key={index}
+            onClick={() => onRouteChange && onRouteChange(index)}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '2px solid white',
+              backgroundColor: index === selectedRouteIndex ? '#1565C0' : '#2196F3',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return null;
 };
