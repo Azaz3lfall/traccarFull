@@ -727,5 +727,5 @@
   "routePlannerCostSettings": "Configurações de Custo",
   "routePlannerFuelPrice": "Preço do Combustível",
   "routePlannerVehicleConsumption": "Consumo do Veículo",
-  "routePlannerTollRate": "Taxa de Pedágio"
+  "routePlannerTollCost": "Custo de Pedágio"
 }

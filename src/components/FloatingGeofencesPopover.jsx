@@ -2204,9 +2204,8 @@ const FloatingGeofencesPopover = ({
                                       fontWeight: '700'
                                     }}>
                                       R$ {(() => {
-                                        const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                        const tollRate = 0.15; // Default R$/km
-                                        const tollCost = totalDistance * tollRate;
+                                        // Toll costs are fixed values, not per km
+                                        const tollCost = 15.00; // Default fixed toll cost
                                         return tollCost.toFixed(2);
                                       })()}
                                     </Typography>
@@ -2234,9 +2233,8 @@ const FloatingGeofencesPopover = ({
                                         const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                         const fuelPrice = 5.50; // Default fuel price
                                         const consumption = 12; // Default km/L
-                                        const tollRate = 0.15; // Default R$/km
+                                        const tollCost = 15.00; // Fixed toll cost
                                         const fuelCost = (totalDistance / consumption) * fuelPrice;
-                                        const tollCost = totalDistance * tollRate;
                                         const totalCost = fuelCost + tollCost;
                                         return totalCost.toFixed(2);
                                       })()}
@@ -2294,12 +2292,12 @@ const FloatingGeofencesPopover = ({
                                       color: colors.text, 
                                       marginBottom: '8px'
                                     }}>
-                                      {t('routePlannerTollRate')} (R$/km)
+                                      {t('routePlannerTollCost')} (R$)
                                     </Typography>
                                     <TextField
                                       size="small"
                                       type="number"
-                                      placeholder="0.15"
+                                      placeholder="15.00"
                                       style={{ width: '100%' }}
                                     />
                                   </div>

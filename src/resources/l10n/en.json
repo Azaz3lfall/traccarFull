@@ -727,5 +727,5 @@
   "routePlannerCostSettings": "Cost Settings",
   "routePlannerFuelPrice": "Fuel Price",
   "routePlannerVehicleConsumption": "Vehicle Consumption",
-  "routePlannerTollRate": "Toll Rate"
+  "routePlannerTollCost": "Toll Cost"
 }
