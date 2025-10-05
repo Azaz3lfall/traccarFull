@@ -2352,7 +2352,60 @@ const FloatingGeofencesPopover = ({
                                     {t('routePlannerProfitabilityAnalysis')}
                                   </Typography>
                                   
-                                  {/* Client Price */}
+                                  {/* Price per KM Input */}
+                                  <div style={{ marginBottom: '8px' }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '4px',
+                                      fontSize: '11px'
+                                    }}>
+                                      {t('routePlannerPricePerKm')} (R$/km)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      value={costSettings.pricePerKm}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        pricePerKm: parseFloat(e.target.value) || 0
+                                      }))}
+                                      style={{ 
+                                        width: '100%',
+                                        '& .MuiOutlinedInput-root': {
+                                          fontSize: '11px'
+                                        }
+                                      }}
+                                      inputProps={{
+                                        style: { fontSize: '11px', padding: '6px 8px' }
+                                      }}
+                                    />
+                                  </div>
+                                  
+                                  {/* Round Trip Checkbox */}
+                                  <div style={{ marginBottom: '12px' }}>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          checked={costSettings.roundTrip}
+                                          onChange={(e) => setCostSettings(prev => ({
+                                            ...prev,
+                                            roundTrip: e.target.checked
+                                          }))}
+                                          size="small"
+                                        />
+                                      }
+                                      label={
+                                        <Typography variant="body2" style={{ 
+                                          color: colors.text,
+                                          fontSize: '11px'
+                                        }}>
+                                          {t('routePlannerRoundTrip')}
+                                        </Typography>
+                                      }
+                                    />
+                                  </div>
+                                  
+                                  {/* Toll Cost */}
                                   <div style={{ 
                                     marginBottom: '8px',
                                     padding: '8px',
@@ -2369,7 +2422,7 @@ const FloatingGeofencesPopover = ({
                                         color: colors.text, 
                                         fontSize: '11px'
                                       }}>
-                                        {t('routePlannerClientPrice')}
+                                        {t('routePlannerTollCost')}
                                       </Typography>
                                       <Typography variant="body2" style={{ 
                                         color: colors.text,
@@ -2377,10 +2430,8 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
-                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
-                                          return clientPrice.toFixed(2);
+                                          return (costSettings.tollCost * multiplier).toFixed(2);
                                         })()}
                                       </Typography>
                                     </div>
@@ -2417,6 +2468,40 @@ const FloatingGeofencesPopover = ({
                                           const tollCost = costSettings.tollCost * multiplier;
                                           const totalCost = fuelCost + tollCost;
                                           return totalCost.toFixed(2);
+                                        })()}
+                                      </Typography>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Client Price */}
+                                  <div style={{ 
+                                    marginBottom: '8px',
+                                    padding: '8px',
+                                    backgroundColor: colors.secondary,
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text, 
+                                        fontSize: '11px'
+                                      }}>
+                                        {t('routePlannerClientPrice')}
+                                      </Typography>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text,
+                                        fontWeight: '600',
+                                        fontSize: '11px'
+                                      }}>
+                                        R$ {(() => {
+                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
+                                          return clientPrice.toFixed(2);
                                         })()}
                                       </Typography>
                                     </div>
@@ -2561,56 +2646,6 @@ const FloatingGeofencesPopover = ({
                                     />
                                   </div>
                                   
-                                  <div style={{ marginBottom: '8px' }}>
-                                    <Typography variant="body2" style={{ 
-                                      color: colors.text, 
-                                      marginBottom: '4px',
-                                      fontSize: '11px'
-                                    }}>
-                                      {t('routePlannerPricePerKm')} (R$/km)
-                                    </Typography>
-                                    <TextField
-                                      size="small"
-                                      type="number"
-                                      value={costSettings.pricePerKm}
-                                      onChange={(e) => setCostSettings(prev => ({
-                                        ...prev,
-                                        pricePerKm: parseFloat(e.target.value) || 0
-                                      }))}
-                                      style={{ 
-                                        width: '100%',
-                                        '& .MuiOutlinedInput-root': {
-                                          fontSize: '11px'
-                                        }
-                                      }}
-                                      inputProps={{
-                                        style: { fontSize: '11px', padding: '6px 8px' }
-                                      }}
-                                    />
-                                  </div>
-                                  
-                                  <div>
-                                    <FormControlLabel
-                                      control={
-                                        <Checkbox
-                                          checked={costSettings.roundTrip}
-                                          onChange={(e) => setCostSettings(prev => ({
-                                            ...prev,
-                                            roundTrip: e.target.checked
-                                          }))}
-                                          size="small"
-                                        />
-                                      }
-                                      label={
-                                        <Typography variant="body2" style={{ 
-                                          color: colors.text,
-                                          fontSize: '11px'
-                                        }}>
-                                          {t('routePlannerRoundTrip')}
-                                        </Typography>
-                                      }
-                                    />
-                                  </div>
                                 </div>
                               </div>
                             )}

@@ -733,5 +733,7 @@
   "routePlannerClientPrice": "Preço do Cliente",
   "routePlannerProfit": "Lucro",
   "routePlannerPricePerKm": "Preço por KM",
-  "routePlannerRoundTrip": "Ida/Volta"
+  "routePlannerRoundTrip": "Ida/Volta",
+  "routePlannerYes": "Sim",
+  "routePlannerNo": "Não"
 }

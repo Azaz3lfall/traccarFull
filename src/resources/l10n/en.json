@@ -733,5 +733,7 @@
   "routePlannerClientPrice": "Client Price",
   "routePlannerProfit": "Profit",
   "routePlannerPricePerKm": "Price per KM",
-  "routePlannerRoundTrip": "Round Trip"
+  "routePlannerRoundTrip": "Round Trip",
+  "routePlannerYes": "Yes",
+  "routePlannerNo": "No"
 }
