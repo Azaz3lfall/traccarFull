@@ -2530,7 +2530,7 @@ const FloatingGeofencesPopover = ({
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
-                                          const clientPrice = ((totalDistance * costSettings.pricePerKm) + costSettings.handlingFee) * multiplier;
+                                          const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
                                           return clientPrice.toFixed(2);
                                         })()}
                                       </Typography>
@@ -2564,7 +2564,7 @@ const FloatingGeofencesPopover = ({
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
-                                          const clientPrice = ((totalDistance * costSettings.pricePerKm) + costSettings.handlingFee) * multiplier;
+                                          const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           const tollCost = costSettings.tollCost * multiplier;
                                           const totalCost = fuelCost + tollCost;
