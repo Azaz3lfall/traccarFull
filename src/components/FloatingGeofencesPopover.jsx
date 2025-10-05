@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocalization } from '../common/components/LocalizationProvider';
 import {
   TextField,
   Button,
@@ -74,6 +75,7 @@ const FloatingGeofencesPopover = ({
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
+  const { language } = useLocalization();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
@@ -971,7 +973,11 @@ const FloatingGeofencesPopover = ({
       // Mapbox Directions API request with more precise parameters
       const approaches = validWaypoints.map(() => 'curb').join(';');
       const radiuses = validWaypoints.map(() => 'unlimited').join(';');
-      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true`;
+      
+      // Convert language code to Mapbox format (e.g., 'pt_BR' -> 'pt', 'en_US' -> 'en')
+      const mapboxLanguage = language.split('_')[0];
+      
+      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true&language=${mapboxLanguage}`;
       
       console.log('Fetching route from Mapbox...', request);
       
