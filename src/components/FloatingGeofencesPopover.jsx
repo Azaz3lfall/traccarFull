@@ -107,18 +107,12 @@ const FloatingGeofencesPopover = ({
   const [polygonPoints, setPolygonPoints] = useState([]);
 
   // Route planner state
-  const [startAddress, setStartAddress] = useState('');
-  const [endAddress, setEndAddress] = useState('');
-  const [startSearchResults, setStartSearchResults] = useState([]);
-  const [endSearchResults, setEndSearchResults] = useState([]);
-  const [isStartSearching, setIsStartSearching] = useState(false);
-  const [isEndSearching, setIsEndSearching] = useState(false);
+  // Unified field management system
+  const [fields, setFields] = useState([
+    { id: 'start', type: 'start', value: '', searchResults: [], isSearching: false },
+    { id: 'end', type: 'end', value: '', searchResults: [], isSearching: false }
+  ]);
   const [routeWaypoints, setRouteWaypoints] = useState([]);
-  const [fieldOrder, setFieldOrder] = useState(['start', 'end']); // Track field order
-  const [dynamicFields, setDynamicFields] = useState([]); // Track dynamic fields
-  const [dynamicFieldValues, setDynamicFieldValues] = useState({}); // Track values for dynamic fields
-  const [dynamicFieldResults, setDynamicFieldResults] = useState({}); // Track search results for dynamic fields
-  const [dynamicFieldSearching, setDynamicFieldSearching] = useState({}); // Track searching state for dynamic fields
   
   // Get Mapbox access token from user session
   const mapboxToken = useSelector(state => state.session.user?.attributes?.mapboxAccessToken);
@@ -926,25 +920,21 @@ const FloatingGeofencesPopover = ({
   };
 
   // Address search functionality for route planner using Mapbox
-  const searchAddresses = async (query, isStart, fieldId = null) => {
+  const searchAddresses = async (query, fieldId) => {
     if (!query.trim() || query.trim().length < 5) {
-      if (fieldId) {
-        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
-      } else if (isStart) {
-        setStartSearchResults([]);
-      } else {
-        setEndSearchResults([]);
-      }
+      setFields(prev => prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, searchResults: [], isSearching: false }
+          : field
+      ));
       return;
     }
 
-    if (fieldId) {
-      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
-    } else if (isStart) {
-      setIsStartSearching(true);
-    } else {
-      setIsEndSearching(true);
-    }
+    setFields(prev => prev.map(field => 
+      field.id === fieldId 
+        ? { ...field, isSearching: true }
+        : field
+    ));
 
     try {
       if (!mapboxToken) {
@@ -975,271 +965,172 @@ const FloatingGeofencesPopover = ({
         };
       });
       
-      if (fieldId) {
-        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: results }));
-      } else if (isStart) {
-        setStartSearchResults(results);
-      } else {
-        setEndSearchResults(results);
-      }
+      setFields(prev => prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, searchResults: results, isSearching: false }
+          : field
+      ));
     } catch (error) {
       console.error('Search error:', error);
-      if (fieldId) {
-        setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
-      } else if (isStart) {
-        setStartSearchResults([]);
-      } else {
-        setEndSearchResults([]);
-      }
-    } finally {
-      if (fieldId) {
-        setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: false }));
-      } else if (isStart) {
-        setIsStartSearching(false);
-      } else {
-        setIsEndSearching(false);
-      }
+      setFields(prev => prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, searchResults: [], isSearching: false }
+          : field
+      ));
     }
   };
 
-  // Handle start address search
-  const handleStartAddressChange = (e) => {
-    const query = e.target.value;
-    setStartAddress(query);
+  // Handle field value change
+  const handleFieldChange = (fieldId, value) => {
+    setFields(prev => prev.map(field => 
+      field.id === fieldId 
+        ? { ...field, value }
+        : field
+    ));
     
-    // Clear previous timeout
-    clearTimeout(window.startSearchTimeout);
+    // Clear previous timeout for this field
+    clearTimeout(window[`searchTimeout_${fieldId}`]);
     
-    // Only search if query has at least 5 characters
-    if (query.trim().length >= 5) {
+    if (value.trim().length >= 5) {
       // Debounce search with 800ms delay
-      window.startSearchTimeout = setTimeout(() => {
-        searchAddresses(query, true);
+      window[`searchTimeout_${fieldId}`] = setTimeout(() => {
+        searchAddresses(value, fieldId);
       }, 800);
     } else {
       // Clear results if less than 5 characters
-      setStartSearchResults([]);
-      setIsStartSearching(false);
+      setFields(prev => prev.map(field => 
+        field.id === fieldId 
+          ? { ...field, searchResults: [], isSearching: false }
+          : field
+      ));
     }
   };
 
-  // Handle end address search
-  const handleEndAddressChange = (e) => {
-    const query = e.target.value;
-    setEndAddress(query);
+  // Handle field selection
+  const handleFieldSelect = (fieldId, result) => {
+    const address = result.properties?.display_name || result.text;
     
-    // Clear previous timeout
-    clearTimeout(window.endSearchTimeout);
+    setFields(prev => prev.map(field => 
+      field.id === fieldId 
+        ? { ...field, value: address, searchResults: [] }
+        : field
+    ));
     
-    // Only search if query has at least 5 characters
-    if (query.trim().length >= 5) {
-      // Debounce search with 800ms delay
-      window.endSearchTimeout = setTimeout(() => {
-        searchAddresses(query, false);
-      }, 800);
-    } else {
-      // Clear results if less than 5 characters
-      setEndSearchResults([]);
-      setIsEndSearching(false);
-    }
-  };
-
-  // Handle start address selection
-  const handleStartAddressSelect = (result) => {
-    setStartAddress(result.properties?.display_name || result.text);
-    setStartSearchResults([]);
-    // Add to route waypoints - use field order to determine position
+    // Update route waypoints based on field position
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
-      const startPosition = fieldOrder.indexOf('start');
-      newWaypoints[startPosition] = {
-        address: result.properties?.display_name || result.text,
+      const fieldIndex = fields.findIndex(f => f.id === fieldId);
+      
+      // Determine type based on position
+      let type;
+      if (fieldIndex === 0) {
+        type = 'start';
+      } else if (fieldIndex === fields.length - 1) {
+        type = 'end';
+      } else {
+        type = `waypoint_${fieldIndex}`;
+      }
+      
+      newWaypoints[fieldIndex] = {
+        address,
         coordinates: result.center,
-        type: 'start'
+        type
       };
-      return newWaypoints;
-    });
-  };
-
-  // Handle end address selection
-  const handleEndAddressSelect = (result) => {
-    setEndAddress(result.properties?.display_name || result.text);
-    setEndSearchResults([]);
-    // Add to route waypoints - use field order to determine position
-    setRouteWaypoints(prev => {
-      const newWaypoints = [...prev];
-      const endPosition = fieldOrder.indexOf('end');
-      newWaypoints[endPosition] = {
-        address: result.properties?.display_name || result.text,
-        coordinates: result.center,
-        type: 'end'
-      };
+      
       return newWaypoints;
     });
   };
 
   // Handle field reordering
-  const handleReorderFields = (direction) => {
-    if (direction === 'up') {
-      // Move first field up (swap positions)
-      setFieldOrder(prev => [prev[1], prev[0]]);
-    } else if (direction === 'down') {
-      // Move second field down (swap positions)
-      setFieldOrder(prev => [prev[1], prev[0]]);
-    }
-    
-    // Update route waypoints to reflect new order
-    setRouteWaypoints(prev => {
-      if (prev.length >= 2) {
-        const newWaypoints = [...prev];
-        // Swap the waypoints
-        [newWaypoints[0], newWaypoints[1]] = [newWaypoints[1], newWaypoints[0]];
-        // The first position (index 0) is always START, second position (index 1) is always END
-        newWaypoints[0].type = 'start';
-        newWaypoints[1].type = 'end';
-        return newWaypoints;
+  const handleReorderField = (fieldId, direction) => {
+    setFields(prev => {
+      const newFields = [...prev];
+      const currentIndex = newFields.findIndex(f => f.id === fieldId);
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      
+      if (newIndex >= 0 && newIndex < newFields.length) {
+        // Swap fields
+        [newFields[currentIndex], newFields[newIndex]] = [newFields[newIndex], newFields[currentIndex]];
       }
-      return prev;
+      
+      return newFields;
     });
-  };
-
-  // Handle waypoint deletion
-  const handleDeleteWaypoint = (index) => {
+    
+    // Update route waypoints to match new field order
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
-      newWaypoints.splice(index, 1);
+      const fieldIndex = fields.findIndex(f => f.id === fieldId);
+      const newIndex = direction === 'up' ? fieldIndex - 1 : fieldIndex + 1;
       
-      // Update types based on new positions
-      newWaypoints.forEach((waypoint, i) => {
-        waypoint.type = i === 0 ? 'start' : 'end';
-      });
-      
-      // Update input fields based on new waypoints
-      if (newWaypoints.length === 0) {
-        setStartAddress('');
-        setEndAddress('');
-        setStartSearchResults([]);
-        setEndSearchResults([]);
-      } else if (newWaypoints.length === 1) {
-        // Only one waypoint left - it becomes the start
-        setStartAddress(newWaypoints[0].address);
-        setEndAddress('');
-        setStartSearchResults([]);
-        setEndSearchResults([]);
-      } else {
-        // Two waypoints left
-        setStartAddress(newWaypoints[0].address);
-        setEndAddress(newWaypoints[1].address);
-        setStartSearchResults([]);
-        setEndSearchResults([]);
+      if (newIndex >= 0 && newIndex < newWaypoints.length && newWaypoints[fieldIndex] && newWaypoints[newIndex]) {
+        // Swap waypoints
+        [newWaypoints[fieldIndex], newWaypoints[newIndex]] = [newWaypoints[newIndex], newWaypoints[fieldIndex]];
+        
+        // Update types based on new positions
+        newWaypoints.forEach((waypoint, index) => {
+          if (waypoint) {
+            if (index === 0) {
+              waypoint.type = 'start';
+            } else if (index === newWaypoints.length - 1) {
+              waypoint.type = 'end';
+            } else {
+              waypoint.type = `waypoint_${index}`;
+            }
+          }
+        });
       }
       
       return newWaypoints;
     });
   };
 
-  // Add new dynamic field
-  const handleAddDynamicField = () => {
-    const newFieldId = `dynamic_${Date.now()}`;
-    setDynamicFields(prev => [...prev, newFieldId]);
-    setDynamicFieldValues(prev => ({ ...prev, [newFieldId]: '' }));
-    setDynamicFieldResults(prev => ({ ...prev, [newFieldId]: [] }));
-    setDynamicFieldSearching(prev => ({ ...prev, [newFieldId]: false }));
-  };
-
-  // Handle dynamic field value change
-  const handleDynamicFieldChange = (fieldId, value) => {
-    setDynamicFieldValues(prev => ({ ...prev, [fieldId]: value }));
+  // Handle field deletion
+  const handleDeleteField = (fieldId) => {
+    setFields(prev => {
+      const newFields = prev.filter(field => field.id !== fieldId);
+      
+      // If we're deleting the first or last field, we need to keep at least 2 fields
+      if (newFields.length < 2) {
+        return prev; // Don't delete if it would leave less than 2 fields
+      }
+      
+      return newFields;
+    });
     
-    // Clear previous timeout for this field
-    clearTimeout(window[`dynamicSearchTimeout_${fieldId}`]);
-    
-    if (value.trim().length >= 5) {
-      // Debounce search with 800ms delay
-      window[`dynamicSearchTimeout_${fieldId}`] = setTimeout(() => {
-        setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: true }));
-        searchAddresses(value, false, fieldId);
-      }, 800);
-    } else {
-      // Clear results if less than 5 characters
-      setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
-      setDynamicFieldSearching(prev => ({ ...prev, [fieldId]: false }));
-    }
-  };
-
-  // Handle dynamic field address selection
-  const handleDynamicFieldSelect = (fieldId, result) => {
-    setDynamicFieldValues(prev => ({ ...prev, [fieldId]: result.properties?.display_name || result.text }));
-    setDynamicFieldResults(prev => ({ ...prev, [fieldId]: [] }));
-    
-    // Add to route waypoints
     setRouteWaypoints(prev => {
-      const newWaypoints = [...prev];
-      const fieldIndex = dynamicFields.indexOf(fieldId) + 2; // +2 because we have start and end fields
-      newWaypoints[fieldIndex] = {
-        address: result.properties?.display_name || result.text,
-        coordinates: result.center,
-        type: `waypoint_${fieldIndex}`
-      };
-      return newWaypoints;
-    });
-  };
-
-  // Handle dynamic field deletion
-  const handleDeleteDynamicField = (fieldId) => {
-    setDynamicFields(prev => prev.filter(id => id !== fieldId));
-    setDynamicFieldValues(prev => {
-      const newValues = { ...prev };
-      delete newValues[fieldId];
-      return newValues;
-    });
-    setDynamicFieldResults(prev => {
-      const newResults = { ...prev };
-      delete newResults[fieldId];
-      return newResults;
-    });
-    setDynamicFieldSearching(prev => {
-      const newSearching = { ...prev };
-      delete newSearching[fieldId];
-      return newSearching;
-    });
-    
-    // Remove from route waypoints
-    setRouteWaypoints(prev => {
-      const fieldIndex = dynamicFields.indexOf(fieldId) + 2;
+      const fieldIndex = fields.findIndex(f => f.id === fieldId);
       const newWaypoints = [...prev];
       newWaypoints.splice(fieldIndex, 1);
+      
+      // Update types based on new positions
+      newWaypoints.forEach((waypoint, index) => {
+        if (waypoint) {
+          if (index === 0) {
+            waypoint.type = 'start';
+          } else if (index === newWaypoints.length - 1) {
+            waypoint.type = 'end';
+          } else {
+            waypoint.type = `waypoint_${index}`;
+          }
+        }
+      });
+      
       return newWaypoints;
     });
   };
 
-  // Handle dynamic field reordering
-  const handleDynamicFieldReorder = (fieldId, direction) => {
-    const currentIndex = dynamicFields.indexOf(fieldId);
-    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    
-    if (newIndex >= 0 && newIndex < dynamicFields.length) {
-      setDynamicFields(prev => {
-        const newFields = [...prev];
-        [newFields[currentIndex], newFields[newIndex]] = [newFields[newIndex], newFields[currentIndex]];
-        return newFields;
-      });
-      
-      // Update route waypoints - only reorder if both waypoints exist
-      setRouteWaypoints(prev => {
-        const newWaypoints = [...prev];
-        const startIndex = currentIndex + 2;
-        const endIndex = newIndex + 2;
-        
-        // Only swap if both waypoints exist
-        if (newWaypoints[startIndex] && newWaypoints[endIndex]) {
-          [newWaypoints[startIndex], newWaypoints[endIndex]] = [newWaypoints[endIndex], newWaypoints[startIndex]];
-        }
-        
-        return newWaypoints;
-      });
-    }
+  // Add new field
+  const handleAddField = () => {
+    const newFieldId = `dynamic_${Date.now()}`;
+    setFields(prev => [...prev, {
+      id: newFieldId,
+      type: 'waypoint',
+      value: '',
+      searchResults: [],
+      isSearching: false
+    }]);
   };
+
 
   // Render address field based on type
   const renderAddressField = (fieldType, isFirst) => {
@@ -1409,7 +1300,7 @@ const FloatingGeofencesPopover = ({
         )}
         
         {/* No Results */}
-        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.some(wp => wp.address === address) && (
+        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.some(wp => wp && wp.address === address) && (
           <div style={{
             marginTop: '8px',
             padding: '8px',
@@ -1700,22 +1591,15 @@ const FloatingGeofencesPopover = ({
 
           {activeTab === 1 && (
             <div style={{ padding: '12px' }}>
-              {/* Dynamic Address Fields based on order */}
-              {fieldOrder.map((fieldType, index) => 
-                <div key={`field-${fieldType}-${index}`}>
-                  {renderAddressField(fieldType, index === 0)}
-                </div>
-              )}
-
-              {/* Dynamic Fields */}
-              {dynamicFields.map((fieldId, index) => (
-                <div key={fieldId} style={{ marginBottom: '16px' }}>
+              {/* Unified Field System */}
+              {fields.map((field, index) => (
+                <div key={field.id} style={{ marginBottom: '16px' }}>
                   <div style={{ position: 'relative' }}>
                     <input
                       type="text"
-                      placeholder="Enter address"
-                      value={dynamicFieldValues[fieldId] || ''}
-                      onChange={(e) => handleDynamicFieldChange(fieldId, e.target.value)}
+                      placeholder={field.id === 'start' ? 'Enter start address...' : field.id === 'end' ? 'Enter end address...' : 'Enter address'}
+                      value={field.value}
+                      onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       style={{
                         width: '100%',
                         padding: '10px 60px 10px 12px', // Space for controls
@@ -1739,7 +1623,7 @@ const FloatingGeofencesPopover = ({
                       gap: '1px' 
                     }}>
                       <button
-                        onClick={() => handleDynamicFieldReorder(fieldId, 'up')}
+                        onClick={() => handleReorderField(field.id, 'up')}
                         disabled={index === 0}
                         style={{
                           width: '20px',
@@ -1760,21 +1644,21 @@ const FloatingGeofencesPopover = ({
                         <ArrowUpIcon style={{ fontSize: '10px' }} />
                       </button>
                       <button
-                        onClick={() => handleDynamicFieldReorder(fieldId, 'down')}
-                        disabled={index === dynamicFields.length - 1}
+                        onClick={() => handleReorderField(field.id, 'down')}
+                        disabled={index === fields.length - 1}
                         style={{
                           width: '20px',
                           height: '12px',
                           border: 'none',
                           backgroundColor: 'transparent',
-                          color: index === dynamicFields.length - 1 ? colors.textSecondary : colors.text,
-                          cursor: index === dynamicFields.length - 1 ? 'not-allowed' : 'pointer',
+                          color: index === fields.length - 1 ? colors.textSecondary : colors.text,
+                          cursor: index === fields.length - 1 ? 'not-allowed' : 'pointer',
                           borderRadius: '0 0 2px 2px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '10px',
-                          opacity: index === dynamicFields.length - 1 ? 0.5 : 1,
+                          opacity: index === fields.length - 1 ? 0.5 : 1,
                           transition: 'all 0.2s ease'
                         }}
                       >
@@ -1782,9 +1666,10 @@ const FloatingGeofencesPopover = ({
                       </button>
                     </div>
                     
-                    {/* Delete button */}
-                    <button
-                      onClick={() => handleDeleteDynamicField(fieldId)}
+                    {/* Delete button for non-essential fields */}
+                    {field.id !== 'start' && field.id !== 'end' && (
+                      <button
+                        onClick={() => handleDeleteField(field.id)}
                       style={{
                         position: 'absolute',
                         right: '32px',
@@ -1805,9 +1690,10 @@ const FloatingGeofencesPopover = ({
                     >
                       <CloseIcon2 style={{ fontSize: '12px' }} />
                     </button>
+                    )}
                     
                     {/* Loading spinner */}
-                    {dynamicFieldSearching[fieldId] && (
+                    {field.isSearching && (
                       <div style={{
                         position: 'absolute',
                         right: '60px',
@@ -1820,7 +1706,7 @@ const FloatingGeofencesPopover = ({
                   </div>
                   
                   {/* Search Results */}
-                  {dynamicFieldResults[fieldId] && dynamicFieldResults[fieldId].length > 0 && (
+                  {field.searchResults && field.searchResults.length > 0 && (
                     <div style={{
                       backgroundColor: colors.background,
                       border: `1px solid ${colors.border}`,
@@ -1832,14 +1718,14 @@ const FloatingGeofencesPopover = ({
                       marginTop: '8px',
                       width: '100%'
                     }}>
-                      {dynamicFieldResults[fieldId].map((result, resultIndex) => (
+                      {field.searchResults.map((result, resultIndex) => (
                         <div
-                          key={`${fieldId}-result-${resultIndex}-${result.properties?.display_name || result.text}`}
-                          onClick={() => handleDynamicFieldSelect(fieldId, result)}
+                          key={`${field.id}-result-${resultIndex}-${result.properties?.display_name || result.text}`}
+                          onClick={() => handleFieldSelect(field.id, result)}
                           style={{
                             padding: '12px',
                             cursor: 'pointer',
-                            borderBottom: resultIndex < dynamicFieldResults[fieldId].length - 1 ? `1px solid ${colors.border}` : 'none',
+                            borderBottom: resultIndex < field.searchResults.length - 1 ? `1px solid ${colors.border}` : 'none',
                             backgroundColor: 'transparent',
                             transition: 'background-color 0.2s ease'
                           }}
@@ -1859,7 +1745,7 @@ const FloatingGeofencesPopover = ({
                   )}
                   
                   {/* Character count message */}
-                  {dynamicFieldValues[fieldId] && dynamicFieldValues[fieldId].trim().length > 0 && dynamicFieldValues[fieldId].trim().length < 5 && (
+                  {field.value && field.value.trim().length > 0 && field.value.trim().length < 5 && (
                     <div style={{
                       marginTop: '8px',
                       padding: '8px',
@@ -1872,7 +1758,7 @@ const FloatingGeofencesPopover = ({
                   )}
                   
                   {/* No Results */}
-                  {dynamicFieldValues[fieldId] && dynamicFieldValues[fieldId].trim().length >= 5 && dynamicFieldResults[fieldId] && dynamicFieldResults[fieldId].length === 0 && !dynamicFieldSearching[fieldId] && !routeWaypoints.some(wp => wp.address === dynamicFieldValues[fieldId]) && (
+                  {field.value && field.value.trim().length >= 5 && field.searchResults && field.searchResults.length === 0 && !field.isSearching && !routeWaypoints.some(wp => wp && wp.address === field.value) && (
                     <div style={{
                       marginTop: '8px',
                       padding: '8px',
@@ -1888,7 +1774,7 @@ const FloatingGeofencesPopover = ({
 
               {/* Add Field Button */}
               <button
-                onClick={handleAddDynamicField}
+                onClick={handleAddField}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -1941,7 +1827,7 @@ const FloatingGeofencesPopover = ({
                           {waypoint.address}
                         </Typography>
                         <button
-                          onClick={() => handleDeleteWaypoint(index)}
+                          onClick={() => handleDeleteField(fields[index].id)}
                           style={{
                             width: '20px',
                             height: '20px',
