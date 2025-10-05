@@ -1021,7 +1021,14 @@ const FloatingGeofencesPopover = ({
       const fieldIndex = updatedFields.findIndex(f => f.id === fieldId);
       
       setRouteWaypoints(prevWaypoints => {
+        // Ensure waypoints array matches fields array length
         const newWaypoints = [...prevWaypoints];
+        while (newWaypoints.length < updatedFields.length) {
+          newWaypoints.push(null);
+        }
+        if (newWaypoints.length > updatedFields.length) {
+          newWaypoints.splice(updatedFields.length);
+        }
         
         // Determine type based on position
         let type;
@@ -1059,25 +1066,32 @@ const FloatingGeofencesPopover = ({
         
         // Update route waypoints to match new field order
         setRouteWaypoints(prevWaypoints => {
+          // Ensure waypoints array matches fields array length
           const newWaypoints = [...prevWaypoints];
-          
-          if (newWaypoints[currentIndex] && newWaypoints[newIndex]) {
-            // Swap waypoints
-            [newWaypoints[currentIndex], newWaypoints[newIndex]] = [newWaypoints[newIndex], newWaypoints[currentIndex]];
-            
-            // Update types based on new positions
-            newWaypoints.forEach((waypoint, index) => {
-              if (waypoint) {
-                if (index === 0) {
-                  waypoint.type = 'start';
-                } else if (index === newWaypoints.length - 1) {
-                  waypoint.type = 'end';
-                } else {
-                  waypoint.type = `waypoint_${index}`;
-                }
-              }
-            });
+          while (newWaypoints.length < newFields.length) {
+            newWaypoints.push(null);
           }
+          if (newWaypoints.length > newFields.length) {
+            newWaypoints.splice(newFields.length);
+          }
+          
+          // Swap waypoints if both exist
+          if (newWaypoints[currentIndex] && newWaypoints[newIndex]) {
+            [newWaypoints[currentIndex], newWaypoints[newIndex]] = [newWaypoints[newIndex], newWaypoints[currentIndex]];
+          }
+          
+          // Update types based on new positions
+          newWaypoints.forEach((waypoint, index) => {
+            if (waypoint) {
+              if (index === 0) {
+                waypoint.type = 'start';
+              } else if (index === newWaypoints.length - 1) {
+                waypoint.type = 'end';
+              } else {
+                waypoint.type = `waypoint_${index}`;
+              }
+            }
+          });
           
           return newWaypoints;
         });
@@ -1109,6 +1123,14 @@ const FloatingGeofencesPopover = ({
         const newWaypoints = [...prevWaypoints];
         newWaypoints.splice(fieldIndex, 1);
         
+        // Ensure waypoints array matches fields array length
+        while (newWaypoints.length < newFields.length) {
+          newWaypoints.push(null);
+        }
+        if (newWaypoints.length > newFields.length) {
+          newWaypoints.splice(newFields.length);
+        }
+        
         // Update types based on new positions
         newWaypoints.forEach((waypoint, index) => {
           if (waypoint) {
@@ -1139,6 +1161,9 @@ const FloatingGeofencesPopover = ({
       searchResults: [],
       isSearching: false
     }]);
+    
+    // Add null entry to routeWaypoints to maintain synchronization
+    setRouteWaypoints(prev => [...prev, null]);
   };
 
   // Helper function to check if a field has a corresponding waypoint
@@ -1147,38 +1172,39 @@ const FloatingGeofencesPopover = ({
     return routeWaypoints[fieldIndex] && routeWaypoints[fieldIndex].address === fieldValue;
   };
 
-  // Synchronize routeWaypoints with fields array
+  // BULLETPROOF synchronization - Rebuild waypoints from fields
   useEffect(() => {
-    // Ensure routeWaypoints array matches fields array length
-    if (routeWaypoints.length !== fields.length) {
-      const newWaypoints = [...routeWaypoints];
+    console.log('=== SYNC CHECK ===');
+    console.log('Fields:', fields.map(f => ({ id: f.id, value: f.value })));
+    console.log('Current waypoints:', routeWaypoints.map((w, i) => ({ index: i, address: w?.address })));
+    
+    // Rebuild waypoints array from scratch based on fields
+    const newWaypoints = fields.map((field, index) => {
+      // Find existing waypoint for this field
+      const existingWaypoint = routeWaypoints[index];
       
-      // If routeWaypoints is shorter, pad with nulls
-      while (newWaypoints.length < fields.length) {
-        newWaypoints.push(null);
+      // If field has a value and we have a matching waypoint, keep it
+      if (field.value && existingWaypoint && existingWaypoint.address === field.value) {
+        return existingWaypoint;
       }
       
-      // If routeWaypoints is longer, trim it
-      if (newWaypoints.length > fields.length) {
-        newWaypoints.splice(fields.length);
+      // If field has a value but no matching waypoint, create new one
+      if (field.value && (!existingWaypoint || existingWaypoint.address !== field.value)) {
+        return {
+          address: field.value,
+          coordinates: [0, 0], // Will be updated when user selects from search
+          type: index === 0 ? 'start' : index === fields.length - 1 ? 'end' : `waypoint_${index}`
+        };
       }
       
-      // Update types based on current positions
-      newWaypoints.forEach((waypoint, index) => {
-        if (waypoint) {
-          if (index === 0) {
-            waypoint.type = 'start';
-          } else if (index === newWaypoints.length - 1) {
-            waypoint.type = 'end';
-          } else {
-            waypoint.type = `waypoint_${index}`;
-          }
-        }
-      });
-      
-      setRouteWaypoints(newWaypoints);
-    }
-  }, [fields.length]);
+      // Field is empty, return null
+      return null;
+    });
+    
+    console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
+    setRouteWaypoints(newWaypoints);
+  }, [fields]);
+
 
 
 
@@ -1672,8 +1698,9 @@ const FloatingGeofencesPopover = ({
                   }}>
                     <div style={{ position: 'relative' }}>
                       {routeWaypoints.filter(waypoint => waypoint && waypoint.address).map((waypoint, index) => {
+                        const filteredWaypoints = routeWaypoints.filter(wp => wp && wp.address);
                         const isFirst = index === 0;
-                        const isLast = index === routeWaypoints.filter(wp => wp && wp.address).length - 1;
+                        const isLast = index === filteredWaypoints.length - 1;
                         const isMiddle = !isFirst && !isLast;
                         
                         return (
