@@ -89,9 +89,11 @@ const FloatingGeofencesPopover = ({
   
   // Cost calculation state
   const [costSettings, setCostSettings] = useState({
-    fuelPrice: 5.50,
-    consumption: 12,
-    tollCost: 15.00
+    fuelPrice: 6.70,
+    consumption: 9,
+    tollCost: 15.00,
+    pricePerKm: 3.90,
+    roundTrip: false
   });
   const [searchKeyword, setSearchKeyword] = useState('');
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -2333,6 +2335,132 @@ const FloatingGeofencesPopover = ({
                                   </div>
                                 </div>
                                 
+                                {/* Profitability Analysis */}
+                                <div style={{ 
+                                  backgroundColor: colors.background,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  padding: '12px',
+                                  marginBottom: '12px'
+                                }}>
+                                  <Typography variant="body2" style={{ 
+                                    color: colors.text, 
+                                    marginBottom: '12px',
+                                    fontWeight: '500',
+                                    fontSize: '12px'
+                                  }}>
+                                    {t('routePlannerProfitabilityAnalysis')}
+                                  </Typography>
+                                  
+                                  {/* Client Price */}
+                                  <div style={{ 
+                                    marginBottom: '8px',
+                                    padding: '8px',
+                                    backgroundColor: colors.secondary,
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text, 
+                                        fontSize: '11px'
+                                      }}>
+                                        {t('routePlannerClientPrice')}
+                                      </Typography>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text,
+                                        fontWeight: '600',
+                                        fontSize: '11px'
+                                      }}>
+                                        R$ {(() => {
+                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
+                                          return clientPrice.toFixed(2);
+                                        })()}
+                                      </Typography>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Total Cost */}
+                                  <div style={{ 
+                                    marginBottom: '8px',
+                                    padding: '8px',
+                                    backgroundColor: colors.secondary,
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text, 
+                                        fontSize: '11px'
+                                      }}>
+                                        {t('routePlannerTotalCost')}
+                                      </Typography>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text,
+                                        fontWeight: '600',
+                                        fontSize: '11px'
+                                      }}>
+                                        R$ {(() => {
+                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
+                                          const tollCost = costSettings.tollCost * multiplier;
+                                          const totalCost = fuelCost + tollCost;
+                                          return totalCost.toFixed(2);
+                                        })()}
+                                      </Typography>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Profit */}
+                                  <div style={{ 
+                                    padding: '8px',
+                                    backgroundColor: colors.secondary,
+                                    borderRadius: '4px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text, 
+                                        fontSize: '11px',
+                                        fontWeight: '600'
+                                      }}>
+                                        {t('routePlannerProfit')}
+                                      </Typography>
+                                      <Typography variant="body2" style={{ 
+                                        color: colors.text,
+                                        fontWeight: '700',
+                                        fontSize: '11px'
+                                      }}>
+                                        R$ {(() => {
+                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const clientPrice = (totalDistance * costSettings.pricePerKm) * multiplier;
+                                          const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
+                                          const tollCost = costSettings.tollCost * multiplier;
+                                          const totalCost = fuelCost + tollCost;
+                                          const profit = clientPrice - totalCost;
+                                          return profit.toFixed(2);
+                                        })()}
+                                      </Typography>
+                                    </div>
+                                  </div>
+                                </div>
+                                
                                 {/* Cost Settings */}
                                 <div style={{ 
                                   backgroundColor: colors.background,
@@ -2405,7 +2533,7 @@ const FloatingGeofencesPopover = ({
                                     />
                                   </div>
                                   
-                                  <div>
+                                  <div style={{ marginBottom: '8px' }}>
                                     <Typography variant="body2" style={{ 
                                       color: colors.text, 
                                       marginBottom: '4px',
@@ -2430,6 +2558,57 @@ const FloatingGeofencesPopover = ({
                                       inputProps={{
                                         style: { fontSize: '11px', padding: '6px 8px' }
                                       }}
+                                    />
+                                  </div>
+                                  
+                                  <div style={{ marginBottom: '8px' }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '4px',
+                                      fontSize: '11px'
+                                    }}>
+                                      {t('routePlannerPricePerKm')} (R$/km)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      value={costSettings.pricePerKm}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        pricePerKm: parseFloat(e.target.value) || 0
+                                      }))}
+                                      style={{ 
+                                        width: '100%',
+                                        '& .MuiOutlinedInput-root': {
+                                          fontSize: '11px'
+                                        }
+                                      }}
+                                      inputProps={{
+                                        style: { fontSize: '11px', padding: '6px 8px' }
+                                      }}
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          checked={costSettings.roundTrip}
+                                          onChange={(e) => setCostSettings(prev => ({
+                                            ...prev,
+                                            roundTrip: e.target.checked
+                                          }))}
+                                          size="small"
+                                        />
+                                      }
+                                      label={
+                                        <Typography variant="body2" style={{ 
+                                          color: colors.text,
+                                          fontSize: '11px'
+                                        }}>
+                                          {t('routePlannerRoundTrip')}
+                                        </Typography>
+                                      }
                                     />
                                   </div>
                                 </div>
