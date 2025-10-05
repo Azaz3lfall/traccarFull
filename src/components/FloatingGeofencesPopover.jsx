@@ -1279,12 +1279,9 @@ const FloatingGeofencesPopover = ({
         
         {/* No Results */}
         {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.find((wp, i) => {
-          // Check if this field has a corresponding waypoint
-          if (isStart) {
-            return i === 0 && wp.address === address;
-          } else {
-            return i === 1 && wp.address === address;
-          }
+          // Check if this field has a corresponding waypoint based on current field order
+          const currentFieldPosition = fieldOrder.indexOf(fieldType);
+          return i === currentFieldPosition && wp.address === address;
         }) && (
           <div style={{
             marginTop: '8px',
