@@ -82,6 +82,8 @@ const FloatingGeofencesPopover = ({
   // State management
   const [activeTab, setActiveTab] = useState(0);
   const [routePlannerTab, setRoutePlannerTab] = useState(0);
+  const [routeData, setRouteData] = useState(null);
+  const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [geofenceToDelete, setGeofenceToDelete] = useState(null);
@@ -922,6 +924,68 @@ const FloatingGeofencesPopover = ({
 
   const handleRoutePlannerTabChange = (event, newValue) => {
     setRoutePlannerTab(newValue);
+    
+    // If switching to Route Plan tab, fetch route data
+    if (newValue === 1) {
+      // Small delay to ensure waypoints are updated
+      setTimeout(() => {
+        fetchRoutePlan();
+      }, 100);
+    }
+  };
+
+  // Fetch route plan from Mapbox
+  const fetchRoutePlan = async () => {
+    // Get valid waypoints from fields instead of routeWaypoints state
+    const validWaypoints = fields
+      .filter(field => field.value && field.value.trim() !== '')
+      .map(field => {
+        // Find the corresponding waypoint from routeWaypoints
+        const waypoint = routeWaypoints.find(wp => wp && wp.address === field.value);
+        return waypoint || null;
+      })
+      .filter(wp => wp && wp.coordinates);
+    
+    if (validWaypoints.length < 2) {
+      console.log('Not enough waypoints for route planning');
+      return;
+    }
+
+    setIsLoadingRoute(true);
+    
+    try {
+      if (!mapboxToken) {
+        console.error('Mapbox access token not found');
+        setIsLoadingRoute(false);
+        return;
+      }
+
+      // Build coordinates string for Mapbox Directions API
+      const coordinates = validWaypoints.map(wp => wp.coordinates).join(';');
+      
+      console.log('Waypoints for routing:', validWaypoints.map(wp => ({
+        address: wp.address,
+        coordinates: wp.coordinates
+      })));
+      
+      // Mapbox Directions API request with more precise parameters
+      const approaches = validWaypoints.map(() => 'curb').join(';');
+      const radiuses = validWaypoints.map(() => 'unlimited').join(';');
+      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true`;
+      
+      console.log('Fetching route from Mapbox...', request);
+      
+      const response = await fetch(request);
+      const data = await response.json();
+      
+      console.log('Mapbox Route Response:', data);
+      setRouteData(data);
+      
+    } catch (error) {
+      console.error('Error fetching route:', error);
+    } finally {
+      setIsLoadingRoute(false);
+    }
   };
 
   // Address search functionality for route planner using Mapbox
@@ -946,7 +1010,7 @@ const FloatingGeofencesPopover = ({
         throw new Error('Mapbox access token not found');
       }
 
-      const request = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&limit=15&types=place,locality,neighborhood,address,poi`;
+      const request = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&limit=15&types=address,poi&country=BR&language=pt`;
       const response = await fetch(request);
       
       if (!response.ok) {
@@ -1841,14 +1905,179 @@ const FloatingGeofencesPopover = ({
 
                 {/* Route Plan Tab Content */}
                 {routePlannerTab === 1 && (
-                  <div style={{ maxHeight: '300px', overflowY: 'auto', padding: '12px' }}>
-                    <Typography variant="body2" style={{ 
-                      color: colors.textSecondary, 
-                      textAlign: 'center',
-                      padding: '40px 20px'
-                    }}>
-                      Route Plan coming soon...
-                    </Typography>
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '0px' }}>
+                    {(() => {
+                      const validWaypoints = routeWaypoints.filter(wp => wp && wp.address && wp.coordinates);
+                      
+                      if (validWaypoints.length < 2) {
+                        return (
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary, 
+                            textAlign: 'center',
+                            padding: '40px 20px'
+                          }}>
+                            Please select at least 2 addresses to plan a route
+                          </Typography>
+                        );
+                      }
+                      
+                      if (isLoadingRoute) {
+                        return (
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            alignItems: 'center', 
+                            padding: '40px 20px' 
+                          }}>
+                            <CircularProgress size={24} style={{ marginBottom: '16px' }} />
+                            <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                              Planning route...
+                            </Typography>
+                          </div>
+                        );
+                      }
+                      
+                      if (routeData) {
+                        return (
+                          <div>
+                            
+                            {routeData.routes && routeData.routes.length > 0 && (
+                              <div>
+                                {/* Main Route Info */}
+                                <div style={{ 
+                                  backgroundColor: colors.secondary,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  padding: '4px',
+                                  marginBottom: '12px'
+                                }}>
+                                  
+                                  
+                                  {routeData.routes[0].legs && routeData.routes[0].legs.length > 0 && (
+                                    <div style={{ marginTop: '0px' }}>
+                                      {routeData.routes[0].legs.map((leg, legIndex) => (
+                                        <div key={legIndex} style={{ 
+                                          marginBottom: '0px',
+                                          padding: '10px 8px',
+                                          backgroundColor: colors.background,
+                                          borderRadius: '4px',
+                                          border: `1px solid ${colors.border}`
+                                        }}>
+                                          <Typography variant="body2" style={{ color: colors.text, fontSize: '12px', fontWeight: '500' }}>
+                                            <strong>Leg {legIndex + 1}:</strong>
+                                          </Typography>
+                                          
+                                          <div style={{ 
+                                            marginTop: '2px', 
+                                            marginBottom: '2px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between'
+                                          }}>
+                                            {leg.distance && (
+                                              <Typography variant="body2" style={{ 
+                                                color: colors.text, 
+                                                fontSize: '11px'
+                                              }}>
+                                                Distance: {(leg.distance / 1000).toFixed(2)} km
+                                              </Typography>
+                                            )}
+                                            {leg.duration && (
+                                              <Typography variant="body2" style={{ 
+                                                color: colors.text, 
+                                                fontSize: '11px'
+                                              }}>
+                                                Duration: {`${Math.floor(leg.duration / 3600)}:${Math.floor((leg.duration % 3600) / 60).toString().padStart(2, '0')} hr`}
+                                              </Typography>
+                                            )}
+                                          </div>
+                                          
+                                          {leg.steps && leg.steps.length > 0 && (
+                                            <Typography variant="body2" style={{ 
+                                              color: colors.textSecondary, 
+                                              fontSize: '11px'
+                                            }}>
+                                              {leg.steps.length} steps
+                                            </Typography>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Step-by-Step Details */}
+                                  {routeData.routes[0].legs && routeData.routes[0].legs.length > 0 && (
+                                    <div style={{ marginTop: '1px' }}>
+                                      
+                                      {routeData.routes[0].legs.map((leg, legIndex) => (
+                                        <div key={legIndex}>
+                                          {leg.steps && leg.steps.map((step, stepIndex) => (
+                                            <div key={stepIndex} style={{ 
+                                              marginTop: '4px',
+                                              marginBottom: '0px',
+                                              padding: '10px 8px',
+                                              backgroundColor: colors.background,
+                                              borderRadius: '4px',
+                                              border: `1px solid ${colors.border}`
+                                            }}>
+                                              <Typography variant="body2" style={{ 
+                                                color: colors.text, 
+                                                fontSize: '12px',
+                                                fontWeight: '500'
+                                              }}>
+                                                Step {stepIndex + 1}
+                                              </Typography>
+                                              
+                                              {step.maneuver && step.maneuver.instruction && (
+                                                <Typography variant="body2" style={{ 
+                                                  color: colors.text, 
+                                                  fontSize: '11px',
+                                                  marginTop: '4px',
+                                                  lineHeight: '1.4'
+                                                }}>
+                                                  {step.maneuver.instruction}
+                                                </Typography>
+                                              )}
+                                              
+                                              <div style={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                marginTop: '4px',
+                                                fontSize: '11px',
+                                                color: colors.textSecondary
+                                              }}>
+                                                {step.distance && (
+                                                  <span>{(step.distance / 1000).toFixed(2)} km</span>
+                                                )}
+                                                {step.duration && (
+                                                  <span>{Math.round(step.duration / 60)} min</span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+
+
+                              </div>
+                            )}
+                            
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <Typography variant="body2" style={{ 
+                          color: colors.textSecondary, 
+                          textAlign: 'center',
+                          padding: '40px 20px'
+                        }}>
+                          Click to plan route
+                        </Typography>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
