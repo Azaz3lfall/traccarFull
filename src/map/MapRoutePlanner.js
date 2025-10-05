@@ -1,10 +1,12 @@
 import { useTheme } from '@mui/material/styles';
-import { useId, useEffect } from 'react';
+import { useId, useEffect, useRef } from 'react';
 import { map } from './core/MapView';
+import mapboxgl from 'mapbox-gl';
 
 const MapRoutePlanner = ({ routeData }) => {
   const id = useId();
   const theme = useTheme();
+  const markersRef = useRef([]);
 
   useEffect(() => {
     if (!routeData || !routeData.routes || routeData.routes.length === 0) {
@@ -15,6 +17,9 @@ const MapRoutePlanner = ({ routeData }) => {
       if (map.getSource(id)) {
         map.removeSource(id);
       }
+      // Remove all markers
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
       return;
     }
 
@@ -46,11 +51,69 @@ const MapRoutePlanner = ({ routeData }) => {
         'line-cap': 'round',
       },
       paint: {
-        'line-color': theme.palette.primary.main,
+        'line-color': '#2196F3', // Blue color
         'line-width': 4,
         'line-opacity': 0.8,
       },
     });
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Add markers for start, waypoints, and end
+    const startCoord = coordinates[0];
+    const endCoord = coordinates[coordinates.length - 1];
+    
+    // Add start marker (green)
+    const startMarker = document.createElement('div');
+    startMarker.style.width = '20px';
+    startMarker.style.height = '20px';
+    startMarker.style.borderRadius = '50%';
+    startMarker.style.backgroundColor = '#4CAF50'; // Green for start
+    startMarker.style.border = '3px solid white';
+    startMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+    
+    const startMarkerInstance = new mapboxgl.Marker(startMarker)
+      .setLngLat(startCoord)
+      .addTo(map);
+    markersRef.current.push(startMarkerInstance);
+
+    // Add end marker (red)
+    const endMarker = document.createElement('div');
+    endMarker.style.width = '20px';
+    endMarker.style.height = '20px';
+    endMarker.style.borderRadius = '50%';
+    endMarker.style.backgroundColor = '#F44336'; // Red for end
+    endMarker.style.border = '3px solid white';
+    endMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+    
+    const endMarkerInstance = new mapboxgl.Marker(endMarker)
+      .setLngLat(endCoord)
+      .addTo(map);
+    markersRef.current.push(endMarkerInstance);
+
+    // Add waypoint markers (orange) - if there are waypoints in the route
+    if (routeData.waypoints && routeData.waypoints.length > 2) {
+      // Skip first and last waypoints (start and end)
+      const waypoints = routeData.waypoints.slice(1, -1);
+      waypoints.forEach((waypoint, index) => {
+        if (waypoint && waypoint.coordinates) {
+          const waypointMarker = document.createElement('div');
+          waypointMarker.style.width = '16px';
+          waypointMarker.style.height = '16px';
+          waypointMarker.style.borderRadius = '50%';
+          waypointMarker.style.backgroundColor = '#FF9800'; // Orange for waypoints
+          waypointMarker.style.border = '2px solid white';
+          waypointMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+          
+          const waypointMarkerInstance = new mapboxgl.Marker(waypointMarker)
+            .setLngLat(waypoint.coordinates)
+            .addTo(map);
+          markersRef.current.push(waypointMarkerInstance);
+        }
+      });
+    }
 
     // Adjust camera to fit the route
     if (route.geometry.coordinates.length > 0) {
@@ -85,6 +148,9 @@ const MapRoutePlanner = ({ routeData }) => {
       if (map.getSource(id)) {
         map.removeSource(id);
       }
+      // Remove all markers
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
     };
   }, [routeData, theme.palette.primary.main]);
 

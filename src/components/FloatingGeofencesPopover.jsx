@@ -1264,9 +1264,14 @@ const FloatingGeofencesPopover = ({
   // Notify parent component when route data changes
   useEffect(() => {
     if (onRouteDataChange) {
-      onRouteDataChange(routeData);
+      // Include waypoints in the route data for markers
+      const routeDataWithWaypoints = routeData ? {
+        ...routeData,
+        waypoints: routeWaypoints
+      } : null;
+      onRouteDataChange(routeDataWithWaypoints);
     }
-  }, [routeData, onRouteDataChange]);
+  }, [routeData, routeWaypoints, onRouteDataChange]);
 
   // BULLETPROOF synchronization - Rebuild waypoints from fields
   useEffect(() => {
