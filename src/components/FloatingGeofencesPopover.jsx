@@ -1278,6 +1278,13 @@ const FloatingGeofencesPopover = ({
     
     console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
     setRouteWaypoints(newWaypoints);
+    
+    // Clear route data and switch to Waypoints tab when waypoints change
+    if (routeData) {
+      console.log('Waypoints changed - clearing route data and switching to Waypoints tab');
+      setRouteData(null);
+      setRoutePlannerTab(0); // Switch to Waypoints tab (index 0)
+    }
   }, [fields]);
 
 
