@@ -991,8 +991,11 @@ const FloatingGeofencesPopover = ({
       const response = await fetch(request);
       const data = await response.json();
       
-      console.log('Mapbox Route Response:', data);
-      setRouteData(data);
+             console.log('Mapbox Route Response:', data);
+             setRouteData(data);
+             
+             // Switch to Route Plan tab after successful route generation
+             setRoutePlannerTab(1);
       
     } catch (error) {
       console.error('Error fetching route:', error);
@@ -1811,7 +1814,10 @@ const FloatingGeofencesPopover = ({
                 >
                   <Tab label={t('routePlannerWaypoints')} />
                   <Tab label={t('routePlannerRoutePlan')} />
-                  <Tab label={t('routePlannerCosts')} />
+                  <Tab 
+                    label={t('routePlannerCosts')} 
+                    disabled={!routeData}
+                  />
                 </Tabs>
 
                 {/* Waypoints Tab Content */}
@@ -2230,9 +2236,9 @@ const FloatingGeofencesPopover = ({
                                   {/* Total Cost */}
                                   <div style={{ 
                                     padding: '8px',
-                                    backgroundColor: colors.primary,
+                                    backgroundColor: colors.secondary,
                                     borderRadius: '4px',
-                                    border: `1px solid ${colors.primary}`
+                                    border: `1px solid ${colors.border}`
                                   }}>
                                     <div style={{ 
                                       display: 'flex', 
@@ -2240,16 +2246,16 @@ const FloatingGeofencesPopover = ({
                                       alignItems: 'center'
                                     }}>
                                       <Typography variant="body2" style={{ 
-                                        color: 'white', 
+                                        color: colors.text, 
                                         fontSize: '11px',
-                                        fontWeight: '500'
+                                        fontWeight: '600'
                                       }}>
                                         {t('routePlannerTotalCost')}
                                       </Typography>
                                       <Typography variant="body2" style={{ 
-                                        color: 'white',
+                                        color: colors.text,
                                         fontWeight: '700',
-                                        fontSize: '12px'
+                                        fontSize: '11px'
                                       }}>
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
