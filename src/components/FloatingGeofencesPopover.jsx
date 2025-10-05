@@ -1166,14 +1166,16 @@ const FloatingGeofencesPopover = ({
                 width: '20px',
                 height: '12px',
                 border: 'none',
-                backgroundColor: isFirst ? colors.border : colors.primary,
-                color: isFirst ? colors.textSecondary : '#ffffff',
+                backgroundColor: 'transparent',
+                color: isFirst ? colors.textSecondary : colors.text,
                 cursor: isFirst ? 'not-allowed' : 'pointer',
                 borderRadius: '2px 2px 0 0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '10px'
+                fontSize: '10px',
+                opacity: isFirst ? 0.5 : 1,
+                transition: 'all 0.2s ease'
               }}
             >
               <ArrowUpIcon style={{ fontSize: '10px' }} />
@@ -1185,14 +1187,16 @@ const FloatingGeofencesPopover = ({
                 width: '20px',
                 height: '12px',
                 border: 'none',
-                backgroundColor: !isFirst ? colors.border : colors.primary,
-                color: !isFirst ? colors.textSecondary : '#ffffff',
+                backgroundColor: 'transparent',
+                color: !isFirst ? colors.textSecondary : colors.text,
                 cursor: !isFirst ? 'not-allowed' : 'pointer',
                 borderRadius: '0 0 2px 2px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '10px'
+                fontSize: '10px',
+                opacity: !isFirst ? 0.5 : 1,
+                transition: 'all 0.2s ease'
               }}
             >
               <ArrowDownIcon style={{ fontSize: '10px' }} />
