@@ -2230,7 +2230,8 @@ const FloatingGeofencesPopover = ({
                                       }}>
                                         {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                          const fuelLiters = totalDistance / costSettings.consumption;
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const fuelLiters = (totalDistance / costSettings.consumption) * multiplier;
                                           return fuelLiters.toFixed(2) + ' L';
                                         })()}
                                       </Typography>
@@ -2263,7 +2264,8 @@ const FloatingGeofencesPopover = ({
                                       }}>
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                          const fuelCost = (totalDistance / costSettings.consumption) * costSettings.fuelPrice;
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           return fuelCost.toFixed(2);
                                         })()}
                                       </Typography>
@@ -2327,8 +2329,10 @@ const FloatingGeofencesPopover = ({
                                       }}>
                                         R$ {(() => {
                                           const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                          const fuelCost = (totalDistance / costSettings.consumption) * costSettings.fuelPrice;
-                                          const totalCost = fuelCost + costSettings.tollCost;
+                                          const multiplier = costSettings.roundTrip ? 2 : 1;
+                                          const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
+                                          const tollCost = costSettings.tollCost * multiplier;
+                                          const totalCost = fuelCost + tollCost;
                                           return totalCost.toFixed(2);
                                         })()}
                                       </Typography>
