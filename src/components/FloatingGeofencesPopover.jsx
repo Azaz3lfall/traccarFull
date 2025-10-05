@@ -33,6 +33,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Divider,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -75,6 +77,7 @@ const FloatingGeofencesPopover = ({
   const geofenceAttributes = useGeofenceAttributes(t);
 
   // State management
+  const [activeTab, setActiveTab] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [geofenceToDelete, setGeofenceToDelete] = useState(null);
@@ -897,6 +900,11 @@ const FloatingGeofencesPopover = ({
 
   // Handle menu actions
 
+  // Handle tab change
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   // Reset page when search changes
   useEffect(() => {
     setPage(1);
@@ -995,252 +1003,313 @@ const FloatingGeofencesPopover = ({
             </label>
           </div>
 
-          {/* Search and Add */}
-          <div style={{ padding: '16px', borderBottom: `1px solid ${colors.border}` }}>
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+          {/* Tabs */}
+          <div style={{ 
+            borderBottom: `1px solid ${colors.border}`,
+            marginBottom: '16px',
+          }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                '& .MuiTab-root': {
+                  color: '#666666',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  textTransform: 'none',
+                  minHeight: '40px',
+                  padding: '8px 16px',
+                  '&.Mui-selected': {
+                    color: '#1976d2',
+                    fontWeight: '600',
+                    backgroundColor: 'transparent',
+                  },
+                  '&:hover': {
+                    color: '#1976d2',
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                  },
+                  '&.Mui-selected:hover': {
+                    color: '#1976d2',
+                    backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#1976d2',
+                  height: '2px',
+                },
+              }}
+            >
+              <Tab label="Basic" />
+              <Tab label="Route Planner" />
+            </Tabs>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 0 && (
+            <>
+              {/* Search and Add */}
+              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${colors.border}` }}>
+                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                  <TextField
+                    fullWidth
+                    placeholder={t('sharedSearch')}
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    size="small"
+                    InputProps={{
+                      startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
+                    }}
+                    style={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '8px'
+                      }
+                    }}
+                  />
+                </div>
+              <Button
+                variant="contained"
+                startIcon={isAddMode ? <AddIcon /> : null}
+                onClick={isAddMode ? handleAdd : handleSave}
+                fullWidth
+                size="small"
+                disabled={!isAddMode && saving}
+                style={{
+                  backgroundColor: colors.primary,
+                  color: colors.text,
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '500',
+                  marginBottom: '12px'
+                }}
+              >
+                {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
+              </Button>
+              
+              {/* Geofence Name Input */}
               <TextField
                 fullWidth
-                placeholder={t('sharedSearch')}
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
                 size="small"
-                InputProps={{
-                  startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />
-                }}
+                label={t('sharedName')}
+                value={geofenceName}
+                onChange={(e) => setGeofenceName(e.target.value)}
+                disabled={isAddMode}
                 style={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '8px'
-                  }
+                  marginBottom: '12px'
+                }}
+                InputLabelProps={{
+                  style: { color: colors.text }
+                }}
+                InputProps={{
+                  style: { color: colors.text }
                 }}
               />
+              
+              {/* Drawing Tools Row */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Button
+                  variant={circleDrawingMode ? "contained" : "outlined"}
+                  size="small"
+                  onClick={() => handleDrawingTool('circle')}
+                  disabled={isAddMode}
+                  style={{
+                    color: circleDrawingMode ? '#ffffff' : colors.text,
+                    backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
+                    borderColor: circleDrawingMode ? '#1976d2' : colors.border,
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '500',
+                    minWidth: '48px',
+                    height: '48px',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <CircleIcon fontSize="small" />
+                </Button>
+                <Button
+                  variant={polylineDrawingMode ? "contained" : "outlined"}
+                  size="small"
+                  onClick={() => handleDrawingTool('line')}
+                  disabled={isAddMode}
+                  style={{
+                    color: polylineDrawingMode ? '#ffffff' : colors.text,
+                    backgroundColor: polylineDrawingMode ? '#1976d2' : 'transparent',
+                    borderColor: polylineDrawingMode ? '#1976d2' : colors.border,
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '500',
+                    minWidth: '48px',
+                    height: '48px',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <LineIcon fontSize="small" />
+                </Button>
+                <Button
+                  variant={polygonDrawingMode ? "contained" : "outlined"}
+                  size="small"
+                  onClick={() => handleDrawingTool('polygon')}
+                  disabled={isAddMode}
+                  style={{
+                    color: polygonDrawingMode ? '#ffffff' : colors.text,
+                    backgroundColor: polygonDrawingMode ? '#1976d2' : 'transparent',
+                    borderColor: polygonDrawingMode ? '#1976d2' : colors.border,
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '500',
+                    minWidth: '48px',
+                    height: '48px',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <PolygonIcon fontSize="small" />
+                </Button>
+              </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 1 && (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
+                Route Planner
+              </Typography>
+              <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '14px' }}>
+                Coming soon...
+              </Typography>
             </div>
-          <Button
-            variant="contained"
-            startIcon={isAddMode ? <AddIcon /> : null}
-            onClick={isAddMode ? handleAdd : handleSave}
-            fullWidth
-            size="small"
-            disabled={!isAddMode && saving}
-            style={{
-              backgroundColor: colors.primary,
-              color: colors.text,
-              textTransform: 'none',
-              borderRadius: '8px',
-              fontWeight: '500',
-              marginBottom: '12px'
-            }}
-          >
-            {isAddMode ? `${t('sharedAdd')} ${t('sharedGeofence')}` : `${t('sharedSave')} ${t('sharedGeofence')}`}
-          </Button>
-          
-          {/* Geofence Name Input */}
-          <TextField
-            fullWidth
-            size="small"
-            label={t('sharedName')}
-            value={geofenceName}
-            onChange={(e) => setGeofenceName(e.target.value)}
-            disabled={isAddMode}
-            style={{
-              marginBottom: '12px'
-            }}
-            InputLabelProps={{
-              style: { color: colors.text }
-            }}
-            InputProps={{
-              style: { color: colors.text }
-            }}
-          />
-          
-          {/* Drawing Tools Row */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Button
-              variant={circleDrawingMode ? "contained" : "outlined"}
-              size="small"
-              onClick={() => handleDrawingTool('circle')}
-              disabled={isAddMode}
-              style={{
-                color: circleDrawingMode ? '#ffffff' : colors.text,
-                backgroundColor: circleDrawingMode ? '#1976d2' : 'transparent',
-                borderColor: circleDrawingMode ? '#1976d2' : colors.border,
-                textTransform: 'none',
-                borderRadius: '8px',
-                fontWeight: '500',
-                minWidth: '48px',
-                height: '48px',
-                padding: '0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <CircleIcon fontSize="small" />
-            </Button>
-            <Button
-              variant={polylineDrawingMode ? "contained" : "outlined"}
-              size="small"
-              onClick={() => handleDrawingTool('line')}
-              disabled={isAddMode}
-              style={{
-                color: polylineDrawingMode ? '#ffffff' : colors.text,
-                backgroundColor: polylineDrawingMode ? '#1976d2' : 'transparent',
-                borderColor: polylineDrawingMode ? '#1976d2' : colors.border,
-                textTransform: 'none',
-                borderRadius: '8px',
-                fontWeight: '500',
-                minWidth: '48px',
-                height: '48px',
-                padding: '0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <LineIcon fontSize="small" />
-            </Button>
-            <Button
-              variant={polygonDrawingMode ? "contained" : "outlined"}
-              size="small"
-              onClick={() => handleDrawingTool('polygon')}
-              disabled={isAddMode}
-              style={{
-                color: polygonDrawingMode ? '#ffffff' : colors.text,
-                backgroundColor: polygonDrawingMode ? '#1976d2' : 'transparent',
-                borderColor: polygonDrawingMode ? '#1976d2' : colors.border,
-                textTransform: 'none',
-                borderRadius: '8px',
-                fontWeight: '500',
-                minWidth: '48px',
-                height: '48px',
-                padding: '0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <PolygonIcon fontSize="small" />
-            </Button>
-          </div>
-          </div>
+          )}
 
-          {/* Content */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
-            {isLoading ? (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '40px',
-                height: '200px'
-              }}>
-                <CircularProgress />
-              </div>
-            ) : error ? (
-              <Alert severity="error" style={{ margin: '16px' }}>
-                {t('sharedError')}
-              </Alert>
-            ) : filteredGeofences.length === 0 ? (
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '40px 20px',
-                textAlign: 'center'
-              }}>
-                <Typography variant="body1" style={{ color: colors.textSecondary, marginBottom: '8px' }}>
-                  {searchKeyword ? t('sharedNoResults') : t('sharedNoGeofences')}
-                </Typography>
-                <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                  {searchKeyword ? t('sharedTryDifferentSearch') : t('sharedAddFirstGeofence')}
-                </Typography>
-              </div>
-            ) : (
-              <TableContainer>
-                <Table>
-                  <TableBody>
-                    {paginatedGeofences.map((geofence) => (
-                      <TableRow 
-                        key={geofence.id} 
-                        hover
-                        onClick={() => handleGeofenceClick(geofence)}
-                        style={{ 
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor: colors.hover
-                          }
-                        }}
-                      >
-                        <TableCell>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            {geofence.area.startsWith('CIRCLE') ? (
-                              <CircleIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : geofence.area.startsWith('LINESTRING') ? (
-                              <LineIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : geofence.area.startsWith('POLYGON') ? (
-                              <PolygonIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : (
-                              <div
-                                style={{
-                                  width: '12px',
-                                  height: '12px',
-                                  borderRadius: '50%',
-                                  backgroundColor: geofence.attributes?.color || '#3f51b5'
-                                }}
-                              />
-                            )}
-                            <Typography variant="body2" style={{ color: colors.text }}>
-                              {geofence.name}
+          {/* Content - Only show for Basic tab */}
+          {activeTab === 0 && (
+            <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
+              {isLoading ? (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '40px',
+                  height: '200px'
+                }}>
+                  <CircularProgress />
+                </div>
+              ) : error ? (
+                <Alert severity="error" style={{ margin: '16px' }}>
+                  {t('sharedError')}
+                </Alert>
+              ) : filteredGeofences.length === 0 ? (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="body1" style={{ color: colors.textSecondary, marginBottom: '8px' }}>
+                    {searchKeyword ? t('sharedNoResults') : t('sharedNoGeofences')}
+                  </Typography>
+                  <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                    {searchKeyword ? t('sharedTryDifferentSearch') : t('sharedAddFirstGeofence')}
+                  </Typography>
+                </div>
+              ) : (
+                <TableContainer>
+                  <Table>
+                    <TableBody>
+                      {paginatedGeofences.map((geofence) => (
+                        <TableRow 
+                          key={geofence.id} 
+                          hover
+                          onClick={() => handleGeofenceClick(geofence)}
+                          style={{ 
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: colors.hover
+                            }
+                          }}
+                        >
+                          <TableCell>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              {geofence.area.startsWith('CIRCLE') ? (
+                                <CircleIcon 
+                                  style={{ 
+                                    fontSize: '16px', 
+                                    color: geofence.attributes?.color || '#3f51b5' 
+                                  }} 
+                                />
+                              ) : geofence.area.startsWith('LINESTRING') ? (
+                                <LineIcon 
+                                  style={{ 
+                                    fontSize: '16px', 
+                                    color: geofence.attributes?.color || '#3f51b5' 
+                                  }} 
+                                />
+                              ) : geofence.area.startsWith('POLYGON') ? (
+                                <PolygonIcon 
+                                  style={{ 
+                                    fontSize: '16px', 
+                                    color: geofence.attributes?.color || '#3f51b5' 
+                                  }} 
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    width: '12px',
+                                    height: '12px',
+                                    borderRadius: '50%',
+                                    backgroundColor: geofence.attributes?.color || '#3f51b5'
+                                  }}
+                                />
+                              )}
+                              <Typography variant="body2" style={{ color: colors.text }}>
+                                {geofence.name}
+                              </Typography>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                              {geofence.description || t('sharedNoDescription')}
                             </Typography>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                            {geofence.description || t('sharedNoDescription')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(geofence);
-                            }}
-                            style={{
-                              color: colors.textSecondary,
-                              '&:hover': {
-                                color: colors.error
-                              }
-                            }}
-                          >
-                            <DeleteIcon style={{ fontSize: 16 }} />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </div>
+                          </TableCell>
+                          <TableCell align="right">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(geofence);
+                              }}
+                              style={{
+                                color: colors.textSecondary,
+                                '&:hover': {
+                                  color: colors.error
+                                }
+                              }}
+                            >
+                              <DeleteIcon style={{ fontSize: 16 }} />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </div>
+          )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {/* Pagination - Only show for Basic tab */}
+          {activeTab === 0 && totalPages > 1 && (
             <div style={{
               padding: '16px',
               borderTop: `1px solid ${colors.border}`,
