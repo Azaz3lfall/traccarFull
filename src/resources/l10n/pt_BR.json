@@ -717,5 +717,15 @@
   "routePlannerPlanningRoute": "Planejando rota...",
   "routePlannerSelectAddresses": "Por favor, selecione pelo menos 2 endereços para planejar uma rota",
   "routePlannerClickToPlan": "Clique para planejar rota",
-  "routePlannerNotEnoughWaypoints": "Pontos de parada insuficientes para planejamento de rota"
+  "routePlannerNotEnoughWaypoints": "Pontos de parada insuficientes para planejamento de rota",
+  "routePlannerCosts": "Custos",
+  "routePlannerCostAnalysis": "Análise de Custos",
+  "routePlannerFuelCost": "Custo de Combustível",
+  "routePlannerTollCost": "Custo de Pedágio",
+  "routePlannerTotalCost": "Custo Total",
+  "routePlannerCalculating": "Calculando",
+  "routePlannerCostSettings": "Configurações de Custo",
+  "routePlannerFuelPrice": "Preço do Combustível",
+  "routePlannerVehicleConsumption": "Consumo do Veículo",
+  "routePlannerTollRate": "Taxa de Pedágio"
 }

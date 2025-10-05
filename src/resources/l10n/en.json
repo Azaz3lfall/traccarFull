@@ -717,5 +717,15 @@
   "routePlannerPlanningRoute": "Planning route...",
   "routePlannerSelectAddresses": "Please select at least 2 addresses to plan a route",
   "routePlannerClickToPlan": "Click to plan route",
-  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning"
+  "routePlannerNotEnoughWaypoints": "Not enough waypoints for route planning",
+  "routePlannerCosts": "Costs",
+  "routePlannerCostAnalysis": "Cost Analysis",
+  "routePlannerFuelCost": "Fuel Cost",
+  "routePlannerTollCost": "Toll Cost",
+  "routePlannerTotalCost": "Total Cost",
+  "routePlannerCalculating": "Calculating",
+  "routePlannerCostSettings": "Cost Settings",
+  "routePlannerFuelPrice": "Fuel Price",
+  "routePlannerVehicleConsumption": "Vehicle Consumption",
+  "routePlannerTollRate": "Toll Rate"
 }

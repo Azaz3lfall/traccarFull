@@ -1277,11 +1277,15 @@ const FloatingGeofencesPopover = ({
     });
     
     console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
+    
+    // Check if waypoints actually changed
+    const waypointsChanged = JSON.stringify(newWaypoints) !== JSON.stringify(routeWaypoints);
+    
     setRouteWaypoints(newWaypoints);
     
-    // Clear route data and switch to Waypoints tab when waypoints change
-    if (routeData) {
-      console.log('Waypoints changed - clearing route data and switching to Waypoints tab');
+    // Only clear route data and switch to Waypoints tab when waypoints actually change
+    if (waypointsChanged && routeData) {
+      console.log('Waypoints actually changed - clearing route data and switching to Waypoints tab');
       setRouteData(null);
       setRoutePlannerTab(0); // Switch to Waypoints tab (index 0)
     }
@@ -1800,6 +1804,7 @@ const FloatingGeofencesPopover = ({
                 >
                   <Tab label={t('routePlannerWaypoints')} />
                   <Tab label={t('routePlannerRoutePlan')} />
+                  <Tab label={t('routePlannerCosts')} />
                 </Tabs>
 
                 {/* Waypoints Tab Content */}
@@ -2077,6 +2082,210 @@ const FloatingGeofencesPopover = ({
                               </div>
                             )}
                             
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <Typography variant="body2" style={{ 
+                          color: colors.textSecondary, 
+                          textAlign: 'center',
+                          padding: '40px 20px'
+                        }}>
+                          {t('routePlannerClickToPlan')}
+                        </Typography>
+                      );
+                    })()}
+                  </div>
+                )}
+
+                {/* Costs Tab Content */}
+                {routePlannerTab === 2 && (
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '0px' }}>
+                    {(() => {
+                      const validWaypoints = routeWaypoints.filter(wp => wp && wp.address && wp.coordinates);
+                      
+                      if (validWaypoints.length < 2) {
+                        return (
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary, 
+                            textAlign: 'center',
+                            padding: '40px 20px'
+                          }}>
+                            {t('routePlannerSelectAddresses')}
+                          </Typography>
+                        );
+                      }
+                      
+                      if (isLoadingRoute) {
+                        return (
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            padding: '40px 20px' 
+                          }}>
+                            <CircularProgress size={24} style={{ marginBottom: '16px' }} />
+                            <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                              {t('routePlannerPlanningRoute')}
+                            </Typography>
+                          </div>
+                        );
+                      }
+                      
+                      if (routeData) {
+                        return (
+                          <div>
+                            {routeData.routes && routeData.routes.length > 0 && (
+                              <div>
+                                {/* Cost Analysis */}
+                                <div style={{ 
+                                  backgroundColor: colors.secondary,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  padding: '16px',
+                                  marginBottom: '12px'
+                                }}>
+                                  <Typography variant="h6" style={{ 
+                                    color: colors.text, 
+                                    marginBottom: '16px',
+                                    fontWeight: '600'
+                                  }}>
+                                    {t('routePlannerCostAnalysis')}
+                                  </Typography>
+                                  
+                                  {/* Fuel Cost */}
+                                  <div style={{ 
+                                    marginBottom: '12px',
+                                    padding: '12px',
+                                    backgroundColor: colors.background,
+                                    borderRadius: '6px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      fontWeight: '500',
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerFuelCost')}
+                                    </Typography>
+                                    <Typography variant="h6" style={{ 
+                                      color: colors.primary,
+                                      fontWeight: '700'
+                                    }}>
+                                      {t('routePlannerCalculating')}...
+                                    </Typography>
+                                  </div>
+                                  
+                                  {/* Toll Cost */}
+                                  <div style={{ 
+                                    marginBottom: '12px',
+                                    padding: '12px',
+                                    backgroundColor: colors.background,
+                                    borderRadius: '6px',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      fontWeight: '500',
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerTollCost')}
+                                    </Typography>
+                                    <Typography variant="h6" style={{ 
+                                      color: colors.primary,
+                                      fontWeight: '700'
+                                    }}>
+                                      {t('routePlannerCalculating')}...
+                                    </Typography>
+                                  </div>
+                                  
+                                  {/* Total Cost */}
+                                  <div style={{ 
+                                    padding: '12px',
+                                    backgroundColor: colors.primary,
+                                    borderRadius: '6px',
+                                    border: `1px solid ${colors.primary}`
+                                  }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: 'white', 
+                                      fontWeight: '500',
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerTotalCost')}
+                                    </Typography>
+                                    <Typography variant="h5" style={{ 
+                                      color: 'white',
+                                      fontWeight: '700'
+                                    }}>
+                                      {t('routePlannerCalculating')}...
+                                    </Typography>
+                                  </div>
+                                </div>
+                                
+                                {/* Cost Settings */}
+                                <div style={{ 
+                                  backgroundColor: colors.secondary,
+                                  border: `1px solid ${colors.border}`,
+                                  borderRadius: '8px',
+                                  padding: '16px'
+                                }}>
+                                  <Typography variant="h6" style={{ 
+                                    color: colors.text, 
+                                    marginBottom: '16px',
+                                    fontWeight: '600'
+                                  }}>
+                                    {t('routePlannerCostSettings')}
+                                  </Typography>
+                                  
+                                  <div style={{ marginBottom: '12px' }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerFuelPrice')} (R$/L)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      placeholder="5.50"
+                                      style={{ width: '100%' }}
+                                    />
+                                  </div>
+                                  
+                                  <div style={{ marginBottom: '12px' }}>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerVehicleConsumption')} (km/L)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      placeholder="12"
+                                      style={{ width: '100%' }}
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.text, 
+                                      marginBottom: '8px'
+                                    }}>
+                                      {t('routePlannerTollRate')} (R$/km)
+                                    </Typography>
+                                    <TextField
+                                      size="small"
+                                      type="number"
+                                      placeholder="0.15"
+                                      style={{ width: '100%' }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       }
