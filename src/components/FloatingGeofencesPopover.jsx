@@ -1026,10 +1026,11 @@ const FloatingGeofencesPopover = ({
   const handleStartAddressSelect = (result) => {
     setStartAddress(result.properties?.display_name || result.text);
     setStartSearchResults([]);
-    // Add to route waypoints - first position is always start
+    // Add to route waypoints - use field order to determine position
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
-      newWaypoints[0] = {
+      const startPosition = fieldOrder.indexOf('start');
+      newWaypoints[startPosition] = {
         address: result.properties?.display_name || result.text,
         coordinates: result.center,
         type: 'start'
@@ -1042,10 +1043,11 @@ const FloatingGeofencesPopover = ({
   const handleEndAddressSelect = (result) => {
     setEndAddress(result.properties?.display_name || result.text);
     setEndSearchResults([]);
-    // Add to route waypoints - second position is always end
+    // Add to route waypoints - use field order to determine position
     setRouteWaypoints(prev => {
       const newWaypoints = [...prev];
-      newWaypoints[1] = {
+      const endPosition = fieldOrder.indexOf('end');
+      newWaypoints[endPosition] = {
         address: result.properties?.display_name || result.text,
         coordinates: result.center,
         type: 'end'
@@ -1278,11 +1280,7 @@ const FloatingGeofencesPopover = ({
         )}
         
         {/* No Results */}
-        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.find((wp, i) => {
-          // Check if this field has a corresponding waypoint based on current field order
-          const currentFieldPosition = fieldOrder.indexOf(fieldType);
-          return i === currentFieldPosition && wp.address === address;
-        }) && (
+        {address && address.trim().length >= 5 && searchResults.length === 0 && !isSearching && !routeWaypoints.some(wp => wp.address === address) && (
           <div style={{
             marginTop: '8px',
             padding: '8px',
