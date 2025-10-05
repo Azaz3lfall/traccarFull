@@ -1607,7 +1607,7 @@ const FloatingGeofencesPopover = ({
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '10px 60px 10px 12px', // Space for controls
+                        padding: '10px 50px 10px 12px', // Space for controls
                         backgroundColor: colors.secondary,
                         border: `1px solid ${colors.border}`,
                         borderRadius: '8px',
@@ -1677,7 +1677,7 @@ const FloatingGeofencesPopover = ({
                         onClick={() => handleDeleteField(field.id)}
                       style={{
                         position: 'absolute',
-                        right: '32px',
+                        right: '22px',
                         top: '50%',
                         transform: 'translateY(-50%)',
                         width: '20px',
@@ -1701,11 +1701,17 @@ const FloatingGeofencesPopover = ({
                     {field.isSearching && (
                       <div style={{
                         position: 'absolute',
-                        right: '60px',
+                        right: '50px',
                         top: '50%',
                         transform: 'translateY(-50%)'
                       }}>
-                        <CircularProgress size={16} style={{ color: colors.primary }} />
+                        <CircularProgress 
+                          size={16} 
+                          style={{ 
+                            color: colors.text,
+                            filter: 'brightness(1.2)'
+                          }} 
+                        />
                       </div>
                     )}
                   </div>
