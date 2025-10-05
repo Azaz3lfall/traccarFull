@@ -35,34 +35,48 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
 
     const coordinates = selectedRoute.geometry.coordinates;
 
-    // Add source for route polyline
-    map.addSource(id, {
-      type: 'geojson',
-      data: {
+    // Add source for route polyline (check if it already exists)
+    if (!map.getSource(id)) {
+      map.addSource(id, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: coordinates,
+          },
+          properties: {},
+        },
+      });
+    } else {
+      // Update existing source data
+      map.getSource(id).setData({
         type: 'Feature',
         geometry: {
           type: 'LineString',
           coordinates: coordinates,
         },
         properties: {},
-      },
-    });
+      });
+    }
 
-    // Add layer for route polyline
-    map.addLayer({
-      source: id,
-      id: `${id}-line`,
-      type: 'line',
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      paint: {
-        'line-color': '#1565C0', // Darker blue color
-        'line-width': 4,
-        'line-opacity': 0.9,
-      },
-    });
+    // Add layer for route polyline (check if it already exists)
+    if (!map.getLayer(`${id}-line`)) {
+      map.addLayer({
+        source: id,
+        id: `${id}-line`,
+        type: 'line',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#1565C0', // Darker blue color
+          'line-width': 4,
+          'line-opacity': 0.9,
+        },
+      });
+    }
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
