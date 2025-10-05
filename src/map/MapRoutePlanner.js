@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import { useId, useEffect, useRef } from 'react';
 import { map } from './core/MapView';
-import mapboxgl from 'mapbox-gl';
+import maplibregl from 'maplibre-gl';
 
 const MapRoutePlanner = ({ routeData }) => {
   const id = useId();
@@ -76,7 +76,7 @@ const MapRoutePlanner = ({ routeData }) => {
     startMarker.style.border = '3px solid white';
     startMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
     
-    const startMarkerInstance = new mapboxgl.Marker(startMarker)
+    const startMarkerInstance = new maplibregl.Marker(startMarker)
       .setLngLat(startCoord)
       .addTo(map);
     markersRef.current.push(startMarkerInstance);
@@ -90,7 +90,7 @@ const MapRoutePlanner = ({ routeData }) => {
     endMarker.style.border = '3px solid white';
     endMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
     
-    const endMarkerInstance = new mapboxgl.Marker(endMarker)
+    const endMarkerInstance = new maplibregl.Marker(endMarker)
       .setLngLat(endCoord)
       .addTo(map);
     markersRef.current.push(endMarkerInstance);
@@ -109,7 +109,7 @@ const MapRoutePlanner = ({ routeData }) => {
           waypointMarker.style.border = '2px solid white';
           waypointMarker.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
           
-          const waypointMarkerInstance = new mapboxgl.Marker(waypointMarker)
+          const waypointMarkerInstance = new maplibregl.Marker(waypointMarker)
             .setLngLat(waypoint.coordinates)
             .addTo(map);
           markersRef.current.push(waypointMarkerInstance);
