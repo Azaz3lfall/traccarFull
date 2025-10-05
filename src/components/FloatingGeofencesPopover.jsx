@@ -86,6 +86,13 @@ const FloatingGeofencesPopover = ({
   const [routePlannerTab, setRoutePlannerTab] = useState(0);
   const [routeData, setRouteData] = useState(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  
+  // Cost calculation state
+  const [costSettings, setCostSettings] = useState({
+    fuelPrice: 5.50,
+    consumption: 12,
+    tollCost: 15.00
+  });
   const [searchKeyword, setSearchKeyword] = useState('');
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [geofenceToDelete, setGeofenceToDelete] = useState(null);
@@ -2176,9 +2183,7 @@ const FloatingGeofencesPopover = ({
                                     }}>
                                       R$ {(() => {
                                         const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                        const fuelPrice = 5.50; // Default fuel price
-                                        const consumption = 12; // Default km/L
-                                        const fuelCost = (totalDistance / consumption) * fuelPrice;
+                                        const fuelCost = (totalDistance / costSettings.consumption) * costSettings.fuelPrice;
                                         return fuelCost.toFixed(2);
                                       })()}
                                     </Typography>
@@ -2204,9 +2209,7 @@ const FloatingGeofencesPopover = ({
                                       fontWeight: '700'
                                     }}>
                                       R$ {(() => {
-                                        // Toll costs are fixed values, not per km
-                                        const tollCost = 15.00; // Default fixed toll cost
-                                        return tollCost.toFixed(2);
+                                        return costSettings.tollCost.toFixed(2);
                                       })()}
                                     </Typography>
                                   </div>
@@ -2231,11 +2234,8 @@ const FloatingGeofencesPopover = ({
                                     }}>
                                       R$ {(() => {
                                         const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
-                                        const fuelPrice = 5.50; // Default fuel price
-                                        const consumption = 12; // Default km/L
-                                        const tollCost = 15.00; // Fixed toll cost
-                                        const fuelCost = (totalDistance / consumption) * fuelPrice;
-                                        const totalCost = fuelCost + tollCost;
+                                        const fuelCost = (totalDistance / costSettings.consumption) * costSettings.fuelPrice;
+                                        const totalCost = fuelCost + costSettings.tollCost;
                                         return totalCost.toFixed(2);
                                       })()}
                                     </Typography>
@@ -2267,7 +2267,11 @@ const FloatingGeofencesPopover = ({
                                     <TextField
                                       size="small"
                                       type="number"
-                                      placeholder="5.50"
+                                      value={costSettings.fuelPrice}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        fuelPrice: parseFloat(e.target.value) || 0
+                                      }))}
                                       style={{ width: '100%' }}
                                     />
                                   </div>
@@ -2282,7 +2286,11 @@ const FloatingGeofencesPopover = ({
                                     <TextField
                                       size="small"
                                       type="number"
-                                      placeholder="12"
+                                      value={costSettings.consumption}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        consumption: parseFloat(e.target.value) || 0
+                                      }))}
                                       style={{ width: '100%' }}
                                     />
                                   </div>
@@ -2297,7 +2305,11 @@ const FloatingGeofencesPopover = ({
                                     <TextField
                                       size="small"
                                       type="number"
-                                      placeholder="15.00"
+                                      value={costSettings.tollCost}
+                                      onChange={(e) => setCostSettings(prev => ({
+                                        ...prev,
+                                        tollCost: parseFloat(e.target.value) || 0
+                                      }))}
                                       style={{ width: '100%' }}
                                     />
                                   </div>
