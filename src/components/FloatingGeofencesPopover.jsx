@@ -977,6 +977,10 @@ const FloatingGeofencesPopover = ({
     }
 
     setIsSavingRoute(true);
+    
+    // Add a small delay to ensure loading state is visible
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     try {
       // Get the currently active/selected route (the one displayed on map)
       const activeRoute = routeData.routes[selectedRouteIndex];
@@ -996,10 +1000,9 @@ const FloatingGeofencesPopover = ({
       // Create geofence data
       const routeGeofence = {
         name: `${t('routePlannerRouteName')} ${new Date().toLocaleString()}`,
-        description: t('routePlannerRouteWithWaypoints', { 
-          0: selectedRouteIndex + 1, 
-          1: routeData.waypoints?.length || 0 
-        }),
+        description: t('routePlannerRouteWithWaypoints')
+          .replace('{0}', selectedRouteIndex + 1)
+          .replace('{1}', routeData.waypoints?.length || 0),
         area: area,
         calendarId: null,
         attributes: {
@@ -1018,7 +1021,18 @@ const FloatingGeofencesPopover = ({
       console.log('Number of coordinates:', activeRoute.geometry.coordinates.length);
 
       // Use the existing createGeofenceMutation
-      createGeofenceMutation.mutate(routeGeofence);
+      await new Promise((resolve, reject) => {
+        createGeofenceMutation.mutate(routeGeofence, {
+          onSuccess: () => {
+            console.log('Route saved successfully');
+            resolve();
+          },
+          onError: (error) => {
+            console.error('Error saving route:', error);
+            reject(error);
+          }
+        });
+      });
 
     } catch (error) {
       console.error('Error saving route:', error);

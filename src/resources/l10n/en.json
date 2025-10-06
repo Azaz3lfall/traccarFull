@@ -741,5 +741,7 @@
   "routePlannerCurrencySymbol": "$",
   "routePlannerRouteName": "Route",
   "routePlannerRouteWithWaypoints": "Route {0} with {1} waypoints",
+  "routePlannerWith": "with",
+  "routePlannerPoints": "points",
   "routePlannerNoApiToken": "Mapbox API token is not configured. Please contact your administrator to set up the API token."
 }

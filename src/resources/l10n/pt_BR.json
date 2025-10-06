@@ -741,5 +741,7 @@
   "routePlannerCurrencySymbol": "R$",
   "routePlannerRouteName": "Rota",
   "routePlannerRouteWithWaypoints": "Rota {0} com {1} pontos",
+  "routePlannerWith": "com",
+  "routePlannerPoints": "pontos",
   "routePlannerNoApiToken": "Token da API do Mapbox não está configurado. Entre em contato com seu administrador para configurar o token da API."
 }
