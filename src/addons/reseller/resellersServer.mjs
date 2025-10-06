@@ -42,7 +42,6 @@ const dnsLookup = promisify(dns.lookup);
 // Helper function to check domain propagation
 const checkDomainPropagation = async (domain) => {
   try {
-    console.log(`🔍 Checking domain propagation for: ${domain}`);
     
     // Remove protocol if present
     const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -51,14 +50,11 @@ const checkDomainPropagation = async (domain) => {
     const dnsResult = await dnsLookup(cleanDomain);
     const ipAddress = dnsResult.address;
     
-    console.log(`✅ Domain ${cleanDomain} resolves to: ${ipAddress}`);
     
     // Try to ping the domain (optional - just for additional verification)
     try {
       await execAsync(`ping -c 1 -W 3 ${cleanDomain}`);
-      console.log(`✅ Domain ${cleanDomain} is reachable via ping`);
     } catch (pingError) {
-      console.log(`⚠️ Ping failed for ${cleanDomain}, but DNS resolution works`);
     }
     
     return {
@@ -107,7 +103,6 @@ const createNginxConfig = async (appUrl) => {
     // Write nginx configuration file
     const configPath = `${sitesAvailableDir}/${appUrl}.conf`;
     fs.writeFileSync(configPath, nginxConfig);
-    console.log(`✅ Created nginx config: ${configPath}`);
 
     return configPath;
   } catch (error) {
@@ -133,7 +128,6 @@ const enableNginxSite = async (appUrl) => {
       fs.unlinkSync(symlinkPath); // Remove existing symlink
     }
     fs.symlinkSync(configPath, symlinkPath);
-    console.log(`✅ Enabled nginx site: ${symlinkPath}`);
 
     return symlinkPath;
   } catch (error) {
@@ -146,7 +140,6 @@ const enableNginxSite = async (appUrl) => {
 const reloadNginx = async () => {
   try {
     await execAsync('service nginx reload');
-    console.log('✅ Nginx reloaded successfully');
   } catch (error) {
     console.error('❌ Error reloading nginx:', error);
     throw error;
@@ -159,11 +152,9 @@ const setupSSL = async (appUrl, email = 'admin@example.com') => {
     // Run certbot with non-interactive flags
     const certbotCommand = `certbot --nginx -d ${appUrl} --non-interactive --agree-tos --email ${email} --redirect`;
     await execAsync(certbotCommand);
-    console.log(`✅ SSL certificate created for ${appUrl}`);
     
     // Reload nginx after SSL setup
     await reloadNginx();
-    console.log('✅ Nginx reloaded after SSL setup');
   } catch (error) {
     console.error('❌ Error setting up SSL:', error);
     throw error;
@@ -173,7 +164,6 @@ const setupSSL = async (appUrl, email = 'admin@example.com') => {
 // Main function to setup nginx and SSL for a reseller
 const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') => {
   try {
-    console.log(`🚀 Setting up nginx for reseller: ${appUrl}`);
     
     // Step 1: Create nginx configuration
     await createNginxConfig(appUrl);
@@ -191,7 +181,6 @@ const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') =>
       console.error('⚠️ SSL setup failed (non-blocking):', sslError.message);
     }
     
-    console.log(`✅ Nginx setup completed for ${appUrl}`);
   } catch (error) {
     console.error('❌ Error in nginx setup (non-blocking):', error.message);
     // Don't throw - this is non-blocking
@@ -204,9 +193,7 @@ const disableNginxSite = async (appUrl) => {
     const enabledPath = `/etc/nginx/sites-enabled/${appUrl}.conf`;
     if (fs.existsSync(enabledPath)) {
       await execAsync(`rm -f ${enabledPath}`);
-      console.log(`✅ Disabled nginx site: ${appUrl}`);
     } else {
-      console.log(`ℹ️ Nginx site already disabled: ${appUrl}`);
     }
   } catch (error) {
     console.error(`❌ Error disabling nginx site ${appUrl}:`, error);
@@ -220,9 +207,7 @@ const removeNginxConfig = async (appUrl) => {
     const configPath = `/etc/nginx/sites-available/${appUrl}.conf`;
     if (fs.existsSync(configPath)) {
       await execAsync(`rm -f ${configPath}`);
-      console.log(`✅ Removed nginx configuration: ${appUrl}`);
     } else {
-      console.log(`ℹ️ Nginx configuration already removed: ${appUrl}`);
     }
   } catch (error) {
     console.error(`❌ Error removing nginx config ${appUrl}:`, error);
@@ -233,7 +218,6 @@ const removeNginxConfig = async (appUrl) => {
 // Helper function to cleanup nginx for deleted reseller
 const cleanupResellerNginx = async (appUrl) => {
   try {
-    console.log(`🧹 Cleaning up nginx for deleted reseller: ${appUrl}`);
 
     // Step 1: Disable the site
     await disableNginxSite(appUrl);
@@ -244,7 +228,6 @@ const cleanupResellerNginx = async (appUrl) => {
     // Step 3: Reload nginx
     await reloadNginx();
 
-    console.log(`✅ Nginx cleanup completed for ${appUrl}`);
   } catch (error) {
     console.error('❌ Error in nginx cleanup (non-blocking):', error.message);
     // Don't throw - this is non-blocking
@@ -1207,22 +1190,18 @@ const ensureDirectories = () => {
     const mainDir = '/opt/addons/resellers';
     if (!fs.existsSync(mainDir)) {
       fs.mkdirSync(mainDir, { recursive: true });
-      console.log('✅ Created main resellers directory:', mainDir);
     }
     
     // Create data directory
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
-      console.log('✅ Created data directory:', DATA_DIR);
     }
     
     // Create images directory
     if (!fs.existsSync(IMAGES_DIR)) {
       fs.mkdirSync(IMAGES_DIR, { recursive: true });
-      console.log('✅ Created images directory:', IMAGES_DIR);
     }
     
-    console.log('✅ All required directories ensured:', mainDir, DATA_DIR, IMAGES_DIR);
   } catch (error) {
     console.error('❌ Error creating directories:', error);
     console.error('❌ Make sure the application has write permissions to /opt/addons/resellers');

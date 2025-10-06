@@ -4,7 +4,6 @@ import { map } from './core/MapView';
 import maplibregl from 'maplibre-gl';
 
 const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) => {
-  console.log('MapRoutePlanner component mounted with:', { routeData, selectedRouteIndex, onRouteChange });
   
   const id = useId();
   const theme = useTheme();
@@ -37,7 +36,6 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     }
 
     const coordinates = selectedRoute.geometry.coordinates;
-    console.log('MapRoutePlanner: Rendering route with', coordinates.length, 'coordinates');
 
     // Add source for route polyline (check if it already exists)
     if (!map.getSource(id)) {
@@ -209,7 +207,6 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
   }, []);
 
   // Debug logging
-  console.log('MapRoutePlanner render:', {
     routeData: routeData,
     routesLength: routeData?.routes?.length,
     selectedRouteIndex: selectedRouteIndex
