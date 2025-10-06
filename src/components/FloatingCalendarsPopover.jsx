@@ -1081,7 +1081,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                   </div>
 
                   {/* Form */}
-                  <div style={{ flex: 1, overflow: 'visible', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 24px 24px 24px', display: 'flex', flexDirection: 'column' }}>
                     {/* Tabs Navigation */}
                     <Tabs
                       value={activeTab}
@@ -1126,7 +1126,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                     </Tabs>
 
                     {/* Tab Content */}
-                    <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
+                    <Box style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: '16px' }}>
                       {/* Required Tab */}
                       {activeTab === 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1485,6 +1485,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                   mt: 1,
                                   maxHeight: '300px',
                                   overflowY: 'auto',
+                                  overflowX: 'hidden',
                                   '&::-webkit-scrollbar': {
                                     width: '6px',
                                   },
