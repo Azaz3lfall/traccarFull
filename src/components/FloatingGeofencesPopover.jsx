@@ -963,8 +963,8 @@ const FloatingGeofencesPopover = ({
   const handleRoutePlannerTabChange = (event, newValue) => {
     setRoutePlannerTab(newValue);
     
-    // If switching to Route Plan tab, fetch route data
-    if (newValue === 1) {
+    // If switching to Route Plan tab, only fetch route data if we don't have any
+    if (newValue === 1 && !routeData) {
       // Small delay to ensure waypoints are updated
       setTimeout(() => {
         fetchRoutePlan();
@@ -1350,6 +1350,8 @@ const FloatingGeofencesPopover = ({
     if (waypointsChanged && routeData) {
       console.log('Waypoints actually changed - clearing route data and switching to Waypoints tab');
       setRouteData(null);
+      setDisplayedRouteData(null);
+      setSelectedRouteIndex(0);
       setRoutePlannerTab(0); // Switch to Waypoints tab (index 0)
     }
     
