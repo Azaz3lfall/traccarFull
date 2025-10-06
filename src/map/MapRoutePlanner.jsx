@@ -12,21 +12,22 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
   const routeSourcesRef = useRef([]);
 
   useEffect(() => {
+    // Always clear existing routes and markers first
+    routeSourcesRef.current.forEach(sourceId => {
+      if (map.getLayer(`${sourceId}-line`)) {
+        map.removeLayer(`${sourceId}-line`);
+      }
+      if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
+      }
+    });
+    routeSourcesRef.current = [];
+    
+    // Remove all markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
     if (!routeData || !routeData.routes || routeData.routes.length === 0) {
-      // Remove existing routes if no route data
-      routeSourcesRef.current.forEach(sourceId => {
-        if (map.getLayer(`${sourceId}-line`)) {
-          map.removeLayer(`${sourceId}-line`);
-        }
-        if (map.getSource(sourceId)) {
-          map.removeSource(sourceId);
-        }
-      });
-      routeSourcesRef.current = [];
-      
-      // Remove all markers
-      markersRef.current.forEach(marker => marker.remove());
-      markersRef.current = [];
       return;
     }
 
@@ -36,6 +37,7 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     }
 
     const coordinates = selectedRoute.geometry.coordinates;
+    console.log('MapRoutePlanner: Rendering route with', coordinates.length, 'coordinates');
 
     // Add source for route polyline (check if it already exists)
     if (!map.getSource(id)) {

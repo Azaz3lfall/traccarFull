@@ -1300,6 +1300,18 @@ const FloatingGeofencesPopover = ({
     }
   }, [routeData, routeWaypoints, onRouteDataChange]);
 
+  // Notify parent component when displayed route changes (for map updates)
+  useEffect(() => {
+    if (onRouteDataChange && displayedRouteData) {
+      // Send the displayed route data (selected route only) to parent for map updates
+      const displayedRouteWithWaypoints = {
+        ...displayedRouteData,
+        waypoints: routeWaypoints
+      };
+      onRouteDataChange(displayedRouteWithWaypoints);
+    }
+  }, [displayedRouteData, routeWaypoints, onRouteDataChange]);
+
   // BULLETPROOF synchronization - Rebuild waypoints from fields
   useEffect(() => {
     console.log('=== SYNC CHECK ===');
