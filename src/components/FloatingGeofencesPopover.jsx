@@ -2481,7 +2481,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '600',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const totalDistance = getRouteDistance();
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
@@ -2515,7 +2515,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '600',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           return (costSettings.tollCost * multiplier).toFixed(2);
                                         })()}
@@ -2547,7 +2547,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '700',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const totalDistance = getRouteDistance();
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
@@ -2584,7 +2584,7 @@ const FloatingGeofencesPopover = ({
                                       marginBottom: '4px',
                                       fontSize: '11px'
                                     }}>
-                                      {t('routePlannerHandlingFee')} (R$)
+                                      {t('routePlannerHandlingFee')} ({t('routePlannerCurrencySymbol')})
                                     </Typography>
                                     <TextField
                                       size="small"
@@ -2613,7 +2613,7 @@ const FloatingGeofencesPopover = ({
                                       marginBottom: '4px',
                                       fontSize: '11px'
                                     }}>
-                                      {t('routePlannerPricePerKm')} (R$/km)
+                                      {t('routePlannerPricePerKm')} ({t('routePlannerCurrencySymbol')}/km)
                                     </Typography>
                                     <TextField
                                       size="small"
@@ -2683,7 +2683,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '600',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           return (costSettings.tollCost * multiplier).toFixed(2);
                                         })()}
@@ -2715,7 +2715,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '600',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const totalDistance = getRouteDistance();
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
@@ -2751,7 +2751,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '600',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const totalDistance = getRouteDistance();
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
@@ -2785,7 +2785,7 @@ const FloatingGeofencesPopover = ({
                                         fontWeight: '700',
                                         fontSize: '11px'
                                       }}>
-                                        R$ {(() => {
+                                        {t('routePlannerCurrencySymbol')} {(() => {
                                           const totalDistance = getRouteDistance();
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
@@ -2822,7 +2822,7 @@ const FloatingGeofencesPopover = ({
                                       marginBottom: '4px',
                                       fontSize: '11px'
                                     }}>
-                                      {t('routePlannerFuelPrice')} (R$/L)
+                                      {t('routePlannerFuelPrice')} ({t('routePlannerCurrencySymbol')}/L)
                                     </Typography>
                                     <TextField
                                       size="small"
@@ -2878,7 +2878,7 @@ const FloatingGeofencesPopover = ({
                                       marginBottom: '4px',
                                       fontSize: '11px'
                                     }}>
-                                      {t('routePlannerTollCost')} (R$)
+                                      {t('routePlannerTollCost')} ({t('routePlannerCurrencySymbol')})
                                     </Typography>
                                     <TextField
                                       size="small"

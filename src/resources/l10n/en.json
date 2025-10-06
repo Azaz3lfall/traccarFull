@@ -737,5 +737,6 @@
   "routePlannerYes": "Yes",
   "routePlannerNo": "No",
   "routePlannerSaveRoute": "Save Route",
-  "routePlannerSwitchingRoute": "Switching route..."
+  "routePlannerSwitchingRoute": "Switching route...",
+  "routePlannerCurrencySymbol": "$"
 }
