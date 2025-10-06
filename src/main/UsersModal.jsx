@@ -538,6 +538,8 @@ const UsersModal = ({ open, onClose }) => {
                   size="small"
                   showFirstButton={false}
                   showLastButton={false}
+                  siblingCount={0}
+                  boundaryCount={1}
                   style={{
                     '& .MuiPaginationItem-root': {
                       color: colors.text,

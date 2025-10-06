@@ -47,12 +47,14 @@ import {
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator, useRestriction } from '../common/util/permissions';
+import CustomPagination from './CustomPagination';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import useUserAttributes from '../common/attributes/useUserAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
@@ -468,9 +470,7 @@ const FloatingUsersPopover = ({
               </Typography>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={() => {
                   setEditingUser({ 
                     name: '', 
@@ -483,17 +483,16 @@ const FloatingUsersPopover = ({
                   setActiveTab(0); // Reset to first tab
                   setEditDialog(true);
                 }}
-                size="small"
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.text,
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontWeight: '500',
+                  width: '40px',
+                  height: '40px',
                 }}
+                title={t('sharedAdd')}
               >
-                {t('sharedAdd')}
-              </Button>
+                <AddIcon />
+              </IconButton>
             </div>
           </div>
 
@@ -521,7 +520,7 @@ const FloatingUsersPopover = ({
               style={{
                 flex: 1,
                 minWidth: '120px',
-                '& .MuiOutlinedInput-root': {
+                '& .MuiOutlinedInputRoot': {
                   borderRadius: '8px',
                 },
               }}
@@ -744,53 +743,14 @@ const FloatingUsersPopover = ({
               <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
                 {page} / {totalPages} ({filteredUsers.length} {t('settingsUsers')})
               </Typography>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                <IconButton
-                  onClick={() => setPage(1)}
-                  disabled={page === 1}
-                  size="small"
-                  style={{
-                    color: colors.text,
-                    width: '24px',
-                    height: '24px',
-                  }}
-                >
-                  <FirstPageIcon fontSize="small" />
-                </IconButton>
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={(event, value) => setPage(value)}
-                  color="primary"
-                  size="small"
-                  showFirstButton={false}
-                  showLastButton={false}
-                  style={{
-                    '& .MuiPaginationItem-root': {
-                      color: colors.text,
-                      fontSize: '10px',
-                      minWidth: '24px',
-                      height: '24px',
-                      '&.Mui-selected': {
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      },
-                    },
-                  }}
-                />
-                <IconButton
-                  onClick={() => setPage(totalPages)}
-                  disabled={page === totalPages}
-                  size="small"
-                  style={{
-                    color: colors.text,
-                    width: '24px',
-                    height: '24px',
-                  }}
-                >
-                  <LastPageIcon fontSize="small" />
-                </IconButton>
-              </div>
+              <CustomPagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                colors={colors}
+                size="small"
+                showFirstLastButtons={true}
+              />
             </div>
           )}
 
@@ -974,6 +934,7 @@ const FloatingUsersPopover = ({
                   borderBottom: `1px solid ${colors.border}`,
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                   background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -988,6 +949,19 @@ const FloatingUsersPopover = ({
                       {editingUser?.id ? t('sharedEdit') : t('sharedAdd')} {t('settingsUser')}
                     </Typography>
                   </div>
+                  <IconButton
+                    onClick={handleSaveUser}
+                    disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password)}
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.text,
+                      width: '40px',
+                      height: '40px',
+                    }}
+                    title={t('sharedSave')}
+                  >
+                    <SaveIcon />
+                  </IconButton>
                 </div>
 
                 {/* Drawer Content */}
@@ -1325,35 +1299,6 @@ const FloatingUsersPopover = ({
                 )}
               </div>
 
-                {/* Drawer Footer */}
-                <div style={{
-                  padding: '20px 24px',
-                  borderTop: `1px solid ${colors.border}`,
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '12px',
-                  background: colors.surface,
-                }}>
-              <Button
-                onClick={handleCloseEditDialog}
-                size="small"
-                style={{ color: colors.textSecondary }}
-              >
-                {t('sharedCancel')}
-              </Button>
-              <Button
-                onClick={handleSaveUser}
-                disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password)}
-                size="small"
-                    variant="contained"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                }}
-              >
-                {t('sharedSave')}
-              </Button>
-                </div>
                 </motion.div>
               </>
             )}

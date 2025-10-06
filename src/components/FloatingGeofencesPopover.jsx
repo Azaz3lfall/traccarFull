@@ -3136,6 +3136,8 @@ const FloatingGeofencesPopover = ({
                 onChange={(event, value) => setPage(value)}
                 size="small"
                 color="primary"
+                siblingCount={0}
+                boundaryCount={1}
               />
             </div>
           )}

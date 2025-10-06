@@ -584,6 +584,8 @@ const FloatingDevicesPopover = ({
                         onChange={(e, newPage) => setPage(newPage)}
                         size="small"
                         color="primary"
+                        siblingCount={0}
+                        boundaryCount={1}
                       />
                     </div>
                   )}

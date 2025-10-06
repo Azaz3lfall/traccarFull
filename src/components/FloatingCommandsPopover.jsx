@@ -576,6 +576,8 @@ const FloatingCommandsPopover = ({
                     size="small"
                     showFirstButton
                     showLastButton
+                    siblingCount={0}
+                    boundaryCount={1}
                     style={{
                       '& .MuiPaginationItem-root': {
                         color: colors.text,

@@ -550,6 +550,8 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                       page={page}
                       onChange={(event, value) => setPage(value)}
                       size="small"
+                      siblingCount={0}
+                      boundaryCount={1}
                       sx={{
                         '& .MuiPaginationItem-root': {
                           color: colors.text,

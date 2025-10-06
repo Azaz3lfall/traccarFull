@@ -466,6 +466,8 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                       size="small"
                       showFirstButton={false}
                       showLastButton={false}
+                      siblingCount={0}
+                      boundaryCount={1}
                       style={{
                         '& .MuiPaginationItem-root': {
                           color: colors.text,

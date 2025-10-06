@@ -59,6 +59,7 @@ import fetchOrThrow from '../common/util/fetchOrThrow';
 import resellersConfig from '../config/resellersConfig';
 import { resellersActions } from '../store';
 import { useSelector } from 'react-redux';
+import CustomPagination from './CustomPagination';
 
 const FloatingResellersPopover = ({ 
   desktop, 
@@ -826,53 +827,14 @@ const FloatingResellersPopover = ({
                 <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
                   {page} / {totalPages} ({filteredResellers.length} {t('resellerPanel')})
                 </Typography>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                  <IconButton
-                    onClick={() => setPage(1)}
-                    disabled={page === 1}
-                    size="small"
-                    style={{
-                      color: colors.text,
-                      width: '24px',
-                      height: '24px',
-                    }}
-                  >
-                    <FirstPageIcon fontSize="small" />
-                  </IconButton>
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(event, value) => setPage(value)}
-                    color="primary"
-                    size="small"
-                    showFirstButton={false}
-                    showLastButton={false}
-                    style={{
-                      '& .MuiPaginationItem-root': {
-                        color: colors.text,
-                        fontSize: '10px',
-                        minWidth: '24px',
-                        height: '24px',
-                        '&.Mui-selected': {
-                          backgroundColor: colors.primary,
-                          color: colors.text,
-                        },
-                      },
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => setPage(totalPages)}
-                    disabled={page === totalPages}
-                    size="small"
-                    style={{
-                      color: colors.text,
-                      width: '24px',
-                      height: '24px',
-                    }}
-                  >
-                    <LastPageIcon fontSize="small" />
-                  </IconButton>
-                </div>
+                <CustomPagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                  colors={colors}
+                  size="small"
+                  showFirstLastButtons={true}
+                />
               </div>
             )}
 
@@ -1425,7 +1387,7 @@ const FloatingResellersPopover = ({
                                     )
                                   }}
                                   sx={{
-                                    '& .MuiOutlinedInputRoot': {
+                                    '& .MuiOutlinedInput-root': {
                                       backgroundColor: colors.secondary,
                                       '& fieldset': { 
                                         borderColor: domainValid ? colors.success : colors.border 
@@ -1437,7 +1399,7 @@ const FloatingResellersPopover = ({
                                         borderColor: domainValid ? colors.success : colors.primary 
                                       },
                                     },
-                                    '& .MuiInputLabelRoot': {
+                                    '& .MuiInputLabel-root': {
                                       color: colors.textSecondary,
                                       '&.Mui-focused': { color: colors.primary }
                                     },
