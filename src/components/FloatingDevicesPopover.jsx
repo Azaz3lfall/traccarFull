@@ -48,6 +48,7 @@ import { useRestriction } from '../common/util/permissions';
 import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
+import CustomPagination from './CustomPagination';
 import { sessionActions, devicesActions } from '../store';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
@@ -577,15 +578,24 @@ const FloatingDevicesPopover = ({
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-                      <Pagination
-                        count={totalPages}
+                    <div style={{
+                      padding: '8px 16px',
+                      borderTop: `1px solid ${colors.border}`,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}>
+                      <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
+                        {page} / {totalPages} ({filteredDevices.length} {t('sharedDevices')})
+                      </Typography>
+                      <CustomPagination
                         page={page}
-                        onChange={(e, newPage) => setPage(newPage)}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                        colors={colors}
                         size="small"
-                        color="primary"
-                        siblingCount={0}
-                        boundaryCount={1}
+                        showFirstLastButtons={true}
                       />
                     </div>
                   )}
