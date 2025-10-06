@@ -33,6 +33,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
@@ -624,25 +625,18 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                 {t('sharedCalendars')}
               </Typography>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddCalendar}
-                size="small"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
-                }}
-              >
-                {t('sharedAdd')}
-              </Button>
-            </div>
+            <IconButton
+              onClick={handleAddCalendar}
+              style={{
+                backgroundColor: colors.primary,
+                color: colors.text,
+                width: '40px',
+                height: '40px',
+              }}
+              title={t('sharedAdd')}
+            >
+              <AddIcon />
+            </IconButton>
           </div>
 
           {/* Search */}
@@ -657,7 +651,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                 startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
               }}
               sx={{
-                '& .MuiOutlinedInput-root': {
+                '& .MuiOutlinedInputRoot': {
                   backgroundColor: colors.secondary,
                   '& fieldset': { borderColor: colors.border },
                   '&:hover fieldset': { borderColor: colors.primary },
@@ -739,7 +733,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             {t('calendarRecurrence')}
                           </TableCell>
                         )}
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
@@ -786,7 +780,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               </Typography>
                             </TableCell>
                           )}
-                          <TableCell align="right">
+                          <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                             <IconButton
                               onClick={(e) => {
                                 setSelectedCalendar(calendar);
@@ -1052,6 +1046,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -1066,6 +1061,23 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                         {editingCalendar?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedCalendar')}
                       </Typography>
                     </div>
+                    <IconButton
+                      onClick={handleSaveCalendar}
+                      disabled={createCalendarMutation.isPending || updateCalendarMutation.isPending || !editingCalendar?.name}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
+                      }}
+                      title={createCalendarMutation.isPending || updateCalendarMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                    >
+                      {(createCalendarMutation.isPending || updateCalendarMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
+                    </IconButton>
                   </div>
 
                   {/* Form */}
@@ -1127,7 +1139,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             variant="outlined"
                             size="small"
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1150,7 +1162,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               readOnly: true,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 color: colors.text,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.border },
@@ -1173,7 +1185,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                               variant="outlined"
                               size="small"
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -1203,7 +1215,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             size="small"
                             InputLabelProps={{ shrink: true }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1227,7 +1239,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                             size="small"
                             InputLabelProps={{ shrink: true }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1254,7 +1266,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                 endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
                               }}
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   color: colors.text,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -1334,7 +1346,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                   endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
                                 }}
                                 sx={{
-                                  '& .MuiOutlinedInput-root': {
+                                  '& .MuiOutlinedInputRoot': {
                                     color: colors.text,
                                     '& fieldset': { borderColor: colors.border },
                                     '&:hover fieldset': { borderColor: colors.primary },
@@ -1552,7 +1564,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             InputLabelProps={{ shrink: true }}
                                             size="small"
                                             sx={{
-                                              '& .MuiOutlinedInput-root': {
+                                              '& .MuiOutlinedInputRoot': {
                                                 backgroundColor: colors.secondary,
                                                 '& fieldset': { borderColor: colors.border },
                                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1576,7 +1588,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             InputLabelProps={{ shrink: true }}
                                             size="small"
                                             sx={{
-                                              '& .MuiOutlinedInput-root': {
+                                              '& .MuiOutlinedInputRoot': {
                                                 backgroundColor: colors.secondary,
                                                 '& fieldset': { borderColor: colors.border },
                                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1633,39 +1645,6 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingCalendar(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveCalendar}
-                      variant="contained"
-                      disabled={createCalendarMutation.isPending || updateCalendarMutation.isPending || !editingCalendar?.name}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createCalendarMutation.isPending || updateCalendarMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
