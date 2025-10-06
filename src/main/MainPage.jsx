@@ -5357,9 +5357,12 @@ const MainPage = () => {
                         zIndex: 99999,
                       }
                     }}
-                    PopperComponent={(props) => (
-                      <div {...props} style={{ ...props.style, zIndex: 99999 }} />
-                    )}
+                    PopperComponent={(props) => {
+                      const { disablePortal, anchorEl, ...divProps } = props;
+                      return (
+                        <div {...divProps} style={{ ...props.style, zIndex: 99999 }} />
+                      );
+                    }}
                   />
                   
                   <FormControl fullWidth margin="normal">
