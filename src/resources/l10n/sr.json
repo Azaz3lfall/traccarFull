@@ -740,5 +740,6 @@
   "routePlannerNo": "Не",
   "routePlannerSaveRoute": "Сачувај руту",
   "routePlannerSwitchingRoute": "Пребацивање руте...",
-  "routePlannerCurrencySymbol": "дин"
+  "routePlannerCurrencySymbol": "дин",
+  "routePlannerNoApiToken": "Mapbox API токен није конфигурисан. Молимо контактирајте вашег администратора за подешавање API токена."
 }

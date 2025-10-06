@@ -740,5 +740,6 @@
   "routePlannerNo": "Ne",
   "routePlannerSaveRoute": "Uložit trasu",
   "routePlannerSwitchingRoute": "Přepínání trasy...",
-  "routePlannerCurrencySymbol": "Kč"
+  "routePlannerCurrencySymbol": "Kč",
+  "routePlannerNoApiToken": "Mapbox API token není nakonfigurován. Obraťte se na svého administrátora, aby nastavil API token."
 }

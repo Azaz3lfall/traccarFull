@@ -739,5 +739,6 @@
   "routePlannerNo": "[TRANSLATE_ME] routePlannerNo",
   "routePlannerSaveRoute": "Guardar ruta",
   "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
-  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol"
+  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol",
+  "routePlannerNoApiToken": "El token de API de Mapbox no está configurado. Póngase en contacto con su administrador para configurar el token de API."
 }

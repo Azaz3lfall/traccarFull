@@ -740,5 +740,6 @@
   "routePlannerNo": "Hayır",
   "routePlannerSaveRoute": "Rotayı kaydet",
   "routePlannerSwitchingRoute": "Rota değiştiriliyor...",
-  "routePlannerCurrencySymbol": "₺"
+  "routePlannerCurrencySymbol": "₺",
+  "routePlannerNoApiToken": "Mapbox API tokeni yapılandırılmamış. API tokenini ayarlamak için yöneticinizle iletişime geçin."
 }

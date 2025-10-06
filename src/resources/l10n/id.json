@@ -740,5 +740,6 @@
   "routePlannerNo": "Tidak",
   "routePlannerSaveRoute": "Simpan rute",
   "routePlannerSwitchingRoute": "Mengganti rute...",
-  "routePlannerCurrencySymbol": "Rp"
+  "routePlannerCurrencySymbol": "Rp",
+  "routePlannerNoApiToken": "Token API Mapbox tidak dikonfigurasi. Silakan hubungi administrator Anda untuk mengatur token API."
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "Nu",
   "routePlannerSaveRoute": "Salvează ruta",
   "routePlannerSwitchingRoute": "Schimbarea rutei...",
-  "routePlannerCurrencySymbol": "lei"
+  "routePlannerCurrencySymbol": "lei",
+  "routePlannerNoApiToken": "Tokenul API Mapbox nu este configurat. Vă rugăm să contactați administratorul pentru a configura tokenul API."
 }

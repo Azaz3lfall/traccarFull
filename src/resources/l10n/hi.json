@@ -739,5 +739,6 @@
   "routePlannerNo": "नहीं",
   "routePlannerSaveRoute": "रूट सेव करें",
   "routePlannerSwitchingRoute": "रूट बदल रहे हैं...",
-  "routePlannerCurrencySymbol": "₹"
+  "routePlannerCurrencySymbol": "₹",
+  "routePlannerNoApiToken": "Mapbox API टोकन कॉन्फ़िगर नहीं है। API टोकन सेट अप करने के लिए कृपया अपने व्यवस्थापक से संपर्क करें।"
 }

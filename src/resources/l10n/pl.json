@@ -740,5 +740,6 @@
   "routePlannerNo": "Nie",
   "routePlannerSaveRoute": "Zapisz trasę",
   "routePlannerSwitchingRoute": "Przełączanie trasy...",
-  "routePlannerCurrencySymbol": "zł"
+  "routePlannerCurrencySymbol": "zł",
+  "routePlannerNoApiToken": "Token API Mapbox nie jest skonfigurowany. Skontaktuj się z administratorem, aby skonfigurować token API."
 }

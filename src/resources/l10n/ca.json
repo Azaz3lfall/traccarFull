@@ -740,5 +740,6 @@
   "routePlannerNo": "No",
   "routePlannerSaveRoute": "Desar ruta",
   "routePlannerSwitchingRoute": "Canviant ruta...",
-  "routePlannerCurrencySymbol": "€"
+  "routePlannerCurrencySymbol": "€",
+  "routePlannerNoApiToken": "El token de l'API de Mapbox no està configurat. Contacteu amb el vostre administrador per configurar el token de l'API."
 }

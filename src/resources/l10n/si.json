@@ -740,5 +740,6 @@
   "routePlannerNo": "නැහැ",
   "routePlannerSaveRoute": "මාර්ගය සුරකින්න",
   "routePlannerSwitchingRoute": "මාර්ගය මාරු කරමින්...",
-  "routePlannerCurrencySymbol": "රු"
+  "routePlannerCurrencySymbol": "රු",
+  "routePlannerNoApiToken": "Mapbox API token සකස් කර නැත. API token සකස් කිරීමට කරුණාකර ඔබේ පරිපාලක සමඟ සම්බන්ධ වන්න."
 }

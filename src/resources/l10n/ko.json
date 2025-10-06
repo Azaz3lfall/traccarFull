@@ -739,5 +739,6 @@
   "routePlannerNo": "아니오",
   "routePlannerSaveRoute": "경로 저장",
   "routePlannerSwitchingRoute": "경로 전환 중...",
-  "routePlannerCurrencySymbol": "₩"
+  "routePlannerCurrencySymbol": "₩",
+  "routePlannerNoApiToken": "Mapbox API 토큰이 구성되지 않았습니다. API 토큰을 설정하려면 관리자에게 문의하세요."
 }

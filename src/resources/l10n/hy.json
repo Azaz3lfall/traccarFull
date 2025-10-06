@@ -740,5 +740,6 @@
   "routePlannerNo": "Ոչ",
   "routePlannerSaveRoute": "Պահպանել երթուղի",
   "routePlannerSwitchingRoute": "Երթուղի փոխարինում...",
-  "routePlannerCurrencySymbol": "֏"
+  "routePlannerCurrencySymbol": "֏",
+  "routePlannerNoApiToken": "Mapbox API-ի նշանը կարգավորված չէ: Խնդրում ենք կապ հաստատել ձեր ադմինիստրատորի հետ API նշանը կարգավորելու համար:"
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "לא",
   "routePlannerSaveRoute": "שמור מסלול",
   "routePlannerSwitchingRoute": "מחליף מסלול...",
-  "routePlannerCurrencySymbol": "₪"
+  "routePlannerCurrencySymbol": "₪",
+  "routePlannerNoApiToken": "אסימון API של Mapbox אינו מוגדר. אנא פנה למנהל המערכת שלך להגדרת אסימון ה-API."
 }

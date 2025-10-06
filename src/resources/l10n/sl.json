@@ -740,5 +740,6 @@
   "routePlannerNo": "Ne",
   "routePlannerSaveRoute": "Shrani pot",
   "routePlannerSwitchingRoute": "Preklapljanje poti...",
-  "routePlannerCurrencySymbol": "€"
+  "routePlannerCurrencySymbol": "€",
+  "routePlannerNoApiToken": "Mapbox API token ni konfiguriran. Prosimo, obrnite se na svojega administratorja za nastavitev API tokena."
 }

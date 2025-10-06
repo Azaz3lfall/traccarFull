@@ -740,5 +740,6 @@
   "routePlannerNo": "ไม่",
   "routePlannerSaveRoute": "บันทึกเส้นทาง",
   "routePlannerSwitchingRoute": "เปลี่ยนเส้นทาง...",
-  "routePlannerCurrencySymbol": "฿"
+  "routePlannerCurrencySymbol": "฿",
+  "routePlannerNoApiToken": "Mapbox API token ยังไม่ได้กำหนดค่า กรุณาติดต่อผู้ดูแลระบบของคุณเพื่อตั้งค่า API token"
 }

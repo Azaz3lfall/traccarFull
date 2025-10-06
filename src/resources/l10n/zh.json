@@ -739,5 +739,6 @@
   "routePlannerNo": "否",
   "routePlannerSaveRoute": "保存路线",
   "routePlannerSwitchingRoute": "切换路线...",
-  "routePlannerCurrencySymbol": "¥"
+  "routePlannerCurrencySymbol": "¥",
+  "routePlannerNoApiToken": "Mapbox API 令牌未配置。请联系您的管理员设置 API 令牌。"
 }

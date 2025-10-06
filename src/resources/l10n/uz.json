@@ -740,5 +740,6 @@
   "routePlannerNo": "Yo'q",
   "routePlannerSaveRoute": "Marshrutni saqlash",
   "routePlannerSwitchingRoute": "Marshrutni almashtirish...",
-  "routePlannerCurrencySymbol": "so'm"
+  "routePlannerCurrencySymbol": "so'm",
+  "routePlannerNoApiToken": "Mapbox API tokeni sozlanmagan. API tokenini sozlash uchun administratoringiz bilan bog'laning."
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "Jo",
   "routePlannerSaveRoute": "Ruaj rrugën",
   "routePlannerSwitchingRoute": "Ndryshimi i rrugës...",
-  "routePlannerCurrencySymbol": "L"
+  "routePlannerCurrencySymbol": "L",
+  "routePlannerNoApiToken": "Mapbox API token nuk është konfiguruar. Ju lutemi kontaktoni administratorin tuaj për të konfiguruar API token."
 }

@@ -739,5 +739,6 @@
   "routePlannerNo": "いいえ",
   "routePlannerSaveRoute": "ルート保存",
   "routePlannerSwitchingRoute": "ルート切り替え中...",
-  "routePlannerCurrencySymbol": "¥"
+  "routePlannerCurrencySymbol": "¥",
+  "routePlannerNoApiToken": "Mapbox APIトークンが設定されていません。APIトークンを設定するには、管理者にお問い合わせください。"
 }

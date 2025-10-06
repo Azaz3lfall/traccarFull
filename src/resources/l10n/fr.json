@@ -739,5 +739,6 @@
   "routePlannerNo": "Non",
   "routePlannerSaveRoute": "Enregistrer l'itinéraire",
   "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
-  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol"
+  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol",
+  "routePlannerNoApiToken": "Le token API Mapbox n'est pas configuré. Veuillez contacter votre administrateur pour configurer le token API."
 }

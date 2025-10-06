@@ -740,5 +740,6 @@
   "routePlannerNo": "Hapana",
   "routePlannerSaveRoute": "Hifadhi njia",
   "routePlannerSwitchingRoute": "Kubadilisha njia...",
-  "routePlannerCurrencySymbol": "TSh"
+  "routePlannerCurrencySymbol": "TSh",
+  "routePlannerNoApiToken": "Mapbox API token haijasanidiwa. Tafadhali wasiliana na msimamizi wako ili kusanidi API token."
 }

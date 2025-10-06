@@ -740,5 +740,6 @@
   "routePlannerNo": "Ne",
   "routePlannerSaveRoute": "Išsaugoti maršrutą",
   "routePlannerSwitchingRoute": "Keičiamas maršrutas...",
-  "routePlannerCurrencySymbol": "€"
+  "routePlannerCurrencySymbol": "€",
+  "routePlannerNoApiToken": "Mapbox API tokenas nėra sukonfigūruotas. Prašome susisiekti su savo administratoriumi, kad nustatytų API tokeną."
 }

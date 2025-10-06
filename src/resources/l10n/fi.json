@@ -740,5 +740,6 @@
   "routePlannerNo": "Ei",
   "routePlannerSaveRoute": "Tallenna reitti",
   "routePlannerSwitchingRoute": "Vaihdetaan reittiä...",
-  "routePlannerCurrencySymbol": "€"
+  "routePlannerCurrencySymbol": "€",
+  "routePlannerNoApiToken": "Mapbox API-tokenia ei ole määritetty. Ota yhteyttä järjestelmänvalvojaasi API-tokenin määrittämiseksi."
 }

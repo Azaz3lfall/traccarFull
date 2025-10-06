@@ -740,5 +740,6 @@
   "routePlannerSwitchingRoute": "Wissel roete...",
   "routePlannerCurrencySymbol": "R",
   "routePlannerRouteName": "Roete",
-  "routePlannerRouteWithWaypoints": "Roete {0} met {1} wegpunte"
+  "routePlannerRouteWithWaypoints": "Roete {0} met {1} wegpunte",
+  "routePlannerNoApiToken": "Mapbox API-token is nie gekonfigureer nie. Kontak asseblief jou administrateur om die API-token op te stel."
 }

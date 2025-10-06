@@ -740,5 +740,6 @@
   "routePlannerNo": "Nem",
   "routePlannerSaveRoute": "Útvonal mentése",
   "routePlannerSwitchingRoute": "Útvonal váltás...",
-  "routePlannerCurrencySymbol": "Ft"
+  "routePlannerCurrencySymbol": "Ft",
+  "routePlannerNoApiToken": "A Mapbox API token nincs konfigurálva. Kérjük, lépjen kapcsolatba a rendszergazdájával az API token beállításához."
 }

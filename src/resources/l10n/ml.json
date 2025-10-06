@@ -740,5 +740,6 @@
   "routePlannerNo": "ഇല്ല",
   "routePlannerSaveRoute": "റൂട്ട് സേവ് ചെയ്യുക",
   "routePlannerSwitchingRoute": "റൂട്ട് മാറ്റുന്നു...",
-  "routePlannerCurrencySymbol": "₹"
+  "routePlannerCurrencySymbol": "₹",
+  "routePlannerNoApiToken": "Mapbox API ടോക്കൺ കോൺഫിഗർ ചെയ്തിട്ടില്ല. API ടോക്കൺ സജ്ജീകരിക്കാൻ ദയവായി നിങ്ങളുടെ അഡ്മിനിസ്ട്രേറ്ററുമായി ബന്ധപ്പെടുക."
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "Жоқ",
   "routePlannerSaveRoute": "Маршрутты сақтау",
   "routePlannerSwitchingRoute": "Маршрутты ауыстыру...",
-  "routePlannerCurrencySymbol": "₸"
+  "routePlannerCurrencySymbol": "₸",
+  "routePlannerNoApiToken": "Mapbox API токені конфигурацияланбаған. API токенін орнату үшін әкімшіңізге хабарласыңыз."
 }

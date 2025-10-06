@@ -740,5 +740,6 @@
   "routePlannerNo": "Não",
   "routePlannerSaveRoute": "Salvar rota",
   "routePlannerSwitchingRoute": "Alternando rota...",
-  "routePlannerCurrencySymbol": "€"
+  "routePlannerCurrencySymbol": "€",
+  "routePlannerNoApiToken": "Token da API Mapbox não está configurado. Entre em contato com seu administrador para configurar o token da API."
 }

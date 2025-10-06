@@ -740,5 +740,6 @@
   "routePlannerNo": "Nei",
   "routePlannerSaveRoute": "Lagre rute",
   "routePlannerSwitchingRoute": "Bytter rute...",
-  "routePlannerCurrencySymbol": "kr"
+  "routePlannerCurrencySymbol": "kr",
+  "routePlannerNoApiToken": "Mapbox API-token er ikkje konfigurert. Ver venleg kontakt administrator din for å setje opp API-tokenet."
 }

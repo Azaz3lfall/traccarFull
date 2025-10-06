@@ -740,5 +740,6 @@
   "routePlannerNo": "Ýok",
   "routePlannerSaveRoute": "Ýoly sakla",
   "routePlannerSwitchingRoute": "Ýoly üýtgetmek...",
-  "routePlannerCurrencySymbol": "TMT"
+  "routePlannerCurrencySymbol": "TMT",
+  "routePlannerNoApiToken": "Mapbox API token konfigurirlenmedi. API tokeni düzeltmek üçin administratoruňyz bilen habarlaşyň."
 }

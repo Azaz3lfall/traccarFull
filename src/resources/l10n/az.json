@@ -740,5 +740,6 @@
   "routePlannerNo": "Xeyr",
   "routePlannerSaveRoute": "Marşrutu Saxla",
   "routePlannerSwitchingRoute": "Marşrutu dəyişdirir...",
-  "routePlannerCurrencySymbol": "₼"
+  "routePlannerCurrencySymbol": "₼",
+  "routePlannerNoApiToken": "Mapbox API tokeni konfiqurasiya edilməyib. API tokenini təyin etmək üçün administratorunuzla əlaqə saxlayın."
 }

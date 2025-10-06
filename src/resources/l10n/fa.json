@@ -740,5 +740,6 @@
   "routePlannerNo": "خیر",
   "routePlannerSaveRoute": "ذخیره مسیر",
   "routePlannerSwitchingRoute": "تغییر مسیر...",
-  "routePlannerCurrencySymbol": "ریال"
+  "routePlannerCurrencySymbol": "ریال",
+  "routePlannerNoApiToken": "توکن API Mapbox پیکربندی نشده است. لطفاً برای راه‌اندازی توکن API با مدیر خود تماس بگیرید."
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "ບໍ່",
   "routePlannerSaveRoute": "ບັນທຶກເສັ້ນທາງ",
   "routePlannerSwitchingRoute": "ປ່ຽນເສັ້ນທາງ...",
-  "routePlannerCurrencySymbol": "₭"
+  "routePlannerCurrencySymbol": "₭",
+  "routePlannerNoApiToken": "Mapbox API token ບໍ່ໄດ້ຖືກຕັ້ງຄ່າ. ກະລຸນາຕິດຕໍ່ຜູ້ບໍລິຫານຂອງທ່ານເພື່ອຕັ້ງຄ່າ API token."
 }

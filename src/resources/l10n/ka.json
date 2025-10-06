@@ -740,5 +740,6 @@
   "routePlannerNo": "არა",
   "routePlannerSaveRoute": "მარშრუტის შენახვა",
   "routePlannerSwitchingRoute": "მარშრუტის შეცვლა...",
-  "routePlannerCurrencySymbol": "₾"
+  "routePlannerCurrencySymbol": "₾",
+  "routePlannerNoApiToken": "Mapbox API ტოკენი არ არის კონფიგურირებული. გთხოვთ დაუკავშირდეთ თქვენს ადმინისტრატორს API ტოკენის დასაყენებლად."
 }

@@ -740,5 +740,6 @@
   "routePlannerNo": "Không",
   "routePlannerSaveRoute": "Lưu tuyến đường",
   "routePlannerSwitchingRoute": "Đang chuyển tuyến...",
-  "routePlannerCurrencySymbol": "₫"
+  "routePlannerCurrencySymbol": "₫",
+  "routePlannerNoApiToken": "Token API Mapbox chưa được cấu hình. Vui lòng liên hệ với quản trị viên của bạn để thiết lập token API."
 }

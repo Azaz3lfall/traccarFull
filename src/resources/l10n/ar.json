@@ -739,5 +739,6 @@
   "routePlannerNo": "لا",
   "routePlannerSaveRoute": "حفظ المسار",
   "routePlannerSwitchingRoute": "تبديل المسار...",
-  "routePlannerCurrencySymbol": "ر.س"
+  "routePlannerCurrencySymbol": "ر.س",
+  "routePlannerNoApiToken": "رمز API الخاص بـ Mapbox غير مُكوَّن. يرجى الاتصال بمديرك لإعداد رمز API."
 }

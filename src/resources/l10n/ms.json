@@ -740,5 +740,6 @@
   "routePlannerNo": "Tidak",
   "routePlannerSaveRoute": "Simpan laluan",
   "routePlannerSwitchingRoute": "Menukar laluan...",
-  "routePlannerCurrencySymbol": "RM"
+  "routePlannerCurrencySymbol": "RM",
+  "routePlannerNoApiToken": "Token API Mapbox tidak dikonfigurasi. Sila hubungi pentadbir anda untuk menyediakan token API."
 }

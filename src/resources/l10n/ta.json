@@ -740,5 +740,6 @@
   "routePlannerNo": "இல்லை",
   "routePlannerSaveRoute": "வழியை சேமி",
   "routePlannerSwitchingRoute": "வழி மாற்றுகிறது...",
-  "routePlannerCurrencySymbol": "₹"
+  "routePlannerCurrencySymbol": "₹",
+  "routePlannerNoApiToken": "Mapbox API டோக்கன் கட்டமைக்கப்படவில்லை. API டோக்கனை அமைக்க உங்கள் நிர்வாகியைத் தொடர்பு கொள்ளவும்."
 }

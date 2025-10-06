@@ -739,5 +739,6 @@
   "routePlannerNo": "Нет",
   "routePlannerSaveRoute": "Сохранить маршрут",
   "routePlannerSwitchingRoute": "Переключение маршрута...",
-  "routePlannerCurrencySymbol": "₽"
+  "routePlannerCurrencySymbol": "₽",
+  "routePlannerNoApiToken": "Токен API Mapbox не настроен. Обратитесь к администратору для настройки токена API."
 }

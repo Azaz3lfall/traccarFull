@@ -739,5 +739,6 @@
   "routePlannerNo": "Nej",
   "routePlannerSaveRoute": "Spara rutt",
   "routePlannerSwitchingRoute": "Bytter rutt...",
-  "routePlannerCurrencySymbol": "kr"
+  "routePlannerCurrencySymbol": "kr",
+  "routePlannerNoApiToken": "Mapbox API-token är inte konfigurerat. Kontakta din administratör för att ställa in API-token."
 }
