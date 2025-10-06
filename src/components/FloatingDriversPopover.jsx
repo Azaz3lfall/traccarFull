@@ -30,6 +30,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
@@ -281,25 +282,18 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                 {t('sharedDrivers')}
               </Typography>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddDriver}
-                size="small"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
-                }}
-              >
-                {t('sharedAdd')}
-              </Button>
-            </div>
+            <IconButton
+              onClick={handleAddDriver}
+              style={{
+                backgroundColor: colors.primary,
+                color: colors.text,
+                width: '40px',
+                height: '40px',
+              }}
+              title={t('sharedAdd')}
+            >
+              <AddIcon />
+            </IconButton>
           </div>
 
           {/* Search */}
@@ -314,7 +308,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                 startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
               }}
               style={{
-                '& .MuiOutlinedInput-root': {
+                '& .MuiOutlinedInputRoot': {
                   backgroundColor: colors.secondary,
                   '& fieldset': { borderColor: colors.border },
                   '&:hover fieldset': { borderColor: colors.primary },
@@ -387,7 +381,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                             {t('deviceIdentifier')}
                           </TableCell>
                         )}
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
@@ -420,7 +414,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                               </Typography>
                             </TableCell>
                           )}
-                          <TableCell align="right">
+                          <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                             <IconButton
                               onClick={(e) => {
                                 setSelectedDriver(driver);
@@ -686,6 +680,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -700,6 +695,23 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                         {editingDriver?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedDriver')}
                       </Typography>
                     </div>
+                    <IconButton
+                      onClick={handleSaveDriver}
+                      disabled={createDriverMutation.isPending || updateDriverMutation.isPending || !editingDriver?.name || !editingDriver?.uniqueId}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
+                      }}
+                      title={createDriverMutation.isPending || updateDriverMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                    >
+                      {(createDriverMutation.isPending || updateDriverMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
+                    </IconButton>
                   </div>
 
                   {/* Form */}
@@ -760,7 +772,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                             variant="outlined"
                             size="small"
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -782,7 +794,7 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                             variant="outlined"
                             size="small"
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -813,39 +825,6 @@ const FloatingDriversPopover = ({ isVisible, onClose, desktop, isMenuExpanded })
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingDriver(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveDriver}
-                      variant="contained"
-                      disabled={createDriverMutation.isPending || updateDriverMutation.isPending || !editingDriver?.name || !editingDriver?.uniqueId}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createDriverMutation.isPending || updateDriverMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
