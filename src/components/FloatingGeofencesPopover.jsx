@@ -1916,7 +1916,7 @@ const FloatingGeofencesPopover = ({
                   <Tab label={t('routePlannerWaypoints')} />
                   <Tab 
                     label={t('routePlannerRoutePlan')} 
-                    disabled={!routeData}
+                    disabled={routeWaypoints.filter(wp => wp && wp.address && wp.coordinates).length < 2}
                   />
                   <Tab 
                     label={t('routePlannerCosts')} 
@@ -2324,13 +2324,22 @@ const FloatingGeofencesPopover = ({
                       }
                       
                       return (
-                        <Typography variant="body2" style={{ 
-                          color: colors.textSecondary, 
-                          textAlign: 'center',
-                          padding: '40px 20px'
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          padding: '40px 20px',
+                          gap: '12px'
                         }}>
-                          {t('routePlannerClickToPlan')}
-                        </Typography>
+                          <CircularProgress size={24} style={{ color: colors.primary.main }} />
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary, 
+                            textAlign: 'center'
+                          }}>
+                            {t('routePlannerPlanningRoute')}
+                          </Typography>
+                        </div>
                       );
                     })()}
                   </div>
@@ -2911,13 +2920,22 @@ const FloatingGeofencesPopover = ({
                       }
                       
                       return (
-                        <Typography variant="body2" style={{ 
-                          color: colors.textSecondary, 
-                          textAlign: 'center',
-                          padding: '40px 20px'
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          padding: '40px 20px',
+                          gap: '12px'
                         }}>
-                          {t('routePlannerClickToPlan')}
-                        </Typography>
+                          <CircularProgress size={24} style={{ color: colors.primary.main }} />
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary, 
+                            textAlign: 'center'
+                          }}>
+                            {t('routePlannerPlanningRoute')}
+                          </Typography>
+                        </div>
                       );
                     })()}
                   </div>
