@@ -104,7 +104,6 @@ const FloatingGeofencesPopover = ({
   // Update displayed route data when selected route changes
   useEffect(() => {
     if (routeData && routeData.routes && routeData.routes[selectedRouteIndex]) {
-      console.log('Updating displayed route data for index:', selectedRouteIndex);
       setDisplayedRouteData({
         ...routeData,
         routes: [routeData.routes[selectedRouteIndex]] // Only show the selected route
@@ -232,7 +231,6 @@ const FloatingGeofencesPopover = ({
     onSuccess: async (_, geofenceId) => {
       // Immediately remove from Redux store to update map
       dispatch(geofencesActions.remove(geofenceId));
-      console.log('Geofence removed from store:', geofenceId);
       
       // Invalidate query to refresh popover list
       queryClient.invalidateQueries(['geofences']);
@@ -1015,16 +1013,11 @@ const FloatingGeofencesPopover = ({
         },
       };
 
-      console.log('Saving active route as geofence:', routeGeofence);
-      console.log('Selected route index:', selectedRouteIndex);
-      console.log('Area size:', areaSizeKB, 'KB');
-      console.log('Number of coordinates:', activeRoute.geometry.coordinates.length);
 
       // Use the existing createGeofenceMutation
       await new Promise((resolve, reject) => {
         createGeofenceMutation.mutate(routeGeofence, {
           onSuccess: () => {
-            console.log('Route saved successfully');
             resolve();
           },
           onError: (error) => {
@@ -1054,7 +1047,6 @@ const FloatingGeofencesPopover = ({
       .filter(wp => wp && wp.coordinates);
     
     if (validWaypoints.length < 2) {
-      console.log('Not enough waypoints for route planning');
       return;
     }
 
@@ -1070,10 +1062,6 @@ const FloatingGeofencesPopover = ({
       // Build coordinates string for Mapbox Directions API
       const coordinates = validWaypoints.map(wp => wp.coordinates).join(';');
       
-      console.log('Waypoints for routing:', validWaypoints.map(wp => ({
-        address: wp.address,
-        coordinates: wp.coordinates
-      })));
       
       // Mapbox Directions API request with more precise parameters
       const approaches = validWaypoints.map(() => 'curb').join(';');
@@ -1084,13 +1072,10 @@ const FloatingGeofencesPopover = ({
       
       const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=duration,distance,speed,congestion&approaches=${approaches}&radiuses=${radiuses}&continue_straight=true&roundabout_exits=true&voice_instructions=true&banner_instructions=true&language=${mapboxLanguage}&alternatives=true`;
       
-      console.log('Fetching route from Mapbox...', request);
       
       const response = await fetch(request);
       const data = await response.json();
       
-      console.log('Mapbox Route Response:', data);
-      console.log('Number of routes returned:', data.routes ? data.routes.length : 0);
       setRouteData(data);
       setSelectedRouteIndex(0); // Reset to first route when new data comes in
              
@@ -1383,9 +1368,6 @@ const FloatingGeofencesPopover = ({
 
   // BULLETPROOF synchronization - Rebuild waypoints from fields
   useEffect(() => {
-    console.log('=== SYNC CHECK ===');
-    console.log('Fields:', fields.map(f => ({ id: f.id, value: f.value })));
-    console.log('Current waypoints:', routeWaypoints.map((w, i) => ({ index: i, address: w?.address })));
     
     // Rebuild waypoints array from scratch based on fields
     const newWaypoints = fields.map((field, index) => {
@@ -1410,11 +1392,9 @@ const FloatingGeofencesPopover = ({
       return null;
     });
     
-    console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
     
     // SIMPLE CHECK: If we have route data and fields changed in ANY way, clear everything
     if (routeData) {
-      console.log('FIELDS CHANGED - clearing route data and switching to Waypoints tab');
       setRouteData(null);
       setDisplayedRouteData(null);
       setSelectedRouteIndex(0);
@@ -2140,8 +2120,6 @@ const FloatingGeofencesPopover = ({
                                         <button
                                           key={index}
                                           onClick={() => {
-                                            console.log('Route button clicked:', index);
-                                            console.log('Current selectedRouteIndex:', selectedRouteIndex);
                                             
                                             // Force complete re-render by clearing and setting data
                                             setIsSwitchingRoute(true);

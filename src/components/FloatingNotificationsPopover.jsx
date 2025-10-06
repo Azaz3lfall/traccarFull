@@ -38,6 +38,7 @@ import {
   Search as SearchIcon,
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatBoolean, formatNotificationTitle } from '../common/util/formatter';
@@ -365,24 +366,19 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                 {t('sharedNotifications')}
               </Typography>
             </div>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
+            <IconButton
               onClick={handleAddNotification}
               disabled={limitNotifications}
-              size="small"
               style={{
                 backgroundColor: colors.primary,
                 color: colors.text,
-                fontSize: '12px',
-                fontWeight: '500',
-                textTransform: 'none',
-                padding: '6px 12px',
-                minWidth: 'auto',
+                width: '40px',
+                height: '40px',
               }}
+              title={t('sharedAdd')}
             >
-              {t('sharedAdd')}
-            </Button>
+              <AddIcon />
+            </IconButton>
           </div>
 
           {/* Content */}
@@ -421,7 +417,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                       startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      '& .MuiOutlinedInputRoot': {
                         backgroundColor: colors.secondary,
                         '& fieldset': { borderColor: colors.border },
                         '&:hover fieldset': { borderColor: colors.primary },
@@ -463,7 +459,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                             {t('notificationNotificators')}
                           </TableCell>
                         )}
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
@@ -524,7 +520,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                               </Typography>
                             </TableCell>
                           )}
-                          <TableCell align="right" style={{ padding: '4px' }}>
+                          <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                             <IconButton
                               size="small"
                               onClick={(e) => {
@@ -653,6 +649,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -670,6 +667,23 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                         {editingNotification?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedNotification')}
                       </Typography>
                     </div>
+                    <IconButton
+                      onClick={() => handleSaveNotification()}
+                      disabled={createNotificationMutation.isPending || updateNotificationMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
+                      }}
+                      title={createNotificationMutation.isPending || updateNotificationMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                    >
+                      {(createNotificationMutation.isPending || updateNotificationMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
+                    </IconButton>
                   </div>
 
                   {/* Tabs */}
@@ -721,7 +735,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                               readOnly
                               size="small"
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -791,7 +805,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                                 readOnly
                                 size="small"
                                 sx={{
-                                  '& .MuiOutlinedInput-root': {
+                                  '& .MuiOutlinedInputRoot': {
                                     backgroundColor: colors.secondary,
                                     '& fieldset': { borderColor: colors.border },
                                     '&:hover fieldset': { borderColor: colors.primary },
@@ -872,7 +886,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                               readOnly
                               size="small"
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -953,7 +967,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                                 readOnly
                                 size="small"
                                 sx={{
-                                  '& .MuiOutlinedInput-root': {
+                                  '& .MuiOutlinedInputRoot': {
                                     backgroundColor: colors.secondary,
                                     '& fieldset': { borderColor: colors.border },
                                     '&:hover fieldset': { borderColor: colors.primary },
@@ -1057,7 +1071,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                             onChange={(e) => setEditingNotification({ ...editingNotification, description: e.target.value })}
                             size="small"
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1081,7 +1095,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                               readOnly
                               size="small"
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -1189,41 +1203,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingNotification(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        handleSaveNotification();
-                      }}
-                      variant="contained"
-                      disabled={createNotificationMutation.isPending || updateNotificationMutation.isPending}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createNotificationMutation.isPending || updateNotificationMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
