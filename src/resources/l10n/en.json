@@ -736,5 +736,6 @@
   "routePlannerHandlingFee": "Handling Fee",
   "routePlannerYes": "Yes",
   "routePlannerNo": "No",
-  "routePlannerSaveRoute": "Save Route"
+  "routePlannerSaveRoute": "Save Route",
+  "routePlannerSwitchingRoute": "Switching route..."
 }

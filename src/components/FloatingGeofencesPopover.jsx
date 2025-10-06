@@ -2082,7 +2082,7 @@ const FloatingGeofencesPopover = ({
                           <div style={{ textAlign: 'center', padding: '20px' }}>
                             <CircularProgress size={24} style={{ marginBottom: '16px' }} />
                             <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                              Switching route...
+                              {t('routePlannerSwitchingRoute')}
                             </Typography>
                           </div>
                         );

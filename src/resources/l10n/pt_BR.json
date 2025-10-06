@@ -736,5 +736,6 @@
   "routePlannerHandlingFee": "Taxa de Manuseio",
   "routePlannerYes": "Sim",
   "routePlannerNo": "Não",
-  "routePlannerSaveRoute": "Salvar Rota"
+  "routePlannerSaveRoute": "Salvar Rota",
+  "routePlannerSwitchingRoute": "Alternando rota..."
 }
