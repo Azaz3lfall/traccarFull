@@ -778,7 +778,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -798,7 +798,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -824,7 +824,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -896,7 +896,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -916,7 +916,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -936,7 +936,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -958,7 +958,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -1015,7 +1015,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -1092,7 +1092,7 @@ const FloatingDevicesPopover = ({
                               '&:hover fieldset': { borderColor: colors.primary },
                               '&.Mui-focused fieldset': { borderColor: colors.primary },
                             },
-                            '& .MuiInputLabel-root': { 
+                            '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
                             },
@@ -1141,7 +1141,7 @@ const FloatingDevicesPopover = ({
                                   '&:hover fieldset': { borderColor: colors.primary },
                                   '&.Mui-focused fieldset': { borderColor: colors.primary },
                                 },
-                                '& .MuiInputLabel-root': { 
+                                '& .MuiInputLabelRoot': { 
                                   color: colors.textSecondary,
                                   '&.Mui-focused': { color: colors.primary }
                                 },
