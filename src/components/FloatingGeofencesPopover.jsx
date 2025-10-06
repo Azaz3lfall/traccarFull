@@ -2044,8 +2044,9 @@ const FloatingGeofencesPopover = ({
                                   <div style={{
                                     display: 'flex',
                                     gap: '8px',
+                                    marginTop: '8px',
                                     marginBottom: '12px',
-                                    justifyContent: 'center'
+                                    justifyContent: 'flex-start'
                                   }}>
                                     {routeData.routes.map((route, index) => (
                                       <button
@@ -2069,26 +2070,29 @@ const FloatingGeofencesPopover = ({
                                           }, 50);
                                         }}
                                         style={{
-                                          width: '40px',
-                                          height: '40px',
-                                          borderRadius: '50%',
-                                          border: '2px solid white',
-                                          backgroundColor: index === selectedRouteIndex ? '#1565C0' : '#2196F3',
-                                          color: 'white',
-                                          fontSize: '16px',
-                                          fontWeight: 'bold',
+                                          width: '36px',
+                                          height: '36px',
+                                          borderRadius: '6px',
+                                          border: `1px solid ${colors.border}`,
+                                          backgroundColor: index === selectedRouteIndex ? colors.primary : colors.secondary,
+                                          color: index === selectedRouteIndex ? colors.primaryText : colors.text,
+                                          fontSize: '14px',
+                                          fontWeight: '600',
                                           cursor: 'pointer',
-                                          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                                           display: 'flex',
                                           alignItems: 'center',
                                           justifyContent: 'center',
-                                          transition: 'all 0.2s ease'
+                                          transition: 'all 0.2s ease',
+                                          outline: 'none'
                                         }}
                                         onMouseEnter={(e) => {
-                                          e.target.style.transform = 'scale(1.1)';
+                                          e.target.style.transform = 'translateY(-1px)';
+                                          e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
                                         }}
                                         onMouseLeave={(e) => {
-                                          e.target.style.transform = 'scale(1)';
+                                          e.target.style.transform = 'translateY(0)';
+                                          e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
                                         }}
                                       >
                                         {index + 1}
