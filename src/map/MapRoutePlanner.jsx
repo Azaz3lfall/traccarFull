@@ -182,6 +182,10 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
       });
     }
 
+  }, [routeData, selectedRouteIndex, theme.palette.primary.main]);
+
+  // Cleanup effect for component unmount
+  useEffect(() => {
     return () => {
       // Remove all route sources and layers
       routeSourcesRef.current.forEach(sourceId => {
@@ -198,7 +202,7 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
     };
-  }, [routeData, selectedRouteIndex, theme.palette.primary.main]);
+  }, []);
 
   // Render alternative route buttons if multiple routes exist
   if (routeData && routeData.routes && routeData.routes.length > 1) {
