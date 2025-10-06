@@ -193,6 +193,7 @@ const MainPage = () => {
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
   const [preferencesAttributes, setPreferencesAttributes] = useState({});
+  const [preferencesSaving, setPreferencesSaving] = useState(false);
   const [token, setToken] = useState(null);
   const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
   const [activeServerTab, setActiveServerTab] = useState(0);
@@ -706,13 +707,18 @@ const MainPage = () => {
   });
 
   const handlePreferencesSave = useCatch(async () => {
-    const response = await fetchOrThrow(`/api/users/${user.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...user, attributes: preferencesAttributes }),
-    });
-    dispatch(sessionActions.updateUser(await response.json()));
-    setShowPreferencesDrawer(false);
+    setPreferencesSaving(true);
+    try {
+      const response = await fetchOrThrow(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, attributes: preferencesAttributes }),
+      });
+      dispatch(sessionActions.updateUser(await response.json()));
+      setShowPreferencesDrawer(false);
+    } finally {
+      setPreferencesSaving(false);
+    }
   });
 
   const handleReboot = useCatch(async () => {
@@ -5133,6 +5139,7 @@ const MainPage = () => {
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -5151,6 +5158,23 @@ const MainPage = () => {
                     {activePreferencesTab === 4 && t('sharedInfoTitle')}
                   </Typography>
                 </div>
+                <IconButton
+                  onClick={handlePreferencesSave}
+                  disabled={preferencesSaving}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                    width: '40px',
+                    height: '40px',
+                  }}
+                  title={preferencesSaving ? t('sharedSaving') : t('sharedSave')}
+                >
+                  {preferencesSaving ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SaveIcon />
+                  )}
+                </IconButton>
               </div>
 
               {/* Content */}
@@ -5886,36 +5910,6 @@ const MainPage = () => {
                   </Box>
                 )}
 
-                {/* Action Buttons */}
-                <div style={{
-                  display: 'flex',
-                  gap: '12px',
-                  justifyContent: 'flex-end',
-                  marginTop: '32px',
-                  paddingTop: '20px',
-                  borderTop: `1px solid ${colors.border}`,
-                }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setShowPreferencesDrawer(false)}
-                    style={{
-                      borderColor: colors.border,
-                      color: colors.text,
-                    }}
-                  >
-                    {t('sharedCancel')}
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={handlePreferencesSave}
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.text,
-                    }}
-                  >
-                    {t('sharedSave')}
-                  </Button>
-                </div>
               </div>
             </motion.div>
           </>
