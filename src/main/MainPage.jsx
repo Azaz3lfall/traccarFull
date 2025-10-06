@@ -5181,7 +5181,7 @@ const MainPage = () => {
               <div style={{ 
                 flex: 1, 
                 overflow: 'auto', 
-                padding: '24px',
+                padding: '16px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
@@ -5234,14 +5234,11 @@ const MainPage = () => {
 
                 {/* Map Tab */}
                 {activePreferencesTab === 0 && (
-                  <Box sx={{ paddingTop: '16px' }}>
+                  <Box>
                     {!readonly && (
                       <>
                         {/* Map Settings */}
                         <div style={{ marginBottom: '24px' }}>
-                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                            {t('mapTitle')}
-                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('mapActive')}</InputLabel>
@@ -5571,14 +5568,11 @@ const MainPage = () => {
 
                 {/* Device Tab */}
                 {activePreferencesTab === 1 && (
-                  <Box sx={{ paddingTop: '16px' }}>
+                  <Box>
                     {!readonly && (
                       <>
                         {/* Device Settings */}
                         <div style={{ marginBottom: '24px' }}>
-                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                            {t('deviceTitle')}
-                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('devicePrimaryInfo')}</InputLabel>
@@ -5664,14 +5658,11 @@ const MainPage = () => {
 
                 {/* Sound Tab */}
                 {activePreferencesTab === 2 && (
-                  <Box sx={{ paddingTop: '16px' }}>
+                  <Box>
                     {!readonly && (
                       <>
                         {/* Sound Settings */}
                         <div style={{ marginBottom: '24px' }}>
-                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                            {t('sharedSound')}
-                          </Typography>
                   
                   <FormControl fullWidth margin="normal">
                     <InputLabel>{t('eventsSoundEvents')}</InputLabel>
@@ -5754,12 +5745,9 @@ const MainPage = () => {
 
                 {/* User Token Tab */}
                 {activePreferencesTab === 3 && (
-                  <Box sx={{ paddingTop: '16px' }}>
+                  <Box>
                     {/* User Token */}
                     <div style={{ marginBottom: '24px' }}>
-                      <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                        {t('userToken')}
-                      </Typography>
                   
                   <TextField
                     fullWidth
@@ -5818,14 +5806,11 @@ const MainPage = () => {
 
                 {/* System Info Tab */}
                 {activePreferencesTab === 4 && (
-                  <Box sx={{ paddingTop: '16px' }}>
+                  <Box>
                     {!readonly && (
                       <>
                         {/* System Info */}
                         <div style={{ marginBottom: '24px' }}>
-                          <Typography variant="subtitle1" style={{ color: colors.text, marginBottom: '16px', fontWeight: '500' }}>
-                            {t('sharedInfoTitle')}
-                          </Typography>
                   
                   <TextField
                     fullWidth
