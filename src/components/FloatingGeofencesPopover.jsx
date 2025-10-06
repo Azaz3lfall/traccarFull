@@ -87,6 +87,7 @@ const FloatingGeofencesPopover = ({
   const [routePlannerTab, setRoutePlannerTab] = useState(0);
   const [routeData, setRouteData] = useState(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   
   // Cost calculation state
   const [costSettings, setCostSettings] = useState({
@@ -998,6 +999,7 @@ const FloatingGeofencesPopover = ({
       console.log('Mapbox Route Response:', data);
       console.log('Number of routes returned:', data.routes ? data.routes.length : 0);
       setRouteData(data);
+      setSelectedRouteIndex(0); // Reset to first route when new data comes in
              
              // Switch to Route Plan tab after successful route generation
              setRoutePlannerTab(1);
@@ -2004,14 +2006,14 @@ const FloatingGeofencesPopover = ({
                                         key={index}
                                         onClick={() => {
                                           console.log('Route button clicked:', index);
-                                          // Handle route change here
+                                          setSelectedRouteIndex(index);
                                         }}
                                         style={{
                                           width: '40px',
                                           height: '40px',
                                           borderRadius: '50%',
                                           border: '2px solid white',
-                                          backgroundColor: index === 0 ? '#1565C0' : '#2196F3',
+                                          backgroundColor: index === selectedRouteIndex ? '#1565C0' : '#2196F3',
                                           color: 'white',
                                           fontSize: '16px',
                                           fontWeight: 'bold',
@@ -2045,9 +2047,9 @@ const FloatingGeofencesPopover = ({
                                 }}>
                                   
                                   
-                                  {routeData.routes[0].legs && routeData.routes[0].legs.length > 0 && (
+                                  {routeData.routes[selectedRouteIndex].legs && routeData.routes[selectedRouteIndex].legs.length > 0 && (
                                     <div style={{ marginTop: '0px' }}>
-                                      {routeData.routes[0].legs.map((leg, legIndex) => (
+                                      {routeData.routes[selectedRouteIndex].legs.map((leg, legIndex) => (
                                         <div key={legIndex} style={{ 
                                           marginBottom: '0px',
                                           padding: '10px 8px',
@@ -2097,10 +2099,10 @@ const FloatingGeofencesPopover = ({
                                   )}
                                   
                                   {/* Step-by-Step Details */}
-                                  {routeData.routes[0].legs && routeData.routes[0].legs.length > 0 && (
+                                  {routeData.routes[selectedRouteIndex].legs && routeData.routes[selectedRouteIndex].legs.length > 0 && (
                                     <div style={{ marginTop: '1px' }}>
                                       
-                                      {routeData.routes[0].legs.map((leg, legIndex) => (
+                                      {routeData.routes[selectedRouteIndex].legs.map((leg, legIndex) => (
                                         <div key={legIndex}>
                                           {leg.steps && leg.steps.map((step, stepIndex) => (
                                             <div key={stepIndex} style={{ 

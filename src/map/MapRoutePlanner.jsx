@@ -213,25 +213,7 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     selectedRouteIndex: selectedRouteIndex
   });
 
-  // Always render a test element to see if component is working
-  return (
-    <div style={{
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      zIndex: 9999,
-      backgroundColor: 'red',
-      color: 'white',
-      padding: '10px',
-      borderRadius: '4px',
-      fontSize: '12px'
-    }}>
-      MapRoutePlanner Active
-      {routeData && routeData.routes && (
-        <div>Routes: {routeData.routes.length}</div>
-      )}
-    </div>
-  );
+  return null;
 };
 
 export default MapRoutePlanner;
