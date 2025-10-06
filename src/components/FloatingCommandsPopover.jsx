@@ -41,6 +41,7 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Send as SendIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useCatch } from '../reactHelper';
@@ -318,9 +319,7 @@ const FloatingCommandsPopover = ({
                   {t('sharedSavedCommands')}
                 </Typography>
               </div>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={() => {
                   setEditingCommand({
                     description: '',
@@ -333,19 +332,16 @@ const FloatingCommandsPopover = ({
                   setValidationError(''); // Clear validation error
                 }}
                 disabled={limitCommands}
-                size="small"
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
+                  width: '40px',
+                  height: '40px',
                 }}
+                title={t('sharedAdd')}
               >
-                {t('sharedAdd')}
-              </Button>
+                <AddIcon />
+              </IconButton>
             </div>
 
             {/* Search and Filters */}
@@ -785,22 +781,41 @@ const FloatingCommandsPopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setEditDialog(false);
+                          setEditingCommand(null);
+                        }}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                        {editingCommand?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedCommand')}
+                      </Typography>
+                    </div>
                     <IconButton
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingCommand(null);
+                      onClick={handleSaveCommand}
+                      disabled={createCommandMutation.isPending || updateCommandMutation.isPending || !isFormValid()}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
                       }}
-                      size="small"
-                      style={{ color: colors.textSecondary }}
+                      title={createCommandMutation.isPending || updateCommandMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                     >
-                      <ChevronLeftIcon />
+                      {(createCommandMutation.isPending || updateCommandMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
                     </IconButton>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {editingCommand?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedCommand')}
-                    </Typography>
                   </div>
 
                   {/* Form */}
@@ -941,39 +956,6 @@ const FloatingCommandsPopover = ({
                     </div>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingCommand(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveCommand}
-                      variant="contained"
-                      disabled={createCommandMutation.isPending || updateCommandMutation.isPending || !isFormValid()}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createCommandMutation.isPending || updateCommandMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
