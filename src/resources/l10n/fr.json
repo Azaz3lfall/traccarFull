@@ -732,12 +732,12 @@
   "routePlannerFuelLiters": "Litres de carburant",
   "routePlannerProfitabilityAnalysis": "Analyse de rentabilité",
   "routePlannerClientPrice": "Prix client",
-  "routePlannerProfit": "Profit",
-  "routePlannerPricePerKm": "Price per KM",
+  "routePlannerProfit": "[TRANSLATE_ME] routePlannerProfit",
+  "routePlannerPricePerKm": "[TRANSLATE_ME] routePlannerPricePerKm",
   "routePlannerRoundTrip": "Aller-retour",
   "routePlannerYes": "Oui",
   "routePlannerNo": "Non",
   "routePlannerSaveRoute": "Enregistrer l'itinéraire",
-  "routePlannerSwitchingRoute": "Switching route...",
-  "routePlannerCurrencySymbol": "$"
+  "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
+  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol"
 }

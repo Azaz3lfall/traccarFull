@@ -733,11 +733,11 @@
   "routePlannerProfitabilityAnalysis": "Análisis de rentabilidad",
   "routePlannerClientPrice": "Precio del cliente",
   "routePlannerProfit": "Beneficio",
-  "routePlannerPricePerKm": "Price per KM",
+  "routePlannerPricePerKm": "[TRANSLATE_ME] routePlannerPricePerKm",
   "routePlannerRoundTrip": "Ida y vuelta",
   "routePlannerYes": "Sí",
-  "routePlannerNo": "No",
+  "routePlannerNo": "[TRANSLATE_ME] routePlannerNo",
   "routePlannerSaveRoute": "Guardar ruta",
-  "routePlannerSwitchingRoute": "Switching route...",
-  "routePlannerCurrencySymbol": "$"
+  "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
+  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol"
 }
