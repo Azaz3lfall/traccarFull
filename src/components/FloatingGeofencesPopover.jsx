@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocalization } from '../common/components/LocalizationProvider';
+import { useAttributePreference } from '../common/util/preferences';
 import {
   TextField,
   Button,
@@ -957,32 +958,15 @@ const FloatingGeofencesPopover = ({
   };
 
   const handleRoutePlannerTabChange = (event, newValue) => {
-    console.log('Tab change requested:', newValue, 'Current token:', mapboxToken, 'Token type:', typeof mapboxToken);
-    
-    // If switching to Route Plan tab, check for API token first
-    if (newValue === 1) {
-      if (!mapboxToken || mapboxToken === '' || mapboxToken === null || mapboxToken === undefined) {
-        console.log('No Mapbox token found, showing alert and preventing tab switch');
-        // Show alert for missing API token
-        alert(t('routePlannerNoApiToken') || 'Mapbox API token is not configured. Please contact your administrator to set up the API token.');
-        console.log('BLOCKING tab switch due to missing token');
-        return; // Don't switch tab if no token - EXIT HERE
-      }
-      
-      console.log('Mapbox token found, proceeding with tab switch');
-      
-      // Only fetch route data if we don't have any
-      if (!routeData) {
-        // Small delay to ensure waypoints are updated
-        setTimeout(() => {
-          fetchRoutePlan();
-        }, 100);
-      }
-    }
-    
-    // Only switch tab if we reach here (validation passed or not Route Plan tab)
-    console.log('Switching to tab:', newValue);
     setRoutePlannerTab(newValue);
+    
+    // If switching to Route Plan tab, fetch route data if we don't have any
+    if (newValue === 1 && !routeData) {
+      // Small delay to ensure waypoints are updated
+      setTimeout(() => {
+        fetchRoutePlan();
+      }, 100);
+    }
   };
 
   // Handle save route as geofence
@@ -1566,7 +1550,10 @@ const FloatingGeofencesPopover = ({
               }}
             >
                 <Tab label={t('routePlannerBasic')} />
-                <Tab label={t('routePlanner')} />
+                <Tab 
+                  label={t('routePlanner')} 
+                  disabled={!mapboxToken || mapboxToken === '' || mapboxToken === null || mapboxToken === undefined}
+                />
             </Tabs>
           </div>
 
