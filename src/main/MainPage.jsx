@@ -69,6 +69,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import SaveIcon from '@mui/icons-material/Save';
 import CachedIcon from '@mui/icons-material/Cached';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation, useLocalization } from '../common/components/LocalizationProvider';
@@ -4486,6 +4487,7 @@ const MainPage = () => {
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -4500,6 +4502,118 @@ const MainPage = () => {
                     {t('resellerPanel')}
                   </Typography>
                 </div>
+                <IconButton
+                  onClick={async () => {
+                    const errors = [];
+                    
+                    // Validate required fields
+                    const requiredFields = [
+                      { key: 'resellerId', label: t('resellerId') },
+                      { key: 'resellerUser', label: t('resellerUser') },
+                      { key: 'resellerEmail', label: t('resellerEmail') },
+                      { key: 'companyName', label: t('resellerCompanyName') },
+                      { key: 'logo', label: t('resellerLogotype') },
+                      { key: 'url', label: t('resellerAppUrl') },
+                      { key: 'whatsapp', label: t('resellerWhatsapp') },
+                      { key: 'billingEmail', label: t('resellerBillingEmail') },
+                      { key: 'supportEmail', label: t('resellerSupportEmail') },
+                      { key: 'resellerLimit', label: t('resellerLimit') },
+                      { key: 'deviceLimit', label: t('userDeviceLimit') },
+                      { key: 'userLimit', label: t('userUserLimit') }
+                    ];
+
+                    // Special validation for resellerId - must be a valid user ID
+                    if (!resellerData.resellerId || resellerData.resellerId === '' || isNaN(resellerData.resellerId)) {
+                      errors.push(t('resellerId') + ' (must select a valid user)');
+                    }
+
+                    requiredFields.forEach(field => {
+                      const value = resellerData[field.key];
+                      if (!value || (typeof value === 'string' && value.trim() === '')) {
+                        errors.push(field.label);
+                      }
+                    });
+
+                    // Validate email format
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (resellerData.resellerEmail && !emailRegex.test(resellerData.resellerEmail)) {
+                      errors.push(`${t('resellerEmail')} has invalid format`);
+                    }
+                    if (resellerData.billingEmail && !emailRegex.test(resellerData.billingEmail)) {
+                      errors.push(`${t('resellerBillingEmail')} has invalid format`);
+                    }
+                    if (resellerData.supportEmail && !emailRegex.test(resellerData.supportEmail)) {
+                      errors.push(`${t('resellerSupportEmail')} has invalid format`);
+                    }
+
+                    // Validate number fields are positive
+                    if (resellerData.resellerLimit) {
+                      const limit = parseInt(resellerData.resellerLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('resellerLimit')} must be a positive number`);
+                      }
+                    }
+                    if (resellerData.deviceLimit) {
+                      const limit = parseInt(resellerData.deviceLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('userDeviceLimit')} must be a positive number`);
+                      }
+                    }
+                    if (resellerData.userLimit) {
+                      const limit = parseInt(resellerData.userLimit);
+                      if (isNaN(limit) || limit < 1) {
+                        errors.push(`${t('userUserLimit')} must be a positive number`);
+                      }
+                    }
+
+                    // If there are errors, show them and stop
+                    if (errors.length > 0) {
+                      setResellerErrors(errors);
+                      return;
+                    }
+
+                    // Clear any previous errors
+                    setResellerErrors([]);
+
+                    // Create JSON object with all reseller fields
+                    const resellerJson = {
+                      currentDomain: resellerData.currentDomain,
+                      parentUserId: resellerData.parentUserId,
+                      parentUser: resellerData.parentUser,
+                      parentEmail: resellerData.parentEmail,
+                      resellerId: resellerData.resellerId.trim(),
+                      resellerUser: resellerData.resellerUser.trim(),
+                      resellerEmail: resellerData.resellerEmail.trim(),
+                      companyName: resellerData.companyName.trim(),
+                      logotype: resellerData.logo.trim(),
+                      appUrl: resellerData.url.trim(),
+                      whatsapp: resellerData.whatsapp.trim(),
+                      billingEmail: resellerData.billingEmail.trim(),
+                      supportEmail: resellerData.supportEmail.trim(),
+                      resellerLimit: parseInt(resellerData.resellerLimit) || 0,
+                      deviceLimit: parseInt(resellerData.deviceLimit) || 0,
+                      userLimit: parseInt(resellerData.userLimit) || 0,
+                      timestamp: new Date().toISOString(),
+                      createdBy: user?.name || 'Unknown',
+                      createdById: user?.id || null
+                    };
+                    
+                    // Upload file to server
+                    await handleResellerFileUpload(resellerJson);
+                    
+                    // Close drawer on success
+                    setShowResellerDrawer(false);
+                  }}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                    width: '40px',
+                    height: '40px',
+                  }}
+                  title={t('sharedSave')}
+                >
+                  <SaveIcon />
+                </IconButton>
               </div>
 
               {/* Drawer Content */}
@@ -4979,135 +5093,6 @@ const MainPage = () => {
                 )}
               </div>
 
-              {/* Drawer Footer */}
-              <div style={{
-                padding: '16px 20px',
-                borderTop: `1px solid ${colors.border}`,
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'flex-end',
-                backgroundColor: colors.surface,
-              }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowResellerDrawer(false)}
-                  style={{
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
-                >
-                  {t('sharedCancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={async () => {
-                    const errors = [];
-                    
-                    // Validate required fields
-                    const requiredFields = [
-                      { key: 'resellerId', label: t('resellerId') },
-                      { key: 'resellerUser', label: t('resellerUser') },
-                      { key: 'resellerEmail', label: t('resellerEmail') },
-                      { key: 'companyName', label: t('resellerCompanyName') },
-                      { key: 'logo', label: t('resellerLogotype') },
-                      { key: 'url', label: t('resellerAppUrl') },
-                      { key: 'whatsapp', label: t('resellerWhatsapp') },
-                      { key: 'billingEmail', label: t('resellerBillingEmail') },
-                      { key: 'supportEmail', label: t('resellerSupportEmail') },
-                      { key: 'resellerLimit', label: t('resellerLimit') },
-                      { key: 'deviceLimit', label: t('userDeviceLimit') },
-                      { key: 'userLimit', label: t('userUserLimit') }
-                    ];
-
-                    // Special validation for resellerId - must be a valid user ID
-                    if (!resellerData.resellerId || resellerData.resellerId === '' || isNaN(resellerData.resellerId)) {
-                      errors.push(t('resellerId') + ' (must select a valid user)');
-                    }
-
-                    requiredFields.forEach(field => {
-                      const value = resellerData[field.key];
-                      if (!value || (typeof value === 'string' && value.trim() === '')) {
-                        errors.push(field.label);
-                      }
-                    });
-
-                    // Validate email format
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (resellerData.resellerEmail && !emailRegex.test(resellerData.resellerEmail)) {
-                      errors.push(`${t('resellerEmail')} has invalid format`);
-                    }
-                    if (resellerData.billingEmail && !emailRegex.test(resellerData.billingEmail)) {
-                      errors.push(`${t('resellerBillingEmail')} has invalid format`);
-                    }
-                    if (resellerData.supportEmail && !emailRegex.test(resellerData.supportEmail)) {
-                      errors.push(`${t('resellerSupportEmail')} has invalid format`);
-                    }
-
-                    // Validate number fields are positive
-                    if (resellerData.resellerLimit) {
-                      const limit = parseInt(resellerData.resellerLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('resellerLimit')} must be a positive number`);
-                      }
-                    }
-                    if (resellerData.deviceLimit) {
-                      const limit = parseInt(resellerData.deviceLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('userDeviceLimit')} must be a positive number`);
-                      }
-                    }
-                    if (resellerData.userLimit) {
-                      const limit = parseInt(resellerData.userLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('userUserLimit')} must be a positive number`);
-                      }
-                    }
-
-                    // If there are errors, show them and stop
-                    if (errors.length > 0) {
-                      setResellerErrors(errors);
-                      return;
-                    }
-
-                    // Clear any previous errors
-                    setResellerErrors([]);
-
-                    // Create JSON object with all reseller fields
-                    const resellerJson = {
-                      currentDomain: resellerData.currentDomain,
-                      parentUserId: resellerData.parentUserId,
-                      parentUser: resellerData.parentUser,
-                      parentEmail: resellerData.parentEmail,
-                      resellerId: resellerData.resellerId.trim(),
-                      resellerUser: resellerData.resellerUser.trim(),
-                      resellerEmail: resellerData.resellerEmail.trim(),
-                      companyName: resellerData.companyName.trim(),
-                      logotype: resellerData.logo.trim(),
-                      appUrl: resellerData.url.trim(),
-                      whatsapp: resellerData.whatsapp.trim(),
-                      billingEmail: resellerData.billingEmail.trim(),
-                      supportEmail: resellerData.supportEmail.trim(),
-                      resellerLimit: parseInt(resellerData.resellerLimit) || 0,
-                      deviceLimit: parseInt(resellerData.deviceLimit) || 0,
-                      userLimit: parseInt(resellerData.userLimit) || 0,
-                      timestamp: new Date().toISOString(),
-                      createdBy: user?.name || 'Unknown',
-                      createdById: user?.id || null
-                    };
-                    
-                    // Console log the JSON object
-                    
-                    // Upload file to server
-                    await handleResellerFileUpload(resellerJson);
-                  }}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                  }}
-                >
-                  {t('sharedSave')}
-                </Button>
-              </div>
             </motion.div>
           </>
         )}

@@ -49,6 +49,7 @@ import {
   Block as BlockIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -617,9 +618,7 @@ const FloatingResellersPopover = ({
                 </Typography>
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
+                <IconButton
                   onClick={() => {
                     setEditingReseller({ 
                       id: null,
@@ -643,17 +642,16 @@ const FloatingResellersPopover = ({
                     setActiveTab(0);
                     setEditDialog(true);
                   }}
-                  size="small"
                   style={{
                     backgroundColor: colors.primary,
                     color: colors.text,
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    fontWeight: '500',
+                    width: '40px',
+                    height: '40px',
                   }}
+                  title={t('sharedAdd')}
                 >
-                  {t('sharedAdd')}
-                </Button>
+                  <AddIcon />
+                </IconButton>
               </div>
             </div>
 
@@ -1057,6 +1055,7 @@ const FloatingResellersPopover = ({
                       borderBottom: `1px solid ${colors.border}`,
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'space-between',
                       background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -1071,6 +1070,27 @@ const FloatingResellersPopover = ({
                           {t('resellerPanel')}
                         </Typography>
                       </div>
+                      <IconButton
+                        onClick={handleSaveReseller}
+                        disabled={
+                          createResellerMutation.isPending || 
+                          updateResellerMutation.isPending ||
+                          (!isEditMode && !domainValid) // Only require domain validation for new resellers
+                        }
+                        style={{
+                          backgroundColor: colors.primary,
+                          color: colors.text,
+                          width: '40px',
+                          height: '40px',
+                        }}
+                        title={createResellerMutation.isPending || updateResellerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                      >
+                        {(createResellerMutation.isPending || updateResellerMutation.isPending) ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <SaveIcon />
+                        )}
+                      </IconButton>
                     </div>
 
                     {/* Drawer Content */}
@@ -1638,49 +1658,6 @@ const FloatingResellersPopover = ({
                       )}
                     </div>
 
-                    {/* Drawer Footer */}
-                    <div style={{
-                      padding: '16px 20px',
-                      borderTop: `1px solid ${colors.border}`,
-                      display: 'flex',
-                      gap: '12px',
-                      justifyContent: 'flex-end',
-                      backgroundColor: colors.surface,
-                    }}>
-                      <Button
-                        variant="outlined"
-                        onClick={handleCloseEditDialog}
-                        style={{
-                          borderColor: colors.border,
-                          color: colors.text,
-                        }}
-                      >
-                        {t('sharedCancel')}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="contained"
-                        onClick={handleSaveReseller}
-                        disabled={
-                          createResellerMutation.isPending || 
-                          updateResellerMutation.isPending ||
-                          (!isEditMode && !domainValid) // Only require domain validation for new resellers
-                        }
-                        style={{
-                          backgroundColor: colors.primary,
-                          color: colors.text,
-                        }}
-                      >
-                        {(createResellerMutation.isPending || updateResellerMutation.isPending) ? (
-                          <>
-                            <CircularProgress size={16} color="inherit" style={{ marginRight: '8px' }} />
-                            {t('sharedSaving')}
-                          </>
-                        ) : (
-                          t('sharedSave')
-                        )}
-                      </Button>
-                    </div>
                   </motion.div>
                 </>
               )}
