@@ -974,26 +974,27 @@ const FloatingGeofencesPopover = ({
 
   // Handle save route as geofence
   const handleSaveRoute = async () => {
-    if (!displayedRouteData || !displayedRouteData.routes || !displayedRouteData.routes[0]) {
-      console.error('No route data to save');
+    if (!routeData || !routeData.routes || !routeData.routes[selectedRouteIndex]) {
+      console.error('No active route data to save');
       return;
     }
 
     try {
-      const selectedRoute = displayedRouteData.routes[0];
-      if (!selectedRoute.geometry || !selectedRoute.geometry.coordinates) {
+      // Get the currently active/selected route (the one displayed on map)
+      const activeRoute = routeData.routes[selectedRouteIndex];
+      if (!activeRoute.geometry || !activeRoute.geometry.coordinates) {
         console.error('No route geometry to save');
         return;
       }
 
       // Convert route coordinates to LINESTRING format (lat lng, lat lng, ...)
-      const coordinates = selectedRoute.geometry.coordinates.map(coord => `${coord[1]} ${coord[0]}`).join(', ');
+      const coordinates = activeRoute.geometry.coordinates.map(coord => `${coord[1]} ${coord[0]}`).join(', ');
       const area = `LINESTRING (${coordinates})`;
 
       // Create geofence data
       const routeGeofence = {
         name: `Route ${new Date().toLocaleString()}`,
-        description: `Route with ${displayedRouteData.waypoints?.length || 0} waypoints`,
+        description: `Route ${selectedRouteIndex + 1} with ${routeData.waypoints?.length || 0} waypoints`,
         area: area,
         calendarId: null,
         attributes: {
@@ -1001,12 +1002,13 @@ const FloatingGeofencesPopover = ({
           mapLineWidth: 3,
           mapLineOpacity: 0.8,
           speedLimit: null,
-          polylineDistance: Math.round(selectedRoute.distance / 1000), // Convert to km
+          polylineDistance: Math.round(activeRoute.distance / 1000), // Convert to km
           hide: false,
         },
       };
 
-      console.log('Saving route as geofence:', routeGeofence);
+      console.log('Saving active route as geofence:', routeGeofence);
+      console.log('Selected route index:', selectedRouteIndex);
 
       // Use the existing createGeofenceMutation
       createGeofenceMutation.mutate(routeGeofence);
@@ -2154,12 +2156,13 @@ const FloatingGeofencesPopover = ({
                                   <button
                                     onClick={handleSaveRoute}
                                     style={{
-                                      padding: '8px 16px',
+                                      width: '36px',
+                                      height: '36px',
                                       borderRadius: '6px',
                                       border: `1px solid ${colors.border}`,
-                                      backgroundColor: colors.primary,
-                                      color: colors.primaryText,
-                                      fontSize: '14px',
+                                      backgroundColor: colors.secondary,
+                                      color: colors.text,
+                                      fontSize: '12px',
                                       fontWeight: '600',
                                       cursor: 'pointer',
                                       boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
@@ -2167,7 +2170,8 @@ const FloatingGeofencesPopover = ({
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       transition: 'all 0.2s ease',
-                                      outline: 'none'
+                                      outline: 'none',
+                                      padding: '0 4px'
                                     }}
                                     onMouseEnter={(e) => {
                                       e.target.style.transform = 'translateY(-1px)';
@@ -2177,8 +2181,9 @@ const FloatingGeofencesPopover = ({
                                       e.target.style.transform = 'translateY(0)';
                                       e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
                                     }}
+                                    title={t('routePlannerSaveRoute')}
                                   >
-                                    {t('routePlannerSaveRoute')}
+                                    💾
                                   </button>
                                 </div>
                                 
