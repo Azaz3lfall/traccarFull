@@ -1343,17 +1343,9 @@ const FloatingGeofencesPopover = ({
     
     console.log('Rebuilt waypoints:', newWaypoints.map((w, i) => ({ index: i, address: w?.address })));
     
-    // Check if waypoints actually changed BEFORE updating state
-    const waypointsChanged = JSON.stringify(newWaypoints) !== JSON.stringify(routeWaypoints);
-    
-    // Also check if the order of addresses changed (even if same addresses)
-    const addressesChanged = JSON.stringify(fields.map(f => f.value)) !== JSON.stringify(routeWaypoints.map(wp => wp?.address || ''));
-    
-    // Only clear route data and switch to Waypoints tab when waypoints actually change
-    if ((waypointsChanged || addressesChanged) && routeData) {
-      console.log('Waypoints or addresses changed - clearing route data and switching to Waypoints tab');
-      console.log('Waypoints changed:', waypointsChanged);
-      console.log('Addresses changed:', addressesChanged);
+    // SIMPLE CHECK: If we have route data and fields changed in ANY way, clear everything
+    if (routeData) {
+      console.log('FIELDS CHANGED - clearing route data and switching to Waypoints tab');
       setRouteData(null);
       setDisplayedRouteData(null);
       setSelectedRouteIndex(0);
