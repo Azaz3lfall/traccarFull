@@ -204,8 +204,16 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     };
   }, []);
 
+  // Debug logging
+  console.log('MapRoutePlanner render:', {
+    routeData: routeData,
+    routesLength: routeData?.routes?.length,
+    selectedRouteIndex: selectedRouteIndex
+  });
+
   // Render alternative route buttons if multiple routes exist
   if (routeData && routeData.routes && routeData.routes.length > 1) {
+    console.log('Rendering alternative route buttons for', routeData.routes.length, 'routes');
     return (
       <div style={{
         position: 'absolute',
@@ -219,7 +227,10 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
         {routeData.routes.map((route, index) => (
           <button
             key={index}
-            onClick={() => onRouteChange && onRouteChange(index)}
+            onClick={() => {
+              console.log('Route button clicked:', index);
+              onRouteChange && onRouteChange(index);
+            }}
             style={{
               width: '40px',
               height: '40px',
