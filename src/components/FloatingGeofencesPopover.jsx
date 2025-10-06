@@ -2075,7 +2075,7 @@ const FloatingGeofencesPopover = ({
                                           borderRadius: '6px',
                                           border: `1px solid ${colors.border}`,
                                           backgroundColor: index === selectedRouteIndex ? colors.primary : colors.secondary,
-                                          color: index === selectedRouteIndex ? colors.primaryText : colors.text,
+                                          color: colors.text,
                                           fontSize: '14px',
                                           fontWeight: '600',
                                           cursor: 'pointer',
