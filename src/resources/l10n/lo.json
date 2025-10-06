@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "ກະລຸນາເລືອກຢ່າງໜ້ອຍ 2 ທີ່ຢູ່ເພື່ອວາງແຜນທາງ",
   "routePlannerClickToPlan": "ກົດເພື່ອວາງແຜນທາງ",
   "routePlannerNotEnoughWaypoints": "ຈຸດພັກບໍ່ພຽງພໍສຳລັບການວາງແຜນທາງ",
-  "routePlannerHandlingFee": "ຄ່າທຳນຽມການຈັດການ"
+  "routePlannerHandlingFee": "ຄ່າທຳນຽມການຈັດການ",
+  "routePlannerRouteName": "ທາງ",
+  "routePlannerRouteWithWaypoints": "ທາງ {0} ດ້ວຍ {1} ຈຸດ"
 }

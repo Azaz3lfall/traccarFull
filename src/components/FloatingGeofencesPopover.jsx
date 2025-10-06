@@ -992,8 +992,11 @@ const FloatingGeofencesPopover = ({
 
       // Create geofence data
       const routeGeofence = {
-        name: `Route ${new Date().toLocaleString()}`,
-        description: `Route ${selectedRouteIndex + 1} with ${routeData.waypoints?.length || 0} waypoints`,
+        name: `${t('routePlannerRouteName')} ${new Date().toLocaleString()}`,
+        description: t('routePlannerRouteWithWaypoints', { 
+          0: selectedRouteIndex + 1, 
+          1: routeData.waypoints?.length || 0 
+        }),
         area: area,
         calendarId: null,
         attributes: {

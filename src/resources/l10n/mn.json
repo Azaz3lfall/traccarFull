@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Зам төлөвлөхийн тулд дор хаяж 2 хаяг сонгоно уу",
   "routePlannerClickToPlan": "Зам төлөвлөхийн тулд дарна уу",
   "routePlannerNotEnoughWaypoints": "Зам төлөвлөхийн тулд хангалттай зогсоолын цэг байхгүй",
-  "routePlannerHandlingFee": "Боловсруулах Төлбөр"
+  "routePlannerHandlingFee": "Боловсруулах Төлбөр",
+  "routePlannerRouteName": "Зам",
+  "routePlannerRouteWithWaypoints": "{1} цэгтэй {0} зам"
 }

@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Vă rugăm să selectați cel puțin 2 adrese pentru a planifica o rută",
   "routePlannerClickToPlan": "Faceți clic pentru a planifica ruta",
   "routePlannerNotEnoughWaypoints": "Puncte de oprire insuficiente pentru planificarea rutei",
-  "routePlannerHandlingFee": "Taxa de Prelucrare"
+  "routePlannerHandlingFee": "Taxa de Prelucrare",
+  "routePlannerRouteName": "Rută",
+  "routePlannerRouteWithWaypoints": "Ruta {0} cu {1} puncte"
 }

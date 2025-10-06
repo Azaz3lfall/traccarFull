@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Marşrut planlamaq üçün ən azı 2 ünvan seçin",
   "routePlannerClickToPlan": "Planlamaq üçün klikləyin",
   "routePlannerNotEnoughWaypoints": "Marşrut planlamaq üçün kifayət qədər dayanacaq nöqtəsi yoxdur",
-  "routePlannerHandlingFee": "İşləmə Haqqı"
+  "routePlannerHandlingFee": "İşləmə Haqqı",
+  "routePlannerRouteName": "Marşrut",
+  "routePlannerRouteWithWaypoints": "{1} nöqtəli {0} marşrutu"
 }

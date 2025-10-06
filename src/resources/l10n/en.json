@@ -738,5 +738,7 @@
   "routePlannerNo": "No",
   "routePlannerSaveRoute": "Save Route",
   "routePlannerSwitchingRoute": "Switching route...",
-  "routePlannerCurrencySymbol": "$"
+  "routePlannerCurrencySymbol": "$",
+  "routePlannerRouteName": "Route",
+  "routePlannerRouteWithWaypoints": "Route {0} with {1} waypoints"
 }

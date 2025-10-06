@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Rota planlamak için en az 2 adres seçin",
   "routePlannerClickToPlan": "Rota planlamak için tıklayın",
   "routePlannerNotEnoughWaypoints": "Rota planlama için yeterli durak noktası yok",
-  "routePlannerHandlingFee": "İşlem Ücreti"
+  "routePlannerHandlingFee": "İşlem Ücreti",
+  "routePlannerRouteName": "Rota",
+  "routePlannerRouteWithWaypoints": "{1} noktalı {0} rotası"
 }

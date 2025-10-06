@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Vui lòng chọn ít nhất 2 địa chỉ để lập kế hoạch tuyến đường",
   "routePlannerClickToPlan": "Nhấp để lập kế hoạch tuyến đường",
   "routePlannerNotEnoughWaypoints": "Không đủ điểm dừng để lập kế hoạch tuyến đường",
-  "routePlannerHandlingFee": "Phí Xử Lý"
+  "routePlannerHandlingFee": "Phí Xử Lý",
+  "routePlannerRouteName": "Tuyến đường",
+  "routePlannerRouteWithWaypoints": "Tuyến đường {0} với {1} điểm"
 }

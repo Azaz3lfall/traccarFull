@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "റൂട്ട് ആസൂത്രണം ചെയ്യാൻ ദയവായി കുറഞ്ഞത് 2 വിലാസങ്ങൾ തിരഞ്ഞെടുക്കുക",
   "routePlannerClickToPlan": "റൂട്ട് ആസൂത്രണം ചെയ്യാൻ ക്ലിക്ക് ചെയ്യുക",
   "routePlannerNotEnoughWaypoints": "റൂട്ട് ആസൂത്രണത്തിന് മതിയായ വഴിമുട്ടുകൾ ഇല്ല",
-  "routePlannerHandlingFee": "ഹാൻഡ്ലിംഗ് ഫീ"
+  "routePlannerHandlingFee": "ഹാൻഡ്ലിംഗ് ഫീ",
+  "routePlannerRouteName": "റൂട്ട്",
+  "routePlannerRouteWithWaypoints": "{1} വെപ്പോയിന്റുകളുള്ള റൂട്ട് {0}"
 }

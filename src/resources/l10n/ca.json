@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Si us plau, seleccioneu almenys 2 adreces per planificar una ruta",
   "routePlannerClickToPlan": "Feu clic per planificar ruta",
   "routePlannerNotEnoughWaypoints": "Punts de parada insuficients per planificar ruta",
-  "routePlannerHandlingFee": "Handling Fee"
+  "routePlannerHandlingFee": "Handling Fee",
+  "routePlannerRouteName": "Ruta",
+  "routePlannerRouteWithWaypoints": "Ruta {0} amb {1} punts"
 }

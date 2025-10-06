@@ -717,5 +717,7 @@
   "routePlannerSelectAddresses": "Por favor, seleccione al menos 2 direcciones para planificar una ruta",
   "routePlannerClickToPlan": "Haga clic para planificar ruta",
   "routePlannerNotEnoughWaypoints": "Puntos de parada insuficientes para planificación de ruta",
-  "routePlannerHandlingFee": "Tarifa de Manejo"
+  "routePlannerHandlingFee": "Tarifa de Manejo",
+  "routePlannerRouteName": "Ruta",
+  "routePlannerRouteWithWaypoints": "Ruta {0} con {1} puntos"
 }

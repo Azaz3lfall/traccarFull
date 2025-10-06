@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Prosimo, izberite vsaj 2 naslova za načrtovanje poti",
   "routePlannerClickToPlan": "Kliknite za načrtovanje poti",
   "routePlannerNotEnoughWaypoints": "Premalo vmesnih postaj za načrtovanje poti",
-  "routePlannerHandlingFee": "Pristojbina za Obdelavo"
+  "routePlannerHandlingFee": "Pristojbina za Obdelavo",
+  "routePlannerRouteName": "Pot",
+  "routePlannerRouteWithWaypoints": "Pot {0} z {1} točkami"
 }

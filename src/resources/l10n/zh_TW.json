@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "請選擇至少2個地址來規劃路線",
   "routePlannerClickToPlan": "點擊規劃路線",
   "routePlannerNotEnoughWaypoints": "途經點不足，無法規劃路線",
-  "routePlannerHandlingFee": "Handling Fee"
+  "routePlannerHandlingFee": "Handling Fee",
+  "routePlannerRouteName": "路線",
+  "routePlannerRouteWithWaypoints": "路線{0}，{1}個途經點"
 }

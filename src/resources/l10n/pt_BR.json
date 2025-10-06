@@ -738,5 +738,7 @@
   "routePlannerNo": "Não",
   "routePlannerSaveRoute": "Salvar Rota",
   "routePlannerSwitchingRoute": "Alternando rota...",
-  "routePlannerCurrencySymbol": "R$"
+  "routePlannerCurrencySymbol": "R$",
+  "routePlannerRouteName": "Rota",
+  "routePlannerRouteWithWaypoints": "Rota {0} com {1} pontos"
 }

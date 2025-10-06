@@ -717,5 +717,7 @@
   "routePlannerSelectAddresses": "Seleziona almeno 2 indirizzi per pianificare un percorso",
   "routePlannerClickToPlan": "Clicca per pianificare il percorso",
   "routePlannerNotEnoughWaypoints": "Punti di passaggio insufficienti per pianificare il percorso",
-  "routePlannerHandlingFee": "Tassa di Gestione"
+  "routePlannerHandlingFee": "Tassa di Gestione",
+  "routePlannerRouteName": "Percorso",
+  "routePlannerRouteWithWaypoints": "Percorso {0} con {1} punti"
 }

@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Моля, изберете поне 2 адреса за планиране на маршрут",
   "routePlannerClickToPlan": "Кликнете за планиране на маршрут",
   "routePlannerNotEnoughWaypoints": "Недостатъчно междинни точки за планиране на маршрут",
-  "routePlannerHandlingFee": "Такса за Обработка"
+  "routePlannerHandlingFee": "Такса за Обработка",
+  "routePlannerRouteName": "Маршрут",
+  "routePlannerRouteWithWaypoints": "Маршрут {0} с {1} точки"
 }

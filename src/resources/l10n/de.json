@@ -717,5 +717,7 @@
   "routePlannerSelectAddresses": "Bitte wählen Sie mindestens 2 Adressen für die Routenplanung",
   "routePlannerClickToPlan": "Klicken Sie zum Planen der Route",
   "routePlannerNotEnoughWaypoints": "Nicht genügend Zwischenstopps für Routenplanung",
-  "routePlannerHandlingFee": "Bearbeitungsgebühr"
+  "routePlannerHandlingFee": "Bearbeitungsgebühr",
+  "routePlannerRouteName": "Route",
+  "routePlannerRouteWithWaypoints": "Route {0} mit {1} Wegpunkten"
 }

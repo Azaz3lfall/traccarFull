@@ -717,5 +717,7 @@
   "routePlannerSelectAddresses": "Пожалуйста, выберите хотя бы 2 адреса для планирования маршрута",
   "routePlannerClickToPlan": "Нажмите для планирования маршрута",
   "routePlannerNotEnoughWaypoints": "Недостаточно промежуточных точек для планирования маршрута",
-  "routePlannerHandlingFee": "Плата за Обработку"
+  "routePlannerHandlingFee": "Плата за Обработку",
+  "routePlannerRouteName": "Маршрут",
+  "routePlannerRouteWithWaypoints": "Маршрут {0} с {1} точками"
 }

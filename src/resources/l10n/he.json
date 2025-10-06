@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "אנא בחר לפחות 2 כתובות לתכנון מסלול",
   "routePlannerClickToPlan": "לחץ לתכנון מסלול",
   "routePlannerNotEnoughWaypoints": "אין מספיק נקודות עצירה לתכנון מסלול",
-  "routePlannerHandlingFee": "עמלת טיפול"
+  "routePlannerHandlingFee": "עמלת טיפול",
+  "routePlannerRouteName": "מסלול",
+  "routePlannerRouteWithWaypoints": "מסלול {0} עם {1} נקודות"
 }

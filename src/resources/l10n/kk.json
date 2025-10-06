@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Маршрут жоспарлау үшін кемінде 2 мекенжай таңдаңыз",
   "routePlannerClickToPlan": "Маршрут жоспарлау үшін басыңыз",
   "routePlannerNotEnoughWaypoints": "Маршрут жоспарлау үшін жеткілікті аралық нүктелер жоқ",
-  "routePlannerHandlingFee": "Өңдеу Ақысы"
+  "routePlannerHandlingFee": "Өңдеу Ақысы",
+  "routePlannerRouteName": "Маршрут",
+  "routePlannerRouteWithWaypoints": "{1} нүктесі бар {0} маршруты"
 }

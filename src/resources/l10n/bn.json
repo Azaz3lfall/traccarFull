@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "রুট পরিকল্পনার জন্য কমপক্ষে ২টি ঠিকানা নির্বাচন করুন",
   "routePlannerClickToPlan": "রুট পরিকল্পনার জন্য ক্লিক করুন",
   "routePlannerNotEnoughWaypoints": "রুট পরিকল্পনার জন্য পর্যাপ্ত পথের বিন্দু নেই",
-  "routePlannerHandlingFee": "হ্যান্ডলিং ফি"
+  "routePlannerHandlingFee": "হ্যান্ডলিং ফি",
+  "routePlannerRouteName": "রুট",
+  "routePlannerRouteWithWaypoints": "{1} ওয়েপয়েন্ট সহ রুট {0}"
 }

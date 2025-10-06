@@ -717,5 +717,7 @@
   "routePlannerSelectAddresses": "ルートを計画するには、少なくとも2つのアドレスを選択してください",
   "routePlannerClickToPlan": "ルートを計画するにはクリック",
   "routePlannerNotEnoughWaypoints": "ルート計画に十分な経由地がありません",
-  "routePlannerHandlingFee": "取扱手数料"
+  "routePlannerHandlingFee": "取扱手数料",
+  "routePlannerRouteName": "ルート",
+  "routePlannerRouteWithWaypoints": "{1}個のポイントを持つルート{0}"
 }

@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Ver venleg vel minst 2 adresser for å planlegge ei rute",
   "routePlannerClickToPlan": "Klikk for å planlegge rute",
   "routePlannerNotEnoughWaypoints": "Ikkje nok mellomstopp for ruteplanlegging",
-  "routePlannerHandlingFee": "Handling Fee"
+  "routePlannerHandlingFee": "Handling Fee",
+  "routePlannerRouteName": "Rute",
+  "routePlannerRouteWithWaypoints": "Rute {0} med {1} veipunkt"
 }

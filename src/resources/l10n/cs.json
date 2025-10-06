@@ -718,5 +718,7 @@
   "routePlannerSelectAddresses": "Prosím, vyberte alespoň 2 adresy pro plánování trasy",
   "routePlannerClickToPlan": "Klikněte pro plánování trasy",
   "routePlannerNotEnoughWaypoints": "Nedostatek zastávek pro plánování trasy",
-  "routePlannerHandlingFee": "Poplatek za Zpracování"
+  "routePlannerHandlingFee": "Poplatek za Zpracování",
+  "routePlannerRouteName": "Trasa",
+  "routePlannerRouteWithWaypoints": "Trasa {0} s {1} body"
 }
