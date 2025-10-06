@@ -36,6 +36,7 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     }
 
     const coordinates = selectedRoute.geometry.coordinates;
+    
 
     // Add source for route polyline (check if it already exists)
     if (!map.getSource(id)) {
@@ -206,11 +207,6 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     };
   }, []);
 
-  // Debug logging
-    routeData: routeData,
-    routesLength: routeData?.routes?.length,
-    selectedRouteIndex: selectedRouteIndex
-  });
 
   return null;
 };

@@ -39,6 +39,7 @@ import {
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
   Link as LinkIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
@@ -405,26 +406,19 @@ const FloatingDevicesPopover = ({
                   {t('deviceTitle')}
                 </Typography>
               </div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddDevice}
-                  disabled={limitDevices}
-                  size="small"
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    textTransform: 'none',
-                    padding: '6px 12px',
-                    minWidth: 'auto',
-                  }}
-                >
-                  {t('sharedAdd')}
-                </Button>
-              </div>
+              <IconButton
+                onClick={handleAddDevice}
+                disabled={limitDevices}
+                style={{
+                  backgroundColor: colors.primary,
+                  color: colors.text,
+                  width: '40px',
+                  height: '40px',
+                }}
+                title={t('sharedAdd')}
+              >
+                <AddIcon />
+              </IconButton>
             </div>
 
             {/* Search */}
@@ -441,7 +435,7 @@ const FloatingDevicesPopover = ({
                   }}
                   style={{
                     flex: 1,
-                    '& .MuiOutlinedInput-root': {
+                    '& .MuiOutlinedInputRoot': {
                       backgroundColor: colors.secondary,
                       '& fieldset': { borderColor: colors.border },
                       '&:hover fieldset': { borderColor: colors.primary },
@@ -510,7 +504,7 @@ const FloatingDevicesPopover = ({
                               {t('deviceStatus')}
                             </TableCell>
                           )}
-                          <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                             {t('sharedActions')}
                           </TableCell>
                         </TableRow>
@@ -557,7 +551,7 @@ const FloatingDevicesPopover = ({
                                 />
                               </TableCell>
                             )}
-                            <TableCell align="right" style={{ padding: '4px' }}>
+                            <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                               <IconButton
                                 size="small"
                                 onClick={(e) => {
@@ -685,21 +679,41 @@ const FloatingDevicesPopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setEditDialog(false);
+                          setEditingDevice(null);
+                        }}
+                        size="small"
+                        style={{ color: colors.text }}
+                      >
+                        <ChevronLeftIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                        {editingDevice?.id ? editingDevice.name : `${t('sharedAdd')} ${t('sharedDevice')}`}
+                      </Typography>
+                    </div>
                     <IconButton
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingDevice(null);
+                      onClick={() => handleSaveDevice()}
+                      disabled={createDeviceMutation.isPending || updateDeviceMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
                       }}
-                      size="small"
-                      style={{ color: colors.text, marginRight: '12px' }}
+                      title={createDeviceMutation.isPending || updateDeviceMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                     >
-                      <ChevronLeftIcon fontSize="small" />
+                      {(createDeviceMutation.isPending || updateDeviceMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
                     </IconButton>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {editingDevice?.id ? editingDevice.name : `${t('sharedAdd')} ${t('sharedDevice')}`}
-                    </Typography>
                   </div>
 
                   {/* Form */}
@@ -758,7 +772,7 @@ const FloatingDevicesPopover = ({
                           onChange={(e) => setEditingDevice({ ...editingDevice, name: e.target.value })}
                           size="small"
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -778,7 +792,7 @@ const FloatingDevicesPopover = ({
                           size="small"
                           helperText={t('deviceIdentifierHelp')}
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -804,7 +818,7 @@ const FloatingDevicesPopover = ({
                           size="small"
                           ref={setGroupInputRef}
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -876,7 +890,7 @@ const FloatingDevicesPopover = ({
                           onChange={(e) => setEditingDevice({ ...editingDevice, phone: e.target.value })}
                           size="small"
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -896,7 +910,7 @@ const FloatingDevicesPopover = ({
                           onChange={(e) => setEditingDevice({ ...editingDevice, model: e.target.value })}
                           size="small"
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -916,7 +930,7 @@ const FloatingDevicesPopover = ({
                           onChange={(e) => setEditingDevice({ ...editingDevice, contact: e.target.value })}
                           size="small"
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -938,7 +952,7 @@ const FloatingDevicesPopover = ({
                           size="small"
                           ref={setCategoryInputRef}
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -995,7 +1009,7 @@ const FloatingDevicesPopover = ({
                           size="small"
                           ref={setCalendarInputRef}
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -1072,7 +1086,7 @@ const FloatingDevicesPopover = ({
                           }}
                           size="small"
                           sx={{
-                            '& .MuiOutlinedInput-root': {
+                            '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
                               '& fieldset': { borderColor: colors.border },
                               '&:hover fieldset': { borderColor: colors.primary },
@@ -1121,7 +1135,7 @@ const FloatingDevicesPopover = ({
                               onChange={handleFileInput}
                               inputProps={{ accept: 'image/*' }}
                               style={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -1148,41 +1162,6 @@ const FloatingDevicesPopover = ({
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingDevice(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        handleSaveDevice();
-                      }}
-                      variant="contained"
-                      disabled={createDeviceMutation.isPending || updateDeviceMutation.isPending}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createDeviceMutation.isPending || updateDeviceMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
