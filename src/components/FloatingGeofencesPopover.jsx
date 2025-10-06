@@ -957,15 +957,19 @@ const FloatingGeofencesPopover = ({
   };
 
   const handleRoutePlannerTabChange = (event, newValue) => {
-    setRoutePlannerTab(newValue);
+    console.log('Tab change requested:', newValue, 'Current token:', mapboxToken, 'Token type:', typeof mapboxToken);
     
     // If switching to Route Plan tab, check for API token first
     if (newValue === 1) {
-      if (!mapboxToken) {
+      if (!mapboxToken || mapboxToken === '' || mapboxToken === null || mapboxToken === undefined) {
+        console.log('No Mapbox token found, showing alert and preventing tab switch');
         // Show alert for missing API token
         alert(t('routePlannerNoApiToken') || 'Mapbox API token is not configured. Please contact your administrator to set up the API token.');
-        return;
+        console.log('BLOCKING tab switch due to missing token');
+        return; // Don't switch tab if no token - EXIT HERE
       }
+      
+      console.log('Mapbox token found, proceeding with tab switch');
       
       // Only fetch route data if we don't have any
       if (!routeData) {
@@ -975,6 +979,10 @@ const FloatingGeofencesPopover = ({
         }, 100);
       }
     }
+    
+    // Only switch tab if we reach here (validation passed or not Route Plan tab)
+    console.log('Switching to tab:', newValue);
+    setRoutePlannerTab(newValue);
   };
 
   // Handle save route as geofence
