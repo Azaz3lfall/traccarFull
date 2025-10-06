@@ -2043,13 +2043,21 @@ const FloatingGeofencesPopover = ({
                       
                       if (validWaypoints.length < 2) {
                         return (
-                          <Typography variant="body2" style={{ 
-                            color: colors.textSecondary, 
-                            textAlign: 'center',
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
                             padding: '40px 20px'
                           }}>
-                            {t('routePlannerSelectAddresses')}
-                          </Typography>
+                            <CircularProgress size={24} style={{ marginBottom: '16px' }} />
+                            <Typography variant="body2" style={{ 
+                              color: colors.textSecondary, 
+                              textAlign: 'center'
+                            }}>
+                              {t('routePlannerPlanningRoute')}
+                            </Typography>
+                          </div>
                         );
                       }
                       
