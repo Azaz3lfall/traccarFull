@@ -46,6 +46,7 @@ import {
   LastPage as LastPageIcon,
   Functions as FunctionsIcon,
   PlayArrow as PlayArrowIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
@@ -344,9 +345,7 @@ const FloatingComputedAttributesPopover = ({
                   {t('sharedComputedAttributes')}
                 </Typography>
               </div>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={() => {
                   setEditingAttribute({
                     description: '',
@@ -359,19 +358,16 @@ const FloatingComputedAttributesPopover = ({
                   setEditDialog(true);
                 }}
                 disabled={limitComputedAttributes || !administrator}
-                size="small"
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
+                  width: '40px',
+                  height: '40px',
                 }}
+                title={t('sharedAdd')}
               >
-                {t('sharedAdd')}
-              </Button>
+                <AddIcon />
+              </IconButton>
             </div>
 
             {/* Search and Filters */}
@@ -390,7 +386,7 @@ const FloatingComputedAttributesPopover = ({
                   style: { color: colors.text }
                 }}
                 style={{
-                  '& .MuiOutlinedInput-root': {
+                  '& .MuiOutlinedInputRoot': {
                     backgroundColor: colors.secondary,
                     '& fieldset': { borderColor: colors.border },
                     '&:hover fieldset': { borderColor: colors.primary },
@@ -549,7 +545,7 @@ const FloatingComputedAttributesPopover = ({
                               />
                             </TableCell>
                           )}
-                          <TableCell style={{ padding: '4px' }}>
+                          <TableCell align="right" style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
                               onClick={(e) => {
@@ -794,22 +790,41 @@ const FloatingComputedAttributesPopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setEditDialog(false);
+                          setEditingAttribute(null);
+                        }}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                        {editingAttribute?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedComputedAttribute')}
+                      </Typography>
+                    </div>
                     <IconButton
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingAttribute(null);
+                      onClick={handleSaveAttribute}
+                      disabled={createAttributeMutation.isPending || updateAttributeMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
                       }}
-                      size="small"
-                      style={{ color: colors.textSecondary }}
+                      title={createAttributeMutation.isPending || updateAttributeMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                     >
-                      <ChevronLeftIcon />
+                      {(createAttributeMutation.isPending || updateAttributeMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
                     </IconButton>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {editingAttribute?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedComputedAttribute')}
-                    </Typography>
                   </div>
 
                   {/* Form */}
@@ -874,7 +889,7 @@ const FloatingComputedAttributesPopover = ({
                               variant="outlined"
                               size="small"
                               style={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -899,7 +914,7 @@ const FloatingComputedAttributesPopover = ({
                                 size="small"
                                 fullWidth
                                 style={{
-                                  '& .MuiOutlinedInput-root': {
+                                  '& .MuiOutlinedInputRoot': {
                                     backgroundColor: colors.secondary,
                                     '& fieldset': { borderColor: colors.border },
                                     '&:hover fieldset': { borderColor: colors.primary },
@@ -973,7 +988,7 @@ const FloatingComputedAttributesPopover = ({
                               variant="outlined"
                               size="small"
                               style={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
                                   '&:hover fieldset': { borderColor: colors.primary },
@@ -1048,7 +1063,7 @@ const FloatingComputedAttributesPopover = ({
                             variant="outlined"
                             size="small"
                             style={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -1078,7 +1093,7 @@ const FloatingComputedAttributesPopover = ({
                                 size="small"
                                 fullWidth
                                 style={{
-                                  '& .MuiOutlinedInput-root': {
+                                  '& .MuiOutlinedInputRoot': {
                                     backgroundColor: colors.secondary,
                                     '& fieldset': { borderColor: colors.border },
                                     '&:hover fieldset': { borderColor: colors.primary },
@@ -1154,39 +1169,6 @@ const FloatingComputedAttributesPopover = ({
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingAttribute(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveAttribute}
-                      variant="contained"
-                      disabled={createAttributeMutation.isPending || updateAttributeMutation.isPending || !editingAttribute?.description || !editingAttribute?.expression}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createAttributeMutation.isPending || updateAttributeMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
