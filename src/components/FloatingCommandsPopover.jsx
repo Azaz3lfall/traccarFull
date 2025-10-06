@@ -364,7 +364,7 @@ const FloatingCommandsPopover = ({
                   style: { color: colors.text }
                 }}
                 style={{
-                  '& .MuiOutlinedInput-root': {
+                  '& .MuiOutlinedInputRoot': {
                     backgroundColor: colors.secondary,
                     '& fieldset': { borderColor: colors.border },
                     '&:hover fieldset': { borderColor: colors.primary },
@@ -818,7 +818,7 @@ const FloatingCommandsPopover = ({
                         variant="outlined"
                         size="small"
                         style={{
-                          '& .MuiOutlinedInput-root': {
+                          '& .MuiOutlinedInputRoot': {
                             backgroundColor: colors.secondary,
                             '& fieldset': { borderColor: colors.border },
                             '&:hover fieldset': { borderColor: colors.primary },
@@ -904,7 +904,7 @@ const FloatingCommandsPopover = ({
                             error={!!validationError}
                             helperText={validationError}
                             style={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: validationError ? colors.error : colors.border },
                                 '&:hover fieldset': { borderColor: validationError ? colors.error : colors.primary },
