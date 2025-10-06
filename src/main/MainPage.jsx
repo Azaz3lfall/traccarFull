@@ -99,7 +99,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  Chip
+  Chip,
+  CircularProgress
 } from '@mui/material';
 import { 
   useAdministrator, 
@@ -3836,6 +3837,7 @@ const MainPage = () => {
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -3850,6 +3852,23 @@ const MainPage = () => {
                     {t('settingsServer')}
                   </Typography>
                 </div>
+                <IconButton
+                  onClick={() => updateServerMutation.mutate(serverData)}
+                  disabled={updateServerMutation.isPending}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.text,
+                    width: '40px',
+                    height: '40px',
+                  }}
+                  title={updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                >
+                  {updateServerMutation.isPending ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SaveIcon />
+                  )}
+                </IconButton>
               </div>
 
               {/* Drawer Content */}
@@ -4404,37 +4423,6 @@ const MainPage = () => {
                 )}
               </div>
 
-              {/* Drawer Footer */}
-              <div style={{
-                padding: '16px 20px',
-                borderTop: `1px solid ${colors.border}`,
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'flex-end',
-                backgroundColor: colors.surface,
-              }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowServerDrawer(false)}
-                  style={{
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
-                >
-                  {t('sharedCancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => updateServerMutation.mutate(serverData)}
-                  disabled={updateServerMutation.isPending}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                  }}
-                >
-                  {updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
-                </Button>
-              </div>
             </motion.div>
           </>
         )}

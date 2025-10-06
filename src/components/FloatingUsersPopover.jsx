@@ -115,6 +115,18 @@ const FloatingUsersPopover = ({
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverLoading, setServerLoading] = useState(false);
   
+  const updateServerMutation = useMutation({
+    mutationFn: async (data) => {
+      await fetchOrThrow('/api/server', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      setServerDialog(false);
+    },
+  });
 
   // Fetch users with TanStack Query
   const { data: users = [], isLoading, error } = useQuery({
@@ -951,16 +963,20 @@ const FloatingUsersPopover = ({
                   </div>
                   <IconButton
                     onClick={handleSaveUser}
-                    disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password)}
+                    disabled={!editingUser?.name || !editingUser?.email || (!editingUser?.id && !editingUser?.password) || createUserMutation.isPending || updateUserMutation.isPending}
                     style={{
                       backgroundColor: colors.primary,
                       color: colors.text,
                       width: '40px',
                       height: '40px',
                     }}
-                    title={t('sharedSave')}
+                    title={createUserMutation.isPending || updateUserMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                   >
-                    <SaveIcon />
+                    {(createUserMutation.isPending || updateUserMutation.isPending) ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <SaveIcon />
+                    )}
                   </IconButton>
                 </div>
 
@@ -1530,6 +1546,7 @@ const FloatingUsersPopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -1544,6 +1561,23 @@ const FloatingUsersPopover = ({
                         {t('settingsServer')}
                       </Typography>
                     </div>
+                    <IconButton
+                      onClick={() => updateServerMutation.mutate(serverData)}
+                      disabled={updateServerMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
+                      }}
+                      title={updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                    >
+                      {updateServerMutation.isPending ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
+                    </IconButton>
                   </div>
 
                   {/* Drawer Content */}
@@ -1958,47 +1992,6 @@ const FloatingUsersPopover = ({
                     )}
                   </div>
 
-                  {/* Drawer Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                    backgroundColor: colors.surface,
-                  }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setServerDialog(false)}
-                      style={{
-                        borderColor: colors.border,
-                        color: colors.text,
-                      }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={async () => {
-                        try {
-                          await fetchOrThrow('/api/server', {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(serverData),
-                          });
-                          setServerDialog(false);
-                        } catch (error) {
-                          console.error('Failed to save server settings:', error);
-                        }
-                      }}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: 'white',
-                      }}
-                    >
-                      {t('sharedSave')}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
