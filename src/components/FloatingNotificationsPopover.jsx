@@ -234,10 +234,13 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
       return;
     }
 
+    // Create payload without description field (not supported by Traccar backend)
+    const { description, ...notificationData } = editingNotification;
+
     if (editingNotification.id) {
-      updateNotificationMutation.mutate({ id: editingNotification.id, notificationData: editingNotification });
+      updateNotificationMutation.mutate({ id: editingNotification.id, notificationData });
     } else {
-      createNotificationMutation.mutate(editingNotification);
+      createNotificationMutation.mutate(notificationData);
     }
   };
 
@@ -272,8 +275,8 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
       type: '',
       notificators: '',
       always: false,
-      description: '',
       calendarId: null,
+      commandId: null,
       attributes: {
         alarms: '',
         priority: false,
@@ -297,8 +300,8 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
 
   // Filter and paginate notifications
   const filteredNotifications = notifications.filter(notification =>
-    notification.description?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    notification.type?.toLowerCase().includes(searchKeyword.toLowerCase())
+    notification.type?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+    notification.notificators?.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredNotifications.length / pageSize);
@@ -447,13 +450,8 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     <TableHead>
                       <TableRow style={{ backgroundColor: colors.surface }}>
                         <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('sharedDescription')}
+                          {t('notificationType')}
                         </TableCell>
-                        {desktop && (
-                          <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                            {t('notificationType')}
-                          </TableCell>
-                        )}
                         {desktop && (
                           <TableCell align="left" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                             {t('notificationAlways')}
@@ -492,23 +490,9 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                         >
                           <TableCell>
                             <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
-                              {notification.description || '-'}
+                              {t(prefixString('event', notification.type))}
                             </Typography>
                           </TableCell>
-                          {desktop && (
-                            <TableCell>
-                              <Chip
-                                label={t(prefixString('event', notification.type))}
-                                size="small"
-                                style={{
-                                  backgroundColor: colors.primary,
-                                  color: colors.text,
-                                  fontSize: '10px',
-                                  height: '16px',
-                                }}
-                              />
-                            </TableCell>
-                          )}
                           {desktop && (
                             <TableCell>
                               <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
@@ -1074,25 +1058,6 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
 
                       {activeTab === 1 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <TextField
-                            fullWidth
-                            label={t('sharedDescription')}
-                            value={editingNotification?.description || ''}
-                            onChange={(e) => setEditingNotification({ ...editingNotification, description: e.target.value })}
-                            size="small"
-                            sx={{
-                              '& .MuiOutlinedInputRoot': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': { 
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          />
                           
                           {/* Calendar Dropdown */}
                           <div ref={calendarInputRef} style={{ position: 'relative' }}>
@@ -1261,7 +1226,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                     color: colors.text,
                     lineHeight: '1.5'
                   }}>
-                    {t('sharedDeleteConfirm')} "{notificationToDelete?.description || notificationToDelete?.type}"?
+                    {t('sharedDeleteConfirm')} "{t(prefixString('event', notificationToDelete?.type))}"?
                   </p>
                   <div style={{
                     display: 'flex',
