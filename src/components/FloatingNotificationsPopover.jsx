@@ -224,6 +224,16 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
       return;
     }
 
+    // Validate required fields like the original
+    if (!editingNotification.type || !editingNotification.notificators) {
+      return;
+    }
+
+    // If notificators includes 'command', commandId is required
+    if (editingNotification.notificators.includes('command') && !editingNotification.commandId) {
+      return;
+    }
+
     if (editingNotification.id) {
       updateNotificationMutation.mutate({ id: editingNotification.id, notificationData: editingNotification });
     } else {
@@ -1159,7 +1169,7 @@ const FloatingNotificationsPopover = ({ desktop, isMenuExpanded, isVisible, onCl
                                     }}
                                     onMouseDown={(e) => {
                                       e.preventDefault();
-                                      setEditingNotification({ ...editingNotification, calendarId: calendar.id });
+                                      setEditingNotification({ ...editingNotification, calendarId: Number(calendar.id) });
                                       setCalendarDropdownOpen(false);
                                     }}
                                     onMouseEnter={(e) => {
