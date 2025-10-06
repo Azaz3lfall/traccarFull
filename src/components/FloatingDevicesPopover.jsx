@@ -487,7 +487,7 @@ const FloatingDevicesPopover = ({
               ) : (
                 <>
                   {/* Table */}
-                  <TableContainer style={{ padding: '0 20px' }}>
+                  <TableContainer>
                     <Table size="small">
                       <TableHead>
                         <TableRow style={{ backgroundColor: colors.surface }}>
