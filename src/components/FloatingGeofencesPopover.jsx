@@ -107,6 +107,9 @@ const FloatingGeofencesPopover = ({
         ...routeData,
         routes: [routeData.routes[selectedRouteIndex]] // Only show the selected route
       });
+    } else if (!routeData) {
+      // Clear displayed route data when routeData is cleared
+      setDisplayedRouteData(null);
     }
   }, [routeData, selectedRouteIndex]);
   
@@ -2093,10 +2096,10 @@ const FloatingGeofencesPopover = ({
                                 }}>
                                   
                                   
-                                  {displayedRouteData.routes[0].legs && displayedRouteData.routes[0].legs.length > 0 && (
+                                  {displayedRouteData.routes[0]?.legs && displayedRouteData.routes[0].legs.length > 0 && (
                                     <div style={{ marginTop: '0px' }}>
                                       {console.log('Rendering displayed route with distance:', getRouteDistance(), 'duration:', displayedRouteData?.routes?.[0]?.duration || 0)}
-                                      {displayedRouteData.routes[0].legs.map((leg, legIndex) => (
+                                      {displayedRouteData.routes[0]?.legs?.map((leg, legIndex) => (
                                         <div key={legIndex} style={{ 
                                           marginBottom: '0px',
                                           padding: '10px 8px',
@@ -2146,10 +2149,10 @@ const FloatingGeofencesPopover = ({
                                   )}
                                   
                                   {/* Step-by-Step Details */}
-                                  {displayedRouteData.routes[0].legs && displayedRouteData.routes[0].legs.length > 0 && (
+                                  {displayedRouteData.routes[0]?.legs && displayedRouteData.routes[0].legs.length > 0 && (
                                     <div style={{ marginTop: '1px' }}>
                                       
-                                      {displayedRouteData.routes[0].legs.map((leg, legIndex) => (
+                                      {displayedRouteData.routes[0]?.legs?.map((leg, legIndex) => (
                                         <div key={legIndex}>
                                           {leg.steps && leg.steps.map((step, stepIndex) => (
                                             <div key={stepIndex} style={{ 
