@@ -13,6 +13,9 @@ const { reducer, actions } = createSlice({
     update(state, action) {
       action.payload.forEach((item) => state.items[item.id] = item);
     },
+    remove(state, action) {
+      delete state.items[action.payload];
+    },
   },
 });
 
