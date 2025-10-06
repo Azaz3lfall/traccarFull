@@ -733,12 +733,12 @@
   "routePlannerProfitabilityAnalysis": "Análisis de rentabilidad",
   "routePlannerClientPrice": "Precio del cliente",
   "routePlannerProfit": "Beneficio",
-  "routePlannerPricePerKm": "[TRANSLATE_ME] routePlannerPricePerKm",
+  "routePlannerPricePerKm": "Precio por km",
   "routePlannerRoundTrip": "Ida y vuelta",
   "routePlannerYes": "Sí",
-  "routePlannerNo": "[TRANSLATE_ME] routePlannerNo",
+  "routePlannerNo": "No",
   "routePlannerSaveRoute": "Guardar ruta",
-  "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
-  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol",
+  "routePlannerSwitchingRoute": "Cambiando ruta...",
+  "routePlannerCurrencySymbol": "$",
   "routePlannerNoApiToken": "El token de API de Mapbox no está configurado. Póngase en contacto con su administrador para configurar el token de API."
 }

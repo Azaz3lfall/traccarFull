@@ -732,13 +732,13 @@
   "routePlannerFuelLiters": "Litres de carburant",
   "routePlannerProfitabilityAnalysis": "Analyse de rentabilité",
   "routePlannerClientPrice": "Prix client",
-  "routePlannerProfit": "[TRANSLATE_ME] routePlannerProfit",
-  "routePlannerPricePerKm": "[TRANSLATE_ME] routePlannerPricePerKm",
+  "routePlannerProfit": "Profit",
+  "routePlannerPricePerKm": "Prix par km",
   "routePlannerRoundTrip": "Aller-retour",
   "routePlannerYes": "Oui",
   "routePlannerNo": "Non",
   "routePlannerSaveRoute": "Enregistrer l'itinéraire",
-  "routePlannerSwitchingRoute": "[TRANSLATE_ME] routePlannerSwitchingRoute",
-  "routePlannerCurrencySymbol": "[TRANSLATE_ME] routePlannerCurrencySymbol",
+  "routePlannerSwitchingRoute": "Changement d'itinéraire...",
+  "routePlannerCurrencySymbol": "€",
   "routePlannerNoApiToken": "Le token API Mapbox n'est pas configuré. Veuillez contacter votre administrateur pour configurer le token API."
 }
