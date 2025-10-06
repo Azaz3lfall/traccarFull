@@ -41,6 +41,7 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Build as BuildIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatBoolean } from '../common/util/formatter';
@@ -328,9 +329,7 @@ const FloatingMaintenancePopover = ({
                   {t('sharedMaintenance')}
                 </Typography>
               </div>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={() => {
                   setEditingMaintenance({
                     name: '',
@@ -343,19 +342,16 @@ const FloatingMaintenancePopover = ({
                   setEditDialog(true);
                 }}
                 disabled={limitMaintenance}
-                size="small"
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
+                  width: '40px',
+                  height: '40px',
                 }}
+                title={t('sharedAdd')}
               >
-                {t('sharedAdd')}
-              </Button>
+                <AddIcon />
+              </IconButton>
             </div>
 
             {/* Search and Filters */}
@@ -760,22 +756,41 @@ const FloatingMaintenancePopover = ({
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setEditDialog(false);
+                          setEditingMaintenance(null);
+                        }}
+                        size="small"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        <ChevronLeftIcon />
+                      </IconButton>
+                      <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                        {editingMaintenance?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedMaintenance')}
+                      </Typography>
+                    </div>
                     <IconButton
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingMaintenance(null);
+                      onClick={handleSaveMaintenance}
+                      disabled={createMaintenanceMutation.isPending || updateMaintenanceMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
                       }}
-                      size="small"
-                      style={{ color: colors.textSecondary }}
+                      title={createMaintenanceMutation.isPending || updateMaintenanceMutation.isPending ? t('sharedSaving') : t('sharedSave')}
                     >
-                      <ChevronLeftIcon />
+                      {(createMaintenanceMutation.isPending || updateMaintenanceMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
                     </IconButton>
-                    <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                      {editingMaintenance?.id ? t('sharedEdit') : t('sharedAdd')} {t('sharedMaintenance')}
-                    </Typography>
                   </div>
 
                   {/* Form */}
@@ -901,39 +916,6 @@ const FloatingMaintenancePopover = ({
                     </div>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingMaintenance(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveMaintenance}
-                      variant="contained"
-                      disabled={createMaintenanceMutation.isPending || updateMaintenanceMutation.isPending}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createMaintenanceMutation.isPending || updateMaintenanceMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
