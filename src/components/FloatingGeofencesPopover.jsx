@@ -88,6 +88,18 @@ const FloatingGeofencesPopover = ({
   const [routeData, setRouteData] = useState(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  const [displayedRouteData, setDisplayedRouteData] = useState(null);
+  
+  // Update displayed route data when selected route changes
+  useEffect(() => {
+    if (routeData && routeData.routes && routeData.routes[selectedRouteIndex]) {
+      console.log('Updating displayed route data for index:', selectedRouteIndex);
+      setDisplayedRouteData({
+        ...routeData,
+        routes: [routeData.routes[selectedRouteIndex]] // Only show the selected route
+      });
+    }
+  }, [routeData, selectedRouteIndex]);
   
   // Cost calculation state
   const [costSettings, setCostSettings] = useState({
@@ -1987,11 +1999,11 @@ const FloatingGeofencesPopover = ({
                         );
                       }
                       
-                      if (routeData) {
+                      if (displayedRouteData) {
                         return (
                           <div>
                             
-                            {routeData.routes && routeData.routes.length > 0 && (
+                            {displayedRouteData.routes && displayedRouteData.routes.length > 0 && (
                               <div>
                                 {/* Alternative Route Buttons */}
                                 {routeData.routes.length > 1 && (
@@ -2006,7 +2018,9 @@ const FloatingGeofencesPopover = ({
                                         key={index}
                                         onClick={() => {
                                           console.log('Route button clicked:', index);
+                                          console.log('Current selectedRouteIndex:', selectedRouteIndex);
                                           setSelectedRouteIndex(index);
+                                          console.log('Setting selectedRouteIndex to:', index);
                                         }}
                                         style={{
                                           width: '40px',
@@ -2047,9 +2061,10 @@ const FloatingGeofencesPopover = ({
                                 }}>
                                   
                                   
-                                  {routeData.routes[selectedRouteIndex].legs && routeData.routes[selectedRouteIndex].legs.length > 0 && (
+                                  {displayedRouteData.routes[0].legs && displayedRouteData.routes[0].legs.length > 0 && (
                                     <div style={{ marginTop: '0px' }}>
-                                      {routeData.routes[selectedRouteIndex].legs.map((leg, legIndex) => (
+                                      {console.log('Rendering displayed route with distance:', displayedRouteData.routes[0].distance, 'duration:', displayedRouteData.routes[0].duration)}
+                                      {displayedRouteData.routes[0].legs.map((leg, legIndex) => (
                                         <div key={legIndex} style={{ 
                                           marginBottom: '0px',
                                           padding: '10px 8px',
@@ -2099,10 +2114,10 @@ const FloatingGeofencesPopover = ({
                                   )}
                                   
                                   {/* Step-by-Step Details */}
-                                  {routeData.routes[selectedRouteIndex].legs && routeData.routes[selectedRouteIndex].legs.length > 0 && (
+                                  {displayedRouteData.routes[0].legs && displayedRouteData.routes[0].legs.length > 0 && (
                                     <div style={{ marginTop: '1px' }}>
                                       
-                                      {routeData.routes[selectedRouteIndex].legs.map((leg, legIndex) => (
+                                      {displayedRouteData.routes[0].legs.map((leg, legIndex) => (
                                         <div key={legIndex}>
                                           {leg.steps && leg.steps.map((step, stepIndex) => (
                                             <div key={stepIndex} style={{ 
@@ -2257,7 +2272,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           return (totalDistance * multiplier).toFixed(2) + ' km';
                                         })()}
@@ -2290,7 +2305,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelLiters = (totalDistance / costSettings.consumption) * multiplier;
                                           return fuelLiters.toFixed(2) + ' L';
@@ -2324,7 +2339,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           return fuelCost.toFixed(2);
@@ -2390,7 +2405,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           const tollCost = costSettings.tollCost * multiplier;
@@ -2558,7 +2573,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
                                           const tollCost = costSettings.tollCost * multiplier;
@@ -2594,7 +2609,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
                                           return clientPrice.toFixed(2);
@@ -2628,7 +2643,7 @@ const FloatingGeofencesPopover = ({
                                         fontSize: '11px'
                                       }}>
                                         R$ {(() => {
-                                          const totalDistance = routeData.routes[0].distance / 1000; // Convert to km
+                                          const totalDistance = displayedRouteData.routes[0].distance / 1000; // Convert to km
                                           const multiplier = costSettings.roundTrip ? 2 : 1;
                                           const clientPrice = (totalDistance * costSettings.pricePerKm * multiplier) + costSettings.handlingFee;
                                           const fuelCost = ((totalDistance / costSettings.consumption) * costSettings.fuelPrice) * multiplier;
