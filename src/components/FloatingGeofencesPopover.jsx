@@ -90,6 +90,7 @@ const FloatingGeofencesPopover = ({
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [displayedRouteData, setDisplayedRouteData] = useState(null);
   const [isSwitchingRoute, setIsSwitchingRoute] = useState(false);
+  const [isSavingRoute, setIsSavingRoute] = useState(false);
   
   // Helper function to safely get route distance
   const getRouteDistance = () => {
@@ -958,12 +959,21 @@ const FloatingGeofencesPopover = ({
   const handleRoutePlannerTabChange = (event, newValue) => {
     setRoutePlannerTab(newValue);
     
-    // If switching to Route Plan tab, only fetch route data if we don't have any
-    if (newValue === 1 && !routeData) {
-      // Small delay to ensure waypoints are updated
-      setTimeout(() => {
-        fetchRoutePlan();
-      }, 100);
+    // If switching to Route Plan tab, check for API token first
+    if (newValue === 1) {
+      if (!mapboxToken) {
+        // Show alert for missing API token
+        alert(t('routePlannerNoApiToken') || 'Mapbox API token is not configured. Please contact your administrator to set up the API token.');
+        return;
+      }
+      
+      // Only fetch route data if we don't have any
+      if (!routeData) {
+        // Small delay to ensure waypoints are updated
+        setTimeout(() => {
+          fetchRoutePlan();
+        }, 100);
+      }
     }
   };
 
@@ -974,6 +984,7 @@ const FloatingGeofencesPopover = ({
       return;
     }
 
+    setIsSavingRoute(true);
     try {
       // Get the currently active/selected route (the one displayed on map)
       const activeRoute = routeData.routes[selectedRouteIndex];
@@ -1019,6 +1030,8 @@ const FloatingGeofencesPopover = ({
 
     } catch (error) {
       console.error('Error saving route:', error);
+    } finally {
+      setIsSavingRoute(false);
     }
   };
 
@@ -2167,37 +2180,72 @@ const FloatingGeofencesPopover = ({
                                     </div>
                                   )}
                                   
-                                  {/* Save Route Button */}
-                                  <button
-                                    onClick={handleSaveRoute}
-                                    style={{
-                                      padding: '8px 12px',
-                                      borderRadius: '6px',
-                                      border: `1px solid ${colors.border}`,
-                                      backgroundColor: colors.secondary,
-                                      color: colors.text,
-                                      fontSize: '12px',
-                                      fontWeight: '600',
-                                      cursor: 'pointer',
-                                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      transition: 'all 0.2s ease',
-                                      outline: 'none',
-                                      minHeight: '36px'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.target.style.transform = 'translateY(-1px)';
-                                      e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.target.style.transform = 'translateY(0)';
-                                      e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
-                                    }}
-                                  >
-                                    {t('routePlannerSaveRoute')}
-                                  </button>
+                                  {/* Save Route Button and PDF Export Button */}
+                                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <button
+                                      onClick={handleSaveRoute}
+                                      disabled={isSavingRoute}
+                                      style={{
+                                        padding: '8px 12px',
+                                        borderRadius: '6px',
+                                        border: `1px solid ${colors.border}`,
+                                        backgroundColor: isSavingRoute ? colors.disabled : colors.secondary,
+                                        color: colors.text,
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        cursor: isSavingRoute ? 'not-allowed' : 'pointer',
+                                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '6px',
+                                        transition: 'all 0.2s ease',
+                                        outline: 'none',
+                                        minHeight: '36px',
+                                        opacity: isSavingRoute ? 0.7 : 1
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        if (!isSavingRoute) {
+                                          e.target.style.transform = 'translateY(-1px)';
+                                          e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+                                        }
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+                                      }}
+                                    >
+                                      {isSavingRoute && <CircularProgress size={14} style={{ color: colors.text }} />}
+                                      {t('routePlannerSaveRoute')}
+                                    </button>
+                                    
+                                    {/* PDF Export Button */}
+                                    <button
+                                      disabled
+                                      style={{
+                                        padding: '8px',
+                                        borderRadius: '6px',
+                                        border: `1px solid ${colors.border}`,
+                                        backgroundColor: colors.disabled,
+                                        color: colors.textSecondary,
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        cursor: 'not-allowed',
+                                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease',
+                                        outline: 'none',
+                                        minHeight: '36px',
+                                        minWidth: '36px',
+                                        opacity: 0.5
+                                      }}
+                                      title="PDF Export (Coming Soon)"
+                                    >
+                                      📄
+                                    </button>
+                                  </div>
                                 </div>
                                 
                                 {/* Main Route Info */}
