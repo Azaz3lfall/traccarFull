@@ -30,6 +30,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
@@ -312,25 +313,18 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                 {t('settingsGroups')}
               </Typography>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddGroup}
-                size="small"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  textTransform: 'none',
-                  padding: '6px 12px',
-                  minWidth: 'auto',
-                }}
-              >
-                {t('sharedAdd')}
-              </Button>
-            </div>
+            <IconButton
+              onClick={handleAddGroup}
+              style={{
+                backgroundColor: colors.primary,
+                color: colors.text,
+                width: '40px',
+                height: '40px',
+              }}
+              title={t('sharedAdd')}
+            >
+              <AddIcon />
+            </IconButton>
           </div>
 
           {/* Search */}
@@ -345,7 +339,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                 startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
               }}
               style={{
-                '& .MuiOutlinedInput-root': {
+                '& .MuiOutlinedInputRoot': {
                   backgroundColor: colors.secondary,
                   '& fieldset': { borderColor: colors.border },
                   '&:hover fieldset': { borderColor: colors.primary },
@@ -418,7 +412,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                             {t('groupParent')}
                           </TableCell>
                         )}
-                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                           {t('sharedActions')}
                         </TableCell>
                       </TableRow>
@@ -451,7 +445,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                               </Typography>
                             </TableCell>
                           )}
-                          <TableCell align="right">
+                          <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                             <IconButton
                               onClick={(e) => {
                                 setSelectedGroup(group);
@@ -717,6 +711,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                     borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -731,6 +726,23 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                         {editingGroup?.id ? t('sharedEdit') : t('sharedAdd')} {t('groupDialog')}
                       </Typography>
                     </div>
+                    <IconButton
+                      onClick={handleSaveGroup}
+                      disabled={createGroupMutation.isPending || updateGroupMutation.isPending || !editingGroup?.name}
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.text,
+                        width: '40px',
+                        height: '40px',
+                      }}
+                      title={createGroupMutation.isPending || updateGroupMutation.isPending ? t('sharedSaving') : t('sharedSave')}
+                    >
+                      {(createGroupMutation.isPending || updateGroupMutation.isPending) ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )}
+                    </IconButton>
                   </div>
 
                   {/* Form */}
@@ -792,7 +804,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                             variant="outlined"
                             size="small"
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              '& .MuiOutlinedInputRoot': {
                                 backgroundColor: colors.secondary,
                                 '& fieldset': { borderColor: colors.border },
                                 '&:hover fieldset': { borderColor: colors.primary },
@@ -824,7 +836,7 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                                 endAdornment: <ChevronLeftIcon style={{ transform: 'rotate(-90deg)', color: colors.textSecondary }} />
                               }}
                               sx={{
-                                '& .MuiOutlinedInput-root': {
+                                '& .MuiOutlinedInputRoot': {
                                   color: colors.text,
                                   backgroundColor: colors.secondary,
                                   '& fieldset': { borderColor: colors.border },
@@ -933,39 +945,6 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
                     </Box>
                   </div>
 
-                  {/* Footer */}
-                  <div style={{
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                  }}>
-                    <Button
-                      onClick={() => {
-                        setEditDialog(false);
-                        setEditingGroup(null);
-                      }}
-                      style={{ color: colors.textSecondary }}
-                    >
-                      {t('sharedCancel')}
-                    </Button>
-                    <Button
-                      onClick={handleSaveGroup}
-                      variant="contained"
-                      disabled={createGroupMutation.isPending || updateGroupMutation.isPending || !editingGroup?.name}
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: colors.text,
-                      }}
-                    >
-                      {(createGroupMutation.isPending || updateGroupMutation.isPending) ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        t('sharedSave')
-                      )}
-                    </Button>
-                  </div>
                 </motion.div>
               </>
             )}
