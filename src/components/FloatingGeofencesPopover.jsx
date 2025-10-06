@@ -2156,8 +2156,7 @@ const FloatingGeofencesPopover = ({
                                   <button
                                     onClick={handleSaveRoute}
                                     style={{
-                                      width: '36px',
-                                      height: '36px',
+                                      padding: '8px 12px',
                                       borderRadius: '6px',
                                       border: `1px solid ${colors.border}`,
                                       backgroundColor: colors.secondary,
@@ -2171,7 +2170,7 @@ const FloatingGeofencesPopover = ({
                                       justifyContent: 'center',
                                       transition: 'all 0.2s ease',
                                       outline: 'none',
-                                      padding: '0 4px'
+                                      minHeight: '36px'
                                     }}
                                     onMouseEnter={(e) => {
                                       e.target.style.transform = 'translateY(-1px)';
@@ -2181,9 +2180,8 @@ const FloatingGeofencesPopover = ({
                                       e.target.style.transform = 'translateY(0)';
                                       e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
                                     }}
-                                    title={t('routePlannerSaveRoute')}
                                   >
-                                    💾
+                                    {t('routePlannerSaveRoute')}
                                   </button>
                                 </div>
                                 
