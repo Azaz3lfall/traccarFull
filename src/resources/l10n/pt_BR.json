@@ -735,5 +735,6 @@
   "routePlannerRoundTrip": "Ida/Volta",
   "routePlannerHandlingFee": "Taxa de Manuseio",
   "routePlannerYes": "Sim",
-  "routePlannerNo": "Não"
+  "routePlannerNo": "Não",
+  "routePlannerSaveRoute": "Salvar Rota"
 }

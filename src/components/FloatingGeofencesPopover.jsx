@@ -972,6 +972,50 @@ const FloatingGeofencesPopover = ({
     }
   };
 
+  // Handle save route as geofence
+  const handleSaveRoute = async () => {
+    if (!displayedRouteData || !displayedRouteData.routes || !displayedRouteData.routes[0]) {
+      console.error('No route data to save');
+      return;
+    }
+
+    try {
+      const selectedRoute = displayedRouteData.routes[0];
+      if (!selectedRoute.geometry || !selectedRoute.geometry.coordinates) {
+        console.error('No route geometry to save');
+        return;
+      }
+
+      // Convert route coordinates to LINESTRING format (lat lng, lat lng, ...)
+      const coordinates = selectedRoute.geometry.coordinates.map(coord => `${coord[1]} ${coord[0]}`).join(', ');
+      const area = `LINESTRING (${coordinates})`;
+
+      // Create geofence data
+      const routeGeofence = {
+        name: `Route ${new Date().toLocaleString()}`,
+        description: `Route with ${displayedRouteData.waypoints?.length || 0} waypoints`,
+        area: area,
+        calendarId: null,
+        attributes: {
+          color: '#1976d2',
+          mapLineWidth: 3,
+          mapLineOpacity: 0.8,
+          speedLimit: null,
+          polylineDistance: Math.round(selectedRoute.distance / 1000), // Convert to km
+          hide: false,
+        },
+      };
+
+      console.log('Saving route as geofence:', routeGeofence);
+
+      // Use the existing createGeofenceMutation
+      createGeofenceMutation.mutate(routeGeofence);
+
+    } catch (error) {
+      console.error('Error saving route:', error);
+    }
+  };
+
   // Fetch route plan from Mapbox
   const fetchRoutePlan = async () => {
     // Get valid waypoints from fields instead of routeWaypoints state
@@ -2039,67 +2083,104 @@ const FloatingGeofencesPopover = ({
                             
                             {displayedRouteData.routes && displayedRouteData.routes.length > 0 && (
                               <div>
-                                {/* Alternative Route Buttons */}
-                                {routeData.routes.length > 1 && (
-                                  <div style={{
-                                    display: 'flex',
-                                    gap: '8px',
-                                    marginTop: '8px',
-                                    marginBottom: '12px',
-                                    justifyContent: 'flex-start'
-                                  }}>
-                                    {routeData.routes.map((route, index) => (
-                                      <button
-                                        key={index}
-                                        onClick={() => {
-                                          console.log('Route button clicked:', index);
-                                          console.log('Current selectedRouteIndex:', selectedRouteIndex);
-                                          
-                                          // Force complete re-render by clearing and setting data
-                                          setIsSwitchingRoute(true);
-                                          setDisplayedRouteData(null);
-                                          setTimeout(() => {
-                                            setSelectedRouteIndex(index);
-                                            if (routeData && routeData.routes && routeData.routes[index]) {
-                                              setDisplayedRouteData({
-                                                ...routeData,
-                                                routes: [routeData.routes[index]]
-                                              });
-                                            }
-                                            setIsSwitchingRoute(false);
-                                          }, 50);
-                                        }}
-                                        style={{
-                                          width: '36px',
-                                          height: '36px',
-                                          borderRadius: '6px',
-                                          border: `1px solid ${colors.border}`,
-                                          backgroundColor: index === selectedRouteIndex ? colors.primary : colors.secondary,
-                                          color: colors.text,
-                                          fontSize: '14px',
-                                          fontWeight: '600',
-                                          cursor: 'pointer',
-                                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          transition: 'all 0.2s ease',
-                                          outline: 'none'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                          e.target.style.transform = 'translateY(-1px)';
-                                          e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                          e.target.style.transform = 'translateY(0)';
-                                          e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
-                                        }}
-                                      >
-                                        {index + 1}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
+                                {/* Alternative Route Buttons and Save Button */}
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  marginTop: '8px',
+                                  marginBottom: '12px'
+                                }}>
+                                  {/* Route Buttons */}
+                                  {routeData.routes.length > 1 && (
+                                    <div style={{
+                                      display: 'flex',
+                                      gap: '8px'
+                                    }}>
+                                      {routeData.routes.map((route, index) => (
+                                        <button
+                                          key={index}
+                                          onClick={() => {
+                                            console.log('Route button clicked:', index);
+                                            console.log('Current selectedRouteIndex:', selectedRouteIndex);
+                                            
+                                            // Force complete re-render by clearing and setting data
+                                            setIsSwitchingRoute(true);
+                                            setDisplayedRouteData(null);
+                                            setTimeout(() => {
+                                              setSelectedRouteIndex(index);
+                                              if (routeData && routeData.routes && routeData.routes[index]) {
+                                                setDisplayedRouteData({
+                                                  ...routeData,
+                                                  routes: [routeData.routes[index]]
+                                                });
+                                              }
+                                              setIsSwitchingRoute(false);
+                                            }, 50);
+                                          }}
+                                          style={{
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: '6px',
+                                            border: `1px solid ${colors.border}`,
+                                            backgroundColor: index === selectedRouteIndex ? colors.primary : colors.secondary,
+                                            color: colors.text,
+                                            fontSize: '14px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.2s ease',
+                                            outline: 'none'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.transform = 'translateY(-1px)';
+                                            e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.transform = 'translateY(0)';
+                                            e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+                                          }}
+                                        >
+                                          {index + 1}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Save Route Button */}
+                                  <button
+                                    onClick={handleSaveRoute}
+                                    style={{
+                                      padding: '8px 16px',
+                                      borderRadius: '6px',
+                                      border: `1px solid ${colors.border}`,
+                                      backgroundColor: colors.primary,
+                                      color: colors.primaryText,
+                                      fontSize: '14px',
+                                      fontWeight: '600',
+                                      cursor: 'pointer',
+                                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      transition: 'all 0.2s ease',
+                                      outline: 'none'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.target.style.transform = 'translateY(-1px)';
+                                      e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.target.style.transform = 'translateY(0)';
+                                      e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+                                    }}
+                                  >
+                                    {t('routePlannerSaveRoute')}
+                                  </button>
+                                </div>
                                 
                                 {/* Main Route Info */}
                                 <div style={{ 
