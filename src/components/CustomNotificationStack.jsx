@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconButton } from '@mui/material';
+import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -10,6 +10,8 @@ import { formatTime, formatNotificationTitle } from '../common/util/formatter';
 const CustomNotificationStack = ({ notifications, onRemove }) => {
   const t = useTranslation();
   const colors = useThemeColors();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const [visibleNotifications, setVisibleNotifications] = useState([]);
@@ -98,12 +100,14 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
     <div style={{
       position: 'fixed',
       bottom: '20px',
-      right: '20px',
+      right: isMobile ? '20px' : '20px',
+      left: isMobile ? '20px' : 'auto', // Only add left margin on mobile
       zIndex: 10000,
       display: 'flex',
       flexDirection: 'column-reverse', // Reverse so newest appear at bottom
       gap: '8px',
-      maxWidth: '400px',
+      maxWidth: isMobile ? 'calc(100vw - 40px)' : '400px', // Responsive max width
+      width: isMobile ? '100%' : 'auto', // Full width on mobile, auto on desktop
       pointerEvents: 'none'
     }}>
       <AnimatePresence mode="popLayout">
@@ -142,9 +146,10 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
               borderRadius: '12px',
               boxShadow: colors.shadow,
               border: `1px solid ${colors.border}`,
-              padding: '16px',
-              minWidth: '350px',
-              maxWidth: '400px',
+              padding: isMobile ? '12px' : '16px', // Smaller padding on mobile
+              minWidth: isMobile ? '280px' : '350px', // Responsive min width
+              maxWidth: '100%', // Take full width of container
+              width: '100%', // Full width on mobile
               pointerEvents: 'auto',
               position: 'relative'
             }}
@@ -166,7 +171,7 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
 
             {/* Device Name - Header */}
             <div style={{
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px', // Smaller font on mobile
               fontWeight: '500',
               color: colors.textSecondary,
               marginBottom: '4px',
@@ -178,7 +183,7 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
             {/* Address - Second Line (if available) */}
             {getAddress(notification) && (
               <div style={{
-                fontSize: '11px',
+                fontSize: isMobile ? '10px' : '11px', // Smaller font on mobile
                 color: '#9CA3AF',
                 marginBottom: '4px',
                 fontStyle: 'italic',
@@ -195,7 +200,7 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              fontSize: '12px',
+              fontSize: isMobile ? '11px' : '12px', // Smaller font on mobile
               color: '#9CA3AF'
             }}>
               <span style={{ fontWeight: '500' }}>
