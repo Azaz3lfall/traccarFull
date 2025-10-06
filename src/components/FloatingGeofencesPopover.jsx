@@ -991,6 +991,10 @@ const FloatingGeofencesPopover = ({
       const coordinates = activeRoute.geometry.coordinates.map(coord => `${coord[1]} ${coord[0]}`).join(', ');
       const area = `LINESTRING (${coordinates})`;
 
+      // Calculate area size in KB
+      const areaSizeBytes = new Blob([area]).size;
+      const areaSizeKB = (areaSizeBytes / 1024).toFixed(2);
+
       // Create geofence data
       const routeGeofence = {
         name: `Route ${new Date().toLocaleString()}`,
@@ -1009,6 +1013,8 @@ const FloatingGeofencesPopover = ({
 
       console.log('Saving active route as geofence:', routeGeofence);
       console.log('Selected route index:', selectedRouteIndex);
+      console.log('Area size:', areaSizeKB, 'KB');
+      console.log('Number of coordinates:', activeRoute.geometry.coordinates.length);
 
       // Use the existing createGeofenceMutation
       createGeofenceMutation.mutate(routeGeofence);
