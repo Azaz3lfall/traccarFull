@@ -370,7 +370,7 @@ const FloatingMaintenancePopover = ({
                   style: { color: colors.text }
                 }}
                 style={{
-                  '& .MuiOutlinedInput-root': {
+                  '& .MuiOutlinedInputRoot': {
                     backgroundColor: colors.secondary,
                     '& fieldset': { borderColor: colors.border },
                     '&:hover fieldset': { borderColor: colors.primary },
@@ -511,7 +511,7 @@ const FloatingMaintenancePopover = ({
                               {displayRawValue(maintenance.type, false, maintenance.period)}
                             </TableCell>
                           )}
-                          <TableCell style={{ padding: '4px' }}>
+                          <TableCell align="right" style={{ padding: '4px' }}>
                             <IconButton
                               size="small"
                               onClick={(e) => {
@@ -808,7 +808,7 @@ const FloatingMaintenancePopover = ({
                         variant="outlined"
                         size="small"
                         style={{
-                          '& .MuiOutlinedInput-root': {
+                          '& .MuiOutlinedInputRoot': {
                             backgroundColor: colors.secondary,
                             '& fieldset': { borderColor: colors.border },
                             '&:hover fieldset': { borderColor: colors.primary },
@@ -880,7 +880,7 @@ const FloatingMaintenancePopover = ({
                         variant="outlined"
                         size="small"
                         style={{
-                          '& .MuiOutlinedInput-root': {
+                          '& .MuiOutlinedInputRoot': {
                             backgroundColor: colors.secondary,
                             '& fieldset': { borderColor: colors.border },
                             '&:hover fieldset': { borderColor: colors.primary },
@@ -905,7 +905,7 @@ const FloatingMaintenancePopover = ({
                         variant="outlined"
                         size="small"
                         style={{
-                          '& .MuiOutlinedInput-root': {
+                          '& .MuiOutlinedInputRoot': {
                             backgroundColor: colors.secondary,
                             '& fieldset': { borderColor: colors.border },
                             '&:hover fieldset': { borderColor: colors.primary },
