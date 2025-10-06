@@ -4,6 +4,8 @@ import { map } from './core/MapView';
 import maplibregl from 'maplibre-gl';
 
 const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) => {
+  console.log('MapRoutePlanner component mounted with:', { routeData, selectedRouteIndex, onRouteChange });
+  
   const id = useId();
   const theme = useTheme();
   const markersRef = useRef([]);
@@ -211,57 +213,25 @@ const MapRoutePlanner = ({ routeData, selectedRouteIndex = 0, onRouteChange }) =
     selectedRouteIndex: selectedRouteIndex
   });
 
-  // Render alternative route buttons if multiple routes exist
-  if (routeData && routeData.routes && routeData.routes.length > 1) {
-    console.log('Rendering alternative route buttons for', routeData.routes.length, 'routes');
-    return (
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '10px',
-        zIndex: 1000,
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap'
-      }}>
-        {routeData.routes.map((route, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              console.log('Route button clicked:', index);
-              onRouteChange && onRouteChange(index);
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: '2px solid white',
-              backgroundColor: index === selectedRouteIndex ? '#1565C0' : '#2196F3',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'scale(1.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'scale(1)';
-            }}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
-    );
-  }
-
-  return null;
+  // Always render a test element to see if component is working
+  return (
+    <div style={{
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      zIndex: 9999,
+      backgroundColor: 'red',
+      color: 'white',
+      padding: '10px',
+      borderRadius: '4px',
+      fontSize: '12px'
+    }}>
+      MapRoutePlanner Active
+      {routeData && routeData.routes && (
+        <div>Routes: {routeData.routes.length}</div>
+      )}
+    </div>
+  );
 };
 
 export default MapRoutePlanner;

@@ -1991,6 +1991,50 @@ const FloatingGeofencesPopover = ({
                             
                             {routeData.routes && routeData.routes.length > 0 && (
                               <div>
+                                {/* Alternative Route Buttons */}
+                                {routeData.routes.length > 1 && (
+                                  <div style={{
+                                    display: 'flex',
+                                    gap: '8px',
+                                    marginBottom: '12px',
+                                    justifyContent: 'center'
+                                  }}>
+                                    {routeData.routes.map((route, index) => (
+                                      <button
+                                        key={index}
+                                        onClick={() => {
+                                          console.log('Route button clicked:', index);
+                                          // Handle route change here
+                                        }}
+                                        style={{
+                                          width: '40px',
+                                          height: '40px',
+                                          borderRadius: '50%',
+                                          border: '2px solid white',
+                                          backgroundColor: index === 0 ? '#1565C0' : '#2196F3',
+                                          color: 'white',
+                                          fontSize: '16px',
+                                          fontWeight: 'bold',
+                                          cursor: 'pointer',
+                                          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.target.style.transform = 'scale(1.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.target.style.transform = 'scale(1)';
+                                        }}
+                                      >
+                                        {index + 1}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                                
                                 {/* Main Route Info */}
                                 <div style={{ 
                                   backgroundColor: colors.secondary,
