@@ -1914,7 +1914,10 @@ const FloatingGeofencesPopover = ({
                   }}
                 >
                   <Tab label={t('routePlannerWaypoints')} />
-                  <Tab label={t('routePlannerRoutePlan')} />
+                  <Tab 
+                    label={t('routePlannerRoutePlan')} 
+                    disabled={!routeData}
+                  />
                   <Tab 
                     label={t('routePlannerCosts')} 
                     disabled={!routeData}
