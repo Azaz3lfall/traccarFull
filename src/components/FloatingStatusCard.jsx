@@ -9,7 +9,8 @@ import {
   Snackbar,
   Alert,
   Autocomplete,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material';
 import {
   devicesActions,
@@ -106,6 +107,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
   const [showSensorDropdown, setShowSensorDropdown] = useState(false);
+  const [savingSensors, setSavingSensors] = useState(false);
   const dropdownRef = useRef(null);
   
   // Handle clicking outside dropdown
@@ -342,6 +344,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       return;
     }
     
+    setSavingSensors(true);
+    
     try {
       // Create final customSensors object (only include sensors that are still in sensorNames)
       const finalCustomSensors = {};
@@ -373,23 +377,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         },
         body: JSON.stringify(updatedDevice)
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to update device: ${response.statusText}`);
       }
-      
+
       // Revalidate the device data
       await queryClient.invalidateQueries(['devices']);
       await queryClient.invalidateQueries(['device', device.id]);
-      
+
       console.log('Device updated successfully');
-      
+
       setSensorEditModalOpen(false);
       setSensorNames({});
-      
+
     } catch (error) {
       console.error('Error updating device:', error);
       showSnackbar('Failed to save sensor changes', 'error');
+    } finally {
+      setSavingSensors(false);
     }
   }, [sensorNames, position, positionItems, positionAttributes, device, queryClient, showSnackbar]);
 
@@ -2644,62 +2650,74 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         }}>
                           {key}
                         </div>
-                        <input
-                          type="text"
-                          value={sensorNames[key] || ''}
-                          onChange={(e) => handleSensorNameChange(key, e.target.value)}
-                          style={{
-                            flex: 1,
-                            minWidth: 0,
-                            padding: '8px 12px',
-                            backgroundColor: colors.secondary,
-                            border: 'none',
-                            borderRadius: '6px',
-                            color: colors.text,
-                            fontSize: '14px',
-                            outline: 'none',
-                            transition: 'all 0.2s'
-                          }}
-                          onFocus={(e) => {
-                            e.target.style.backgroundColor = colors.hover;
-                          }}
-                          onBlur={(e) => {
-                            e.target.style.backgroundColor = colors.secondary;
-                          }}
-                          placeholder="Enter sensor name"
-                        />
-                        {/* Delete button for custom sensors */}
-                        {!positionItems.split(',').includes(key) && (
-                          <button
-                            onClick={() => handleDeleteCustomSensor(key)}
+                        <div style={{
+                          flex: 1,
+                          minWidth: 0,
+                          position: 'relative',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <input
+                            type="text"
+                            value={sensorNames[key] || ''}
+                            onChange={(e) => handleSensorNameChange(key, e.target.value)}
                             style={{
-                              width: '28px',
-                              height: '28px',
-                              backgroundColor: 'transparent',
+                              width: '100%',
+                              padding: '8px 12px',
+                              paddingRight: !positionItems.split(',').includes(key) ? '36px' : '12px',
+                              backgroundColor: colors.secondary,
                               border: 'none',
-                              borderRadius: '4px',
-                              color: colors.textSecondary,
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '16px',
-                              transition: 'all 0.2s',
-                              flexShrink: 0
+                              borderRadius: '6px',
+                              color: colors.text,
+                              fontSize: '14px',
+                              outline: 'none',
+                              transition: 'all 0.2s'
                             }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = colors.error;
-                              e.target.style.color = 'white';
+                            onFocus={(e) => {
+                              e.target.style.backgroundColor = colors.hover;
                             }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = 'transparent';
-                              e.target.style.color = colors.textSecondary;
+                            onBlur={(e) => {
+                              e.target.style.backgroundColor = colors.secondary;
                             }}
-                            title="Delete custom sensor"
-                          >
-                            ×
-                          </button>
-                        )}
+                            placeholder="Enter sensor name"
+                          />
+                          {/* Delete button for custom sensors - positioned inside input */}
+                          {!positionItems.split(',').includes(key) && (
+                            <button
+                              onClick={() => handleDeleteCustomSensor(key)}
+                              style={{
+                                position: 'absolute',
+                                right: '6px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                width: '24px',
+                                height: '24px',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: colors.textSecondary,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '16px',
+                                transition: 'all 0.2s',
+                                zIndex: 1
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = colors.error;
+                                e.target.style.color = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.color = colors.textSecondary;
+                              }}
+                              title="Delete custom sensor"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -2737,27 +2755,41 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </button>
                   <button
                     onClick={handleSaveSensorEdit}
+                    disabled={savingSensors}
                     style={{
                       padding: '10px 20px',
                       borderRadius: '8px',
                       border: 'none',
-                      backgroundColor: '#D1FAE5',
-                      color: '#065F46',
+                      backgroundColor: savingSensors ? '#E5E7EB' : '#D1FAE5',
+                      color: savingSensors ? '#6B7280' : '#065F46',
                       fontSize: '14px',
                       fontWeight: '500',
-                      cursor: 'pointer',
+                      cursor: savingSensors ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '8px',
+                      opacity: savingSensors ? 0.7 : 1,
+                      transition: 'all 0.2s'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#A7F3D0';
+                      if (!savingSensors) {
+                        e.target.style.backgroundColor = '#A7F3D0';
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = '#D1FAE5';
+                      if (!savingSensors) {
+                        e.target.style.backgroundColor = '#D1FAE5';
+                      }
                     }}
                   >
-                    {t('sharedSave')}
+                    {savingSensors && (
+                      <CircularProgress 
+                        size={16} 
+                        thickness={4}
+                        style={{ color: '#6B7280' }}
+                      />
+                    )}
+                    {savingSensors ? 'Saving...' : t('sharedSave')}
                   </button>
                 </div>
               </div>
