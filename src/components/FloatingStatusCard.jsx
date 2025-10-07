@@ -2766,7 +2766,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       />
                       {showSensorDropdown && createPortal(
                         <div 
-                          onMouseDown={(e) => e.preventDefault()}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           style={{
                             position: 'fixed',
                             top: dropdownRef.current ? dropdownRef.current.getBoundingClientRect().bottom + 4 : 0,
@@ -2791,7 +2798,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             .map(sensor => (
                               <div
                                 key={sensor.value}
-                                onClick={() => {
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('Sensor clicked:', sensor.value);
                                   setSelectedNewSensor(sensor.value);
                                   setSensorSearchTerm(sensor.label);
                                   setShowSensorDropdown(false);
