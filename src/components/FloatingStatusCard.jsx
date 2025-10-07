@@ -2392,7 +2392,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 backgroundColor: colors.surface,
                 borderRadius: '8px',
                 width: '500px',
-                maxWidth: '90vw',
+                maxWidth: '95vw',
                 maxHeight: '80vh',
                 overflow: 'hidden',
                 boxShadow: colors.shadow
@@ -2400,7 +2400,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Content */}
-              <div style={{ padding: '20px' }}>
+              <div style={{ padding: '16px' }}>
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{
                     display: 'flex',
@@ -2451,14 +2451,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       <div key={key} style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '12px',
-                        marginBottom: '12px'
+                        gap: '8px',
+                        marginBottom: '12px',
+                        minWidth: 0
                       }}>
                         <div style={{
-                          minWidth: '120px',
+                          minWidth: '80px',
+                          maxWidth: '120px',
                           fontSize: '12px',
                           fontWeight: '500',
-                          color: colors.textSecondary
+                          color: colors.textSecondary,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0
                         }}>
                           {key}
                         </div>
@@ -2468,6 +2474,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           onChange={(e) => handleSensorNameChange(key, e.target.value)}
                           style={{
                             flex: 1,
+                            minWidth: 0,
                             padding: '8px 12px',
                             backgroundColor: colors.secondary,
                             border: 'none',
