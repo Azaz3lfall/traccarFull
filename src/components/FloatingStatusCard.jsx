@@ -2648,7 +2648,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       color: colors.text,
                       margin: 0
                     }}>
-                      Edit Sensor Names
+                      {t('editSensorNames')}
                     </label>
                     <button
                       onClick={handleOpenAddSensor}
@@ -2670,7 +2670,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor = colors.secondary;
                       }}
-                      title="Add New Sensor"
+                      title={t('customizeSensor')}
                     >
                       <AddIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
                     </button>
@@ -2734,8 +2734,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             }}
                             placeholder="Enter sensor name"
                           />
-                          {/* Delete button for custom sensors - positioned inside input */}
-                          {!positionItems.split(',').includes(key) && (
+                        {/* Delete button for customized sensors - positioned inside input */}
+                        {(() => {
+                          const currentName = positionAttributes[key]?.name || key;
+                          const newName = sensorNames[key];
+                          const isCustomized = newName && newName !== currentName;
+                          return isCustomized;
+                        })() && (
                             <button
                               onClick={() => handleDeleteCustomSensor(key)}
                               style={{
@@ -2842,7 +2847,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         style={{ color: '#6B7280' }}
                       />
                     )}
-                    {savingSensors ? 'Saving...' : t('sharedSave')}
+                    {!savingSensors && t('sharedSave')}
                   </button>
                 </div>
               </div>
@@ -2904,7 +2909,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       color: colors.text,
                       margin: 0
                     }}>
-                      Add New Sensor
+                      {t('customizeSensor')}
                     </label>
                     <button
                       onClick={() => setAddSensorModalOpen(false)}
@@ -2940,7 +2945,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       marginBottom: '4px',
                       display: 'block'
                     }}>
-                      Select Sensor Type
+                      {t('selectSensor')}
                     </label>
                     <div ref={dropdownRef} style={{ position: 'relative' }}>
                       <input
@@ -3060,7 +3065,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       marginBottom: '4px',
                       display: 'block'
                     }}>
-                      Custom Name
+                      {t('customName')}
                     </label>
                     <input
                       type="text"
@@ -3145,7 +3150,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }
                     }}
                   >
-                    Add Sensor
+                    {t('addSensor')}
                   </button>
                 </div>
               </div>
