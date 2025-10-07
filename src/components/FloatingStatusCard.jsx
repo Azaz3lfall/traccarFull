@@ -92,8 +92,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const [sensorEditModalOpen, setSensorEditModalOpen] = useState(false);
-  const [editingSensor, setEditingSensor] = useState({ key: '', name: '' });
-  const [sensorName, setSensorName] = useState('');
+  const [sensorNames, setSensorNames] = useState({});
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -215,24 +214,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setShowEditModal(true);
   }, [distanceUnit]);
 
-  const handleEditSensor = useCallback((sensorKey, currentName) => {
-    setEditingSensor({
-      key: sensorKey,
-      name: currentName
+  const handleOpenSensorEdit = useCallback(() => {
+    if (!position) return;
+    
+    // Initialize sensor names with current values
+    const initialSensorNames = {};
+    positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).forEach((key) => {
+      initialSensorNames[key] = positionAttributes[key]?.name || key;
     });
-    setSensorName(currentName);
+    
+    setSensorNames(initialSensorNames);
     setSensorEditModalOpen(true);
+  }, [position, positionItems, positionAttributes]);
+
+  const handleSensorNameChange = useCallback((sensorKey, newName) => {
+    setSensorNames(prev => ({
+      ...prev,
+      [sensorKey]: newName
+    }));
   }, []);
 
   const handleSaveSensorEdit = useCallback(() => {
-    console.log('Saving sensor configuration:', {
-      key: editingSensor.key,
-      name: sensorName,
-    });
+    console.log('Saving sensor configuration:', sensorNames);
     setSensorEditModalOpen(false);
-    setEditingSensor({ key: '', name: '' });
-    setSensorName('');
-  }, [editingSensor.key, sensorName]);
+    setSensorNames({});
+  }, [sensorNames]);
 
   const handleSaveEdit = useCallback(async () => {
     if (!device?.id || !editField) return;
@@ -1681,6 +1687,42 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             {/* Position Attributes */}
             {position && (
               <div style={{ marginBottom: '8px' }}>
+                {/* Edit Sensors Button */}
+                {!deviceReadonly && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    marginBottom: '12px'
+                  }}>
+                    <button
+                      onClick={handleOpenSensorEdit}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: colors.secondary,
+                        color: colors.text,
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                    >
+                      <SettingsIcon style={{ fontSize: '14px' }} />
+                      Edit Sensors
+                    </button>
+                  </div>
+                )}
+                
                 {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
                   const attributeName = positionAttributes[key]?.name || key;
                   const value = position.hasOwnProperty(key) ? position[key] : position.attributes[key];
@@ -1758,27 +1800,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             }}
                           >
                             <Settings size={14} color={colors.textSecondary} />
-                          </button>
-                        )}
-                        {!deviceReadonly && (
-                          <button
-                            onClick={() => handleEditSensor(key, attributeName)}
-                            style={{
-                              width: '22px',
-                              height: '22px',
-                              borderRadius: '4px',
-                              border: 'none',
-                              backgroundColor: 'transparent',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '2px',
-                              marginLeft: '4px'
-                            }}
-                            title="Edit Sensor"
-                          >
-                            <SettingsIcon style={{ fontSize: '14px', color: colors.textSecondary }} />
                           </button>
                         )}
                       </div>
@@ -2341,7 +2362,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
       {/* Sensor Edit Modal */}
       <AnimatePresence>
-        {sensorEditModalOpen && (
+        {sensorEditModalOpen && position && (
           <motion.div
             key="sensor-edit-modal"
             initial={{ opacity: 0 }}
@@ -2370,8 +2391,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               style={{
                 backgroundColor: colors.surface,
                 borderRadius: '8px',
-                width: '400px',
+                width: '500px',
                 maxWidth: '90vw',
+                maxHeight: '80vh',
                 overflow: 'hidden',
                 boxShadow: colors.shadow
               }}
@@ -2384,15 +2406,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '8px'
+                    marginBottom: '16px'
                   }}>
                     <label style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
+                      fontSize: '16px',
+                      fontWeight: '600',
                       color: colors.text,
                       margin: 0
                     }}>
-                      Edit Sensor: {editingSensor.key}
+                      Edit Sensor Names
                     </label>
                     <button
                       onClick={() => setSensorEditModalOpen(false)}
@@ -2419,40 +2441,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     </button>
                   </div>
                   
-                  {/* Sensor Name Input */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      color: colors.textSecondary,
-                      marginBottom: '4px',
-                      display: 'block'
-                    }}>
-                      Sensor Name
-                    </label>
-                    <input
-                      type="text"
-                      value={sensorName}
-                      onChange={(e) => setSensorName(e.target.value)}
-                      style={{
-                        width: '100%',
+                  {/* Sensor List */}
+                  <div style={{
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    marginBottom: '20px'
+                  }}>
+                    {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => (
+                      <div key={key} style={{
+                        marginBottom: '16px',
                         padding: '12px',
                         backgroundColor: colors.secondary,
-                        border: 'none',
-                        borderRadius: '8px',
-                        color: colors.text,
-                        fontSize: '16px',
-                        outline: 'none',
-                        transition: 'all 0.2s'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
-                      }}
-                      placeholder="Enter sensor name"
-                    />
+                        borderRadius: '8px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              color: colors.textSecondary,
+                              marginBottom: '4px',
+                              display: 'block'
+                            }}>
+                              {key}
+                            </label>
+                            <input
+                              type="text"
+                              value={sensorNames[key] || ''}
+                              onChange={(e) => handleSensorNameChange(key, e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                backgroundColor: colors.surface,
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: colors.text,
+                                fontSize: '14px',
+                                outline: 'none',
+                                transition: 'all 0.2s'
+                              }}
+                              onFocus={(e) => {
+                                e.target.style.backgroundColor = colors.hover;
+                              }}
+                              onBlur={(e) => {
+                                e.target.style.backgroundColor = colors.surface;
+                              }}
+                              placeholder="Enter sensor name"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
