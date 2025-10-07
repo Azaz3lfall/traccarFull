@@ -2811,7 +2811,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   setShowSensorDropdown(false);
                                 }}
                                 style={{
-                                  padding: '6px 12px',
+                                  padding: '1px 4px',
                                   cursor: 'pointer',
                                   color: colors.text,
                                   fontSize: '14px',
@@ -2820,14 +2820,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   backgroundColor: 'transparent'
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.target.style.backgroundColor = colors.hover;
+                                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = 'transparent';
+                                  e.currentTarget.style.backgroundColor = 'transparent';
                                 }}
                               >
-                                <div style={{ fontWeight: '500' }}>{sensor.label}</div>
-                                <div style={{ fontSize: '12px', color: colors.textSecondary, marginTop: '1px' }}>
+                                <div style={{ fontWeight: '500', lineHeight: '1.2' }}>{sensor.label}</div>
+                                <div style={{ fontSize: '11px', color: colors.textSecondary, lineHeight: '1.2', marginTop: '-2px' }}>
                                   {sensor.value}
                                 </div>
                               </div>
