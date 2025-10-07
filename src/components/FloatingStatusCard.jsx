@@ -4,6 +4,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
+import { createPortal } from 'react-dom';
 import {
   Snackbar,
   Alert,
@@ -2763,21 +2764,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           e.target.style.backgroundColor = colors.secondary;
                         }}
                       />
-                      {showSensorDropdown && (
+                      {showSensorDropdown && createPortal(
                         <div 
                           onMouseDown={(e) => e.preventDefault()}
                           style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
+                            position: 'fixed',
+                            top: dropdownRef.current ? dropdownRef.current.getBoundingClientRect().bottom + 4 : 0,
+                            left: dropdownRef.current ? dropdownRef.current.getBoundingClientRect().left : 0,
+                            width: dropdownRef.current ? dropdownRef.current.getBoundingClientRect().width : 0,
                             backgroundColor: colors.secondary,
                             border: `1px solid ${colors.border}`,
                             borderRadius: '8px',
                             maxHeight: '200px',
                             overflowY: 'auto',
                             zIndex: 10010,
-                            marginTop: '4px',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                           }}>
                           {allPossibleSensors
@@ -2817,7 +2817,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 </div>
                               </div>
                             ))}
-                        </div>
+                        </div>,
+                        document.body
                       )}
                     </div>
                   </div>
