@@ -170,6 +170,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       label: positionAttributes[key]?.name || key
     }));
   }, [positionAttributes]);
+
+  // Helper function to get sensor display name (custom name takes precedence)
+  const getSensorDisplayName = useCallback((sensorKey) => {
+    // Check for custom sensor name first
+    if (device?.attributes?.customSensors) {
+      try {
+        const customSensors = JSON.parse(device.attributes.customSensors);
+        if (customSensors[sensorKey]) {
+          return customSensors[sensorKey];
+        }
+      } catch (error) {
+        console.error('Error parsing customSensors:', error);
+      }
+    }
+    
+    // Fall back to original translation
+    return positionAttributes[sensorKey]?.name || sensorKey;
+  }, [device, positionAttributes]);
   
   // Get current device and position
   // In replay mode, use replay device; otherwise use selected device
@@ -1905,7 +1923,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 )}
                 
                 {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
-                  const attributeName = positionAttributes[key]?.name || key;
+                  const attributeName = getSensorDisplayName(key);
                   const value = position.hasOwnProperty(key) ? position[key] : position.attributes[key];
                   
                   return (
