@@ -105,6 +105,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
   const [showSensorDropdown, setShowSensorDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  // Handle clicking outside dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        console.log('Clicked outside dropdown');
+        setShowSensorDropdown(false);
+      }
+    };
+
+    if (showSensorDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSensorDropdown]);
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -2712,7 +2731,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}>
                       Select Sensor Type
                     </label>
-                    <div style={{ position: 'relative' }}>
+                    <div ref={dropdownRef} style={{ position: 'relative' }}>
                       <input
                         type="text"
                         value={sensorSearchTerm}
@@ -2728,7 +2747,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           setShowSensorDropdown(true);
                         }}
                         onBlur={() => {
-                          setShowSensorDropdown(false);
+                          console.log('Blur event triggered');
+                          setTimeout(() => setShowSensorDropdown(false), 100);
                         }}
                         placeholder="Type to search sensors..."
                         style={{
