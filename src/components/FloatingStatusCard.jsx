@@ -2729,6 +2729,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         backgroundColor: colors.secondary,
                         borderRadius: '8px',
                       }}
+                      ListboxProps={{
+                        style: {
+                          zIndex: 9999,
+                          maxHeight: '200px',
+                        }
+                      }}
+                      PopperComponent={(props) => (
+                        <div {...props} style={{ ...props.style, zIndex: 9999 }} />
+                      )}
                     />
                   </div>
 
