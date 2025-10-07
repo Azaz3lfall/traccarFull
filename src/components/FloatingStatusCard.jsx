@@ -2449,51 +2449,42 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   }}>
                     {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => (
                       <div key={key} style={{
-                        marginBottom: '16px',
-                        padding: '12px',
-                        backgroundColor: colors.secondary,
-                        borderRadius: '8px'
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        marginBottom: '12px'
                       }}>
                         <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px'
+                          minWidth: '120px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          color: colors.textSecondary
                         }}>
-                          <div style={{ flex: 1 }}>
-                            <label style={{
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              color: colors.textSecondary,
-                              marginBottom: '4px',
-                              display: 'block'
-                            }}>
-                              {key}
-                            </label>
-                            <input
-                              type="text"
-                              value={sensorNames[key] || ''}
-                              onChange={(e) => handleSensorNameChange(key, e.target.value)}
-                              style={{
-                                width: '100%',
-                                padding: '8px 12px',
-                                backgroundColor: colors.surface,
-                                border: 'none',
-                                borderRadius: '6px',
-                                color: colors.text,
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'all 0.2s'
-                              }}
-                              onFocus={(e) => {
-                                e.target.style.backgroundColor = colors.hover;
-                              }}
-                              onBlur={(e) => {
-                                e.target.style.backgroundColor = colors.surface;
-                              }}
-                              placeholder="Enter sensor name"
-                            />
-                          </div>
+                          {key}
                         </div>
+                        <input
+                          type="text"
+                          value={sensorNames[key] || ''}
+                          onChange={(e) => handleSensorNameChange(key, e.target.value)}
+                          style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            backgroundColor: colors.secondary,
+                            border: 'none',
+                            borderRadius: '6px',
+                            color: colors.text,
+                            fontSize: '14px',
+                            outline: 'none',
+                            transition: 'all 0.2s'
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.backgroundColor = colors.hover;
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.backgroundColor = colors.secondary;
+                          }}
+                          placeholder="Enter sensor name"
+                        />
                       </div>
                     ))}
                   </div>
