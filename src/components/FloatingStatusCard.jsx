@@ -235,10 +235,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, []);
 
   const handleSaveSensorEdit = useCallback(() => {
-    console.log('Saving sensor configuration:', sensorNames);
+    if (!position) return;
+    
+    // Find only the sensors that have changed
+    const changedSensors = {};
+    positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).forEach((key) => {
+      const currentName = positionAttributes[key]?.name || key;
+      const newName = sensorNames[key];
+      
+      // Only include if the name has actually changed
+      if (newName && newName !== currentName) {
+        changedSensors[key] = newName;
+      }
+    });
+    
+    // Log only the changed sensors in the specified format
+    console.log('customSensors:', changedSensors);
+    
     setSensorEditModalOpen(false);
     setSensorNames({});
-  }, [sensorNames]);
+  }, [sensorNames, position, positionItems, positionAttributes]);
 
   const handleSaveEdit = useCallback(async () => {
     if (!device?.id || !editField) return;
