@@ -2247,7 +2247,6 @@ const FloatingGeofencesPopover = ({
                                   
                                   {displayedRouteData.routes[0]?.legs && displayedRouteData.routes[0].legs.length > 0 && (
                                     <div style={{ marginTop: '0px' }}>
-                                      {console.log('Rendering displayed route with distance:', getRouteDistance(), 'duration:', displayedRouteData?.routes?.[0]?.duration || 0)}
                                       {displayedRouteData.routes[0]?.legs?.map((leg, legIndex) => (
                                         <div key={legIndex} style={{ 
                                           marginBottom: '0px',
