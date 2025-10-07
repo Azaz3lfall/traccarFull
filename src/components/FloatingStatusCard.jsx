@@ -254,17 +254,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [distanceUnit]);
 
   const handleOpenSensorEdit = useCallback(() => {
-    if (!position) return;
+    if (!position || !device) return;
     
     // Initialize sensor names with current values
     const initialSensorNames = {};
+    
+    // Load regular sensors from positionItems
     positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).forEach((key) => {
       initialSensorNames[key] = positionAttributes[key]?.name || key;
     });
     
+    // Load custom sensors from device attributes
+    if (device.attributes?.customSensors) {
+      try {
+        const customSensors = JSON.parse(device.attributes.customSensors);
+        Object.keys(customSensors).forEach((key) => {
+          initialSensorNames[key] = customSensors[key];
+        });
+      } catch (error) {
+        console.error('Error parsing customSensors:', error);
+      }
+    }
+    
     setSensorNames(initialSensorNames);
     setSensorEditModalOpen(true);
-  }, [position, positionItems, positionAttributes]);
+  }, [position, positionItems, positionAttributes, device]);
 
   const handleSensorNameChange = useCallback((sensorKey, newName) => {
     setSensorNames(prev => ({
@@ -273,17 +287,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }));
   }, []);
 
+  const handleDeleteCustomSensor = useCallback((sensorKey) => {
+    setSensorNames(prev => {
+      const newSensorNames = { ...prev };
+      delete newSensorNames[sensorKey];
+      return newSensorNames;
+    });
+  }, []);
+
   const handleSaveSensorEdit = useCallback(async () => {
     if (!position || !device) return;
     
-    // Find only the sensors that have changed or are new
+    // Get current custom sensors from device
+    let currentCustomSensors = {};
+    if (device.attributes?.customSensors) {
+      try {
+        currentCustomSensors = JSON.parse(device.attributes.customSensors);
+      } catch (error) {
+        console.error('Error parsing current customSensors:', error);
+      }
+    }
+    
+    // Find sensors that have changed, are new, or were deleted
     const changedSensors = {};
+    const positionItemsList = positionItems.split(',');
+    
+    // Check all sensors in sensorNames
     Object.keys(sensorNames).forEach((key) => {
       const currentName = positionAttributes[key]?.name || key;
       const newName = sensorNames[key];
       
       // Include if the name has changed or if it's a new sensor (not in positionItems)
-      const isExistingSensor = positionItems.split(',').includes(key);
+      const isExistingSensor = positionItemsList.includes(key);
       const isChanged = newName && newName !== currentName;
       const isNewSensor = !isExistingSensor && newName;
       
@@ -292,20 +327,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     });
     
+    // Check for deleted custom sensors (were in customSensors but not in sensorNames)
+    Object.keys(currentCustomSensors).forEach((key) => {
+      if (!sensorNames.hasOwnProperty(key)) {
+        // This sensor was deleted, we'll handle it by not including it in the final customSensors
+        console.log('Deleted custom sensor:', key);
+      }
+    });
+    
     // If no changes, just close the modal
-    if (Object.keys(changedSensors).length === 0) {
+    if (Object.keys(changedSensors).length === 0 && Object.keys(currentCustomSensors).length === 0) {
       setSensorEditModalOpen(false);
       setSensorNames({});
       return;
     }
     
     try {
+      // Create final customSensors object (only include sensors that are still in sensorNames)
+      const finalCustomSensors = {};
+      Object.keys(sensorNames).forEach((key) => {
+        const isExistingSensor = positionItemsList.includes(key);
+        if (!isExistingSensor) {
+          // This is a custom sensor, include it in final customSensors
+          finalCustomSensors[key] = sensorNames[key];
+        }
+      });
+      
       // Create updated device object with customSensors
       const updatedDevice = {
         ...device,
         attributes: {
           ...device.attributes,
-          customSensors: JSON.stringify(changedSensors)
+          customSensors: JSON.stringify(finalCustomSensors)
         }
       };
       
@@ -2615,6 +2668,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           }}
                           placeholder="Enter sensor name"
                         />
+                        {/* Delete button for custom sensors */}
+                        {!positionItems.split(',').includes(key) && (
+                          <button
+                            onClick={() => handleDeleteCustomSensor(key)}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              borderRadius: '4px',
+                              color: colors.textSecondary,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '16px',
+                              transition: 'all 0.2s',
+                              flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = colors.error;
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.color = colors.textSecondary;
+                            }}
+                            title="Delete custom sensor"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
