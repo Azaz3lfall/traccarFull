@@ -103,6 +103,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
+  const [showSensorDropdown, setShowSensorDropdown] = useState(false);
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -296,6 +297,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleOpenAddSensor = useCallback(() => {
     setSelectedNewSensor('');
     setNewSensorName('');
+    setShowSensorDropdown(false);
     setAddSensorModalOpen(true);
   }, []);
 
@@ -2708,37 +2710,91 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}>
                       Select Sensor Type
                     </label>
-                    <Autocomplete
-                      value={allPossibleSensors.find(sensor => sensor.value === selectedNewSensor) || null}
-                      onChange={(event, newValue) => {
-                        setSelectedNewSensor(newValue?.value || '');
-                      }}
-                      options={allPossibleSensors.filter(sensor => !Object.keys(sensorNames).includes(sensor.value))}
-                      getOptionLabel={(option) => option.label}
-                      isOptionEqualToValue={(option, value) => option.value === value?.value}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Choose a sensor..."
-                          variant="outlined"
-                          size="small"
-                        />
-                      )}
-                      style={{
-                        width: '100%',
-                        backgroundColor: colors.secondary,
-                        borderRadius: '8px',
-                      }}
-                      ListboxProps={{
-                        style: {
-                          zIndex: 9999,
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        value={selectedNewSensor ? allPossibleSensors.find(s => s.value === selectedNewSensor)?.label || selectedNewSensor : ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedNewSensor(value);
+                        }}
+                        onFocus={() => setShowSensorDropdown(true)}
+                        onBlur={() => {
+                          // Delay hiding to allow clicking on options
+                          setTimeout(() => setShowSensorDropdown(false), 200);
+                        }}
+                        placeholder="Choose a sensor..."
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: colors.secondary,
+                          border: 'none',
+                          borderRadius: '8px',
+                          color: colors.text,
+                          fontSize: '14px',
+                          outline: 'none',
+                          transition: 'all 0.2s'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.backgroundColor = colors.secondary;
+                        }}
+                      />
+                      {showSensorDropdown && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          backgroundColor: colors.secondary,
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: '8px',
                           maxHeight: '200px',
-                        }
-                      }}
-                      PopperComponent={(props) => (
-                        <div {...props} style={{ ...props.style, zIndex: 9999 }} />
+                          overflowY: 'auto',
+                          zIndex: 9999,
+                          marginTop: '4px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        }}>
+                          {allPossibleSensors
+                            .filter(sensor => 
+                              !Object.keys(sensorNames).includes(sensor.value) &&
+                              (selectedNewSensor === '' || 
+                               sensor.label.toLowerCase().includes(selectedNewSensor.toLowerCase()) ||
+                               sensor.value.toLowerCase().includes(selectedNewSensor.toLowerCase()))
+                            )
+                            .map(sensor => (
+                              <div
+                                key={sensor.value}
+                                onClick={() => {
+                                  setSelectedNewSensor(sensor.value);
+                                  setShowSensorDropdown(false);
+                                }}
+                                style={{
+                                  padding: '12px',
+                                  cursor: 'pointer',
+                                  color: colors.text,
+                                  fontSize: '14px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                  transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = colors.hover;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                <div style={{ fontWeight: '500' }}>{sensor.label}</div>
+                                <div style={{ fontSize: '12px', color: colors.textSecondary, marginTop: '2px' }}>
+                                  {sensor.value}
+                                </div>
+                              </div>
+                            ))}
+                        </div>
                       )}
-                    />
+                    </div>
                   </div>
 
                   {/* Sensor Name Input */}
