@@ -2722,38 +2722,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           placeholder="Choose a sensor..."
                           variant="outlined"
                           size="small"
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              backgroundColor: colors.secondary,
-                              '& fieldset': {
-                                borderColor: 'transparent',
-                              },
-                              '&:hover fieldset': {
-                                borderColor: 'transparent',
-                              },
-                              '&.Mui-focused fieldset': {
-                                borderColor: 'transparent',
-                                backgroundColor: colors.hover,
-                              },
-                            },
-                            '& .MuiInputBase-input': {
-                              color: colors.text,
-                              fontSize: '14px',
-                            },
-                            '& .MuiInputBase-input::placeholder': {
-                              color: colors.textSecondary,
-                              opacity: 1,
-                            },
-                          }}
                         />
                       )}
-                      sx={{
-                        '& .MuiAutocomplete-popupIndicator': {
-                          color: colors.textSecondary,
-                        },
-                        '& .MuiAutocomplete-clearIndicator': {
-                          color: colors.textSecondary,
-                        },
+                      style={{
+                        width: '100%',
+                        backgroundColor: colors.secondary,
+                        borderRadius: '8px',
                       }}
                     />
                   </div>
