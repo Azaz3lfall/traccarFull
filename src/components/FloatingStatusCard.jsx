@@ -2719,7 +2719,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         onChange={(e) => {
                           setSensorSearchTerm(e.target.value);
                         }}
+                        onClick={() => {
+                          console.log('Click event triggered');
+                          setShowSensorDropdown(true);
+                        }}
                         onFocus={() => {
+                          console.log('Focus event triggered');
                           setShowSensorDropdown(true);
                         }}
                         onBlur={() => {
@@ -2744,7 +2749,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           e.target.style.backgroundColor = colors.secondary;
                         }}
                       />
-                      {showSensorDropdown && (
+                      {console.log('showSensorDropdown state:', showSensorDropdown) || showSensorDropdown && (
                         <div 
                           onMouseDown={(e) => e.preventDefault()}
                           style={{
