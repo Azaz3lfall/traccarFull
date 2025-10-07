@@ -45,6 +45,7 @@ import AnchorIcon from '@mui/icons-material/Anchor';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ShareIcon from '@mui/icons-material/Share';
+import SettingsIcon from '@mui/icons-material/Settings';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -90,6 +91,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [showLockClosedConfirmation, setShowLockClosedConfirmation] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [sensorEditModalOpen, setSensorEditModalOpen] = useState(false);
+  const [editingSensor, setEditingSensor] = useState({ key: '', name: '', translation: '' });
+  const [sensorName, setSensorName] = useState('');
+  const [sensorTranslation, setSensorTranslation] = useState('');
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -210,6 +215,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setEditField(field);
     setShowEditModal(true);
   }, [distanceUnit]);
+
+  const handleEditSensor = useCallback((sensorKey, currentName) => {
+    setEditingSensor({
+      key: sensorKey,
+      name: currentName,
+      translation: positionAttributes[sensorKey]?.name || sensorKey
+    });
+    setSensorName(currentName);
+    setSensorTranslation(positionAttributes[sensorKey]?.name || sensorKey);
+    setSensorEditModalOpen(true);
+  }, [positionAttributes]);
+
+  const handleSaveSensorEdit = useCallback(() => {
+    console.log('Saving sensor configuration:', {
+      key: editingSensor.key,
+      name: sensorName,
+      translation: sensorTranslation,
+    });
+    setSensorEditModalOpen(false);
+    setEditingSensor({ key: '', name: '', translation: '' });
+    setSensorName('');
+    setSensorTranslation('');
+  }, [editingSensor.key, sensorName, sensorTranslation]);
 
   const handleSaveEdit = useCallback(async () => {
     if (!device?.id || !editField) return;
@@ -1737,6 +1765,27 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             <Settings size={14} color={colors.textSecondary} />
                           </button>
                         )}
+                        {!deviceReadonly && (
+                          <button
+                            onClick={() => handleEditSensor(key, attributeName)}
+                            style={{
+                              width: '22px',
+                              height: '22px',
+                              borderRadius: '4px',
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '2px',
+                              marginLeft: '4px'
+                            }}
+                            title="Edit Sensor"
+                          >
+                            <SettingsIcon style={{ fontSize: '14px', color: colors.textSecondary }} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -2204,18 +2253,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       width: '100%',
                       padding: '12px',
                       backgroundColor: colors.secondary,
-                      border: '2px solid #000000',
+                      border: 'none',
                       borderRadius: '8px',
                       color: colors.text,
                       fontSize: '16px',
                       outline: 'none',
-                      transition: 'border-color 0.2s'
+                      transition: 'all 0.2s'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#3B82F6';
+                      e.target.style.backgroundColor = colors.hover;
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = colors.border;
+                      e.target.style.backgroundColor = colors.secondary;
                     }}
                     step={editField === 'hours' ? '0.1' : '0.01'}
                     min="0"
@@ -2234,7 +2283,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     style={{
                       padding: '10px 20px',
                       borderRadius: '8px',
-                      border: '2px solid #000000',
+                      border: 'none',
                       backgroundColor: colors.secondary,
                       color: colors.text,
                       fontSize: '14px',
@@ -2264,7 +2313,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     style={{
                       padding: '10px 20px',
                       borderRadius: '8px',
-                      border: isSaving ? `1px solid ${colors.border}` : '1px solid #065F46',
+                      border: 'none',
                       backgroundColor: isSaving ? colors.secondary : '#D1FAE5',
                       color: isSaving ? colors.text : '#065F46',
                       fontSize: '14px',
@@ -2287,6 +2336,220 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   >
                     {isSaving && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
                     {isSaving ? t('sharedSaving') : t('sharedSave')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sensor Edit Modal */}
+      <AnimatePresence>
+        {sensorEditModalOpen && (
+          <motion.div
+            key="sensor-edit-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10004
+            }}
+            onClick={() => setSensorEditModalOpen(false)}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '8px',
+                width: '400px',
+                maxWidth: '90vw',
+                overflow: 'hidden',
+                boxShadow: colors.shadow
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Content */}
+              <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '8px'
+                  }}>
+                    <label style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.text,
+                      margin: 0
+                    }}>
+                      Edit Sensor: {editingSensor.key}
+                    </label>
+                    <button
+                      onClick={() => setSensorEditModalOpen(false)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: colors.secondary,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                    >
+                      <X size={16} color={colors.textSecondary} />
+                    </button>
+                  </div>
+                  
+                  {/* Sensor Name Input */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: colors.textSecondary,
+                      marginBottom: '4px',
+                      display: 'block'
+                    }}>
+                      Sensor Name
+                    </label>
+                    <input
+                      type="text"
+                      value={sensorName}
+                      onChange={(e) => setSensorName(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: colors.secondary,
+                        border: 'none',
+                        borderRadius: '8px',
+                        color: colors.text,
+                        fontSize: '16px',
+                        outline: 'none',
+                        transition: 'all 0.2s'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                      placeholder="Enter sensor name"
+                    />
+                  </div>
+
+                  {/* Translation Input */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: colors.textSecondary,
+                      marginBottom: '4px',
+                      display: 'block'
+                    }}>
+                      Translation Key
+                    </label>
+                    <input
+                      type="text"
+                      value={sensorTranslation}
+                      onChange={(e) => setSensorTranslation(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: colors.secondary,
+                        border: 'none',
+                        borderRadius: '8px',
+                        color: colors.text,
+                        fontSize: '16px',
+                        outline: 'none',
+                        transition: 'all 0.2s'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                      placeholder="Enter translation key"
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'space-between'
+                }}>
+                  <button
+                    onClick={() => setSensorEditModalOpen(false)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.color = colors.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                      e.target.style.color = colors.text;
+                    }}
+                  >
+                    {t('sharedCancel')}
+                  </button>
+                  <button
+                    onClick={handleSaveSensorEdit}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: '#D1FAE5',
+                      color: '#065F46',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#A7F3D0';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = '#D1FAE5';
+                    }}
+                  >
+                    {t('sharedSave')}
                   </button>
                 </div>
               </div>
@@ -3112,6 +3375,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         {snackbar.message}
       </Alert>
     </Snackbar>
+    
     </>
   );
 };
