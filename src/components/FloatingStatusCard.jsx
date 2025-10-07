@@ -1490,7 +1490,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             </div>
 
             {/* Address */}
-            <div style={{ textAlign: 'left', marginBottom: '16px' }}>
+            <div style={{ textAlign: 'left', marginBottom: '4px' }}>
               <p style={{
                 fontSize: '12px',
                 color: colors.textSecondary,
@@ -1702,13 +1702,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             
             {/* Position Attributes */}
             {position && (
-              <div style={{ marginBottom: '8px' }}>
+              <div style={{ marginBottom: '4px' }}>
                 {/* Edit Sensors Button */}
                 {!deviceReadonly && (
                   <div style={{
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    marginBottom: '12px'
+                    marginBottom: '4px'
                   }}>
                     <button
                       onClick={handleOpenSensorEdit}
@@ -1716,9 +1716,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '6px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
                         border: 'none',
                         backgroundColor: colors.secondary,
                         color: colors.text,
@@ -1733,7 +1733,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }}
                       title="Edit Sensors"
                     >
-                      <EditIcon style={{ fontSize: '16px' }} />
+                      <EditIcon style={{ fontSize: '14px' }} />
                     </button>
                   </div>
                 )}
