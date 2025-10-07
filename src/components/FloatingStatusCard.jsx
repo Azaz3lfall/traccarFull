@@ -305,7 +305,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         ...device,
         attributes: {
           ...device.attributes,
-          customSensors: changedSensors
+          customSensors: JSON.stringify(changedSensors)
         }
       };
       
