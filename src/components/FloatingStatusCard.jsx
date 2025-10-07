@@ -104,14 +104,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   
-  // Get all possible Traccar sensors from position attributes
-  const allPossibleSensors = useMemo(() => {
-    return Object.keys(positionAttributes).map(key => ({
-      value: key,
-      label: positionAttributes[key]?.name || key
-    }));
-  }, [positionAttributes]);
-  
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
   };
@@ -147,6 +139,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const positionItems = useAttributePreference('positionItems', 'fixTime,address,speed,totalDistance');
   const positionAttributes = usePositionAttributes(t);
   const deviceReadonly = useDeviceReadonly();
+  
+  // Get all possible Traccar sensors from position attributes
+  const allPossibleSensors = useMemo(() => {
+    return Object.keys(positionAttributes).map(key => ({
+      value: key,
+      label: positionAttributes[key]?.name || key
+    }));
+  }, [positionAttributes]);
   
   // Get current device and position
   // In replay mode, use replay device; otherwise use selected device
