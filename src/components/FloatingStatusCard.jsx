@@ -170,6 +170,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       label: positionAttributes[key]?.name || key
     }));
   }, [positionAttributes]);
+  
+  // Get current device and position
+  // In replay mode, use replay device; otherwise use selected device
+  const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
 
   // Helper function to get sensor display name (custom name takes precedence)
   const getSensorDisplayName = useCallback((sensorKey) => {
@@ -188,10 +192,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Fall back to original translation
     return positionAttributes[sensorKey]?.name || sensorKey;
   }, [device, positionAttributes]);
-  
-  // Get current device and position
-  // In replay mode, use replay device; otherwise use selected device
-  const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
   
   // Sync local state with Redux state
   useEffect(() => {
