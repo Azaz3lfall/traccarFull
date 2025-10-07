@@ -2720,7 +2720,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           setSensorSearchTerm(e.target.value);
                           setShowSensorDropdown(true);
                         }}
-                        onFocus={() => setShowSensorDropdown(true)}
+                        onFocus={() => {
+                          setShowSensorDropdown(true);
+                        }}
                         onBlur={() => {
                           setTimeout(() => setShowSensorDropdown(false), 150);
                         }}
