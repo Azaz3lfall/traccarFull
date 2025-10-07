@@ -103,6 +103,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
+  const [sensorSearchTerm, setSensorSearchTerm] = useState('');
   const [showSensorDropdown, setShowSensorDropdown] = useState(false);
   
   const showSnackbar = (message, severity = 'error') => {
@@ -297,6 +298,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleOpenAddSensor = useCallback(() => {
     setSelectedNewSensor('');
     setNewSensorName('');
+    setSensorSearchTerm('');
     setShowSensorDropdown(false);
     setAddSensorModalOpen(true);
   }, []);
@@ -2713,17 +2715,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     <div style={{ position: 'relative' }}>
                       <input
                         type="text"
-                        value={selectedNewSensor ? allPossibleSensors.find(s => s.value === selectedNewSensor)?.label || selectedNewSensor : ''}
+                        value={sensorSearchTerm}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          setSelectedNewSensor(value);
+                          setSensorSearchTerm(e.target.value);
+                          setShowSensorDropdown(true);
                         }}
                         onFocus={() => setShowSensorDropdown(true)}
                         onBlur={() => {
-                          // Delay hiding to allow clicking on options
-                          setTimeout(() => setShowSensorDropdown(false), 200);
+                          setTimeout(() => setShowSensorDropdown(false), 150);
                         }}
-                        placeholder="Choose a sensor..."
+                        placeholder="Type to search sensors..."
                         style={{
                           width: '100%',
                           padding: '12px',
@@ -2743,32 +2744,35 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         }}
                       />
                       {showSensorDropdown && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          right: 0,
-                          backgroundColor: colors.secondary,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: '8px',
-                          maxHeight: '200px',
-                          overflowY: 'auto',
-                          zIndex: 9999,
-                          marginTop: '4px',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                        }}>
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            backgroundColor: colors.secondary,
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '8px',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            zIndex: 9999,
+                            marginTop: '4px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                          }}>
                           {allPossibleSensors
-                            .filter(sensor => 
-                              !Object.keys(sensorNames).includes(sensor.value) &&
-                              (selectedNewSensor === '' || 
-                               sensor.label.toLowerCase().includes(selectedNewSensor.toLowerCase()) ||
-                               sensor.value.toLowerCase().includes(selectedNewSensor.toLowerCase()))
-                            )
+                            .filter(sensor => !Object.keys(sensorNames).includes(sensor.value))
+                            .filter(sensor => {
+                              if (!sensorSearchTerm) return true;
+                              return sensor.label.toLowerCase().includes(sensorSearchTerm.toLowerCase()) ||
+                                     sensor.value.toLowerCase().includes(sensorSearchTerm.toLowerCase());
+                            })
+                            .slice(0, 20) // Limit to 20 results for performance
                             .map(sensor => (
                               <div
                                 key={sensor.value}
                                 onClick={() => {
                                   setSelectedNewSensor(sensor.value);
+                                  setSensorSearchTerm(sensor.label);
                                   setShowSensorDropdown(false);
                                 }}
                                 style={{
