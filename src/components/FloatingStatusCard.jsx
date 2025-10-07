@@ -332,18 +332,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     const changedSensors = {};
     const positionItemsList = positionItems.split(',');
     
-    // Check all sensors in sensorNames
+    // Check all sensors in sensorNames for changes
     Object.keys(sensorNames).forEach((key) => {
       const currentName = positionAttributes[key]?.name || key;
       const newName = sensorNames[key];
       
-      // Include if the name has changed or if it's a new sensor (not in positionItems)
-      const isExistingSensor = positionItemsList.includes(key);
+      // Include if the name has changed (regardless of whether it's existing or new)
       const isChanged = newName && newName !== currentName;
-      const isNewSensor = !isExistingSensor && newName;
       
-      if (isChanged || isNewSensor) {
+      if (isChanged) {
         changedSensors[key] = newName;
+        console.log(`Sensor changed: ${key} from "${currentName}" to "${newName}"`);
       }
     });
     
@@ -365,13 +364,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setSavingSensors(true);
     
     try {
-      // Create final customSensors object (only include sensors that are still in sensorNames)
+      // Create final customSensors object (include all changed sensors)
       const finalCustomSensors = {};
-      Object.keys(sensorNames).forEach((key) => {
-        const isExistingSensor = positionItemsList.includes(key);
-        if (!isExistingSensor) {
-          // This is a custom sensor, include it in final customSensors
-          finalCustomSensors[key] = sensorNames[key];
+      
+      // Include all changed sensors (both existing and new)
+      Object.keys(changedSensors).forEach((key) => {
+        finalCustomSensors[key] = changedSensors[key];
+      });
+      
+      // Also include any existing custom sensors that weren't changed or deleted
+      Object.keys(currentCustomSensors).forEach((key) => {
+        if (!changedSensors.hasOwnProperty(key) && sensorNames.hasOwnProperty(key)) {
+          // This is an existing custom sensor that wasn't changed, keep it
+          finalCustomSensors[key] = currentCustomSensors[key];
         }
       });
       
