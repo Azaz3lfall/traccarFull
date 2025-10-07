@@ -2811,7 +2811,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   setShowSensorDropdown(false);
                                 }}
                                 style={{
-                                  padding: '1px 4px',
+                                  padding: '4px 8px',
                                   cursor: 'pointer',
                                   color: colors.text,
                                   fontSize: '14px',
@@ -2827,7 +2827,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 }}
                               >
                                 <div style={{ fontWeight: '500', lineHeight: '1.2' }}>{sensor.label}</div>
-                                <div style={{ fontSize: '11px', color: colors.textSecondary, lineHeight: '1.2', marginTop: '-2px' }}>
+                                <div style={{ fontSize: '11px', color: colors.textSecondary, lineHeight: '1.2', marginTop: '2px' }}>
                                   {sensor.value}
                                 </div>
                               </div>
