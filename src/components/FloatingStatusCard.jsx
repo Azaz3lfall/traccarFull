@@ -111,7 +111,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        console.log('Clicked outside dropdown');
         setShowSensorDropdown(false);
       }
     };
@@ -292,9 +291,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     });
     
-    // Log only the changed sensors in the specified format
-    console.log('customSensors:', changedSensors);
-    
+    // Log only the changed sensors in the specified format    
     setSensorEditModalOpen(false);
     setSensorNames({});
   }, [sensorNames, position, positionItems, positionAttributes]);
@@ -2739,15 +2736,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           setSensorSearchTerm(e.target.value);
                         }}
                         onClick={() => {
-                          console.log('Click event triggered');
                           setShowSensorDropdown(true);
                         }}
                         onFocus={() => {
-                          console.log('Focus event triggered');
                           setShowSensorDropdown(true);
                         }}
                         onBlur={() => {
-                          console.log('Blur event triggered');
                           setTimeout(() => setShowSensorDropdown(false), 100);
                         }}
                         placeholder="Type to search sensors..."
@@ -2769,7 +2763,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           e.target.style.backgroundColor = colors.secondary;
                         }}
                       />
-                      {console.log('showSensorDropdown state:', showSensorDropdown) || showSensorDropdown && (
+                      {showSensorDropdown && (
                         <div 
                           onMouseDown={(e) => e.preventDefault()}
                           style={{
@@ -2782,7 +2776,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             borderRadius: '8px',
                             maxHeight: '200px',
                             overflowY: 'auto',
-                            zIndex: 99999,
+                            zIndex: 10010,
                             marginTop: '4px',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                           }}>
