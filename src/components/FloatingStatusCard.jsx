@@ -2718,13 +2718,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         value={sensorSearchTerm}
                         onChange={(e) => {
                           setSensorSearchTerm(e.target.value);
-                          setShowSensorDropdown(true);
                         }}
                         onFocus={() => {
                           setShowSensorDropdown(true);
                         }}
                         onBlur={() => {
-                          setTimeout(() => setShowSensorDropdown(false), 150);
+                          setShowSensorDropdown(false);
                         }}
                         placeholder="Type to search sensors..."
                         style={{
@@ -2747,6 +2746,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       />
                       {showSensorDropdown && (
                         <div 
+                          onMouseDown={(e) => e.preventDefault()}
                           style={{
                             position: 'absolute',
                             top: '100%',
@@ -2757,7 +2757,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             borderRadius: '8px',
                             maxHeight: '200px',
                             overflowY: 'auto',
-                            zIndex: 9999,
+                            zIndex: 99999,
                             marginTop: '4px',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                           }}>
