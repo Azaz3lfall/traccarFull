@@ -45,7 +45,7 @@ import AnchorIcon from '@mui/icons-material/Anchor';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ShareIcon from '@mui/icons-material/Share';
-import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -1715,14 +1715,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 12px',
+                        justifyContent: 'center',
+                        width: '32px',
+                        height: '32px',
                         borderRadius: '6px',
                         border: 'none',
                         backgroundColor: colors.secondary,
                         color: colors.text,
-                        fontSize: '12px',
-                        fontWeight: '500',
                         cursor: 'pointer',
                         transition: 'all 0.2s'
                       }}
@@ -1732,9 +1731,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor = colors.secondary;
                       }}
+                      title="Edit Sensors"
                     >
-                      <SettingsIcon style={{ fontSize: '14px' }} />
-                      Edit Sensors
+                      <EditIcon style={{ fontSize: '16px' }} />
                     </button>
                   </div>
                 )}
