@@ -4,7 +4,12 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { Snackbar, Alert } from '@mui/material';
+import {
+  Snackbar,
+  Alert,
+  Autocomplete,
+  TextField
+} from '@mui/material';
 import {
   devicesActions,
   geofencesActions,
@@ -99,49 +104,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   
-  // All possible Traccar sensors
-  const allPossibleSensors = [
-    'id', 'latitude', 'longitude', 'speed', 'course', 'altitude', 'accuracy', 'valid', 'protocol', 'address',
-    'deviceTime', 'fixTime', 'serverTime', 'geofenceIds', 'raw', 'index', 'hdop', 'vdop', 'pdop', 'sat',
-    'satVisible', 'rssi', 'coolantTemp', 'engineTemp', 'battery', 'batteryLevel', 'power', 'fuel', 'fuelLevel',
-    'fuelUsed', 'fuelConsumption', 'volume', 'odometer', 'serviceOdometer', 'tripOdometer', 'obdOdometer',
-    'distance', 'totalDistance', 'hours', 'obdSpeed', 'ignition', 'motion', 'armed', 'alarm', 'status',
-    'rpm', 'throttle', 'load', 'maf', 'coolant', 'intakeTemp', 'intakePressure', 'timingAdvance', 'fuelPressure',
-    'fuelTrim', 'lambda', 'lambdaVoltage', 'lambdaCurrent', 'lambdaVoltage2', 'lambdaCurrent2', 'lambdaVoltage3',
-    'lambdaCurrent3', 'lambdaVoltage4', 'lambdaCurrent4', 'lambdaVoltage5', 'lambdaCurrent5', 'lambdaVoltage6',
-    'lambdaCurrent6', 'lambdaVoltage7', 'lambdaCurrent7', 'lambdaVoltage8', 'lambdaCurrent8', 'lambdaVoltage9',
-    'lambdaCurrent9', 'lambdaVoltage10', 'lambdaCurrent10', 'lambdaVoltage11', 'lambdaCurrent11', 'lambdaVoltage12',
-    'lambdaCurrent12', 'lambdaVoltage13', 'lambdaCurrent13', 'lambdaVoltage14', 'lambdaCurrent14', 'lambdaVoltage15',
-    'lambdaCurrent15', 'lambdaVoltage16', 'lambdaCurrent16', 'lambdaVoltage17', 'lambdaCurrent17', 'lambdaVoltage18',
-    'lambdaCurrent18', 'lambdaVoltage19', 'lambdaCurrent19', 'lambdaVoltage20', 'lambdaCurrent20', 'lambdaVoltage21',
-    'lambdaCurrent21', 'lambdaVoltage22', 'lambdaCurrent22', 'lambdaVoltage23', 'lambdaCurrent23', 'lambdaVoltage24',
-    'lambdaCurrent24', 'lambdaVoltage25', 'lambdaCurrent25', 'lambdaVoltage26', 'lambdaCurrent26', 'lambdaVoltage27',
-    'lambdaCurrent27', 'lambdaVoltage28', 'lambdaCurrent28', 'lambdaVoltage29', 'lambdaCurrent29', 'lambdaVoltage30',
-    'lambdaCurrent30', 'lambdaVoltage31', 'lambdaCurrent31', 'lambdaVoltage32', 'lambdaCurrent32', 'lambdaVoltage33',
-    'lambdaCurrent33', 'lambdaVoltage34', 'lambdaCurrent34', 'lambdaVoltage35', 'lambdaCurrent35', 'lambdaVoltage36',
-    'lambdaCurrent36', 'lambdaVoltage37', 'lambdaCurrent37', 'lambdaVoltage38', 'lambdaCurrent38', 'lambdaVoltage39',
-    'lambdaCurrent39', 'lambdaVoltage40', 'lambdaCurrent40', 'lambdaVoltage41', 'lambdaCurrent41', 'lambdaVoltage42',
-    'lambdaCurrent42', 'lambdaVoltage43', 'lambdaCurrent43', 'lambdaVoltage44', 'lambdaCurrent44', 'lambdaVoltage45',
-    'lambdaCurrent45', 'lambdaVoltage46', 'lambdaCurrent46', 'lambdaVoltage47', 'lambdaCurrent47', 'lambdaVoltage48',
-    'lambdaCurrent48', 'lambdaVoltage49', 'lambdaCurrent49', 'lambdaVoltage50', 'lambdaCurrent50', 'lambdaVoltage51',
-    'lambdaCurrent51', 'lambdaVoltage52', 'lambdaCurrent52', 'lambdaVoltage53', 'lambdaCurrent53', 'lambdaVoltage54',
-    'lambdaCurrent54', 'lambdaVoltage55', 'lambdaCurrent55', 'lambdaVoltage56', 'lambdaCurrent56', 'lambdaVoltage57',
-    'lambdaCurrent57', 'lambdaVoltage58', 'lambdaCurrent58', 'lambdaVoltage59', 'lambdaCurrent59', 'lambdaVoltage60',
-    'lambdaCurrent60', 'lambdaVoltage61', 'lambdaCurrent61', 'lambdaVoltage62', 'lambdaCurrent62', 'lambdaVoltage63',
-    'lambdaCurrent63', 'lambdaVoltage64', 'lambdaCurrent64', 'lambdaVoltage65', 'lambdaCurrent65', 'lambdaVoltage66',
-    'lambdaCurrent66', 'lambdaVoltage67', 'lambdaCurrent67', 'lambdaVoltage68', 'lambdaCurrent68', 'lambdaVoltage69',
-    'lambdaCurrent69', 'lambdaVoltage70', 'lambdaCurrent70', 'lambdaVoltage71', 'lambdaCurrent71', 'lambdaVoltage72',
-    'lambdaCurrent72', 'lambdaVoltage73', 'lambdaCurrent73', 'lambdaVoltage74', 'lambdaCurrent74', 'lambdaVoltage75',
-    'lambdaCurrent75', 'lambdaVoltage76', 'lambdaCurrent76', 'lambdaVoltage77', 'lambdaCurrent77', 'lambdaVoltage78',
-    'lambdaCurrent78', 'lambdaVoltage79', 'lambdaCurrent79', 'lambdaVoltage80', 'lambdaCurrent80', 'lambdaVoltage81',
-    'lambdaCurrent81', 'lambdaVoltage82', 'lambdaCurrent82', 'lambdaVoltage83', 'lambdaCurrent83', 'lambdaVoltage84',
-    'lambdaCurrent84', 'lambdaVoltage85', 'lambdaCurrent85', 'lambdaVoltage86', 'lambdaCurrent86', 'lambdaVoltage87',
-    'lambdaCurrent87', 'lambdaVoltage88', 'lambdaCurrent88', 'lambdaVoltage89', 'lambdaCurrent89', 'lambdaVoltage90',
-    'lambdaCurrent90', 'lambdaVoltage91', 'lambdaCurrent91', 'lambdaVoltage92', 'lambdaCurrent92', 'lambdaVoltage93',
-    'lambdaCurrent93', 'lambdaVoltage94', 'lambdaCurrent94', 'lambdaVoltage95', 'lambdaCurrent95', 'lambdaVoltage96',
-    'lambdaCurrent96', 'lambdaVoltage97', 'lambdaCurrent97', 'lambdaVoltage98', 'lambdaCurrent98', 'lambdaVoltage99',
-    'lambdaCurrent99', 'lambdaVoltage100', 'lambdaCurrent100'
-  ];
+  // Get all possible Traccar sensors from position attributes
+  const allPossibleSensors = useMemo(() => {
+    return Object.keys(positionAttributes).map(key => ({
+      value: key,
+      label: positionAttributes[key]?.name || key
+    }));
+  }, [positionAttributes]);
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -2739,36 +2708,54 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}>
                       Select Sensor Type
                     </label>
-                    <select
-                      value={selectedNewSensor}
-                      onChange={(e) => setSelectedNewSensor(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        backgroundColor: colors.secondary,
-                        border: 'none',
-                        borderRadius: '8px',
-                        color: colors.text,
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'all 0.2s'
+                    <Autocomplete
+                      value={allPossibleSensors.find(sensor => sensor.value === selectedNewSensor) || null}
+                      onChange={(event, newValue) => {
+                        setSelectedNewSensor(newValue?.value || '');
                       }}
-                      onFocus={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
+                      options={allPossibleSensors.filter(sensor => !Object.keys(sensorNames).includes(sensor.value))}
+                      getOptionLabel={(option) => option.label}
+                      isOptionEqualToValue={(option, value) => option.value === value?.value}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Choose a sensor..."
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': {
+                                borderColor: 'transparent',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: 'transparent',
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: 'transparent',
+                                backgroundColor: colors.hover,
+                              },
+                            },
+                            '& .MuiInputBase-input': {
+                              color: colors.text,
+                              fontSize: '14px',
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                              color: colors.textSecondary,
+                              opacity: 1,
+                            },
+                          }}
+                        />
+                      )}
+                      sx={{
+                        '& .MuiAutocomplete-popupIndicator': {
+                          color: colors.textSecondary,
+                        },
+                        '& .MuiAutocomplete-clearIndicator': {
+                          color: colors.textSecondary,
+                        },
                       }}
-                      onBlur={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
-                      }}
-                    >
-                      <option value="">Choose a sensor...</option>
-                      {allPossibleSensors
-                        .filter(sensor => !Object.keys(sensorNames).includes(sensor))
-                        .map(sensor => (
-                          <option key={sensor} value={sensor}>
-                            {sensor}
-                          </option>
-                        ))}
-                    </select>
+                    />
                   </div>
 
                   {/* Sensor Name Input */}
