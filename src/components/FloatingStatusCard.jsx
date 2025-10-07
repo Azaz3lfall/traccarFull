@@ -273,8 +273,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }));
   }, []);
 
-  const handleSaveSensorEdit = useCallback(() => {
-    if (!position) return;
+  const handleSaveSensorEdit = useCallback(async () => {
+    if (!position || !device) return;
     
     // Find only the sensors that have changed or are new
     const changedSensors = {};
@@ -292,13 +292,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     });
     
-    // Log only the changed sensors in the specified format
-    console.log('customSensors:', changedSensors);
-    console.log('activeDevice:', device);
+    // If no changes, just close the modal
+    if (Object.keys(changedSensors).length === 0) {
+      setSensorEditModalOpen(false);
+      setSensorNames({});
+      return;
+    }
     
-    setSensorEditModalOpen(false);
-    setSensorNames({});
-  }, [sensorNames, position, positionItems, positionAttributes]);
+    try {
+      // Create updated device object with customSensors
+      const updatedDevice = {
+        ...device,
+        attributes: {
+          ...device.attributes,
+          customSensors: changedSensors
+        }
+      };
+      
+      console.log('customSensors:', changedSensors);
+      console.log('updatedDevice:', updatedDevice);
+      
+      // PUT the updated device to the API
+      const response = await fetch(`/api/devices/${device.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedDevice)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update device: ${response.statusText}`);
+      }
+      
+      // Revalidate the device data
+      await queryClient.invalidateQueries(['devices']);
+      await queryClient.invalidateQueries(['device', device.id]);
+      
+      console.log('Device updated successfully');
+      
+      setSensorEditModalOpen(false);
+      setSensorNames({});
+      
+    } catch (error) {
+      console.error('Error updating device:', error);
+      showSnackbar('Failed to save sensor changes', 'error');
+    }
+  }, [sensorNames, position, positionItems, positionAttributes, device, queryClient, showSnackbar]);
 
   const handleAddSensor = useCallback(() => {
     if (!selectedNewSensor || !newSensorName) return;
