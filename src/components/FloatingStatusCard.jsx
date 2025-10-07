@@ -2732,7 +2732,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             onBlur={(e) => {
                               e.target.style.backgroundColor = colors.secondary;
                             }}
-                            placeholder="Enter sensor name"
+                            placeholder={t('customName')}
                           />
                         {/* Delete button for customized sensors - positioned inside input */}
                         {(() => {
@@ -2963,7 +2963,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         onBlur={() => {
                           setTimeout(() => setShowSensorDropdown(false), 100);
                         }}
-                        placeholder="Type to search sensors..."
+                        placeholder={t('selectSensor')}
                         style={{
                           width: '100%',
                           padding: '12px',
@@ -3088,7 +3088,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       onBlur={(e) => {
                         e.target.style.backgroundColor = colors.secondary;
                       }}
-                      placeholder="Enter custom name for this sensor"
+                      placeholder={t('customName')}
                     />
                   </div>
                 </div>
