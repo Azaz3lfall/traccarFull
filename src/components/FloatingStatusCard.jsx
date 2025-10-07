@@ -46,6 +46,8 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -93,6 +95,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const [sensorEditModalOpen, setSensorEditModalOpen] = useState(false);
   const [sensorNames, setSensorNames] = useState({});
+  const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
+  const [selectedNewSensor, setSelectedNewSensor] = useState('');
+  const [newSensorName, setNewSensorName] = useState('');
+  
+  // All possible Traccar sensors
+  const allPossibleSensors = [
+    'id', 'latitude', 'longitude', 'speed', 'course', 'altitude', 'accuracy', 'valid', 'protocol', 'address',
+    'deviceTime', 'fixTime', 'serverTime', 'geofenceIds', 'raw', 'index', 'hdop', 'vdop', 'pdop', 'sat',
+    'satVisible', 'rssi', 'coolantTemp', 'engineTemp', 'battery', 'batteryLevel', 'power', 'fuel', 'fuelLevel',
+    'fuelUsed', 'fuelConsumption', 'volume', 'odometer', 'serviceOdometer', 'tripOdometer', 'obdOdometer',
+    'distance', 'totalDistance', 'hours', 'obdSpeed', 'ignition', 'motion', 'armed', 'alarm', 'status',
+    'rpm', 'throttle', 'load', 'maf', 'coolant', 'intakeTemp', 'intakePressure', 'timingAdvance', 'fuelPressure',
+    'fuelTrim', 'lambda', 'lambdaVoltage', 'lambdaCurrent', 'lambdaVoltage2', 'lambdaCurrent2', 'lambdaVoltage3',
+    'lambdaCurrent3', 'lambdaVoltage4', 'lambdaCurrent4', 'lambdaVoltage5', 'lambdaCurrent5', 'lambdaVoltage6',
+    'lambdaCurrent6', 'lambdaVoltage7', 'lambdaCurrent7', 'lambdaVoltage8', 'lambdaCurrent8', 'lambdaVoltage9',
+    'lambdaCurrent9', 'lambdaVoltage10', 'lambdaCurrent10', 'lambdaVoltage11', 'lambdaCurrent11', 'lambdaVoltage12',
+    'lambdaCurrent12', 'lambdaVoltage13', 'lambdaCurrent13', 'lambdaVoltage14', 'lambdaCurrent14', 'lambdaVoltage15',
+    'lambdaCurrent15', 'lambdaVoltage16', 'lambdaCurrent16', 'lambdaVoltage17', 'lambdaCurrent17', 'lambdaVoltage18',
+    'lambdaCurrent18', 'lambdaVoltage19', 'lambdaCurrent19', 'lambdaVoltage20', 'lambdaCurrent20', 'lambdaVoltage21',
+    'lambdaCurrent21', 'lambdaVoltage22', 'lambdaCurrent22', 'lambdaVoltage23', 'lambdaCurrent23', 'lambdaVoltage24',
+    'lambdaCurrent24', 'lambdaVoltage25', 'lambdaCurrent25', 'lambdaVoltage26', 'lambdaCurrent26', 'lambdaVoltage27',
+    'lambdaCurrent27', 'lambdaVoltage28', 'lambdaCurrent28', 'lambdaVoltage29', 'lambdaCurrent29', 'lambdaVoltage30',
+    'lambdaCurrent30', 'lambdaVoltage31', 'lambdaCurrent31', 'lambdaVoltage32', 'lambdaCurrent32', 'lambdaVoltage33',
+    'lambdaCurrent33', 'lambdaVoltage34', 'lambdaCurrent34', 'lambdaVoltage35', 'lambdaCurrent35', 'lambdaVoltage36',
+    'lambdaCurrent36', 'lambdaVoltage37', 'lambdaCurrent37', 'lambdaVoltage38', 'lambdaCurrent38', 'lambdaVoltage39',
+    'lambdaCurrent39', 'lambdaVoltage40', 'lambdaCurrent40', 'lambdaVoltage41', 'lambdaCurrent41', 'lambdaVoltage42',
+    'lambdaCurrent42', 'lambdaVoltage43', 'lambdaCurrent43', 'lambdaVoltage44', 'lambdaCurrent44', 'lambdaVoltage45',
+    'lambdaCurrent45', 'lambdaVoltage46', 'lambdaCurrent46', 'lambdaVoltage47', 'lambdaCurrent47', 'lambdaVoltage48',
+    'lambdaCurrent48', 'lambdaVoltage49', 'lambdaCurrent49', 'lambdaVoltage50', 'lambdaCurrent50', 'lambdaVoltage51',
+    'lambdaCurrent51', 'lambdaVoltage52', 'lambdaCurrent52', 'lambdaVoltage53', 'lambdaCurrent53', 'lambdaVoltage54',
+    'lambdaCurrent54', 'lambdaVoltage55', 'lambdaCurrent55', 'lambdaVoltage56', 'lambdaCurrent56', 'lambdaVoltage57',
+    'lambdaCurrent57', 'lambdaVoltage58', 'lambdaCurrent58', 'lambdaVoltage59', 'lambdaCurrent59', 'lambdaVoltage60',
+    'lambdaCurrent60', 'lambdaVoltage61', 'lambdaCurrent61', 'lambdaVoltage62', 'lambdaCurrent62', 'lambdaVoltage63',
+    'lambdaCurrent63', 'lambdaVoltage64', 'lambdaCurrent64', 'lambdaVoltage65', 'lambdaCurrent65', 'lambdaVoltage66',
+    'lambdaCurrent66', 'lambdaVoltage67', 'lambdaCurrent67', 'lambdaVoltage68', 'lambdaCurrent68', 'lambdaVoltage69',
+    'lambdaCurrent69', 'lambdaVoltage70', 'lambdaCurrent70', 'lambdaVoltage71', 'lambdaCurrent71', 'lambdaVoltage72',
+    'lambdaCurrent72', 'lambdaVoltage73', 'lambdaCurrent73', 'lambdaVoltage74', 'lambdaCurrent74', 'lambdaVoltage75',
+    'lambdaCurrent75', 'lambdaVoltage76', 'lambdaCurrent76', 'lambdaVoltage77', 'lambdaCurrent77', 'lambdaVoltage78',
+    'lambdaCurrent78', 'lambdaVoltage79', 'lambdaCurrent79', 'lambdaVoltage80', 'lambdaCurrent80', 'lambdaVoltage81',
+    'lambdaCurrent81', 'lambdaVoltage82', 'lambdaCurrent82', 'lambdaVoltage83', 'lambdaCurrent83', 'lambdaVoltage84',
+    'lambdaCurrent84', 'lambdaVoltage85', 'lambdaCurrent85', 'lambdaVoltage86', 'lambdaCurrent86', 'lambdaVoltage87',
+    'lambdaCurrent87', 'lambdaVoltage88', 'lambdaCurrent88', 'lambdaVoltage89', 'lambdaCurrent89', 'lambdaVoltage90',
+    'lambdaCurrent90', 'lambdaVoltage91', 'lambdaCurrent91', 'lambdaVoltage92', 'lambdaCurrent92', 'lambdaVoltage93',
+    'lambdaCurrent93', 'lambdaVoltage94', 'lambdaCurrent94', 'lambdaVoltage95', 'lambdaCurrent95', 'lambdaVoltage96',
+    'lambdaCurrent96', 'lambdaVoltage97', 'lambdaCurrent97', 'lambdaVoltage98', 'lambdaCurrent98', 'lambdaVoltage99',
+    'lambdaCurrent99', 'lambdaVoltage100', 'lambdaCurrent100'
+  ];
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -237,14 +286,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleSaveSensorEdit = useCallback(() => {
     if (!position) return;
     
-    // Find only the sensors that have changed
+    // Find only the sensors that have changed or are new
     const changedSensors = {};
-    positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).forEach((key) => {
+    Object.keys(sensorNames).forEach((key) => {
       const currentName = positionAttributes[key]?.name || key;
       const newName = sensorNames[key];
       
-      // Only include if the name has actually changed
-      if (newName && newName !== currentName) {
+      // Include if the name has changed or if it's a new sensor (not in positionItems)
+      const isExistingSensor = positionItems.split(',').includes(key);
+      const isChanged = newName && newName !== currentName;
+      const isNewSensor = !isExistingSensor && newName;
+      
+      if (isChanged || isNewSensor) {
         changedSensors[key] = newName;
       }
     });
@@ -255,6 +308,27 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setSensorEditModalOpen(false);
     setSensorNames({});
   }, [sensorNames, position, positionItems, positionAttributes]);
+
+  const handleAddSensor = useCallback(() => {
+    if (!selectedNewSensor || !newSensorName) return;
+    
+    // Add the new sensor to the sensorNames
+    setSensorNames(prev => ({
+      ...prev,
+      [selectedNewSensor]: newSensorName
+    }));
+    
+    // Reset the add sensor form
+    setSelectedNewSensor('');
+    setNewSensorName('');
+    setAddSensorModalOpen(false);
+  }, [selectedNewSensor, newSensorName]);
+
+  const handleOpenAddSensor = useCallback(() => {
+    setSelectedNewSensor('');
+    setNewSensorName('');
+    setAddSensorModalOpen(true);
+  }, []);
 
   const handleSaveEdit = useCallback(async () => {
     if (!device?.id || !editField) return;
@@ -2432,7 +2506,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       Edit Sensor Names
                     </label>
                     <button
-                      onClick={() => setSensorEditModalOpen(false)}
+                      onClick={handleOpenAddSensor}
                       style={{
                         width: '32px',
                         height: '32px',
@@ -2451,8 +2525,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor = colors.secondary;
                       }}
+                      title="Add New Sensor"
                     >
-                      <X size={16} color={colors.textSecondary} />
+                      <AddIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
                     </button>
                   </div>
                   
@@ -2462,7 +2537,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     overflowY: 'auto',
                     marginBottom: '20px'
                   }}>
-                    {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => (
+                    {Object.keys(sensorNames).map((key) => (
                       <div key={key} style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -2565,6 +2640,232 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}
                   >
                     {t('sharedSave')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Sensor Modal */}
+      <AnimatePresence>
+        {addSensorModalOpen && (
+          <motion.div
+            key="add-sensor-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10005
+            }}
+            onClick={() => setAddSensorModalOpen(false)}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '8px',
+                width: '400px',
+                maxWidth: '90vw',
+                overflow: 'hidden',
+                boxShadow: colors.shadow
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Content */}
+              <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px'
+                  }}>
+                    <label style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: colors.text,
+                      margin: 0
+                    }}>
+                      Add New Sensor
+                    </label>
+                    <button
+                      onClick={() => setAddSensorModalOpen(false)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: colors.secondary,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                    >
+                      <CloseIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                    </button>
+                  </div>
+                  
+                  {/* Sensor Selection */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: colors.textSecondary,
+                      marginBottom: '4px',
+                      display: 'block'
+                    }}>
+                      Select Sensor Type
+                    </label>
+                    <select
+                      value={selectedNewSensor}
+                      onChange={(e) => setSelectedNewSensor(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: colors.secondary,
+                        border: 'none',
+                        borderRadius: '8px',
+                        color: colors.text,
+                        fontSize: '14px',
+                        outline: 'none',
+                        transition: 'all 0.2s'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                    >
+                      <option value="">Choose a sensor...</option>
+                      {allPossibleSensors
+                        .filter(sensor => !Object.keys(sensorNames).includes(sensor))
+                        .map(sensor => (
+                          <option key={sensor} value={sensor}>
+                            {sensor}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Sensor Name Input */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: colors.textSecondary,
+                      marginBottom: '4px',
+                      display: 'block'
+                    }}>
+                      Custom Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newSensorName}
+                      onChange={(e) => setNewSensorName(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: colors.secondary,
+                        border: 'none',
+                        borderRadius: '8px',
+                        color: colors.text,
+                        fontSize: '14px',
+                        outline: 'none',
+                        transition: 'all 0.2s'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.backgroundColor = colors.secondary;
+                      }}
+                      placeholder="Enter custom name for this sensor"
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'space-between'
+                }}>
+                  <button
+                    onClick={() => setAddSensorModalOpen(false)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.color = colors.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                      e.target.style.color = colors.text;
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddSensor}
+                    disabled={!selectedNewSensor || !newSensorName}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: (!selectedNewSensor || !newSensorName) ? colors.border : '#D1FAE5',
+                      color: (!selectedNewSensor || !newSensorName) ? colors.textSecondary : '#065F46',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: (!selectedNewSensor || !newSensorName) ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedNewSensor && newSensorName) {
+                        e.target.style.backgroundColor = '#A7F3D0';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedNewSensor && newSensorName) {
+                        e.target.style.backgroundColor = '#D1FAE5';
+                      }
+                    }}
+                  >
+                    Add Sensor
                   </button>
                 </div>
               </div>
