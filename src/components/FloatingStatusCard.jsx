@@ -92,9 +92,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const [sensorEditModalOpen, setSensorEditModalOpen] = useState(false);
-  const [editingSensor, setEditingSensor] = useState({ key: '', name: '', translation: '' });
+  const [editingSensor, setEditingSensor] = useState({ key: '', name: '' });
   const [sensorName, setSensorName] = useState('');
-  const [sensorTranslation, setSensorTranslation] = useState('');
   
   const showSnackbar = (message, severity = 'error') => {
     setSnackbar({ open: true, message, severity });
@@ -219,25 +218,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleEditSensor = useCallback((sensorKey, currentName) => {
     setEditingSensor({
       key: sensorKey,
-      name: currentName,
-      translation: positionAttributes[sensorKey]?.name || sensorKey
+      name: currentName
     });
     setSensorName(currentName);
-    setSensorTranslation(positionAttributes[sensorKey]?.name || sensorKey);
     setSensorEditModalOpen(true);
-  }, [positionAttributes]);
+  }, []);
 
   const handleSaveSensorEdit = useCallback(() => {
     console.log('Saving sensor configuration:', {
       key: editingSensor.key,
       name: sensorName,
-      translation: sensorTranslation,
     });
     setSensorEditModalOpen(false);
-    setEditingSensor({ key: '', name: '', translation: '' });
+    setEditingSensor({ key: '', name: '' });
     setSensorName('');
-    setSensorTranslation('');
-  }, [editingSensor.key, sensorName, sensorTranslation]);
+  }, [editingSensor.key, sensorName]);
 
   const handleSaveEdit = useCallback(async () => {
     if (!device?.id || !editField) return;
@@ -2425,7 +2420,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </div>
                   
                   {/* Sensor Name Input */}
-                  <div style={{ marginBottom: '16px' }}>
+                  <div style={{ marginBottom: '20px' }}>
                     <label style={{
                       fontSize: '12px',
                       fontWeight: '500',
@@ -2457,42 +2452,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         e.target.style.backgroundColor = colors.secondary;
                       }}
                       placeholder="Enter sensor name"
-                    />
-                  </div>
-
-                  {/* Translation Input */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      color: colors.textSecondary,
-                      marginBottom: '4px',
-                      display: 'block'
-                    }}>
-                      Translation Key
-                    </label>
-                    <input
-                      type="text"
-                      value={sensorTranslation}
-                      onChange={(e) => setSensorTranslation(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        backgroundColor: colors.secondary,
-                        border: 'none',
-                        borderRadius: '8px',
-                        color: colors.text,
-                        fontSize: '16px',
-                        outline: 'none',
-                        transition: 'all 0.2s'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
-                      }}
-                      placeholder="Enter translation key"
                     />
                   </div>
                 </div>
