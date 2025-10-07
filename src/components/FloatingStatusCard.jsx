@@ -292,7 +292,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     });
     
-    // Log only the changed sensors in the specified format    
+    // Log only the changed sensors in the specified format
+    console.log('customSensors:', changedSensors);
+    console.log('activeDevice:', device);
+    
     setSensorEditModalOpen(false);
     setSensorNames({});
   }, [sensorNames, position, positionItems, positionAttributes]);
