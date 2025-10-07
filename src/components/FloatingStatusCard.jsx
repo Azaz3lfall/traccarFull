@@ -310,10 +310,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleDeleteCustomSensor = useCallback((sensorKey) => {
     setSensorNames(prev => {
       const newSensorNames = { ...prev };
-      delete newSensorNames[sensorKey];
+      
+      // Check if this is an existing sensor (in positionItems) or a custom sensor
+      const isExistingSensor = positionItems.split(',').includes(sensorKey);
+      
+      if (isExistingSensor) {
+        // For existing sensors, reset to default value instead of removing
+        newSensorNames[sensorKey] = positionAttributes[sensorKey]?.name || sensorKey;
+      } else {
+        // For custom sensors, remove them completely
+        delete newSensorNames[sensorKey];
+      }
+      
       return newSensorNames;
     });
-  }, []);
+  }, [positionItems, positionAttributes]);
 
   const handleSaveSensorEdit = useCallback(async () => {
     if (!position || !device) return;
@@ -346,6 +357,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     });
     
+    // Check for sensors that were reset to default (should be removed from customSensors)
+    Object.keys(sensorNames).forEach((key) => {
+      const currentName = positionAttributes[key]?.name || key;
+      const newName = sensorNames[key];
+      const isExistingSensor = positionItemsList.includes(key);
+      
+      // If it's an existing sensor and the name matches the default, it was reset
+      if (isExistingSensor && newName === currentName) {
+        console.log(`Sensor reset to default: ${key} = "${newName}"`);
+      }
+    });
+    
     // Check for deleted custom sensors (were in customSensors but not in sensorNames)
     Object.keys(currentCustomSensors).forEach((key) => {
       if (!sensorNames.hasOwnProperty(key)) {
@@ -364,7 +387,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setSavingSensors(true);
     
     try {
-      // Create final customSensors object (include all changed sensors)
+      // Create final customSensors object (include all changed sensors, exclude resets)
       const finalCustomSensors = {};
       
       // Include all changed sensors (both existing and new)
@@ -375,8 +398,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Also include any existing custom sensors that weren't changed or deleted
       Object.keys(currentCustomSensors).forEach((key) => {
         if (!changedSensors.hasOwnProperty(key) && sensorNames.hasOwnProperty(key)) {
-          // This is an existing custom sensor that wasn't changed, keep it
-          finalCustomSensors[key] = currentCustomSensors[key];
+          // Check if this sensor was reset to default
+          const currentName = positionAttributes[key]?.name || key;
+          const newName = sensorNames[key];
+          const isExistingSensor = positionItemsList.includes(key);
+          
+          // Only keep it if it's not an existing sensor reset to default
+          if (!(isExistingSensor && newName === currentName)) {
+            finalCustomSensors[key] = currentCustomSensors[key];
+          }
         }
       });
       
