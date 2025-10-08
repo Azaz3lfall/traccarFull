@@ -325,15 +325,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     });
   }, [positionItems, positionAttributes]);
 
-  const handleImportSensors = useCallback(() => {
+  const handleImportSensors = useCallback(async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (event) => {
+    input.onchange = async (event) => {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           try {
             const jsonData = JSON.parse(e.target.result);
             
@@ -352,13 +352,62 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             
             console.log('Imported customSensors:', jsonData);
             
-            // Update sensor names with imported data
-            setSensorNames(prev => ({
-              ...prev,
-              ...jsonData
-            }));
+            if (!position || !device) {
+              showSnackbar('No device data available for import.', 'error');
+              return;
+            }
             
-            showSnackbar('Sensors imported successfully!', 'success');
+            setSavingSensors(true);
+            
+            try {
+              // Save the imported data to the device
+              const updatedDevice = {
+                ...device,
+                attributes: {
+                  ...device.attributes,
+                  customSensors: JSON.stringify(jsonData)
+                }
+              };
+              
+              // PUT the updated device to the API
+              const response = await fetch(`/api/devices/${device.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedDevice)
+              });
+              
+              if (!response.ok) {
+                throw new Error(`Failed to save imported sensors: ${response.statusText}`);
+              }
+              
+              // Update the device in the store
+              dispatch(devicesActions.update([updatedDevice]));
+              
+              // Revalidate by fetching the latest device data
+              const revalidateResponse = await fetch(`/api/devices/${device.id}`);
+              if (!revalidateResponse.ok) {
+                throw new Error(`Failed to revalidate device data: ${revalidateResponse.statusText}`);
+              }
+              
+              const revalidatedDevice = await revalidateResponse.json();
+              console.log('Revalidated device data after import:', revalidatedDevice);
+              
+              // Update sensor names with imported data
+              setSensorNames(prev => ({
+                ...prev,
+                ...jsonData
+              }));
+              
+              showSnackbar('Sensors imported, saved and revalidated successfully!', 'success');
+              
+            } catch (error) {
+              console.error('Error saving imported sensors:', error);
+              showSnackbar(`Error saving imported sensors: ${error.message}`, 'error');
+            } finally {
+              setSavingSensors(false);
+            }
           } catch (error) {
             console.error('Error parsing JSON file:', error);
             showSnackbar('Error parsing JSON file. Please check the file format.', 'error');
@@ -368,7 +417,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     };
     input.click();
-  }, [showSnackbar]);
+  }, [position, device, dispatch, showSnackbar]);
 
   const handleExportSensors = useCallback(async () => {
     if (!position || !device) {
@@ -2839,27 +2888,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}>
                       <button
                         onClick={handleImportSensors}
+                        disabled={savingSensors}
                         style={{
                           width: '32px',
                           height: '32px',
                           borderRadius: '8px',
                           border: 'none',
-                          backgroundColor: colors.secondary,
-                          cursor: 'pointer',
+                          backgroundColor: savingSensors ? colors.border : colors.secondary,
+                          cursor: savingSensors ? 'not-allowed' : 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'all 0.2s'
                         }}
                         onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = colors.hover;
+                          if (!savingSensors) {
+                            e.target.style.backgroundColor = colors.hover;
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = colors.secondary;
+                          if (!savingSensors) {
+                            e.target.style.backgroundColor = colors.secondary;
+                          }
                         }}
-                        title="Import Sensors"
+                        title={savingSensors ? "Importing and saving..." : "Import Sensors"}
                       >
-                        <UploadIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                        {savingSensors ? (
+                          <CircularProgress size={16} style={{ color: colors.textSecondary }} />
+                        ) : (
+                          <UploadIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                        )}
                       </button>
                       <button
                         onClick={handleExportSensors}
