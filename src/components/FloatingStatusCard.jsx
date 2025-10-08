@@ -328,14 +328,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleImportSensors = useCallback(async () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.tpl';
     input.onchange = async (event) => {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
-            const jsonData = JSON.parse(e.target.result);
+            // First, decode base64
+            let jsonData;
+            try {
+              const base64Data = e.target.result;
+              const decodedData = atob(base64Data);
+              jsonData = JSON.parse(decodedData);
+            } catch (decodeError) {
+              showSnackbar('Invalid .tpl file format. File must be base64 encoded JSON.', 'error');
+              return;
+            }
             
             // Validate the structure - should be an object with string values
             if (typeof jsonData !== 'object' || jsonData === null || Array.isArray(jsonData)) {
@@ -350,7 +359,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               return;
             }
             
-            console.log('Imported customSensors:', jsonData);
+            console.log('Imported customSensors (decoded from base64):', jsonData);
             
             if (!position || !device) {
               showSnackbar('No device data available for import.', 'error');
@@ -400,7 +409,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 ...jsonData
               }));
               
-              showSnackbar('Sensors imported, saved and revalidated successfully!', 'success');
+              showSnackbar('Sensors imported from .tpl file, saved and revalidated successfully!', 'success');
               
             } catch (error) {
               console.error('Error saving imported sensors:', error);
@@ -409,8 +418,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               setSavingSensors(false);
             }
           } catch (error) {
-            console.error('Error parsing JSON file:', error);
-            showSnackbar('Error parsing JSON file. Please check the file format.', 'error');
+            console.error('Error processing .tpl file:', error);
+            showSnackbar('Error processing .tpl file. Please check the file format.', 'error');
           }
         };
         reader.readAsText(file);
@@ -534,20 +543,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         return;
       }
       
-      // Now download the file
+      // Now download the file as base64 encoded .tpl
       const dataStr = JSON.stringify(latestCustomSensors, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const base64Data = btoa(unescape(encodeURIComponent(dataStr)));
+      const dataBlob = new Blob([base64Data], { type: 'text/plain' });
       
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `customSensors_${device.name || 'device'}_${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `customSensors_${device.name || 'device'}_${new Date().toISOString().split('T')[0]}.tpl`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      showSnackbar('Custom sensors saved and exported successfully!', 'success');
+      showSnackbar('Custom sensors saved and exported as .tpl file successfully!', 'success');
       
     } catch (error) {
       console.error('Error exporting sensors:', error);
