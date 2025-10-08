@@ -2875,16 +2875,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     <button
                       onClick={() => setSensorEditModalOpen(false)}
                       style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '8px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '6px',
                         border: 'none',
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginRight: '12px',
+                        marginRight: '8px',
                         transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
@@ -2896,7 +2896,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       title="Close"
                     >
                       <ChevronLeft style={{ 
-                        fontSize: '20px', 
+                        fontSize: '18px', 
                         color: colors.textSecondary,
                         backgroundColor: 'transparent',
                         display: 'block'
@@ -3212,16 +3212,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     <button
                       onClick={() => setAddSensorModalOpen(false)}
                       style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '8px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '6px',
                         border: 'none',
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginRight: '12px',
+                        marginRight: '8px',
                         transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
@@ -3233,7 +3233,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       title="Close"
                     >
                       <ChevronLeft style={{ 
-                        fontSize: '20px', 
+                        fontSize: '18px', 
                         color: colors.textSecondary,
                         backgroundColor: 'transparent',
                         display: 'block'
