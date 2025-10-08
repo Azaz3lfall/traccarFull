@@ -872,14 +872,14 @@ const MainPage = () => {
 
   // Format event type using Traccar's formatter with custom sensor support
   const formatEventType = (event) => {
-    // Check if this is a custom sensor event (only for specific sensor keys)
+    const device = devices[event.deviceId];
+    
+    // Check if this is a custom sensor event in attributes
     if (event.attributes) {
-      // Look for custom sensor keys in event attributes
       const customSensorKeys = ['in1', 'in2', 'in3', 'in4', 'out1', 'out2', 'out3', 'out4', 'input', 'output'];
       const customSensorKey = customSensorKeys.find(key => event.attributes.hasOwnProperty(key));
       
       if (customSensorKey) {
-        const device = devices[event.deviceId];
         let customSensorName = customSensorKey;
         
         // Get custom sensor name if available
@@ -901,17 +901,14 @@ const MainPage = () => {
         // Handle boolean values
         if (typeof value === 'boolean' || value === 0 || value === 1 || value === '0' || value === '1' || value === 'true' || value === 'false') {
           const boolValue = value === true || value === 1 || value === '1' || value === 'true';
-          formattedValue = boolValue ? 'yes' : 'no';
+          formattedValue = boolValue ? t('sharedYes') : t('sharedNo');
         }
         
         return `${customSensorName}: ${formattedValue}`;
       }
     }
     
-    // Fall back to standard event formatting for all other events
-    // This handles: deviceOnline, deviceOffline, deviceUnknown, deviceMoving, 
-    // deviceStopped, ignitionOn, ignitionOff, geofenceEnter, geofenceExit, 
-    // alarm, maintenance, textMessage, driverChanged, media, commandResult, etc.
+    // Get standard event formatting first
     const standardEvent = formatNotificationTitle(t, {
       type: event.type,
       attributes: {
@@ -919,8 +916,32 @@ const MainPage = () => {
       },
     });
     
-    // Debug logging to see what events are being processed
-    console.log('Event type:', event.type, 'Formatted:', standardEvent);
+    // Check if we can replace any sensor key in the event type with custom name
+    if (device?.attributes?.customSensors) {
+      try {
+        const customSensors = JSON.parse(device.attributes.customSensors);
+        
+        // Check each custom sensor key to see if it appears in the event type
+        for (const [sensorKey, customName] of Object.entries(customSensors)) {
+          if (event.type.includes(sensorKey)) {
+            // Replace the sensor key with custom name in the standard event
+            const regex = new RegExp(sensorKey, 'gi');
+            let customEvent = standardEvent.replace(regex, customName);
+            
+            // Handle on/off status for boolean events
+            if (event.type.endsWith('On') || event.type.endsWith('Off')) {
+              const isOn = event.type.endsWith('On');
+              const status = isOn ? t('sharedYes') : t('sharedNo');
+              customEvent = `${customName}: ${status}`;
+            }
+            
+            return customEvent;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing customSensors:', error);
+      }
+    }
     
     return standardEvent;
   };
