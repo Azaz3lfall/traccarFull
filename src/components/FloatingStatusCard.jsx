@@ -2895,7 +2895,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }}
                       title="Close"
                     >
-                      <ChevronLeft style={{ fontSize: '20px', color: colors.textSecondary }} />
+                      <ChevronLeft style={{ 
+                        fontSize: '20px', 
+                        color: colors.textSecondary,
+                        backgroundColor: 'transparent',
+                        display: 'block'
+                      }} />
                     </button>
                     <label style={{
                       fontSize: '16px',
@@ -3227,7 +3232,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }}
                       title="Close"
                     >
-                      <ChevronLeft style={{ fontSize: '20px', color: colors.textSecondary }} />
+                      <ChevronLeft style={{ 
+                        fontSize: '20px', 
+                        color: colors.textSecondary,
+                        backgroundColor: 'transparent',
+                        display: 'block'
+                      }} />
                     </button>
                     <label style={{
                       fontSize: '16px',
