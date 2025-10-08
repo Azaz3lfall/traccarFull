@@ -8,8 +8,6 @@ import { createPortal } from 'react-dom';
 import {
   Snackbar,
   Alert,
-  Autocomplete,
-  TextField,
   CircularProgress
 } from '@mui/material';
 import {
@@ -55,6 +53,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import dayjs from 'dayjs';
@@ -325,6 +324,189 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       return newSensorNames;
     });
   }, [positionItems, positionAttributes]);
+
+  const handleImportSensors = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const jsonData = JSON.parse(e.target.result);
+            
+            // Validate the structure - should be an object with string values
+            if (typeof jsonData !== 'object' || jsonData === null || Array.isArray(jsonData)) {
+              showSnackbar('Invalid JSON structure. Expected an object with sensor names.', 'error');
+              return;
+            }
+            
+            // Check if all values are strings
+            const invalidKeys = Object.entries(jsonData).filter(([, value]) => typeof value !== 'string');
+            if (invalidKeys.length > 0) {
+              showSnackbar('Invalid sensor data. All sensor names must be strings.', 'error');
+              return;
+            }
+            
+            console.log('Imported customSensors:', jsonData);
+            
+            // Update sensor names with imported data
+            setSensorNames(prev => ({
+              ...prev,
+              ...jsonData
+            }));
+            
+            showSnackbar('Sensors imported successfully!', 'success');
+          } catch (error) {
+            console.error('Error parsing JSON file:', error);
+            showSnackbar('Error parsing JSON file. Please check the file format.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  }, [showSnackbar]);
+
+  const handleExportSensors = useCallback(async () => {
+    if (!position || !device) {
+      showSnackbar('No device data available for export.', 'error');
+      return;
+    }
+    
+    setSavingSensors(true);
+    
+    try {
+      // First, save any current changes
+      let finalCustomSensors = {};
+      
+      // Get current custom sensors from device
+      let currentCustomSensors = {};
+      if (device.attributes?.customSensors) {
+        try {
+          currentCustomSensors = JSON.parse(device.attributes.customSensors);
+        } catch (error) {
+          console.error('Error parsing current customSensors:', error);
+        }
+      }
+      
+      // Find sensors that have changed, are new, or were deleted
+      const changedSensors = {};
+      const positionItemsList = positionItems.split(',');
+      
+      // Check all sensors in sensorNames for changes
+      Object.keys(sensorNames).forEach((key) => {
+        const currentName = positionAttributes[key]?.name || key;
+        const newName = sensorNames[key];
+        
+        // Include if the name has changed (regardless of whether it's existing or new)
+        const isChanged = newName && newName !== currentName;
+        
+        if (isChanged) {
+          changedSensors[key] = newName;
+        }
+      });
+      
+      // Create final customSensors object (include all changed sensors, exclude resets)
+      Object.keys(changedSensors).forEach((key) => {
+        finalCustomSensors[key] = changedSensors[key];
+      });
+      
+      // Also include any existing custom sensors that weren't changed or deleted
+      Object.keys(currentCustomSensors).forEach((key) => {
+        if (!changedSensors.hasOwnProperty(key) && sensorNames.hasOwnProperty(key)) {
+          // Check if this sensor was reset to default
+          const currentName = positionAttributes[key]?.name || key;
+          const newName = sensorNames[key];
+          const isExistingSensor = positionItemsList.includes(key);
+          
+          // Only keep it if it's not an existing sensor reset to default
+          if (!(isExistingSensor && newName === currentName)) {
+            finalCustomSensors[key] = currentCustomSensors[key];
+          }
+        }
+      });
+      
+      // If there are changes, save them first
+      if (Object.keys(changedSensors).length > 0 || Object.keys(currentCustomSensors).length > 0) {
+        // Create updated device object with customSensors
+        const updatedDevice = {
+          ...device,
+          attributes: {
+            ...device.attributes,
+            customSensors: JSON.stringify(finalCustomSensors)
+          }
+        };
+        
+        // PUT the updated device to the API
+        const response = await fetch(`/api/devices/${device.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedDevice)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to save sensors: ${response.statusText}`);
+        }
+        
+        // Update the device in the store
+        dispatch(devicesActions.update([updatedDevice]));
+        
+        console.log('Sensors saved before export:', finalCustomSensors);
+      }
+      
+      // Revalidate by fetching the latest device data
+      const revalidateResponse = await fetch(`/api/devices/${device.id}`);
+      if (!revalidateResponse.ok) {
+        throw new Error(`Failed to revalidate device data: ${revalidateResponse.statusText}`);
+      }
+      
+      const revalidatedDevice = await revalidateResponse.json();
+      console.log('Revalidated device data:', revalidatedDevice);
+      
+      // Get the latest customSensors from revalidated data
+      let latestCustomSensors = {};
+      if (revalidatedDevice.attributes?.customSensors) {
+        try {
+          latestCustomSensors = JSON.parse(revalidatedDevice.attributes.customSensors);
+        } catch (error) {
+          console.error('Error parsing revalidated customSensors:', error);
+          latestCustomSensors = finalCustomSensors; // Fallback to what we just saved
+        }
+      }
+      
+      // If no custom sensors exist, show error
+      if (Object.keys(latestCustomSensors).length === 0) {
+        showSnackbar('No custom sensors to export.', 'error');
+        return;
+      }
+      
+      // Now download the file
+      const dataStr = JSON.stringify(latestCustomSensors, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `customSensors_${device.name || 'device'}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      showSnackbar('Custom sensors saved and exported successfully!', 'success');
+      
+    } catch (error) {
+      console.error('Error exporting sensors:', error);
+      showSnackbar(`Error exporting sensors: ${error.message}`, 'error');
+    } finally {
+      setSavingSensors(false);
+    }
+  }, [position, device, positionItems, positionAttributes, sensorNames, dispatch, showSnackbar]);
 
   const handleSaveSensorEdit = useCallback(async () => {
     if (!position || !device) return;
@@ -2650,30 +2832,93 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     }}>
                       {t('editSensorNames')}
                     </label>
-                    <button
-                      onClick={handleOpenAddSensor}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: colors.secondary,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
-                      }}
-                      title={t('customizeSensor')}
-                    >
-                      <AddIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
-                    </button>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <button
+                        onClick={handleImportSensors}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          backgroundColor: colors.secondary,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = colors.secondary;
+                        }}
+                        title="Import Sensors"
+                      >
+                        <UploadIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                      </button>
+                      <button
+                        onClick={handleExportSensors}
+                        disabled={savingSensors}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          backgroundColor: savingSensors ? colors.border : colors.secondary,
+                          cursor: savingSensors ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!savingSensors) {
+                            e.target.style.backgroundColor = colors.hover;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!savingSensors) {
+                            e.target.style.backgroundColor = colors.secondary;
+                          }
+                        }}
+                        title={savingSensors ? "Saving and exporting..." : "Export Sensors"}
+                      >
+                        {savingSensors ? (
+                          <CircularProgress size={16} style={{ color: colors.textSecondary }} />
+                        ) : (
+                          <DownloadIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleOpenAddSensor}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          backgroundColor: colors.secondary,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = colors.secondary;
+                        }}
+                        title={t('customizeSensor')}
+                      >
+                        <AddIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Sensor List */}
@@ -2957,11 +3202,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         onClick={() => {
                           setShowSensorDropdown(true);
                         }}
-                        onFocus={() => {
+                        onFocus={(e) => {
                           setShowSensorDropdown(true);
+                          e.target.style.backgroundColor = colors.hover;
                         }}
-                        onBlur={() => {
+                        onBlur={(e) => {
                           setTimeout(() => setShowSensorDropdown(false), 100);
+                          e.target.style.backgroundColor = colors.secondary;
                         }}
                         placeholder={t('selectSensor')}
                         style={{
@@ -2974,12 +3221,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           fontSize: '14px',
                           outline: 'none',
                           transition: 'all 0.2s'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.backgroundColor = colors.hover;
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.backgroundColor = colors.secondary;
                         }}
                       />
                       {showSensorDropdown && createPortal(
