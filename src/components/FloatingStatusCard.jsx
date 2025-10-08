@@ -3008,11 +3008,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 zIndex: 1
                               }}
                               onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = '#ef4444';
-                                e.target.style.color = '#ffffff';
+                                e.target.style.color = '#ef4444';
                               }}
                               onMouseLeave={(e) => {
-                                e.target.style.backgroundColor = 'transparent';
                                 e.target.style.color = colors.textSecondary;
                               }}
                               title="Delete custom sensor"
