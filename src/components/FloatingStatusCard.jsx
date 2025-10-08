@@ -2875,32 +2875,28 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     <button
                       onClick={() => setSensorEditModalOpen(false)}
                       style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '6px',
                         border: 'none',
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginRight: '6px',
-                        transition: 'all 0.2s'
+                        marginRight: '8px',
+                        transition: 'all 0.2s',
+                        padding: 0
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
+                        e.currentTarget.style.backgroundColor = colors.hover;
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                       title="Close"
                     >
-                      <ChevronLeft style={{ 
-                        fontSize: '16px', 
-                        color: colors.textSecondary,
-                        backgroundColor: 'transparent',
-                        display: 'block'
-                      }} />
+                      <ChevronLeft size={20} color={colors.textSecondary} />
                     </button>
                     <label style={{
                       fontSize: '16px',
@@ -3212,32 +3208,28 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     <button
                       onClick={() => setAddSensorModalOpen(false)}
                       style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '4px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '6px',
                         border: 'none',
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginRight: '6px',
-                        transition: 'all 0.2s'
+                        marginRight: '8px',
+                        transition: 'all 0.2s',
+                        padding: 0
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
+                        e.currentTarget.style.backgroundColor = colors.hover;
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                       title="Close"
                     >
-                      <ChevronLeft style={{ 
-                        fontSize: '16px', 
-                        color: colors.textSecondary,
-                        backgroundColor: 'transparent',
-                        display: 'block'
-                      }} />
+                      <ChevronLeft size={20} color={colors.textSecondary} />
                     </button>
                     <label style={{
                       fontSize: '16px',
