@@ -872,7 +872,7 @@ const MainPage = () => {
 
   // Format event type using Traccar's formatter with custom sensor support
   const formatEventType = (event) => {
-    // Check if this is a custom sensor event
+    // Check if this is a custom sensor event (only for specific sensor keys)
     if (event.attributes) {
       // Look for custom sensor keys in event attributes
       const customSensorKeys = ['in1', 'in2', 'in3', 'in4', 'out1', 'out2', 'out3', 'out4', 'input', 'output'];
@@ -908,13 +908,21 @@ const MainPage = () => {
       }
     }
     
-    // Fall back to standard event formatting
-    return formatNotificationTitle(t, {
+    // Fall back to standard event formatting for all other events
+    // This handles: deviceOnline, deviceOffline, deviceUnknown, deviceMoving, 
+    // deviceStopped, ignitionOn, ignitionOff, geofenceEnter, geofenceExit, 
+    // alarm, maintenance, textMessage, driverChanged, media, commandResult, etc.
+    const standardEvent = formatNotificationTitle(t, {
       type: event.type,
       attributes: {
         alarms: event.attributes?.alarm,
       },
     });
+    
+    // Debug logging to see what events are being processed
+    console.log('Event type:', event.type, 'Formatted:', standardEvent);
+    
+    return standardEvent;
   };
 
   // Get device name from deviceId
