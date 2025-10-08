@@ -2129,7 +2129,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }}
                       title="Edit Sensors"
                     >
-                      <EditIcon style={{ fontSize: '14px' }} />
+                      <EditIcon style={{ 
+                        fontSize: '14px', 
+                        backgroundColor: 'transparent',
+                        color: 'inherit',
+                        display: 'block'
+                      }} />
                     </button>
                   </div>
                 )}
