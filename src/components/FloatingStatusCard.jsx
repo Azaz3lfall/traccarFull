@@ -344,7 +344,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               const utf8Data = decodeURIComponent(escape(decodedData));
               jsonData = JSON.parse(utf8Data);
             } catch (decodeError) {
-              showSnackbar('Invalid .tpl file format. File must be base64 encoded JSON.', 'error');
+              showSnackbar('Invalid .tpl file format.', 'error');
               return;
             }
             
