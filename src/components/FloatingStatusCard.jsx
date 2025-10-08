@@ -2870,14 +2870,39 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
                     marginBottom: '16px'
                   }}>
+                    <button
+                      onClick={() => setSensorEditModalOpen(false)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '12px',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                      title="Close"
+                    >
+                      <ChevronLeft style={{ fontSize: '20px', color: colors.textSecondary }} />
+                    </button>
                     <label style={{
                       fontSize: '16px',
                       fontWeight: '600',
                       color: colors.text,
-                      margin: 0
+                      margin: 0,
+                      flex: 1
                     }}>
                       {t('editSensorNames')}
                     </label>
@@ -3086,32 +3111,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 <div style={{
                   display: 'flex',
                   gap: '12px',
-                  justifyContent: 'space-between'
+                  justifyContent: 'flex-end'
                 }}>
-                  <button
-                    onClick={() => setSensorEditModalOpen(false)}
-                    style={{
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: colors.secondary,
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = colors.hover;
-                      e.target.style.color = colors.text;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = colors.secondary;
-                      e.target.style.color = colors.text;
-                    }}
-                  >
-                    {t('sharedCancel')}
-                  </button>
                   <button
                     onClick={handleSaveSensorEdit}
                     disabled={savingSensors}
@@ -3201,17 +3202,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
                     marginBottom: '16px'
                   }}>
-                    <label style={{
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      color: colors.text,
-                      margin: 0
-                    }}>
-                      {t('customizeSensor')}
-                    </label>
                     <button
                       onClick={() => setAddSensorModalOpen(false)}
                       style={{
@@ -3219,22 +3211,33 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         height: '32px',
                         borderRadius: '8px',
                         border: 'none',
-                        backgroundColor: colors.secondary,
+                        backgroundColor: 'transparent',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        marginRight: '12px',
                         transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.backgroundColor = colors.hover;
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
+                        e.target.style.backgroundColor = 'transparent';
                       }}
+                      title="Close"
                     >
-                      <CloseIcon style={{ fontSize: '16px', color: colors.textSecondary }} />
+                      <ChevronLeft style={{ fontSize: '20px', color: colors.textSecondary }} />
                     </button>
+                    <label style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: colors.text,
+                      margin: 0,
+                      flex: 1
+                    }}>
+                      {t('customizeSensor')}
+                    </label>
                   </div>
                   
                   {/* Sensor Selection */}
@@ -3394,32 +3397,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 <div style={{
                   display: 'flex',
                   gap: '12px',
-                  justifyContent: 'space-between'
+                  justifyContent: 'flex-end'
                 }}>
-                  <button
-                    onClick={() => setAddSensorModalOpen(false)}
-                    style={{
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: colors.secondary,
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = colors.hover;
-                      e.target.style.color = colors.text;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = colors.secondary;
-                      e.target.style.color = colors.text;
-                    }}
-                  >
-                    Cancel
-                  </button>
                   <button
                     onClick={handleAddSensor}
                     disabled={!selectedNewSensor || !newSensorName}
