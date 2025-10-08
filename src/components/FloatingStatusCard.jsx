@@ -1539,6 +1539,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
 
+          {/* Sensor Edit Button - Hidden in replay mode */}
+          {!showReplayPopover && !deviceReadonly && (
+            <button
+              onClick={handleOpenSensorEdit}
+              style={{
+                position: 'absolute',
+                top: !desktop ? '8px' : '12px',
+                right: !desktop ? '47px' : '52px',
+                zIndex: 10,
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Edit Sensors"
+            >
+              <EditIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+            </button>
+          )}
+
           {/* Details Button - Hidden in replay mode */}
           {!showReplayPopover && (
             <button
@@ -2164,40 +2189,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             {/* Position Attributes */}
             {position && (
               <div style={{ marginBottom: '4px' }}>
-                {/* Edit Sensors Button */}
-                {!deviceReadonly && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    marginBottom: '4px'
-                  }}>
-                    <button
-                      onClick={handleOpenSensorEdit}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '8px',
-                        border: `1px solid ${colors.textSecondary}`,
-                        backgroundColor: 'transparent',
-                        color: colors.textSecondary,
-                        cursor: 'pointer',
-                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                        boxSizing: 'border-box'
-                      }}
-                      title="Edit Sensors"
-                    >
-                      <EditIcon style={{ 
-                        fontSize: '14px', 
-                        backgroundColor: 'transparent',
-                        color: 'inherit',
-                        display: 'block'
-                      }} />
-                    </button>
-                  </div>
-                )}
                 
                 {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
                   const attributeName = getSensorDisplayName(key);
