@@ -2335,8 +2335,33 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 borderBottom: `1px solid ${colors.border}`,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                gap: '8px'
               }}>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s',
+                    marginRight: '8px',
+                    padding: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.secondary;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <ChevronLeft size={20} color={colors.textSecondary} style={{ pointerEvents: 'none' }} />
+                </button>
                 <h2 style={{
                   margin: 0,
                   fontSize: '20px',
@@ -2345,23 +2370,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 }}>
                   {device?.name} {t('sharedDetails')}
                 </h2>
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    backgroundColor: colors.secondary,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <X size={16} color={colors.textSecondary} />
-                </button>
               </div>
 
               {/* Modal Content */}
