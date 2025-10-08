@@ -870,8 +870,45 @@ const MainPage = () => {
       .slice(0, 2); // Max 2 letters
   };
 
-  // Format event type using Traccar's formatter
+  // Format event type using Traccar's formatter with custom sensor support
   const formatEventType = (event) => {
+    // Check if this is a custom sensor event
+    if (event.attributes) {
+      // Look for custom sensor keys in event attributes
+      const customSensorKeys = ['in1', 'in2', 'in3', 'in4', 'out1', 'out2', 'out3', 'out4', 'input', 'output'];
+      const customSensorKey = customSensorKeys.find(key => event.attributes.hasOwnProperty(key));
+      
+      if (customSensorKey) {
+        const device = devices[event.deviceId];
+        let customSensorName = customSensorKey;
+        
+        // Get custom sensor name if available
+        if (device?.attributes?.customSensors) {
+          try {
+            const customSensors = JSON.parse(device.attributes.customSensors);
+            if (customSensors[customSensorKey]) {
+              customSensorName = customSensors[customSensorKey];
+            }
+          } catch (error) {
+            console.error('Error parsing customSensors:', error);
+          }
+        }
+        
+        // Format the value
+        const value = event.attributes[customSensorKey];
+        let formattedValue = value;
+        
+        // Handle boolean values
+        if (typeof value === 'boolean' || value === 0 || value === 1 || value === '0' || value === '1' || value === 'true' || value === 'false') {
+          const boolValue = value === true || value === 1 || value === '1' || value === 'true';
+          formattedValue = boolValue ? 'yes' : 'no';
+        }
+        
+        return `${customSensorName}: ${formattedValue}`;
+      }
+    }
+    
+    // Fall back to standard event formatting
     return formatNotificationTitle(t, {
       type: event.type,
       attributes: {
