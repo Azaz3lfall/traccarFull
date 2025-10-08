@@ -3008,8 +3008,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 zIndex: 1
                               }}
                               onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = colors.error;
-                                e.target.style.color = 'white';
+                                e.target.style.backgroundColor = '#ef4444';
+                                e.target.style.color = '#ffffff';
                               }}
                               onMouseLeave={(e) => {
                                 e.target.style.backgroundColor = 'transparent';
