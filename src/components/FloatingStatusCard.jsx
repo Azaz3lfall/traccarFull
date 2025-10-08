@@ -1547,10 +1547,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               style={{
                 position: 'absolute',
                 top: !desktop ? '8px' : '12px',
-                right: !desktop ? '47px' : '52px',
+                right: !desktop ? '39px' : '44px',
                 zIndex: 10,
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 display: 'flex',
@@ -1561,7 +1561,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               }}
               title="Edit Sensors"
             >
-              <SensorsOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+              <SensorsOutlinedIcon style={{ fontSize: '18px', color: colors.textSecondary }} />
             </button>
           )}
 
@@ -1574,8 +1574,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 top: !desktop ? '8px' : '12px',
                 right: !desktop ? '7px' : '12px',
                 zIndex: 10,
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 display: 'flex',
@@ -1585,7 +1585,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 transition: 'all 0.2s ease'
               }}
             >
-              <InfoOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+              <InfoOutlinedIcon style={{ fontSize: '18px', color: colors.textSecondary }} />
             </button>
           )}
           
@@ -1741,23 +1741,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
                 {/* Column 2: Device Name, Status, Address */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {/* Chevron and space for alignment */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                    {/* Chevron placeholder for alignment */}
-                    <div style={{ width: '20px' }} />
-                    
-                    {/* Empty space to preserve layout */}
-                    <div style={{ flex: 1 }} />
-                  </div>
-
                   {/* Device Name centered */}
                   <h3 style={{
                     fontSize: '18px',
                     fontWeight: '700',
                     color: colors.text,
-                    margin: !desktop ? '-30px 0 0 0' : '0',
+                    margin: '0 0 8px 0',
                     lineHeight: '1.2',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    paddingRight: '80px' // Space for buttons
                   }}>
                     {device[devicePrimary]}
                   </h3>
