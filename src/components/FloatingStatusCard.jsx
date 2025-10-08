@@ -52,7 +52,6 @@ import PauseIcon from '@mui/icons-material/Pause';
 import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
@@ -343,7 +342,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               // Properly handle UTF-8 characters
               const utf8Data = decodeURIComponent(escape(decodedData));
               jsonData = JSON.parse(utf8Data);
-            } catch (decodeError) {
+            } catch {
               showSnackbar(t('invalidTplFileFormat'), 'error');
               return;
             }
@@ -2434,7 +2433,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 </div>
                               )}
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
-                                {positionAttributes[property]?.name || property}
+                                {(() => {
+                                  // Check for custom sensor name first
+                                  if (device?.attributes?.customSensors) {
+                                    try {
+                                      const customSensors = JSON.parse(device.attributes.customSensors);
+                                      if (customSensors[property]) {
+                                        return customSensors[property];
+                                      }
+                                    } catch (error) {
+                                      console.error('Error parsing customSensors:', error);
+                                    }
+                                  }
+                                  // Fall back to position attributes or property name
+                                  return positionAttributes[property]?.name || property;
+                                })()}
                               </div>
                               <div style={{ 
                                 color: colors.text, 
@@ -2543,7 +2556,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 </div>
                               )}
                               <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
-                                {positionAttributes[attribute]?.name || attribute}
+                                {(() => {
+                                  // Check for custom sensor name first
+                                  if (device?.attributes?.customSensors) {
+                                    try {
+                                      const customSensors = JSON.parse(device.attributes.customSensors);
+                                      if (customSensors[attribute]) {
+                                        return customSensors[attribute];
+                                      }
+                                    } catch (error) {
+                                      console.error('Error parsing customSensors:', error);
+                                    }
+                                  }
+                                  // Fall back to position attributes or attribute name
+                                  return positionAttributes[attribute]?.name || attribute;
+                                })()}
                               </div>
                               <div style={{ 
                                 color: colors.text, 
