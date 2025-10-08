@@ -2350,7 +2350,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.2s',
-                    marginRight: '8px',
+                    marginRight: '4px',
                     padding: 0
                   }}
                   onMouseEnter={(e) => {
@@ -2545,7 +2545,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         })}
                         
                         {/* Position Attributes */}
-                        {Object.getOwnPropertyNames(detailedPosition.attributes).filter((attr) => attr).map((attribute, attrIndex) => {
+                        {Object.getOwnPropertyNames(detailedPosition.attributes).filter((attr) => attr && !detailedPosition.hasOwnProperty(attr)).map((attribute, attrIndex) => {
                           const value = detailedPosition.attributes[attribute];
                           return (
                             <div key={`attribute-${attribute || 'empty'}-${attrIndex}`} style={{
