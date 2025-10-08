@@ -51,6 +51,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
 import CommandDialog from './CommandDialog';
@@ -1560,7 +1561,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               }}
               title="Edit Sensors"
             >
-              <EditIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+              <SensorsOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
             </button>
           )}
 
