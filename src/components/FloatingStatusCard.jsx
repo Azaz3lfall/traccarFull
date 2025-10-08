@@ -2119,18 +2119,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         justifyContent: 'center',
                         width: '28px',
                         height: '28px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        backgroundColor: colors.secondary,
-                        color: colors.text,
+                        borderRadius: '8px',
+                        border: `1px solid ${colors.textSecondary}`,
+                        backgroundColor: 'transparent',
+                        color: colors.textSecondary,
                         cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
+                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        boxSizing: 'border-box'
                       }}
                       title="Edit Sensors"
                     >
