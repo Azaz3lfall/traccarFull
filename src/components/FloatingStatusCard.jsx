@@ -335,12 +335,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
-            // First, decode base64
+            // First, decode base64 with proper UTF-8 handling
             let jsonData;
             try {
               const base64Data = e.target.result;
               const decodedData = atob(base64Data);
-              jsonData = JSON.parse(decodedData);
+              // Properly handle UTF-8 characters
+              const utf8Data = decodeURIComponent(escape(decodedData));
+              jsonData = JSON.parse(utf8Data);
             } catch (decodeError) {
               showSnackbar('Invalid .tpl file format. File must be base64 encoded JSON.', 'error');
               return;
@@ -546,7 +548,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Now download the file as base64 encoded .tpl
       const dataStr = JSON.stringify(latestCustomSensors, null, 2);
       const base64Data = btoa(unescape(encodeURIComponent(dataStr)));
-      const dataBlob = new Blob([base64Data], { type: 'text/plain' });
+      const dataBlob = new Blob([base64Data], { type: 'text/plain; charset=utf-8' });
       
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
