@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "მარშრუტის შენახვა",
   "routePlannerSwitchingRoute": "მარშრუტის შეცვლა...",
   "routePlannerCurrencySymbol": "₾",
-  "routePlannerNoApiToken": "Mapbox API ტოკენი არ არის კონფიგურირებული. გთხოვთ დაუკავშირდეთ თქვენს ადმინისტრატორს API ტოკენის დასაყენებლად."
+  "routePlannerNoApiToken": "Mapbox API ტოკენი არ არის კონფიგურირებული. გთხოვთ დაუკავშირდეთ თქვენს ადმინისტრატორს API ტოკენის დასაყენებლად.",
+  "noCustomSensorsToExport": "ექსპორტისთვის მორგებული სენსორები არ არის.",
+  "customSensorsExportedSuccessfully": "მორგებული სენსორები წარმატებით შეინახა და .tpl ფაილად გაიტანა!",
+  "customSensorsImportedSuccessfully": "მორგებული სენსორები .tpl ფაილიდან იმპორტირდა, შეინახა და წარმატებით გადაამოწმა!",
+  "invalidTplFileFormat": "არასწორი .tpl ფაილის ფორმატი."
 }

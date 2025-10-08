@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Маршрут хадгалах",
   "routePlannerSwitchingRoute": "Маршрут солих...",
   "routePlannerCurrencySymbol": "₮",
-  "routePlannerNoApiToken": "Mapbox API токен тохируулагдаагүй байна. API токен тохируулахын тулд админтайгаа холбоо барина уу."
+  "routePlannerNoApiToken": "Mapbox API токен тохируулагдаагүй байна. API токен тохируулахын тулд админтайгаа холбоо барина уу.",
+  "noCustomSensorsToExport": "Экспортлох тохируулсан мэдрэгч байхгүй.",
+  "customSensorsExportedSuccessfully": "Тохируулсан мэдрэгч .tpl файл болгон амжилттай хадгалагдсан, экспортлогдсон!",
+  "customSensorsImportedSuccessfully": "Тохируулсан мэдрэгч .tpl файлаас импортлож, хадгалагдсан, амжилттай дахин баталгаажуулсан!",
+  "invalidTplFileFormat": "Буруу .tpl файлын формат."
 }

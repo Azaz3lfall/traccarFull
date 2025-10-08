@@ -584,7 +584,7 @@
   "sharedSavedCommands": "Comandos Salvos",
   "sharedSearch": "Busca",
   "sharedSearchDevices": "Pesquisar Dispositivos",
-  "editSensorNames": "Editar Nomes dos Sensores",
+  "editSensorNames": "Editar Sensores",
   "customizeSensor": "Personalizar Sensor",
   "selectSensor": "Selecionar Sensor",
   "customName": "Nome Personalizado",
@@ -748,5 +748,9 @@
   "routePlannerRouteWithWaypoints": "Rota {0} com {1} pontos",
   "routePlannerWith": "com",
   "routePlannerPoints": "pontos",
-  "routePlannerNoApiToken": "Token da API do Mapbox não está configurado. Entre em contato com seu administrador para configurar o token da API."
+  "routePlannerNoApiToken": "Token da API do Mapbox não está configurado. Entre em contato com seu administrador para configurar o token da API.",
+  "noCustomSensorsToExport": "Nenhum sensor personalizado para exportar.",
+  "customSensorsExportedSuccessfully": "Sensores personalizados salvos e exportados como arquivo .tpl com sucesso!",
+  "customSensorsImportedSuccessfully": "Sensores personalizados importados do arquivo .tpl, salvos e revalidados com sucesso!",
+  "invalidTplFileFormat": "Formato de arquivo .tpl inválido."
 }

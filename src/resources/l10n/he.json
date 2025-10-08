@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "שמור מסלול",
   "routePlannerSwitchingRoute": "מחליף מסלול...",
   "routePlannerCurrencySymbol": "₪",
-  "routePlannerNoApiToken": "אסימון API של Mapbox אינו מוגדר. אנא פנה למנהל המערכת שלך להגדרת אסימון ה-API."
+  "routePlannerNoApiToken": "אסימון API של Mapbox אינו מוגדר. אנא פנה למנהל המערכת שלך להגדרת אסימון ה-API.",
+  "noCustomSensorsToExport": "אין חיישנים מותאמים אישית לייצוא.",
+  "customSensorsExportedSuccessfully": "חיישנים מותאמים אישית נשמרו ויוצאו כקובץ .tpl בהצלחה!",
+  "customSensorsImportedSuccessfully": "חיישנים מותאמים אישית יובאו מקובץ .tpl, נשמרו ואומתו מחדש בהצלחה!",
+  "invalidTplFileFormat": "פורמט קובץ .tpl לא תקין."
 }

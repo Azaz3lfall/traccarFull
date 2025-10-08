@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "வழியை சேமி",
   "routePlannerSwitchingRoute": "வழி மாற்றுகிறது...",
   "routePlannerCurrencySymbol": "₹",
-  "routePlannerNoApiToken": "Mapbox API டோக்கன் கட்டமைக்கப்படவில்லை. API டோக்கனை அமைக்க உங்கள் நிர்வாகியைத் தொடர்பு கொள்ளவும்."
+  "routePlannerNoApiToken": "Mapbox API டோக்கன் கட்டமைக்கப்படவில்லை. API டோக்கனை அமைக்க உங்கள் நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+  "noCustomSensorsToExport": "ஏற்றுமதி செய்ய தனிப்பயன் சென்சார்கள் இல்லை.",
+  "customSensorsExportedSuccessfully": "தனிப்பயன் சென்சார்கள் .tpl கோப்பாக வெற்றிகரமாக சேமிக்கப்பட்டு ஏற்றுமதி செய்யப்பட்டன!",
+  "customSensorsImportedSuccessfully": "தனிப்பயன் சென்சார்கள் .tpl கோப்பிலிருந்து இறக்குமதி செய்யப்பட்டு, சேமிக்கப்பட்டு வெற்றிகரமாக மீண்டும் சரிபார்க்கப்பட்டன!",
+  "invalidTplFileFormat": "தவறான .tpl கோப்பு வடிவம்."
 }

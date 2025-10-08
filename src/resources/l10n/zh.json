@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "保存路线",
   "routePlannerSwitchingRoute": "切换路线...",
   "routePlannerCurrencySymbol": "¥",
-  "routePlannerNoApiToken": "Mapbox API 令牌未配置。请联系您的管理员设置 API 令牌。"
+  "routePlannerNoApiToken": "Mapbox API 令牌未配置。请联系您的管理员设置 API 令牌。",
+  "noCustomSensorsToExport": "没有要导出的自定义传感器。",
+  "customSensorsExportedSuccessfully": "自定义传感器已成功保存并导出为.tpl文件！",
+  "customSensorsImportedSuccessfully": "自定义传感器已从.tpl文件导入，保存并重新验证成功！",
+  "invalidTplFileFormat": "无效的.tpl文件格式。"
 }

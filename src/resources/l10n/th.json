@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "บันทึกเส้นทาง",
   "routePlannerSwitchingRoute": "เปลี่ยนเส้นทาง...",
   "routePlannerCurrencySymbol": "฿",
-  "routePlannerNoApiToken": "Mapbox API token ยังไม่ได้กำหนดค่า กรุณาติดต่อผู้ดูแลระบบของคุณเพื่อตั้งค่า API token"
+  "routePlannerNoApiToken": "Mapbox API token ยังไม่ได้กำหนดค่า กรุณาติดต่อผู้ดูแลระบบของคุณเพื่อตั้งค่า API token",
+  "noCustomSensorsToExport": "ไม่มีเซ็นเซอร์ที่กำหนดเองให้ส่งออก",
+  "customSensorsExportedSuccessfully": "เซ็นเซอร์ที่กำหนดเองถูกบันทึกและส่งออกเป็นไฟล์ .tpl เรียบร้อยแล้ว!",
+  "customSensorsImportedSuccessfully": "เซ็นเซอร์ที่กำหนดเองถูกนำเข้าจากไฟล์ .tpl บันทึกและตรวจสอบซ้ำเรียบร้อยแล้ว!",
+  "invalidTplFileFormat": "รูปแบบไฟล์ .tpl ไม่ถูกต้อง"
 }

@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Išsaugoti maršrutą",
   "routePlannerSwitchingRoute": "Keičiamas maršrutas...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API tokenas nėra sukonfigūruotas. Prašome susisiekti su savo administratoriumi, kad nustatytų API tokeną."
+  "routePlannerNoApiToken": "Mapbox API tokenas nėra sukonfigūruotas. Prašome susisiekti su savo administratoriumi, kad nustatytų API tokeną.",
+  "noCustomSensorsToExport": "Nėra pritaikytų jutiklių eksportui.",
+  "customSensorsExportedSuccessfully": "Pritaikyti jutikliai sėkmingai išsaugoti ir eksportuoti kaip .tpl failas!",
+  "customSensorsImportedSuccessfully": "Pritaikyti jutikliai importuoti iš .tpl failo, išsaugoti ir sėkmingai pervaliduoti!",
+  "invalidTplFileFormat": "Netinkamas .tpl failo formatas."
 }

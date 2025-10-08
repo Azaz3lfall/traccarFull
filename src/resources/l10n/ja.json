@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "ルート保存",
   "routePlannerSwitchingRoute": "ルート切り替え中...",
   "routePlannerCurrencySymbol": "¥",
-  "routePlannerNoApiToken": "Mapbox APIトークンが設定されていません。APIトークンを設定するには、管理者にお問い合わせください。"
+  "routePlannerNoApiToken": "Mapbox APIトークンが設定されていません。APIトークンを設定するには、管理者にお問い合わせください。",
+  "noCustomSensorsToExport": "エクスポートするカスタムセンサーがありません。",
+  "customSensorsExportedSuccessfully": "カスタムセンサーが.tplファイルとして正常に保存・エクスポートされました！",
+  "customSensorsImportedSuccessfully": "カスタムセンサーが.tplファイルからインポートされ、保存・再検証されました！",
+  "invalidTplFileFormat": "無効な.tplファイル形式。"
 }

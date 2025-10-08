@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "Сохранить маршрут",
   "routePlannerSwitchingRoute": "Переключение маршрута...",
   "routePlannerCurrencySymbol": "₽",
-  "routePlannerNoApiToken": "Токен API Mapbox не настроен. Обратитесь к администратору для настройки токена API."
+  "routePlannerNoApiToken": "Токен API Mapbox не настроен. Обратитесь к администратору для настройки токена API.",
+  "noCustomSensorsToExport": "Нет пользовательских датчиков для экспорта.",
+  "customSensorsExportedSuccessfully": "Пользовательские датчики успешно сохранены и экспортированы как файл .tpl!",
+  "customSensorsImportedSuccessfully": "Пользовательские датчики импортированы из файла .tpl, сохранены и успешно перепроверены!",
+  "invalidTplFileFormat": "Неверный формат файла .tpl."
 }

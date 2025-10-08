@@ -344,7 +344,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               const utf8Data = decodeURIComponent(escape(decodedData));
               jsonData = JSON.parse(utf8Data);
             } catch (decodeError) {
-              showSnackbar('Invalid .tpl file format.', 'error');
+              showSnackbar(t('invalidTplFileFormat'), 'error');
               return;
             }
             
@@ -411,7 +411,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 ...jsonData
               }));
               
-              showSnackbar('Sensors imported from .tpl file, saved and revalidated successfully!', 'success');
+              showSnackbar(t('customSensorsImportedSuccessfully'), 'success');
               
             } catch (error) {
               console.error('Error saving imported sensors:', error);
@@ -541,7 +541,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // If no custom sensors exist, show error
       if (Object.keys(latestCustomSensors).length === 0) {
-        showSnackbar('No custom sensors to export.', 'error');
+        showSnackbar(t('noCustomSensorsToExport'), 'error');
         return;
       }
       
@@ -559,7 +559,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      showSnackbar('Custom sensors saved and exported as .tpl file successfully!', 'success');
+      showSnackbar(t('customSensorsExportedSuccessfully'), 'success');
       
     } catch (error) {
       console.error('Error exporting sensors:', error);

@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Marshrutni saqlash",
   "routePlannerSwitchingRoute": "Marshrutni almashtirish...",
   "routePlannerCurrencySymbol": "so'm",
-  "routePlannerNoApiToken": "Mapbox API tokeni sozlanmagan. API tokenini sozlash uchun administratoringiz bilan bog'laning."
+  "routePlannerNoApiToken": "Mapbox API tokeni sozlanmagan. API tokenini sozlash uchun administratoringiz bilan bog'laning.",
+  "noCustomSensorsToExport": "Eksport qilish uchun maxsus sensorlar yo'q.",
+  "customSensorsExportedSuccessfully": "Maxsus sensorlar .tpl fayli sifatida muvaffaqiyatli saqlandi va eksport qilindi!",
+  "customSensorsImportedSuccessfully": "Maxsus sensorlar .tpl faylidan import qilindi, saqlandi va muvaffaqiyatli qayta tasdiqlandi!",
+  "invalidTplFileFormat": "Noto'g'ri .tpl fayl formati."
 }

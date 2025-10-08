@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Simpan laluan",
   "routePlannerSwitchingRoute": "Menukar laluan...",
   "routePlannerCurrencySymbol": "RM",
-  "routePlannerNoApiToken": "Token API Mapbox tidak dikonfigurasi. Sila hubungi pentadbir anda untuk menyediakan token API."
+  "routePlannerNoApiToken": "Token API Mapbox tidak dikonfigurasi. Sila hubungi pentadbir anda untuk menyediakan token API.",
+  "noCustomSensorsToExport": "Tiada sensor tersuai untuk dieksport.",
+  "customSensorsExportedSuccessfully": "Sensor tersuai berjaya disimpan dan dieksport sebagai fail .tpl!",
+  "customSensorsImportedSuccessfully": "Sensor tersuai diimport dari fail .tpl, disimpan dan disahkan semula dengan jayanya!",
+  "invalidTplFileFormat": "Format fail .tpl tidak sah."
 }

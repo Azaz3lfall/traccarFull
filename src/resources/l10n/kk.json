@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Маршрутты сақтау",
   "routePlannerSwitchingRoute": "Маршрутты ауыстыру...",
   "routePlannerCurrencySymbol": "₸",
-  "routePlannerNoApiToken": "Mapbox API токені конфигурацияланбаған. API токенін орнату үшін әкімшіңізге хабарласыңыз."
+  "routePlannerNoApiToken": "Mapbox API токені конфигурацияланбаған. API токенін орнату үшін әкімшіңізге хабарласыңыз.",
+  "noCustomSensorsToExport": "Экспорттау үшін арнайы сенсорлар жоқ.",
+  "customSensorsExportedSuccessfully": "Арнайы сенсорлар сәтті сақталды және .tpl файлы ретінде экспортталды!",
+  "customSensorsImportedSuccessfully": "Арнайы сенсорлар .tpl файлынан импортталды, сақталды және сәтті қайта тексерілді!",
+  "invalidTplFileFormat": "Жарамсыз .tpl файл форматы."
 }

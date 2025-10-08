@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Zapisz trasę",
   "routePlannerSwitchingRoute": "Przełączanie trasy...",
   "routePlannerCurrencySymbol": "zł",
-  "routePlannerNoApiToken": "Token API Mapbox nie jest skonfigurowany. Skontaktuj się z administratorem, aby skonfigurować token API."
+  "routePlannerNoApiToken": "Token API Mapbox nie jest skonfigurowany. Skontaktuj się z administratorem, aby skonfigurować token API.",
+  "noCustomSensorsToExport": "Brak niestandardowych czujników do eksportu.",
+  "customSensorsExportedSuccessfully": "Niestandardowe czujniki pomyślnie zapisane i wyeksportowane jako plik .tpl!",
+  "customSensorsImportedSuccessfully": "Niestandardowe czujniki zaimportowane z pliku .tpl, zapisane i pomyślnie ponownie zweryfikowane!",
+  "invalidTplFileFormat": "Nieprawidłowy format pliku .tpl."
 }

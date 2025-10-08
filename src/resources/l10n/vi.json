@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Lưu tuyến đường",
   "routePlannerSwitchingRoute": "Đang chuyển tuyến...",
   "routePlannerCurrencySymbol": "₫",
-  "routePlannerNoApiToken": "Token API Mapbox chưa được cấu hình. Vui lòng liên hệ với quản trị viên của bạn để thiết lập token API."
+  "routePlannerNoApiToken": "Token API Mapbox chưa được cấu hình. Vui lòng liên hệ với quản trị viên của bạn để thiết lập token API.",
+  "noCustomSensorsToExport": "Không có cảm biến tùy chỉnh để xuất.",
+  "customSensorsExportedSuccessfully": "Cảm biến tùy chỉnh đã được lưu và xuất dưới dạng tệp .tpl thành công!",
+  "customSensorsImportedSuccessfully": "Cảm biến tùy chỉnh đã được nhập từ tệp .tpl, lưu và xác thực lại thành công!",
+  "invalidTplFileFormat": "Định dạng tệp .tpl không hợp lệ."
 }

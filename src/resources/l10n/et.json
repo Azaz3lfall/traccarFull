@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Salvesta marsruut",
   "routePlannerSwitchingRoute": "Marsruudi vahetamine...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API token ei ole konfigureeritud. Palun võtke ühendust oma administraatoriga API tokeni seadistamiseks."
+  "routePlannerNoApiToken": "Mapbox API token ei ole konfigureeritud. Palun võtke ühendust oma administraatoriga API tokeni seadistamiseks.",
+  "noCustomSensorsToExport": "Eksportida pole kohandatud andureid.",
+  "customSensorsExportedSuccessfully": "Kohandatud andurid salvestatud ja eksporditud .tpl failina edukalt!",
+  "customSensorsImportedSuccessfully": "Kohandatud andurid imporditud .tpl failist, salvestatud ja edukalt üle kontrollitud!",
+  "invalidTplFileFormat": "Vigane .tpl faili formaat."
 }

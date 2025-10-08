@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "Route opslaan",
   "routePlannerSwitchingRoute": "Route wisselen...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API-token is niet geconfigureerd. Neem contact op met uw beheerder om de API-token in te stellen."
+  "routePlannerNoApiToken": "Mapbox API-token is niet geconfigureerd. Neem contact op met uw beheerder om de API-token in te stellen.",
+  "noCustomSensorsToExport": "Geen aangepaste sensoren om te exporteren.",
+  "customSensorsExportedSuccessfully": "Aangepaste sensoren succesvol opgeslagen en geëxporteerd als .tpl bestand!",
+  "customSensorsImportedSuccessfully": "Aangepaste sensoren geïmporteerd uit .tpl bestand, opgeslagen en succesvol gevalideerd!",
+  "invalidTplFileFormat": "Ongeldig .tpl bestandsformaat."
 }

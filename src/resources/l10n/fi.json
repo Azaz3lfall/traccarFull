@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Tallenna reitti",
   "routePlannerSwitchingRoute": "Vaihdetaan reittiä...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API-tokenia ei ole määritetty. Ota yhteyttä järjestelmänvalvojaasi API-tokenin määrittämiseksi."
+  "routePlannerNoApiToken": "Mapbox API-tokenia ei ole määritetty. Ota yhteyttä järjestelmänvalvojaasi API-tokenin määrittämiseksi.",
+  "noCustomSensorsToExport": "Ei mukautettuja antureita viedä.",
+  "customSensorsExportedSuccessfully": "Mukautetut anturit tallennettu ja viety .tpl-tiedostona onnistuneesti!",
+  "customSensorsImportedSuccessfully": "Mukautetut anturit tuotu .tpl-tiedostosta, tallennettu ja vahvistettu onnistuneesti!",
+  "invalidTplFileFormat": "Virheellinen .tpl tiedostomuoto."
 }

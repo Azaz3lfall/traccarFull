@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Сачувај руту",
   "routePlannerSwitchingRoute": "Пребацивање руте...",
   "routePlannerCurrencySymbol": "дин",
-  "routePlannerNoApiToken": "Mapbox API токен није конфигурисан. Молимо контактирајте вашег администратора за подешавање API токена."
+  "routePlannerNoApiToken": "Mapbox API токен није конфигурисан. Молимо контактирајте вашег администратора за подешавање API токена.",
+  "noCustomSensorsToExport": "Нема прилагођених сензора за извоз.",
+  "customSensorsExportedSuccessfully": "Прилагођени сензори успешно сачувани и извезени као .tpl датотека!",
+  "customSensorsImportedSuccessfully": "Прилагођени сензори увезени из .tpl датотеке, сачувани и успешно превалидирани!",
+  "invalidTplFileFormat": "Неважећи формат .tpl датотеке."
 }

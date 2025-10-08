@@ -746,5 +746,9 @@
   "routePlannerCurrencySymbol": "R",
   "routePlannerRouteName": "Roete",
   "routePlannerRouteWithWaypoints": "Roete {0} met {1} wegpunte",
-  "routePlannerNoApiToken": "Mapbox API-token is nie gekonfigureer nie. Kontak asseblief jou administrateur om die API-token op te stel."
+  "routePlannerNoApiToken": "Mapbox API-token is nie gekonfigureer nie. Kontak asseblief jou administrateur om die API-token op te stel.",
+  "noCustomSensorsToExport": "Geen pasgemaakte sensors om uit te voer.",
+  "customSensorsExportedSuccessfully": "Pasgemaakte sensors suksesvol gestoor en uitgevoer as .tpl lêer!",
+  "customSensorsImportedSuccessfully": "Pasgemaakte sensors van .tpl lêer ingevoer, gestoor en hersien met sukses!",
+  "invalidTplFileFormat": "Ongeldige .tpl lêer formaat."
 }

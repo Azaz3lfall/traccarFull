@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Ýoly sakla",
   "routePlannerSwitchingRoute": "Ýoly üýtgetmek...",
   "routePlannerCurrencySymbol": "TMT",
-  "routePlannerNoApiToken": "Mapbox API token konfigurirlenmedi. API tokeni düzeltmek üçin administratoruňyz bilen habarlaşyň."
+  "routePlannerNoApiToken": "Mapbox API token konfigurirlenmedi. API tokeni düzeltmek üçin administratoruňyz bilen habarlaşyň.",
+  "noCustomSensorsToExport": "Eksport etmek üçin özel sensor ýok.",
+  "customSensorsExportedSuccessfully": "Özel sensorlar .tpl faýly hökmünde üstünlikli saklandy we eksport edildi!",
+  "customSensorsImportedSuccessfully": "Özel sensorlar .tpl faýlyndan import edildi, saklandy we üstünlikli gaýtadan tassyklanyldy!",
+  "invalidTplFileFormat": "Nädogry .tpl faýl formaty."
 }

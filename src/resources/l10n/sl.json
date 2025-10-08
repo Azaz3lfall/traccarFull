@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Shrani pot",
   "routePlannerSwitchingRoute": "Preklapljanje poti...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API token ni konfiguriran. Prosimo, obrnite se na svojega administratorja za nastavitev API tokena."
+  "routePlannerNoApiToken": "Mapbox API token ni konfiguriran. Prosimo, obrnite se na svojega administratorja za nastavitev API tokena.",
+  "noCustomSensorsToExport": "Ni prilagojenih senzorjev za izvoz.",
+  "customSensorsExportedSuccessfully": "Prilagojeni senzorji uspešno shranjeni in izvoženi kot .tpl datoteka!",
+  "customSensorsImportedSuccessfully": "Prilagojeni senzorji uvoženi iz .tpl datoteke, shranjeni in uspešno prevalidirani!",
+  "invalidTplFileFormat": "Neveljaven format datoteke .tpl."
 }

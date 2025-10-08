@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Ruaj rrugën",
   "routePlannerSwitchingRoute": "Ndryshimi i rrugës...",
   "routePlannerCurrencySymbol": "L",
-  "routePlannerNoApiToken": "Mapbox API token nuk është konfiguruar. Ju lutemi kontaktoni administratorin tuaj për të konfiguruar API token."
+  "routePlannerNoApiToken": "Mapbox API token nuk është konfiguruar. Ju lutemi kontaktoni administratorin tuaj për të konfiguruar API token.",
+  "noCustomSensorsToExport": "Nuk ka sensorë të personalizuar për eksport.",
+  "customSensorsExportedSuccessfully": "Sensorët e personalizuar u ruajtën dhe u eksportuan si skedar .tpl me sukses!",
+  "customSensorsImportedSuccessfully": "Sensorët e personalizuar u importuan nga skedari .tpl, u ruajtën dhe u validuan përsëri me sukses!",
+  "invalidTplFileFormat": "Format skedari .tpl i pavlefshëm."
 }

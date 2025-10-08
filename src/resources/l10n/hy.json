@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Պահպանել երթուղի",
   "routePlannerSwitchingRoute": "Երթուղի փոխարինում...",
   "routePlannerCurrencySymbol": "֏",
-  "routePlannerNoApiToken": "Mapbox API-ի նշանը կարգավորված չէ: Խնդրում ենք կապ հաստատել ձեր ադմինիստրատորի հետ API նշանը կարգավորելու համար:"
+  "routePlannerNoApiToken": "Mapbox API-ի նշանը կարգավորված չէ: Խնդրում ենք կապ հաստատել ձեր ադմինիստրատորի հետ API նշանը կարգավորելու համար:",
+  "noCustomSensorsToExport": "Արտահանելու համար հատուկ սենսորներ չկան:",
+  "customSensorsExportedSuccessfully": "Հատուկ սենսորները հաջողությամբ պահպանվեցին և արտահանվեցին որպես .tpl ֆայլ:",
+  "customSensorsImportedSuccessfully": "Հատուկ սենսորները ներմուծվեցին .tpl ֆայլից, պահպանվեցին և հաջողությամբ վերավավերացվեցին:",
+  "invalidTplFileFormat": "Անվավեր .tpl ֆայլի ձևաչափ:"
 }

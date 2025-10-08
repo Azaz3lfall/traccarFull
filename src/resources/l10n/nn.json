@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Lagre rute",
   "routePlannerSwitchingRoute": "Bytter rute...",
   "routePlannerCurrencySymbol": "kr",
-  "routePlannerNoApiToken": "Mapbox API-token er ikkje konfigurert. Ver venleg kontakt administrator din for å setje opp API-tokenet."
+  "routePlannerNoApiToken": "Mapbox API-token er ikkje konfigurert. Ver venleg kontakt administrator din for å setje opp API-tokenet.",
+  "noCustomSensorsToExport": "Ingen tilpassa sensorar å eksportera.",
+  "customSensorsExportedSuccessfully": "Tilpassa sensorar lagra og eksportert som .tpl fil med suksess!",
+  "customSensorsImportedSuccessfully": "Tilpassa sensorar importert frå .tpl fil, lagra og revalidera med suksess!",
+  "invalidTplFileFormat": "Ugyldig .tpl filformat."
 }

@@ -15,6 +15,7 @@ export default defineConfig(() => {
   const WS_BASE_URL = process.env.VITE_WS_BASE_URL || 'wss://gps.codeartisan.cloud';
 
   return {
+    
     server: {
       allowedHosts: ['cloud.absmultipla.com.br', "75768c9e2b08.ngrok-free.app"],
       port: 3000,

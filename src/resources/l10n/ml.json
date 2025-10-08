@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "റൂട്ട് സേവ് ചെയ്യുക",
   "routePlannerSwitchingRoute": "റൂട്ട് മാറ്റുന്നു...",
   "routePlannerCurrencySymbol": "₹",
-  "routePlannerNoApiToken": "Mapbox API ടോക്കൺ കോൺഫിഗർ ചെയ്തിട്ടില്ല. API ടോക്കൺ സജ്ജീകരിക്കാൻ ദയവായി നിങ്ങളുടെ അഡ്മിനിസ്ട്രേറ്ററുമായി ബന്ധപ്പെടുക."
+  "routePlannerNoApiToken": "Mapbox API ടോക്കൺ കോൺഫിഗർ ചെയ്തിട്ടില്ല. API ടോക്കൺ സജ്ജീകരിക്കാൻ ദയവായി നിങ്ങളുടെ അഡ്മിനിസ്ട്രേറ്ററുമായി ബന്ധപ്പെടുക.",
+  "noCustomSensorsToExport": "കയറ്റുമതി ചെയ്യാൻ ഇഷ്ടാനുസൃത സെൻസറുകളൊന്നുമില്ല.",
+  "customSensorsExportedSuccessfully": "ഇഷ്ടാനുസൃത സെൻസറുകൾ .tpl ഫയലായി വിജയകരമായി സംരക്ഷിച്ച് കയറ്റുമതി ചെയ്തു!",
+  "customSensorsImportedSuccessfully": "ഇഷ്ടാനുസൃത സെൻസറുകൾ .tpl ഫയലിൽ നിന്ന് ഇറക്കുമതി ചെയ്തു, സംരക്ഷിച്ച് വിജയകരമായി വീണ്ടും പരിശോധിച്ചു!",
+  "invalidTplFileFormat": "അസാധുവായ .tpl ഫയൽ ഫോർമാറ്റ്."
 }

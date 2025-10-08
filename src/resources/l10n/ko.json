@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "경로 저장",
   "routePlannerSwitchingRoute": "경로 전환 중...",
   "routePlannerCurrencySymbol": "₩",
-  "routePlannerNoApiToken": "Mapbox API 토큰이 구성되지 않았습니다. API 토큰을 설정하려면 관리자에게 문의하세요."
+  "routePlannerNoApiToken": "Mapbox API 토큰이 구성되지 않았습니다. API 토큰을 설정하려면 관리자에게 문의하세요.",
+  "noCustomSensorsToExport": "내보낼 사용자 정의 센서가 없습니다.",
+  "customSensorsExportedSuccessfully": "사용자 정의 센서가 .tpl 파일로 성공적으로 저장 및 내보내기되었습니다!",
+  "customSensorsImportedSuccessfully": "사용자 정의 센서가 .tpl 파일에서 가져와져 저장되고 성공적으로 재검증되었습니다!",
+  "invalidTplFileFormat": "잘못된 .tpl 파일 형식입니다."
 }

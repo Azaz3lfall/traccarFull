@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "রুট সংরক্ষণ",
   "routePlannerSwitchingRoute": "রুট পরিবর্তন হচ্ছে...",
   "routePlannerCurrencySymbol": "৳",
-  "routePlannerNoApiToken": "Mapbox API টোকেন কনফিগার করা হয়নি। API টোকেন সেট আপ করতে আপনার অ্যাডমিনিস্ট্রেটরের সাথে যোগাযোগ করুন।"
+  "routePlannerNoApiToken": "Mapbox API টোকেন কনফিগার করা হয়নি। API টোকেন সেট আপ করতে আপনার অ্যাডমিনিস্ট্রেটরের সাথে যোগাযোগ করুন।",
+  "noCustomSensorsToExport": "রপ্তানি করার জন্য কোন কাস্টম সেন্সর নেই।",
+  "customSensorsExportedSuccessfully": "কাস্টম সেন্সরগুলি .tpl ফাইল হিসাবে সফলভাবে সংরক্ষিত এবং রপ্তানি করা হয়েছে!",
+  "customSensorsImportedSuccessfully": "কাস্টম সেন্সরগুলি .tpl ফাইল থেকে আমদানি, সংরক্ষিত এবং সফলভাবে পুনরায় যাচাই করা হয়েছে!",
+  "invalidTplFileFormat": "অবৈধ .tpl ফাইল ফরম্যাট।"
 }

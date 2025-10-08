@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "මාර්ගය සුරකින්න",
   "routePlannerSwitchingRoute": "මාර්ගය මාරු කරමින්...",
   "routePlannerCurrencySymbol": "රු",
-  "routePlannerNoApiToken": "Mapbox API token සකස් කර නැත. API token සකස් කිරීමට කරුණාකර ඔබේ පරිපාලක සමඟ සම්බන්ධ වන්න."
+  "routePlannerNoApiToken": "Mapbox API token සකස් කර නැත. API token සකස් කිරීමට කරුණාකර ඔබේ පරිපාලක සමඟ සම්බන්ධ වන්න.",
+  "noCustomSensorsToExport": "අපනයනය කිරීමට අභිරුචි සංවේදක නොමැත.",
+  "customSensorsExportedSuccessfully": "අභිරුචි සංවේදක .tpl ගොනුවක් ලෙස සාර්ථකව සුරකින ලදී සහ අපනයනය කරන ලදී!",
+  "customSensorsImportedSuccessfully": "අභිරුචි සංවේදක .tpl ගොනුවෙන් ආනයනය කරන ලදී, සුරකින ලදී සහ සාර්ථකව නැවත වලංගු කරන ලදී!",
+  "invalidTplFileFormat": "වලංගු නොවන .tpl ගොනු ආකෘතිය."
 }

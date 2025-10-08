@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "حفظ المسار",
   "routePlannerSwitchingRoute": "تبديل المسار...",
   "routePlannerCurrencySymbol": "ر.س",
-  "routePlannerNoApiToken": "رمز API الخاص بـ Mapbox غير مُكوَّن. يرجى الاتصال بمديرك لإعداد رمز API."
+  "routePlannerNoApiToken": "رمز API الخاص بـ Mapbox غير مُكوَّن. يرجى الاتصال بمديرك لإعداد رمز API.",
+  "noCustomSensorsToExport": "لا توجد أجهزة استشعار مخصصة للتصدير.",
+  "customSensorsExportedSuccessfully": "تم حفظ وتصدير أجهزة الاستشعار المخصصة كملف .tpl بنجاح!",
+  "customSensorsImportedSuccessfully": "تم استيراد أجهزة الاستشعار المخصصة من ملف .tpl وحفظها وإعادة التحقق منها بنجاح!",
+  "invalidTplFileFormat": "تنسيق ملف .tpl غير صالح."
 }

@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "ບັນທຶກເສັ້ນທາງ",
   "routePlannerSwitchingRoute": "ປ່ຽນເສັ້ນທາງ...",
   "routePlannerCurrencySymbol": "₭",
-  "routePlannerNoApiToken": "Mapbox API token ບໍ່ໄດ້ຖືກຕັ້ງຄ່າ. ກະລຸນາຕິດຕໍ່ຜູ້ບໍລິຫານຂອງທ່ານເພື່ອຕັ້ງຄ່າ API token."
+  "routePlannerNoApiToken": "Mapbox API token ບໍ່ໄດ້ຖືກຕັ້ງຄ່າ. ກະລຸນາຕິດຕໍ່ຜູ້ບໍລິຫານຂອງທ່ານເພື່ອຕັ້ງຄ່າ API token.",
+  "noCustomSensorsToExport": "ບໍ່ມີເຊັນເຊີທີ່ກຳນົດເອງເພື່ອສົ່ງອອກ.",
+  "customSensorsExportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກບັນທຶກ ແລະ ສົ່ງອອກເປັນໄຟລ໌ .tpl ຢ່າງສຳເລັດ!",
+  "customSensorsImportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກນຳເຂົ້າຈາກໄຟລ໌ .tpl, ບັນທຶກ ແລະ ກວດສອບຄືນໃໝ່ຢ່າງສຳເລັດ!",
+  "invalidTplFileFormat": "ຮູບແບບໄຟລ໌ .tpl ທີ່ບໍ່ຖືກຕ້ອງ."
 }

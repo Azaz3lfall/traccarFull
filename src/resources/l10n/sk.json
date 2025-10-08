@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Uložiť trasu",
   "routePlannerSwitchingRoute": "Prepínanie trasy...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Mapbox API token nie je nakonfigurovaný. Obraťte sa na svojho administrátora, aby nastavil API token."
+  "routePlannerNoApiToken": "Mapbox API token nie je nakonfigurovaný. Obraťte sa na svojho administrátora, aby nastavil API token.",
+  "noCustomSensorsToExport": "Žiadne vlastné senzory na export.",
+  "customSensorsExportedSuccessfully": "Vlastné senzory úspešne uložené a exportované ako .tpl súbor!",
+  "customSensorsImportedSuccessfully": "Vlastné senzory importované zo súboru .tpl, uložené a úspešne prevalidované!",
+  "invalidTplFileFormat": "Neplatný formát súboru .tpl."
 }

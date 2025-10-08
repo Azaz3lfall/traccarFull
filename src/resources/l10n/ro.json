@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Salvează ruta",
   "routePlannerSwitchingRoute": "Schimbarea rutei...",
   "routePlannerCurrencySymbol": "lei",
-  "routePlannerNoApiToken": "Tokenul API Mapbox nu este configurat. Vă rugăm să contactați administratorul pentru a configura tokenul API."
+  "routePlannerNoApiToken": "Tokenul API Mapbox nu este configurat. Vă rugăm să contactați administratorul pentru a configura tokenul API.",
+  "noCustomSensorsToExport": "Nu există senzori personalizați de exportat.",
+  "customSensorsExportedSuccessfully": "Senzorii personalizați au fost salvați și exportați ca fișier .tpl cu succes!",
+  "customSensorsImportedSuccessfully": "Senzorii personalizați importați din fișierul .tpl, salvați și revalidați cu succes!",
+  "invalidTplFileFormat": "Format de fișier .tpl nevalid."
 }

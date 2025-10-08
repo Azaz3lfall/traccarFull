@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Rotayı kaydet",
   "routePlannerSwitchingRoute": "Rota değiştiriliyor...",
   "routePlannerCurrencySymbol": "₺",
-  "routePlannerNoApiToken": "Mapbox API tokeni yapılandırılmamış. API tokenini ayarlamak için yöneticinizle iletişime geçin."
+  "routePlannerNoApiToken": "Mapbox API tokeni yapılandırılmamış. API tokenini ayarlamak için yöneticinizle iletişime geçin.",
+  "noCustomSensorsToExport": "Dışa aktarılacak özel sensör yok.",
+  "customSensorsExportedSuccessfully": "Özel sensörler .tpl dosyası olarak başarıyla kaydedildi ve dışa aktarıldı!",
+  "customSensorsImportedSuccessfully": "Özel sensörler .tpl dosyasından içe aktarıldı, kaydedildi ve başarıyla yeniden doğrulandı!",
+  "invalidTplFileFormat": "Geçersiz .tpl dosya formatı."
 }

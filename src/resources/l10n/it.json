@@ -745,5 +745,9 @@
   "routePlannerSaveRoute": "Salva percorso",
   "routePlannerSwitchingRoute": "Cambio percorso...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Il token API Mapbox non è configurato. Contatta il tuo amministratore per configurare il token API."
+  "routePlannerNoApiToken": "Il token API Mapbox non è configurato. Contatta il tuo amministratore per configurare il token API.",
+  "noCustomSensorsToExport": "Nessun sensore personalizzato da esportare.",
+  "customSensorsExportedSuccessfully": "Sensori personalizzati salvati ed esportati come file .tpl con successo!",
+  "customSensorsImportedSuccessfully": "Sensori personalizzati importati dal file .tpl, salvati e rivalidati con successo!",
+  "invalidTplFileFormat": "Formato file .tpl non valido."
 }

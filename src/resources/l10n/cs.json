@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "Uložit trasu",
   "routePlannerSwitchingRoute": "Přepínání trasy...",
   "routePlannerCurrencySymbol": "Kč",
-  "routePlannerNoApiToken": "Mapbox API token není nakonfigurován. Obraťte se na svého administrátora, aby nastavil API token."
+  "routePlannerNoApiToken": "Mapbox API token není nakonfigurován. Obraťte se na svého administrátora, aby nastavil API token.",
+  "noCustomSensorsToExport": "Žádné vlastní senzory k exportu.",
+  "customSensorsExportedSuccessfully": "Vlastní senzory úspěšně uloženy a exportovány jako .tpl soubor!",
+  "customSensorsImportedSuccessfully": "Vlastní senzory importovány ze souboru .tpl, uloženy a znovu ověřeny úspěšně!",
+  "invalidTplFileFormat": "Neplatný formát souboru .tpl."
 }

@@ -746,5 +746,9 @@
   "routePlannerSaveRoute": "मार्ग बचत गर्नुहोस्",
   "routePlannerSwitchingRoute": "मार्ग परिवर्तन गर्दै...",
   "routePlannerCurrencySymbol": "रु",
-  "routePlannerNoApiToken": "Mapbox API टोकन कन्फिगर गरिएको छैन। API टोकन सेट अप गर्न कृपया आफ्नो प्रशासकसँग सम्पर्क गर्नुहोस्।"
+  "routePlannerNoApiToken": "Mapbox API टोकन कन्फिगर गरिएको छैन। API टोकन सेट अप गर्न कृपया आफ्नो प्रशासकसँग सम्पर्क गर्नुहोस्।",
+  "noCustomSensorsToExport": "निर्यात गर्न कस्टम सेन्सरहरू छैनन्।",
+  "customSensorsExportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलको रूपमा सफलतापूर्वक सेभ र निर्यात गरियो!",
+  "customSensorsImportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलबाट आयात गरियो, सेभ र सफलतापूर्वक पुनः प्रमाणित गरियो!",
+  "invalidTplFileFormat": "अमान्य .tpl फाइल ढाँचा।"
 }
