@@ -3006,8 +3006,11 @@ const MainPage = () => {
                   <div style={{
                     fontSize: '14px',
                     fontWeight: '500',
-                      color: colors.textSecondary,
-                    marginBottom: '4px'
+                    color: colors.textSecondary,
+                    marginBottom: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}>
                     {getDeviceName(event.deviceId)}
                   </div>
