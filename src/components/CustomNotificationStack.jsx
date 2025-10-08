@@ -84,12 +84,44 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
   };
 
   const formatEventType = (event) => {
-    return formatNotificationTitle(t, {
+    const device = devices[event.deviceId];
+    
+    // Get standard event formatting first
+    const standardEvent = formatNotificationTitle(t, {
       type: event.type,
       attributes: {
         alarms: event.attributes?.alarm,
       },
     });
+    
+    // Check if we can replace any sensor key in the event type with custom name
+    if (device?.attributes?.customSensors) {
+      try {
+        const customSensors = JSON.parse(device.attributes.customSensors);
+        
+        // Check each custom sensor key to see if it appears in the event type
+        for (const [sensorKey, customName] of Object.entries(customSensors)) {
+          if (event.type.includes(sensorKey)) {
+            // Replace the sensor key with custom name in the standard event
+            const regex = new RegExp(sensorKey, 'gi');
+            let customEvent = standardEvent.replace(regex, customName);
+            
+            // Handle on/off status for boolean events
+            if (event.type.endsWith('On') || event.type.endsWith('Off')) {
+              const isOn = event.type.endsWith('On');
+              const status = isOn ? t('sharedYes') : t('sharedNo');
+              customEvent = `${customName}: ${status}`;
+            }
+            
+            return customEvent;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing customSensors:', error);
+      }
+    }
+    
+    return standardEvent;
   };
 
   if (visibleNotifications.length === 0) {
