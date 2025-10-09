@@ -99,6 +99,39 @@ const FloatingUsersPopover = ({
     return baseIndex;
   };
 
+  // Helper function to reset all checkboxes to checked (default state)
+  const resetAccessLevelCheckboxes = () => {
+    setAccessLevelCheckboxes({
+      'Main Menu': true,
+      'Device List': true,
+      'Reports': true,
+      'Geofences': true,
+      'Settings': true,
+      'Notifications': true,
+      'Account': true,
+      'Devices': true,
+      'Groups': true,
+      'Drivers': true,
+      'Calendars': true,
+      'Computed Attributes': true,
+      'Maintenance': true,
+      'Saved Commands': true,
+      'Announcement': true,
+      'Server': true,
+      'Users': true,
+      'Reseller Panel': true,
+      'Edit Sensors': true,
+      'Stop Engine': true,
+      'Resume Engine': true,
+      'Replay': true,
+      'Send Command': true,
+      'Share Device': true,
+      'Anchor': true,
+      'Total Distance': true,
+      'Hours': true
+    });
+  };
+
   // Helper function to load accessLevel from user attributes and set checkboxes
   const loadAccessLevelFromUser = (user) => {
     if (user && user.attributes && user.attributes.accessLevel) {
@@ -141,35 +174,7 @@ const FloatingUsersPopover = ({
       }
     } else {
       // Reset to default state if no accessLevel found
-      setAccessLevelCheckboxes({
-        'Main Menu': true,
-        'Device List': true,
-        'Reports': true,
-        'Geofences': true,
-        'Settings': true,
-        'Notifications': true,
-        'Account': true,
-        'Devices': true,
-        'Groups': true,
-        'Drivers': true,
-        'Calendars': true,
-        'Computed Attributes': true,
-        'Maintenance': true,
-        'Saved Commands': true,
-        'Announcement': true,
-        'Server': true,
-        'Users': true,
-        'Reseller Panel': true,
-        'Edit Sensors': true,
-        'Stop Engine': true,
-        'Resume Engine': true,
-        'Replay': true,
-        'Send Command': true,
-        'Share Device': true,
-        'Anchor': true,
-        'Total Distance': true,
-        'Hours': true
-      });
+      resetAccessLevelCheckboxes();
     }
   };
   
@@ -428,6 +433,7 @@ const FloatingUsersPopover = ({
   const handleCloseEditDialog = () => {
     setEditDialog(false);
     setEditingUser(null);
+    resetAccessLevelCheckboxes(); // Reset all checkboxes to checked (default state)
     // If we were editing a specific user (not from the list), close the entire popover
     if (userId) {
       onClose();
