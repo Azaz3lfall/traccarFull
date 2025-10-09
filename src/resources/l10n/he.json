@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "אין חיישנים מותאמים אישית לייצוא.",
   "customSensorsExportedSuccessfully": "חיישנים מותאמים אישית נשמרו ויוצאו כקובץ .tpl בהצלחה!",
   "customSensorsImportedSuccessfully": "חיישנים מותאמים אישית יובאו מקובץ .tpl, נשמרו ואומתו מחדש בהצלחה!",
-  "invalidTplFileFormat": "פורמט קובץ .tpl לא תקין."
+  "invalidTplFileFormat": "פורמט קובץ .tpl לא תקין.",
+  "sharedAccessLevel": "רמת גישה"
 }

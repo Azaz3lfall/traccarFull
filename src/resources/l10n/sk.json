@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Vlastné senzory úspešne uložené a exportované ako .tpl súbor!",
   "customSensorsImportedSuccessfully": "Vlastné senzory importované zo súboru .tpl, uložené a úspešne prevalidované!",
   "invalidTplFileFormat": "Neplatný formát súboru .tpl.",
-  "noEventsAvailable": "Žiadne dostupné udalosti"
+  "noEventsAvailable": "Žiadne dostupné udalosti",
+  "sharedAccessLevel": "Úroveň prístupu"
 }

@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "ഇഷ്ടാനുസൃത സെൻസറുകൾ .tpl ഫയലായി വിജയകരമായി സംരക്ഷിച്ച് കയറ്റുമതി ചെയ്തു!",
   "customSensorsImportedSuccessfully": "ഇഷ്ടാനുസൃത സെൻസറുകൾ .tpl ഫയലിൽ നിന്ന് ഇറക്കുമതി ചെയ്തു, സംരക്ഷിച്ച് വിജയകരമായി വീണ്ടും പരിശോധിച്ചു!",
   "invalidTplFileFormat": "അസാധുവായ .tpl ഫയൽ ഫോർമാറ്റ്.",
-  "noEventsAvailable": "ലഭ്യമായ ഇവന്റുകളൊന്നുമില്ല"
+  "noEventsAvailable": "ലഭ്യമായ ഇവന്റുകളൊന്നുമില്ല",
+  "sharedAccessLevel": "പ്രവേശന നില"
 }

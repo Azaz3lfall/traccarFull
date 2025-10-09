@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກບັນທຶກ ແລະ ສົ່ງອອກເປັນໄຟລ໌ .tpl ຢ່າງສຳເລັດ!",
   "customSensorsImportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກນຳເຂົ້າຈາກໄຟລ໌ .tpl, ບັນທຶກ ແລະ ກວດສອບຄືນໃໝ່ຢ່າງສຳເລັດ!",
   "invalidTplFileFormat": "ຮູບແບບໄຟລ໌ .tpl ທີ່ບໍ່ຖືກຕ້ອງ.",
-  "noEventsAvailable": "ບໍ່ມີເຫດການທີ່ມີຢູ່"
+  "noEventsAvailable": "ບໍ່ມີເຫດການທີ່ມີຢູ່",
+  "sharedAccessLevel": "ລະດັບການເຂົ້າເຖິງ"
 }

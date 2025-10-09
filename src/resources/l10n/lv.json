@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Pielāgoti sensori veiksmīgi saglabāti un eksportēti kā .tpl fails!",
   "customSensorsImportedSuccessfully": "Pielāgoti sensori importēti no .tpl faila, saglabāti un veiksmīgi pārvalidēti!",
   "invalidTplFileFormat": "Nederīgs .tpl faila formāts.",
-  "noEventsAvailable": "Nav pieejamu notikumu"
+  "noEventsAvailable": "Nav pieejamu notikumu",
+  "sharedAccessLevel": "Piekļuves līmenis"
 }

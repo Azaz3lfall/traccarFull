@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Prilagojeni senzorji uspešno shranjeni in izvoženi kot .tpl datoteka!",
   "customSensorsImportedSuccessfully": "Prilagojeni senzorji uvoženi iz .tpl datoteke, shranjeni in uspešno prevalidirani!",
   "invalidTplFileFormat": "Neveljaven format datoteke .tpl.",
-  "noEventsAvailable": "Ni na voljo dogodkov"
+  "noEventsAvailable": "Ni na voljo dogodkov",
+  "sharedAccessLevel": "Raven dostopa"
 }

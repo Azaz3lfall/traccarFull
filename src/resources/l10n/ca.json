@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "No hi ha sensors personalitzats per exportar.",
   "customSensorsExportedSuccessfully": "Sensors personalitzats guardats i exportats com a fitxer .tpl amb èxit!",
   "customSensorsImportedSuccessfully": "Sensors personalitzats importats del fitxer .tpl, guardats i revalidats amb èxit!",
-  "invalidTplFileFormat": "Format de fitxer .tpl no vàlid."
+  "invalidTplFileFormat": "Format de fitxer .tpl no vàlid.",
+  "sharedAccessLevel": "Nivell d'accés"
 }

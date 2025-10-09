@@ -754,5 +754,6 @@
   "noCustomSensorsToExport": "エクスポートするカスタムセンサーがありません。",
   "customSensorsExportedSuccessfully": "カスタムセンサーが.tplファイルとして正常に保存・エクスポートされました！",
   "customSensorsImportedSuccessfully": "カスタムセンサーが.tplファイルからインポートされ、保存・再検証されました！",
-  "invalidTplFileFormat": "無効な.tplファイル形式。"
+  "invalidTplFileFormat": "無効な.tplファイル形式。",
+  "sharedAccessLevel": "アクセスレベル"
 }

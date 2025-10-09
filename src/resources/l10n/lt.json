@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Pritaikyti jutikliai sėkmingai išsaugoti ir eksportuoti kaip .tpl failas!",
   "customSensorsImportedSuccessfully": "Pritaikyti jutikliai importuoti iš .tpl failo, išsaugoti ir sėkmingai pervaliduoti!",
   "invalidTplFileFormat": "Netinkamas .tpl failo formatas.",
-  "noEventsAvailable": "Nėra prieinamų įvykių"
+  "noEventsAvailable": "Nėra prieinamų įvykių",
+  "sharedAccessLevel": "Prieigos lygis"
 }

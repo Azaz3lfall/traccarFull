@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Ingen tilpassede sensorer å eksportere.",
   "customSensorsExportedSuccessfully": "Tilpassede sensorer lagret og eksportert som .tpl fil med suksess!",
   "customSensorsImportedSuccessfully": "Tilpassede sensorer importert fra .tpl fil, lagret og revalideret med suksess!",
-  "invalidTplFileFormat": "Ugyldig .tpl filformat."
+  "invalidTplFileFormat": "Ugyldig .tpl filformat.",
+  "sharedAccessLevel": "Tilgangsnivå"
 }

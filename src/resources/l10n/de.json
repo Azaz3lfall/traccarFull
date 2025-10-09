@@ -754,5 +754,6 @@
   "noCustomSensorsToExport": "Keine benutzerdefinierten Sensoren zum Exportieren.",
   "customSensorsExportedSuccessfully": "Benutzerdefinierte Sensoren erfolgreich als .tpl-Datei gespeichert und exportiert!",
   "customSensorsImportedSuccessfully": "Benutzerdefinierte Sensoren aus .tpl-Datei importiert, gespeichert und erfolgreich revalidiert!",
-  "invalidTplFileFormat": "Ungültiges .tpl-Dateiformat."
+  "invalidTplFileFormat": "Ungültiges .tpl-Dateiformat.",
+  "sharedAccessLevel": "Zugriffsebene"
 }

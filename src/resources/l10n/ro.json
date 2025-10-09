@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Nu există senzori personalizați de exportat.",
   "customSensorsExportedSuccessfully": "Senzorii personalizați au fost salvați și exportați ca fișier .tpl cu succes!",
   "customSensorsImportedSuccessfully": "Senzorii personalizați importați din fișierul .tpl, salvați și revalidați cu succes!",
-  "invalidTplFileFormat": "Format de fișier .tpl nevalid."
+  "invalidTplFileFormat": "Format de fișier .tpl nevalid.",
+  "sharedAccessLevel": "Nivel de acces"
 }

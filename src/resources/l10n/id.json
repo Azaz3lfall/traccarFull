@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Tidak ada sensor khusus untuk diekspor.",
   "customSensorsExportedSuccessfully": "Sensor khusus berhasil disimpan dan diekspor sebagai file .tpl!",
   "customSensorsImportedSuccessfully": "Sensor khusus diimpor dari file .tpl, disimpan dan divalidasi ulang dengan sukses!",
-  "invalidTplFileFormat": "Format file .tpl tidak valid."
+  "invalidTplFileFormat": "Format file .tpl tidak valid.",
+  "sharedAccessLevel": "Tingkat Akses"
 }

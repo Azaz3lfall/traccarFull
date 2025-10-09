@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Sensa za kawaida zimehifadhiwa na kuhamishwa kama faili .tpl kwa mafanikio!",
   "customSensorsImportedSuccessfully": "Sensa za kawaida zimeingizwa kutoka kwa faili .tpl, zimehifadhiwa na kuthibitishwa tena kwa mafanikio!",
   "invalidTplFileFormat": "Umbizo la faili .tpl si sahihi.",
-  "noEventsAvailable": "Hakuna matukio yanayopatikana"
+  "noEventsAvailable": "Hakuna matukio yanayopatikana",
+  "sharedAccessLevel": "Kiwango cha ufikiaji"
 }

@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Прилагођени сензори успешно сачувани и извезени као .tpl датотека!",
   "customSensorsImportedSuccessfully": "Прилагођени сензори увезени из .tpl датотеке, сачувани и успешно превалидирани!",
   "invalidTplFileFormat": "Неважећи формат .tpl датотеке.",
-  "noEventsAvailable": "Нема доступних догађаја"
+  "noEventsAvailable": "Нема доступних догађаја",
+  "sharedAccessLevel": "Ниво приступа"
 }

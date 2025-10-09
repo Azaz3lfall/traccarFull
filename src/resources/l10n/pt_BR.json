@@ -757,5 +757,6 @@
   "customSensorsExportedSuccessfully": "Sensores personalizados salvos e exportados como arquivo .tpl com sucesso!",
   "customSensorsImportedSuccessfully": "Sensores personalizados importados do arquivo .tpl, salvos e revalidados com sucesso!",
   "invalidTplFileFormat": "Formato de arquivo .tpl inválido.",
-  "noEventsAvailable": "Nenhum evento disponível"
+  "noEventsAvailable": "Nenhum evento disponível",
+  "sharedAccessLevel": "Nível de acesso"
 }

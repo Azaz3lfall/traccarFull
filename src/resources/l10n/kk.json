@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Арнайы сенсорлар сәтті сақталды және .tpl файлы ретінде экспортталды!",
   "customSensorsImportedSuccessfully": "Арнайы сенсорлар .tpl файлынан импортталды, сақталды және сәтті қайта тексерілді!",
   "invalidTplFileFormat": "Жарамсыз .tpl файл форматы.",
-  "noEventsAvailable": "Қолжетімді оқиғалар жоқ"
+  "noEventsAvailable": "Қолжетімді оқиғалар жоқ",
+  "sharedAccessLevel": "Қол жеткізу деңгейі"
 }

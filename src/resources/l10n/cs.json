@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Žádné vlastní senzory k exportu.",
   "customSensorsExportedSuccessfully": "Vlastní senzory úspěšně uloženy a exportovány jako .tpl soubor!",
   "customSensorsImportedSuccessfully": "Vlastní senzory importovány ze souboru .tpl, uloženy a znovu ověřeny úspěšně!",
-  "invalidTplFileFormat": "Neplatný formát souboru .tpl."
+  "invalidTplFileFormat": "Neplatný formát souboru .tpl.",
+  "sharedAccessLevel": "Úroveň přístupu"
 }

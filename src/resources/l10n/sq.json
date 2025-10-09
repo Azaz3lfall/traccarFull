@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "Sensorët e personalizuar u ruajtën dhe u eksportuan si skedar .tpl me sukses!",
   "customSensorsImportedSuccessfully": "Sensorët e personalizuar u importuan nga skedari .tpl, u ruajtën dhe u validuan përsëri me sukses!",
   "invalidTplFileFormat": "Format skedari .tpl i pavlefshëm.",
-  "noEventsAvailable": "Nuk ka ngjarje të disponueshme"
+  "noEventsAvailable": "Nuk ka ngjarje të disponueshme",
+  "sharedAccessLevel": "Niveli i aksesit"
 }

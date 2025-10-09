@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Nincsenek egyéni érzékelők az exportáláshoz.",
   "customSensorsExportedSuccessfully": "Egyéni érzékelők sikeresen mentve és .tpl fájlként exportálva!",
   "customSensorsImportedSuccessfully": "Egyéni érzékelők importálva a .tpl fájlból, mentve és sikeresen újravalidálva!",
-  "invalidTplFileFormat": "Érvénytelen .tpl fájlformátum."
+  "invalidTplFileFormat": "Érvénytelen .tpl fájlformátum.",
+  "sharedAccessLevel": "Hozzáférési szint"
 }

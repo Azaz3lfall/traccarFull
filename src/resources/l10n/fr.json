@@ -754,5 +754,6 @@
   "routePlannerSaveRoute": "Enregistrer l'itinéraire",
   "routePlannerSwitchingRoute": "Changement d'itinéraire...",
   "routePlannerCurrencySymbol": "€",
-  "routePlannerNoApiToken": "Le token API Mapbox n'est pas configuré. Veuillez contacter votre administrateur pour configurer le token API."
+  "routePlannerNoApiToken": "Le token API Mapbox n'est pas configuré. Veuillez contacter votre administrateur pour configurer le token API.",
+  "sharedAccessLevel": "Niveau d'accès"
 }

@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Dışa aktarılacak özel sensör yok.",
   "customSensorsExportedSuccessfully": "Özel sensörler .tpl dosyası olarak başarıyla kaydedildi ve dışa aktarıldı!",
   "customSensorsImportedSuccessfully": "Özel sensörler .tpl dosyasından içe aktarıldı, kaydedildi ve başarıyla yeniden doğrulandı!",
-  "invalidTplFileFormat": "Geçersiz .tpl dosya formatı."
+  "invalidTplFileFormat": "Geçersiz .tpl dosya formatı.",
+  "sharedAccessLevel": "Erişim Seviyesi"
 }

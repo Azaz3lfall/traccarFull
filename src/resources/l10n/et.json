@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Eksportida pole kohandatud andureid.",
   "customSensorsExportedSuccessfully": "Kohandatud andurid salvestatud ja eksporditud .tpl failina edukalt!",
   "customSensorsImportedSuccessfully": "Kohandatud andurid imporditud .tpl failist, salvestatud ja edukalt üle kontrollitud!",
-  "invalidTplFileFormat": "Vigane .tpl faili formaat."
+  "invalidTplFileFormat": "Vigane .tpl faili formaat.",
+  "sharedAccessLevel": "Juurdepääsu tase"
 }

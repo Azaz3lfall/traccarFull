@@ -754,5 +754,6 @@
   "noCustomSensorsToExport": "Nessun sensore personalizzato da esportare.",
   "customSensorsExportedSuccessfully": "Sensori personalizzati salvati ed esportati come file .tpl con successo!",
   "customSensorsImportedSuccessfully": "Sensori personalizzati importati dal file .tpl, salvati e rivalidati con successo!",
-  "invalidTplFileFormat": "Formato file .tpl non valido."
+  "invalidTplFileFormat": "Formato file .tpl non valido.",
+  "sharedAccessLevel": "Livello di accesso"
 }

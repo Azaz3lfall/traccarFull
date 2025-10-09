@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Brak niestandardowych czujników do eksportu.",
   "customSensorsExportedSuccessfully": "Niestandardowe czujniki pomyślnie zapisane i wyeksportowane jako plik .tpl!",
   "customSensorsImportedSuccessfully": "Niestandardowe czujniki zaimportowane z pliku .tpl, zapisane i pomyślnie ponownie zweryfikowane!",
-  "invalidTplFileFormat": "Nieprawidłowy format pliku .tpl."
+  "invalidTplFileFormat": "Nieprawidłowy format pliku .tpl.",
+  "sharedAccessLevel": "Poziom dostępu"
 }

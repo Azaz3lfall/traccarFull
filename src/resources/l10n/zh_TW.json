@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "沒有要匯出的自訂感應器。",
   "customSensorsExportedSuccessfully": "自訂感應器已成功儲存並匯出為.tpl檔案！",
   "customSensorsImportedSuccessfully": "自訂感應器已從.tpl檔案匯入，儲存並重新驗證成功！",
-  "invalidTplFileFormat": "無效的.tpl檔案格式。"
+  "invalidTplFileFormat": "無效的.tpl檔案格式。",
+  "sharedAccessLevel": "存取層級"
 }

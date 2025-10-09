@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Немає користувацьких датчиків для експорту.",
   "customSensorsExportedSuccessfully": "Користувацькі датчики успішно збережені та експортовані як файл .tpl!",
   "customSensorsImportedSuccessfully": "Користувацькі датчики імпортовані з файлу .tpl, збережені та успішно перевірені!",
-  "invalidTplFileFormat": "Недійсний формат файлу .tpl."
+  "invalidTplFileFormat": "Недійсний формат файлу .tpl.",
+  "sharedAccessLevel": "Рівень доступу"
 }

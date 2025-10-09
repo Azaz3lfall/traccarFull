@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Δεν υπάρχουν προσαρμοσμένοι αισθητήρες για εξαγωγή.",
   "customSensorsExportedSuccessfully": "Οι προσαρμοσμένοι αισθητήρες αποθηκεύτηκαν και εξήχθησαν ως αρχείο .tpl με επιτυχία!",
   "customSensorsImportedSuccessfully": "Οι προσαρμοσμένοι αισθητήρες εισήχθησαν από το αρχείο .tpl, αποθηκεύτηκαν και επαναεπιβεβαιώθηκαν με επιτυχία!",
-  "invalidTplFileFormat": "Μη έγκυρη μορφή αρχείου .tpl."
+  "invalidTplFileFormat": "Μη έγκυρη μορφή αρχείου .tpl.",
+  "sharedAccessLevel": "Επίπεδο πρόσβασης"
 }

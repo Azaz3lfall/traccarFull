@@ -755,5 +755,6 @@
   "noCustomSensorsToExport": "Geen pasgemaakte sensors om uit te voer.",
   "customSensorsExportedSuccessfully": "Pasgemaakte sensors suksesvol gestoor en uitgevoer as .tpl lêer!",
   "customSensorsImportedSuccessfully": "Pasgemaakte sensors van .tpl lêer ingevoer, gestoor en hersien met sukses!",
-  "invalidTplFileFormat": "Ongeldige .tpl lêer formaat."
+  "invalidTplFileFormat": "Ongeldige .tpl lêer formaat.",
+  "sharedAccessLevel": "Toegangsvlak"
 }

@@ -751,5 +751,6 @@
   "customSensorsExportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलको रूपमा सफलतापूर्वक सेभ र निर्यात गरियो!",
   "customSensorsImportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलबाट आयात गरियो, सेभ र सफलतापूर्वक पुनः प्रमाणित गरियो!",
   "invalidTplFileFormat": "अमान्य .tpl फाइल ढाँचा।",
-  "noEventsAvailable": "कुनै उपलब्ध घटनाहरू छैनन्"
+  "noEventsAvailable": "कुनै उपलब्ध घटनाहरू छैनन्",
+  "sharedAccessLevel": "पहुँच स्तर"
 }

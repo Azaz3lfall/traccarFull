@@ -754,5 +754,6 @@
   "noCustomSensorsToExport": "Geen aangepaste sensoren om te exporteren.",
   "customSensorsExportedSuccessfully": "Aangepaste sensoren succesvol opgeslagen en geëxporteerd als .tpl bestand!",
   "customSensorsImportedSuccessfully": "Aangepaste sensoren geïmporteerd uit .tpl bestand, opgeslagen en succesvol gevalideerd!",
-  "invalidTplFileFormat": "Ongeldig .tpl bestandsformaat."
+  "invalidTplFileFormat": "Ongeldig .tpl bestandsformaat.",
+  "sharedAccessLevel": "Toegangsniveau"
 }

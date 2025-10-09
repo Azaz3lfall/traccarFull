@@ -754,5 +754,6 @@
   "routePlannerSaveRoute": "Guardar ruta",
   "routePlannerSwitchingRoute": "Cambiando ruta...",
   "routePlannerCurrencySymbol": "$",
-  "routePlannerNoApiToken": "El token de API de Mapbox no está configurado. Póngase en contacto con su administrador para configurar el token de API."
+  "routePlannerNoApiToken": "El token de API de Mapbox no está configurado. Póngase en contacto con su administrador para configurar el token de API.",
+  "sharedAccessLevel": "Nivel de acceso"
 }
