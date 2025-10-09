@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Maxsus sensorlar .tpl faylidan import qilindi, saqlandi va muvaffaqiyatli qayta tasdiqlandi!",
   "invalidTplFileFormat": "Noto'g'ri .tpl fayl formati.",
   "noEventsAvailable": "Mavjud hodisalar yo'q",
-  "sharedAccessLevel": "Kirish darajasi"
+  "sharedAccessLevel": "Kirish darajasi",
+  "accessLevelEditSensors": "Sensorni Tahrirlash",
+  "accessLevelStopEngine": "Motorni To'xtatish",
+  "accessLevelResumeEngine": "Motorni Davom Ettirish",
+  "accessLevelReplay": "Qayta O'ynatish",
+  "accessLevelSendCommand": "Buyruq Yuborish",
+  "accessLevelShareDevice": "Qurilmani Baham Ko'rish",
+  "accessLevelAnchor": "Langar",
+  "accessLevelTotalDistance": "Jami Masofa",
+  "accessLevelHours": "Soat"
 }

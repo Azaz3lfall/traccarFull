@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Özel sensorlar .tpl faýlyndan import edildi, saklandy we üstünlikli gaýtadan tassyklanyldy!",
   "invalidTplFileFormat": "Nädogry .tpl faýl formaty.",
   "noEventsAvailable": "Elýeterli wakalar ýok",
-  "sharedAccessLevel": "Giriş derejesi"
+  "sharedAccessLevel": "Giriş derejesi",
+  "accessLevelEditSensors": "Sensorlary Redaktirle",
+  "accessLevelStopEngine": "Motojy Durdur",
+  "accessLevelResumeEngine": "Motojy Dowam Etdir",
+  "accessLevelReplay": "Gaýtala",
+  "accessLevelSendCommand": "Buýruk Iber",
+  "accessLevelShareDevice": "Enjamy Paýlaş",
+  "accessLevelAnchor": "Labyr",
+  "accessLevelTotalDistance": "Jemi Uzaklyk",
+  "accessLevelHours": "Sagat"
 }

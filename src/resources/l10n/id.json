@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Sensor khusus berhasil disimpan dan diekspor sebagai file .tpl!",
   "customSensorsImportedSuccessfully": "Sensor khusus diimpor dari file .tpl, disimpan dan divalidasi ulang dengan sukses!",
   "invalidTplFileFormat": "Format file .tpl tidak valid.",
-  "sharedAccessLevel": "Tingkat Akses"
+  "sharedAccessLevel": "Tingkat Akses",
+  "accessLevelEditSensors": "Edit Sensor",
+  "accessLevelStopEngine": "Hentikan Mesin",
+  "accessLevelResumeEngine": "Lanjutkan Mesin",
+  "accessLevelReplay": "Putar Ulang",
+  "accessLevelSendCommand": "Kirim Perintah",
+  "accessLevelShareDevice": "Bagikan Perangkat",
+  "accessLevelAnchor": "Jangkar",
+  "accessLevelTotalDistance": "Total Jarak",
+  "accessLevelHours": "Jam"
 }

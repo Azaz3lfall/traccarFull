@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "ഇഷ്ടാനുസൃത സെൻസറുകൾ .tpl ഫയലിൽ നിന്ന് ഇറക്കുമതി ചെയ്തു, സംരക്ഷിച്ച് വിജയകരമായി വീണ്ടും പരിശോധിച്ചു!",
   "invalidTplFileFormat": "അസാധുവായ .tpl ഫയൽ ഫോർമാറ്റ്.",
   "noEventsAvailable": "ലഭ്യമായ ഇവന്റുകളൊന്നുമില്ല",
-  "sharedAccessLevel": "പ്രവേശന നില"
+  "sharedAccessLevel": "പ്രവേശന നില",
+  "accessLevelEditSensors": "സെൻസറുകൾ എഡിറ്റ് ചെയ്യുക",
+  "accessLevelStopEngine": "എഞ്ചിൻ നിർത്തുക",
+  "accessLevelResumeEngine": "എഞ്ചിൻ തുടരുക",
+  "accessLevelReplay": "റിപ്ലേ",
+  "accessLevelSendCommand": "കമാൻഡ് അയയ്ക്കുക",
+  "accessLevelShareDevice": "ഉപകരണം പങ്കിടുക",
+  "accessLevelAnchor": "അങ്കർ",
+  "accessLevelTotalDistance": "മൊത്തം ദൂരം",
+  "accessLevelHours": "മണിക്കൂറുകൾ"
 }

@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Tilpassa sensorar importert frå .tpl fil, lagra og revalidera med suksess!",
   "invalidTplFileFormat": "Ugyldig .tpl filformat.",
   "noEventsAvailable": "Ingen tilgjengelege hendingar",
-  "sharedAccessLevel": "Tilgangsnivå"
+  "sharedAccessLevel": "Tilgangsnivå",
+  "accessLevelEditSensors": "Rediger Sensore",
+  "accessLevelStopEngine": "Stopp Motor",
+  "accessLevelResumeEngine": "Fortset Motor",
+  "accessLevelReplay": "Gjengi",
+  "accessLevelSendCommand": "Send Kommando",
+  "accessLevelShareDevice": "Del Eining",
+  "accessLevelAnchor": "Anker",
+  "accessLevelTotalDistance": "Total Avstand",
+  "accessLevelHours": "Timar"
 }

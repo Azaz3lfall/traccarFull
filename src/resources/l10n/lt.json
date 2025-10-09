@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Pritaikyti jutikliai importuoti iš .tpl failo, išsaugoti ir sėkmingai pervaliduoti!",
   "invalidTplFileFormat": "Netinkamas .tpl failo formatas.",
   "noEventsAvailable": "Nėra prieinamų įvykių",
-  "sharedAccessLevel": "Prieigos lygis"
+  "sharedAccessLevel": "Prieigos lygis",
+  "accessLevelEditSensors": "Redaguoti Jutiklius",
+  "accessLevelStopEngine": "Sustabdyti Variklį",
+  "accessLevelResumeEngine": "Tęsti Variklį",
+  "accessLevelReplay": "Atkurti",
+  "accessLevelSendCommand": "Siųsti Komandą",
+  "accessLevelShareDevice": "Dalintis Įrenginiu",
+  "accessLevelAnchor": "Inkaras",
+  "accessLevelTotalDistance": "Bendras Atstumas",
+  "accessLevelHours": "Valandos"
 }

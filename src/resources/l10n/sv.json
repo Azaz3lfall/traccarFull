@@ -755,5 +755,14 @@
   "customSensorsExportedSuccessfully": "Anpassade sensorer sparade och exporterade som .tpl fil framgångsrikt!",
   "customSensorsImportedSuccessfully": "Anpassade sensorer importerade från .tpl fil, sparade och framgångsrikt omvaliderade!",
   "invalidTplFileFormat": "Ogiltigt .tpl filformat.",
-  "sharedAccessLevel": "Åtkomstnivå"
+  "sharedAccessLevel": "Åtkomstnivå",
+  "accessLevelEditSensors": "Redigera Sensorer",
+  "accessLevelStopEngine": "Stoppa Motor",
+  "accessLevelResumeEngine": "Återuppta Motor",
+  "accessLevelReplay": "Uppspelning",
+  "accessLevelSendCommand": "Skicka Kommando",
+  "accessLevelShareDevice": "Dela Enhet",
+  "accessLevelAnchor": "Ankare",
+  "accessLevelTotalDistance": "Total Distans",
+  "accessLevelHours": "Timmar"
 }

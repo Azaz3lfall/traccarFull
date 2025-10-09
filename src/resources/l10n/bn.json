@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "কাস্টম সেন্সরগুলি .tpl ফাইল হিসাবে সফলভাবে সংরক্ষিত এবং রপ্তানি করা হয়েছে!",
   "customSensorsImportedSuccessfully": "কাস্টম সেন্সরগুলি .tpl ফাইল থেকে আমদানি, সংরক্ষিত এবং সফলভাবে পুনরায় যাচাই করা হয়েছে!",
   "invalidTplFileFormat": "অবৈধ .tpl ফাইল ফরম্যাট।",
-  "sharedAccessLevel": "অ্যাক্সেস লেভেল"
+  "sharedAccessLevel": "অ্যাক্সেস লেভেল",
+  "accessLevelEditSensors": "সেন্সর সম্পাদনা",
+  "accessLevelStopEngine": "ইঞ্জিন বন্ধ",
+  "accessLevelResumeEngine": "ইঞ্জিন পুনরায় শুরু",
+  "accessLevelReplay": "পুনরাবৃত্তি",
+  "accessLevelSendCommand": "কমান্ড পাঠান",
+  "accessLevelShareDevice": "ডিভাইস শেয়ার",
+  "accessLevelAnchor": "নোঙ্গর",
+  "accessLevelTotalDistance": "মোট দূরত্ব",
+  "accessLevelHours": "ঘন্টা"
 }

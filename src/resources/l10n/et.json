@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Kohandatud andurid salvestatud ja eksporditud .tpl failina edukalt!",
   "customSensorsImportedSuccessfully": "Kohandatud andurid imporditud .tpl failist, salvestatud ja edukalt üle kontrollitud!",
   "invalidTplFileFormat": "Vigane .tpl faili formaat.",
-  "sharedAccessLevel": "Juurdepääsu tase"
+  "sharedAccessLevel": "Juurdepääsu tase",
+  "accessLevelEditSensors": "Redigeeri Andureid",
+  "accessLevelStopEngine": "Peata Mootor",
+  "accessLevelResumeEngine": "Jätka Mootorit",
+  "accessLevelReplay": "Taasesitus",
+  "accessLevelSendCommand": "Saada Käsk",
+  "accessLevelShareDevice": "Jaga Seadet",
+  "accessLevelAnchor": "Ankur",
+  "accessLevelTotalDistance": "Kogu Vahemaa",
+  "accessLevelHours": "Tunnid"
 }

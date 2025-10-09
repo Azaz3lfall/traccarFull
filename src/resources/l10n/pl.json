@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Niestandardowe czujniki pomyślnie zapisane i wyeksportowane jako plik .tpl!",
   "customSensorsImportedSuccessfully": "Niestandardowe czujniki zaimportowane z pliku .tpl, zapisane i pomyślnie ponownie zweryfikowane!",
   "invalidTplFileFormat": "Nieprawidłowy format pliku .tpl.",
-  "sharedAccessLevel": "Poziom dostępu"
+  "sharedAccessLevel": "Poziom dostępu",
+  "accessLevelEditSensors": "Edytuj Czujniki",
+  "accessLevelStopEngine": "Zatrzymaj Silnik",
+  "accessLevelResumeEngine": "Wznów Silnik",
+  "accessLevelReplay": "Odtwórz",
+  "accessLevelSendCommand": "Wyślij Polecenie",
+  "accessLevelShareDevice": "Udostępnij Urządzenie",
+  "accessLevelAnchor": "Kotwica",
+  "accessLevelTotalDistance": "Całkowita Odległość",
+  "accessLevelHours": "Godziny"
 }

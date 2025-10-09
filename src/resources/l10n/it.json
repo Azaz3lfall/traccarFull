@@ -755,5 +755,14 @@
   "customSensorsExportedSuccessfully": "Sensori personalizzati salvati ed esportati come file .tpl con successo!",
   "customSensorsImportedSuccessfully": "Sensori personalizzati importati dal file .tpl, salvati e rivalidati con successo!",
   "invalidTplFileFormat": "Formato file .tpl non valido.",
-  "sharedAccessLevel": "Livello di accesso"
+  "sharedAccessLevel": "Livello di accesso",
+  "accessLevelEditSensors": "Modifica Sensori",
+  "accessLevelStopEngine": "Ferma Motore",
+  "accessLevelResumeEngine": "Riprendi Motore",
+  "accessLevelReplay": "Riproduci",
+  "accessLevelSendCommand": "Invia Comando",
+  "accessLevelShareDevice": "Condividi Dispositivo",
+  "accessLevelAnchor": "Ancora",
+  "accessLevelTotalDistance": "Distanza Totale",
+  "accessLevelHours": "Ore"
 }

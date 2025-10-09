@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "მორგებული სენსორები .tpl ფაილიდან იმპორტირდა, შეინახა და წარმატებით გადაამოწმა!",
   "invalidTplFileFormat": "არასწორი .tpl ფაილის ფორმატი.",
   "noEventsAvailable": "მოვლენები არ არის ხელმისაწვდომი",
-  "sharedAccessLevel": "წვდომის დონე"
+  "sharedAccessLevel": "წვდომის დონე",
+  "accessLevelEditSensors": "სენსორების რედაქტირება",
+  "accessLevelStopEngine": "ძრავის გაჩერება",
+  "accessLevelResumeEngine": "ძრავის გაგრძელება",
+  "accessLevelReplay": "გამეორება",
+  "accessLevelSendCommand": "ბრძანების გაგზავნა",
+  "accessLevelShareDevice": "მოწყობილობის გაზიარება",
+  "accessLevelAnchor": "ღუზა",
+  "accessLevelTotalDistance": "საერთო მანძილი",
+  "accessLevelHours": "საათები"
 }

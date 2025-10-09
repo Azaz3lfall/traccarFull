@@ -755,5 +755,14 @@
   "customSensorsExportedSuccessfully": "Aangepaste sensoren succesvol opgeslagen en geëxporteerd als .tpl bestand!",
   "customSensorsImportedSuccessfully": "Aangepaste sensoren geïmporteerd uit .tpl bestand, opgeslagen en succesvol gevalideerd!",
   "invalidTplFileFormat": "Ongeldig .tpl bestandsformaat.",
-  "sharedAccessLevel": "Toegangsniveau"
+  "sharedAccessLevel": "Toegangsniveau",
+  "accessLevelEditSensors": "Sensoren Bewerken",
+  "accessLevelStopEngine": "Motor Stoppen",
+  "accessLevelResumeEngine": "Motor Hervatten",
+  "accessLevelReplay": "Herhalen",
+  "accessLevelSendCommand": "Commando Verzenden",
+  "accessLevelShareDevice": "Apparaat Delen",
+  "accessLevelAnchor": "Anker",
+  "accessLevelTotalDistance": "Totale Afstand",
+  "accessLevelHours": "Uren"
 }

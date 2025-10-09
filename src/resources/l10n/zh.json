@@ -755,5 +755,14 @@
   "customSensorsExportedSuccessfully": "自定义传感器已成功保存并导出为.tpl文件！",
   "customSensorsImportedSuccessfully": "自定义传感器已从.tpl文件导入，保存并重新验证成功！",
   "invalidTplFileFormat": "无效的.tpl文件格式。",
-  "sharedAccessLevel": "访问级别"
+  "sharedAccessLevel": "访问级别",
+  "accessLevelEditSensors": "编辑传感器",
+  "accessLevelStopEngine": "停止引擎",
+  "accessLevelResumeEngine": "恢复引擎",
+  "accessLevelReplay": "重放",
+  "accessLevelSendCommand": "发送命令",
+  "accessLevelShareDevice": "共享设备",
+  "accessLevelAnchor": "锚点",
+  "accessLevelTotalDistance": "总距离",
+  "accessLevelHours": "小时"
 }

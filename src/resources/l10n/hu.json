@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Egyéni érzékelők sikeresen mentve és .tpl fájlként exportálva!",
   "customSensorsImportedSuccessfully": "Egyéni érzékelők importálva a .tpl fájlból, mentve és sikeresen újravalidálva!",
   "invalidTplFileFormat": "Érvénytelen .tpl fájlformátum.",
-  "sharedAccessLevel": "Hozzáférési szint"
+  "sharedAccessLevel": "Hozzáférési szint",
+  "accessLevelEditSensors": "Szenzorok Szerkesztése",
+  "accessLevelStopEngine": "Motor Leállítása",
+  "accessLevelResumeEngine": "Motor Folytatása",
+  "accessLevelReplay": "Újrajátszás",
+  "accessLevelSendCommand": "Parancs Küldése",
+  "accessLevelShareDevice": "Eszköz Megosztása",
+  "accessLevelAnchor": "Horgony",
+  "accessLevelTotalDistance": "Összes Távolság",
+  "accessLevelHours": "Órák"
 }

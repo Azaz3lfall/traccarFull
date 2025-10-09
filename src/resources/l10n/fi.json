@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Mukautetut anturit tallennettu ja viety .tpl-tiedostona onnistuneesti!",
   "customSensorsImportedSuccessfully": "Mukautetut anturit tuotu .tpl-tiedostosta, tallennettu ja vahvistettu onnistuneesti!",
   "invalidTplFileFormat": "Virheellinen .tpl tiedostomuoto.",
-  "sharedAccessLevel": "Käyttöoikeustaso"
+  "sharedAccessLevel": "Käyttöoikeustaso",
+  "accessLevelEditSensors": "Muokkaa Antureita",
+  "accessLevelStopEngine": "Pysäytä Moottori",
+  "accessLevelResumeEngine": "Jatka Moottoria",
+  "accessLevelReplay": "Toisto",
+  "accessLevelSendCommand": "Lähetä Komento",
+  "accessLevelShareDevice": "Jaa Laite",
+  "accessLevelAnchor": "Ankkuri",
+  "accessLevelTotalDistance": "Kokonaismatka",
+  "accessLevelHours": "Tunnit"
 }

@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Özel sensörler .tpl dosyası olarak başarıyla kaydedildi ve dışa aktarıldı!",
   "customSensorsImportedSuccessfully": "Özel sensörler .tpl dosyasından içe aktarıldı, kaydedildi ve başarıyla yeniden doğrulandı!",
   "invalidTplFileFormat": "Geçersiz .tpl dosya formatı.",
-  "sharedAccessLevel": "Erişim Seviyesi"
+  "sharedAccessLevel": "Erişim Seviyesi",
+  "accessLevelEditSensors": "Sensörleri Düzenle",
+  "accessLevelStopEngine": "Motoru Durdur",
+  "accessLevelResumeEngine": "Motoru Devam Ettir",
+  "accessLevelReplay": "Tekrar Oynat",
+  "accessLevelSendCommand": "Komut Gönder",
+  "accessLevelShareDevice": "Cihazı Paylaş",
+  "accessLevelAnchor": "Çapa",
+  "accessLevelTotalDistance": "Toplam Mesafe",
+  "accessLevelHours": "Saat"
 }

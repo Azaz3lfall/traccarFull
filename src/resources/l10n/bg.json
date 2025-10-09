@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Персонализираните сензори са запазени и експортирани като .tpl файл успешно!",
   "customSensorsImportedSuccessfully": "Персонализираните сензори са импортирани от .tpl файл, запазени и препроверени успешно!",
   "invalidTplFileFormat": "Невалиден формат на .tpl файл.",
-  "sharedAccessLevel": "Ниво на достъп"
+  "sharedAccessLevel": "Ниво на достъп",
+  "accessLevelEditSensors": "Редактиране на сензори",
+  "accessLevelStopEngine": "Спиране на двигателя",
+  "accessLevelResumeEngine": "Възобновяване на двигателя",
+  "accessLevelReplay": "Повторение",
+  "accessLevelSendCommand": "Изпращане на команда",
+  "accessLevelShareDevice": "Споделяне на устройство",
+  "accessLevelAnchor": "Котва",
+  "accessLevelTotalDistance": "Общо разстояние",
+  "accessLevelHours": "Часове"
 }

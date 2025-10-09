@@ -755,5 +755,14 @@
   "routePlannerSwitchingRoute": "Cambiando ruta...",
   "routePlannerCurrencySymbol": "$",
   "routePlannerNoApiToken": "El token de API de Mapbox no está configurado. Póngase en contacto con su administrador para configurar el token de API.",
-  "sharedAccessLevel": "Nivel de acceso"
+  "sharedAccessLevel": "Nivel de acceso",
+  "accessLevelEditSensors": "Editar Sensores",
+  "accessLevelStopEngine": "Detener Motor",
+  "accessLevelResumeEngine": "Reanudar Motor",
+  "accessLevelReplay": "Reproducir",
+  "accessLevelSendCommand": "Enviar Comando",
+  "accessLevelShareDevice": "Compartir Dispositivo",
+  "accessLevelAnchor": "Ancla",
+  "accessLevelTotalDistance": "Distancia Total",
+  "accessLevelHours": "Horas"
 }

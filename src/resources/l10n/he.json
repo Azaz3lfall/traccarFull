@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "חיישנים מותאמים אישית נשמרו ויוצאו כקובץ .tpl בהצלחה!",
   "customSensorsImportedSuccessfully": "חיישנים מותאמים אישית יובאו מקובץ .tpl, נשמרו ואומתו מחדש בהצלחה!",
   "invalidTplFileFormat": "פורמט קובץ .tpl לא תקין.",
-  "sharedAccessLevel": "רמת גישה"
+  "sharedAccessLevel": "רמת גישה",
+  "accessLevelEditSensors": "עריכת חיישנים",
+  "accessLevelStopEngine": "עצירת מנוע",
+  "accessLevelResumeEngine": "חידוש מנוע",
+  "accessLevelReplay": "השמעה",
+  "accessLevelSendCommand": "שליחת פקודה",
+  "accessLevelShareDevice": "שיתוף מכשיר",
+  "accessLevelAnchor": "עוגן",
+  "accessLevelTotalDistance": "מרחק כולל",
+  "accessLevelHours": "שעות"
 }

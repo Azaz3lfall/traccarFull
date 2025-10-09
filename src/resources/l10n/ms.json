@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Sensor tersuai diimport dari fail .tpl, disimpan dan disahkan semula dengan jayanya!",
   "invalidTplFileFormat": "Format fail .tpl tidak sah.",
   "noEventsAvailable": "Tiada peristiwa tersedia",
-  "sharedAccessLevel": "Tahap Akses"
+  "sharedAccessLevel": "Tahap Akses",
+  "accessLevelEditSensors": "Edit Sensor",
+  "accessLevelStopEngine": "Hentikan Enjin",
+  "accessLevelResumeEngine": "Sambung Enjin",
+  "accessLevelReplay": "Main Semula",
+  "accessLevelSendCommand": "Hantar Arahan",
+  "accessLevelShareDevice": "Kongsi Peranti",
+  "accessLevelAnchor": "Sauh",
+  "accessLevelTotalDistance": "Jumlah Jarak",
+  "accessLevelHours": "Jam"
 }

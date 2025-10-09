@@ -755,5 +755,14 @@
   "customSensorsImportedSuccessfully": "कस्टम सेंसर .tpl फ़ाइल से आयात किए गए, सहेजे गए और सफलतापूर्वक पुनः सत्यापित किए गए!",
   "invalidTplFileFormat": "अमान्य .tpl फ़ाइल प्रारूप।",
   "noEventsAvailable": "कोई उपलब्ध घटनाएं नहीं",
-  "sharedAccessLevel": "पहुंच स्तर"
+  "sharedAccessLevel": "पहुंच स्तर",
+  "accessLevelEditSensors": "सेंसर संपादित करें",
+  "accessLevelStopEngine": "इंजन रोकें",
+  "accessLevelResumeEngine": "इंजन फिर से शुरू करें",
+  "accessLevelReplay": "पुनरावृत्ति",
+  "accessLevelSendCommand": "कमांड भेजें",
+  "accessLevelShareDevice": "डिवाइस साझा करें",
+  "accessLevelAnchor": "लंगर",
+  "accessLevelTotalDistance": "कुल दूरी",
+  "accessLevelHours": "घंटे"
 }

@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກນຳເຂົ້າຈາກໄຟລ໌ .tpl, ບັນທຶກ ແລະ ກວດສອບຄືນໃໝ່ຢ່າງສຳເລັດ!",
   "invalidTplFileFormat": "ຮູບແບບໄຟລ໌ .tpl ທີ່ບໍ່ຖືກຕ້ອງ.",
   "noEventsAvailable": "ບໍ່ມີເຫດການທີ່ມີຢູ່",
-  "sharedAccessLevel": "ລະດັບການເຂົ້າເຖິງ"
+  "sharedAccessLevel": "ລະດັບການເຂົ້າເຖິງ",
+  "accessLevelEditSensors": "ແກ້ໄຂເຊັນເຊີ",
+  "accessLevelStopEngine": "ຢຸດເຄື່ອງຍົນ",
+  "accessLevelResumeEngine": "ດຳເນີນຕໍ່ເຄື່ອງຍົນ",
+  "accessLevelReplay": "ຫຼິ້ນຄືນ",
+  "accessLevelSendCommand": "ສົ່ງຄຳສັ່ງ",
+  "accessLevelShareDevice": "ແບ່ງປັນອຸປະກອນ",
+  "accessLevelAnchor": "ສະມໍ",
+  "accessLevelTotalDistance": "ໄລຍະທາງລວມ",
+  "accessLevelHours": "ຊົ່ວໂມງ"
 }

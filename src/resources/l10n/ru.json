@@ -755,5 +755,14 @@
   "customSensorsExportedSuccessfully": "Пользовательские датчики успешно сохранены и экспортированы как файл .tpl!",
   "customSensorsImportedSuccessfully": "Пользовательские датчики импортированы из файла .tpl, сохранены и успешно перепроверены!",
   "invalidTplFileFormat": "Неверный формат файла .tpl.",
-  "sharedAccessLevel": "Уровень доступа"
+  "sharedAccessLevel": "Уровень доступа",
+  "accessLevelEditSensors": "Редактировать Датчики",
+  "accessLevelStopEngine": "Остановить Двигатель",
+  "accessLevelResumeEngine": "Возобновить Двигатель",
+  "accessLevelReplay": "Воспроизведение",
+  "accessLevelSendCommand": "Отправить Команду",
+  "accessLevelShareDevice": "Поделиться Устройством",
+  "accessLevelAnchor": "Якорь",
+  "accessLevelTotalDistance": "Общее Расстояние",
+  "accessLevelHours": "Часы"
 }

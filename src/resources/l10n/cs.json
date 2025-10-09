@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Vlastní senzory úspěšně uloženy a exportovány jako .tpl soubor!",
   "customSensorsImportedSuccessfully": "Vlastní senzory importovány ze souboru .tpl, uloženy a znovu ověřeny úspěšně!",
   "invalidTplFileFormat": "Neplatný formát souboru .tpl.",
-  "sharedAccessLevel": "Úroveň přístupu"
+  "sharedAccessLevel": "Úroveň přístupu",
+  "accessLevelEditSensors": "Upravit Senzory",
+  "accessLevelStopEngine": "Zastavit Motor",
+  "accessLevelResumeEngine": "Obnovit Motor",
+  "accessLevelReplay": "Přehrát",
+  "accessLevelSendCommand": "Odeslat Příkaz",
+  "accessLevelShareDevice": "Sdílet Zařízení",
+  "accessLevelAnchor": "Kotva",
+  "accessLevelTotalDistance": "Celková Vzdálenost",
+  "accessLevelHours": "Hodiny"
 }

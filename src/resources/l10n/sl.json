@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Prilagojeni senzorji uvoženi iz .tpl datoteke, shranjeni in uspešno prevalidirani!",
   "invalidTplFileFormat": "Neveljaven format datoteke .tpl.",
   "noEventsAvailable": "Ni na voljo dogodkov",
-  "sharedAccessLevel": "Raven dostopa"
+  "sharedAccessLevel": "Raven dostopa",
+  "accessLevelEditSensors": "Uredi Senzorje",
+  "accessLevelStopEngine": "Ustavi Motor",
+  "accessLevelResumeEngine": "Nadaljuj Motor",
+  "accessLevelReplay": "Predvajaj",
+  "accessLevelSendCommand": "Pošlji Ukaz",
+  "accessLevelShareDevice": "Deli Napravo",
+  "accessLevelAnchor": "Sidro",
+  "accessLevelTotalDistance": "Skupna Razdalja",
+  "accessLevelHours": "Ure"
 }

@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Прилагодените сензори се увезени од .tpl датотека, зачувани и успешно превалидирани!",
   "invalidTplFileFormat": "Невалиден формат на .tpl датотека.",
   "noEventsAvailable": "Нема достапни настани",
-  "sharedAccessLevel": "Ниво на пристап"
+  "sharedAccessLevel": "Ниво на пристап",
+  "accessLevelEditSensors": "Уреди Сензори",
+  "accessLevelStopEngine": "Стопи Мотор",
+  "accessLevelResumeEngine": "Продолжи Мотор",
+  "accessLevelReplay": "Повторување",
+  "accessLevelSendCommand": "Испрати Команда",
+  "accessLevelShareDevice": "Сподели Уред",
+  "accessLevelAnchor": "Сидро",
+  "accessLevelTotalDistance": "Вкупна Оддалеченост",
+  "accessLevelHours": "Часови"
 }

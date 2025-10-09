@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Prilagođeni senzori uspješno spremljeni i izvezeni kao .tpl datoteka!",
   "customSensorsImportedSuccessfully": "Prilagođeni senzori uvezeni iz .tpl datoteke, spremljeni i uspješno ponovno provjereni!",
   "invalidTplFileFormat": "Nevažeći format .tpl datoteke.",
-  "sharedAccessLevel": "Razina pristupa"
+  "sharedAccessLevel": "Razina pristupa",
+  "accessLevelEditSensors": "Uredi Senzore",
+  "accessLevelStopEngine": "Zaustavi Motor",
+  "accessLevelResumeEngine": "Nastavi Motor",
+  "accessLevelReplay": "Ponovno Reproduciraj",
+  "accessLevelSendCommand": "Pošalji Naredbu",
+  "accessLevelShareDevice": "Podijeli Uređaj",
+  "accessLevelAnchor": "Sidro",
+  "accessLevelTotalDistance": "Ukupna Udaljenost",
+  "accessLevelHours": "Sati"
 }

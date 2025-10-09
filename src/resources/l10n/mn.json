@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Тохируулсан мэдрэгч .tpl файлаас импортлож, хадгалагдсан, амжилттай дахин баталгаажуулсан!",
   "invalidTplFileFormat": "Буруу .tpl файлын формат.",
   "noEventsAvailable": "Боломжтой үйл явдал байхгүй",
-  "sharedAccessLevel": "Хандалтын түвшин"
+  "sharedAccessLevel": "Хандалтын түвшин",
+  "accessLevelEditSensors": "Сенсор Засах",
+  "accessLevelStopEngine": "Хөдөлгүүр Зогсоох",
+  "accessLevelResumeEngine": "Хөдөлгүүр Үргэлжлүүлэх",
+  "accessLevelReplay": "Дахин Тоглуулах",
+  "accessLevelSendCommand": "Команда Илгээх",
+  "accessLevelShareDevice": "Төхөөрөмж Хуваалцах",
+  "accessLevelAnchor": "Зангуу",
+  "accessLevelTotalDistance": "Нийт Зай",
+  "accessLevelHours": "Цаг"
 }

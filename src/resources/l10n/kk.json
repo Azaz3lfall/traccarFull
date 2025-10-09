@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Арнайы сенсорлар .tpl файлынан импортталды, сақталды және сәтті қайта тексерілді!",
   "invalidTplFileFormat": "Жарамсыз .tpl файл форматы.",
   "noEventsAvailable": "Қолжетімді оқиғалар жоқ",
-  "sharedAccessLevel": "Қол жеткізу деңгейі"
+  "sharedAccessLevel": "Қол жеткізу деңгейі",
+  "accessLevelEditSensors": "Сенсорларды Редактеу",
+  "accessLevelStopEngine": "Қозғалтқышты Тоқтату",
+  "accessLevelResumeEngine": "Қозғалтқышты Жалғастыру",
+  "accessLevelReplay": "Қайталау",
+  "accessLevelSendCommand": "Бұйрық Жіберу",
+  "accessLevelShareDevice": "Құрылғыны Бөлісу",
+  "accessLevelAnchor": "Лақап",
+  "accessLevelTotalDistance": "Жалпы Қашықтық",
+  "accessLevelHours": "Сағаттар"
 }

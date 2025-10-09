@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "เซ็นเซอร์ที่กำหนดเองถูกบันทึกและส่งออกเป็นไฟล์ .tpl เรียบร้อยแล้ว!",
   "customSensorsImportedSuccessfully": "เซ็นเซอร์ที่กำหนดเองถูกนำเข้าจากไฟล์ .tpl บันทึกและตรวจสอบซ้ำเรียบร้อยแล้ว!",
   "invalidTplFileFormat": "รูปแบบไฟล์ .tpl ไม่ถูกต้อง",
-  "sharedAccessLevel": "ระดับการเข้าถึง"
+  "sharedAccessLevel": "ระดับการเข้าถึง",
+  "accessLevelEditSensors": "แก้ไขเซ็นเซอร์",
+  "accessLevelStopEngine": "หยุดเครื่องยนต์",
+  "accessLevelResumeEngine": "ดำเนินการเครื่องยนต์ต่อ",
+  "accessLevelReplay": "เล่นซ้ำ",
+  "accessLevelSendCommand": "ส่งคำสั่ง",
+  "accessLevelShareDevice": "แชร์อุปกรณ์",
+  "accessLevelAnchor": "สมอ",
+  "accessLevelTotalDistance": "ระยะทางรวม",
+  "accessLevelHours": "ชั่วโมง"
 }

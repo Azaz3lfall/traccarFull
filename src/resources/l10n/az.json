@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Xüsusi sensorlar .tpl faylı kimi uğurla saxlanıldı və ixrac edildi!",
   "customSensorsImportedSuccessfully": "Xüsusi sensorlar .tpl faylından idxal edildi, saxlanıldı və yenidən yoxlanıldı!",
   "invalidTplFileFormat": "Yanlış .tpl fayl formatı.",
-  "sharedAccessLevel": "Giriş Səviyyəsi"
+  "sharedAccessLevel": "Giriş Səviyyəsi",
+  "accessLevelEditSensors": "Sensorları Redaktə Et",
+  "accessLevelStopEngine": "Mühərriki Dayandır",
+  "accessLevelResumeEngine": "Mühərriki Davam Et",
+  "accessLevelReplay": "Təkrar",
+  "accessLevelSendCommand": "Əmr Göndər",
+  "accessLevelShareDevice": "Cihazı Paylaş",
+  "accessLevelAnchor": "Lövbər",
+  "accessLevelTotalDistance": "Ümumi Məsafə",
+  "accessLevelHours": "Saat"
 }

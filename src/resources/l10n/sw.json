@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Sensa za kawaida zimeingizwa kutoka kwa faili .tpl, zimehifadhiwa na kuthibitishwa tena kwa mafanikio!",
   "invalidTplFileFormat": "Umbizo la faili .tpl si sahihi.",
   "noEventsAvailable": "Hakuna matukio yanayopatikana",
-  "sharedAccessLevel": "Kiwango cha ufikiaji"
+  "sharedAccessLevel": "Kiwango cha ufikiaji",
+  "accessLevelEditSensors": "Hariri Vichunguzi",
+  "accessLevelStopEngine": "Simamisha Injini",
+  "accessLevelResumeEngine": "Rudia Injini",
+  "accessLevelReplay": "Rudia",
+  "accessLevelSendCommand": "Tuma Amri",
+  "accessLevelShareDevice": "Shiriki Kifaa",
+  "accessLevelAnchor": "Nanga",
+  "accessLevelTotalDistance": "Jumla ya Umbali",
+  "accessLevelHours": "Masaa"
 }

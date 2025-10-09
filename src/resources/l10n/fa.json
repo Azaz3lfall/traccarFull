@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "سنسورهای سفارشی از فایل .tpl وارد شدند، ذخیره و با موفقیت مجدداً تأیید شدند!",
   "invalidTplFileFormat": "فرمت فایل .tpl نامعتبر است.",
   "noEventsAvailable": "هیچ رویدادی در دسترس نیست",
-  "sharedAccessLevel": "سطح دسترسی"
+  "sharedAccessLevel": "سطح دسترسی",
+  "accessLevelEditSensors": "ویرایش سنسورها",
+  "accessLevelStopEngine": "توقف موتور",
+  "accessLevelResumeEngine": "ادامه موتور",
+  "accessLevelReplay": "بازپخش",
+  "accessLevelSendCommand": "ارسال دستور",
+  "accessLevelShareDevice": "اشتراک گذاری دستگاه",
+  "accessLevelAnchor": "لنگر",
+  "accessLevelTotalDistance": "مسافت کل",
+  "accessLevelHours": "ساعت"
 }

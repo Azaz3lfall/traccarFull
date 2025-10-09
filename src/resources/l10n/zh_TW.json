@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "自訂感應器已成功儲存並匯出為.tpl檔案！",
   "customSensorsImportedSuccessfully": "自訂感應器已從.tpl檔案匯入，儲存並重新驗證成功！",
   "invalidTplFileFormat": "無效的.tpl檔案格式。",
-  "sharedAccessLevel": "存取層級"
+  "sharedAccessLevel": "存取層級",
+  "accessLevelEditSensors": "編輯感應器",
+  "accessLevelStopEngine": "停止引擎",
+  "accessLevelResumeEngine": "恢復引擎",
+  "accessLevelReplay": "重播",
+  "accessLevelSendCommand": "發送指令",
+  "accessLevelShareDevice": "分享裝置",
+  "accessLevelAnchor": "錨點",
+  "accessLevelTotalDistance": "總距離",
+  "accessLevelHours": "小時"
 }

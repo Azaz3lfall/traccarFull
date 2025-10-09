@@ -1430,7 +1430,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Edit Sensors"
+                              label={t('accessLevelEditSensors')}
                             />
                             <FormControlLabel
                               control={
@@ -1443,7 +1443,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Stop Engine"
+                              label={t('accessLevelStopEngine')}
                             />
                             <FormControlLabel
                               control={
@@ -1456,7 +1456,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Resume Engine"
+                              label={t('accessLevelResumeEngine')}
                             />
                             <FormControlLabel
                               control={
@@ -1469,7 +1469,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Replay"
+                              label={t('accessLevelReplay')}
                             />
                             <FormControlLabel
                               control={
@@ -1482,7 +1482,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Send Command"
+                              label={t('accessLevelSendCommand')}
                             />
                             <FormControlLabel
                               control={
@@ -1495,7 +1495,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Share Device"
+                              label={t('accessLevelShareDevice')}
                             />
                             <FormControlLabel
                               control={
@@ -1508,7 +1508,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Anchor"
+                              label={t('accessLevelAnchor')}
                             />
                             <FormControlLabel
                               control={
@@ -1521,7 +1521,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Total Distance"
+                              label={t('accessLevelTotalDistance')}
                             />
                             <FormControlLabel
                               control={
@@ -1534,7 +1534,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Hours"
+                              label={t('accessLevelHours')}
                             />
                           </FormGroup>
                         </div>

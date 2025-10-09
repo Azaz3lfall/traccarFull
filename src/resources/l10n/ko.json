@@ -755,5 +755,14 @@
   "customSensorsImportedSuccessfully": "사용자 정의 센서가 .tpl 파일에서 가져와져 저장되고 성공적으로 재검증되었습니다!",
   "invalidTplFileFormat": "잘못된 .tpl 파일 형식입니다.",
   "noEventsAvailable": "사용 가능한 이벤트가 없습니다",
-  "sharedAccessLevel": "액세스 레벨"
+  "sharedAccessLevel": "액세스 레벨",
+  "accessLevelEditSensors": "센서 편집",
+  "accessLevelStopEngine": "엔진 정지",
+  "accessLevelResumeEngine": "엔진 재개",
+  "accessLevelReplay": "재생",
+  "accessLevelSendCommand": "명령 전송",
+  "accessLevelShareDevice": "기기 공유",
+  "accessLevelAnchor": "앵커",
+  "accessLevelTotalDistance": "총 거리",
+  "accessLevelHours": "시간"
 }

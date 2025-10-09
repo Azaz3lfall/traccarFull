@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Հատուկ սենսորները ներմուծվեցին .tpl ֆայլից, պահպանվեցին և հաջողությամբ վերավավերացվեցին:",
   "invalidTplFileFormat": "Անվավեր .tpl ֆայլի ձևաչափ:",
   "noEventsAvailable": "Հասանելի իրադարձություններ չկան",
-  "sharedAccessLevel": "Մուտքի մակարդակ"
+  "sharedAccessLevel": "Մուտքի մակարդակ",
+  "accessLevelEditSensors": "Խմբագրել Սենսորները",
+  "accessLevelStopEngine": "Կանգնեցնել Շարժիչը",
+  "accessLevelResumeEngine": "Շարունակել Շարժիչը",
+  "accessLevelReplay": "Վերարտադրություն",
+  "accessLevelSendCommand": "Ուղարկել Հրաման",
+  "accessLevelShareDevice": "Կիսվել Սարքով",
+  "accessLevelAnchor": "Անկյուն",
+  "accessLevelTotalDistance": "Ընդհանուր Հեռավորություն",
+  "accessLevelHours": "Ժամեր"
 }

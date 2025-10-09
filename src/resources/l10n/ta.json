@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "தனிப்பயன் சென்சார்கள் .tpl கோப்பிலிருந்து இறக்குமதி செய்யப்பட்டு, சேமிக்கப்பட்டு வெற்றிகரமாக மீண்டும் சரிபார்க்கப்பட்டன!",
   "invalidTplFileFormat": "தவறான .tpl கோப்பு வடிவம்.",
   "noEventsAvailable": "கிடைக்கும் நிகழ்வுகள் இல்லை",
-  "sharedAccessLevel": "அணுகல் நிலை"
+  "sharedAccessLevel": "அணுகல் நிலை",
+  "accessLevelEditSensors": "சென்சார்களைத் திருத்து",
+  "accessLevelStopEngine": "இயந்திரத்தை நிறுத்து",
+  "accessLevelResumeEngine": "இயந்திரத்தைத் தொடர்",
+  "accessLevelReplay": "மீண்டும் இயக்கு",
+  "accessLevelSendCommand": "கட்டளையை அனுப்பு",
+  "accessLevelShareDevice": "சாதனத்தைப் பகிர்",
+  "accessLevelAnchor": "நங்கூரம்",
+  "accessLevelTotalDistance": "மொத்த தூரம்",
+  "accessLevelHours": "மணிநேரங்கள்"
 }

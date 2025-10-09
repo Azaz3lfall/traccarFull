@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Senzorii personalizați au fost salvați și exportați ca fișier .tpl cu succes!",
   "customSensorsImportedSuccessfully": "Senzorii personalizați importați din fișierul .tpl, salvați și revalidați cu succes!",
   "invalidTplFileFormat": "Format de fișier .tpl nevalid.",
-  "sharedAccessLevel": "Nivel de acces"
+  "sharedAccessLevel": "Nivel de acces",
+  "accessLevelEditSensors": "Editează Senzori",
+  "accessLevelStopEngine": "Oprește Motorul",
+  "accessLevelResumeEngine": "Reia Motorul",
+  "accessLevelReplay": "Redare",
+  "accessLevelSendCommand": "Trimite Comandă",
+  "accessLevelShareDevice": "Partajează Dispozitivul",
+  "accessLevelAnchor": "Ancoră",
+  "accessLevelTotalDistance": "Distanța Totală",
+  "accessLevelHours": "Ore"
 }

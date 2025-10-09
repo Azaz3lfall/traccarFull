@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Pielāgoti sensori importēti no .tpl faila, saglabāti un veiksmīgi pārvalidēti!",
   "invalidTplFileFormat": "Nederīgs .tpl faila formāts.",
   "noEventsAvailable": "Nav pieejamu notikumu",
-  "sharedAccessLevel": "Piekļuves līmenis"
+  "sharedAccessLevel": "Piekļuves līmenis",
+  "accessLevelEditSensors": "Rediģēt Sensorus",
+  "accessLevelStopEngine": "Apturēt Dzinēju",
+  "accessLevelResumeEngine": "Turpināt Dzinēju",
+  "accessLevelReplay": "Atkārtot",
+  "accessLevelSendCommand": "Nosūtīt Komandu",
+  "accessLevelShareDevice": "Dalīties ar Ierīci",
+  "accessLevelAnchor": "Enkurs",
+  "accessLevelTotalDistance": "Kopējais Attālums",
+  "accessLevelHours": "Stundas"
 }

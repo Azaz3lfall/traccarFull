@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Vlastné senzory importované zo súboru .tpl, uložené a úspešne prevalidované!",
   "invalidTplFileFormat": "Neplatný formát súboru .tpl.",
   "noEventsAvailable": "Žiadne dostupné udalosti",
-  "sharedAccessLevel": "Úroveň prístupu"
+  "sharedAccessLevel": "Úroveň prístupu",
+  "accessLevelEditSensors": "Upraviť Senzory",
+  "accessLevelStopEngine": "Zastaviť Motor",
+  "accessLevelResumeEngine": "Obnoviť Motor",
+  "accessLevelReplay": "Prehrať",
+  "accessLevelSendCommand": "Odoslať Príkaz",
+  "accessLevelShareDevice": "Zdieľať Zariadenie",
+  "accessLevelAnchor": "Kotva",
+  "accessLevelTotalDistance": "Celková Vzdialenosť",
+  "accessLevelHours": "Hodiny"
 }

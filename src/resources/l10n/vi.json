@@ -756,5 +756,14 @@
   "customSensorsExportedSuccessfully": "Cảm biến tùy chỉnh đã được lưu và xuất dưới dạng tệp .tpl thành công!",
   "customSensorsImportedSuccessfully": "Cảm biến tùy chỉnh đã được nhập từ tệp .tpl, lưu và xác thực lại thành công!",
   "invalidTplFileFormat": "Định dạng tệp .tpl không hợp lệ.",
-  "sharedAccessLevel": "Mức truy cập"
+  "sharedAccessLevel": "Mức truy cập",
+  "accessLevelEditSensors": "Chỉnh Sửa Cảm Biến",
+  "accessLevelStopEngine": "Dừng Động Cơ",
+  "accessLevelResumeEngine": "Tiếp Tục Động Cơ",
+  "accessLevelReplay": "Phát Lại",
+  "accessLevelSendCommand": "Gửi Lệnh",
+  "accessLevelShareDevice": "Chia Sẻ Thiết Bị",
+  "accessLevelAnchor": "Mỏ Neo",
+  "accessLevelTotalDistance": "Tổng Khoảng Cách",
+  "accessLevelHours": "Giờ"
 }

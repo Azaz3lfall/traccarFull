@@ -752,5 +752,14 @@
   "customSensorsImportedSuccessfully": "Sensorët e personalizuar u importuan nga skedari .tpl, u ruajtën dhe u validuan përsëri me sukses!",
   "invalidTplFileFormat": "Format skedari .tpl i pavlefshëm.",
   "noEventsAvailable": "Nuk ka ngjarje të disponueshme",
-  "sharedAccessLevel": "Niveli i aksesit"
+  "sharedAccessLevel": "Niveli i aksesit",
+  "accessLevelEditSensors": "Redakto Sensoret",
+  "accessLevelStopEngine": "Ndalo Motorin",
+  "accessLevelResumeEngine": "Vazhdo Motorin",
+  "accessLevelReplay": "Rikthe",
+  "accessLevelSendCommand": "Dërgo Komandën",
+  "accessLevelShareDevice": "Ndaj Pajisjen",
+  "accessLevelAnchor": "Spor",
+  "accessLevelTotalDistance": "Distanca Totale",
+  "accessLevelHours": "Orë"
 }
