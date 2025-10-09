@@ -420,6 +420,19 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has device list permission
+  const hasDeviceListPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.deviceList === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1366,6 +1379,7 @@ const MainPage = () => {
           </div>
           
           {/* Device List Toggle Button */}
+          {hasDeviceListPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -1430,6 +1444,7 @@ const MainPage = () => {
               </span>
             )}
           </div>
+          )}
           
           {/* Reports Icon */}
           {!disableReports && hasReportsPermission && (
