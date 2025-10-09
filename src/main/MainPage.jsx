@@ -859,6 +859,7 @@ const MainPage = () => {
   const events = useSelector((state) => state.events.items);
   const eventsCount = events ? events.length : 0;
   
+  
   // Get user initials for avatar
   const getUserInitials = (user) => {
     if (!user || !user.name) return 'U';
@@ -3002,7 +3003,7 @@ const MainPage = () => {
                 textAlign: 'center',
                 color: colors.textSecondary
               }}>
-{t('noEventsAvailable')}
+                {t('noEventsAvailable')}
               </div>
             ) : (
               events.map((event, index) => (
