@@ -1068,116 +1068,129 @@ const FloatingUsersPopover = ({
                     {/* Access Level Tab */}
                     {activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <FormGroup>
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Main Menu"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Device List"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Reports"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Geofences"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Settings"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Notifications"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Account"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Devices"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Groups"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Drivers"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Calendars"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Computed Attributes"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Maintenance"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Saved Commands"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Announcement"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Server"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Users"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Reseller Panel"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Edit Sensors"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Stop Engine"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Resume Engine"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Replay"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Send Command"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Share Device"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Anchor"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Total Distance"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox />}
-                            label="Hours"
-                          />
-                        </FormGroup>
+                        {/* Check All */}
+                        <FormControlLabel
+                          control={<Checkbox />}
+                          label="Check All"
+                          style={{ fontWeight: 'bold', marginBottom: '8px' }}
+                        />
+                        
+                        {/* Two Column Layout */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Main Menu"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Device List"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Reports"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Geofences"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Settings"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Notifications"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Account"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Devices"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Groups"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Drivers"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Calendars"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Computed Attributes"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Maintenance"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Saved Commands"
+                            />
+                          </FormGroup>
+                          
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Announcement"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Server"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Users"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Reseller Panel"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Edit Sensors"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Stop Engine"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Resume Engine"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Replay"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Send Command"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Share Device"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Anchor"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Total Distance"
+                            />
+                            <FormControlLabel
+                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              label="Hours"
+                            />
+                          </FormGroup>
+                        </div>
                       </div>
                     )}
 
