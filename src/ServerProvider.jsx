@@ -36,7 +36,8 @@ const ServerProvider = ({
           // Apply branding to the page
           applyResellerBranding(resellerData);
         } else {
-          // Apply fallback branding
+          // Domain not found - apply fallback branding
+          dispatch(sessionActions.updateResellerBranding(null));
           applyFallbackBranding();
         }
       } catch (error) {

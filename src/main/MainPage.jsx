@@ -816,7 +816,17 @@ const MainPage = () => {
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
   
   // Reseller branding
-  const { getLogoUrl, getCompanyName } = useResellerBranding();
+  const { getLogoUrl, getCompanyName, hasResellerBranding, resellerData: resellerBrandingData } = useResellerBranding();
+  
+  // Track if domain lookup has completed
+  const [domainLookupCompleted, setDomainLookupCompleted] = useState(false);
+  
+  // Check if domain lookup has completed
+  useEffect(() => {
+    if (hasResellerBranding !== undefined) {
+      setDomainLookupCompleted(true);
+    }
+  }, [hasResellerBranding]);
 
   // Check if current user is a reseller
   useEffect(() => {
@@ -1180,13 +1190,16 @@ const MainPage = () => {
                 padding: '0 10px',
                 marginBottom: '6px'
               }}>
-                {(() => {
+                {domainLookupCompleted && (() => {
                   // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
                   const logoUrl = getLogoUrl() || logo || logoInverted;
                   
+                  // Only show logo if we have a valid URL
+                  if (!logoUrl) return null;
+                  
                   return (
                     <img 
-                      src={logoUrl || fallbackLogo} 
+                      src={logoUrl} 
                       alt="Server Logo" 
                       style={{ 
                         maxWidth: '100%',
@@ -6304,13 +6317,16 @@ const MainPage = () => {
                 alignItems: 'center',
                 justifyContent: 'flex-start'
               }}>
-                {(() => {
+                {domainLookupCompleted && (() => {
                   // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
                   const logoUrl = getLogoUrl() || logo || logoInverted;
                   
+                  // Only show logo if we have a valid URL
+                  if (!logoUrl) return null;
+                  
                   return (
                     <img 
-                      src={logoUrl || fallbackLogo} 
+                      src={logoUrl} 
                       alt="Server Logo" 
                       style={{ 
                         maxWidth: '100%',

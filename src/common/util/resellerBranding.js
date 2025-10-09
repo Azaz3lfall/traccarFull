@@ -19,16 +19,14 @@ export const fetchResellerBranding = async () => {
       body: JSON.stringify(requestBody),
     });
 
-
     if (response.ok) {
       const data = await response.json();
       return data;
     } else if (response.status === 404) {
-      const errorText = await response.text();
+      // Domain not found - this is a definitive "no reseller" result
       return null;
     } else {
       console.error('❌ Error fetching reseller branding:', response.status, response.statusText);
-      const errorText = await response.text();
       return null;
     }
   } catch (error) {
@@ -42,7 +40,7 @@ export const fetchResellerBranding = async () => {
  * @param {Object} resellerData - Reseller data from API
  */
 export const applyResellerBranding = (resellerData) => {
-  if (!resellerData || !resellerData.data) {
+  if (!resellerData || !resellerData.success || !resellerData.data) {
     applyFallbackBranding();
     return;
   }
@@ -85,6 +83,9 @@ export const applyFallbackBranding = () => {
   if (metaDescription) {
     metaDescription.setAttribute('content', 'CodeArtisan GPS SaaS');
   }
+  
+  // Set a flag to indicate fallback branding should be used
+  window.fallbackBrandingApplied = true;
 };
 
 /**
@@ -135,10 +136,15 @@ const resetFavicon = () => {
  * @returns {string} Logo URL (reseller logo or fallback)
  */
 export const getLogoUrl = (resellerData) => {
-  if (resellerData?.imageBase64) {
+  if (resellerData?.success && resellerData?.imageBase64) {
     return resellerData.imageBase64;
   }
-  return fallbackLogo;
+  // Only return fallback logo if fallback branding has been explicitly applied
+  if (window.fallbackBrandingApplied) {
+    return fallbackLogo;
+  }
+  // Return null if no reseller data and fallback not yet applied
+  return null;
 };
 
 /**
@@ -147,7 +153,7 @@ export const getLogoUrl = (resellerData) => {
  * @returns {string} Company name or default
  */
 export const getCompanyName = (resellerData) => {
-  if (resellerData?.data?.companyName) {
+  if (resellerData?.success && resellerData?.data?.companyName) {
     return resellerData.data.companyName;
   }
   return 'CodeArtisan GPS SaaS';
