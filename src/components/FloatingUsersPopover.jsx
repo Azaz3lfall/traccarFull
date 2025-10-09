@@ -570,7 +570,7 @@ const FloatingUsersPopover = ({
     
     // Create accessLevel object with all permissions (camelCase keys)
     const accessLevel = {
-      mainMenu: accessLevelCheckboxes['Main Menu'],
+      mainMenu: true, // Always true - readonly
       deviceList: accessLevelCheckboxes['Device List'],
       reports: accessLevelCheckboxes['Reports'],
       geofences: accessLevelCheckboxes['Geofences'],
@@ -1371,15 +1371,17 @@ const FloatingUsersPopover = ({
                             <FormControlLabel
                               control={
                                 <Checkbox 
-                                  checked={accessLevelCheckboxes['Main Menu']}
-                                  onChange={handleIndividualCheckbox('Main Menu')}
+                                  checked={true}
+                                  disabled={true}
                                   sx={{ 
                                     '&:hover': { backgroundColor: 'transparent !important' },
-                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' }
+                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' },
+                                    '&.Mui-disabled': { color: 'rgba(0, 0, 0, 0.6) !important' }
                                   }}
                                 />
                               }
                               label={t('sharedMenu')}
+                              sx={{ color: 'rgba(0, 0, 0, 0.6) !important' }}
                             />
                             <FormControlLabel
                               control={
