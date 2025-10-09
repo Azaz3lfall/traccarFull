@@ -198,6 +198,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [user]);
   
+  // Check if any action buttons should be visible
+  const hasAnyActionButtons = useMemo(() => {
+    return hasResumeEnginePermission || hasStopEnginePermission || hasSendCommandPermission || hasShareDevicePermission || hasAnchorPermission;
+  }, [hasResumeEnginePermission, hasStopEnginePermission, hasSendCommandPermission, hasShareDevicePermission, hasAnchorPermission]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -2098,6 +2103,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             )}
             
             {/* Action Buttons */}
+            {hasAnyActionButtons && (
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -2293,6 +2299,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </button>
               )}
             </div>
+            )}
           </div>
           
           {/* Content */}
