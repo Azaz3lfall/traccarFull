@@ -762,5 +762,16 @@
   "routePlannerRouteWithWaypoints": "Route {0} with {1} waypoints",
   "routePlannerWith": "with",
   "routePlannerPoints": "points",
-  "routePlannerNoApiToken": "Mapbox API token is not configured. Please contact your administrator to set up the API token."
+  "routePlannerNoApiToken": "Mapbox API token is not configured. Please contact your administrator to set up the API token.",
+  "sharedCheckAll": "Check All",
+  "sharedAccessLevel": "Access Level",
+  "accessLevelEditSensors": "Edit Sensors",
+  "accessLevelStopEngine": "Stop Engine",
+  "accessLevelResumeEngine": "Resume Engine",
+  "accessLevelReplay": "Replay",
+  "accessLevelSendCommand": "Send Command",
+  "accessLevelShareDevice": "Share Device",
+  "accessLevelAnchor": "Anchor",
+  "accessLevelTotalDistance": "Total Distance",
+  "accessLevelHours": "Hours"
 }
