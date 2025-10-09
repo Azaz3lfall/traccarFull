@@ -91,10 +91,13 @@ const FloatingUsersPopover = ({
   // Check if user is editing their own account
   const isEditingOwnAccount = userId && currentUser && userId === currentUser.id;
   
+  // Check if current user is admin
+  const isCurrentUserAdmin = currentUser && currentUser.administrator;
+  
   // Helper function to get correct tab index based on whether Access Level tab is shown
   const getTabIndex = (baseIndex) => {
-    if (isEditingOwnAccount && baseIndex > 1) {
-      return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden
+    if (isEditingOwnAccount && !isCurrentUserAdmin && baseIndex > 1) {
+      return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden for non-admin users
     }
     return baseIndex;
   };
@@ -382,12 +385,12 @@ const FloatingUsersPopover = ({
     }
   }, [specificUser, userId, isVisible]);
 
-  // Reset active tab if user switches to editing their own account while on Access Level tab
+  // Reset active tab if non-admin user switches to editing their own account while on Access Level tab
   useEffect(() => {
-    if (isEditingOwnAccount && activeTab === 1) {
+    if (isEditingOwnAccount && !isCurrentUserAdmin && activeTab === 1) {
       setActiveTab(0); // Reset to Required tab
     }
-  }, [isEditingOwnAccount, activeTab]);
+  }, [isEditingOwnAccount, isCurrentUserAdmin, activeTab]);
 
   // Filter users based on search and temporary status
   const filteredUsers = users.filter(user => {
@@ -1280,7 +1283,7 @@ const FloatingUsersPopover = ({
                     }}
                   >
                     <Tab label={t('sharedRequired')} />
-                    {!isEditingOwnAccount && <Tab label={t('sharedAccessLevel')} />}
+                    {(!isEditingOwnAccount || isCurrentUserAdmin) && <Tab label={t('sharedAccessLevel')} />}
                     <Tab label={t('sharedPreferences')} />
                     <Tab label={t('sharedLocation')} />
                     <Tab label={t('sharedPermissions')} />
@@ -1317,7 +1320,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Access Level Tab */}
-                    {!isEditingOwnAccount && activeTab === 1 && (
+                    {(!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {/* Check All */}
                         <FormControlLabel
