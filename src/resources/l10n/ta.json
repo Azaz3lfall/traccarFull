@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "ஏற்றுமதி செய்ய தனிப்பயன் சென்சார்கள் இல்லை.",
   "customSensorsExportedSuccessfully": "தனிப்பயன் சென்சார்கள் .tpl கோப்பாக வெற்றிகரமாக சேமிக்கப்பட்டு ஏற்றுமதி செய்யப்பட்டன!",
   "customSensorsImportedSuccessfully": "தனிப்பயன் சென்சார்கள் .tpl கோப்பிலிருந்து இறக்குமதி செய்யப்பட்டு, சேமிக்கப்பட்டு வெற்றிகரமாக மீண்டும் சரிபார்க்கப்பட்டன!",
-  "invalidTplFileFormat": "தவறான .tpl கோப்பு வடிவம்."
+  "invalidTplFileFormat": "தவறான .tpl கோப்பு வடிவம்.",
+  "noEventsAvailable": "கிடைக்கும் நிகழ்வுகள் இல்லை"
 }

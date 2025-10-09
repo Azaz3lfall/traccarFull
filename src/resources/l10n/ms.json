@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Tiada sensor tersuai untuk dieksport.",
   "customSensorsExportedSuccessfully": "Sensor tersuai berjaya disimpan dan dieksport sebagai fail .tpl!",
   "customSensorsImportedSuccessfully": "Sensor tersuai diimport dari fail .tpl, disimpan dan disahkan semula dengan jayanya!",
-  "invalidTplFileFormat": "Format fail .tpl tidak sah."
+  "invalidTplFileFormat": "Format fail .tpl tidak sah.",
+  "noEventsAvailable": "Tiada peristiwa tersedia"
 }

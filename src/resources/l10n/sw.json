@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Hakuna sensa za kawaida za kuhamisha.",
   "customSensorsExportedSuccessfully": "Sensa za kawaida zimehifadhiwa na kuhamishwa kama faili .tpl kwa mafanikio!",
   "customSensorsImportedSuccessfully": "Sensa za kawaida zimeingizwa kutoka kwa faili .tpl, zimehifadhiwa na kuthibitishwa tena kwa mafanikio!",
-  "invalidTplFileFormat": "Umbizo la faili .tpl si sahihi."
+  "invalidTplFileFormat": "Umbizo la faili .tpl si sahihi.",
+  "noEventsAvailable": "Hakuna matukio yanayopatikana"
 }

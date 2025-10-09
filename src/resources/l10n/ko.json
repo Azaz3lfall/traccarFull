@@ -753,5 +753,6 @@
   "noCustomSensorsToExport": "내보낼 사용자 정의 센서가 없습니다.",
   "customSensorsExportedSuccessfully": "사용자 정의 센서가 .tpl 파일로 성공적으로 저장 및 내보내기되었습니다!",
   "customSensorsImportedSuccessfully": "사용자 정의 센서가 .tpl 파일에서 가져와져 저장되고 성공적으로 재검증되었습니다!",
-  "invalidTplFileFormat": "잘못된 .tpl 파일 형식입니다."
+  "invalidTplFileFormat": "잘못된 .tpl 파일 형식입니다.",
+  "noEventsAvailable": "사용 가능한 이벤트가 없습니다"
 }

@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Non hai sensores personalizados para exportar.",
   "customSensorsExportedSuccessfully": "Sensores personalizados gardados e exportados como ficheiro .tpl con éxito!",
   "customSensorsImportedSuccessfully": "Sensores personalizados importados do ficheiro .tpl, gardados e revalidados con éxito!",
-  "invalidTplFileFormat": "Formato de ficheiro .tpl non válido."
+  "invalidTplFileFormat": "Formato de ficheiro .tpl non válido.",
+  "noEventsAvailable": "Non hai eventos dispoñibles"
 }

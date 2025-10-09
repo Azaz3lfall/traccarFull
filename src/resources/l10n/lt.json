@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Nėra pritaikytų jutiklių eksportui.",
   "customSensorsExportedSuccessfully": "Pritaikyti jutikliai sėkmingai išsaugoti ir eksportuoti kaip .tpl failas!",
   "customSensorsImportedSuccessfully": "Pritaikyti jutikliai importuoti iš .tpl failo, išsaugoti ir sėkmingai pervaliduoti!",
-  "invalidTplFileFormat": "Netinkamas .tpl failo formatas."
+  "invalidTplFileFormat": "Netinkamas .tpl failo formatas.",
+  "noEventsAvailable": "Nėra prieinamų įvykių"
 }

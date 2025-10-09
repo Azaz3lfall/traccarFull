@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Eksport qilish uchun maxsus sensorlar yo'q.",
   "customSensorsExportedSuccessfully": "Maxsus sensorlar .tpl fayli sifatida muvaffaqiyatli saqlandi va eksport qilindi!",
   "customSensorsImportedSuccessfully": "Maxsus sensorlar .tpl faylidan import qilindi, saqlandi va muvaffaqiyatli qayta tasdiqlandi!",
-  "invalidTplFileFormat": "Noto'g'ri .tpl fayl formati."
+  "invalidTplFileFormat": "Noto'g'ri .tpl fayl formati.",
+  "noEventsAvailable": "Mavjud hodisalar yo'q"
 }

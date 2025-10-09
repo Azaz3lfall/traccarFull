@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "ექსპორტისთვის მორგებული სენსორები არ არის.",
   "customSensorsExportedSuccessfully": "მორგებული სენსორები წარმატებით შეინახა და .tpl ფაილად გაიტანა!",
   "customSensorsImportedSuccessfully": "მორგებული სენსორები .tpl ფაილიდან იმპორტირდა, შეინახა და წარმატებით გადაამოწმა!",
-  "invalidTplFileFormat": "არასწორი .tpl ფაილის ფორმატი."
+  "invalidTplFileFormat": "არასწორი .tpl ფაილის ფორმატი.",
+  "noEventsAvailable": "მოვლენები არ არის ხელმისაწვდომი"
 }

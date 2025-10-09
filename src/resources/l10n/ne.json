@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "निर्यात गर्न कस्टम सेन्सरहरू छैनन्।",
   "customSensorsExportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलको रूपमा सफलतापूर्वक सेभ र निर्यात गरियो!",
   "customSensorsImportedSuccessfully": "कस्टम सेन्सरहरू .tpl फाइलबाट आयात गरियो, सेभ र सफलतापूर्वक पुनः प्रमाणित गरियो!",
-  "invalidTplFileFormat": "अमान्य .tpl फाइल ढाँचा।"
+  "invalidTplFileFormat": "अमान्य .tpl फाइल ढाँचा।",
+  "noEventsAvailable": "कुनै उपलब्ध घटनाहरू छैनन्"
 }

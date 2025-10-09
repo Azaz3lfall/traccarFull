@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Экспортлох тохируулсан мэдрэгч байхгүй.",
   "customSensorsExportedSuccessfully": "Тохируулсан мэдрэгч .tpl файл болгон амжилттай хадгалагдсан, экспортлогдсон!",
   "customSensorsImportedSuccessfully": "Тохируулсан мэдрэгч .tpl файлаас импортлож, хадгалагдсан, амжилттай дахин баталгаажуулсан!",
-  "invalidTplFileFormat": "Буруу .tpl файлын формат."
+  "invalidTplFileFormat": "Буруу .tpl файлын формат.",
+  "noEventsAvailable": "Боломжтой үйл явдал байхгүй"
 }

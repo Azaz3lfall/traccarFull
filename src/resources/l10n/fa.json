@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "هیچ سنسور سفارشی برای صادرات وجود ندارد.",
   "customSensorsExportedSuccessfully": "سنسورهای سفارشی با موفقیت به عنوان فایل .tpl ذخیره و صادر شدند!",
   "customSensorsImportedSuccessfully": "سنسورهای سفارشی از فایل .tpl وارد شدند، ذخیره و با موفقیت مجدداً تأیید شدند!",
-  "invalidTplFileFormat": "فرمت فایل .tpl نامعتبر است."
+  "invalidTplFileFormat": "فرمت فایل .tpl نامعتبر است.",
+  "noEventsAvailable": "هیچ رویدادی در دسترس نیست"
 }

@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Нема прилагођених сензора за извоз.",
   "customSensorsExportedSuccessfully": "Прилагођени сензори успешно сачувани и извезени као .tpl датотека!",
   "customSensorsImportedSuccessfully": "Прилагођени сензори увезени из .tpl датотеке, сачувани и успешно превалидирани!",
-  "invalidTplFileFormat": "Неважећи формат .tpl датотеке."
+  "invalidTplFileFormat": "Неважећи формат .tpl датотеке.",
+  "noEventsAvailable": "Нема доступних догађаја"
 }

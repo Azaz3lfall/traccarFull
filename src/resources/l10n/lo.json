@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "ບໍ່ມີເຊັນເຊີທີ່ກຳນົດເອງເພື່ອສົ່ງອອກ.",
   "customSensorsExportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກບັນທຶກ ແລະ ສົ່ງອອກເປັນໄຟລ໌ .tpl ຢ່າງສຳເລັດ!",
   "customSensorsImportedSuccessfully": "ເຊັນເຊີທີ່ກຳນົດເອງຖືກນຳເຂົ້າຈາກໄຟລ໌ .tpl, ບັນທຶກ ແລະ ກວດສອບຄືນໃໝ່ຢ່າງສຳເລັດ!",
-  "invalidTplFileFormat": "ຮູບແບບໄຟລ໌ .tpl ທີ່ບໍ່ຖືກຕ້ອງ."
+  "invalidTplFileFormat": "ຮູບແບບໄຟລ໌ .tpl ທີ່ບໍ່ຖືກຕ້ອງ.",
+  "noEventsAvailable": "ບໍ່ມີເຫດການທີ່ມີຢູ່"
 }

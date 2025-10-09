@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Экспорттау үшін арнайы сенсорлар жоқ.",
   "customSensorsExportedSuccessfully": "Арнайы сенсорлар сәтті сақталды және .tpl файлы ретінде экспортталды!",
   "customSensorsImportedSuccessfully": "Арнайы сенсорлар .tpl файлынан импортталды, сақталды және сәтті қайта тексерілді!",
-  "invalidTplFileFormat": "Жарамсыз .tpl файл форматы."
+  "invalidTplFileFormat": "Жарамсыз .tpl файл форматы.",
+  "noEventsAvailable": "Қолжетімді оқиғалар жоқ"
 }

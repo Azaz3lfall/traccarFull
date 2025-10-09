@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "Արտահանելու համար հատուկ սենսորներ չկան:",
   "customSensorsExportedSuccessfully": "Հատուկ սենսորները հաջողությամբ պահպանվեցին և արտահանվեցին որպես .tpl ֆայլ:",
   "customSensorsImportedSuccessfully": "Հատուկ սենսորները ներմուծվեցին .tpl ֆայլից, պահպանվեցին և հաջողությամբ վերավավերացվեցին:",
-  "invalidTplFileFormat": "Անվավեր .tpl ֆայլի ձևաչափ:"
+  "invalidTplFileFormat": "Անվավեր .tpl ֆայլի ձևաչափ:",
+  "noEventsAvailable": "Հասանելի իրադարձություններ չկան"
 }

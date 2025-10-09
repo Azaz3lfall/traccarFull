@@ -750,5 +750,6 @@
   "noCustomSensorsToExport": "අපනයනය කිරීමට අභිරුචි සංවේදක නොමැත.",
   "customSensorsExportedSuccessfully": "අභිරුචි සංවේදක .tpl ගොනුවක් ලෙස සාර්ථකව සුරකින ලදී සහ අපනයනය කරන ලදී!",
   "customSensorsImportedSuccessfully": "අභිරුචි සංවේදක .tpl ගොනුවෙන් ආනයනය කරන ලදී, සුරකින ලදී සහ සාර්ථකව නැවත වලංගු කරන ලදී!",
-  "invalidTplFileFormat": "වලංගු නොවන .tpl ගොනු ආකෘතිය."
+  "invalidTplFileFormat": "වලංගු නොවන .tpl ගොනු ආකෘතිය.",
+  "noEventsAvailable": "ලබා ගත හැකි සිදුවීම් නොමැත"
 }
