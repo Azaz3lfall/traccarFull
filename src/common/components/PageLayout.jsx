@@ -90,8 +90,18 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
 
   const [openDrawer, setOpenDrawer] = useState(false);
   
-  // Check if user has mainMenu permission (always true - readonly)
-  const hasMainMenuPermission = true;
+  // Check if user has mainMenu permission
+  const hasMainMenuPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.mainMenu === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
 
   const toggleDrawer = () => setMiniVariant(!miniVariant);
 

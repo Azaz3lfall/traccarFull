@@ -1372,16 +1372,14 @@ const FloatingUsersPopover = ({
                               control={
                                 <Checkbox 
                                   checked={true}
-                                  disabled={true}
+                                  readOnly={true}
                                   sx={{ 
                                     '&:hover': { backgroundColor: 'transparent !important' },
-                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' },
-                                    '&.Mui-disabled': { color: 'rgba(0, 0, 0, 0.6) !important' }
+                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' }
                                   }}
                                 />
                               }
                               label={t('sharedMenu')}
-                              sx={{ color: 'rgba(0, 0, 0, 0.6) !important' }}
                             />
                             <FormControlLabel
                               control={
