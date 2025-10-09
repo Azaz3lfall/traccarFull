@@ -1395,7 +1395,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label={t('deviceTitle')}
+                              label={t('showHideDevices')}
                             />
                             <FormControlLabel
                               control={
