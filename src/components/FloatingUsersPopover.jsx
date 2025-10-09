@@ -1029,6 +1029,7 @@ const FloatingUsersPopover = ({
                     }}
                   >
                     <Tab label={t('sharedRequired')} />
+                    <Tab label={t('sharedAccessLevel')} />
                     <Tab label={t('sharedPreferences')} />
                     <Tab label={t('sharedLocation')} />
                     <Tab label={t('sharedPermissions')} />
@@ -1064,8 +1065,56 @@ const FloatingUsersPopover = ({
                       </div>
                     )}
 
-                    {/* Preferences Tab */}
+                    {/* Access Level Tab */}
                     {activeTab === 1 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <FormControl fullWidth>
+                          <InputLabel>{t('sharedAccessLevel')}</InputLabel>
+                          <Select
+                            value={editingUser.administrator ? 'admin' : 'user'}
+                            onChange={(e) => setEditingUser({ 
+                              ...editingUser, 
+                              administrator: e.target.value === 'admin' 
+                            })}
+                            label={t('sharedAccessLevel')}
+                          >
+                            <MenuItem value="user">{t('sharedUser')}</MenuItem>
+                            <MenuItem value="admin">{t('sharedAdministrator')}</MenuItem>
+                          </Select>
+                        </FormControl>
+                        
+                        <FormControl fullWidth>
+                          <InputLabel>{t('sharedReadonly')}</InputLabel>
+                          <Select
+                            value={editingUser.readonly ? 'readonly' : 'readwrite'}
+                            onChange={(e) => setEditingUser({ 
+                              ...editingUser, 
+                              readonly: e.target.value === 'readonly' 
+                            })}
+                            label={t('sharedReadonly')}
+                          >
+                            <MenuItem value="readwrite">{t('sharedReadWrite')}</MenuItem>
+                            <MenuItem value="readonly">{t('sharedReadOnly')}</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={editingUser.disabled || false}
+                              onChange={(e) => setEditingUser({ 
+                                ...editingUser, 
+                                disabled: e.target.checked 
+                              })}
+                            />
+                          }
+                          label={t('sharedDisabled')}
+                        />
+                      </div>
+                    )}
+
+                    {/* Preferences Tab */}
+                    {activeTab === 2 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                           value={editingUser.phone || ''}
@@ -1200,7 +1249,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Location Tab */}
-                    {activeTab === 2 && (
+                    {activeTab === 3 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <TextField
                           type="number"
@@ -1227,7 +1276,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Permissions Tab */}
-                    {activeTab === 3 && (
+                    {activeTab === 4 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                       label={t('userExpirationTime')}
@@ -1298,7 +1347,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Attributes Tab */}
-                    {activeTab === 4 && (
+                    {activeTab === 5 && (
                       <div>
                         <EditAttributesAccordion
                           attribute={null}
