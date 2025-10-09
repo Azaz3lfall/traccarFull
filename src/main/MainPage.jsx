@@ -433,6 +433,45 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has calendars permission
+  const hasCalendarsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.calendars === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has computed attributes permission
+  const hasComputedAttributesPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.computedAttributes === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has maintenance permission
+  const hasMaintenancePermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.maintenance === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1993,7 +2032,7 @@ const MainPage = () => {
           )}
           
           {/* Calendars Icon */}
-          {!readonly && !features.disableCalendars && (
+          {!readonly && !features.disableCalendars && hasCalendarsPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -2061,7 +2100,7 @@ const MainPage = () => {
           )}
           
           {/* Computed Attributes Icon */}
-          {!readonly && !features.disableComputedAttributes && (
+          {!readonly && !features.disableComputedAttributes && hasComputedAttributesPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2129,7 +2168,7 @@ const MainPage = () => {
           )}
           
           {/* Maintenance Icon */}
-          {!readonly && !features.disableMaintenance && (
+          {!readonly && !features.disableMaintenance && hasMaintenancePermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -6748,7 +6787,7 @@ const MainPage = () => {
                   )}
 
                   {/* Calendars */}
-                  {!readonly && !features.disableCalendars && (
+                  {!readonly && !features.disableCalendars && hasCalendarsPermission && (
                     <button
                       onClick={() => {
                         setShowCalendarsPopover(true);
@@ -6784,7 +6823,7 @@ const MainPage = () => {
                   )}
 
                   {/* Computed Attributes */}
-                  {!readonly && !features.disableComputedAttributes && (
+                  {!readonly && !features.disableComputedAttributes && hasComputedAttributesPermission && (
                     <button
                       onClick={() => {
                         setShowComputedAttributesPopover(true);
@@ -6820,7 +6859,7 @@ const MainPage = () => {
                   )}
 
                   {/* Maintenance */}
-                  {!readonly && !features.disableMaintenance && (
+                  {!readonly && !features.disableMaintenance && hasMaintenancePermission && (
                     <button
                       onClick={() => {
                         setShowMaintenancePopover(true);
