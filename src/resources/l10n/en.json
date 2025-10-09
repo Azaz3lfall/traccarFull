@@ -93,8 +93,6 @@
   "sharedPhone": "Phone",
   "sharedRequired": "Required",
   "sharedAccessLevel": "Access Level",
-  "sharedReadWrite": "Read/Write",
-  "sharedReadOnly": "Read Only",
   "sharedPreferences": "Preferences",
   "sharedPermissions": "Permissions",
   "sharedConnections": "Connections",

@@ -1068,48 +1068,7 @@ const FloatingUsersPopover = ({
                     {/* Access Level Tab */}
                     {activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <FormControl fullWidth>
-                          <InputLabel>{t('sharedAccessLevel')}</InputLabel>
-                          <Select
-                            value={editingUser.administrator ? 'admin' : 'user'}
-                            onChange={(e) => setEditingUser({ 
-                              ...editingUser, 
-                              administrator: e.target.value === 'admin' 
-                            })}
-                            label={t('sharedAccessLevel')}
-                          >
-                            <MenuItem value="user">{t('sharedUser')}</MenuItem>
-                            <MenuItem value="admin">{t('sharedAdministrator')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        
-                        <FormControl fullWidth>
-                          <InputLabel>{t('sharedReadonly')}</InputLabel>
-                          <Select
-                            value={editingUser.readonly ? 'readonly' : 'readwrite'}
-                            onChange={(e) => setEditingUser({ 
-                              ...editingUser, 
-                              readonly: e.target.value === 'readonly' 
-                            })}
-                            label={t('sharedReadonly')}
-                          >
-                            <MenuItem value="readwrite">{t('sharedReadWrite')}</MenuItem>
-                            <MenuItem value="readonly">{t('sharedReadOnly')}</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={editingUser.disabled || false}
-                              onChange={(e) => setEditingUser({ 
-                                ...editingUser, 
-                                disabled: e.target.checked 
-                              })}
-                            />
-                          }
-                          label={t('sharedDisabled')}
-                        />
+                        {/* Access Level content will be added here */}
                       </div>
                     )}
 
