@@ -115,6 +115,57 @@ const FloatingUsersPopover = ({
   const [activeServerTab, setActiveServerTab] = useState(0);
   const [serverLoading, setServerLoading] = useState(false);
   
+  // Access Level checkboxes state
+  const [accessLevelCheckboxes, setAccessLevelCheckboxes] = useState({
+    'Main Menu': false,
+    'Device List': false,
+    'Reports': false,
+    'Geofences': false,
+    'Settings': false,
+    'Notifications': false,
+    'Account': false,
+    'Devices': false,
+    'Groups': false,
+    'Drivers': false,
+    'Calendars': false,
+    'Computed Attributes': false,
+    'Maintenance': false,
+    'Saved Commands': false,
+    'Announcement': false,
+    'Server': false,
+    'Users': false,
+    'Reseller Panel': false,
+    'Edit Sensors': false,
+    'Stop Engine': false,
+    'Resume Engine': false,
+    'Replay': false,
+    'Send Command': false,
+    'Share Device': false,
+    'Anchor': false,
+    'Total Distance': false,
+    'Hours': false
+  });
+  
+  // Check All functionality
+  const isAllChecked = Object.values(accessLevelCheckboxes).every(checked => checked);
+  const isIndeterminate = Object.values(accessLevelCheckboxes).some(checked => checked) && !isAllChecked;
+  
+  const handleCheckAll = (event) => {
+    const checked = event.target.checked;
+    const newState = {};
+    Object.keys(accessLevelCheckboxes).forEach(key => {
+      newState[key] = checked;
+    });
+    setAccessLevelCheckboxes(newState);
+  };
+  
+  const handleIndividualCheckbox = (key) => (event) => {
+    setAccessLevelCheckboxes(prev => ({
+      ...prev,
+      [key]: event.target.checked
+    }));
+  };
+  
   const updateServerMutation = useMutation({
     mutationFn: async (data) => {
       await fetchOrThrow('/api/server', {
@@ -1070,7 +1121,13 @@ const FloatingUsersPopover = ({
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {/* Check All */}
                         <FormControlLabel
-                          control={<Checkbox />}
+                          control={
+                            <Checkbox 
+                              checked={isAllChecked}
+                              indeterminate={isIndeterminate}
+                              onChange={handleCheckAll}
+                            />
+                          }
                           label="Check All"
                           style={{ fontWeight: 'bold', marginBottom: '8px' }}
                         />
@@ -1079,114 +1136,276 @@ const FloatingUsersPopover = ({
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                           <FormGroup>
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Main Menu']}
+                                  onChange={handleIndividualCheckbox('Main Menu')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Main Menu"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Device List']}
+                                  onChange={handleIndividualCheckbox('Device List')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Device List"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Reports']}
+                                  onChange={handleIndividualCheckbox('Reports')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Reports"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Geofences']}
+                                  onChange={handleIndividualCheckbox('Geofences')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Geofences"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Settings']}
+                                  onChange={handleIndividualCheckbox('Settings')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Settings"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Notifications']}
+                                  onChange={handleIndividualCheckbox('Notifications')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Notifications"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Account']}
+                                  onChange={handleIndividualCheckbox('Account')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Account"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Devices']}
+                                  onChange={handleIndividualCheckbox('Devices')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Devices"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Groups']}
+                                  onChange={handleIndividualCheckbox('Groups')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Groups"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Drivers']}
+                                  onChange={handleIndividualCheckbox('Drivers')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Drivers"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Calendars']}
+                                  onChange={handleIndividualCheckbox('Calendars')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Calendars"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Computed Attributes']}
+                                  onChange={handleIndividualCheckbox('Computed Attributes')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Computed Attributes"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Maintenance']}
+                                  onChange={handleIndividualCheckbox('Maintenance')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Maintenance"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Saved Commands']}
+                                  onChange={handleIndividualCheckbox('Saved Commands')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Saved Commands"
                             />
                           </FormGroup>
                           
                           <FormGroup>
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Announcement']}
+                                  onChange={handleIndividualCheckbox('Announcement')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Announcement"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Server']}
+                                  onChange={handleIndividualCheckbox('Server')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Server"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Users']}
+                                  onChange={handleIndividualCheckbox('Users')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Users"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Reseller Panel']}
+                                  onChange={handleIndividualCheckbox('Reseller Panel')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Reseller Panel"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Edit Sensors']}
+                                  onChange={handleIndividualCheckbox('Edit Sensors')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Edit Sensors"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Stop Engine']}
+                                  onChange={handleIndividualCheckbox('Stop Engine')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Stop Engine"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Resume Engine']}
+                                  onChange={handleIndividualCheckbox('Resume Engine')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Resume Engine"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Replay']}
+                                  onChange={handleIndividualCheckbox('Replay')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Replay"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Send Command']}
+                                  onChange={handleIndividualCheckbox('Send Command')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Send Command"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Share Device']}
+                                  onChange={handleIndividualCheckbox('Share Device')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Share Device"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Anchor']}
+                                  onChange={handleIndividualCheckbox('Anchor')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Anchor"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Total Distance']}
+                                  onChange={handleIndividualCheckbox('Total Distance')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Total Distance"
                             />
                             <FormControlLabel
-                              control={<Checkbox sx={{ '&:hover': { backgroundColor: 'transparent' } }} />}
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Hours']}
+                                  onChange={handleIndividualCheckbox('Hours')}
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                />
+                              }
                               label="Hours"
                             />
                           </FormGroup>
