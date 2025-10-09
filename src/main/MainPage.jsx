@@ -3857,7 +3857,7 @@ const MainPage = () => {
               }}>
                 <button
                   onClick={() => {
-                    if (hasAccountPermission) {
+                    if (hasAccountPermission || admin) {
                       setShowUserPopover(false);
                       setEditingUserId(user.id);
                       setShowUsersPopover(true);
@@ -3866,23 +3866,23 @@ const MainPage = () => {
                   style={{
                     flex: 1,
                     padding: '10px 16px',
-                    backgroundColor: hasAccountPermission ? colors.secondary : colors.disabled,
-                    color: hasAccountPermission ? colors.text : colors.textSecondary,
+                    backgroundColor: (hasAccountPermission || admin) ? colors.secondary : colors.disabled,
+                    color: (hasAccountPermission || admin) ? colors.text : colors.textSecondary,
                     border: `1px solid ${colors.border}`,
                     borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: '500',
-                    cursor: hasAccountPermission ? 'pointer' : 'not-allowed',
+                    cursor: (hasAccountPermission || admin) ? 'pointer' : 'not-allowed',
                     transition: 'background-color 0.2s',
-                    opacity: hasAccountPermission ? 1 : 0.6
+                    opacity: (hasAccountPermission || admin) ? 1 : 0.6
                   }}
                   onMouseEnter={(e) => {
-                    if (hasAccountPermission) {
+                    if (hasAccountPermission || admin) {
                       e.target.style.backgroundColor = colors.hover;
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (hasAccountPermission) {
+                    if (hasAccountPermission || admin) {
                       e.target.style.backgroundColor = colors.secondary;
                     }
                   }}
