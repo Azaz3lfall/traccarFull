@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Άγκυρα",
   "accessLevelTotalDistance": "Συνολική Απόσταση",
   "accessLevelHours": "Ώρες",
-  "sharedCheckAll": "Επιλογή Όλων"
+  "sharedCheckAll": "Επιλογή Όλων",
+  "accessLevelChangePicture": "Αλλαγή εικόνας",
+  "accessLevelMoreInfo": "Περισσότερες πληροφορίες"
 }

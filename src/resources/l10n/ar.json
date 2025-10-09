@@ -754,5 +754,7 @@
   "customSensorsExportedSuccessfully": "تم حفظ وتصدير أجهزة الاستشعار المخصصة كملف .tpl بنجاح!",
   "customSensorsImportedSuccessfully": "تم استيراد أجهزة الاستشعار المخصصة من ملف .tpl وحفظها وإعادة التحقق منها بنجاح!",
   "invalidTplFileFormat": "تنسيق ملف .tpl غير صالح.",
-  "noEventsAvailable": "لا توجد أحداث متاحة"
+  "noEventsAvailable": "لا توجد أحداث متاحة",
+  "accessLevelChangePicture": "تغيير الصورة",
+  "accessLevelMoreInfo": "معلومات أكثر"
 }

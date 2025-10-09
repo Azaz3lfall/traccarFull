@@ -766,5 +766,7 @@
   "accessLevelAnchor": "錨點",
   "accessLevelTotalDistance": "總距離",
   "accessLevelHours": "小時",
-  "sharedCheckAll": "全選"
+  "sharedCheckAll": "全選",
+  "accessLevelChangePicture": "更改圖片",
+  "accessLevelMoreInfo": "更多資訊"
 }

@@ -762,5 +762,7 @@
   "accessLevelAnchor": "لنگر",
   "accessLevelTotalDistance": "مسافت کل",
   "accessLevelHours": "ساعت",
-  "sharedCheckAll": "انتخاب همه"
+  "sharedCheckAll": "انتخاب همه",
+  "accessLevelChangePicture": "تغییر تصویر",
+  "accessLevelMoreInfo": "اطلاعات بیشتر"
 }

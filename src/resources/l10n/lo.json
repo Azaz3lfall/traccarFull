@@ -762,5 +762,7 @@
   "accessLevelAnchor": "ສະມໍ",
   "accessLevelTotalDistance": "ໄລຍະທາງລວມ",
   "accessLevelHours": "ຊົ່ວໂມງ",
-  "sharedCheckAll": "ເລືອກທັງໝົດ"
+  "sharedCheckAll": "ເລືອກທັງໝົດ",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

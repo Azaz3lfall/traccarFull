@@ -762,5 +762,7 @@
   "accessLevelAnchor": "අංකුරය",
   "accessLevelTotalDistance": "මුළු දුර",
   "accessLevelHours": "පැය",
-  "sharedCheckAll": "සියල්ල තෝරන්න"
+  "sharedCheckAll": "සියල්ල තෝරන්න",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

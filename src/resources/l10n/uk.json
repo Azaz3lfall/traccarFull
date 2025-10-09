@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Якір",
   "accessLevelTotalDistance": "Загальна Відстань",
   "accessLevelHours": "Години",
-  "sharedCheckAll": "Вибрати Все"
+  "sharedCheckAll": "Вибрати Все",
+  "accessLevelChangePicture": "Змінити зображення",
+  "accessLevelMoreInfo": "Більше інформації"
 }

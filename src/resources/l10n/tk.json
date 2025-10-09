@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Labyr",
   "accessLevelTotalDistance": "Jemi Uzaklyk",
   "accessLevelHours": "Sagat",
-  "sharedCheckAll": "Hemmesini Saýla"
+  "sharedCheckAll": "Hemmesini Saýla",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

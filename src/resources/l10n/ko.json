@@ -765,5 +765,7 @@
   "accessLevelAnchor": "앵커",
   "accessLevelTotalDistance": "총 거리",
   "accessLevelHours": "시간",
-  "sharedCheckAll": "모두 선택"
+  "sharedCheckAll": "모두 선택",
+  "accessLevelChangePicture": "이미지 변경",
+  "accessLevelMoreInfo": "추가 정보"
 }

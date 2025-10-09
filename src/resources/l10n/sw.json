@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Nanga",
   "accessLevelTotalDistance": "Jumla ya Umbali",
   "accessLevelHours": "Masaa",
-  "sharedCheckAll": "Chagua Zote"
+  "sharedCheckAll": "Chagua Zote",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

@@ -762,5 +762,7 @@
   "accessLevelAnchor": "അങ്കർ",
   "accessLevelTotalDistance": "മൊത്തം ദൂരം",
   "accessLevelHours": "മണിക്കൂറുകൾ",
-  "sharedCheckAll": "എല്ലാം തിരഞ്ഞെടുക്കുക"
+  "sharedCheckAll": "എല്ലാം തിരഞ്ഞെടുക്കുക",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

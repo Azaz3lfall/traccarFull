@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Ancoră",
   "accessLevelTotalDistance": "Distanța Totală",
   "accessLevelHours": "Ore",
-  "sharedCheckAll": "Selectează Totul"
+  "sharedCheckAll": "Selectează Totul",
+  "accessLevelChangePicture": "Schimbă imaginea",
+  "accessLevelMoreInfo": "Mai multe informații"
 }

@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Horgony",
   "accessLevelTotalDistance": "Összes Távolság",
   "accessLevelHours": "Órák",
-  "sharedCheckAll": "Összes Kiválasztása"
+  "sharedCheckAll": "Összes Kiválasztása",
+  "accessLevelChangePicture": "Kép módosítása",
+  "accessLevelMoreInfo": "További információ"
 }

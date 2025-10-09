@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Ankur",
   "accessLevelTotalDistance": "Kogu Vahemaa",
   "accessLevelHours": "Tunnid",
-  "sharedCheckAll": "Vali Kõik"
+  "sharedCheckAll": "Vali Kõik",
+  "accessLevelChangePicture": "Muuda pilti",
+  "accessLevelMoreInfo": "Rohkem infot"
 }

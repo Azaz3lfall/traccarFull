@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Сидро",
   "accessLevelTotalDistance": "Укупна Удаљеност",
   "accessLevelHours": "Сати",
-  "sharedCheckAll": "Одабери Све"
+  "sharedCheckAll": "Одабери Све",
+  "accessLevelChangePicture": "Промени слику",
+  "accessLevelMoreInfo": "Више информација"
 }

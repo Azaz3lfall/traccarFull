@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Kotva",
   "accessLevelTotalDistance": "Celková Vzdálenost",
   "accessLevelHours": "Hodiny",
-  "sharedCheckAll": "Vybrat Vše"
+  "sharedCheckAll": "Vybrat Vše",
+  "accessLevelChangePicture": "Změnit obrázek",
+  "accessLevelMoreInfo": "Více informací"
 }

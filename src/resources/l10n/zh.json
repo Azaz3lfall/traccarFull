@@ -765,5 +765,7 @@
   "accessLevelAnchor": "锚点",
   "accessLevelTotalDistance": "总距离",
   "accessLevelHours": "小时",
-  "sharedCheckAll": "全选"
+  "sharedCheckAll": "全选",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

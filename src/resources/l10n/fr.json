@@ -765,5 +765,7 @@
   "accessLevelAnchor": "Ancre",
   "accessLevelTotalDistance": "Distance Totale",
   "accessLevelHours": "Heures",
-  "sharedCheckAll": "Tout Sélectionner"
+  "sharedCheckAll": "Tout Sélectionner",
+  "accessLevelChangePicture": "Changer l'image",
+  "accessLevelMoreInfo": "Plus d'informations"
 }

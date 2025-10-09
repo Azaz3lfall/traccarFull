@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Mỏ Neo",
   "accessLevelTotalDistance": "Tổng Khoảng Cách",
   "accessLevelHours": "Giờ",
-  "sharedCheckAll": "Chọn Tất Cả"
+  "sharedCheckAll": "Chọn Tất Cả",
+  "accessLevelChangePicture": "Thay đổi hình ảnh",
+  "accessLevelMoreInfo": "Thông tin thêm"
 }

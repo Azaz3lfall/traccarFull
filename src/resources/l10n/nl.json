@@ -765,5 +765,7 @@
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Totale Afstand",
   "accessLevelHours": "Uren",
-  "sharedCheckAll": "Alles Selecteren"
+  "sharedCheckAll": "Alles Selecteren",
+  "accessLevelChangePicture": "Afbeelding wijzigen",
+  "accessLevelMoreInfo": "Meer informatie"
 }

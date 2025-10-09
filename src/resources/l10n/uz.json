@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Langar",
   "accessLevelTotalDistance": "Jami Masofa",
   "accessLevelHours": "Soat",
-  "sharedCheckAll": "Barchasini Tanlash"
+  "sharedCheckAll": "Barchasini Tanlash",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

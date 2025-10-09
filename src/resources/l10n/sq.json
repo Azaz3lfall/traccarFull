@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Spor",
   "accessLevelTotalDistance": "Distanca Totale",
   "accessLevelHours": "Orë",
-  "sharedCheckAll": "Zgjidh Të Gjitha"
+  "sharedCheckAll": "Zgjidh Të Gjitha",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

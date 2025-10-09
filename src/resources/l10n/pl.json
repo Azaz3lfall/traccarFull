@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Kotwica",
   "accessLevelTotalDistance": "Całkowita Odległość",
   "accessLevelHours": "Godziny",
-  "sharedCheckAll": "Zaznacz Wszystkie"
+  "sharedCheckAll": "Zaznacz Wszystkie",
+  "accessLevelChangePicture": "Zmień obraz",
+  "accessLevelMoreInfo": "Więcej informacji"
 }

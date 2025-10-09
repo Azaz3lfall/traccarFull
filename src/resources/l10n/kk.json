@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Лақап",
   "accessLevelTotalDistance": "Жалпы Қашықтық",
   "accessLevelHours": "Сағаттар",
-  "sharedCheckAll": "Бәрін Таңдау"
+  "sharedCheckAll": "Бәрін Таңдау",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

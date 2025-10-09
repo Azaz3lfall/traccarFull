@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Зангуу",
   "accessLevelTotalDistance": "Нийт Зай",
   "accessLevelHours": "Цаг",
-  "sharedCheckAll": "Бүгдийг Сонгох"
+  "sharedCheckAll": "Бүгдийг Сонгох",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

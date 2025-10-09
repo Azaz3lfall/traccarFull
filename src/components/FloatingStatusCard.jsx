@@ -133,6 +133,32 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [user]);
   
+  // Check if user has change picture permission
+  const hasChangePicturePermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.changePicture === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has more info permission
+  const hasMoreInfoPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.moreInfo === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -1610,7 +1636,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           )}
 
           {/* Details Button - Hidden in replay mode */}
-          {!showReplayPopover && (
+          {!showReplayPopover && hasMoreInfoPermission && (
             <button
               onClick={handleMoreDetails}
               style={{
@@ -1730,6 +1756,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </div>
                   
                   {/* Camera Button - Mobile */}
+                  {hasChangePicturePermission && (
                   <div 
                     style={{
                       position: 'absolute',
@@ -1771,6 +1798,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       </svg>
                     )}
                   </div>
+                  )}
                   
                   {/* Speed */}
                   {position && (
@@ -1939,6 +1967,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </div>
               
               {/* Camera Button */}
+              {hasChangePicturePermission && (
               <div 
                 style={{
                   position: 'absolute',
@@ -1980,6 +2009,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </svg>
                 )}
               </div>
+              )}
             </div>
 
             {/* Status and Speed */}

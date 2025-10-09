@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Totale Afstand",
   "accessLevelHours": "Ure",
-  "sharedCheckAll": "Merk Alles"
+  "sharedCheckAll": "Merk Alles",
+  "accessLevelChangePicture": "Verander Prent",
+  "accessLevelMoreInfo": "Meer inligting"
 }

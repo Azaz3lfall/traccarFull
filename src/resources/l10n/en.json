@@ -764,7 +764,6 @@
   "routePlannerPoints": "points",
   "routePlannerNoApiToken": "Mapbox API token is not configured. Please contact your administrator to set up the API token.",
   "sharedCheckAll": "Check All",
-  "sharedAccessLevel": "Access Level",
   "accessLevelEditSensors": "Edit Sensors",
   "accessLevelStopEngine": "Stop Engine",
   "accessLevelResumeEngine": "Resume Engine",
@@ -773,5 +772,7 @@
   "accessLevelShareDevice": "Share Device",
   "accessLevelAnchor": "Anchor",
   "accessLevelTotalDistance": "Total Distance",
-  "accessLevelHours": "Hours"
+  "accessLevelHours": "Hours",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

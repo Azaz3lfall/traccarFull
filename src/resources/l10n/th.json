@@ -766,5 +766,7 @@
   "accessLevelAnchor": "สมอ",
   "accessLevelTotalDistance": "ระยะทางรวม",
   "accessLevelHours": "ชั่วโมง",
-  "sharedCheckAll": "เลือกทั้งหมด"
+  "sharedCheckAll": "เลือกทั้งหมด",
+  "accessLevelChangePicture": "เปลี่ยนรูปภาพ",
+  "accessLevelMoreInfo": "ข้อมูลเพิ่มเติม"
 }

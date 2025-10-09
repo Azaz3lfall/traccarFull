@@ -762,5 +762,7 @@
   "accessLevelAnchor": "ღუზა",
   "accessLevelTotalDistance": "საერთო მანძილი",
   "accessLevelHours": "საათები",
-  "sharedCheckAll": "ყველას არჩევა"
+  "sharedCheckAll": "ყველას არჩევა",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

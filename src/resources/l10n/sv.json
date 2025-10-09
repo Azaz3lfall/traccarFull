@@ -765,5 +765,7 @@
   "accessLevelAnchor": "Ankare",
   "accessLevelTotalDistance": "Total Distans",
   "accessLevelHours": "Timmar",
-  "sharedCheckAll": "Välj Alla"
+  "sharedCheckAll": "Välj Alla",
+  "accessLevelChangePicture": "Ändra bild",
+  "accessLevelMoreInfo": "Mer information"
 }

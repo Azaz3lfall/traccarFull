@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Sidro",
   "accessLevelTotalDistance": "Skupna Razdalja",
   "accessLevelHours": "Ure",
-  "sharedCheckAll": "Izberi Vse"
+  "sharedCheckAll": "Izberi Vse",
+  "accessLevelChangePicture": "Spremeni sliko",
+  "accessLevelMoreInfo": "Več informacij"
 }

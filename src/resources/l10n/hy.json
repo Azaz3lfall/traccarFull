@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Անկյուն",
   "accessLevelTotalDistance": "Ընդհանուր Հեռավորություն",
   "accessLevelHours": "Ժամեր",
-  "sharedCheckAll": "Ընտրել Բոլորը"
+  "sharedCheckAll": "Ընտրել Բոլորը",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

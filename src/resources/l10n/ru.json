@@ -765,5 +765,7 @@
   "accessLevelAnchor": "Якорь",
   "accessLevelTotalDistance": "Общее Расстояние",
   "accessLevelHours": "Часы",
-  "sharedCheckAll": "Выбрать Все"
+  "sharedCheckAll": "Выбрать Все",
+  "accessLevelChangePicture": "Изменить изображение",
+  "accessLevelMoreInfo": "Больше информации"
 }

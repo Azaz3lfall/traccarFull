@@ -131,7 +131,9 @@ const FloatingUsersPopover = ({
       'Share Device': true,
       'Anchor': true,
       'Total Distance': true,
-      'Hours': true
+      'Hours': true,
+      'Change Picture': true,
+      'More Info': true
     });
   };
 
@@ -182,7 +184,9 @@ const FloatingUsersPopover = ({
           'Share Device': accessLevel.shareDevice || false,
           'Anchor': accessLevel.anchor || false,
           'Total Distance': accessLevel.totalDistance || false,
-          'Hours': accessLevel.hours || false
+          'Hours': accessLevel.hours || false,
+          'Change Picture': accessLevel.changePicture || false,
+          'More Info': accessLevel.moreInfo || false
         };
         setAccessLevelCheckboxes(newCheckboxState);
       } catch (error) {
@@ -216,9 +220,11 @@ const FloatingUsersPopover = ({
         'Replay': false,
         'Send Command': false,
         'Share Device': false,
-        'Anchor': false,
-        'Total Distance': false,
-        'Hours': false
+    'Anchor': false,
+    'Total Distance': false,
+    'Hours': false,
+    'Change Picture': false,
+    'More Info': false
       });
     }
   };
@@ -281,7 +287,9 @@ const FloatingUsersPopover = ({
     'Share Device': true,
     'Anchor': true,
     'Total Distance': true,
-    'Hours': true
+    'Hours': true,
+    'Change Picture': true,
+    'More Info': true
   });
   
   // Check All functionality
@@ -599,7 +607,9 @@ const FloatingUsersPopover = ({
       shareDevice: accessLevelCheckboxes['Share Device'],
       anchor: accessLevelCheckboxes['Anchor'],
       totalDistance: accessLevelCheckboxes['Total Distance'],
-      hours: accessLevelCheckboxes['Hours']
+      hours: accessLevelCheckboxes['Hours'],
+      changePicture: accessLevelCheckboxes['Change Picture'],
+      moreInfo: accessLevelCheckboxes['More Info']
     };
     
     // Console log the accessLevel object
@@ -1738,6 +1748,32 @@ const FloatingUsersPopover = ({
                                 />
                               }
                               label={t('accessLevelHours')}
+                            />
+                            <FormControlLabel
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Change Picture']}
+                                  onChange={handleIndividualCheckbox('Change Picture')}
+                                  sx={{ 
+                                    '&:hover': { backgroundColor: 'transparent !important' },
+                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' }
+                                  }}
+                                />
+                              }
+                              label={t('accessLevelChangePicture')}
+                            />
+                            <FormControlLabel
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['More Info']}
+                                  onChange={handleIndividualCheckbox('More Info')}
+                                  sx={{ 
+                                    '&:hover': { backgroundColor: 'transparent !important' },
+                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' }
+                                  }}
+                                />
+                              }
+                              label={t('accessLevelMoreInfo')}
                             />
                           </FormGroup>
                         </div>

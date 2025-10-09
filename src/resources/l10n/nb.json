@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Total Avstand",
   "accessLevelHours": "Timer",
-  "sharedCheckAll": "Velg Alle"
+  "sharedCheckAll": "Velg Alle",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

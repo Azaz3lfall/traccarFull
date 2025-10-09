@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Enkurs",
   "accessLevelTotalDistance": "Kopējais Attālums",
   "accessLevelHours": "Stundas",
-  "sharedCheckAll": "Atlasīt Visus"
+  "sharedCheckAll": "Atlasīt Visus",
+  "accessLevelChangePicture": "Mainīt attēlu",
+  "accessLevelMoreInfo": "Vairāk informācijas"
 }

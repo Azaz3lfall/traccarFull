@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Total Afstand",
   "accessLevelHours": "Timer",
-  "sharedCheckAll": "Vælg Alle"
+  "sharedCheckAll": "Vælg Alle",
+  "accessLevelChangePicture": "Skift billede",
+  "accessLevelMoreInfo": "Mere information"
 }

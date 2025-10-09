@@ -765,5 +765,7 @@
   "accessLevelAnchor": "लंगर",
   "accessLevelTotalDistance": "कुल दूरी",
   "accessLevelHours": "घंटे",
-  "sharedCheckAll": "सभी चुनें"
+  "sharedCheckAll": "सभी चुनें",
+  "accessLevelChangePicture": "चित्र बदलें",
+  "accessLevelMoreInfo": "अधिक जानकारी"
 }

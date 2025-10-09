@@ -765,5 +765,7 @@
   "accessLevelAnchor": "アンカー",
   "accessLevelTotalDistance": "総距離",
   "accessLevelHours": "時間",
-  "sharedCheckAll": "すべて選択"
+  "sharedCheckAll": "すべて選択",
+  "accessLevelChangePicture": "画像を変更",
+  "accessLevelMoreInfo": "詳細情報"
 }

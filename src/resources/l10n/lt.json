@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Inkaras",
   "accessLevelTotalDistance": "Bendras Atstumas",
   "accessLevelHours": "Valandos",
-  "sharedCheckAll": "Pažymėti Visus"
+  "sharedCheckAll": "Pažymėti Visus",
+  "accessLevelChangePicture": "Keisti paveikslėlį",
+  "accessLevelMoreInfo": "Daugiau informacijos"
 }

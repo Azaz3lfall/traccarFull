@@ -762,5 +762,7 @@
   "accessLevelAnchor": "Sauh",
   "accessLevelTotalDistance": "Jumlah Jarak",
   "accessLevelHours": "Jam",
-  "sharedCheckAll": "Pilih Semua"
+  "sharedCheckAll": "Pilih Semua",
+  "accessLevelChangePicture": "Change Picture",
+  "accessLevelMoreInfo": "More Info"
 }

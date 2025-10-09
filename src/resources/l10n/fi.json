@@ -766,5 +766,7 @@
   "accessLevelAnchor": "Ankkuri",
   "accessLevelTotalDistance": "Kokonaismatka",
   "accessLevelHours": "Tunnit",
-  "sharedCheckAll": "Valitse Kaikki"
+  "sharedCheckAll": "Valitse Kaikki",
+  "accessLevelChangePicture": "Vaihda kuva",
+  "accessLevelMoreInfo": "Lisätietoja"
 }
