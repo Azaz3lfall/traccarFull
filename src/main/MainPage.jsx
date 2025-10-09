@@ -342,6 +342,19 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has settings permission
+  const hasSettingsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.settings === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1490,6 +1503,7 @@ const MainPage = () => {
           )}
           
           {/* Settings Icon */}
+          {hasSettingsPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -1554,6 +1568,7 @@ const MainPage = () => {
               </span>
             )}
           </div>
+          )}
           
           {/* Notifications Icon */}
           {!readonly && (
@@ -6431,6 +6446,7 @@ const MainPage = () => {
                   )}
 
                   {/* Settings */}
+                  {hasSettingsPermission && (
                   <button
                     onClick={() => {
                       setShowPreferencesDrawer(true);
@@ -6467,6 +6483,7 @@ const MainPage = () => {
                     <SettingsIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                     {t('settingsTitle')}
                   </button>
+                  )}
 
                   {/* Notifications */}
                   {!readonly && (
