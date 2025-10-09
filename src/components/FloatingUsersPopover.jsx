@@ -98,6 +98,80 @@ const FloatingUsersPopover = ({
     }
     return baseIndex;
   };
+
+  // Helper function to load accessLevel from user attributes and set checkboxes
+  const loadAccessLevelFromUser = (user) => {
+    if (user && user.attributes && user.attributes.accessLevel) {
+      try {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        const newCheckboxState = {
+          'Main Menu': accessLevel.mainMenu || false,
+          'Device List': accessLevel.deviceList || false,
+          'Reports': accessLevel.reports || false,
+          'Geofences': accessLevel.geofences || false,
+          'Settings': accessLevel.settings || false,
+          'Notifications': accessLevel.notifications || false,
+          'Account': accessLevel.account || false,
+          'Devices': accessLevel.devices || false,
+          'Groups': accessLevel.groups || false,
+          'Drivers': accessLevel.drivers || false,
+          'Calendars': accessLevel.calendars || false,
+          'Computed Attributes': accessLevel.computedAttributes || false,
+          'Maintenance': accessLevel.maintenance || false,
+          'Saved Commands': accessLevel.savedCommands || false,
+          'Announcement': accessLevel.announcement || false,
+          'Server': accessLevel.server || false,
+          'Users': accessLevel.users || false,
+          'Reseller Panel': accessLevel.resellerPanel || false,
+          'Edit Sensors': accessLevel.editSensors || false,
+          'Stop Engine': accessLevel.stopEngine || false,
+          'Resume Engine': accessLevel.resumeEngine || false,
+          'Replay': accessLevel.replay || false,
+          'Send Command': accessLevel.sendCommand || false,
+          'Share Device': accessLevel.shareDevice || false,
+          'Anchor': accessLevel.anchor || false,
+          'Total Distance': accessLevel.totalDistance || false,
+          'Hours': accessLevel.hours || false
+        };
+        setAccessLevelCheckboxes(newCheckboxState);
+        console.log('Loaded accessLevel from user:', accessLevel);
+      } catch (error) {
+        console.error('Error parsing accessLevel:', error);
+        // Keep default state if parsing fails
+      }
+    } else {
+      // Reset to default state if no accessLevel found
+      setAccessLevelCheckboxes({
+        'Main Menu': true,
+        'Device List': true,
+        'Reports': true,
+        'Geofences': true,
+        'Settings': true,
+        'Notifications': true,
+        'Account': true,
+        'Devices': true,
+        'Groups': true,
+        'Drivers': true,
+        'Calendars': true,
+        'Computed Attributes': true,
+        'Maintenance': true,
+        'Saved Commands': true,
+        'Announcement': true,
+        'Server': true,
+        'Users': true,
+        'Reseller Panel': true,
+        'Edit Sensors': true,
+        'Stop Engine': true,
+        'Resume Engine': true,
+        'Replay': true,
+        'Send Command': true,
+        'Share Device': true,
+        'Anchor': true,
+        'Total Distance': true,
+        'Hours': true
+      });
+    }
+  };
   
   // Server attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
@@ -253,6 +327,7 @@ const FloatingUsersPopover = ({
         ...specificUser,
         attributes: specificUser.attributes || {}
       });
+      loadAccessLevelFromUser(specificUser); // Load accessLevel and set checkboxes
       setActiveTab(0);
       setEditDialog(true);
     }
@@ -343,6 +418,7 @@ const FloatingUsersPopover = ({
       ...user,
       attributes: user.attributes || {}
     });
+    loadAccessLevelFromUser(user); // Load accessLevel and set checkboxes
     setActiveTab(0); // Reset to first tab
     setEditDialog(true);
     setAnchorEl(null);
