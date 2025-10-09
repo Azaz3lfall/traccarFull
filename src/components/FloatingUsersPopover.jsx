@@ -167,7 +167,6 @@ const FloatingUsersPopover = ({
           'Hours': accessLevel.hours || false
         };
         setAccessLevelCheckboxes(newCheckboxState);
-        console.log('Loaded accessLevel from user:', accessLevel);
       } catch (error) {
         console.error('Error parsing accessLevel:', error);
         // Keep default state if parsing fails
@@ -558,7 +557,6 @@ const FloatingUsersPopover = ({
     };
     
     // Console log the accessLevel object
-    console.log('Access Level permissions:', accessLevel);
     
     // Add accessLevel to userData attributes (stringified)
     userData.attributes = {
