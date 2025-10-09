@@ -1140,7 +1140,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Main Menu']}
                                   onChange={handleIndividualCheckbox('Main Menu')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Main Menu"
@@ -1150,7 +1150,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Device List']}
                                   onChange={handleIndividualCheckbox('Device List')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Device List"
@@ -1160,7 +1160,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Reports']}
                                   onChange={handleIndividualCheckbox('Reports')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Reports"
@@ -1170,7 +1170,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Geofences']}
                                   onChange={handleIndividualCheckbox('Geofences')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Geofences"
@@ -1180,7 +1180,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Settings']}
                                   onChange={handleIndividualCheckbox('Settings')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Settings"
@@ -1190,7 +1190,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Notifications']}
                                   onChange={handleIndividualCheckbox('Notifications')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Notifications"
@@ -1200,7 +1200,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Account']}
                                   onChange={handleIndividualCheckbox('Account')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Account"
@@ -1210,7 +1210,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Devices']}
                                   onChange={handleIndividualCheckbox('Devices')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Devices"
@@ -1220,7 +1220,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Groups']}
                                   onChange={handleIndividualCheckbox('Groups')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Groups"
@@ -1230,7 +1230,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Drivers']}
                                   onChange={handleIndividualCheckbox('Drivers')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Drivers"
@@ -1240,7 +1240,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Calendars']}
                                   onChange={handleIndividualCheckbox('Calendars')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Calendars"
@@ -1250,7 +1250,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Computed Attributes']}
                                   onChange={handleIndividualCheckbox('Computed Attributes')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Computed Attributes"
@@ -1260,7 +1260,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Maintenance']}
                                   onChange={handleIndividualCheckbox('Maintenance')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Maintenance"
@@ -1270,7 +1270,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Saved Commands']}
                                   onChange={handleIndividualCheckbox('Saved Commands')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Saved Commands"
@@ -1283,7 +1283,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Announcement']}
                                   onChange={handleIndividualCheckbox('Announcement')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Announcement"
@@ -1293,7 +1293,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Server']}
                                   onChange={handleIndividualCheckbox('Server')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Server"
@@ -1303,7 +1303,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Users']}
                                   onChange={handleIndividualCheckbox('Users')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Users"
@@ -1313,7 +1313,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Reseller Panel']}
                                   onChange={handleIndividualCheckbox('Reseller Panel')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Reseller Panel"
@@ -1323,7 +1323,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Edit Sensors']}
                                   onChange={handleIndividualCheckbox('Edit Sensors')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Edit Sensors"
@@ -1333,7 +1333,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Stop Engine']}
                                   onChange={handleIndividualCheckbox('Stop Engine')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Stop Engine"
@@ -1343,7 +1343,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Resume Engine']}
                                   onChange={handleIndividualCheckbox('Resume Engine')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Resume Engine"
@@ -1353,7 +1353,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Replay']}
                                   onChange={handleIndividualCheckbox('Replay')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Replay"
@@ -1363,7 +1363,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Send Command']}
                                   onChange={handleIndividualCheckbox('Send Command')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Send Command"
@@ -1373,7 +1373,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Share Device']}
                                   onChange={handleIndividualCheckbox('Share Device')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Share Device"
@@ -1383,7 +1383,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Anchor']}
                                   onChange={handleIndividualCheckbox('Anchor')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Anchor"
@@ -1393,7 +1393,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Total Distance']}
                                   onChange={handleIndividualCheckbox('Total Distance')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Total Distance"
@@ -1403,7 +1403,7 @@ const FloatingUsersPopover = ({
                                 <Checkbox 
                                   checked={accessLevelCheckboxes['Hours']}
                                   onChange={handleIndividualCheckbox('Hours')}
-                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }
+                                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                                 />
                               }
                               label="Hours"
