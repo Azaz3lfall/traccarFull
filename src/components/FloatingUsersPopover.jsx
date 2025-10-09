@@ -1134,16 +1134,38 @@ const FloatingUsersPopover = ({
                             />
                           }
                           label="Check All"
-                          style={{ fontWeight: 'bold', marginBottom: '0px', fontSize: '13px', lineHeight: '1.2' }}
+                          sx={{ 
+                            fontWeight: 'bold', 
+                            margin: '0px !important',
+                            padding: '0px !important',
+                            marginBottom: '0px !important', 
+                            fontSize: '13px', 
+                            lineHeight: '1.0 !important',
+                            minHeight: 'auto !important',
+                            '& .MuiFormControlLabel-label': { 
+                              fontSize: '13px', 
+                              lineHeight: '1.0 !important',
+                              margin: '0px !important',
+                              padding: '0px !important'
+                            }
+                          }}
                         />
                         
                         {/* Two Column Layout */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
                           <FormGroup sx={{ 
                             '& .MuiFormControlLabel-root': { 
-                              marginBottom: '0px',
-                              lineHeight: '1.2',
-                              '& .MuiFormControlLabel-label': { fontSize: '13px', lineHeight: '1.2' }
+                              margin: '0px !important',
+                              padding: '0px !important',
+                              marginBottom: '0px !important',
+                              lineHeight: '1.0 !important',
+                              minHeight: 'auto !important',
+                              '& .MuiFormControlLabel-label': { 
+                                fontSize: '13px', 
+                                lineHeight: '1.0 !important',
+                                margin: '0px !important',
+                                padding: '0px !important'
+                              }
                             } 
                           }}>
                             <FormControlLabel
@@ -1332,9 +1354,17 @@ const FloatingUsersPopover = ({
                           
                           <FormGroup sx={{ 
                             '& .MuiFormControlLabel-root': { 
-                              marginBottom: '0px',
-                              lineHeight: '1.2',
-                              '& .MuiFormControlLabel-label': { fontSize: '13px', lineHeight: '1.2' }
+                              margin: '0px !important',
+                              padding: '0px !important',
+                              marginBottom: '0px !important',
+                              lineHeight: '1.0 !important',
+                              minHeight: 'auto !important',
+                              '& .MuiFormControlLabel-label': { 
+                                fontSize: '13px', 
+                                lineHeight: '1.0 !important',
+                                margin: '0px !important',
+                                padding: '0px !important'
+                              }
                             } 
                           }}>
                             <FormControlLabel
