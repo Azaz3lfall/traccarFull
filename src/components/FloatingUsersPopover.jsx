@@ -91,6 +91,11 @@ const FloatingUsersPopover = ({
   // Check if user is editing their own account
   const isEditingOwnAccount = userId && currentUser && userId === currentUser.id;
   
+  // Debug: Log current user from Redux
+  console.log('Current user from Redux:', currentUser);
+  console.log('User being edited (userId):', userId);
+  console.log('Is editing own account:', isEditingOwnAccount);
+  
   // Helper function to get correct tab index based on whether Access Level tab is shown
   const getTabIndex = (baseIndex) => {
     if (isEditingOwnAccount && baseIndex > 1) {
