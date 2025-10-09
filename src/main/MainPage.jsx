@@ -316,6 +316,19 @@ const MainPage = () => {
   
   // Check if user has mainMenu permission (always true - readonly)
   const hasMainMenuPermission = true;
+  
+  // Check if user has reports permission
+  const hasReportsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.reports === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1328,7 +1341,7 @@ const MainPage = () => {
           </div>
           
           {/* Reports Icon */}
-          {!disableReports && (
+          {!disableReports && hasReportsPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -6367,7 +6380,7 @@ const MainPage = () => {
                     gap: '0'
                   }}>
                   {/* Reports */}
-                  {!disableReports && (
+                  {!disableReports && hasReportsPermission && (
                     <button
                       onClick={() => {
                         setReportsPopoverVisible(true);
