@@ -94,6 +94,32 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [user]);
   
+  // Check if user has resume engine permission
+  const hasResumeEnginePermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.resumeEngine === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has stop engine permission
+  const hasStopEnginePermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.stopEngine === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -2000,6 +2026,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               minHeight: !desktop ? '58px' : '42px'
             }}>
               {/* Button 1 - Lock Open (Outlined) */}
+              {hasResumeEnginePermission && (
               <button
                 onClick={handleLockOpen}
                 disabled={isLockOpenLoading || !selectedDeviceId}
@@ -2026,8 +2053,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 <LockOpenIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
                 )}
               </button>
+              )}
               
               {/* Button 2 - Lock Closed (Outlined) */}
+              {hasStopEnginePermission && (
               <button
                 onClick={handleLockClosed}
                 disabled={isLockClosedLoading || !selectedDeviceId}
@@ -2054,6 +2083,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 <LockOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
                 )}
               </button>
+              )}
               
               {/* Button 3 - Refresh (Outlined) - Hidden on mobile */}
               {desktop && (
