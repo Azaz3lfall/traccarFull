@@ -716,6 +716,8 @@
   "deviceLimitReached": "Device limit reached",
   "upgradePlanRequired": "Please upgrade your plan to add more devices",
   "deviceValidationError": "Device validation error",
+  "deviceAlreadyExistsOrUpgradePlan": "Device already exists with this identification or you need to upgrade your plan to add more devices",
+  "noEventsAvailable": "No events available",
   "devicePermissionDenied": "Permission denied to create device",
   "deviceCreationFailed": "Failed to create device",
   "routePlanner": "Route Planner",

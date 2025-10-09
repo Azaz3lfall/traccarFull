@@ -3002,7 +3002,7 @@ const MainPage = () => {
                 textAlign: 'center',
                 color: colors.textSecondary
               }}>
-                No events available
+{t('noEventsAvailable')}
               </div>
             ) : (
               events.map((event, index) => (
