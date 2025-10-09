@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Төхөөрөмж Хуваалцах",
   "accessLevelAnchor": "Зангуу",
   "accessLevelTotalDistance": "Нийт Зай",
-  "accessLevelHours": "Цаг"
+  "accessLevelHours": "Цаг",
+  "sharedCheckAll": "Бүгдийг Сонгох"
 }

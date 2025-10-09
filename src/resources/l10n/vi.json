@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Chia Sẻ Thiết Bị",
   "accessLevelAnchor": "Mỏ Neo",
   "accessLevelTotalDistance": "Tổng Khoảng Cách",
-  "accessLevelHours": "Giờ"
+  "accessLevelHours": "Giờ",
+  "sharedCheckAll": "Chọn Tất Cả"
 }

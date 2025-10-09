@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Del Enhed",
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Total Afstand",
-  "accessLevelHours": "Timer"
+  "accessLevelHours": "Timer",
+  "sharedCheckAll": "Vælg Alle"
 }

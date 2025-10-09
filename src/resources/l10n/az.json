@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Cihazı Paylaş",
   "accessLevelAnchor": "Lövbər",
   "accessLevelTotalDistance": "Ümumi Məsafə",
-  "accessLevelHours": "Saat"
+  "accessLevelHours": "Saat",
+  "sharedCheckAll": "Hamısını Seç"
 }

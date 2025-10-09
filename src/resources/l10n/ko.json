@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "기기 공유",
   "accessLevelAnchor": "앵커",
   "accessLevelTotalDistance": "총 거리",
-  "accessLevelHours": "시간"
+  "accessLevelHours": "시간",
+  "sharedCheckAll": "모두 선택"
 }

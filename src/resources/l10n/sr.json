@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Подели Уређај",
   "accessLevelAnchor": "Сидро",
   "accessLevelTotalDistance": "Укупна Удаљеност",
-  "accessLevelHours": "Сати"
+  "accessLevelHours": "Сати",
+  "sharedCheckAll": "Одабери Све"
 }

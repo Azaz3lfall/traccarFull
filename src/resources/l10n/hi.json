@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "डिवाइस साझा करें",
   "accessLevelAnchor": "लंगर",
   "accessLevelTotalDistance": "कुल दूरी",
-  "accessLevelHours": "घंटे"
+  "accessLevelHours": "घंटे",
+  "sharedCheckAll": "सभी चुनें"
 }

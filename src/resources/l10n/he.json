@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "שיתוף מכשיר",
   "accessLevelAnchor": "עוגן",
   "accessLevelTotalDistance": "מרחק כולל",
-  "accessLevelHours": "שעות"
+  "accessLevelHours": "שעות",
+  "sharedCheckAll": "בחר הכל"
 }

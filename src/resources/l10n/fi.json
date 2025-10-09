@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Jaa Laite",
   "accessLevelAnchor": "Ankkuri",
   "accessLevelTotalDistance": "Kokonaismatka",
-  "accessLevelHours": "Tunnit"
+  "accessLevelHours": "Tunnit",
+  "sharedCheckAll": "Valitse Kaikki"
 }

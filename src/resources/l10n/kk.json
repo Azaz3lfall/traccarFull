@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Құрылғыны Бөлісу",
   "accessLevelAnchor": "Лақап",
   "accessLevelTotalDistance": "Жалпы Қашықтық",
-  "accessLevelHours": "Сағаттар"
+  "accessLevelHours": "Сағаттар",
+  "sharedCheckAll": "Бәрін Таңдау"
 }

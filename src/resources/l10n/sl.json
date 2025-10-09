@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Deli Napravo",
   "accessLevelAnchor": "Sidro",
   "accessLevelTotalDistance": "Skupna Razdalja",
-  "accessLevelHours": "Ure"
+  "accessLevelHours": "Ure",
+  "sharedCheckAll": "Izberi Vse"
 }

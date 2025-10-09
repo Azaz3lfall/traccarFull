@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Споделяне на устройство",
   "accessLevelAnchor": "Котва",
   "accessLevelTotalDistance": "Общо разстояние",
-  "accessLevelHours": "Часове"
+  "accessLevelHours": "Часове",
+  "sharedCheckAll": "Избери Всички"
 }

@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Κοινή Χρήση Συσκευής",
   "accessLevelAnchor": "Άγκυρα",
   "accessLevelTotalDistance": "Συνολική Απόσταση",
-  "accessLevelHours": "Ώρες"
+  "accessLevelHours": "Ώρες",
+  "sharedCheckAll": "Επιλογή Όλων"
 }

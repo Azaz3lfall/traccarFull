@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "ডিভাইস শেয়ার",
   "accessLevelAnchor": "নোঙ্গর",
   "accessLevelTotalDistance": "মোট দূরত্ব",
-  "accessLevelHours": "ঘন্টা"
+  "accessLevelHours": "ঘন্টা",
+  "sharedCheckAll": "সব চেক করুন"
 }

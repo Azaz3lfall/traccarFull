@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "උපකරණය බෙදාගන්න",
   "accessLevelAnchor": "අංකුරය",
   "accessLevelTotalDistance": "මුළු දුර",
-  "accessLevelHours": "පැය"
+  "accessLevelHours": "පැය",
+  "sharedCheckAll": "සියල්ල තෝරන්න"
 }

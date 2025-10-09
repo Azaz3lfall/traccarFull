@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Qurilmani Baham Ko'rish",
   "accessLevelAnchor": "Langar",
   "accessLevelTotalDistance": "Jami Masofa",
-  "accessLevelHours": "Soat"
+  "accessLevelHours": "Soat",
+  "sharedCheckAll": "Barchasini Tanlash"
 }

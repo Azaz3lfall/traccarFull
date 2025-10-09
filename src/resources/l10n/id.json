@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Bagikan Perangkat",
   "accessLevelAnchor": "Jangkar",
   "accessLevelTotalDistance": "Total Jarak",
-  "accessLevelHours": "Jam"
+  "accessLevelHours": "Jam",
+  "sharedCheckAll": "Pilih Semua"
 }

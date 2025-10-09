@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Cihazı Paylaş",
   "accessLevelAnchor": "Çapa",
   "accessLevelTotalDistance": "Toplam Mesafe",
-  "accessLevelHours": "Saat"
+  "accessLevelHours": "Saat",
+  "sharedCheckAll": "Tümünü Seç"
 }

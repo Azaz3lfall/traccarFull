@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "Apparaat Delen",
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Totale Afstand",
-  "accessLevelHours": "Uren"
+  "accessLevelHours": "Uren",
+  "sharedCheckAll": "Alles Selecteren"
 }

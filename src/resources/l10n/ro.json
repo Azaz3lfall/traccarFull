@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Partajează Dispozitivul",
   "accessLevelAnchor": "Ancoră",
   "accessLevelTotalDistance": "Distanța Totală",
-  "accessLevelHours": "Ore"
+  "accessLevelHours": "Ore",
+  "sharedCheckAll": "Selectează Totul"
 }

@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Zdieľať Zariadenie",
   "accessLevelAnchor": "Kotva",
   "accessLevelTotalDistance": "Celková Vzdialenosť",
-  "accessLevelHours": "Hodiny"
+  "accessLevelHours": "Hodiny",
+  "sharedCheckAll": "Vybrať Všetko"
 }

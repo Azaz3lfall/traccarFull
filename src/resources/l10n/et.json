@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Jaga Seadet",
   "accessLevelAnchor": "Ankur",
   "accessLevelTotalDistance": "Kogu Vahemaa",
-  "accessLevelHours": "Tunnid"
+  "accessLevelHours": "Tunnid",
+  "sharedCheckAll": "Vali Kõik"
 }

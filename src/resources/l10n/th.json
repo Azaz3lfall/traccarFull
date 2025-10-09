@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "แชร์อุปกรณ์",
   "accessLevelAnchor": "สมอ",
   "accessLevelTotalDistance": "ระยะทางรวม",
-  "accessLevelHours": "ชั่วโมง"
+  "accessLevelHours": "ชั่วโมง",
+  "sharedCheckAll": "เลือกทั้งหมด"
 }

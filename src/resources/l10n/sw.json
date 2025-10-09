@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Shiriki Kifaa",
   "accessLevelAnchor": "Nanga",
   "accessLevelTotalDistance": "Jumla ya Umbali",
-  "accessLevelHours": "Masaa"
+  "accessLevelHours": "Masaa",
+  "sharedCheckAll": "Chagua Zote"
 }

@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Del Eining",
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Total Avstand",
-  "accessLevelHours": "Timar"
+  "accessLevelHours": "Timar",
+  "sharedCheckAll": "Vel Alle"
 }

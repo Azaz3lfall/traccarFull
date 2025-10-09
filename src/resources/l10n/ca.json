@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Compartir Dispositiu",
   "accessLevelAnchor": "Àncora",
   "accessLevelTotalDistance": "Distància Total",
-  "accessLevelHours": "Hores"
+  "accessLevelHours": "Hores",
+  "sharedCheckAll": "Seleccionar Tot"
 }

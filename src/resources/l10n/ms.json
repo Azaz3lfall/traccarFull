@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Kongsi Peranti",
   "accessLevelAnchor": "Sauh",
   "accessLevelTotalDistance": "Jumlah Jarak",
-  "accessLevelHours": "Jam"
+  "accessLevelHours": "Jam",
+  "sharedCheckAll": "Pilih Semua"
 }

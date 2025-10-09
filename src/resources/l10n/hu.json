@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Eszköz Megosztása",
   "accessLevelAnchor": "Horgony",
   "accessLevelTotalDistance": "Összes Távolság",
-  "accessLevelHours": "Órák"
+  "accessLevelHours": "Órák",
+  "sharedCheckAll": "Összes Kiválasztása"
 }

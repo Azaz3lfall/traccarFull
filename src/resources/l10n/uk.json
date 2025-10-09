@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Поділитися Пристроєм",
   "accessLevelAnchor": "Якір",
   "accessLevelTotalDistance": "Загальна Відстань",
-  "accessLevelHours": "Години"
+  "accessLevelHours": "Години",
+  "sharedCheckAll": "Вибрати Все"
 }

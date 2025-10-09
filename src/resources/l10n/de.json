@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "Gerät Teilen",
   "accessLevelAnchor": "Anker",
   "accessLevelTotalDistance": "Gesamtentfernung",
-  "accessLevelHours": "Stunden"
+  "accessLevelHours": "Stunden",
+  "sharedCheckAll": "Alle Auswählen"
 }

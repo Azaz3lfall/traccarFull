@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "Dela Enhet",
   "accessLevelAnchor": "Ankare",
   "accessLevelTotalDistance": "Total Distans",
-  "accessLevelHours": "Timmar"
+  "accessLevelHours": "Timmar",
+  "sharedCheckAll": "Välj Alla"
 }

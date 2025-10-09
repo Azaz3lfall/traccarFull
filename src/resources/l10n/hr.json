@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Podijeli Uređaj",
   "accessLevelAnchor": "Sidro",
   "accessLevelTotalDistance": "Ukupna Udaljenost",
-  "accessLevelHours": "Sati"
+  "accessLevelHours": "Sati",
+  "sharedCheckAll": "Označi Sve"
 }

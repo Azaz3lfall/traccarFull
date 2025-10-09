@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "მოწყობილობის გაზიარება",
   "accessLevelAnchor": "ღუზა",
   "accessLevelTotalDistance": "საერთო მანძილი",
-  "accessLevelHours": "საათები"
+  "accessLevelHours": "საათები",
+  "sharedCheckAll": "ყველას არჩევა"
 }

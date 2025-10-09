@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "ഉപകരണം പങ്കിടുക",
   "accessLevelAnchor": "അങ്കർ",
   "accessLevelTotalDistance": "മൊത്തം ദൂരം",
-  "accessLevelHours": "മണിക്കൂറുകൾ"
+  "accessLevelHours": "മണിക്കൂറുകൾ",
+  "sharedCheckAll": "എല്ലാം തിരഞ്ഞെടുക്കുക"
 }

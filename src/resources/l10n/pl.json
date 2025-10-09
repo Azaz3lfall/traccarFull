@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "Udostępnij Urządzenie",
   "accessLevelAnchor": "Kotwica",
   "accessLevelTotalDistance": "Całkowita Odległość",
-  "accessLevelHours": "Godziny"
+  "accessLevelHours": "Godziny",
+  "sharedCheckAll": "Zaznacz Wszystkie"
 }

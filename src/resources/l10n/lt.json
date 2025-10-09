@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Dalintis Įrenginiu",
   "accessLevelAnchor": "Inkaras",
   "accessLevelTotalDistance": "Bendras Atstumas",
-  "accessLevelHours": "Valandos"
+  "accessLevelHours": "Valandos",
+  "sharedCheckAll": "Pažymėti Visus"
 }

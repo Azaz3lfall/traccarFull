@@ -1133,7 +1133,7 @@ const FloatingUsersPopover = ({
                               }}
                             />
                           }
-                          label="Check All"
+                          label={t('sharedCheckAll')}
                           sx={{ 
                             fontWeight: 'bold', 
                             margin: '0px !important',

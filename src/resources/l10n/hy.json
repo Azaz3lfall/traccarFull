@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Կիսվել Սարքով",
   "accessLevelAnchor": "Անկյուն",
   "accessLevelTotalDistance": "Ընդհանուր Հեռավորություն",
-  "accessLevelHours": "Ժամեր"
+  "accessLevelHours": "Ժամեր",
+  "sharedCheckAll": "Ընտրել Բոլորը"
 }

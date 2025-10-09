@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "ແບ່ງປັນອຸປະກອນ",
   "accessLevelAnchor": "ສະມໍ",
   "accessLevelTotalDistance": "ໄລຍະທາງລວມ",
-  "accessLevelHours": "ຊົ່ວໂມງ"
+  "accessLevelHours": "ຊົ່ວໂມງ",
+  "sharedCheckAll": "ເລືອກທັງໝົດ"
 }

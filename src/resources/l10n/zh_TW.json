@@ -765,5 +765,6 @@
   "accessLevelShareDevice": "分享裝置",
   "accessLevelAnchor": "錨點",
   "accessLevelTotalDistance": "總距離",
-  "accessLevelHours": "小時"
+  "accessLevelHours": "小時",
+  "sharedCheckAll": "全選"
 }

@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Enjamy Paýlaş",
   "accessLevelAnchor": "Labyr",
   "accessLevelTotalDistance": "Jemi Uzaklyk",
-  "accessLevelHours": "Sagat"
+  "accessLevelHours": "Sagat",
+  "sharedCheckAll": "Hemmesini Saýla"
 }

@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Dalīties ar Ierīci",
   "accessLevelAnchor": "Enkurs",
   "accessLevelTotalDistance": "Kopējais Attālums",
-  "accessLevelHours": "Stundas"
+  "accessLevelHours": "Stundas",
+  "sharedCheckAll": "Atlasīt Visus"
 }

@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "Ndaj Pajisjen",
   "accessLevelAnchor": "Spor",
   "accessLevelTotalDistance": "Distanca Totale",
-  "accessLevelHours": "Orë"
+  "accessLevelHours": "Orë",
+  "sharedCheckAll": "Zgjidh Të Gjitha"
 }

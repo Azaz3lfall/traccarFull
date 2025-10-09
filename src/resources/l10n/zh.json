@@ -764,5 +764,6 @@
   "accessLevelShareDevice": "共享设备",
   "accessLevelAnchor": "锚点",
   "accessLevelTotalDistance": "总距离",
-  "accessLevelHours": "小时"
+  "accessLevelHours": "小时",
+  "sharedCheckAll": "全选"
 }

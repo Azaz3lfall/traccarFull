@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "ចែករំលែកឧបករណ៍",
   "accessLevelAnchor": "យុថ្កា",
   "accessLevelTotalDistance": "ចម្ងាយសរុប",
-  "accessLevelHours": "ម៉ោង"
+  "accessLevelHours": "ម៉ោង",
+  "sharedCheckAll": "ជ្រើសរើសទាំងអស់"
 }

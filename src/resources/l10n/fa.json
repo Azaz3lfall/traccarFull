@@ -761,5 +761,6 @@
   "accessLevelShareDevice": "اشتراک گذاری دستگاه",
   "accessLevelAnchor": "لنگر",
   "accessLevelTotalDistance": "مسافت کل",
-  "accessLevelHours": "ساعت"
+  "accessLevelHours": "ساعت",
+  "sharedCheckAll": "انتخاب همه"
 }
