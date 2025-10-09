@@ -1134,12 +1134,18 @@ const FloatingUsersPopover = ({
                             />
                           }
                           label="Check All"
-                          style={{ fontWeight: 'bold', marginBottom: '0px' }}
+                          style={{ fontWeight: 'bold', marginBottom: '0px', fontSize: '13px', lineHeight: '1.2' }}
                         />
                         
                         {/* Two Column Layout */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                          <FormGroup>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                          <FormGroup sx={{ 
+                            '& .MuiFormControlLabel-root': { 
+                              marginBottom: '0px',
+                              lineHeight: '1.2',
+                              '& .MuiFormControlLabel-label': { fontSize: '13px', lineHeight: '1.2' }
+                            } 
+                          }}>
                             <FormControlLabel
                               control={
                                 <Checkbox 
@@ -1324,7 +1330,13 @@ const FloatingUsersPopover = ({
                             />
                           </FormGroup>
                           
-                          <FormGroup>
+                          <FormGroup sx={{ 
+                            '& .MuiFormControlLabel-root': { 
+                              marginBottom: '0px',
+                              lineHeight: '1.2',
+                              '& .MuiFormControlLabel-label': { fontSize: '13px', lineHeight: '1.2' }
+                            } 
+                          }}>
                             <FormControlLabel
                               control={
                                 <Checkbox 
