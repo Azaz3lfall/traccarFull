@@ -203,6 +203,32 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     return hasResumeEnginePermission || hasStopEnginePermission || hasSendCommandPermission || hasShareDevicePermission || hasAnchorPermission;
   }, [hasResumeEnginePermission, hasStopEnginePermission, hasSendCommandPermission, hasShareDevicePermission, hasAnchorPermission]);
   
+  // Check if user has hours permission
+  const hasHoursPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.hours === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has total distance permission
+  const hasTotalDistancePermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.totalDistance === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -2374,6 +2400,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             value || t('sharedUnknown')}
                         </span>
                         {!deviceReadonly && (key === 'totalDistance' || key === 'hours') && (
+                          (key === 'totalDistance' && hasTotalDistancePermission) || (key === 'hours' && hasHoursPermission)
+                        ) && (
                           <button
                             onClick={() => handleEditField(key, value)}
                             style={{
@@ -2618,6 +2646,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                     value || t('sharedUnknown')}
                               </div>
                               {!deviceReadonly && (property === 'totalDistance' || property === 'hours') && (
+                                (property === 'totalDistance' && hasTotalDistancePermission) || (property === 'hours' && hasHoursPermission)
+                              ) && (
                                 <button
                                   onClick={() => handleEditField(property, detailedPosition[property])}
                                   style={{
@@ -2741,6 +2771,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                     value || t('sharedUnknown')}
                               </div>
                               {!deviceReadonly && (attribute === 'totalDistance' || attribute === 'hours') && (
+                                (attribute === 'totalDistance' && hasTotalDistancePermission) || (attribute === 'hours' && hasHoursPermission)
+                              ) && (
                                 <button
                                   onClick={() => handleEditField(attribute, detailedPosition.attributes[attribute])}
                                   style={{
