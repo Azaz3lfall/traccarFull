@@ -381,6 +381,45 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has devices permission
+  const hasDevicesPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.devices === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has groups permission
+  const hasGroupsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.groups === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has drivers permission
+  const hasDriversPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.drivers === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1735,7 +1774,7 @@ const MainPage = () => {
           )}
           
           {/* Devices Icon */}
-          {!readonly && (
+          {!readonly && hasDevicesPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -1803,7 +1842,7 @@ const MainPage = () => {
           )}
           
           {/* Groups Icon */}
-          {!readonly && !features.disableGroups && (
+          {!readonly && !features.disableGroups && hasGroupsPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -1871,7 +1910,7 @@ const MainPage = () => {
           )}
           
           {/* Drivers Icon */}
-          {!readonly && !features.disableDrivers && (
+          {!readonly && !features.disableDrivers && hasDriversPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -6586,7 +6625,7 @@ const MainPage = () => {
                   )}
 
                   {/* Devices Management */}
-                  {!readonly && (
+                  {!readonly && hasDevicesPermission && (
                     <button
                       onClick={() => {
                         setShowDevicesPopover(true);
@@ -6622,7 +6661,7 @@ const MainPage = () => {
                   )}
 
                   {/* Groups */}
-                  {!readonly && !features.disableGroups && (
+                  {!readonly && !features.disableGroups && hasGroupsPermission && (
                     <button
                       onClick={() => {
                         setShowGroupsPopover(true);
@@ -6658,7 +6697,7 @@ const MainPage = () => {
                   )}
 
                   {/* Drivers */}
-                  {!readonly && !features.disableDrivers && (
+                  {!readonly && !features.disableDrivers && hasDriversPermission && (
                     <button
                       onClick={() => {
                         setShowDriversPopover(true);
