@@ -120,6 +120,19 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [user]);
   
+  // Check if user has send command permission
+  const hasSendCommandPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.sendCommand === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -2128,6 +2141,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               )}
               
               {/* Button 4 - Send Commands (Outlined) */}
+              {hasSendCommandPermission && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -2151,6 +2165,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               >
                 <UploadIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
               </button>
+              )}
               
               {/* Button 5 - Share (Outlined) */}
               <button
