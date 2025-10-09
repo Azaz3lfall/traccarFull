@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   AppBar,
   Breadcrumbs,
@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -83,10 +84,24 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
   const { classes } = useStyles({ miniVariant });
   const theme = useTheme();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.session.user);
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   const [openDrawer, setOpenDrawer] = useState(false);
+  
+  // Check if user has mainMenu permission
+  const hasMainMenuPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.mainMenu === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
 
   const toggleDrawer = () => setMiniVariant(!miniVariant);
 
@@ -124,7 +139,7 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
           {menu}
         </Drawer>
       )}
-      {!desktop && (
+      {!desktop && hasMainMenuPermission && (
         <AppBar className={classes.mobileToolbar} position="static" color="inherit">
           <Toolbar>
             <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => setOpenDrawer(true)}>

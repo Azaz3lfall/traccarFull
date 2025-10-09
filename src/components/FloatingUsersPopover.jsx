@@ -132,11 +132,26 @@ const FloatingUsersPopover = ({
     });
   };
 
+  // Helper function to get current user permissions from Redux
+  const getCurrentUserPermissions = () => {
+    if (!currentUser) return {};
+    
+    return {
+      administrator: currentUser.administrator || false,
+      readonly: currentUser.readonly || false,
+      deviceReadonly: currentUser.deviceReadonly || false,
+      limitCommands: currentUser.limitCommands || false,
+      disableReports: currentUser.disableReports || false,
+      // Add more permissions as needed
+    };
+  };
+
   // Helper function to load accessLevel from user attributes and set checkboxes
   const loadAccessLevelFromUser = (user) => {
     if (user && user.attributes && user.attributes.accessLevel) {
       try {
         const accessLevel = JSON.parse(user.attributes.accessLevel);
+        const currentPermissions = getCurrentUserPermissions();
         const newCheckboxState = {
           'Main Menu': accessLevel.mainMenu || false,
           'Device List': accessLevel.deviceList || false,
@@ -172,8 +187,36 @@ const FloatingUsersPopover = ({
         // Keep default state if parsing fails
       }
     } else {
-      // Reset to default state if no accessLevel found
-      resetAccessLevelCheckboxes();
+      // If no accessLevel found, all permissions are false (unchecked)
+      setAccessLevelCheckboxes({
+        'Main Menu': false,
+        'Device List': false,
+        'Reports': false,
+        'Geofences': false,
+        'Settings': false,
+        'Notifications': false,
+        'Account': false,
+        'Devices': false,
+        'Groups': false,
+        'Drivers': false,
+        'Calendars': false,
+        'Computed Attributes': false,
+        'Maintenance': false,
+        'Saved Commands': false,
+        'Announcement': false,
+        'Server': false,
+        'Users': false,
+        'Reseller Panel': false,
+        'Edit Sensors': false,
+        'Stop Engine': false,
+        'Resume Engine': false,
+        'Replay': false,
+        'Send Command': false,
+        'Share Device': false,
+        'Anchor': false,
+        'Total Distance': false,
+        'Hours': false
+      });
     }
   };
   

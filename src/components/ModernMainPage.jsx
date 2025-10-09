@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,7 +23,21 @@ const ModernMainPage = () => {
   const mapOnSelect = useAttributePreference('mapOnSelect', true);
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
+  const user = useSelector((state) => state.session.user);
   const { companyName } = useResellerBranding();
+  
+  // Check if user has mainMenu permission
+  const hasMainMenuPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.mainMenu === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const [filteredPositions, setFilteredPositions] = useState([]);
   const selectedPosition = filteredPositions.find((position) => selectedDeviceId && position.deviceId === selectedDeviceId);
 
@@ -107,7 +121,7 @@ const ModernMainPage = () => {
           transition={{ duration: 0.3 }}
         >
           <div className="flex items-center space-x-4">
-            {!desktop && (
+            {!desktop && hasMainMenuPermission && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -167,7 +181,7 @@ const ModernMainPage = () => {
       )}
 
       {/* Drawer Menu for Mobile */}
-      {!desktop && (
+      {!desktop && hasMainMenuPermission && (
         <DrawerMenu
           isOpen={drawerOpen}
           onClose={onDrawerClose}
