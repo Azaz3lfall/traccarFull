@@ -332,6 +332,8 @@ const FloatingUsersPopover = ({
         ...specificUser,
         attributes: specificUser.attributes || {}
       });
+      // Reset to default first, then load user's accessLevel
+      resetAccessLevelCheckboxes();
       loadAccessLevelFromUser(specificUser); // Load accessLevel and set checkboxes
       setActiveTab(0);
       setEditDialog(true);
@@ -423,17 +425,30 @@ const FloatingUsersPopover = ({
       ...user,
       attributes: user.attributes || {}
     });
+    // Reset to default first, then load user's accessLevel
+    resetAccessLevelCheckboxes();
     loadAccessLevelFromUser(user); // Load accessLevel and set checkboxes
     setActiveTab(0); // Reset to first tab
     setEditDialog(true);
     setAnchorEl(null);
   };
 
-  // Handle closing edit dialog
+  // Handle closing edit dialog (cancel)
   const handleCloseEditDialog = () => {
     setEditDialog(false);
     setEditingUser(null);
     resetAccessLevelCheckboxes(); // Reset all checkboxes to checked (default state)
+    // If we were editing a specific user (not from the list), close the entire popover
+    if (userId) {
+      onClose();
+    }
+  };
+
+  // Handle successful save (reset checkboxes after save)
+  const handleSaveSuccess = () => {
+    setEditDialog(false);
+    setEditingUser(null);
+    resetAccessLevelCheckboxes(); // Reset all checkboxes to checked after save
     // If we were editing a specific user (not from the list), close the entire popover
     if (userId) {
       onClose();
@@ -474,7 +489,7 @@ const FloatingUsersPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      handleCloseEditDialog();
+      handleSaveSuccess();
     },
   });
 
@@ -489,7 +504,7 @@ const FloatingUsersPopover = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      handleCloseEditDialog();
+      handleSaveSuccess();
     },
   });
 
