@@ -50,7 +50,7 @@ import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
 import CustomPagination from './CustomPagination';
-import { sessionActions, devicesActions } from '../store';
+import { sessionActions, devicesActions, errorsActions } from '../store';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
@@ -149,13 +149,19 @@ const FloatingDevicesPopover = ({
   // Create device mutation
   const createDeviceMutation = useMutation({
     mutationFn: async (deviceData) => {
-      const response = await fetchOrThrow('/api/devices', {
+      const response = await fetch('/api/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deviceData),
       });
-      const result = await response.json();
-      return result;
+      
+      if (response.status === 200) {
+        const result = await response.json();
+        return result;
+      } else {
+        // Any non-200 status is an error
+        throw new Error('Device creation failed');
+      }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries(['devices']);
@@ -163,9 +169,13 @@ const FloatingDevicesPopover = ({
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
+      // Show success message for 200 OK
+      dispatch(errorsActions.push(`✅ Device created successfully`));
     },
     onError: (error) => {
       console.error('Create device error:', error);
+      // Show error message for any non-200 response
+      dispatch(errorsActions.push(`❌ Device already exists with this identification or you need to upgrade your plan to add more devices.`));
     },
   });
 
