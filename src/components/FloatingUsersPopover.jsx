@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   TextField,
@@ -84,6 +84,20 @@ const FloatingUsersPopover = ({
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Get current user from session
+  const currentUser = useSelector((state) => state.session.user);
+  
+  // Check if user is editing their own account
+  const isEditingOwnAccount = userId && currentUser && userId === currentUser.id;
+  
+  // Helper function to get correct tab index based on whether Access Level tab is shown
+  const getTabIndex = (baseIndex) => {
+    if (isEditingOwnAccount && baseIndex > 1) {
+      return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden
+    }
+    return baseIndex;
+  };
   
   // Server attributes hooks
   const commonUserAttributes = useCommonUserAttributes(t);
@@ -242,6 +256,13 @@ const FloatingUsersPopover = ({
       setEditDialog(true);
     }
   }, [specificUser, userId, isVisible]);
+
+  // Reset active tab if user switches to editing their own account while on Access Level tab
+  useEffect(() => {
+    if (isEditingOwnAccount && activeTab === 1) {
+      setActiveTab(0); // Reset to Required tab
+    }
+  }, [isEditingOwnAccount, activeTab]);
 
   // Filter users based on search and temporary status
   const filteredUsers = users.filter(user => {
@@ -1080,7 +1101,7 @@ const FloatingUsersPopover = ({
                     }}
                   >
                     <Tab label={t('sharedRequired')} />
-                    <Tab label={t('sharedAccessLevel')} />
+                    {!isEditingOwnAccount && <Tab label={t('sharedAccessLevel')} />}
                     <Tab label={t('sharedPreferences')} />
                     <Tab label={t('sharedLocation')} />
                     <Tab label={t('sharedPermissions')} />
@@ -1117,7 +1138,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Access Level Tab */}
-                    {activeTab === 1 && (
+                    {!isEditingOwnAccount && activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {/* Check All */}
                         <FormControlLabel
@@ -1542,7 +1563,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Preferences Tab */}
-                    {activeTab === 2 && (
+                    {activeTab === getTabIndex(2) && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                           value={editingUser.phone || ''}
@@ -1677,7 +1698,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Location Tab */}
-                    {activeTab === 3 && (
+                    {activeTab === getTabIndex(3) && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <TextField
                           type="number"
@@ -1704,7 +1725,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Permissions Tab */}
-                    {activeTab === 4 && (
+                    {activeTab === getTabIndex(4) && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                       label={t('userExpirationTime')}
@@ -1775,7 +1796,7 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Attributes Tab */}
-                    {activeTab === 5 && (
+                    {activeTab === getTabIndex(5) && (
                       <div>
                         <EditAttributesAccordion
                           attribute={null}
