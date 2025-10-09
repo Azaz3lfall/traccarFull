@@ -3857,11 +3857,12 @@ const MainPage = () => {
               }}>
                 <button
                   onClick={() => {
-                    setShowUserPopover(false);
-                    setEditingUserId(user.id);
-                    setShowUsersPopover(true);
+                    if (hasAccountPermission) {
+                      setShowUserPopover(false);
+                      setEditingUserId(user.id);
+                      setShowUsersPopover(true);
+                    }
                   }}
-                  disabled={!hasAccountPermission}
                   style={{
                     flex: 1,
                     padding: '10px 16px',
