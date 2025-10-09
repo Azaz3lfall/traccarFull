@@ -3861,23 +3861,29 @@ const MainPage = () => {
                     setEditingUserId(user.id);
                     setShowUsersPopover(true);
                   }}
+                  disabled={!hasAccountPermission}
                   style={{
                     flex: 1,
                     padding: '10px 16px',
-                    backgroundColor: colors.secondary,
-                    color: colors.text,
+                    backgroundColor: hasAccountPermission ? colors.secondary : colors.disabled,
+                    color: hasAccountPermission ? colors.text : colors.textSecondary,
                     border: `1px solid ${colors.border}`,
                     borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s'
+                    cursor: hasAccountPermission ? 'pointer' : 'not-allowed',
+                    transition: 'background-color 0.2s',
+                    opacity: hasAccountPermission ? 1 : 0.6
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
+                    if (hasAccountPermission) {
+                      e.target.style.backgroundColor = colors.hover;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = colors.secondary;
+                    if (hasAccountPermission) {
+                      e.target.style.backgroundColor = colors.secondary;
+                    }
                   }}
                 >
                   {t('settingsUser')}
