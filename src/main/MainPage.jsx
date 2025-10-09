@@ -472,6 +472,71 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has saved commands permission
+  const hasSavedCommandsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.savedCommands === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has announcement permission
+  const hasAnnouncementPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.announcement === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has server permission
+  const hasServerPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.server === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has users permission
+  const hasUsersPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.users === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
+  // Check if user has reseller panel permission
+  const hasResellerPanelPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.resellerPanel === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -2236,7 +2301,7 @@ const MainPage = () => {
           )}
           
           {/* Saved Commands Icon */}
-          {!readonly && !features.disableSavedCommands && (
+          {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2440,7 +2505,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Server Announcement */}
-          {manager && (
+          {manager && hasAnnouncementPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2508,7 +2573,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Server Settings */}
-          {admin && (
+          {admin && hasServerPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2576,7 +2641,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Users Management */}
-          {manager && (
+          {manager && hasUsersPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2644,7 +2709,7 @@ const MainPage = () => {
           )}
           
           {/* Manager Section - Reseller Management */}
-          {(admin || isReseller) && (
+          {(admin || isReseller) && hasResellerPanelPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -6895,7 +6960,7 @@ const MainPage = () => {
                   )}
 
                   {/* Saved Commands */}
-                  {!readonly && !features.disableSavedCommands && (
+                  {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
                     <button
                       onClick={() => {
                         setShowCommandsPopover(true);
@@ -7003,7 +7068,7 @@ const MainPage = () => {
                   )}
 
                   {/* Manager Section - Server Announcement */}
-                  {manager && (
+                  {manager && hasAnnouncementPermission && (
                     <button
                       onClick={() => {
                         setShowAnnouncementDrawer(true);
@@ -7039,7 +7104,7 @@ const MainPage = () => {
                   )}
 
                   {/* Manager Section - Server Settings */}
-                  {manager && admin && (
+                  {manager && admin && hasServerPermission && (
                     <button
                       onClick={() => {
                         setShowServerDrawer(true);
@@ -7075,7 +7140,7 @@ const MainPage = () => {
                   )}
                   
                   {/* Users Management */}
-                  {manager && (
+                  {manager && hasUsersPermission && (
                     <button
                       onClick={() => {
                         setShowUsersPopover(true);
@@ -7115,7 +7180,7 @@ const MainPage = () => {
                   )}
 
                   {/* Reseller Management */}
-                  {(admin || isReseller) && (
+                  {(admin || isReseller) && hasResellerPanelPermission && (
                     <button
                       onClick={() => {
                         setShowResellersPopover(true);
