@@ -26,19 +26,6 @@ const BottomMenu = () => {
   const disableReports = useRestriction('disableReports');
   const user = useSelector((state) => state.session.user);
   const socket = useSelector((state) => state.session.socket);
-  
-  // Check if user has reports permission
-  const hasReportsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
-    try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.reports === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
 
   const [anchorEl, setAnchorEl] = useState(null);
 

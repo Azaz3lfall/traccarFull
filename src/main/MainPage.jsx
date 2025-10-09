@@ -329,6 +329,19 @@ const MainPage = () => {
       return false; // Parse error means no permission
     }
   }, [user]);
+  
+  // Check if user has geofences permission
+  const hasGeofencesPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.geofences === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -1409,6 +1422,7 @@ const MainPage = () => {
           )}
           
           {/* Geofences Icon */}
+          {hasGeofencesPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -1473,6 +1487,7 @@ const MainPage = () => {
               </span>
             )}
           </div>
+          )}
           
           {/* Settings Icon */}
           <div style={{
