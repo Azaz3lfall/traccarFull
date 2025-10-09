@@ -1179,7 +1179,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Main Menu"
+                              label={t('sharedMenu')}
                             />
                             <FormControlLabel
                               control={
@@ -1192,7 +1192,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Device List"
+                              label={t('deviceTitle')}
                             />
                             <FormControlLabel
                               control={
@@ -1205,7 +1205,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Reports"
+                              label={t('reportTitle')}
                             />
                             <FormControlLabel
                               control={
@@ -1218,7 +1218,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Geofences"
+                              label={t('sharedGeofences')}
                             />
                             <FormControlLabel
                               control={
@@ -1231,7 +1231,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Settings"
+                              label={t('settingsTitle')}
                             />
                             <FormControlLabel
                               control={
@@ -1244,7 +1244,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Notifications"
+                              label={t('sharedNotifications')}
                             />
                             <FormControlLabel
                               control={
@@ -1257,7 +1257,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Account"
+                              label={t('settingsUser')}
                             />
                             <FormControlLabel
                               control={
@@ -1270,7 +1270,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Devices"
+                              label={t('deviceTitle')}
                             />
                             <FormControlLabel
                               control={
@@ -1283,7 +1283,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Groups"
+                              label={t('settingsGroups')}
                             />
                             <FormControlLabel
                               control={
@@ -1296,7 +1296,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Drivers"
+                              label={t('sharedDrivers')}
                             />
                             <FormControlLabel
                               control={
@@ -1309,7 +1309,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Calendars"
+                              label={t('sharedCalendars')}
                             />
                             <FormControlLabel
                               control={
@@ -1322,7 +1322,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Computed Attributes"
+                              label={t('sharedComputedAttributes')}
                             />
                             <FormControlLabel
                               control={
@@ -1335,7 +1335,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Maintenance"
+                              label={t('sharedMaintenance')}
                             />
                             <FormControlLabel
                               control={
@@ -1348,7 +1348,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Saved Commands"
+                              label={t('sharedSavedCommands')}
                             />
                           </FormGroup>
                           
@@ -1378,7 +1378,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Announcement"
+                              label={t('serverAnnouncement')}
                             />
                             <FormControlLabel
                               control={
@@ -1391,7 +1391,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Server"
+                              label={t('settingsServer')}
                             />
                             <FormControlLabel
                               control={
@@ -1404,7 +1404,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Users"
+                              label={t('settingsUsers')}
                             />
                             <FormControlLabel
                               control={
@@ -1417,7 +1417,7 @@ const FloatingUsersPopover = ({
                                   }}
                                 />
                               }
-                              label="Reseller Panel"
+                              label={t('resellerPanel')}
                             />
                             <FormControlLabel
                               control={
