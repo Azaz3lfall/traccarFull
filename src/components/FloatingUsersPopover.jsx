@@ -91,11 +91,6 @@ const FloatingUsersPopover = ({
   // Check if user is editing their own account
   const isEditingOwnAccount = userId && currentUser && userId === currentUser.id;
   
-  // Debug: Log current user from Redux
-  console.log('Current user from Redux:', currentUser);
-  console.log('User being edited (userId):', userId);
-  console.log('Is editing own account:', isEditingOwnAccount);
-  
   // Helper function to get correct tab index based on whether Access Level tab is shown
   const getTabIndex = (baseIndex) => {
     if (isEditingOwnAccount && baseIndex > 1) {
@@ -136,33 +131,33 @@ const FloatingUsersPopover = ({
   
   // Access Level checkboxes state
   const [accessLevelCheckboxes, setAccessLevelCheckboxes] = useState({
-    'Main Menu': false,
-    'Device List': false,
-    'Reports': false,
-    'Geofences': false,
-    'Settings': false,
-    'Notifications': false,
-    'Account': false,
-    'Devices': false,
-    'Groups': false,
-    'Drivers': false,
-    'Calendars': false,
-    'Computed Attributes': false,
-    'Maintenance': false,
-    'Saved Commands': false,
-    'Announcement': false,
-    'Server': false,
-    'Users': false,
-    'Reseller Panel': false,
-    'Edit Sensors': false,
-    'Stop Engine': false,
-    'Resume Engine': false,
-    'Replay': false,
-    'Send Command': false,
-    'Share Device': false,
-    'Anchor': false,
-    'Total Distance': false,
-    'Hours': false
+    'Main Menu': true,
+    'Device List': true,
+    'Reports': true,
+    'Geofences': true,
+    'Settings': true,
+    'Notifications': true,
+    'Account': true,
+    'Devices': true,
+    'Groups': true,
+    'Drivers': true,
+    'Calendars': true,
+    'Computed Attributes': true,
+    'Maintenance': true,
+    'Saved Commands': true,
+    'Announcement': true,
+    'Server': true,
+    'Users': true,
+    'Reseller Panel': true,
+    'Edit Sensors': true,
+    'Stop Engine': true,
+    'Resume Engine': true,
+    'Replay': true,
+    'Send Command': true,
+    'Share Device': true,
+    'Anchor': true,
+    'Total Distance': true,
+    'Hours': true
   });
   
   // Check All functionality
@@ -228,6 +223,7 @@ const FloatingUsersPopover = ({
     },
     enabled: isVisible, // Only fetch when popover is visible
   });
+
 
   // Debug logging
   useEffect(() => {
@@ -432,6 +428,46 @@ const FloatingUsersPopover = ({
 
     // Prepare user data for saving
     const userData = { ...editingUser };
+    
+    // Create accessLevel object with all permissions (camelCase keys)
+    const accessLevel = {
+      mainMenu: accessLevelCheckboxes['Main Menu'],
+      deviceList: accessLevelCheckboxes['Device List'],
+      reports: accessLevelCheckboxes['Reports'],
+      geofences: accessLevelCheckboxes['Geofences'],
+      settings: accessLevelCheckboxes['Settings'],
+      notifications: accessLevelCheckboxes['Notifications'],
+      account: accessLevelCheckboxes['Account'],
+      devices: accessLevelCheckboxes['Devices'],
+      groups: accessLevelCheckboxes['Groups'],
+      drivers: accessLevelCheckboxes['Drivers'],
+      calendars: accessLevelCheckboxes['Calendars'],
+      computedAttributes: accessLevelCheckboxes['Computed Attributes'],
+      maintenance: accessLevelCheckboxes['Maintenance'],
+      savedCommands: accessLevelCheckboxes['Saved Commands'],
+      announcement: accessLevelCheckboxes['Announcement'],
+      server: accessLevelCheckboxes['Server'],
+      users: accessLevelCheckboxes['Users'],
+      resellerPanel: accessLevelCheckboxes['Reseller Panel'],
+      editSensors: accessLevelCheckboxes['Edit Sensors'],
+      stopEngine: accessLevelCheckboxes['Stop Engine'],
+      resumeEngine: accessLevelCheckboxes['Resume Engine'],
+      replay: accessLevelCheckboxes['Replay'],
+      sendCommand: accessLevelCheckboxes['Send Command'],
+      shareDevice: accessLevelCheckboxes['Share Device'],
+      anchor: accessLevelCheckboxes['Anchor'],
+      totalDistance: accessLevelCheckboxes['Total Distance'],
+      hours: accessLevelCheckboxes['Hours']
+    };
+    
+    // Console log the accessLevel object
+    console.log('Access Level permissions:', accessLevel);
+    
+    // Add accessLevel to userData attributes (stringified)
+    userData.attributes = {
+      ...userData.attributes, // Keep all existing attributes
+      accessLevel: JSON.stringify(accessLevel)
+    };
     
     // Handle password field
     if (editingUser.id) {

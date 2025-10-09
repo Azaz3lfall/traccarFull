@@ -361,7 +361,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               return;
             }
             
-            console.log('Imported customSensors (decoded from base64):', jsonData);
             
             if (!position || !device) {
               showSnackbar('No device data available for import.', 'error');
@@ -403,7 +402,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               }
               
               const revalidatedDevice = await revalidateResponse.json();
-              console.log('Revalidated device data after import:', revalidatedDevice);
               
               // Update sensor names with imported data
               setSensorNames(prev => ({
@@ -516,7 +514,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         // Update the device in the store
         dispatch(devicesActions.update([updatedDevice]));
         
-        console.log('Sensors saved before export:', finalCustomSensors);
       }
       
       // Revalidate by fetching the latest device data
@@ -526,7 +523,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
       
       const revalidatedDevice = await revalidateResponse.json();
-      console.log('Revalidated device data:', revalidatedDevice);
       
       // Get the latest customSensors from revalidated data
       let latestCustomSensors = {};
@@ -596,7 +592,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       if (isChanged) {
         changedSensors[key] = newName;
-        console.log(`Sensor changed: ${key} from "${currentName}" to "${newName}"`);
       }
     });
     
@@ -608,7 +603,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // If it's an existing sensor and the name matches the default, it was reset
       if (isExistingSensor && newName === currentName) {
-        console.log(`Sensor reset to default: ${key} = "${newName}"`);
       }
     });
     
@@ -616,7 +610,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     Object.keys(currentCustomSensors).forEach((key) => {
       if (!sensorNames.hasOwnProperty(key)) {
         // This sensor was deleted, we'll handle it by not including it in the final customSensors
-        console.log('Deleted custom sensor:', key);
       }
     });
     
@@ -662,8 +655,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         }
       };
       
-      console.log('customSensors:', changedSensors);
-      console.log('updatedDevice:', updatedDevice);
       
       // PUT the updated device to the API
       const response = await fetch(`/api/devices/${device.id}`, {
@@ -682,7 +673,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       await queryClient.invalidateQueries(['devices']);
       await queryClient.invalidateQueries(['device', device.id]);
 
-      console.log('Device updated successfully');
 
       setSensorEditModalOpen(false);
       setSensorNames({});
@@ -3356,7 +3346,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  console.log('Sensor clicked:', sensor.value);
                                   setSelectedNewSensor(sensor.value);
                                   setSensorSearchTerm(sensor.label);
                                   setShowSensorDropdown(false);
