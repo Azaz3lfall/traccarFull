@@ -2136,7 +2136,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               justifyContent: 'space-around',
               gap: '4px',
               width: '100%',
-              marginTop: !desktop ? '12px' : '0px',
+              marginTop: !desktop ? '18px' : '10px',
+              marginBottom: !desktop ? '8px' : '4px',
               minHeight: !desktop ? '58px' : '42px'
             }}>
               {/* Button 1 - Lock Open (Outlined) */}
@@ -2331,7 +2332,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           {/* Content */}
           <div style={{
             flex: 1,
-            padding: '4px 16px 16px 16px',
+            padding: '0px 16px 16px 16px',
             overflow: 'auto'
           }}>
             
