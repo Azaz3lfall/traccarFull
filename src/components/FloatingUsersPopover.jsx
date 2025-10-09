@@ -1068,7 +1068,116 @@ const FloatingUsersPopover = ({
                     {/* Access Level Tab */}
                     {activeTab === 1 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {/* Access Level content will be added here */}
+                        <FormGroup>
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Main Menu"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Device List"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Reports"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Geofences"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Settings"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Notifications"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Account"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Devices"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Groups"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Drivers"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Calendars"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Computed Attributes"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Maintenance"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Saved Commands"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Announcement"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Server"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Users"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Reseller Panel"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Edit Sensors"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Stop Engine"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Resume Engine"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Replay"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Send Command"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Share Device"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Anchor"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Total Distance"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox />}
+                            label="Hours"
+                          />
+                        </FormGroup>
                       </div>
                     )}
 
