@@ -1118,7 +1118,7 @@ const FloatingUsersPopover = ({
 
                     {/* Access Level Tab */}
                     {activeTab === 1 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {/* Check All */}
                         <FormControlLabel
                           control={
@@ -1126,10 +1126,11 @@ const FloatingUsersPopover = ({
                               checked={isAllChecked}
                               indeterminate={isIndeterminate}
                               onChange={handleCheckAll}
+                              sx={{ '&:hover': { backgroundColor: 'transparent' } }}
                             />
                           }
                           label="Check All"
-                          style={{ fontWeight: 'bold', marginBottom: '8px' }}
+                          style={{ fontWeight: 'bold', marginBottom: '4px' }}
                         />
                         
                         {/* Two Column Layout */}
