@@ -79,6 +79,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const replayPositions = useSelector((state) => state.session.replayPositions);
+  const user = useSelector((state) => state.session.user);
+  
+  // Check if user has edit sensors permission
+  const hasEditSensorsPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.editSensors === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+  
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
@@ -1531,7 +1546,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           </button>
 
           {/* Sensor Edit Button - Hidden in replay mode */}
-          {!showReplayPopover && !deviceReadonly && (
+          {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (
             <button
               onClick={handleOpenSensorEdit}
               style={{
