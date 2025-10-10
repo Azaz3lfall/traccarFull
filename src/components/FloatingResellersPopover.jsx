@@ -86,6 +86,7 @@ const FloatingResellersPopover = ({
   const [logsDialog, setLogsDialog] = useState(false);
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [logsDeleting, setLogsDeleting] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [editingReseller, setEditingReseller] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -279,6 +280,8 @@ const FloatingResellersPopover = ({
   const handleDeleteLogs = async () => {
     if (!selectedReseller) return;
     
+    setLogsDeleting(true);
+    
     try {
       console.log('🗑️ Deleting logs for domain:', selectedReseller.appUrl);
       const response = await fetchOrThrow(resellersConfig.ENDPOINTS.LOGS_DELETE, {
@@ -296,6 +299,8 @@ const FloatingResellersPopover = ({
       }
     } catch (error) {
       console.error('❌ Error deleting logs:', error);
+    } finally {
+      setLogsDeleting(false);
     }
   };
 
@@ -946,6 +951,7 @@ const FloatingResellersPopover = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                   style={{
                     position: 'fixed',
                     top: 0,
@@ -971,7 +977,7 @@ const FloatingResellersPopover = ({
                       borderRadius: '16px',
                       maxWidth: '800px',
                       width: '100%',
-                      maxHeight: '80vh',
+                      height: '70vh',
                       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                       border: `1px solid ${colors.border}`,
                       position: 'relative',
@@ -988,32 +994,50 @@ const FloatingResellersPopover = ({
                       alignItems: 'center',
                       justifyContent: 'space-between'
                     }}>
-                      <div>
-                        <Typography style={{
-                          fontSize: '18px',
-                          fontWeight: '600',
-                          color: colors.text,
-                          margin: 0
-                        }}>
-                          {t('logsTitle')} - {selectedReseller?.appUrl}
-                        </Typography>
-                        <Typography style={{
-                          fontSize: '14px',
-                          color: colors.textSecondary,
-                          margin: '4px 0 0 0'
-                        }}>
-                          {logs.length} {t('logsEntries')}
-                        </Typography>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <IconButton
+                          onClick={() => setLogsDialog(false)}
+                          style={{
+                            color: colors.textSecondary,
+                            padding: '8px'
+                          }}
+                          title="Close logs"
+                        >
+                          <ChevronLeftIcon fontSize="small" />
+                        </IconButton>
+                        <div>
+                          <Typography style={{
+                            fontSize: '18px',
+                            fontWeight: '600',
+                            color: colors.text,
+                            margin: 0
+                          }}>
+                            {t('logsTitle')} - {selectedReseller?.appUrl}
+                          </Typography>
+                          <Typography style={{
+                            fontSize: '14px',
+                            color: colors.textSecondary,
+                            margin: '4px 0 0 0'
+                          }}>
+                            {logs.length} {t('logsEntries')}
+                          </Typography>
+                        </div>
                       </div>
                       <IconButton
                         onClick={handleDeleteLogs}
+                        disabled={logsDeleting}
                         style={{
-                          color: colors.textSecondary,
-                          padding: '8px'
+                          color: logsDeleting ? colors.textSecondary : colors.error,
+                          padding: '8px',
+                          opacity: logsDeleting ? 0.6 : 1
                         }}
                         title="Delete logs for this domain"
                       >
-                        <DeleteIcon fontSize="small" />
+                        {logsDeleting ? (
+                          <CircularProgress size={16} style={{ color: colors.textSecondary }} />
+                        ) : (
+                          <DeleteIcon fontSize="small" />
+                        )}
                       </IconButton>
                     </div>
 
