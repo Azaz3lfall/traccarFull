@@ -56,7 +56,7 @@ import {
 import CropIcon from '@mui/icons-material/Crop';
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { HiMiniCubeTransparent } from "react-icons/hi2";
-import { PiMapPinAreaLight, PiSteeringWheelThin } from "react-icons/pi";
+import { PiMapPinAreaLight, PiSteeringWheelLight } from "react-icons/pi";
 import { 
   AiOutlineSetting, 
   AiOutlineTeam, 
@@ -2086,7 +2086,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PiSteeringWheelThin style={{ fontSize: 18, color: colors.textSecondary }} />
+              <PiSteeringWheelLight style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -6859,7 +6859,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <PiSteeringWheelThin style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <PiSteeringWheelLight style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedDrivers')}
                     </button>
                   )}
