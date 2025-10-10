@@ -77,6 +77,14 @@ const FloatingResellersPopover = ({
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
 
+  // Helper function to check if user can edit a specific reseller
+  const canEditReseller = (reseller) => {
+    // Admin can edit all resellers
+    if (admin) return true;
+    // Non-admin users can only edit resellers they created
+    return reseller.parentUserId === user?.id;
+  };
+
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedReseller, setSelectedReseller] = useState(null);
@@ -616,21 +624,21 @@ const FloatingResellersPopover = ({
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
       handler: handleEdit,
-      show: admin,
+      show: (reseller) => canEditReseller(reseller),
     },
     {
       key: 'logs',
       title: 'Logs',
       icon: <BugReportIcon fontSize="small" />,
       handler: handleLogs,
-      show: admin,
+      show: (reseller) => canEditReseller(reseller),
     },
     {
       key: 'delete',
       title: t('sharedRemove'),
       icon: <DeleteIcon fontSize="small" />,
       handler: handleDelete,
-      show: admin,
+      show: (reseller) => canEditReseller(reseller),
     },
   ];
 
@@ -931,7 +939,12 @@ const FloatingResellersPopover = ({
               }}
             >
               {actions
-                .filter(action => action.show !== false)
+                .filter(action => {
+                  if (typeof action.show === 'function') {
+                    return action.show(selectedReseller);
+                  }
+                  return action.show !== false;
+                })
                 .map((action) => (
                   <MenuItem
                     key={action.key}
