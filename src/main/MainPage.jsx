@@ -65,12 +65,14 @@ import {
   AiOutlineSend, 
   AiOutlineSound, 
   AiOutlineUsergroupAdd,
-  AiOutlineCar,
   AiOutlineCalendar
 } from "react-icons/ai";
 import { 
   HiOutlineWrenchScrewdriver,
 } from "react-icons/hi2";
+import { 
+  IoCarSportOutline
+} from "react-icons/io5";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HelpIcon from '@mui/icons-material/Help';
@@ -2087,7 +2089,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <AiOutlineCar style={{ fontSize: 18, color: colors.textSecondary }} />
+              <IoCarSportOutline style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -6860,7 +6862,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <AiOutlineCar style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <IoCarSportOutline style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedDrivers')}
                     </button>
                   )}
