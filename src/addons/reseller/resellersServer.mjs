@@ -137,10 +137,38 @@ const enableNginxSite = async (appUrl) => {
 };
 
 // Helper function to reload nginx
-const reloadNginx = async () => {
+const reloadNginx = async (domain = 'unknown') => {
   try {
-    await execAsync('service nginx reload');
+    logStep(domain, 'NGINX_RELOAD_START', 'Attempting to reload nginx');
+    
+    // Try different nginx reload commands
+    try {
+      logStep(domain, 'NGINX_RELOAD_SYSTEMCTL', 'Trying systemctl reload nginx');
+      await execAsync('systemctl reload nginx');
+      logStep(domain, 'NGINX_RELOAD_SYSTEMCTL_SUCCESS', 'systemctl reload nginx succeeded');
+    } catch (systemctlError) {
+      logStep(domain, 'NGINX_RELOAD_SYSTEMCTL_FAILED', 'systemctl reload nginx failed, trying service command', systemctlError);
+      try {
+        logStep(domain, 'NGINX_RELOAD_SERVICE', 'Trying service nginx reload');
+        await execAsync('service nginx reload');
+        logStep(domain, 'NGINX_RELOAD_SERVICE_SUCCESS', 'service nginx reload succeeded');
+      } catch (serviceError) {
+        logStep(domain, 'NGINX_RELOAD_SERVICE_FAILED', 'service nginx reload failed, trying nginx -s reload', serviceError);
+        try {
+          logStep(domain, 'NGINX_RELOAD_DIRECT', 'Trying nginx -s reload');
+          await execAsync('nginx -s reload');
+          logStep(domain, 'NGINX_RELOAD_DIRECT_SUCCESS', 'nginx -s reload succeeded');
+        } catch (nginxError) {
+          logStep(domain, 'NGINX_RELOAD_DIRECT_FAILED', 'nginx -s reload failed, trying systemctl restart', nginxError);
+          // If all fail, try to restart nginx
+          logStep(domain, 'NGINX_RESTART', 'Trying systemctl restart nginx');
+          await execAsync('systemctl restart nginx');
+          logStep(domain, 'NGINX_RESTART_SUCCESS', 'systemctl restart nginx succeeded');
+        }
+      }
+    }
   } catch (error) {
+    logStep(domain, 'NGINX_RELOAD_FAILED', 'All nginx reload methods failed', error);
     console.error('❌ Error reloading nginx:', error);
     throw error;
   }
@@ -164,7 +192,7 @@ const setupSSL = async (appUrl, email = 'admin@example.com') => {
     
     // Reload nginx after SSL setup
     logStep(appUrl, 'NGINX_RELOAD_SSL', 'Reloading nginx after SSL setup');
-    await reloadNginx();
+    await reloadNginx(appUrl);
     logStep(appUrl, 'NGINX_RELOAD_SSL_SUCCESS', 'Nginx reloaded successfully after SSL setup');
     
   } catch (error) {
@@ -243,7 +271,7 @@ const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') =>
     
     // Step 3: Reload nginx
     try {
-      await reloadNginx();
+      await reloadNginx(appUrl);
       logStep(appUrl, 'NGINX_RELOAD', 'Nginx reloaded successfully');
     } catch (error) {
       logStep(appUrl, 'NGINX_RELOAD', 'Failed to reload nginx', error);
