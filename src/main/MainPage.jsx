@@ -58,6 +58,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FolderIcon from '@mui/icons-material/Folder';
+import GroupsIcon from '@mui/icons-material/Groups';
 import PersonIcon from '@mui/icons-material/Person';
 import StorageIcon from '@mui/icons-material/Storage';
 import BuildIcon from '@mui/icons-material/Build';
@@ -2012,7 +2013,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <FolderIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <GroupsIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -6817,7 +6818,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <FolderIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <GroupsIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsGroups')}
                     </button>
                   )}
