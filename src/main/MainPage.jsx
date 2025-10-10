@@ -55,6 +55,8 @@ import {
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CropIcon from '@mui/icons-material/Crop';
+import { TbSteeringWheel } from "react-icons/tb";
+import { AiOutlineCloudServer } from "react-icons/ai";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -2081,7 +2083,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <TbSteeringWheel style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2625,7 +2627,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineCloudServer style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -6854,7 +6856,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <PersonIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <TbSteeringWheel style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedDrivers')}
                     </button>
                   )}
@@ -7142,7 +7144,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <StorageIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineCloudServer style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsServer')}
                     </button>
                   )}
