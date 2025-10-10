@@ -58,6 +58,7 @@ import CropIcon from '@mui/icons-material/Crop';
 import { TbSteeringWheel } from "react-icons/tb";
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { HiMiniCubeTransparent } from "react-icons/hi2";
+import { PiMapPinAreaLight } from "react-icons/pi";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -67,7 +68,6 @@ import BuildIcon from '@mui/icons-material/Build';
 import PeopleIcon from '@mui/icons-material/People';
 import TodayIcon from '@mui/icons-material/Today';
 import PublishIcon from '@mui/icons-material/Publish';
-import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
@@ -1947,7 +1947,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <SmartphoneIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <PiMapPinAreaLight style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -6784,7 +6784,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <SmartphoneIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <PiMapPinAreaLight style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('deviceTitle')}
                     </button>
                   )}
