@@ -1,11 +1,13 @@
 import { useSelector } from 'react-redux';
 import { getLogoUrl } from '../common/util/resellerBranding';
+import { useThemeColors } from '../common/components/ThemeProvider';
 
 const LogoImage = ({ color }) => {
   const logo = useSelector((state) => state.session.server?.attributes?.logo);
   const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
   const resellerBranding = useSelector((state) => state.session.resellerBranding);
   const resellerBrandingLoaded = useSelector((state) => state.session.resellerBrandingLoaded);
+  const colors = useThemeColors();
   
   // Check if we have server data (which means the app has loaded)
   const serverLoaded = useSelector((state) => !!state.session.server);
@@ -30,19 +32,30 @@ const LogoImage = ({ color }) => {
     );
   }
   
-  // If reseller branding is still loading, don't render anything to prevent fallback logo flash
+  // If reseller branding is still loading, show circular progress
   if (!resellerBrandingLoaded) {
     return (
       <div className="flex justify-center items-center p-4">
         <div 
-          className="w-auto h-auto object-contain"
+          className="w-auto h-auto object-contain flex items-center justify-center"
           style={{ 
             maxWidth: '300px', 
             maxHeight: '100px',
             width: 'auto',
             height: 'auto'
           }}
-        />
+        >
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              border: `3px solid ${colors.border}`,
+              borderTop: `3px solid ${colors.primary}`,
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -59,7 +72,8 @@ const LogoImage = ({ color }) => {
             maxWidth: '300px', 
             maxHeight: '100px',
             width: 'auto',
-            height: 'auto'
+            height: 'auto',
+            animation: 'fadeIn 0.3s ease-in-out'
           }}
           onError={(e) => {
             // If reseller logo fails, fall back to server logo or default

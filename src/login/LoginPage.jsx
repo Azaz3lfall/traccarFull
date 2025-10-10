@@ -96,11 +96,15 @@ const getStyles = (colors) => ({
   },
 });
 
-// Add CSS animation for spinner
+// Add CSS animations for spinner and fade-in
 const spinnerStyle = `
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
 `;
 
