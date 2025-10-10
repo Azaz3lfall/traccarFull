@@ -249,8 +249,8 @@ const FloatingResellersPopover = ({
     setAnchorEl(null);
     
     try {
-      console.log('🔍 Making request to /api/resellers/logs');
-      const response = await fetchOrThrow('/api/resellers/logs', {
+      console.log('🔍 Making request to', resellersConfig.ENDPOINTS.LOGS);
+      const response = await fetchOrThrow(resellersConfig.ENDPOINTS.LOGS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: reseller.appUrl }),
