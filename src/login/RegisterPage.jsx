@@ -415,11 +415,6 @@ const RegisterPage = () => {
             color: '#EF4444',
             fontSize: '14px',
             textAlign: 'center',
-            padding: '8px 12px',
-            backgroundColor: colors.secondary,
-            border: `1px solid #EF4444`,
-            borderRadius: '8px',
-            marginBottom: '8px'
           }}>
             {errorMessage}
           </div>
