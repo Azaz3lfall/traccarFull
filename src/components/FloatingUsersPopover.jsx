@@ -395,12 +395,6 @@ const FloatingUsersPopover = ({
     }
   }, [specificUser, userId, isVisible]);
 
-  // Reset active tab if non-admin user switches to editing their own account while on Access Level tab
-  useEffect(() => {
-    if (isEditingOwnAccount && !isCurrentUserAdmin && activeTab === 1) {
-      setActiveTab(0); // Reset to Required tab
-    }
-  }, [isEditingOwnAccount, isCurrentUserAdmin, activeTab]);
 
   // Filter users based on search and temporary status
   const filteredUsers = users.filter(user => {
@@ -1783,19 +1777,8 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Preferences Tab */}
-                    {(() => {
-                      const showForAdmin = (!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 2;
-                      const showForNonAdmin = (isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 1;
-                      console.log('🔍 Preferences Tab Debug:', {
-                        isEditingOwnAccount,
-                        isCurrentUserAdmin,
-                        activeTab,
-                        showForAdmin,
-                        showForNonAdmin,
-                        shouldShow: showForAdmin || showForNonAdmin
-                      });
-                      return showForAdmin || showForNonAdmin;
-                    })() ? (
+                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 2) || 
+                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 1) ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                           value={editingUser.phone || ''}
