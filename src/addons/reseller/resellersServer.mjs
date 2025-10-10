@@ -213,6 +213,8 @@ const setupSSL = async (appUrl, email = 'admin@example.com') => {
 
 // Logging helper function
 const logStep = (domain, step, message, error = null) => {
+  console.log(`🔧 LOGSTEP CALLED: domain=${domain}, step=${step}, message=${message}`);
+  
   const timestamp = new Date().toISOString();
   const logEntry = {
     timestamp,
@@ -222,23 +224,23 @@ const logStep = (domain, step, message, error = null) => {
     error: error ? error.message : null,
     status: error ? 'ERROR' : 'SUCCESS'
   };
-  
+
   console.log(`[${domain}] ${step}: ${message}${error ? ` - ERROR: ${error.message}` : ''}`);
-  
+
   // Store log in memory (in production, you might want to use a database)
   if (!global.resellerLogs) {
     global.resellerLogs = new Map();
     console.log('🔧 Initialized global.resellerLogs Map');
   }
-  
+
   if (!global.resellerLogs.has(domain)) {
     global.resellerLogs.set(domain, []);
     console.log(`🔧 Created log array for domain: ${domain}`);
   }
-  
+
   global.resellerLogs.get(domain).push(logEntry);
   console.log(`🔧 Added log entry for ${domain}. Total logs: ${global.resellerLogs.get(domain).length}`);
-  
+
   // Keep only last 100 logs per domain
   const logs = global.resellerLogs.get(domain);
   if (logs.length > 100) {
@@ -285,6 +287,18 @@ const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') =>
     } catch (sslError) {
       logStep(appUrl, 'SSL_SETUP', 'SSL certificate setup failed', sslError);
       console.error('⚠️ SSL setup failed (non-blocking):', sslError.message);
+    }
+  } catch (nginxError) {
+    logStep(appUrl, 'NGINX_SETUP_FAILED', 'Nginx setup failed, but continuing with SSL setup', nginxError);
+    console.error('⚠️ Nginx setup failed, but continuing with SSL setup:', nginxError.message);
+    
+    // Even if nginx setup fails, try SSL setup to show certbot errors
+    try {
+      await setupSSL(appUrl, billingEmail);
+      logStep(appUrl, 'SSL_SETUP_AFTER_NGINX_FAIL', 'SSL certificate setup completed after nginx failure');
+    } catch (sslError) {
+      logStep(appUrl, 'SSL_SETUP_AFTER_NGINX_FAIL', 'SSL certificate setup failed after nginx failure', sslError);
+      console.error('⚠️ SSL setup failed after nginx failure:', sslError.message);
     }
     
     logStep(appUrl, 'COMPLETE', 'Nginx and SSL setup completed');
@@ -541,6 +555,8 @@ app.post('/api/check-domain', async (req, res) => {
 // POST endpoint for resellers data
 app.post('/api/resellers', upload.any(), async (req, res) => {
   try {
+    console.log('🔧 POST /api/resellers called');
+    console.log('🔧 Request body:', req.body);
     
     let body;
     
