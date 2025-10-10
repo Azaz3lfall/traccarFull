@@ -96,8 +96,10 @@ const FloatingUsersPopover = ({
   
   // Helper function to get correct tab index based on whether Access Level tab is shown
   const getTabIndex = (baseIndex) => {
-    if (isEditingOwnAccount && !isCurrentUserAdmin && baseIndex > 1) {
-      return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden for non-admin users
+    // If Access Level tab is hidden, shift indices down by 1
+    const isAccessLevelTabHidden = isEditingOwnAccount && !isCurrentUserAdmin;
+    if (isAccessLevelTabHidden && baseIndex > 1) {
+      return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden
     }
     return baseIndex;
   };
