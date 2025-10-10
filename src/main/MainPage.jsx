@@ -54,7 +54,6 @@ import {
   Moon
 } from 'lucide-react';
 import CropIcon from '@mui/icons-material/Crop';
-import { TbSteeringWheel } from "react-icons/tb";
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { HiMiniCubeTransparent } from "react-icons/hi2";
 import { PiMapPinAreaLight } from "react-icons/pi";
@@ -63,14 +62,17 @@ import {
   AiOutlineTeam, 
   AiOutlineUser, 
   AiOutlineDatabase, 
-  AiOutlineTool, 
   AiOutlineSend, 
   AiOutlineSound, 
-  AiOutlineUsergroupAdd 
+  AiOutlineUsergroupAdd,
+  AiOutlineCar,
+  AiOutlineCalendar
 } from "react-icons/ai";
+import { 
+  HiOutlineWrenchScrewdriver,
+} from "react-icons/hi2";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import TodayIcon from '@mui/icons-material/Today';
 import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -2085,7 +2087,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <TbSteeringWheel style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineCar style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2153,7 +2155,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <TodayIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineCalendar style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2289,7 +2291,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <AiOutlineTool style={{ fontSize: 18, color: colors.textSecondary }} />
+              <HiOutlineWrenchScrewdriver style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -6858,7 +6860,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <TbSteeringWheel style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineCar style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedDrivers')}
                     </button>
                   )}
@@ -6894,7 +6896,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <TodayIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineCalendar style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedCalendars')}
                     </button>
                   )}
@@ -6966,7 +6968,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <AiOutlineTool style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <HiOutlineWrenchScrewdriver style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedMaintenance')}
                     </button>
                   )}
