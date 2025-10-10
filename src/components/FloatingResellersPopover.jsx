@@ -240,27 +240,36 @@ const FloatingResellersPopover = ({
   };
 
   const handleLogs = async (reseller) => {
+    console.log('🔍 Opening logs for reseller:', reseller);
+    console.log('🔍 Domain:', reseller.appUrl);
+    
     setSelectedReseller(reseller);
     setLogsDialog(true);
     setLogsLoading(true);
     setAnchorEl(null);
     
     try {
+      console.log('🔍 Making request to /api/resellers/logs');
       const response = await fetchOrThrow('/api/resellers/logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: reseller.appUrl }),
       });
       
+      console.log('🔍 Response status:', response.status);
+      console.log('🔍 Response ok:', response.ok);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 Response data:', data);
+        console.log('🔍 Logs count:', data.logs?.length || 0);
         setLogs(data.logs || []);
       } else {
-        console.error('Failed to fetch logs');
+        console.error('❌ Failed to fetch logs, status:', response.status);
         setLogs([]);
       }
     } catch (error) {
-      console.error('Error fetching logs:', error);
+      console.error('❌ Error fetching logs:', error);
       setLogs([]);
     } finally {
       setLogsLoading(false);
