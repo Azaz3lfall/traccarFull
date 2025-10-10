@@ -98,14 +98,6 @@ const FloatingUsersPopover = ({
   const getTabIndex = (baseIndex) => {
     // If Access Level tab is hidden, shift indices down by 1
     const isAccessLevelTabHidden = isEditingOwnAccount && !isCurrentUserAdmin;
-    console.log('🔍 getTabIndex debug:', {
-      baseIndex,
-      isEditingOwnAccount,
-      isCurrentUserAdmin,
-      isAccessLevelTabHidden,
-      activeTab,
-      result: isAccessLevelTabHidden && baseIndex > 1 ? baseIndex - 1 : baseIndex
-    });
     if (isAccessLevelTabHidden && baseIndex > 1) {
       return baseIndex - 1; // Shift indices down by 1 when Access Level tab is hidden
     }
@@ -1791,7 +1783,8 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Preferences Tab */}
-                    {activeTab === getTabIndex(2) && (
+                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 2) || 
+                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 1) ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                           value={editingUser.phone || ''}
@@ -1923,10 +1916,11 @@ const FloatingUsersPopover = ({
                       fullWidth
                         />
                       </div>
-                    )}
+                    ) : null}
 
                     {/* Location Tab */}
-                    {activeTab === getTabIndex(3) && (
+                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 3) || 
+                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 2) ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <TextField
                           type="number"
@@ -1950,10 +1944,11 @@ const FloatingUsersPopover = ({
                           fullWidth
                         />
                       </div>
-                    )}
+                    ) : null}
 
                     {/* Permissions Tab */}
-                    {activeTab === getTabIndex(4) && (
+                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 4) || 
+                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 3) ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                       label={t('userExpirationTime')}
@@ -2021,10 +2016,11 @@ const FloatingUsersPopover = ({
                       />
                     </FormGroup>
                       </div>
-                    )}
+                    ) : null}
 
                     {/* Attributes Tab */}
-                    {activeTab === getTabIndex(5) && (
+                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 5) || 
+                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 4) ? (
                       <div>
                         <EditAttributesAccordion
                           attribute={null}
@@ -2035,7 +2031,7 @@ const FloatingUsersPopover = ({
                           zIndex={10003}
                         />
                       </div>
-                    )}
+                    ) : null}
                   </Box>
                   </>
                 )}
