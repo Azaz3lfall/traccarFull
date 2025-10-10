@@ -755,6 +755,17 @@
   "customSensorsImportedSuccessfully": "تم استيراد أجهزة الاستشعار المخصصة من ملف .tpl وحفظها وإعادة التحقق منها بنجاح!",
   "invalidTplFileFormat": "تنسيق ملف .tpl غير صالح.",
   "noEventsAvailable": "لا توجد أحداث متاحة",
+  "sharedAccessLevel": "مستوى الوصول",
+  "accessLevelEditSensors": "تحرير أجهزة الاستشعار",
+  "accessLevelStopEngine": "إيقاف المحرك",
+  "accessLevelResumeEngine": "استئناف المحرك",
+  "accessLevelReplay": "إعادة التشغيل",
+  "accessLevelSendCommand": "إرسال أمر",
+  "accessLevelShareDevice": "مشاركة الجهاز",
+  "accessLevelAnchor": "المرساة",
+  "accessLevelTotalDistance": "المسافة الإجمالية",
+  "accessLevelHours": "الساعات",
+  "sharedCheckAll": "تحديد الكل",
   "accessLevelChangePicture": "تغيير الصورة",
   "accessLevelMoreInfo": "معلومات أكثر"
 }

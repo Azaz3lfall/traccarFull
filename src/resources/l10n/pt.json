@@ -760,7 +760,7 @@
   "accessLevelEditSensors": "Editar Sensores",
   "accessLevelStopEngine": "Parar Motor",
   "accessLevelResumeEngine": "Retomar Motor",
-  "accessLevelReplay": "Replay",
+  "accessLevelReplay": "Replay Trajeto",
   "accessLevelSendCommand": "Enviar Comando",
   "accessLevelShareDevice": "Compartilhar Dispositivo",
   "accessLevelAnchor": "Âncora",
