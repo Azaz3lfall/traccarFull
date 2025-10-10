@@ -200,13 +200,16 @@ const logStep = (domain, step, message, error = null) => {
   // Store log in memory (in production, you might want to use a database)
   if (!global.resellerLogs) {
     global.resellerLogs = new Map();
+    console.log('🔧 Initialized global.resellerLogs Map');
   }
   
   if (!global.resellerLogs.has(domain)) {
     global.resellerLogs.set(domain, []);
+    console.log(`🔧 Created log array for domain: ${domain}`);
   }
   
   global.resellerLogs.get(domain).push(logEntry);
+  console.log(`🔧 Added log entry for ${domain}. Total logs: ${global.resellerLogs.get(domain).length}`);
   
   // Keep only last 100 logs per domain
   const logs = global.resellerLogs.get(domain);
@@ -748,6 +751,9 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       // Write JSON file
       fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
       
+      // Log reseller creation
+      logStep(body.appUrl, 'RESELLER_CREATED', `Reseller created successfully for domain: ${body.appUrl}`);
+      
       // Setup nginx configuration and SSL (non-blocking)
       setupResellerNginx(body.appUrl, body.billingEmail || 'admin@example.com');
       
@@ -862,6 +868,9 @@ app.put('/api/resellers/:id', async (req, res) => {
         // Write JSON file
         fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
         
+        // Log reseller update
+        logStep(updatedData.appUrl, 'RESELLER_UPDATED', `Reseller updated successfully for domain: ${updatedData.appUrl}`);
+        
         // Setup nginx configuration and SSL if appUrl was updated (non-blocking)
         if (body.appUrl && body.appUrl.trim() !== '' && body.appUrl !== existingReseller.appUrl) {
           setupResellerNginx(body.appUrl, body.billingEmail || existingReseller.billingEmail || 'admin@example.com');
@@ -889,6 +898,9 @@ app.post('/api/resellers/logs', async (req, res) => {
   try {
     const { domain } = req.body;
     
+    console.log(`🔍 Logs request for domain: ${domain}`);
+    console.log(`🔍 global.resellerLogs exists: ${!!global.resellerLogs}`);
+    
     if (!domain) {
       return res.status(400).json({
         error: 'domain is required',
@@ -898,6 +910,11 @@ app.post('/api/resellers/logs', async (req, res) => {
 
     // Get logs for the domain
     const logs = global.resellerLogs ? global.resellerLogs.get(domain) || [] : [];
+    console.log(`🔍 Found ${logs.length} logs for domain: ${domain}`);
+    
+    if (global.resellerLogs) {
+      console.log(`🔍 All domains in logs: ${Array.from(global.resellerLogs.keys())}`);
+    }
     
     // Sort logs by timestamp (newest first)
     const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
