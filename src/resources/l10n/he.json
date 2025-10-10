@@ -769,7 +769,5 @@
   "sharedCheckAll": "בחר הכל",
   "accessLevelChangePicture": "שנה תמונה",
   "accessLevelMoreInfo": "מידע נוסף",
-  "userEmailAlreadyExists": "האימייל כבר בשימוש",
-  "userValidationError": "נתוני רישום לא תקינים",
-  "userRegistrationError": "הרישום נכשל. נסה שוב."
+  "userEmailAlreadyExists": "האימייל כבר בשימוש"
 }

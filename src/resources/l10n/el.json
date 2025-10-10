@@ -769,7 +769,5 @@
   "sharedCheckAll": "Επιλογή Όλων",
   "accessLevelChangePicture": "Αλλαγή εικόνας",
   "accessLevelMoreInfo": "Περισσότερες πληροφορίες",
-  "userEmailAlreadyExists": "Το email χρησιμοποιείται ήδη",
-  "userValidationError": "Μη έγκυρα δεδομένα εγγραφής",
-  "userRegistrationError": "Η εγγραφή απέτυχε. Δοκιμάστε ξανά."
+  "userEmailAlreadyExists": "Το email χρησιμοποιείται ήδη"
 }

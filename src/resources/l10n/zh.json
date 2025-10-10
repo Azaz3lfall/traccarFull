@@ -768,7 +768,5 @@
   "sharedCheckAll": "全选",
   "accessLevelChangePicture": "更改图片",
   "accessLevelMoreInfo": "更多信息",
-  "userEmailAlreadyExists": "邮箱已被使用",
-  "userValidationError": "注册数据无效",
-  "userRegistrationError": "注册失败。请重试。"
+  "userEmailAlreadyExists": "邮箱已被使用"
 }

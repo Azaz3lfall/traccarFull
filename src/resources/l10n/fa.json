@@ -765,7 +765,5 @@
   "sharedCheckAll": "انتخاب همه",
   "accessLevelChangePicture": "تغییر تصویر",
   "accessLevelMoreInfo": "اطلاعات بیشتر",
-  "userEmailAlreadyExists": "ایمیل قبلاً استفاده شده است",
-  "userValidationError": "داده‌های ثبت نام نامعتبر",
-  "userRegistrationError": "ثبت نام ناموفق بود. دوباره تلاش کنید."
+  "userEmailAlreadyExists": "ایمیل قبلاً استفاده شده است"
 }

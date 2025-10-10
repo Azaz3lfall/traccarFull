@@ -765,7 +765,5 @@
   "sharedCheckAll": "Vel Alle",
   "accessLevelChangePicture": "Endre Bilde",
   "accessLevelMoreInfo": "Meir Informasjon",
-  "userEmailAlreadyExists": "E-post er allereie i bruk",
-  "userValidationError": "Ugyldige registreringsdata",
-  "userRegistrationError": "Registrering mislyktes. Prøv igjen."
+  "userEmailAlreadyExists": "E-post er allereie i bruk"
 }

@@ -765,7 +765,5 @@
   "sharedCheckAll": "Vybrať Všetko",
   "accessLevelChangePicture": "Zmeniť obrázok",
   "accessLevelMoreInfo": "Viac informácií",
-  "userEmailAlreadyExists": "E-mail sa už používa",
-  "userValidationError": "Neplatné registračné údaje",
-  "userRegistrationError": "Registrácia sa nepodarila. Skúste to znovu."
+  "userEmailAlreadyExists": "E-mail sa už používa"
 }

@@ -765,7 +765,5 @@
   "sharedCheckAll": "Barchasini Tanlash",
   "accessLevelChangePicture": "Rasmni O'zgartirish",
   "accessLevelMoreInfo": "Qo'shimcha Ma'lumot",
-  "userEmailAlreadyExists": "E-pochta allaqachon ishlatilmoqda",
-  "userValidationError": "Noto'g'ri ro'yxatdan o'tish ma'lumotlari",
-  "userRegistrationError": "Ro'yxatdan o'tish muvaffaqiyatsiz. Qayta urinib ko'ring."
+  "userEmailAlreadyExists": "E-pochta allaqachon ishlatilmoqda"
 }

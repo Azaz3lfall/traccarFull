@@ -769,7 +769,5 @@
   "sharedCheckAll": "Вибрати Все",
   "accessLevelChangePicture": "Змінити зображення",
   "accessLevelMoreInfo": "Більше інформації",
-  "userEmailAlreadyExists": "Електронна пошта вже використовується",
-  "userValidationError": "Невірні дані реєстрації",
-  "userRegistrationError": "Реєстрація не вдалася. Спробуйте знову."
+  "userEmailAlreadyExists": "Електронна пошта вже використовується"
 }

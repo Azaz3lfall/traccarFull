@@ -769,7 +769,5 @@
   "sharedCheckAll": "Seleccionar Tot",
   "accessLevelChangePicture": "Canviar imatge",
   "accessLevelMoreInfo": "Més informació",
-  "userEmailAlreadyExists": "L'email ja està en ús",
-  "userValidationError": "Dades de registre invàlides",
-  "userRegistrationError": "Error en el registre. Torna-ho a intentar."
+  "userEmailAlreadyExists": "L'email ja està en ús"
 }

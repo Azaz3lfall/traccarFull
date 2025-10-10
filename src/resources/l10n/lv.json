@@ -765,7 +765,5 @@
   "sharedCheckAll": "Atlasīt Visus",
   "accessLevelChangePicture": "Mainīt attēlu",
   "accessLevelMoreInfo": "Vairāk informācijas",
-  "userEmailAlreadyExists": "E-pasts jau tiek izmantots",
-  "userValidationError": "Nederīgi reģistrācijas dati",
-  "userRegistrationError": "Reģistrācija neizdevās. Mēģiniet vēlreiz."
+  "userEmailAlreadyExists": "E-pasts jau tiek izmantots"
 }

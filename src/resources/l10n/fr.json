@@ -768,7 +768,5 @@
   "sharedCheckAll": "Tout Sélectionner",
   "accessLevelChangePicture": "Changer l'image",
   "accessLevelMoreInfo": "Plus d'informations",
-  "userEmailAlreadyExists": "L'adresse e-mail est déjà utilisée",
-  "userValidationError": "Données d'inscription invalides",
-  "userRegistrationError": "Échec de l'inscription. Veuillez réessayer."
+  "userEmailAlreadyExists": "L'adresse e-mail est déjà utilisée"
 }

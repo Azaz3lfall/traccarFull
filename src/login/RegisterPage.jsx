@@ -62,15 +62,13 @@ const RegisterPage = () => {
         const errorText = await response.text();
         if (response.status === 409 || errorText.includes('already exists') || errorText.includes('duplicate')) {
           setErrorMessage(t('userEmailAlreadyExists') || 'Email already in use');
-        } else if (response.status === 400) {
-          setErrorMessage(t('userValidationError') || 'Invalid registration data');
         } else {
-          setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
+          setErrorMessage('Registration failed. Please try again.');
         }
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
+      setErrorMessage('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

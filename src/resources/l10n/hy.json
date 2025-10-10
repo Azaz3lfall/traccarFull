@@ -765,7 +765,5 @@
   "sharedCheckAll": "Ընտրել Բոլորը",
   "accessLevelChangePicture": "Փոխել Նկարը",
   "accessLevelMoreInfo": "Ավելի Շատ Տեղեկություն",
-  "userEmailAlreadyExists": "Էլ. փոստը արդեն օգտագործվում է",
-  "userValidationError": "Անվավեր գրանցման տվյալներ",
-  "userRegistrationError": "Գրանցումը ձախողվեց: Կրկին փորձեք:"
+  "userEmailAlreadyExists": "Էլ. փոստը արդեն օգտագործվում է"
 }

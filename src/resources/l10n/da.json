@@ -769,7 +769,5 @@
   "sharedCheckAll": "Vælg Alle",
   "accessLevelChangePicture": "Skift billede",
   "accessLevelMoreInfo": "Mere information",
-  "userEmailAlreadyExists": "E-mail er allerede i brug",
-  "userValidationError": "Ugyldige registreringsdata",
-  "userRegistrationError": "Registrering mislykkedes. Prøv igen."
+  "userEmailAlreadyExists": "E-mail er allerede i brug"
 }

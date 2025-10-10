@@ -765,7 +765,5 @@
   "sharedCheckAll": "සියල්ල තෝරන්න",
   "accessLevelChangePicture": "රූපය වෙනස් කරන්න",
   "accessLevelMoreInfo": "වැඩිදුර තොරතුරු",
-  "userEmailAlreadyExists": "ඊමේල් දැනටමත් භාවිතයේ ඇත",
-  "userValidationError": "වලංගු නොවන ලියාපදිංචි දත්ත",
-  "userRegistrationError": "ලියාපදිංචිය අසාර්ථකයි. නැවත උත්සාහ කරන්න."
+  "userEmailAlreadyExists": "ඊමේල් දැනටමත් භාවිතයේ ඇත"
 }

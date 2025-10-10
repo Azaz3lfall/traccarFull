@@ -768,7 +768,5 @@
   "sharedCheckAll": "모두 선택",
   "accessLevelChangePicture": "이미지 변경",
   "accessLevelMoreInfo": "추가 정보",
-  "userEmailAlreadyExists": "이메일이 이미 사용 중입니다",
-  "userValidationError": "유효하지 않은 등록 데이터",
-  "userRegistrationError": "등록에 실패했습니다. 다시 시도해주세요."
+  "userEmailAlreadyExists": "이메일이 이미 사용 중입니다"
 }

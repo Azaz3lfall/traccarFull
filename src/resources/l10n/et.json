@@ -769,7 +769,5 @@
   "sharedCheckAll": "Vali Kõik",
   "accessLevelChangePicture": "Muuda pilti",
   "accessLevelMoreInfo": "Rohkem infot",
-  "userEmailAlreadyExists": "E-post on juba kasutusel",
-  "userValidationError": "Vigased registreerimisandmed",
-  "userRegistrationError": "Registreerimine ebaõnnestus. Proovige uuesti."
+  "userEmailAlreadyExists": "E-post on juba kasutusel"
 }

@@ -765,7 +765,5 @@
   "sharedCheckAll": "Chagua Zote",
   "accessLevelChangePicture": "Badilisha Picha",
   "accessLevelMoreInfo": "Maelezo Zaidi",
-  "userEmailAlreadyExists": "Barua pepe tayari inatumika",
-  "userValidationError": "Data ya usajili si sahihi",
-  "userRegistrationError": "Usajili ulishindwa. Jaribu tena."
+  "userEmailAlreadyExists": "Barua pepe tayari inatumika"
 }
