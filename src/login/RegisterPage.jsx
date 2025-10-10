@@ -34,6 +34,8 @@ const RegisterPage = () => {
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
   const [showQr, setShowQr] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffectAsync(async () => {
     if (totpForce) {
@@ -44,15 +46,33 @@ const RegisterPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrorMessage('');
+    setIsLoading(true);
+    
     try {
-      await fetchOrThrow('/api/users', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, totpKey }),
       });
-      setSnackbarOpen(true);
+      
+      if (response.ok) {
+        setSnackbarOpen(true);
+      } else {
+        const errorText = await response.text();
+        if (response.status === 409 || errorText.includes('already exists') || errorText.includes('duplicate')) {
+          setErrorMessage(t('userEmailAlreadyExists') || 'Email already in use');
+        } else if (response.status === 400) {
+          setErrorMessage(t('userValidationError') || 'Invalid registration data');
+        } else {
+          setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
+        }
+      }
     } catch (error) {
       console.error('Registration error:', error);
+      setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -390,10 +410,27 @@ const RegisterPage = () => {
             </div>
           </div>
         )}
+        
+        {/* Error message */}
+        {errorMessage && (
+          <div style={{
+            color: '#EF4444',
+            fontSize: '14px',
+            textAlign: 'center',
+            padding: '8px 12px',
+            backgroundColor: colors.secondary,
+            border: `1px solid #EF4444`,
+            borderRadius: '8px',
+            marginBottom: '8px'
+          }}>
+            {errorMessage}
+          </div>
+        )}
+        
         <Button
           onClick={handleSubmit}
           type="submit"
-          disabled={!name || !password || !(server.newServer || /(.+)@(.+)\.(.{2,})/.test(email))}
+          disabled={!name || !password || !(server.newServer || /(.+)@(.+)\.(.{2,})/.test(email)) || isLoading}
           className="w-full mt-5"
           style={{
             backgroundColor: colors.primary,
@@ -406,19 +443,38 @@ const RegisterPage = () => {
             height: '48px',
             transition: 'all 0.2s ease',
             boxShadow: colors.shadow,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.hover;
-            e.target.style.transform = 'translateY(-1px)';
-            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            if (!isLoading) {
+              e.target.style.backgroundColor = colors.hover;
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = colors.primary;
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = colors.shadow;
+            if (!isLoading) {
+              e.target.style.backgroundColor = colors.primary;
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = colors.shadow;
+            }
           }}
         >
-          {t('loginRegister')}
+          {isLoading ? (
+            <div style={{
+              width: '20px',
+              height: '20px',
+              border: `2px solid ${colors.text}20`,
+              borderTop: `2px solid ${colors.text}`,
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+          ) : (
+            t('loginRegister')
+          )}
         </Button>
       </div>
 

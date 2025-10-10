@@ -774,5 +774,8 @@
   "accessLevelTotalDistance": "Total Distance",
   "accessLevelHours": "Hours",
   "accessLevelChangePicture": "Change Picture",
-  "accessLevelMoreInfo": "More Info"
+  "accessLevelMoreInfo": "More Info",
+  "userEmailAlreadyExists": "Email already in use",
+  "userValidationError": "Invalid registration data",
+  "userRegistrationError": "Registration failed. Please try again."
 }
