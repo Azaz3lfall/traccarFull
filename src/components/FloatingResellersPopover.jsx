@@ -968,10 +968,10 @@ const FloatingResellersPopover = ({
                   onClick={() => setLogsDialog(false)}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8, y: -50 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, y: -50 }}
-                    transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -50, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
                     style={{
                       backgroundColor: colors.surface,
                       borderRadius: '16px',
