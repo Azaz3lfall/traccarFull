@@ -149,39 +149,117 @@ const reloadNginx = async () => {
 // Helper function to setup SSL with certbot
 const setupSSL = async (appUrl, email = 'admin@example.com') => {
   try {
+    logStep(appUrl, 'SSL_START', 'Starting SSL certificate setup with certbot');
+    
     // Run certbot with non-interactive flags
     const certbotCommand = `certbot --nginx -d ${appUrl} --non-interactive --agree-tos --email ${email} --redirect`;
-    await execAsync(certbotCommand);
+    logStep(appUrl, 'CERTBOT_COMMAND', `Running: ${certbotCommand}`);
+    
+    const result = await execAsync(certbotCommand);
+    logStep(appUrl, 'CERTBOT_SUCCESS', 'Certbot command executed successfully');
+    
+    if (result.stdout) {
+      logStep(appUrl, 'CERTBOT_OUTPUT', `Certbot output: ${result.stdout}`);
+    }
     
     // Reload nginx after SSL setup
+    logStep(appUrl, 'NGINX_RELOAD_SSL', 'Reloading nginx after SSL setup');
     await reloadNginx();
+    logStep(appUrl, 'NGINX_RELOAD_SSL_SUCCESS', 'Nginx reloaded successfully after SSL setup');
+    
   } catch (error) {
+    logStep(appUrl, 'SSL_ERROR', 'SSL certificate setup failed', error);
+    
+    // Log detailed error information
+    if (error.stdout) {
+      logStep(appUrl, 'CERTBOT_STDOUT', `Certbot stdout: ${error.stdout}`);
+    }
+    if (error.stderr) {
+      logStep(appUrl, 'CERTBOT_STDERR', `Certbot stderr: ${error.stderr}`);
+    }
+    
     console.error('❌ Error setting up SSL:', error);
     throw error;
+  }
+};
+
+// Logging helper function
+const logStep = (domain, step, message, error = null) => {
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    domain,
+    step,
+    message,
+    error: error ? error.message : null,
+    status: error ? 'ERROR' : 'SUCCESS'
+  };
+  
+  console.log(`[${domain}] ${step}: ${message}${error ? ` - ERROR: ${error.message}` : ''}`);
+  
+  // Store log in memory (in production, you might want to use a database)
+  if (!global.resellerLogs) {
+    global.resellerLogs = new Map();
+  }
+  
+  if (!global.resellerLogs.has(domain)) {
+    global.resellerLogs.set(domain, []);
+  }
+  
+  global.resellerLogs.get(domain).push(logEntry);
+  
+  // Keep only last 100 logs per domain
+  const logs = global.resellerLogs.get(domain);
+  if (logs.length > 100) {
+    logs.splice(0, logs.length - 100);
   }
 };
 
 // Main function to setup nginx and SSL for a reseller
 const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') => {
   try {
+    logStep(appUrl, 'START', 'Starting nginx and SSL setup');
     
     // Step 1: Create nginx configuration
-    await createNginxConfig(appUrl);
+    try {
+      await createNginxConfig(appUrl);
+      logStep(appUrl, 'NGINX_CONFIG', 'Nginx configuration created successfully');
+    } catch (error) {
+      logStep(appUrl, 'NGINX_CONFIG', 'Failed to create nginx configuration', error);
+      throw error;
+    }
     
     // Step 2: Enable the site
-    await enableNginxSite(appUrl);
+    try {
+      await enableNginxSite(appUrl);
+      logStep(appUrl, 'NGINX_ENABLE', 'Nginx site enabled successfully');
+    } catch (error) {
+      logStep(appUrl, 'NGINX_ENABLE', 'Failed to enable nginx site', error);
+      throw error;
+    }
     
     // Step 3: Reload nginx
-    await reloadNginx();
+    try {
+      await reloadNginx();
+      logStep(appUrl, 'NGINX_RELOAD', 'Nginx reloaded successfully');
+    } catch (error) {
+      logStep(appUrl, 'NGINX_RELOAD', 'Failed to reload nginx', error);
+      throw error;
+    }
     
     // Step 4: Setup SSL (with error handling - don't break if SSL fails)
     try {
       await setupSSL(appUrl, billingEmail);
+      logStep(appUrl, 'SSL_SETUP', 'SSL certificate setup completed successfully');
     } catch (sslError) {
+      logStep(appUrl, 'SSL_SETUP', 'SSL certificate setup failed', sslError);
       console.error('⚠️ SSL setup failed (non-blocking):', sslError.message);
     }
     
+    logStep(appUrl, 'COMPLETE', 'Nginx and SSL setup completed');
+    
   } catch (error) {
+    logStep(appUrl, 'FAILED', 'Nginx setup failed', error);
     console.error('❌ Error in nginx setup (non-blocking):', error.message);
     // Don't throw - this is non-blocking
   }
@@ -804,6 +882,42 @@ app.put('/api/resellers/:id', async (req, res) => {
             timestamp: new Date().toISOString()
         });
     }
+});
+
+// GET endpoint for reseller logs
+app.post('/api/resellers/logs', async (req, res) => {
+  try {
+    const { domain } = req.body;
+    
+    if (!domain) {
+      return res.status(400).json({
+        error: 'domain is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Get logs for the domain
+    const logs = global.resellerLogs ? global.resellerLogs.get(domain) || [] : [];
+    
+    // Sort logs by timestamp (newest first)
+    const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    res.json({
+      success: true,
+      domain: domain,
+      logs: sortedLogs,
+      count: sortedLogs.length,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Error fetching reseller logs:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // DELETE endpoint for resellers - POST for security

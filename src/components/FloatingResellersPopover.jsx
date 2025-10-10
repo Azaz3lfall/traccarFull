@@ -50,6 +50,7 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Save as SaveIcon,
+  BugReport as BugReportIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -82,6 +83,9 @@ const FloatingResellersPopover = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [resellerToDelete, setResellerToDelete] = useState(null);
+  const [logsDialog, setLogsDialog] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [editingReseller, setEditingReseller] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -233,6 +237,34 @@ const FloatingResellersPopover = ({
     setResellerToDelete(reseller);
     setDeleteDialog(true);
     setAnchorEl(null);
+  };
+
+  const handleLogs = async (reseller) => {
+    setSelectedReseller(reseller);
+    setLogsDialog(true);
+    setLogsLoading(true);
+    setAnchorEl(null);
+    
+    try {
+      const response = await fetchOrThrow('/api/resellers/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: reseller.appUrl }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setLogs(data.logs || []);
+      } else {
+        console.error('Failed to fetch logs');
+        setLogs([]);
+      }
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      setLogs([]);
+    } finally {
+      setLogsLoading(false);
+    }
   };
 
   // Handle delete confirmation
@@ -547,6 +579,13 @@ const FloatingResellersPopover = ({
       title: t('sharedEdit'),
       icon: <EditIcon fontSize="small" />,
       handler: handleEdit,
+      show: admin,
+    },
+    {
+      key: 'logs',
+      title: 'Logs',
+      icon: <BugReportIcon fontSize="small" />,
+      handler: handleLogs,
       show: admin,
     },
     {
@@ -867,6 +906,173 @@ const FloatingResellersPopover = ({
                   </MenuItem>
                 ))}
             </Menu>
+
+            {/* Logs Dialog */}
+            <AnimatePresence>
+              {logsDialog && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    padding: '20px'
+                  }}
+                  onClick={() => setLogsDialog(false)}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: -50 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -50 }}
+                    transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                    style={{
+                      backgroundColor: colors.surface,
+                      borderRadius: '16px',
+                      maxWidth: '800px',
+                      width: '100%',
+                      maxHeight: '80vh',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                      border: `1px solid ${colors.border}`,
+                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div style={{
+                      padding: '20px 24px 16px',
+                      borderBottom: `1px solid ${colors.border}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <div>
+                        <Typography style={{
+                          fontSize: '18px',
+                          fontWeight: '600',
+                          color: colors.text,
+                          margin: 0
+                        }}>
+                          Logs - {selectedReseller?.appUrl}
+                        </Typography>
+                        <Typography style={{
+                          fontSize: '14px',
+                          color: colors.textSecondary,
+                          margin: '4px 0 0 0'
+                        }}>
+                          {logs.length} log entries
+                        </Typography>
+                      </div>
+                      <IconButton
+                        onClick={() => setLogsDialog(false)}
+                        style={{
+                          color: colors.textSecondary,
+                          padding: '8px'
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{
+                      flex: 1,
+                      overflow: 'auto',
+                      padding: '16px 24px 24px'
+                    }}>
+                      {logsLoading ? (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '40px'
+                        }}>
+                          <CircularProgress size={24} style={{ color: colors.primary }} />
+                          <span style={{ marginLeft: '12px', color: colors.text }}>Loading logs...</span>
+                        </div>
+                      ) : logs.length === 0 ? (
+                        <div style={{
+                          textAlign: 'center',
+                          padding: '40px',
+                          color: colors.textSecondary
+                        }}>
+                          No logs available for this domain
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {logs.map((log, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                padding: '12px 16px',
+                                backgroundColor: log.status === 'ERROR' ? '#FEF2F2' : '#F0FDF4',
+                                border: `1px solid ${log.status === 'ERROR' ? '#FECACA' : '#BBF7D0'}`,
+                                borderRadius: '8px',
+                                borderLeft: `4px solid ${log.status === 'ERROR' ? '#EF4444' : '#10B981'}`
+                              }}
+                            >
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '4px'
+                              }}>
+                                <Typography style={{
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  color: log.status === 'ERROR' ? '#DC2626' : '#059669',
+                                  margin: 0
+                                }}>
+                                  {log.step}
+                                </Typography>
+                                <Typography style={{
+                                  fontSize: '11px',
+                                  color: colors.textSecondary,
+                                  margin: 0
+                                }}>
+                                  {new Date(log.timestamp).toLocaleString()}
+                                </Typography>
+                              </div>
+                              <Typography style={{
+                                fontSize: '13px',
+                                color: colors.text,
+                                margin: '4px 0 0 0'
+                              }}>
+                                {log.message}
+                              </Typography>
+                              {log.error && (
+                                <Typography style={{
+                                  fontSize: '12px',
+                                  color: '#DC2626',
+                                  margin: '8px 0 0 0',
+                                  fontFamily: 'monospace',
+                                  backgroundColor: '#FEF2F2',
+                                  padding: '8px',
+                                  borderRadius: '4px',
+                                  border: '1px solid #FECACA'
+                                }}>
+                                  Error: {log.error}
+                                </Typography>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Delete Confirmation Modal */}
             <AnimatePresence>
