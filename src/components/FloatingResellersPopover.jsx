@@ -1052,10 +1052,11 @@ const FloatingResellersPopover = ({
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          padding: '40px'
+                          height: '100%',
+                          gap: '12px'
                         }}>
-                          <CircularProgress size={24} style={{ color: colors.primary }} />
-                          <span style={{ marginLeft: '12px', color: colors.text }}>{t('logsLoading')}</span>
+                          <CircularProgress size={20} style={{ color: colors.primary }} />
+                          <span style={{ color: colors.text }}>{t('logsLoading')}</span>
                         </div>
                       ) : logs.length === 0 ? (
                         <div style={{
