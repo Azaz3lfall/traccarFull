@@ -13,6 +13,7 @@ const { reducer, actions } = createSlice({
     replayPositions: [],
     currentReplayIndex: 0,
     resellerBranding: null,
+    resellerBrandingLoaded: false,
   },
   reducers: {
     updateServer(state, action) {
@@ -57,6 +58,7 @@ const { reducer, actions } = createSlice({
     },
     updateResellerBranding(state, action) {
       state.resellerBranding = action.payload;
+      state.resellerBrandingLoaded = true;
     },
   },
 });
