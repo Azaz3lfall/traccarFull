@@ -302,11 +302,6 @@ const setupResellerNginx = async (appUrl, billingEmail = 'admin@example.com') =>
     }
     
     logStep(appUrl, 'COMPLETE', 'Nginx and SSL setup completed');
-    
-  } catch (error) {
-    logStep(appUrl, 'FAILED', 'Nginx setup failed', error);
-    console.error('❌ Error in nginx setup (non-blocking):', error.message);
-    // Don't throw - this is non-blocking
   }
 };
 
