@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -78,12 +78,12 @@ const FloatingResellersPopover = ({
   const user = useSelector((state) => state.session.user);
 
   // Helper function to check if user can edit a specific reseller
-  const canEditReseller = (reseller) => {
+  const canEditReseller = useCallback((reseller) => {
     // Admin can edit all resellers
     if (admin) return true;
     // Non-admin users can only edit resellers they created
     return reseller.parentUserId === user?.id;
-  };
+  }, [admin, user?.id]);
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -617,8 +617,8 @@ const FloatingResellersPopover = ({
     }
   };
 
-  // Menu actions
-  const actions = [
+  // Menu actions - memoized to prevent recreation on every render
+  const actions = useMemo(() => [
     {
       key: 'edit',
       title: t('sharedEdit'),
@@ -640,16 +640,16 @@ const FloatingResellersPopover = ({
       handler: handleDelete,
       show: (reseller) => canEditReseller(reseller),
     },
-  ];
+  ], [t, canEditReseller, handleEdit, handleLogs, handleDelete]);
 
-  const getStatusIcon = (reseller) => {
+  const getStatusIcon = useCallback((reseller) => {
     if (reseller.status === 'inactive') return <BlockIcon />;
     return <CheckIcon />;
-  };
+  }, []);
 
-  const getStatusColor = (reseller) => {
+  const getStatusColor = useCallback((reseller) => {
     return reseller.status === 'active' ? colors.success : colors.error;
-  };
+  }, [colors.success, colors.error]);
 
   return (
     <AnimatePresence>
