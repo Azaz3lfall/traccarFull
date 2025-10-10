@@ -769,5 +769,6 @@
   "sharedCheckAll": "Hamısını Seç",
   "accessLevelChangePicture": "Şəkli Dəyişdir",
   "accessLevelMoreInfo": "Daha çox məlumat",
-  "userEmailAlreadyExists": "E-poçt artıq istifadə olunur"
+  "userEmailAlreadyExists": "E-poçt artıq istifadə olunur",
+  "userRegistrationError": "Qeydiyyat uğursuz oldu. Yenidən cəhd edin."
 }

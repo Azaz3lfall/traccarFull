@@ -769,5 +769,6 @@
   "sharedCheckAll": "Selecionar Tudo",
   "accessLevelChangePicture": "Alterar imagem",
   "accessLevelMoreInfo": "Mais informações",
-  "userEmailAlreadyExists": "E-mail já está em uso"
+  "userEmailAlreadyExists": "E-mail já está em uso",
+  "userRegistrationError": "Falha no registro. Tente novamente."
 }

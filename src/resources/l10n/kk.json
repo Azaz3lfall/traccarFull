@@ -765,5 +765,6 @@
   "sharedCheckAll": "Бәрін Таңдау",
   "accessLevelChangePicture": "Суретті өзгерту",
   "accessLevelMoreInfo": "Қосымша ақпарат",
-  "userEmailAlreadyExists": "Электрондық пошта қазірдің өзінде пайдаланылып жатыр"
+  "userEmailAlreadyExists": "Электрондық пошта қазірдің өзінде пайдаланылып жатыр",
+  "userRegistrationError": "Тіркеу сәтсіз аяқталды. Қайталап көріңіз."
 }

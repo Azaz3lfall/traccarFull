@@ -765,5 +765,6 @@
   "sharedCheckAll": "Pažymėti Visus",
   "accessLevelChangePicture": "Keisti paveikslėlį",
   "accessLevelMoreInfo": "Daugiau informacijos",
-  "userEmailAlreadyExists": "El. paštas jau naudojamas"
+  "userEmailAlreadyExists": "El. paštas jau naudojamas",
+  "userRegistrationError": "Registracija nepavyko. Bandykite dar kartą."
 }

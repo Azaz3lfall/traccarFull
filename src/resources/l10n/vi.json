@@ -769,5 +769,6 @@
   "sharedCheckAll": "Chọn Tất Cả",
   "accessLevelChangePicture": "Thay đổi hình ảnh",
   "accessLevelMoreInfo": "Thông tin thêm",
-  "userEmailAlreadyExists": "Email đã được sử dụng"
+  "userEmailAlreadyExists": "Email đã được sử dụng",
+  "userRegistrationError": "Đăng ký thất bại. Vui lòng thử lại."
 }

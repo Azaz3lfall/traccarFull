@@ -765,5 +765,6 @@
   "sharedCheckAll": "انتخاب همه",
   "accessLevelChangePicture": "تغییر تصویر",
   "accessLevelMoreInfo": "اطلاعات بیشتر",
-  "userEmailAlreadyExists": "ایمیل قبلاً استفاده شده است"
+  "userEmailAlreadyExists": "ایمیل قبلاً استفاده شده است",
+  "userRegistrationError": "ثبت نام ناموفق بود. دوباره تلاش کنید."
 }

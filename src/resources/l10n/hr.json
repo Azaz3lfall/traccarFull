@@ -769,5 +769,6 @@
   "sharedCheckAll": "Označi Sve",
   "accessLevelChangePicture": "Promijeni sliku",
   "accessLevelMoreInfo": "Više informacija",
-  "userEmailAlreadyExists": "E-mail se već koristi"
+  "userEmailAlreadyExists": "E-mail se već koristi",
+  "userRegistrationError": "Registracija neuspješna. Pokušajte ponovno."
 }

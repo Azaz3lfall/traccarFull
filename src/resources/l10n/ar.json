@@ -768,5 +768,6 @@
   "sharedCheckAll": "تحديد الكل",
   "accessLevelChangePicture": "تغيير الصورة",
   "accessLevelMoreInfo": "معلومات أكثر",
-  "userEmailAlreadyExists": "البريد الإلكتروني مستخدم بالفعل"
+  "userEmailAlreadyExists": "البريد الإلكتروني مستخدم بالفعل",
+  "userRegistrationError": "فشل التسجيل. حاول مرة أخرى."
 }

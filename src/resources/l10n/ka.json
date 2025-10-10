@@ -765,5 +765,6 @@
   "sharedCheckAll": "ყველას არჩევა",
   "accessLevelChangePicture": "სურათის შეცვლა",
   "accessLevelMoreInfo": "მეტი ინფორმაცია",
-  "userEmailAlreadyExists": "ელ.ფოსტა უკვე გამოიყენება"
+  "userEmailAlreadyExists": "ელ.ფოსტა უკვე გამოიყენება",
+  "userRegistrationError": "რეგისტრაცია ვერ მოხერხდა. სცადეთ კვლავ."
 }

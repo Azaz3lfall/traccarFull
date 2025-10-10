@@ -63,12 +63,12 @@ const RegisterPage = () => {
         if (response.status === 409 || errorText.includes('already exists') || errorText.includes('duplicate')) {
           setErrorMessage(t('userEmailAlreadyExists') || 'Email already in use');
         } else {
-          setErrorMessage('Registration failed. Please try again.');
+          setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
         }
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setErrorMessage('Registration failed. Please try again.');
+      setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

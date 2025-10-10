@@ -769,5 +769,6 @@
   "sharedCheckAll": "Selectează Totul",
   "accessLevelChangePicture": "Schimbă imaginea",
   "accessLevelMoreInfo": "Mai multe informații",
-  "userEmailAlreadyExists": "E-mailul este deja folosit"
+  "userEmailAlreadyExists": "E-mailul este deja folosit",
+  "userRegistrationError": "Înregistrarea a eșuat. Încercați din nou."
 }

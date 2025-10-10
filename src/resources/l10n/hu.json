@@ -769,5 +769,6 @@
   "sharedCheckAll": "Összes Kiválasztása",
   "accessLevelChangePicture": "Kép módosítása",
   "accessLevelMoreInfo": "További információ",
-  "userEmailAlreadyExists": "Az e-mail már használatban van"
+  "userEmailAlreadyExists": "Az e-mail már használatban van",
+  "userRegistrationError": "A regisztráció sikertelen. Próbálja újra."
 }

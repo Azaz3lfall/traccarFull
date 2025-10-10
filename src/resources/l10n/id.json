@@ -769,5 +769,6 @@
   "sharedCheckAll": "Pilih Semua",
   "accessLevelChangePicture": "Ubah gambar",
   "accessLevelMoreInfo": "Info lebih lanjut",
-  "userEmailAlreadyExists": "Email sudah digunakan"
+  "userEmailAlreadyExists": "Email sudah digunakan",
+  "userRegistrationError": "Pendaftaran gagal. Coba lagi."
 }

@@ -775,5 +775,6 @@
   "accessLevelHours": "Hours",
   "accessLevelChangePicture": "Change Picture",
   "accessLevelMoreInfo": "More Info",
-  "userEmailAlreadyExists": "Email already in use"
+  "userEmailAlreadyExists": "Email already in use",
+  "userRegistrationError": "Registration failed. Please try again."
 }

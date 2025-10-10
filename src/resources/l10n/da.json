@@ -769,5 +769,6 @@
   "sharedCheckAll": "Vælg Alle",
   "accessLevelChangePicture": "Skift billede",
   "accessLevelMoreInfo": "Mere information",
-  "userEmailAlreadyExists": "E-mail er allerede i brug"
+  "userEmailAlreadyExists": "E-mail er allerede i brug",
+  "userRegistrationError": "Registrering mislykkedes. Prøv igen."
 }

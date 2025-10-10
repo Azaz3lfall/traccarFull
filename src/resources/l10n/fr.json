@@ -768,5 +768,6 @@
   "sharedCheckAll": "Tout Sélectionner",
   "accessLevelChangePicture": "Changer l'image",
   "accessLevelMoreInfo": "Plus d'informations",
-  "userEmailAlreadyExists": "L'adresse e-mail est déjà utilisée"
+  "userEmailAlreadyExists": "L'adresse e-mail est déjà utilisée",
+  "userRegistrationError": "Échec de l'inscription. Veuillez réessayer."
 }

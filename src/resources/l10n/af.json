@@ -769,5 +769,6 @@
   "sharedCheckAll": "Merk Alles",
   "accessLevelChangePicture": "Verander Prent",
   "accessLevelMoreInfo": "Meer inligting",
-  "userEmailAlreadyExists": "E-pos is reeds in gebruik"
+  "userEmailAlreadyExists": "E-pos is reeds in gebruik",
+  "userRegistrationError": "Registrasie het misluk. Probeer weer."
 }

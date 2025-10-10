@@ -765,5 +765,6 @@
   "sharedCheckAll": "ជ្រើសរើសទាំងអស់",
   "accessLevelChangePicture": "ប្តូររូបភាព",
   "accessLevelMoreInfo": "ព័ត៌មានបន្ថែម",
-  "userEmailAlreadyExists": "អ៊ីមែលត្រូវបានប្រើប្រាស់រួចហើយ"
+  "userEmailAlreadyExists": "អ៊ីមែលត្រូវបានប្រើប្រាស់រួចហើយ",
+  "userRegistrationError": "ការចុះឈ្មោះបរាជ័យ។ សូមព្យាយាមម្តងទៀត។"
 }

@@ -769,5 +769,6 @@
   "sharedCheckAll": "Vybrat Vše",
   "accessLevelChangePicture": "Změnit obrázek",
   "accessLevelMoreInfo": "Více informací",
-  "userEmailAlreadyExists": "E-mail již je používán"
+  "userEmailAlreadyExists": "E-mail již je používán",
+  "userRegistrationError": "Registrace se nezdařila. Zkuste to znovu."
 }

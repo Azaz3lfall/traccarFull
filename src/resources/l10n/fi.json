@@ -769,5 +769,6 @@
   "sharedCheckAll": "Valitse Kaikki",
   "accessLevelChangePicture": "Vaihda kuva",
   "accessLevelMoreInfo": "Lisätietoja",
-  "userEmailAlreadyExists": "Sähköposti on jo käytössä"
+  "userEmailAlreadyExists": "Sähköposti on jo käytössä",
+  "userRegistrationError": "Rekisteröinti epäonnistui. Yritä uudelleen."
 }

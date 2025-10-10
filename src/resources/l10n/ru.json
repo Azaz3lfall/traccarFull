@@ -768,5 +768,6 @@
   "sharedCheckAll": "Выбрать Все",
   "accessLevelChangePicture": "Изменить изображение",
   "accessLevelMoreInfo": "Больше информации",
-  "userEmailAlreadyExists": "Электронная почта уже используется"
+  "userEmailAlreadyExists": "Электронная почта уже используется",
+  "userRegistrationError": "Регистрация не удалась. Попробуйте снова."
 }

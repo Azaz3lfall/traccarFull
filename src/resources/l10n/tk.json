@@ -765,5 +765,6 @@
   "sharedCheckAll": "Hemmesini Saýla",
   "accessLevelChangePicture": "Suraty Üýtget",
   "accessLevelMoreInfo": "Goşmaça Maglumat",
-  "userEmailAlreadyExists": "E-poçta eýýäm ulanylyp dur"
+  "userEmailAlreadyExists": "E-poçta eýýäm ulanylyp dur",
+  "userRegistrationError": "Registrasiýa şowsuz boldy. Täzeden synaň."
 }

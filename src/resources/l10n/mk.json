@@ -765,5 +765,6 @@
   "sharedCheckAll": "Одбери Сè",
   "accessLevelChangePicture": "Промени слика",
   "accessLevelMoreInfo": "Повеќе информации",
-  "userEmailAlreadyExists": "Е-поштата веќе се користи"
+  "userEmailAlreadyExists": "Е-поштата веќе се користи",
+  "userRegistrationError": "Регистрацијата не успеа. Обидете се повторно."
 }

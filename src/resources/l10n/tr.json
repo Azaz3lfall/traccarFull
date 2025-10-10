@@ -769,5 +769,6 @@
   "sharedCheckAll": "Tümünü Seç",
   "accessLevelChangePicture": "Resmi değiştir",
   "accessLevelMoreInfo": "Daha fazla bilgi",
-  "userEmailAlreadyExists": "E-posta zaten kullanımda"
+  "userEmailAlreadyExists": "E-posta zaten kullanımda",
+  "userRegistrationError": "Kayıt başarısız. Tekrar deneyin."
 }

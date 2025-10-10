@@ -769,5 +769,6 @@
   "sharedCheckAll": "Επιλογή Όλων",
   "accessLevelChangePicture": "Αλλαγή εικόνας",
   "accessLevelMoreInfo": "Περισσότερες πληροφορίες",
-  "userEmailAlreadyExists": "Το email χρησιμοποιείται ήδη"
+  "userEmailAlreadyExists": "Το email χρησιμοποιείται ήδη",
+  "userRegistrationError": "Η εγγραφή απέτυχε. Δοκιμάστε ξανά."
 }

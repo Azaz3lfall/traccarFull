@@ -765,5 +765,6 @@
   "sharedCheckAll": "എല്ലാം തിരഞ്ഞെടുക്കുക",
   "accessLevelChangePicture": "ചിത്രം മാറ്റുക",
   "accessLevelMoreInfo": "കൂടുതൽ വിവരങ്ങൾ",
-  "userEmailAlreadyExists": "ഇമെയിൽ ഇതിനകം ഉപയോഗത്തിലാണ്"
+  "userEmailAlreadyExists": "ഇമെയിൽ ഇതിനകം ഉപയോഗത്തിലാണ്",
+  "userRegistrationError": "രജിസ്ട്രേഷൻ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക."
 }

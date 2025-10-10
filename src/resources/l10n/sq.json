@@ -765,5 +765,6 @@
   "sharedCheckAll": "Zgjidh Të Gjitha",
   "accessLevelChangePicture": "Ndrysho Foton",
   "accessLevelMoreInfo": "Më Shumë Informacion",
-  "userEmailAlreadyExists": "Email-i është tashmë në përdorim"
+  "userEmailAlreadyExists": "Email-i është tashmë në përdorim",
+  "userRegistrationError": "Regjistrimi dështoi. Provo përsëri."
 }

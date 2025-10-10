@@ -765,5 +765,6 @@
   "sharedCheckAll": "Chagua Zote",
   "accessLevelChangePicture": "Badilisha Picha",
   "accessLevelMoreInfo": "Maelezo Zaidi",
-  "userEmailAlreadyExists": "Barua pepe tayari inatumika"
+  "userEmailAlreadyExists": "Barua pepe tayari inatumika",
+  "userRegistrationError": "Usajili ulishindwa. Jaribu tena."
 }

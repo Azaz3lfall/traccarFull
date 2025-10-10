@@ -765,5 +765,6 @@
   "sharedCheckAll": "ເລືອກທັງໝົດ",
   "accessLevelChangePicture": "ປ່ຽນຮູບພາບ",
   "accessLevelMoreInfo": "ຂໍ້ມູນເພີ່ມເຕີມ",
-  "userEmailAlreadyExists": "ອີເມວແລ້ວຖືກນຳໃຊ້"
+  "userEmailAlreadyExists": "ອີເມວແລ້ວຖືກນຳໃຊ້",
+  "userRegistrationError": "ການລົງທະບຽນລົ້ມເຫລວ. ລອງໃໝ່ອີກຄັ້ງ."
 }

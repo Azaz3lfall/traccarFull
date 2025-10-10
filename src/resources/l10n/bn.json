@@ -769,5 +769,6 @@
   "sharedCheckAll": "সব চেক করুন",
   "accessLevelChangePicture": "ছবি পরিবর্তন",
   "accessLevelMoreInfo": "আরও তথ্য",
-  "userEmailAlreadyExists": "ইমেইল ইতিমধ্যে ব্যবহৃত হচ্ছে"
+  "userEmailAlreadyExists": "ইমেইল ইতিমধ্যে ব্যবহৃত হচ্ছে",
+  "userRegistrationError": "নিবন্ধন ব্যর্থ। আবার চেষ্টা করুন।"
 }

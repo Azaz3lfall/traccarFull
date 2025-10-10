@@ -768,5 +768,6 @@
   "sharedCheckAll": "すべて選択",
   "accessLevelChangePicture": "画像を変更",
   "accessLevelMoreInfo": "詳細情報",
-  "userEmailAlreadyExists": "メールアドレスは既に使用されています"
+  "userEmailAlreadyExists": "メールアドレスは既に使用されています",
+  "userRegistrationError": "登録に失敗しました。もう一度お試しください。"
 }

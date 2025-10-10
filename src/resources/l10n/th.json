@@ -769,5 +769,6 @@
   "sharedCheckAll": "เลือกทั้งหมด",
   "accessLevelChangePicture": "เปลี่ยนรูปภาพ",
   "accessLevelMoreInfo": "ข้อมูลเพิ่มเติม",
-  "userEmailAlreadyExists": "อีเมลถูกใช้งานแล้ว"
+  "userEmailAlreadyExists": "อีเมลถูกใช้งานแล้ว",
+  "userRegistrationError": "การลงทะเบียนล้มเหลว กรุณาลองใหม่"
 }

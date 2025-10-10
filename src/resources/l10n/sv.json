@@ -768,5 +768,6 @@
   "sharedCheckAll": "Välj Alla",
   "accessLevelChangePicture": "Ändra bild",
   "accessLevelMoreInfo": "Mer information",
-  "userEmailAlreadyExists": "E-post används redan"
+  "userEmailAlreadyExists": "E-post används redan",
+  "userRegistrationError": "Registrering misslyckades. Försök igen."
 }

@@ -769,5 +769,6 @@
   "sharedCheckAll": "全選",
   "accessLevelChangePicture": "更改圖片",
   "accessLevelMoreInfo": "更多資訊",
-  "userEmailAlreadyExists": "電子郵件已被使用"
+  "userEmailAlreadyExists": "電子郵件已被使用",
+  "userRegistrationError": "註冊失敗。請重試。"
 }
