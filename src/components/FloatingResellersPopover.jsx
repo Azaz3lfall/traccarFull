@@ -81,6 +81,15 @@ const FloatingResellersPopover = ({
   const canEditReseller = useCallback((reseller) => {
     // Return false if reseller is null or undefined
     if (!reseller) return false;
+    
+    console.log('🔍 canEditReseller debug:', {
+      resellerId: reseller.id,
+      resellerParentUserId: reseller.parentUserId,
+      currentUserId: user?.id,
+      isAdmin: admin,
+      canEdit: admin || reseller.parentUserId === user?.id
+    });
+    
     // Admin can edit all resellers
     if (admin) return true;
     // Non-admin users can only edit resellers they created
