@@ -764,5 +764,8 @@
   "accessLevelHours": "ຊົ່ວໂມງ",
   "sharedCheckAll": "ເລືອກທັງໝົດ",
   "accessLevelChangePicture": "ປ່ຽນຮູບພາບ",
-  "accessLevelMoreInfo": "ຂໍ້ມູນເພີ່ມເຕີມ"
+  "accessLevelMoreInfo": "ຂໍ້ມູນເພີ່ມເຕີມ",
+  "userEmailAlreadyExists": "ອີເມວແລ້ວຖືກນຳໃຊ້",
+  "userValidationError": "ຂໍ້ມູນລົງທະບຽນບໍ່ຖືກຕ້ອງ",
+  "userRegistrationError": "ການລົງທະບຽນລົ້ມເຫລວ. ລອງໃໝ່ອີກຄັ້ງ."
 }

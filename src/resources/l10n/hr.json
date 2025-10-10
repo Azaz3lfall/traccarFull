@@ -768,5 +768,8 @@
   "accessLevelHours": "Sati",
   "sharedCheckAll": "Označi Sve",
   "accessLevelChangePicture": "Promijeni sliku",
-  "accessLevelMoreInfo": "Više informacija"
+  "accessLevelMoreInfo": "Više informacija",
+  "userEmailAlreadyExists": "E-mail se već koristi",
+  "userValidationError": "Nevaljani podaci za registraciju",
+  "userRegistrationError": "Registracija neuspješna. Pokušajte ponovno."
 }

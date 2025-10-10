@@ -764,5 +764,8 @@
   "accessLevelHours": "Сағаттар",
   "sharedCheckAll": "Бәрін Таңдау",
   "accessLevelChangePicture": "Суретті өзгерту",
-  "accessLevelMoreInfo": "Қосымша ақпарат"
+  "accessLevelMoreInfo": "Қосымша ақпарат",
+  "userEmailAlreadyExists": "Электрондық пошта қазірдің өзінде пайдаланылып жатыр",
+  "userValidationError": "Жарамсыз тіркеу деректері",
+  "userRegistrationError": "Тіркеу сәтсіз аяқталды. Қайталап көріңіз."
 }

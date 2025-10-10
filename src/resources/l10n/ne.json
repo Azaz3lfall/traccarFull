@@ -764,5 +764,8 @@
   "accessLevelHours": "घण्टा",
   "sharedCheckAll": "सबै छान्नुहोस्",
   "accessLevelChangePicture": "तस्बिर परिवर्तन गर्नुहोस्",
-  "accessLevelMoreInfo": "थप जानकारी"
+  "accessLevelMoreInfo": "थप जानकारी",
+  "userEmailAlreadyExists": "इमेल पहिले नै प्रयोगमा छ",
+  "userValidationError": "अवैध दर्ता डेटा",
+  "userRegistrationError": "दर्ता असफल भयो। फेरि प्रयास गर्नुहोस्।"
 }

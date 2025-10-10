@@ -764,5 +764,8 @@
   "accessLevelHours": "Ure",
   "sharedCheckAll": "Izberi Vse",
   "accessLevelChangePicture": "Spremeni sliko",
-  "accessLevelMoreInfo": "Več informacij"
+  "accessLevelMoreInfo": "Več informacij",
+  "userEmailAlreadyExists": "E-pošta se že uporablja",
+  "userValidationError": "Neveljavni podatki za registracijo",
+  "userRegistrationError": "Registracija neuspešna. Poskusite znova."
 }

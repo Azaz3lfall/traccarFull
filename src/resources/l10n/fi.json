@@ -768,5 +768,8 @@
   "accessLevelHours": "Tunnit",
   "sharedCheckAll": "Valitse Kaikki",
   "accessLevelChangePicture": "Vaihda kuva",
-  "accessLevelMoreInfo": "Lisätietoja"
+  "accessLevelMoreInfo": "Lisätietoja",
+  "userEmailAlreadyExists": "Sähköposti on jo käytössä",
+  "userValidationError": "Virheelliset rekisteröintitiedot",
+  "userRegistrationError": "Rekisteröinti epäonnistui. Yritä uudelleen."
 }

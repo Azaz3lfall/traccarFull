@@ -768,5 +768,8 @@
   "accessLevelHours": "ชั่วโมง",
   "sharedCheckAll": "เลือกทั้งหมด",
   "accessLevelChangePicture": "เปลี่ยนรูปภาพ",
-  "accessLevelMoreInfo": "ข้อมูลเพิ่มเติม"
+  "accessLevelMoreInfo": "ข้อมูลเพิ่มเติม",
+  "userEmailAlreadyExists": "อีเมลถูกใช้งานแล้ว",
+  "userValidationError": "ข้อมูลการลงทะเบียนไม่ถูกต้อง",
+  "userRegistrationError": "การลงทะเบียนล้มเหลว กรุณาลองใหม่"
 }

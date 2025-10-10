@@ -768,5 +768,8 @@
   "accessLevelHours": "Jam",
   "sharedCheckAll": "Pilih Semua",
   "accessLevelChangePicture": "Ubah gambar",
-  "accessLevelMoreInfo": "Info lebih lanjut"
+  "accessLevelMoreInfo": "Info lebih lanjut",
+  "userEmailAlreadyExists": "Email sudah digunakan",
+  "userValidationError": "Data pendaftaran tidak valid",
+  "userRegistrationError": "Pendaftaran gagal. Coba lagi."
 }

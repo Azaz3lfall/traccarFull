@@ -768,5 +768,8 @@
   "accessLevelHours": "Saat",
   "sharedCheckAll": "Hamısını Seç",
   "accessLevelChangePicture": "Şəkli Dəyişdir",
-  "accessLevelMoreInfo": "Daha çox məlumat"
+  "accessLevelMoreInfo": "Daha çox məlumat",
+  "userEmailAlreadyExists": "E-poçt artıq istifadə olunur",
+  "userValidationError": "Qeydiyyat məlumatları yanlışdır",
+  "userRegistrationError": "Qeydiyyat uğursuz oldu. Yenidən cəhd edin."
 }

@@ -768,5 +768,8 @@
   "accessLevelHours": "Tunnid",
   "sharedCheckAll": "Vali Kõik",
   "accessLevelChangePicture": "Muuda pilti",
-  "accessLevelMoreInfo": "Rohkem infot"
+  "accessLevelMoreInfo": "Rohkem infot",
+  "userEmailAlreadyExists": "E-post on juba kasutusel",
+  "userValidationError": "Vigased registreerimisandmed",
+  "userRegistrationError": "Registreerimine ebaõnnestus. Proovige uuesti."
 }

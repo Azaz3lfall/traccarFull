@@ -764,5 +764,8 @@
   "accessLevelHours": "საათები",
   "sharedCheckAll": "ყველას არჩევა",
   "accessLevelChangePicture": "სურათის შეცვლა",
-  "accessLevelMoreInfo": "მეტი ინფორმაცია"
+  "accessLevelMoreInfo": "მეტი ინფორმაცია",
+  "userEmailAlreadyExists": "ელ.ფოსტა უკვე გამოიყენება",
+  "userValidationError": "არასწორი რეგისტრაციის მონაცემები",
+  "userRegistrationError": "რეგისტრაცია ვერ მოხერხდა. სცადეთ კვლავ."
 }

@@ -768,5 +768,8 @@
   "accessLevelHours": "Timer",
   "sharedCheckAll": "Velg Alle",
   "accessLevelChangePicture": "Endre Bilde",
-  "accessLevelMoreInfo": "Mer Informasjon"
+  "accessLevelMoreInfo": "Mer Informasjon",
+  "userEmailAlreadyExists": "E-post er allerede i bruk",
+  "userValidationError": "Ugyldige registreringsdata",
+  "userRegistrationError": "Registrering mislyktes. Prøv igjen."
 }

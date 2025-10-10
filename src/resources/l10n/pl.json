@@ -768,5 +768,8 @@
   "accessLevelHours": "Godziny",
   "sharedCheckAll": "Zaznacz Wszystkie",
   "accessLevelChangePicture": "Zmień obraz",
-  "accessLevelMoreInfo": "Więcej informacji"
+  "accessLevelMoreInfo": "Więcej informacji",
+  "userEmailAlreadyExists": "E-mail jest już używany",
+  "userValidationError": "Nieprawidłowe dane rejestracji",
+  "userRegistrationError": "Rejestracja nie powiodła się. Spróbuj ponownie."
 }

@@ -768,5 +768,8 @@
   "accessLevelHours": "Saat",
   "sharedCheckAll": "Tümünü Seç",
   "accessLevelChangePicture": "Resmi değiştir",
-  "accessLevelMoreInfo": "Daha fazla bilgi"
+  "accessLevelMoreInfo": "Daha fazla bilgi",
+  "userEmailAlreadyExists": "E-posta zaten kullanımda",
+  "userValidationError": "Geçersiz kayıt verileri",
+  "userRegistrationError": "Kayıt başarısız. Tekrar deneyin."
 }

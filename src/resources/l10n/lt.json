@@ -764,5 +764,8 @@
   "accessLevelHours": "Valandos",
   "sharedCheckAll": "Pažymėti Visus",
   "accessLevelChangePicture": "Keisti paveikslėlį",
-  "accessLevelMoreInfo": "Daugiau informacijos"
+  "accessLevelMoreInfo": "Daugiau informacijos",
+  "userEmailAlreadyExists": "El. paštas jau naudojamas",
+  "userValidationError": "Neteisingi registracijos duomenys",
+  "userRegistrationError": "Registracija nepavyko. Bandykite dar kartą."
 }

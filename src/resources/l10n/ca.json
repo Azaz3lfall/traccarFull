@@ -768,5 +768,8 @@
   "accessLevelHours": "Hores",
   "sharedCheckAll": "Seleccionar Tot",
   "accessLevelChangePicture": "Canviar imatge",
-  "accessLevelMoreInfo": "Més informació"
+  "accessLevelMoreInfo": "Més informació",
+  "userEmailAlreadyExists": "L'email ja està en ús",
+  "userValidationError": "Dades de registre invàlides",
+  "userRegistrationError": "Error en el registre. Torna-ho a intentar."
 }

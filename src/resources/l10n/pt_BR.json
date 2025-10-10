@@ -770,5 +770,8 @@
   "accessLevelHours": "Horas",
   "sharedCheckAll": "Selecionar Tudo",
   "accessLevelChangePicture": "Alterar imagem",
-  "accessLevelMoreInfo": "Mais informações"
+  "accessLevelMoreInfo": "Mais informações",
+  "userEmailAlreadyExists": "E-mail já está em uso",
+  "userValidationError": "Dados de registro inválidos",
+  "userRegistrationError": "Falha no registro. Tente novamente."
 }

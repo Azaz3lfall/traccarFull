@@ -767,5 +767,8 @@
   "accessLevelHours": "Uren",
   "sharedCheckAll": "Alles Selecteren",
   "accessLevelChangePicture": "Afbeelding wijzigen",
-  "accessLevelMoreInfo": "Meer informatie"
+  "accessLevelMoreInfo": "Meer informatie",
+  "userEmailAlreadyExists": "E-mail is al in gebruik",
+  "userValidationError": "Ongeldige registratiegegevens",
+  "userRegistrationError": "Registratie mislukt. Probeer opnieuw."
 }

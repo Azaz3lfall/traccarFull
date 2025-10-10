@@ -767,5 +767,8 @@
   "accessLevelHours": "घंटे",
   "sharedCheckAll": "सभी चुनें",
   "accessLevelChangePicture": "चित्र बदलें",
-  "accessLevelMoreInfo": "अधिक जानकारी"
+  "accessLevelMoreInfo": "अधिक जानकारी",
+  "userEmailAlreadyExists": "ईमेल पहले से उपयोग में है",
+  "userValidationError": "अमान्य पंजीकरण डेटा",
+  "userRegistrationError": "पंजीकरण विफल। कृपया पुनः प्रयास करें।"
 }

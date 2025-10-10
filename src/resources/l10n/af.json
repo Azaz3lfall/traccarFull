@@ -768,5 +768,8 @@
   "accessLevelHours": "Ure",
   "sharedCheckAll": "Merk Alles",
   "accessLevelChangePicture": "Verander Prent",
-  "accessLevelMoreInfo": "Meer inligting"
+  "accessLevelMoreInfo": "Meer inligting",
+  "userEmailAlreadyExists": "E-pos is reeds in gebruik",
+  "userValidationError": "Ongeldige registrasie data",
+  "userRegistrationError": "Registrasie het misluk. Probeer weer."
 }

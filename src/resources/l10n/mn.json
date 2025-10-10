@@ -764,5 +764,8 @@
   "accessLevelHours": "Цаг",
   "sharedCheckAll": "Бүгдийг Сонгох",
   "accessLevelChangePicture": "Зураг солих",
-  "accessLevelMoreInfo": "Нэмэлт мэдээлэл"
+  "accessLevelMoreInfo": "Нэмэлт мэдээлэл",
+  "userEmailAlreadyExists": "Имэйл аль хэдийн ашиглагдаж байна",
+  "userValidationError": "Буруу бүртгэлийн мэдээлэл",
+  "userRegistrationError": "Бүртгэл амжилтгүй боллоо. Дахин оролдоно уу."
 }

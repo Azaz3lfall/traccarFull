@@ -768,5 +768,8 @@
   "accessLevelHours": "Часове",
   "sharedCheckAll": "Избери Всички",
   "accessLevelChangePicture": "Промяна на снимката",
-  "accessLevelMoreInfo": "Повече информация"
+  "accessLevelMoreInfo": "Повече информация",
+  "userEmailAlreadyExists": "Имейлът вече се използва",
+  "userValidationError": "Невалидни данни за регистрация",
+  "userRegistrationError": "Регистрацията неуспешна. Опитайте отново."
 }

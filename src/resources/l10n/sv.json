@@ -767,5 +767,8 @@
   "accessLevelHours": "Timmar",
   "sharedCheckAll": "Välj Alla",
   "accessLevelChangePicture": "Ändra bild",
-  "accessLevelMoreInfo": "Mer information"
+  "accessLevelMoreInfo": "Mer information",
+  "userEmailAlreadyExists": "E-post används redan",
+  "userValidationError": "Ogiltiga registreringsdata",
+  "userRegistrationError": "Registrering misslyckades. Försök igen."
 }

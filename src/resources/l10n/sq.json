@@ -764,5 +764,8 @@
   "accessLevelHours": "Orë",
   "sharedCheckAll": "Zgjidh Të Gjitha",
   "accessLevelChangePicture": "Ndrysho Foton",
-  "accessLevelMoreInfo": "Më Shumë Informacion"
+  "accessLevelMoreInfo": "Më Shumë Informacion",
+  "userEmailAlreadyExists": "Email-i është tashmë në përdorim",
+  "userValidationError": "Të dhëna regjistrimi të pavlefshme",
+  "userRegistrationError": "Regjistrimi dështoi. Provo përsëri."
 }

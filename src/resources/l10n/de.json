@@ -767,5 +767,8 @@
   "accessLevelHours": "Stunden",
   "sharedCheckAll": "Alle Auswählen",
   "accessLevelChangePicture": "Bild ändern",
-  "accessLevelMoreInfo": "Weitere Informationen"
+  "accessLevelMoreInfo": "Weitere Informationen",
+  "userEmailAlreadyExists": "E-Mail-Adresse bereits in Verwendung",
+  "userValidationError": "Ungültige Registrierungsdaten",
+  "userRegistrationError": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
 }

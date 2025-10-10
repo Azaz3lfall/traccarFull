@@ -767,5 +767,8 @@
   "accessLevelHours": "الساعات",
   "sharedCheckAll": "تحديد الكل",
   "accessLevelChangePicture": "تغيير الصورة",
-  "accessLevelMoreInfo": "معلومات أكثر"
+  "accessLevelMoreInfo": "معلومات أكثر",
+  "userEmailAlreadyExists": "البريد الإلكتروني مستخدم بالفعل",
+  "userValidationError": "بيانات التسجيل غير صالحة",
+  "userRegistrationError": "فشل التسجيل. حاول مرة أخرى."
 }

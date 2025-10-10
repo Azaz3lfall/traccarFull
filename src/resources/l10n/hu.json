@@ -768,5 +768,8 @@
   "accessLevelHours": "Órák",
   "sharedCheckAll": "Összes Kiválasztása",
   "accessLevelChangePicture": "Kép módosítása",
-  "accessLevelMoreInfo": "További információ"
+  "accessLevelMoreInfo": "További információ",
+  "userEmailAlreadyExists": "Az e-mail már használatban van",
+  "userValidationError": "Érvénytelen regisztrációs adatok",
+  "userRegistrationError": "A regisztráció sikertelen. Próbálja újra."
 }
