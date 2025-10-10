@@ -20,6 +20,7 @@ export default {
     CHECK: `${RESELLERS_SERVER_URL}/api/reseller-check`,
     CHECK_DOMAIN: `${RESELLERS_SERVER_URL}/api/check-domain`,
     LOGS: `${RESELLERS_SERVER_URL}/api/resellers/logs`,
+    LOGS_DELETE: `${RESELLERS_SERVER_URL}/api/resellers/logs/delete`,
   }
 };
 

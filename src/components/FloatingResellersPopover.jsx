@@ -276,6 +276,29 @@ const FloatingResellersPopover = ({
     }
   };
 
+  const handleDeleteLogs = async () => {
+    if (!selectedReseller) return;
+    
+    try {
+      console.log('🗑️ Deleting logs for domain:', selectedReseller.appUrl);
+      const response = await fetchOrThrow(resellersConfig.ENDPOINTS.LOGS_DELETE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: selectedReseller.appUrl }),
+      });
+      
+      if (response.ok) {
+        console.log('🗑️ Logs deleted successfully');
+        setLogs([]); // Clear the logs in the UI
+        // Optionally show a success message
+      } else {
+        console.error('❌ Failed to delete logs');
+      }
+    } catch (error) {
+      console.error('❌ Error deleting logs:', error);
+    }
+  };
+
   // Handle delete confirmation
   const confirmDelete = () => {
     if (resellerToDelete) {
@@ -983,11 +1006,12 @@ const FloatingResellersPopover = ({
                         </Typography>
                       </div>
                       <IconButton
-                        onClick={() => setLogsDialog(false)}
+                        onClick={handleDeleteLogs}
                         style={{
                           color: colors.textSecondary,
                           padding: '8px'
                         }}
+                        title="Delete logs for this domain"
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>

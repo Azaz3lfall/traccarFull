@@ -936,10 +936,10 @@ app.put('/api/resellers/:id', async (req, res) => {
 app.post('/api/resellers/logs', async (req, res) => {
   try {
     const { domain } = req.body;
-    
+
     console.log(`🔍 Logs request for domain: ${domain}`);
     console.log(`🔍 global.resellerLogs exists: ${!!global.resellerLogs}`);
-    
+
     if (!domain) {
       return res.status(400).json({
         error: 'domain is required',
@@ -950,14 +950,14 @@ app.post('/api/resellers/logs', async (req, res) => {
     // Get logs for the domain
     const logs = global.resellerLogs ? global.resellerLogs.get(domain) || [] : [];
     console.log(`🔍 Found ${logs.length} logs for domain: ${domain}`);
-    
+
     if (global.resellerLogs) {
       console.log(`🔍 All domains in logs: ${Array.from(global.resellerLogs.keys())}`);
     }
-    
+
     // Sort logs by timestamp (newest first)
     const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     res.json({
       success: true,
       domain: domain,
@@ -965,9 +965,55 @@ app.post('/api/resellers/logs', async (req, res) => {
       count: sortedLogs.length,
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error) {
     console.error('❌ Error fetching reseller logs:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// DELETE endpoint for reseller logs
+app.post('/api/resellers/logs/delete', async (req, res) => {
+  try {
+    const { domain } = req.body;
+
+    console.log(`🗑️ Delete logs request for domain: ${domain}`);
+
+    if (!domain) {
+      return res.status(400).json({
+        error: 'domain is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Delete logs for the domain
+    if (global.resellerLogs && global.resellerLogs.has(domain)) {
+      global.resellerLogs.delete(domain);
+      console.log(`🗑️ Deleted logs for domain: ${domain}`);
+      
+      res.json({
+        success: true,
+        message: `Logs deleted for domain: ${domain}`,
+        domain: domain,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      console.log(`🗑️ No logs found for domain: ${domain}`);
+      
+      res.json({
+        success: true,
+        message: `No logs found for domain: ${domain}`,
+        domain: domain,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Error deleting reseller logs:', error);
     res.status(500).json({
       error: 'Internal server error',
       message: error.message,
