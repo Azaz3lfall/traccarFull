@@ -54,7 +54,7 @@ import {
   Moon
 } from 'lucide-react';
 import SettingsIcon from '@mui/icons-material/Settings';
-import CreateIcon from '@mui/icons-material/Create';
+import CropIcon from '@mui/icons-material/Crop';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -1671,7 +1671,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <CreateIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            <CropIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',

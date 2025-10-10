@@ -3,6 +3,7 @@ import {
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CreateIcon from '@mui/icons-material/Create';
+import CropIcon from '@mui/icons-material/Crop';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import FolderIcon from '@mui/icons-material/Folder';
 import PersonIcon from '@mui/icons-material/Person';
@@ -69,7 +70,7 @@ const SettingsMenu = () => {
             <MenuItem
               title={t('sharedGeofences')}
               link="/geofences"
-              icon={<CreateIcon />}
+              icon={<CropIcon />}
               selected={location.pathname.startsWith('/settings/geofence')}
             />
             {!features.disableGroups && (
