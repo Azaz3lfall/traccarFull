@@ -1046,7 +1046,7 @@ const FloatingResellersPopover = ({
                                 </Typography>
                                 <Typography style={{
                                   fontSize: '11px',
-                                  color: colors.textSecondary,
+                                  color: '#666666',
                                   margin: 0
                                 }}>
                                   {new Date(log.timestamp).toLocaleString()}
@@ -1054,7 +1054,7 @@ const FloatingResellersPopover = ({
                               </div>
                               <Typography style={{
                                 fontSize: '13px',
-                                color: colors.text,
+                                color: '#000000',
                                 margin: '4px 0 0 0'
                               }}>
                                 {log.message}
