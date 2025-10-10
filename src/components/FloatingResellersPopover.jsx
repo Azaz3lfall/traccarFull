@@ -1050,13 +1050,32 @@ const FloatingResellersPopover = ({
                       {logsLoading ? (
                         <div style={{
                           display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
                           height: '100%',
-                          gap: '12px'
+                          gap: '16px'
                         }}>
-                          <CircularProgress size={20} color="inherit" />
-                          <span style={{ color: colors.text }}>{t('logsLoading')}</span>
+                          <div style={{
+                            position: 'relative',
+                            width: '120px',
+                            height: '120px',
+                            backgroundColor: colors.surface,
+                            borderRadius: '50%',
+                            boxShadow: `0 4px 12px ${colors.border}20`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <CircularProgress 
+                              size={100}
+                              thickness={4}
+                              color="inherit"
+                            />
+                          </div>
+                          <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                            {t('logsLoading')}
+                          </Typography>
                         </div>
                       ) : logs.length === 0 ? (
                         <div style={{
