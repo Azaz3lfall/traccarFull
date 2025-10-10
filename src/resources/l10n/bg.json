@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Промяна на снимката",
   "accessLevelMoreInfo": "Повече информация",
   "userEmailAlreadyExists": "Имейлът вече се използва",
-  "userRegistrationError": "Регистрацията неуспешна. Опитайте отново."
+  "userRegistrationError": "Регистрацията неуспешна. Опитайте отново.",
+  "logsLoading": "Зареждане на логове...",
+  "logsNoLogsAvailable": "Няма налични логове за този домейн",
+  "logsEntries": "записи в лог",
+  "logsTitle": "Логове",
+  "logsError": "Грешка"
 }

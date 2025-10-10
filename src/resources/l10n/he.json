@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "שנה תמונה",
   "accessLevelMoreInfo": "מידע נוסף",
   "userEmailAlreadyExists": "האימייל כבר בשימוש",
-  "userRegistrationError": "הרישום נכשל. נסה שוב."
+  "userRegistrationError": "הרישום נכשל. נסה שוב.",
+  "logsLoading": "טוען יומנים...",
+  "logsNoLogsAvailable": "אין יומנים זמינים עבור הדומיין הזה",
+  "logsEntries": "ערכי יומן",
+  "logsTitle": "יומנים",
+  "logsError": "שגיאה"
 }

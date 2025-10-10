@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Cambia immagine",
   "accessLevelMoreInfo": "Maggiori informazioni",
   "userEmailAlreadyExists": "L'email è già in uso",
-  "userRegistrationError": "Registrazione fallita. Riprova."
+  "userRegistrationError": "Registrazione fallita. Riprova.",
+  "logsLoading": "Caricamento log...",
+  "logsNoLogsAvailable": "Nessun log disponibile per questo dominio",
+  "logsEntries": "voci di log",
+  "logsTitle": "Log",
+  "logsError": "Errore"
 }

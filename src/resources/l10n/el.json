@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Αλλαγή εικόνας",
   "accessLevelMoreInfo": "Περισσότερες πληροφορίες",
   "userEmailAlreadyExists": "Το email χρησιμοποιείται ήδη",
-  "userRegistrationError": "Η εγγραφή απέτυχε. Δοκιμάστε ξανά."
+  "userRegistrationError": "Η εγγραφή απέτυχε. Δοκιμάστε ξανά.",
+  "logsLoading": "Φόρτωση αρχείων καταγραφής...",
+  "logsNoLogsAvailable": "Δεν υπάρχουν διαθέσιμα αρχεία καταγραφής για αυτόν τον τομέα",
+  "logsEntries": "καταχωρήσεις αρχείου καταγραφής",
+  "logsTitle": "Αρχεία καταγραφής",
+  "logsError": "Σφάλμα"
 }

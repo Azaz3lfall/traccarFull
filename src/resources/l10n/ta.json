@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "படத்தை மாற்று",
   "accessLevelMoreInfo": "மேலும் தகவல்",
   "userEmailAlreadyExists": "மின்னஞ்சல் ஏற்கனவே பயன்பாட்டில் உள்ளது",
-  "userRegistrationError": "பதிவு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்."
+  "userRegistrationError": "பதிவு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

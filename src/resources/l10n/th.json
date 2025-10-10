@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "เปลี่ยนรูปภาพ",
   "accessLevelMoreInfo": "ข้อมูลเพิ่มเติม",
   "userEmailAlreadyExists": "อีเมลถูกใช้งานแล้ว",
-  "userRegistrationError": "การลงทะเบียนล้มเหลว กรุณาลองใหม่"
+  "userRegistrationError": "การลงทะเบียนล้มเหลว กรุณาลองใหม่",
+  "logsLoading": "กำลังโหลดบันทึก...",
+  "logsNoLogsAvailable": "ไม่มีบันทึกสำหรับโดเมนนี้",
+  "logsEntries": "รายการบันทึก",
+  "logsTitle": "บันทึก",
+  "logsError": "ข้อผิดพลาด"
 }

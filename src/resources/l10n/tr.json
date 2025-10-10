@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Resmi değiştir",
   "accessLevelMoreInfo": "Daha fazla bilgi",
   "userEmailAlreadyExists": "E-posta zaten kullanımda",
-  "userRegistrationError": "Kayıt başarısız. Tekrar deneyin."
+  "userRegistrationError": "Kayıt başarısız. Tekrar deneyin.",
+  "logsLoading": "Günlükler yükleniyor...",
+  "logsNoLogsAvailable": "Bu alan adı için günlük mevcut değil",
+  "logsEntries": "günlük girişi",
+  "logsTitle": "Günlükler",
+  "logsError": "Hata"
 }

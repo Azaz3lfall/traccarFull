@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "ছবি পরিবর্তন",
   "accessLevelMoreInfo": "আরও তথ্য",
   "userEmailAlreadyExists": "ইমেইল ইতিমধ্যে ব্যবহৃত হচ্ছে",
-  "userRegistrationError": "নিবন্ধন ব্যর্থ। আবার চেষ্টা করুন।"
+  "userRegistrationError": "নিবন্ধন ব্যর্থ। আবার চেষ্টা করুন।",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

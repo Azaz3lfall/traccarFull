@@ -776,5 +776,10 @@
   "accessLevelChangePicture": "Change Picture",
   "accessLevelMoreInfo": "More Info",
   "userEmailAlreadyExists": "Email already in use",
-  "userRegistrationError": "Registration failed. Please try again."
+  "userRegistrationError": "Registration failed. Please try again.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "تغییر تصویر",
   "accessLevelMoreInfo": "اطلاعات بیشتر",
   "userEmailAlreadyExists": "ایمیل قبلاً استفاده شده است",
-  "userRegistrationError": "ثبت نام ناموفق بود. دوباره تلاش کنید."
+  "userRegistrationError": "ثبت نام ناموفق بود. دوباره تلاش کنید.",
+  "logsLoading": "در حال بارگذاری گزارش‌ها...",
+  "logsNoLogsAvailable": "هیچ گزارشی برای این دامنه موجود نیست",
+  "logsEntries": "ورودی‌های گزارش",
+  "logsTitle": "گزارش‌ها",
+  "logsError": "خطا"
 }

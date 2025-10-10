@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Spremeni sliko",
   "accessLevelMoreInfo": "Več informacij",
   "userEmailAlreadyExists": "E-pošta se že uporablja",
-  "userRegistrationError": "Registracija neuspešna. Poskusite znova."
+  "userRegistrationError": "Registracija neuspešna. Poskusite znova.",
+  "logsLoading": "Nalaganje dnevnikov...",
+  "logsNoLogsAvailable": "Za to domeno ni na voljo dnevnikov",
+  "logsEntries": "vnosov dnevnika",
+  "logsTitle": "Dnevniki",
+  "logsError": "Napaka"
 }

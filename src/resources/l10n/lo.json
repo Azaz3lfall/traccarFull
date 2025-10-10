@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "ປ່ຽນຮູບພາບ",
   "accessLevelMoreInfo": "ຂໍ້ມູນເພີ່ມເຕີມ",
   "userEmailAlreadyExists": "ອີເມວແລ້ວຖືກນຳໃຊ້",
-  "userRegistrationError": "ການລົງທະບຽນລົ້ມເຫລວ. ລອງໃໝ່ອີກຄັ້ງ."
+  "userRegistrationError": "ການລົງທະບຽນລົ້ມເຫລວ. ລອງໃໝ່ອີກຄັ້ງ.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

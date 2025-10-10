@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "चित्र बदलें",
   "accessLevelMoreInfo": "अधिक जानकारी",
   "userEmailAlreadyExists": "ईमेल पहले से उपयोग में है",
-  "userRegistrationError": "पंजीकरण विफल। कृपया पुनः प्रयास करें।"
+  "userRegistrationError": "पंजीकरण विफल। कृपया पुनः प्रयास करें।",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

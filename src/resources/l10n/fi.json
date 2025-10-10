@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Vaihda kuva",
   "accessLevelMoreInfo": "Lisätietoja",
   "userEmailAlreadyExists": "Sähköposti on jo käytössä",
-  "userRegistrationError": "Rekisteröinti epäonnistui. Yritä uudelleen."
+  "userRegistrationError": "Rekisteröinti epäonnistui. Yritä uudelleen.",
+  "logsLoading": "Ladataan lokitiedostoja...",
+  "logsNoLogsAvailable": "Tälle verkkotunnukselle ei ole lokitiedostoja saatavilla",
+  "logsEntries": "lokimerkintää",
+  "logsTitle": "Lokit",
+  "logsError": "Virhe"
 }

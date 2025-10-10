@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Changer l'image",
   "accessLevelMoreInfo": "Plus d'informations",
   "userEmailAlreadyExists": "L'adresse e-mail est déjà utilisée",
-  "userRegistrationError": "Échec de l'inscription. Veuillez réessayer."
+  "userRegistrationError": "Échec de l'inscription. Veuillez réessayer.",
+  "logsLoading": "Chargement des journaux...",
+  "logsNoLogsAvailable": "Aucun journal disponible pour ce domaine",
+  "logsEntries": "entrées de journal",
+  "logsTitle": "Journaux",
+  "logsError": "Erreur"
 }

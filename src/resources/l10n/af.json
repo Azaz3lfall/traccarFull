@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Verander Prent",
   "accessLevelMoreInfo": "Meer inligting",
   "userEmailAlreadyExists": "E-pos is reeds in gebruik",
-  "userRegistrationError": "Registrasie het misluk. Probeer weer."
+  "userRegistrationError": "Registrasie het misluk. Probeer weer.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

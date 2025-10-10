@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Schimbă imaginea",
   "accessLevelMoreInfo": "Mai multe informații",
   "userEmailAlreadyExists": "E-mailul este deja folosit",
-  "userRegistrationError": "Înregistrarea a eșuat. Încercați din nou."
+  "userRegistrationError": "Înregistrarea a eșuat. Încercați din nou.",
+  "logsLoading": "Se încarcă jurnalele...",
+  "logsNoLogsAvailable": "Nu există jurnale disponibile pentru acest domeniu",
+  "logsEntries": "intrări jurnal",
+  "logsTitle": "Jurnale",
+  "logsError": "Eroare"
 }

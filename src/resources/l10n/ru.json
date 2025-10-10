@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Изменить изображение",
   "accessLevelMoreInfo": "Больше информации",
   "userEmailAlreadyExists": "Электронная почта уже используется",
-  "userRegistrationError": "Регистрация не удалась. Попробуйте снова."
+  "userRegistrationError": "Регистрация не удалась. Попробуйте снова.",
+  "logsLoading": "Загрузка журналов...",
+  "logsNoLogsAvailable": "Нет доступных журналов для этого домена",
+  "logsEntries": "записи журнала",
+  "logsTitle": "Журналы",
+  "logsError": "Ошибка"
 }

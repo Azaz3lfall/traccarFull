@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Keisti paveikslėlį",
   "accessLevelMoreInfo": "Daugiau informacijos",
   "userEmailAlreadyExists": "El. paštas jau naudojamas",
-  "userRegistrationError": "Registracija nepavyko. Bandykite dar kartą."
+  "userRegistrationError": "Registracija nepavyko. Bandykite dar kartą.",
+  "logsLoading": "Įkeliami žurnalai...",
+  "logsNoLogsAvailable": "Šiam domenui nėra prieinamų žurnalų",
+  "logsEntries": "žurnalo įrašai",
+  "logsTitle": "Žurnalai",
+  "logsError": "Klaida"
 }

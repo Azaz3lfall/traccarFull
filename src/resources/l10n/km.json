@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "ប្តូររូបភាព",
   "accessLevelMoreInfo": "ព័ត៌មានបន្ថែម",
   "userEmailAlreadyExists": "អ៊ីមែលត្រូវបានប្រើប្រាស់រួចហើយ",
-  "userRegistrationError": "ការចុះឈ្មោះបរាជ័យ។ សូមព្យាយាមម្តងទៀត។"
+  "userRegistrationError": "ការចុះឈ្មោះបរាជ័យ។ សូមព្យាយាមម្តងទៀត។",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

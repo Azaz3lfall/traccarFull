@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Ndrysho Foton",
   "accessLevelMoreInfo": "Më Shumë Informacion",
   "userEmailAlreadyExists": "Email-i është tashmë në përdorim",
-  "userRegistrationError": "Regjistrimi dështoi. Provo përsëri."
+  "userRegistrationError": "Regjistrimi dështoi. Provo përsëri.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

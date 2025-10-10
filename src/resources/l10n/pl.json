@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Zmień obraz",
   "accessLevelMoreInfo": "Więcej informacji",
   "userEmailAlreadyExists": "E-mail jest już używany",
-  "userRegistrationError": "Rejestracja nie powiodła się. Spróbuj ponownie."
+  "userRegistrationError": "Rejestracja nie powiodła się. Spróbuj ponownie.",
+  "logsLoading": "Ładowanie dzienników...",
+  "logsNoLogsAvailable": "Brak dostępnych dzienników dla tej domeny",
+  "logsEntries": "wpisy dziennika",
+  "logsTitle": "Dzienniki",
+  "logsError": "Błąd"
 }

@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Endre Bilde",
   "accessLevelMoreInfo": "Mer Informasjon",
   "userEmailAlreadyExists": "E-post er allerede i bruk",
-  "userRegistrationError": "Registrering mislyktes. Prøv igjen."
+  "userRegistrationError": "Registrering mislyktes. Prøv igjen.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

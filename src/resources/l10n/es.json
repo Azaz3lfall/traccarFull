@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Cambiar imagen",
   "accessLevelMoreInfo": "Más información",
   "userEmailAlreadyExists": "El correo electrónico ya está en uso",
-  "userRegistrationError": "Error en el registro. Inténtalo de nuevo."
+  "userRegistrationError": "Error en el registro. Inténtalo de nuevo.",
+  "logsLoading": "Cargando registros...",
+  "logsNoLogsAvailable": "No hay registros disponibles para este dominio",
+  "logsEntries": "entradas de registro",
+  "logsTitle": "Registros",
+  "logsError": "Error"
 }

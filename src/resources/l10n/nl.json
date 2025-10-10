@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Afbeelding wijzigen",
   "accessLevelMoreInfo": "Meer informatie",
   "userEmailAlreadyExists": "E-mail is al in gebruik",
-  "userRegistrationError": "Registratie mislukt. Probeer opnieuw."
+  "userRegistrationError": "Registratie mislukt. Probeer opnieuw.",
+  "logsLoading": "Logboeken laden...",
+  "logsNoLogsAvailable": "Geen logboeken beschikbaar voor dit domein",
+  "logsEntries": "logboekvermeldingen",
+  "logsTitle": "Logboeken",
+  "logsError": "Fout"
 }

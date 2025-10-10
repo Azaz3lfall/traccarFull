@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Cambiar imaxe",
   "accessLevelMoreInfo": "Máis información",
   "userEmailAlreadyExists": "O email xa está en uso",
-  "userRegistrationError": "Erro no rexistro. Téntao de novo."
+  "userRegistrationError": "Erro no rexistro. Téntao de novo.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

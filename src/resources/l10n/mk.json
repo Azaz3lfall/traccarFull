@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Промени слика",
   "accessLevelMoreInfo": "Повеќе информации",
   "userEmailAlreadyExists": "Е-поштата веќе се користи",
-  "userRegistrationError": "Регистрацијата не успеа. Обидете се повторно."
+  "userRegistrationError": "Регистрацијата не успеа. Обидете се повторно.",
+  "logsLoading": "Вчитување на записи...",
+  "logsNoLogsAvailable": "Нема достапни записи за овој домен",
+  "logsEntries": "записи во дневник",
+  "logsTitle": "Записи",
+  "logsError": "Грешка"
 }

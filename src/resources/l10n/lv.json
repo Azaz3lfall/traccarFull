@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Mainīt attēlu",
   "accessLevelMoreInfo": "Vairāk informācijas",
   "userEmailAlreadyExists": "E-pasts jau tiek izmantots",
-  "userRegistrationError": "Reģistrācija neizdevās. Mēģiniet vēlreiz."
+  "userRegistrationError": "Reģistrācija neizdevās. Mēģiniet vēlreiz.",
+  "logsLoading": "Ielādē žurnālus...",
+  "logsNoLogsAvailable": "Šim domēnam nav pieejamu žurnālu",
+  "logsEntries": "žurnāla ieraksti",
+  "logsTitle": "Žurnāli",
+  "logsError": "Kļūda"
 }

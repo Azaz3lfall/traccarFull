@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "სურათის შეცვლა",
   "accessLevelMoreInfo": "მეტი ინფორმაცია",
   "userEmailAlreadyExists": "ელ.ფოსტა უკვე გამოიყენება",
-  "userRegistrationError": "რეგისტრაცია ვერ მოხერხდა. სცადეთ კვლავ."
+  "userRegistrationError": "რეგისტრაცია ვერ მოხერხდა. სცადეთ კვლავ.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Suraty Üýtget",
   "accessLevelMoreInfo": "Goşmaça Maglumat",
   "userEmailAlreadyExists": "E-poçta eýýäm ulanylyp dur",
-  "userRegistrationError": "Registrasiýa şowsuz boldy. Täzeden synaň."
+  "userRegistrationError": "Registrasiýa şowsuz boldy. Täzeden synaň.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

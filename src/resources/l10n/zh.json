@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "更改图片",
   "accessLevelMoreInfo": "更多信息",
   "userEmailAlreadyExists": "邮箱已被使用",
-  "userRegistrationError": "注册失败。请重试。"
+  "userRegistrationError": "注册失败。请重试。",
+  "logsLoading": "正在加载日志...",
+  "logsNoLogsAvailable": "此域名没有可用的日志",
+  "logsEntries": "日志条目",
+  "logsTitle": "日志",
+  "logsError": "错误"
 }

@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Thay đổi hình ảnh",
   "accessLevelMoreInfo": "Thông tin thêm",
   "userEmailAlreadyExists": "Email đã được sử dụng",
-  "userRegistrationError": "Đăng ký thất bại. Vui lòng thử lại."
+  "userRegistrationError": "Đăng ký thất bại. Vui lòng thử lại.",
+  "logsLoading": "Đang tải nhật ký...",
+  "logsNoLogsAvailable": "Không có nhật ký nào có sẵn cho miền này",
+  "logsEntries": "mục nhật ký",
+  "logsTitle": "Nhật ký",
+  "logsError": "Lỗi"
 }

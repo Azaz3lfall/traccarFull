@@ -972,14 +972,14 @@ const FloatingResellersPopover = ({
                           color: colors.text,
                           margin: 0
                         }}>
-                          Logs - {selectedReseller?.appUrl}
+                          {t('logsTitle')} - {selectedReseller?.appUrl}
                         </Typography>
                         <Typography style={{
                           fontSize: '14px',
                           color: colors.textSecondary,
                           margin: '4px 0 0 0'
                         }}>
-                          {logs.length} log entries
+                          {logs.length} {t('logsEntries')}
                         </Typography>
                       </div>
                       <IconButton
@@ -1007,7 +1007,7 @@ const FloatingResellersPopover = ({
                           padding: '40px'
                         }}>
                           <CircularProgress size={24} style={{ color: colors.primary }} />
-                          <span style={{ marginLeft: '12px', color: colors.text }}>Loading logs...</span>
+                          <span style={{ marginLeft: '12px', color: colors.text }}>{t('logsLoading')}</span>
                         </div>
                       ) : logs.length === 0 ? (
                         <div style={{
@@ -1015,7 +1015,7 @@ const FloatingResellersPopover = ({
                           padding: '40px',
                           color: colors.textSecondary
                         }}>
-                          No logs available for this domain
+                          {t('logsNoLogsAvailable')}
                         </div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1070,7 +1070,7 @@ const FloatingResellersPopover = ({
                                   borderRadius: '4px',
                                   border: '1px solid #FECACA'
                                 }}>
-                                  Error: {log.error}
+                                  {t('logsError')}: {log.error}
                                 </Typography>
                               )}
                             </div>

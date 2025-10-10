@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Canviar imatge",
   "accessLevelMoreInfo": "Més informació",
   "userEmailAlreadyExists": "L'email ja està en ús",
-  "userRegistrationError": "Error en el registre. Torna-ho a intentar."
+  "userRegistrationError": "Error en el registre. Torna-ho a intentar.",
+  "logsLoading": "Carregant registres...",
+  "logsNoLogsAvailable": "No hi ha registres disponibles per a aquest domini",
+  "logsEntries": "entrades de registre",
+  "logsTitle": "Registres",
+  "logsError": "Error"
 }

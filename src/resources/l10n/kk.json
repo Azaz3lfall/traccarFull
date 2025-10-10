@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Суретті өзгерту",
   "accessLevelMoreInfo": "Қосымша ақпарат",
   "userEmailAlreadyExists": "Электрондық пошта қазірдің өзінде пайдаланылып жатыр",
-  "userRegistrationError": "Тіркеу сәтсіз аяқталды. Қайталап көріңіз."
+  "userRegistrationError": "Тіркеу сәтсіз аяқталды. Қайталап көріңіз.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

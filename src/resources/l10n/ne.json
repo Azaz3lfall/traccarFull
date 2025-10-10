@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "तस्बिर परिवर्तन गर्नुहोस्",
   "accessLevelMoreInfo": "थप जानकारी",
   "userEmailAlreadyExists": "इमेल पहिले नै प्रयोगमा छ",
-  "userRegistrationError": "दर्ता असफल भयो। फेरि प्रयास गर्नुहोस्।"
+  "userRegistrationError": "दर्ता असफल भयो। फेरि प्रयास गर्नुहोस्।",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

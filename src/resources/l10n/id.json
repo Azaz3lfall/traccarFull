@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Ubah gambar",
   "accessLevelMoreInfo": "Info lebih lanjut",
   "userEmailAlreadyExists": "Email sudah digunakan",
-  "userRegistrationError": "Pendaftaran gagal. Coba lagi."
+  "userRegistrationError": "Pendaftaran gagal. Coba lagi.",
+  "logsLoading": "Memuat log...",
+  "logsNoLogsAvailable": "Tidak ada log yang tersedia untuk domain ini",
+  "logsEntries": "entri log",
+  "logsTitle": "Log",
+  "logsError": "Kesalahan"
 }

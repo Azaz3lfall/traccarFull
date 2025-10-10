@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "更改圖片",
   "accessLevelMoreInfo": "更多資訊",
   "userEmailAlreadyExists": "電子郵件已被使用",
-  "userRegistrationError": "註冊失敗。請重試。"
+  "userRegistrationError": "註冊失敗。請重試。",
+  "logsLoading": "正在載入日誌...",
+  "logsNoLogsAvailable": "此網域沒有可用的日誌",
+  "logsEntries": "日誌項目",
+  "logsTitle": "日誌",
+  "logsError": "錯誤"
 }

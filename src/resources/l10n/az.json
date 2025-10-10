@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Şəkli Dəyişdir",
   "accessLevelMoreInfo": "Daha çox məlumat",
   "userEmailAlreadyExists": "E-poçt artıq istifadə olunur",
-  "userRegistrationError": "Qeydiyyat uğursuz oldu. Yenidən cəhd edin."
+  "userRegistrationError": "Qeydiyyat uğursuz oldu. Yenidən cəhd edin.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }

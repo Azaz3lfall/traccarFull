@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Bild ändern",
   "accessLevelMoreInfo": "Weitere Informationen",
   "userEmailAlreadyExists": "E-Mail-Adresse bereits in Verwendung",
-  "userRegistrationError": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  "userRegistrationError": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  "logsLoading": "Protokolle werden geladen...",
+  "logsNoLogsAvailable": "Keine Protokolle für diese Domain verfügbar",
+  "logsEntries": "Protokolleinträge",
+  "logsTitle": "Protokolle",
+  "logsError": "Fehler"
 }

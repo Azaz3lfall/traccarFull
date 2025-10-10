@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Zmeniť obrázok",
   "accessLevelMoreInfo": "Viac informácií",
   "userEmailAlreadyExists": "E-mail sa už používa",
-  "userRegistrationError": "Registrácia sa nepodarila. Skúste to znovu."
+  "userRegistrationError": "Registrácia sa nepodarila. Skúste to znovu.",
+  "logsLoading": "Načítanie protokolov...",
+  "logsNoLogsAvailable": "Pre túto doménu nie sú k dispozícii žiadne protokoly",
+  "logsEntries": "záznamy protokolu",
+  "logsTitle": "Protokoly",
+  "logsError": "Chyba"
 }

@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Muuda pilti",
   "accessLevelMoreInfo": "Rohkem infot",
   "userEmailAlreadyExists": "E-post on juba kasutusel",
-  "userRegistrationError": "Registreerimine ebaõnnestus. Proovige uuesti."
+  "userRegistrationError": "Registreerimine ebaõnnestus. Proovige uuesti.",
+  "logsLoading": "Logide laadimine...",
+  "logsNoLogsAvailable": "Selle domeeni jaoks pole logisid saadaval",
+  "logsEntries": "logi kirjed",
+  "logsTitle": "Logid",
+  "logsError": "Viga"
 }

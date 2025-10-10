@@ -770,5 +770,10 @@
   "accessLevelChangePicture": "Skift billede",
   "accessLevelMoreInfo": "Mere information",
   "userEmailAlreadyExists": "E-mail er allerede i brug",
-  "userRegistrationError": "Registrering mislykkedes. Prøv igen."
+  "userRegistrationError": "Registrering mislykkedes. Prøv igen.",
+  "logsLoading": "Indlæser logfiler...",
+  "logsNoLogsAvailable": "Ingen logfiler tilgængelige for dette domæne",
+  "logsEntries": "logposter",
+  "logsTitle": "Logfiler",
+  "logsError": "Fejl"
 }

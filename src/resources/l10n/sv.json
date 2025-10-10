@@ -769,5 +769,10 @@
   "accessLevelChangePicture": "Ändra bild",
   "accessLevelMoreInfo": "Mer information",
   "userEmailAlreadyExists": "E-post används redan",
-  "userRegistrationError": "Registrering misslyckades. Försök igen."
+  "userRegistrationError": "Registrering misslyckades. Försök igen.",
+  "logsLoading": "Laddar loggar...",
+  "logsNoLogsAvailable": "Inga loggar tillgängliga för denna domän",
+  "logsEntries": "loggposter",
+  "logsTitle": "Loggar",
+  "logsError": "Fel"
 }

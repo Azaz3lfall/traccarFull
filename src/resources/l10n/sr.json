@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Промени слику",
   "accessLevelMoreInfo": "Више информација",
   "userEmailAlreadyExists": "Е-пошта се већ користи",
-  "userRegistrationError": "Регистрација није успела. Покушајте поново."
+  "userRegistrationError": "Регистрација није успела. Покушајте поново.",
+  "logsLoading": "Učitavanje zapisa...",
+  "logsNoLogsAvailable": "Nema dostupnih zapisa za ovu domenu",
+  "logsEntries": "записи дневника",
+  "logsTitle": "Записи",
+  "logsError": "Greška"
 }

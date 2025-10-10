@@ -766,5 +766,10 @@
   "accessLevelChangePicture": "Badilisha Picha",
   "accessLevelMoreInfo": "Maelezo Zaidi",
   "userEmailAlreadyExists": "Barua pepe tayari inatumika",
-  "userRegistrationError": "Usajili ulishindwa. Jaribu tena."
+  "userRegistrationError": "Usajili ulishindwa. Jaribu tena.",
+  "logsLoading": "Loading Logs...",
+  "logsNoLogsAvailable": "No logs available for this domain",
+  "logsEntries": "log entries",
+  "logsTitle": "Logs",
+  "logsError": "Error"
 }
