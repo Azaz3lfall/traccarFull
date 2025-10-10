@@ -1783,8 +1783,19 @@ const FloatingUsersPopover = ({
                     )}
 
                     {/* Preferences Tab */}
-                    {((!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 2) || 
-                     ((isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 1) ? (
+                    {(() => {
+                      const showForAdmin = (!isEditingOwnAccount || isCurrentUserAdmin) && activeTab === 2;
+                      const showForNonAdmin = (isEditingOwnAccount && !isCurrentUserAdmin) && activeTab === 1;
+                      console.log('🔍 Preferences Tab Debug:', {
+                        isEditingOwnAccount,
+                        isCurrentUserAdmin,
+                        activeTab,
+                        showForAdmin,
+                        showForNonAdmin,
+                        shouldShow: showForAdmin || showForNonAdmin
+                      });
+                      return showForAdmin || showForNonAdmin;
+                    })() ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <TextField
                           value={editingUser.phone || ''}
