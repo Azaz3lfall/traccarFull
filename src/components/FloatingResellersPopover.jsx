@@ -1034,7 +1034,7 @@ const FloatingResellersPopover = ({
                         title="Delete logs for this domain"
                       >
                         {logsDeleting ? (
-                          <CircularProgress size={16} style={{ color: colors.textSecondary }} />
+                          <CircularProgress size={16} color="inherit" />
                         ) : (
                           <DeleteIcon fontSize="small" />
                         )}
@@ -1055,7 +1055,7 @@ const FloatingResellersPopover = ({
                           height: '100%',
                           gap: '12px'
                         }}>
-                          <CircularProgress size={20} style={{ color: colors.primary }} />
+                          <CircularProgress size={20} color="inherit" />
                           <span style={{ color: colors.text }}>{t('logsLoading')}</span>
                         </div>
                       ) : logs.length === 0 ? (
