@@ -34,7 +34,7 @@ const RegisterPage = () => {
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
   const [showQr, setShowQr] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorType, setErrorType] = useState(''); // 'email' or 'registration'
   const [isLoading, setIsLoading] = useState(false);
 
   useEffectAsync(async () => {
@@ -46,7 +46,7 @@ const RegisterPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setErrorMessage('');
+    setErrorType('');
     setIsLoading(true);
     
     try {
@@ -59,16 +59,12 @@ const RegisterPage = () => {
       if (response.ok) {
         setSnackbarOpen(true);
       } else {
-        const errorText = await response.text();
-        if (response.status === 409 || errorText.includes('already exists') || errorText.includes('duplicate')) {
-          setErrorMessage(t('userEmailAlreadyExists') || 'Email already in use');
-        } else {
-          setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
-        }
+        // Any error response (not 200) shows email already in use message
+        setErrorType('email');
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setErrorMessage(t('userRegistrationError') || 'Registration failed. Please try again.');
+      setErrorType('email');
     } finally {
       setIsLoading(false);
     }
@@ -410,13 +406,13 @@ const RegisterPage = () => {
         )}
         
         {/* Error message */}
-        {errorMessage && (
+        {errorType && (
           <div style={{
             color: '#EF4444',
             fontSize: '14px',
             textAlign: 'center',
           }}>
-            {errorMessage}
+            {errorType === 'email' ? t('userEmailAlreadyExists') : t('userRegistrationError')}
           </div>
         )}
         
