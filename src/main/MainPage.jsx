@@ -57,9 +57,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CropIcon from '@mui/icons-material/Crop';
 import { TbSteeringWheel } from "react-icons/tb";
 import { AiOutlineCloudServer } from "react-icons/ai";
+import { HiMiniCubeTransparent } from "react-icons/hi2";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import FolderIcon from '@mui/icons-material/Folder';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PersonIcon from '@mui/icons-material/Person';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -2763,7 +2763,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <FolderIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <HiMiniCubeTransparent style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -7224,7 +7224,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <FolderIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <HiMiniCubeTransparent style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('resellerPanel')}
                     </button>
                   )}
