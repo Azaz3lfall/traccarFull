@@ -53,24 +53,26 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
-import SettingsIcon from '@mui/icons-material/Settings';
 import CropIcon from '@mui/icons-material/Crop';
 import { TbSteeringWheel } from "react-icons/tb";
 import { AiOutlineCloudServer } from "react-icons/ai";
 import { HiMiniCubeTransparent } from "react-icons/hi2";
 import { PiMapPinAreaLight } from "react-icons/pi";
+import { 
+  AiOutlineSetting, 
+  AiOutlineTeam, 
+  AiOutlineUser, 
+  AiOutlineDatabase, 
+  AiOutlineTool, 
+  AiOutlineSend, 
+  AiOutlineSound, 
+  AiOutlineUsergroupAdd 
+} from "react-icons/ai";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import GroupsIcon from '@mui/icons-material/Groups';
-import PersonIcon from '@mui/icons-material/Person';
-import StorageIcon from '@mui/icons-material/Storage';
-import BuildIcon from '@mui/icons-material/Build';
-import PeopleIcon from '@mui/icons-material/People';
 import TodayIcon from '@mui/icons-material/Today';
-import PublishIcon from '@mui/icons-material/Publish';
 import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
-import CampaignIcon from '@mui/icons-material/Campaign';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SaveIcon from '@mui/icons-material/Save';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -1741,7 +1743,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <SettingsIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            <AiOutlineSetting style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -1879,7 +1881,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PersonIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineUser style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -2015,7 +2017,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-              <GroupsIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineTeam style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2219,7 +2221,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <StorageIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineDatabase style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -2287,7 +2289,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <BuildIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineTool style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -2355,7 +2357,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PublishIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineSend style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -2559,7 +2561,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <CampaignIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineSound style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -2695,7 +2697,7 @@ const MainPage = () => {
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <PeopleIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+              <AiOutlineUsergroupAdd style={{ fontSize: 18, color: colors.textSecondary }} />
               {isMenuExpanded && (
                 <span style={{
                   marginLeft: '12px',
@@ -6674,7 +6676,7 @@ const MainPage = () => {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
-                    <SettingsIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                    <AiOutlineSetting style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                     {t('settingsTitle')}
                   </button>
                   )}
@@ -6748,7 +6750,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <PersonIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineUser style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsUser')}
                     </button>
                   )}
@@ -6820,7 +6822,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <GroupsIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineTeam style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsGroups')}
                     </button>
                   )}
@@ -6928,7 +6930,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <StorageIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineDatabase style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedComputedAttributes')}
                     </button>
                   )}
@@ -6964,7 +6966,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <BuildIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineTool style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedMaintenance')}
                     </button>
                   )}
@@ -7000,7 +7002,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <PublishIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineSend style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('sharedSavedCommands')}
                     </button>
                   )}
@@ -7108,7 +7110,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <CampaignIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineSound style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('serverAnnouncement')}
                     </button>
                   )}
@@ -7184,7 +7186,7 @@ const MainPage = () => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <PeopleIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      <AiOutlineUsergroupAdd style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
                       {t('settingsUsers')}
                     </button>
                   )}
