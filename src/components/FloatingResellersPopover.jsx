@@ -1059,8 +1059,10 @@ const FloatingResellersPopover = ({
                         </div>
                       ) : logs.length === 0 ? (
                         <div style={{
-                          textAlign: 'center',
-                          padding: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          height: '100%',
                           color: colors.textSecondary
                         }}>
                           {t('logsNoLogsAvailable')}
