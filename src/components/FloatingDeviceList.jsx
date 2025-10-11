@@ -161,34 +161,53 @@ const FloatingDeviceList = ({
   // Close filter popup when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
+      console.log('Click outside handler called', {
+        showFilters,
+        showSortDropdown,
+        showStatusDropdown,
+        showGroupsDropdown,
+        target: event.target,
+        filterButtonRef: filterButtonRef.current,
+        filterPopupRef: filterPopupRef.current
+      });
+      
+      // First check if we're clicking outside the entire filter popup
       if (showFilters && 
           filterButtonRef.current && 
           filterPopupRef.current &&
           !filterButtonRef.current.contains(event.target) &&
           !filterPopupRef.current.contains(event.target)) {
+        console.log('Closing filter popup and all dropdowns');
         setShowFilters(false);
         // Close all dropdowns when filter popup is closed
         setShowSortDropdown(false);
         setShowStatusDropdown(false);
         setShowGroupsDropdown(false);
+        return; // Exit early to prevent individual dropdown handlers
       }
       
-      if (showSortDropdown && 
-          sortDropdownRef.current &&
-          !sortDropdownRef.current.contains(event.target)) {
-        setShowSortDropdown(false);
-      }
-      
-      if (showStatusDropdown && 
-          statusDropdownRef.current &&
-          !statusDropdownRef.current.contains(event.target)) {
-        setShowStatusDropdown(false);
-      }
-      
-      if (showGroupsDropdown && 
-          groupsDropdownRef.current &&
-          !groupsDropdownRef.current.contains(event.target)) {
-        setShowGroupsDropdown(false);
+      // Only check individual dropdowns if filter popup is still open
+      if (showFilters) {
+        if (showSortDropdown && 
+            sortDropdownRef.current &&
+            !sortDropdownRef.current.contains(event.target)) {
+          console.log('Closing sort dropdown');
+          setShowSortDropdown(false);
+        }
+        
+        if (showStatusDropdown && 
+            statusDropdownRef.current &&
+            !statusDropdownRef.current.contains(event.target)) {
+          console.log('Closing status dropdown');
+          setShowStatusDropdown(false);
+        }
+        
+        if (showGroupsDropdown && 
+            groupsDropdownRef.current &&
+            !groupsDropdownRef.current.contains(event.target)) {
+          console.log('Closing groups dropdown');
+          setShowGroupsDropdown(false);
+        }
       }
     };
 
