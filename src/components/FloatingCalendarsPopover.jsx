@@ -34,6 +34,7 @@ import {
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Save as SaveIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
@@ -1396,6 +1397,9 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             color: colors.text,
                                             backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
                                             borderBottom: index < 6 ? `1px solid ${colors.border}` : 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
                                           }}
                                           onMouseEnter={(e) => {
                                             e.stopPropagation();
@@ -1406,7 +1410,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
                                           }}
                                         >
-                                          {t(prefixString('calendar', day))}
+                                          <span>{t(prefixString('calendar', day))}</span>
+                                          {isSelected && <CheckIcon size={16} color={colors.primary} />}
                                         </div>
                                       );
                                     }) : 
@@ -1430,6 +1435,9 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             color: colors.text,
                                             backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
                                             borderBottom: index < 30 ? `1px solid ${colors.border}` : 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
                                           }}
                                           onMouseEnter={(e) => {
                                             e.stopPropagation();
@@ -1440,7 +1448,8 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                             e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
                                           }}
                                         >
-                                          {day}
+                                          <span>{day}</span>
+                                          {isSelected && <CheckIcon size={16} color={colors.primary} />}
                                         </div>
                                       );
                                     })
