@@ -28,9 +28,21 @@ const GroupPage = () => {
 
   const [item, setItem] = useState();
 
-  const onItemSaved = useCatch(async () => {
-    const response = await fetchOrThrow('/api/groups');
-    dispatch(groupsActions.refresh(await response.json()));
+  const onItemSaved = useCatch(async (savedItem) => {
+    // Update Redux store with the saved group
+    if (savedItem) {
+      if (id) {
+        // Update existing group
+        dispatch(groupsActions.update(savedItem));
+      } else {
+        // Add new group
+        dispatch(groupsActions.add(savedItem));
+      }
+    } else {
+      // Fallback: refresh all groups if no item returned
+      const response = await fetchOrThrow('/api/groups');
+      dispatch(groupsActions.refresh(await response.json()));
+    }
   });
 
   const validate = () => item && item.name;

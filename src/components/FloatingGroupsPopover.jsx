@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -37,11 +38,13 @@ import { useThemeColors } from '../common/components/ThemeProvider';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useGroupAttributes from '../common/attributes/useGroupAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
+import { groupsActions } from '../store';
 
 const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) => {
   const colors = useThemeColors();
   const t = useTranslation();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
 
   // State management
   const [page, setPage] = useState(1);
@@ -82,8 +85,11 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
     };
   }, []);
 
+  // Get groups from Redux store
+  const reduxGroups = useSelector((state) => state.groups.items);
+  
   // Fetch groups with TanStack Query
-  const { data: groups = [], isLoading } = useQuery({
+  const { data: queryGroups = [], isLoading } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
       const response = await fetch('/api/groups');
@@ -91,11 +97,16 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
         throw new Error('Failed to fetch groups');
       }
       const data = await response.json();
+      // Sync with Redux store when data is fetched
+      dispatch(groupsActions.refresh(data));
       return data;
     },
     enabled: isVisible,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Use Redux groups if available, otherwise fall back to query groups
+  const groups = Object.keys(reduxGroups).length > 0 ? Object.values(reduxGroups) : queryGroups;
 
   // Filter groups based on search keyword
   const filteredGroups = groups.filter(group =>
@@ -159,7 +170,10 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (newGroup) => {
+      // Update Redux store
+      dispatch(groupsActions.add(newGroup));
+      // Invalidate TanStack Query cache
       queryClient.invalidateQueries(['groups']);
       setEditDialog(false);
       setEditingGroup(null);
@@ -185,7 +199,10 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedGroup) => {
+      // Update Redux store
+      dispatch(groupsActions.update(updatedGroup));
+      // Invalidate TanStack Query cache
       queryClient.invalidateQueries(['groups']);
       setEditDialog(false);
       setEditingGroup(null);
@@ -204,8 +221,12 @@ const FloatingGroupsPopover = ({ isVisible, onClose, desktop, isMenuExpanded }) 
         const errorText = await response.text();
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+      return groupId; // Return the groupId for Redux action
     },
-    onSuccess: () => {
+    onSuccess: (groupId) => {
+      // Update Redux store
+      dispatch(groupsActions.remove(groupId));
+      // Invalidate TanStack Query cache
       queryClient.invalidateQueries(['groups']);
       cancelDelete();
     },

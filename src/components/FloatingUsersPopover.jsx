@@ -329,9 +329,9 @@ const FloatingUsersPopover = ({
 
   // Fetch users with TanStack Query
   const { data: users = [], isLoading, error } = useQuery({
-    queryKey: ['users', { excludeAttributes: true }],
+    queryKey: ['users', { excludeAttributes: false }],
     queryFn: async () => {
-      const response = await fetchOrThrow('/api/users?excludeAttributes=true');
+      const response = await fetchOrThrow('/api/users?excludeAttributes=false');
       return response.json();
     },
     enabled: isVisible, // Only fetch when popover is visible
@@ -2113,8 +2113,8 @@ const FloatingUsersPopover = ({
                     {selectedUserForConnections && (
                       <>
                         <LinkField
-                          endpointAll="/api/devices?all=true&excludeAttributes=true"
-                          endpointLinked={`/api/devices?userId=${selectedUserForConnections.id}&excludeAttributes=true`}
+                          endpointAll="/api/devices?all=true&excludeAttributes=false"
+                          endpointLinked={`/api/devices?userId=${selectedUserForConnections.id}&excludeAttributes=false`}
                           baseId={selectedUserForConnections.id}
                           keyBase="userId"
                           keyLink="deviceId"
@@ -2160,8 +2160,8 @@ const FloatingUsersPopover = ({
                           zIndex={50000}
                         />
                         <LinkField
-                          endpointAll="/api/users?all=true&excludeAttributes=true"
-                          endpointLinked={`/api/users?userId=${selectedUserForConnections.id}&excludeAttributes=true`}
+                          endpointAll="/api/users?all=true&excludeAttributes=false"
+                          endpointLinked={`/api/users?userId=${selectedUserForConnections.id}&excludeAttributes=false`}
                           baseId={selectedUserForConnections.id}
                           keyBase="userId"
                           keyLink="managedUserId"

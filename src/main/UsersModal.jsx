@@ -76,7 +76,7 @@ const UsersModal = ({ open, onClose }) => {
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['users', { excludeAttributes: true }],
     queryFn: async () => {
-      const response = await fetchOrThrow('/api/users?excludeAttributes=true');
+      const response = await fetchOrThrow('/api/users?excludeAttributes=false');
       return response.json();
     },
     enabled: open, // Only fetch when modal is open

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   IconButton, Menu, MenuItem, useMediaQuery, useTheme,
 } from '@mui/material';
@@ -10,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
 import RemoveDialog from '../../common/components/RemoveDialog';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import { groupsActions } from '../../store';
 
 const useStyles = makeStyles()(() => ({
   row: {
@@ -23,6 +25,7 @@ const CollectionActions = ({
   const theme = useTheme();
   const { classes } = useStyles();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const t = useTranslation();
 
   const phone = useMediaQuery(theme.breakpoints.down('sm'));
@@ -52,6 +55,10 @@ const CollectionActions = ({
   const handleRemoveResult = (removed) => {
     setRemoving(false);
     if (removed) {
+      // Update Redux store for groups
+      if (endpoint === 'groups') {
+        dispatch(groupsActions.remove(itemId));
+      }
       setTimestamp(Date.now());
     }
   };

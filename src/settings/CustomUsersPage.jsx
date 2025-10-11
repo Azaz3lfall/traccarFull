@@ -73,7 +73,7 @@ const CustomUsersPage = () => {
   useEffectAsync(async () => {
     setLoading(true);
     try {
-      const response = await fetchOrThrow('/api/users?excludeAttributes=true');
+      const response = await fetchOrThrow('/api/users?excludeAttributes=false');
       const userData = await response.json();
       setUsers(userData);
     } catch (error) {
