@@ -167,6 +167,10 @@ const FloatingDeviceList = ({
           !filterButtonRef.current.contains(event.target) &&
           !filterPopupRef.current.contains(event.target)) {
         setShowFilters(false);
+        // Close all dropdowns when filter popup is closed
+        setShowSortDropdown(false);
+        setShowStatusDropdown(false);
+        setShowGroupsDropdown(false);
       }
       
       if (showSortDropdown && 
@@ -193,6 +197,15 @@ const FloatingDeviceList = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown]);
+
+  // Close all dropdowns when filter popup is closed
+  React.useEffect(() => {
+    if (!showFilters) {
+      setShowSortDropdown(false);
+      setShowStatusDropdown(false);
+      setShowGroupsDropdown(false);
+    }
   }, [showFilters]);
 
   // Hide device list on mobile when device is selected
