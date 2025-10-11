@@ -167,6 +167,12 @@ const FloatingDeviceList = ({
           filterPopupRef.current &&
           !filterButtonRef.current.contains(event.target) &&
           !filterPopupRef.current.contains(event.target)) {
+        console.log('Closing filter popup and all dropdowns', {
+          showGroupsDropdown,
+          target: event.target,
+          filterButtonRef: filterButtonRef.current,
+          filterPopupRef: filterPopupRef.current
+        });
         // Close everything at once
         setShowFilters(false);
         setShowSortDropdown(false);
@@ -193,6 +199,12 @@ const FloatingDeviceList = ({
         if (showGroupsDropdown && 
             groupsDropdownRef.current &&
             !groupsDropdownRef.current.contains(event.target)) {
+          console.log('Closing groups dropdown', {
+            showGroupsDropdown,
+            groupsDropdownRef: groupsDropdownRef.current,
+            target: event.target,
+            contains: groupsDropdownRef.current.contains(event.target)
+          });
           setShowGroupsDropdown(false);
         }
       }
