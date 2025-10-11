@@ -167,18 +167,11 @@ const FloatingDeviceList = ({
           filterPopupRef.current &&
           !filterButtonRef.current.contains(event.target) &&
           !filterPopupRef.current.contains(event.target)) {
-        console.log('Closing filter popup and all dropdowns', {
-          showGroupsDropdown,
-          target: event.target,
-          filterButtonRef: filterButtonRef.current,
-          filterPopupRef: filterPopupRef.current
-        });
         // Close everything at once
         setShowFilters(false);
         setShowSortDropdown(false);
         setShowStatusDropdown(false);
         setShowGroupsDropdown(false);
-        event.stopPropagation();
         return;
       }
       
@@ -199,21 +192,19 @@ const FloatingDeviceList = ({
         if (showGroupsDropdown && 
             groupsDropdownRef.current &&
             !groupsDropdownRef.current.contains(event.target)) {
-          console.log('Closing groups dropdown', {
-            showGroupsDropdown,
-            groupsDropdownRef: groupsDropdownRef.current,
-            target: event.target,
-            contains: groupsDropdownRef.current.contains(event.target)
-          });
           setShowGroupsDropdown(false);
         }
       }
     };
 
-    document.addEventListener('click', handleClickOutside, true); // Use capture phase
+    // Use mousedown with a small delay to ensure proper event handling
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 10);
     
     return () => {
-      document.removeEventListener('click', handleClickOutside, true);
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown]);
 
