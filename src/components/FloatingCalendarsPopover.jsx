@@ -1411,7 +1411,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                           }}
                                         >
                                           <span>{t(prefixString('calendar', day))}</span>
-                                          {isSelected && <CheckIcon size={16} color={colors.primary} />}
+                                          {isSelected && <CheckIcon size={16} color="#10B981" />}
                                         </div>
                                       );
                                     }) : 
@@ -1449,7 +1449,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                           }}
                                         >
                                           <span>{day}</span>
-                                          {isSelected && <CheckIcon size={16} color={colors.primary} />}
+                                          {isSelected && <CheckIcon size={16} color="#10B981" />}
                                         </div>
                                       );
                                     })
