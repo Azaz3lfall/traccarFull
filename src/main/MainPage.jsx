@@ -3675,6 +3675,7 @@ const MainPage = () => {
               padding: '20px',
               border: `1px solid ${colors.border}`
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* User Header */}
             <div style={{
@@ -3822,7 +3823,8 @@ const MainPage = () => {
             }}>
               {/* Billing full width at top */}
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setShowUserPopover(false);
                   if (billingLink) {
                     window.open(billingLink, '_blank');
@@ -3862,7 +3864,8 @@ const MainPage = () => {
                 gap: '8px'
               }}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (hasAccountPermission || admin) {
                       setShowUserPopover(false);
                       setEditingUserId(user.id);
@@ -3896,7 +3899,8 @@ const MainPage = () => {
                   {t('settingsUser')}
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setShowUserPopover(false);
                     setShowLogoutModal(true);
                   }}
