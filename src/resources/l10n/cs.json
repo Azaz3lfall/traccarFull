@@ -786,5 +786,9 @@
   "sharedNoDevicesFound": "Žádná zařízení nebyla nalezena",
   "sharedStatus": "Stav",
   "sharedActions": "Akce",
-  "sharedActive": "Aktivní"
+  "sharedActive": "Aktivní",
+  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
+  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
+  "resellerImageCompressionError": "Failed to compress image. Please try again.",
+  "resellerCompressingImage": "Compressing..."
 }

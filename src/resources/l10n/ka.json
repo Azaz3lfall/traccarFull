@@ -782,5 +782,9 @@
   "sharedNoDevicesFound": "მოწყობილობები ვერ მოიძებნა",
   "sharedStatus": "სტატუსი",
   "sharedActions": "მოქმედებები",
-  "sharedActive": "აქტიური"
+  "sharedActive": "აქტიური",
+  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
+  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
+  "resellerImageCompressionError": "Failed to compress image. Please try again.",
+  "resellerCompressingImage": "Compressing..."
 }

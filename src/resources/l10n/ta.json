@@ -782,5 +782,9 @@
   "sharedNoDevicesFound": "சாதனங்கள் கிடைக்கவில்லை",
   "sharedStatus": "நிலை",
   "sharedActions": "செயல்கள்",
-  "sharedActive": "செயலில்"
+  "sharedActive": "செயலில்",
+  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
+  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
+  "resellerImageCompressionError": "Failed to compress image. Please try again.",
+  "resellerCompressingImage": "Compressing..."
 }

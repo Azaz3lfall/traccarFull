@@ -58,6 +58,7 @@ import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import resellersConfig from '../config/resellersConfig';
+import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { resellersActions } from '../store';
 import { useSelector } from 'react-redux';
 import CustomPagination from './CustomPagination';
@@ -117,6 +118,7 @@ const FloatingResellersPopover = ({
   const [domainCheckResult, setDomainCheckResult] = useState(null);
   const [isCheckingDomain, setIsCheckingDomain] = useState(false);
   const [domainValid, setDomainValid] = useState(false);
+  const [isCompressingImage, setIsCompressingImage] = useState(false);
 
   // Fetch resellers with TanStack Query
   const { data: resellersData, isLoading, error, refetch } = useQuery({
@@ -559,39 +561,66 @@ const FloatingResellersPopover = ({
     setDomainValid(false);
   };
 
-  // Handle image selection
-  const handleImageSelect = (event) => {
+  // Handle image selection with compression
+  const handleImageSelect = useCatch(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Check file type
-    if (file.type !== 'image/png') {
-      setImageError(t('resellerImageErrorPngOnly'));
+    // Reset file input
+    event.target.value = '';
+
+    // Validate file type and size
+    const validation = validateImageFile(file, 120); // 120KB max input
+    if (!validation.success) {
+      setImageError(t('resellerImageValidationError', { maxSize: 120 }));
       setSelectedImage(null);
       setImagePreview(null);
       return;
     }
 
-    // Check file size (120KB = 120 * 1024 bytes)
-    const maxSize = 120 * 1024;
-    if (file.size > maxSize) {
-      setImageError(t('resellerImageErrorSize'));
-      setSelectedImage(null);
-      setImagePreview(null);
-      return;
-    }
-
-    // Clear errors and set image
+    // Clear previous errors
     setImageError('');
-    setSelectedImage(file);
+    setIsCompressingImage(true);
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
-    };
-    reader.readAsDataURL(file);
-  };
+    try {
+      // Compress the image
+      const compressedFile = await compressImage(file, {
+        maxSizeKB: 15,
+        minSizeKB: 10,
+        maxWidth: 400,
+        maxHeight: 400,
+        outputFormat: 'image/png',
+        initialQuality: 0.8
+      });
+
+      // Set the compressed image
+      setSelectedImage(compressedFile);
+
+      // Create preview from compressed file
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(compressedFile);
+
+      // Show compression success message
+      const originalSizeKB = (file.size / 1024).toFixed(1);
+      const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
+      setSnackbar({
+        open: true,
+        message: t('resellerImageCompressedSuccess', { originalSize: originalSizeKB, compressedSize: compressedSizeKB }),
+        severity: 'success'
+      });
+
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      setImageError(t('resellerImageCompressionError'));
+      setSelectedImage(null);
+      setImagePreview(null);
+    } finally {
+      setIsCompressingImage(false);
+    }
+  });
 
   // Upload image to server
   const uploadImage = async (file, appUrl, parentUserId, resellerId) => {
@@ -1582,7 +1611,12 @@ const FloatingResellersPopover = ({
                                         borderStyle: 'dashed',
                                       }}
                                     >
-                                      {selectedImage ? t('resellerChangeLogo') : t('resellerSelectLogo')}
+                                      {isCompressingImage ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                          <CircularProgress size={16} />
+                                          {t('resellerCompressingImage')}
+                                        </Box>
+                                      ) : selectedImage ? t('resellerChangeLogo') : t('resellerSelectLogo')}
                                     </Button>
                                   </label>
                                   

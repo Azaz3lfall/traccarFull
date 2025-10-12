@@ -782,5 +782,9 @@
   "sharedNoDevicesFound": "Ni najdenih naprav",
   "sharedStatus": "Status",
   "sharedActions": "Dejanja",
-  "sharedActive": "Aktiven"
+  "sharedActive": "Aktiven",
+  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
+  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
+  "resellerImageCompressionError": "Failed to compress image. Please try again.",
+  "resellerCompressingImage": "Compressing..."
 }

@@ -786,5 +786,9 @@
   "sharedNoDevicesFound": "Không tìm thấy thiết bị",
   "sharedStatus": "Trạng thái",
   "sharedActions": "Hành động",
-  "sharedActive": "Hoạt động"
+  "sharedActive": "Hoạt động",
+  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
+  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
+  "resellerImageCompressionError": "Failed to compress image. Please try again.",
+  "resellerCompressingImage": "Compressing..."
 }
