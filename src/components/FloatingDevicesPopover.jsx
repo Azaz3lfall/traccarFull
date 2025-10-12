@@ -40,6 +40,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Link as LinkIcon,
   Save as SaveIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
@@ -1011,6 +1012,20 @@ const FloatingDevicesPopover = ({
                           readOnly
                           size="small"
                           ref={setCategoryInputRef}
+                          InputProps={{
+                            startAdornment: (
+                              <img 
+                                src={categoryIcons[editingDevice?.category || 'default'] || categoryIcons.default} 
+                                alt={editingDevice?.category || 'default'}
+                                style={{ 
+                                  width: '20px', 
+                                  height: '20px',
+                                  objectFit: 'contain',
+                                  marginRight: '8px'
+                                }}
+                              />
+                            ),
+                          }}
                           sx={{
                             '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
@@ -1040,6 +1055,7 @@ const FloatingDevicesPopover = ({
                           }}>
                             {deviceCategories.map((category) => {
                               const iconSrc = categoryIcons[category] || categoryIcons.default;
+                              const isSelected = editingDevice?.category === category;
                               return (
                                 <div
                                   key={category}
@@ -1051,7 +1067,8 @@ const FloatingDevicesPopover = ({
                                     borderBottom: `1px solid ${colors.border}`,
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '8px',
+                                    justifyContent: 'space-between',
+                                    backgroundColor: isSelected ? colors.primary + '10' : 'transparent',
                                   }}
                                   onMouseDown={(e) => {
                                     e.preventDefault();
@@ -1059,16 +1076,19 @@ const FloatingDevicesPopover = ({
                                     setCategoryDropdownOpen(false);
                                   }}
                                 >
-                                  <img 
-                                    src={iconSrc} 
-                                    alt={category}
-                                    style={{ 
-                                      width: '18px', 
-                                      height: '18px',
-                                      objectFit: 'contain'
-                                    }}
-                                  />
-                                  {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <img 
+                                      src={iconSrc} 
+                                      alt={category}
+                                      style={{ 
+                                        width: '22px', 
+                                        height: '22px',
+                                        objectFit: 'contain'
+                                      }}
+                                    />
+                                    {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
+                                  </div>
+                                  {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
                                 </div>
                               );
                             })}
