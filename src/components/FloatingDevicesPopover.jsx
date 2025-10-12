@@ -56,6 +56,27 @@ import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import deviceCategories from '../common/util/deviceCategories';
 
+// Import device category icons (same as map markers)
+import bicycleIcon from '../resources/images/newIcons/bicycle.png';
+import boatIcon from '../resources/images/newIcons/boat.png';
+import busIcon from '../resources/images/newIcons/bus.png';
+import carIcon from '../resources/images/newIcons/car.png';
+import camperIcon from '../resources/images/newIcons/camper.png';
+import craneIcon from '../resources/images/newIcons/crane.png';
+import helicopterIcon from '../resources/images/newIcons/helicopter.png';
+import motorcycleIcon from '../resources/images/newIcons/motorcycle.png';
+import personIcon from '../resources/images/newIcons/person.png';
+import planeIcon from '../resources/images/newIcons/plane.png';
+import scooterIcon from '../resources/images/newIcons/scooter.png';
+import shipIcon from '../resources/images/newIcons/ship.png';
+import tractorIcon from '../resources/images/newIcons/tractor.png';
+import trainIcon from '../resources/images/newIcons/train.png';
+import tramIcon from '../resources/images/newIcons/tram.png';
+import truckIcon from '../resources/images/newIcons/truck.png';
+import vanIcon from '../resources/images/newIcons/van.png';
+import defaultIcon from '../resources/images/newIcons/default.png';
+import animalIcon from '../resources/images/newIcons/animal.png';
+
 const FloatingDevicesPopover = ({ 
   desktop, 
   isMenuExpanded, 
@@ -74,9 +95,27 @@ const FloatingDevicesPopover = ({
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const deviceAttributes = useDeviceAttributes(t);
 
-  // Function to get icon path for device category
-  const getCategoryIconPath = (category) => {
-    return `/images/newIcons/${category}.png`;
+  // Device category icons mapping (same as map markers)
+  const categoryIcons = {
+    animal: animalIcon,
+    bicycle: bicycleIcon,
+    boat: boatIcon,
+    bus: busIcon,
+    car: carIcon,
+    camper: camperIcon,
+    crane: craneIcon,
+    helicopter: helicopterIcon,
+    motorcycle: motorcycleIcon,
+    person: personIcon,
+    plane: planeIcon,
+    scooter: scooterIcon,
+    ship: shipIcon,
+    tractor: tractorIcon,
+    train: trainIcon,
+    tram: tramIcon,
+    truck: truckIcon,
+    van: vanIcon,
+    default: defaultIcon,
   };
 
   // State management
@@ -1000,7 +1039,7 @@ const FloatingDevicesPopover = ({
                             width: categoryInputRef?.getBoundingClientRect().width || 200,
                           }}>
                             {deviceCategories.map((category) => {
-                              const iconPath = getCategoryIconPath(category);
+                              const iconSrc = categoryIcons[category] || categoryIcons.default;
                               return (
                                 <div
                                   key={category}
@@ -1021,16 +1060,12 @@ const FloatingDevicesPopover = ({
                                   }}
                                 >
                                   <img 
-                                    src={iconPath} 
+                                    src={iconSrc} 
                                     alt={category}
                                     style={{ 
                                       width: '18px', 
                                       height: '18px',
                                       objectFit: 'contain'
-                                    }}
-                                    onError={(e) => {
-                                      // Fallback to default icon if the specific category icon doesn't exist
-                                      e.target.src = '/images/newIcons/default.png';
                                     }}
                                   />
                                   {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
