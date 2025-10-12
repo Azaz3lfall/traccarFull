@@ -1782,10 +1782,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           tooltip.appendChild(img);
                           document.body.appendChild(tooltip);
                         }
-                        // Position bottom-left of image at mouse pointer
+                        // Position tooltip with top-left anchor at mouse pointer
                         tooltip.style.left = `${e.clientX}px`;
                         tooltip.style.top = `${e.clientY}px`;
-                        tooltip.style.transform = 'translateY(-100%)';
+                        tooltip.style.transform = 'none';
                       }
                     }}
                     onMouseLeave={() => {
@@ -1993,10 +1993,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       tooltip.appendChild(img);
                       document.body.appendChild(tooltip);
                     }
-                    // Position bottom-left of image at mouse pointer
+                    // Position tooltip with top-left anchor at mouse pointer
                     tooltip.style.left = `${e.clientX}px`;
                     tooltip.style.top = `${e.clientY}px`;
-                    tooltip.style.transform = 'translateY(-100%)';
+                    tooltip.style.transform = 'none';
                   }
                 }}
                 onMouseLeave={() => {
