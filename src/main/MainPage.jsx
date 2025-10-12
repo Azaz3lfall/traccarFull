@@ -989,7 +989,7 @@ const MainPage = () => {
 
     // Check Cloudinary configuration
     if (!validateCloudinaryConfig()) {
-      showSnackbar('Cloudinary configuration not found. Please check environment variables.', 'error');
+      showSnackbar(t('userPhotoCloudinaryConfigError'), 'error');
       return;
     }
 
@@ -1045,12 +1045,12 @@ const MainPage = () => {
       const originalSizeKB = (file.size / 1024).toFixed(1);
       const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
       showSnackbar(
-        `Profile photo updated! Compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB`, 
+        t('userPhotoUploadSuccess', { originalSize: originalSizeKB, compressedSize: compressedSizeKB }),
         'success'
       );
     } catch (error) {
       console.error('Error uploading profile photo:', error);
-      showSnackbar('Failed to upload profile photo. Please try again.', 'error');
+      showSnackbar(t('userPhotoUploadError'), 'error');
     } finally {
       setIsUploadingPhoto(false);
     }
@@ -3905,7 +3905,7 @@ const MainPage = () => {
                       opacity: isUploadingPhoto ? 0.7 : 1,
                       transition: 'all 0.2s'
                     }}
-                    title={isUploadingPhoto ? 'Uploading...' : 'Upload photo'}
+                    title={isUploadingPhoto ? t('userPhotoUploading') : t('userPhotoUploadTitle')}
                   >
                     {isUploadingPhoto ? (
                       <div style={{

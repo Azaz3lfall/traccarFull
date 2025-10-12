@@ -192,7 +192,16 @@ export const useLocalization = () => useContext(LocalizationContext);
 export const useTranslation = () => {
   const context = useContext(LocalizationContext);
   const { data } = context.languages[context.language];
-  return useMemo(() => (key) => data[key], [data]);
+  return useMemo(() => (key, params = {}) => {
+    let translation = data[key] || key;
+    
+    // Replace parameters in the translation string
+    Object.keys(params).forEach(param => {
+      translation = translation.replace(new RegExp(`{${param}}`, 'g'), params[param]);
+    });
+    
+    return translation;
+  }, [data]);
 };
 
 export const useTranslationKeys = (predicate) => {

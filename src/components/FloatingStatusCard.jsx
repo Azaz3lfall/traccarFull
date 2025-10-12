@@ -1189,7 +1189,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       const originalSizeKB = (file.size / 1024).toFixed(1);
       const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
       showSnackbar(
-        `Image uploaded successfully! Compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB`, 
+        t('deviceImageCompressedSuccess', { originalSize: originalSizeKB, compressedSize: compressedSizeKB }), 
         'success'
       );
     } catch (error) {
