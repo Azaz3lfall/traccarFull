@@ -40,26 +40,6 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Link as LinkIcon,
   Save as SaveIcon,
-  DirectionsCar as CarIcon,
-  DirectionsBike as BicycleIcon,
-  DirectionsBoat as BoatIcon,
-  DirectionsBus as BusIcon,
-  DirectionsSubway as TrainIcon,
-  Flight as PlaneIcon,
-  Motorcycle as MotorcycleIcon,
-  Person as PersonIcon,
-  DirectionsWalk as PersonWalkIcon,
-  LocalShipping as TruckIcon,
-  DirectionsRailway as TramIcon,
-  Agriculture as TractorIcon,
-  LocalShipping as VanIcon,
-  DirectionsCar as DefaultIcon,
-  DirectionsCar as CamperIcon,
-  Construction as CraneIcon,
-  Flight as HelicopterIcon,
-  DirectionsBoat as ShipIcon,
-  LocalShipping as TrailerIcon,
-  DirectionsBike as ScooterIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
@@ -94,31 +74,9 @@ const FloatingDevicesPopover = ({
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const deviceAttributes = useDeviceAttributes(t);
 
-  // Function to get icon for device category
-  const getCategoryIcon = (category) => {
-    const iconMap = {
-      'default': DefaultIcon,
-      'animal': PersonWalkIcon,
-      'bicycle': BicycleIcon,
-      'boat': BoatIcon,
-      'bus': BusIcon,
-      'car': CarIcon,
-      'camper': CamperIcon,
-      'crane': CraneIcon,
-      'helicopter': HelicopterIcon,
-      'motorcycle': MotorcycleIcon,
-      'person': PersonIcon,
-      'plane': PlaneIcon,
-      'ship': ShipIcon,
-      'tractor': TractorIcon,
-      'trailer': TrailerIcon,
-      'train': TrainIcon,
-      'tram': TramIcon,
-      'truck': TruckIcon,
-      'van': VanIcon,
-      'scooter': ScooterIcon,
-    };
-    return iconMap[category] || DefaultIcon;
+  // Function to get icon path for device category
+  const getCategoryIconPath = (category) => {
+    return `/images/newIcons/${category}.png`;
   };
 
   // State management
@@ -1042,7 +1000,7 @@ const FloatingDevicesPopover = ({
                             width: categoryInputRef?.getBoundingClientRect().width || 200,
                           }}>
                             {deviceCategories.map((category) => {
-                              const IconComponent = getCategoryIcon(category);
+                              const iconPath = getCategoryIconPath(category);
                               return (
                                 <div
                                   key={category}
@@ -1062,7 +1020,19 @@ const FloatingDevicesPopover = ({
                                     setCategoryDropdownOpen(false);
                                   }}
                                 >
-                                  <IconComponent style={{ fontSize: '18px', color: colors.textSecondary }} />
+                                  <img 
+                                    src={iconPath} 
+                                    alt={category}
+                                    style={{ 
+                                      width: '18px', 
+                                      height: '18px',
+                                      objectFit: 'contain'
+                                    }}
+                                    onError={(e) => {
+                                      // Fallback to default icon if the specific category icon doesn't exist
+                                      e.target.src = '/images/newIcons/default.png';
+                                    }}
+                                  />
                                   {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
                                 </div>
                               );
