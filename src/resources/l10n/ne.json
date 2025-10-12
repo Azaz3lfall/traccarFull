@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "छवि सफलतापूर्वक अपलोड भयो! {originalSize}KB बाट {compressedSize}KB मा संकुचित",
+  "userPhotoUploadError": "प्रोफाइल फोटो अपलोड गर्न असफल। कृपया फेरि प्रयास गर्नुहोस्।",
+  "userPhotoUploadSuccess": "प्रोफाइल फोटो अपडेट भयो! {originalSize}KB बाट {compressedSize}KB मा संकुचित",
+  "userPhotoValidationError": "कृपया एक वैध छवि फाइल छान्नुहोस् (PNG, JPG, JPEG, WebP) {maxSize}KB सम्म",
+  "userPhotoCloudinaryConfigError": "Cloudinary कन्फिगरेसन फेला परेन। कृपया वातावरण चरहरू जाँच गर्नुहोस्।",
+  "userPhotoUploading": "अपलोड हुँदैछ...",
+  "userPhotoUploadTitle": "फोटो अपलोड गर्नुहोस्",
+  "sharedNoDevicesFound": "कुनै उपकरण फेला परेन"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Немає доступних журналів для цього домену",
   "logsEntries": "записи журналу",
   "logsTitle": "Журнали",
-  "logsError": "Помилка"
+  "logsError": "Помилка",
+  "deviceImageCompressedSuccess": "Зображення успішно завантажено! Стиснуто з {originalSize}KB до {compressedSize}KB",
+  "userPhotoUploadError": "Не вдалося завантажити фото профілю. Спробуйте ще раз.",
+  "userPhotoUploadSuccess": "Фото профілю оновлено! Стиснуто з {originalSize}KB до {compressedSize}KB",
+  "userPhotoValidationError": "Виберіть дійсний файл зображення (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Конфігурацію Cloudinary не знайдено. Перевірте змінні середовища.",
+  "userPhotoUploading": "Завантажується...",
+  "userPhotoUploadTitle": "Завантажити фото",
+  "sharedNoDevicesFound": "Пристрої не знайдено"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Nema dostupnih zapisa za ovu domenu",
   "logsEntries": "zapisi dnevnika",
   "logsTitle": "Zapisi",
-  "logsError": "Greška"
+  "logsError": "Greška",
+  "deviceImageCompressedSuccess": "Slika uspješno učitana! Kompresirana s {originalSize}KB na {compressedSize}KB",
+  "userPhotoUploadError": "Neuspješno učitavanje profilne slike. Molimo pokušajte ponovno.",
+  "userPhotoUploadSuccess": "Profilna slika ažurirana! Kompresirana s {originalSize}KB na {compressedSize}KB",
+  "userPhotoValidationError": "Molimo odaberite valjanu slikovnu datoteku (PNG, JPG, JPEG, WebP) do {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguracija nije pronađena. Molimo provjerite varijable okruženja.",
+  "userPhotoUploading": "Učitava se...",
+  "userPhotoUploadTitle": "Učitaj sliku",
+  "sharedNoDevicesFound": "Nisu pronađeni uređaji"
 }

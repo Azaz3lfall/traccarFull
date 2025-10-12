@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Pre túto doménu nie sú k dispozícii žiadne protokoly",
   "logsEntries": "záznamy protokolu",
   "logsTitle": "Protokoly",
-  "logsError": "Chyba"
+  "logsError": "Chyba",
+  "deviceImageCompressedSuccess": "Obrázok úspešne nahraný! Komprimovaný z {originalSize}KB na {compressedSize}KB",
+  "userPhotoUploadError": "Nepodarilo sa nahrať profilovú fotku. Skúste to znova.",
+  "userPhotoUploadSuccess": "Profilová fotka aktualizovaná! Komprimovaná z {originalSize}KB na {compressedSize}KB",
+  "userPhotoValidationError": "Vyberte platný súbor obrázka (PNG, JPG, JPEG, WebP) až {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Konfigurácia Cloudinary nebola nájdená. Skontrolujte premenné prostredia.",
+  "userPhotoUploading": "Nahráva sa...",
+  "userPhotoUploadTitle": "Nahrať fotku",
+  "sharedNoDevicesFound": "Neboli nájdené žiadne zariadenia"
 }

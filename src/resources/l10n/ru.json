@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "Нет доступных журналов для этого домена",
   "logsEntries": "записи журнала",
   "logsTitle": "Журналы",
-  "logsError": "Ошибка"
+  "logsError": "Ошибка",
+  "deviceImageCompressedSuccess": "Изображение успешно загружено! Сжато с {originalSize}KB до {compressedSize}KB",
+  "userPhotoUploadError": "Не удалось загрузить фото профиля. Попробуйте снова.",
+  "userPhotoUploadSuccess": "Фото профиля обновлено! Сжато с {originalSize}KB до {compressedSize}KB",
+  "userPhotoValidationError": "Выберите действительный файл изображения (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Конфигурация Cloudinary не найдена. Проверьте переменные окружения.",
+  "userPhotoUploading": "Загружается...",
+  "userPhotoUploadTitle": "Загрузить фото",
+  "sharedNoDevicesFound": "Устройства не найдены"
 }

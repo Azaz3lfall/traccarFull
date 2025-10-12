@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Ingen logfiler tilgængelige for dette domæne",
   "logsEntries": "logposter",
   "logsTitle": "Logfiler",
-  "logsError": "Fejl"
+  "logsError": "Fejl",
+  "deviceImageCompressedSuccess": "Billede uploadet med succes! Komprimeret fra {originalSize}KB til {compressedSize}KB",
+  "userPhotoUploadError": "Kunne ikke uploade profilbillede. Prøv venligst igen.",
+  "userPhotoUploadSuccess": "Profilbillede opdateret! Komprimeret fra {originalSize}KB til {compressedSize}KB",
+  "userPhotoValidationError": "Vælg venligst en gyldig billedfil (PNG, JPG, JPEG, WebP) op til {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguration ikke fundet. Tjek venligst miljøvariabler.",
+  "userPhotoUploading": "Uploader...",
+  "userPhotoUploadTitle": "Upload billede",
+  "sharedNoDevicesFound": "Ingen enheder fundet"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Brak dostępnych dzienników dla tej domeny",
   "logsEntries": "wpisy dziennika",
   "logsTitle": "Dzienniki",
-  "logsError": "Błąd"
+  "logsError": "Błąd",
+  "deviceImageCompressedSuccess": "Obraz przesłany pomyślnie! Skompresowany z {originalSize}KB do {compressedSize}KB",
+  "userPhotoUploadError": "Nie udało się przesłać zdjęcia profilowego. Spróbuj ponownie.",
+  "userPhotoUploadSuccess": "Zdjęcie profilowe zaktualizowane! Skompresowane z {originalSize}KB do {compressedSize}KB",
+  "userPhotoValidationError": "Wybierz prawidłowy plik obrazu (PNG, JPG, JPEG, WebP) do {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Nie znaleziono konfiguracji Cloudinary. Sprawdź zmienne środowiskowe.",
+  "userPhotoUploading": "Przesyłanie...",
+  "userPhotoUploadTitle": "Prześlij zdjęcie",
+  "sharedNoDevicesFound": "Nie znaleziono urządzeń"
 }

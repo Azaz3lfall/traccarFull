@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Imazhi u ngarkua me sukses! I kompresuar nga {originalSize}KB në {compressedSize}KB",
+  "userPhotoUploadError": "Dështoi ngarkimi i fotos së profilit. Ju lutemi provoni përsëri.",
+  "userPhotoUploadSuccess": "Fotoja e profilit u përditësua! I kompresuar nga {originalSize}KB në {compressedSize}KB",
+  "userPhotoValidationError": "Ju lutemi zgjidhni një skedar imazhi të vlefshëm (PNG, JPG, JPEG, WebP) deri në {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Konfigurimi i Cloudinary nuk u gjet. Ju lutemi kontrolloni variablat e mjedisit.",
+  "userPhotoUploading": "Duke ngarkuar...",
+  "userPhotoUploadTitle": "Ngarko foto",
+  "sharedNoDevicesFound": "Nuk u gjetën pajisje"
 }

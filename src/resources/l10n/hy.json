@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Պատկերը հաջողությամբ բեռնվել է! Սեղմված {originalSize}KB-ից {compressedSize}KB",
+  "userPhotoUploadError": "Պրոֆիլի նկարի բեռնումը ձախողվեց: Խնդրում ենք կրկին փորձել:",
+  "userPhotoUploadSuccess": "Պրոֆիլի նկարը թարմացվել է! Սեղմված {originalSize}KB-ից {compressedSize}KB",
+  "userPhotoValidationError": "Խնդրում ենք ընտրել վավեր պատկերի ֆայլ (PNG, JPG, JPEG, WebP) մինչև {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary կարգավորումը չի գտնվել: Խնդրում ենք ստուգել միջավայրի փոփոխականները:",
+  "userPhotoUploading": "Բեռնվում է...",
+  "userPhotoUploadTitle": "Բեռնել նկար",
+  "sharedNoDevicesFound": "Սարքեր չեն գտնվել"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Selle domeeni jaoks pole logisid saadaval",
   "logsEntries": "logi kirjed",
   "logsTitle": "Logid",
-  "logsError": "Viga"
+  "logsError": "Viga",
+  "deviceImageCompressedSuccess": "Pilt üles laetud edukalt! Kokku surutud {originalSize}KB-st {compressedSize}KB-ks",
+  "userPhotoUploadError": "Profiilifoto üleslaadimine ebaõnnestus. Palun proovige uuesti.",
+  "userPhotoUploadSuccess": "Profiilifoto uuendatud! Kokku surutud {originalSize}KB-st {compressedSize}KB-ks",
+  "userPhotoValidationError": "Palun valige kehtiv pildifail (PNG, JPG, JPEG, WebP) kuni {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguratsiooni ei leitud. Palun kontrollige keskkonna muutujaid.",
+  "userPhotoUploading": "Laadib üles...",
+  "userPhotoUploadTitle": "Laadi foto üles",
+  "sharedNoDevicesFound": "Seadmeid ei leitud"
 }

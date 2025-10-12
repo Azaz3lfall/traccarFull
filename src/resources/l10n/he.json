@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "אין יומנים זמינים עבור הדומיין הזה",
   "logsEntries": "ערכי יומן",
   "logsTitle": "יומנים",
-  "logsError": "שגיאה"
+  "logsError": "שגיאה",
+  "deviceImageCompressedSuccess": "התמונה הועלתה בהצלחה! דחוסה מ-{originalSize}KB ל-{compressedSize}KB",
+  "userPhotoUploadError": "העלאת תמונת הפרופיל נכשלה. אנא נסה שוב.",
+  "userPhotoUploadSuccess": "תמונת הפרופיל עודכנה! דחוסה מ-{originalSize}KB ל-{compressedSize}KB",
+  "userPhotoValidationError": "אנא בחר קובץ תמונה תקין (PNG, JPG, JPEG, WebP) עד {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "תצורת Cloudinary לא נמצאה. אנא בדוק את משתני הסביבה.",
+  "userPhotoUploading": "מעלה...",
+  "userPhotoUploadTitle": "העלה תמונה",
+  "sharedNoDevicesFound": "לא נמצאו מכשירים"
 }

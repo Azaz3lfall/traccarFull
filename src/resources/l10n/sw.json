@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Picha imepakiwa kwa mafanikio! Imekandamizwa kutoka {originalSize}KB hadi {compressedSize}KB",
+  "userPhotoUploadError": "Kushindwa kupakia picha ya wasifu. Tafadhali jaribu tena.",
+  "userPhotoUploadSuccess": "Picha ya wasifu imesasishwa! Imekandamizwa kutoka {originalSize}KB hadi {compressedSize}KB",
+  "userPhotoValidationError": "Tafadhali chagua faili la picha halali (PNG, JPG, JPEG, WebP) hadi {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Mpangilio wa Cloudinary haujapatikana. Tafadhali angalia vigezo vya mazingira.",
+  "userPhotoUploading": "Inapakia...",
+  "userPhotoUploadTitle": "Pakia picha",
+  "sharedNoDevicesFound": "Hakuna vifaa vilivyopatikana"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Nincsenek naplók elérhetők ehhez a domainhez",
   "logsEntries": "naplóbejegyzés",
   "logsTitle": "Naplók",
-  "logsError": "Hiba"
+  "logsError": "Hiba",
+  "deviceImageCompressedSuccess": "Kép sikeresen feltöltve! Tömörítve {originalSize}KB-ról {compressedSize}KB-ra",
+  "userPhotoUploadError": "Profilkép feltöltése sikertelen. Kérjük, próbálja újra.",
+  "userPhotoUploadSuccess": "Profilkép frissítve! Tömörítve {originalSize}KB-ról {compressedSize}KB-ra",
+  "userPhotoValidationError": "Kérjük, válasszon egy érvényes képfájlt (PNG, JPG, JPEG, WebP) {maxSize}KB-ig",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguráció nem található. Kérjük, ellenőrizze a környezeti változókat.",
+  "userPhotoUploading": "Feltöltés...",
+  "userPhotoUploadTitle": "Kép feltöltése",
+  "sharedNoDevicesFound": "Nem találhatók eszközök"
 }

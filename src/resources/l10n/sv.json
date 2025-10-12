@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "Inga loggar tillgängliga för denna domän",
   "logsEntries": "loggposter",
   "logsTitle": "Loggar",
-  "logsError": "Fel"
+  "logsError": "Fel",
+  "deviceImageCompressedSuccess": "Bild uppladdad framgångsrikt! Komprimerad från {originalSize}KB till {compressedSize}KB",
+  "userPhotoUploadError": "Misslyckades att ladda upp profilbild. Försök igen.",
+  "userPhotoUploadSuccess": "Profilbild uppdaterad! Komprimerad från {originalSize}KB till {compressedSize}KB",
+  "userPhotoValidationError": "Välj en giltig bildfil (PNG, JPG, JPEG, WebP) upp till {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary-konfiguration hittades inte. Kontrollera miljövariabler.",
+  "userPhotoUploading": "Laddar upp...",
+  "userPhotoUploadTitle": "Ladda upp foto",
+  "sharedNoDevicesFound": "Inga enheter hittades"
 }

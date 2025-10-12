@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Няма налични логове за този домейн",
   "logsEntries": "записи в лог",
   "logsTitle": "Логове",
-  "logsError": "Грешка"
+  "logsError": "Грешка",
+  "deviceImageCompressedSuccess": "Изображението е качено успешно! Компресирано от {originalSize}KB до {compressedSize}KB",
+  "userPhotoUploadError": "Неуспешно качване на профилна снимка. Моля, опитайте отново.",
+  "userPhotoUploadSuccess": "Профилната снимка е обновена! Компресирана от {originalSize}KB до {compressedSize}KB",
+  "userPhotoValidationError": "Моля, изберете валиден файл с изображение (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Конфигурацията на Cloudinary не е намерена. Моля, проверете променливите на средата.",
+  "userPhotoUploading": "Качване...",
+  "userPhotoUploadTitle": "Качи снимка",
+  "sharedNoDevicesFound": "Не са намерени устройства"
 }

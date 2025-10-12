@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "لا توجد سجلات متاحة لهذا المجال",
   "logsEntries": "إدخالات السجل",
   "logsTitle": "السجلات",
-  "logsError": "خطأ"
+  "logsError": "خطأ",
+  "deviceImageCompressedSuccess": "تم رفع الصورة بنجاح! مضغوطة من {originalSize}KB إلى {compressedSize}KB",
+  "userPhotoUploadError": "فشل في رفع صورة الملف الشخصي. يرجى المحاولة مرة أخرى.",
+  "userPhotoUploadSuccess": "تم تحديث صورة الملف الشخصي! مضغوطة من {originalSize}KB إلى {compressedSize}KB",
+  "userPhotoValidationError": "يرجى اختيار ملف صورة صالح (PNG, JPG, JPEG, WebP) حتى {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "لم يتم العثور على إعدادات Cloudinary. يرجى التحقق من متغيرات البيئة.",
+  "userPhotoUploading": "جاري الرفع...",
+  "userPhotoUploadTitle": "رفع صورة",
+  "sharedNoDevicesFound": "لم يتم العثور على أجهزة"
 }

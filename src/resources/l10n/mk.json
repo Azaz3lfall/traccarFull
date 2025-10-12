@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Нема достапни записи за овој домен",
   "logsEntries": "записи во дневник",
   "logsTitle": "Записи",
-  "logsError": "Грешка"
+  "logsError": "Грешка",
+  "deviceImageCompressedSuccess": "Сликата е успешно прикачена! Компресирана од {originalSize}KB на {compressedSize}KB",
+  "userPhotoUploadError": "Неуспешно прикачување на профилна слика. Обидете се повторно.",
+  "userPhotoUploadSuccess": "Профилната слика е ажурирана! Компресирана од {originalSize}KB на {compressedSize}KB",
+  "userPhotoValidationError": "Ве молиме изберете валидна сликовна датотека (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary конфигурацијата не е пронајдена. Ве молиме проверете ги променливите на околината.",
+  "userPhotoUploading": "Прикачува...",
+  "userPhotoUploadTitle": "Прикачи слика",
+  "sharedNoDevicesFound": "Не се пронајдени уреди"
 }

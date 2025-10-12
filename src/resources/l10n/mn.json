@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Зураг амжилттай хүргэгдлээ! {originalSize}KB-аас {compressedSize}KB болгон шахагдсан",
+  "userPhotoUploadError": "Профайлын зураг хүргэхэд амжилтгүй боллоо. Дахин оролдоно уу.",
+  "userPhotoUploadSuccess": "Профайлын зураг шинэчлэгдлээ! {originalSize}KB-аас {compressedSize}KB болгон шахагдсан",
+  "userPhotoValidationError": "Хүчинтэй зураг файл (PNG, JPG, JPEG, WebP) {maxSize}KB хүртэл сонгоно уу",
+  "userPhotoCloudinaryConfigError": "Cloudinary тохиргоо олдсонгүй. Орчны хувьсагчдыг шалгана уу.",
+  "userPhotoUploading": "Хүргэж байна...",
+  "userPhotoUploadTitle": "Зураг хүргэх",
+  "sharedNoDevicesFound": "Төхөөрөмж олдсонгүй"
 }

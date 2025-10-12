@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "No hi ha registres disponibles per a aquest domini",
   "logsEntries": "entrades de registre",
   "logsTitle": "Registres",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Imatge pujada amb èxit! Comprimida de {originalSize}KB a {compressedSize}KB",
+  "userPhotoUploadError": "Error en pujar la foto de perfil. Torna-ho a provar.",
+  "userPhotoUploadSuccess": "Foto de perfil actualitzada! Comprimida de {originalSize}KB a {compressedSize}KB",
+  "userPhotoValidationError": "Si us plau, selecciona un fitxer d'imatge vàlid (PNG, JPG, JPEG, WebP) fins a {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Configuració de Cloudinary no trobada. Si us plau, verifica les variables d'entorn.",
+  "userPhotoUploading": "Pujant...",
+  "userPhotoUploadTitle": "Pujar foto",
+  "sharedNoDevicesFound": "No s'han trobat dispositius"
 }

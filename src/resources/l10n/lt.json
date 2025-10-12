@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Šiam domenui nėra prieinamų žurnalų",
   "logsEntries": "žurnalo įrašai",
   "logsTitle": "Žurnalai",
-  "logsError": "Klaida"
+  "logsError": "Klaida",
+  "deviceImageCompressedSuccess": "Paveikslėlis sėkmingai įkeltas! Suspaustas nuo {originalSize}KB iki {compressedSize}KB",
+  "userPhotoUploadError": "Nepavyko įkelti profilio nuotraukos. Bandykite dar kartą.",
+  "userPhotoUploadSuccess": "Profilio nuotrauka atnaujinta! Suspaustas nuo {originalSize}KB iki {compressedSize}KB",
+  "userPhotoValidationError": "Pasirinkite galiojantį paveikslėlio failą (PNG, JPG, JPEG, WebP) iki {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfigūracija nerasta. Patikrinkite aplinkos kintamuosius.",
+  "userPhotoUploading": "Įkeliama...",
+  "userPhotoUploadTitle": "Įkelti nuotrauką",
+  "sharedNoDevicesFound": "Įrenginių nerasta"
 }

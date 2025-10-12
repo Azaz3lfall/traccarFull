@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "Geen logboeken beschikbaar voor dit domein",
   "logsEntries": "logboekvermeldingen",
   "logsTitle": "Logboeken",
-  "logsError": "Fout"
+  "logsError": "Fout",
+  "deviceImageCompressedSuccess": "Afbeelding succesvol geüpload! Gecomprimeerd van {originalSize}KB naar {compressedSize}KB",
+  "userPhotoUploadError": "Profielfoto uploaden mislukt. Probeer het opnieuw.",
+  "userPhotoUploadSuccess": "Profielfoto bijgewerkt! Gecomprimeerd van {originalSize}KB naar {compressedSize}KB",
+  "userPhotoValidationError": "Selecteer een geldig afbeeldingsbestand (PNG, JPG, JPEG, WebP) tot {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary configuratie niet gevonden. Controleer omgevingsvariabelen.",
+  "userPhotoUploading": "Uploaden...",
+  "userPhotoUploadTitle": "Foto uploaden",
+  "sharedNoDevicesFound": "Geen apparaten gevonden"
 }

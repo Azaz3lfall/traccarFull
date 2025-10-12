@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "ไม่มีบันทึกสำหรับโดเมนนี้",
   "logsEntries": "รายการบันทึก",
   "logsTitle": "บันทึก",
-  "logsError": "ข้อผิดพลาด"
+  "logsError": "ข้อผิดพลาด",
+  "deviceImageCompressedSuccess": "อัปโหลดรูปภาพสำเร็จ! บีบอัดจาก {originalSize}KB เป็น {compressedSize}KB",
+  "userPhotoUploadError": "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ กรุณาลองใหม่",
+  "userPhotoUploadSuccess": "อัปเดตรูปโปรไฟล์แล้ว! บีบอัดจาก {originalSize}KB เป็น {compressedSize}KB",
+  "userPhotoValidationError": "กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง (PNG, JPG, JPEG, WebP) สูงสุด {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "ไม่พบการตั้งค่า Cloudinary กรุณาตรวจสอบตัวแปรสภาพแวดล้อม",
+  "userPhotoUploading": "กำลังอัปโหลด...",
+  "userPhotoUploadTitle": "อัปโหลดรูป",
+  "sharedNoDevicesFound": "ไม่พบอุปกรณ์"
 }

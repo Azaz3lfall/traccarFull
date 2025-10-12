@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Nu există jurnale disponibile pentru acest domeniu",
   "logsEntries": "intrări jurnal",
   "logsTitle": "Jurnale",
-  "logsError": "Eroare"
+  "logsError": "Eroare",
+  "deviceImageCompressedSuccess": "Imaginea a fost încărcată cu succes! Comprimată de la {originalSize}KB la {compressedSize}KB",
+  "userPhotoUploadError": "Eșec la încărcarea fotografiei de profil. Vă rugăm să încercați din nou.",
+  "userPhotoUploadSuccess": "Fotografia de profil a fost actualizată! Comprimată de la {originalSize}KB la {compressedSize}KB",
+  "userPhotoValidationError": "Vă rugăm să selectați un fișier imagine valid (PNG, JPG, JPEG, WebP) până la {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Configurația Cloudinary nu a fost găsită. Vă rugăm să verificați variabilele de mediu.",
+  "userPhotoUploading": "Se încarcă...",
+  "userPhotoUploadTitle": "Încarcă fotografia",
+  "sharedNoDevicesFound": "Nu au fost găsite dispozitive"
 }

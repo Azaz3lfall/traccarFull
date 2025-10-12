@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "ຮູບພາບອັບໂລດສຳເລັດ! ບີບອັດຈາກ {originalSize}KB ເປັນ {compressedSize}KB",
+  "userPhotoUploadError": "ອັບໂລດຮູບພາບໂປຣໄຟລ໌ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.",
+  "userPhotoUploadSuccess": "ຮູບພາບໂປຣໄຟລ໌ອັບເດດ! ບີບອັດຈາກ {originalSize}KB ເປັນ {compressedSize}KB",
+  "userPhotoValidationError": "ກະລຸນາເລືອກໄຟລ໌ຮູບພາບທີ່ຖືກຕ້ອງ (PNG, JPG, JPEG, WebP) ສູງສຸດ {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "ບໍ່ພົບການຕັ້ງຄ່າ Cloudinary. ກະລຸນາກວດສອບຕົວແປຂອງສະພາບແວດລ້ອມ.",
+  "userPhotoUploading": "ກຳລັງອັບໂລດ...",
+  "userPhotoUploadTitle": "ອັບໂລດຮູບພາບ",
+  "sharedNoDevicesFound": "ບໍ່ພົບອຸປະກອນ"
 }

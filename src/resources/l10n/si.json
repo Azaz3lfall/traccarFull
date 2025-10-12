@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "රූපය සාර්ථකව උඩුගත කරන ලදී! {originalSize}KB සිට {compressedSize}KB දක්වා සම්පීඩනය කරන ලදී",
+  "userPhotoUploadError": "පැතිකඩ ඡායාරූපය උඩුගත කිරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "userPhotoUploadSuccess": "පැතිකඩ ඡායාරූපය යාවත්කාලීන කරන ලදී! {originalSize}KB සිට {compressedSize}KB දක්වා සම්පීඩනය කරන ලදී",
+  "userPhotoValidationError": "කරුණාකර වලංගු රූප ගොනුවක් තෝරන්න (PNG, JPG, JPEG, WebP) {maxSize}KB දක්වා",
+  "userPhotoCloudinaryConfigError": "Cloudinary වින්‍යාසය හමු නොවීය. කරුණාකර පරිසර විචල්‍යයන් පරීක්ෂා කරන්න.",
+  "userPhotoUploading": "උඩුගත වෙමින්...",
+  "userPhotoUploadTitle": "ඡායාරූපය උඩුගත කරන්න",
+  "sharedNoDevicesFound": "උපාංග හමු නොවීය"
 }

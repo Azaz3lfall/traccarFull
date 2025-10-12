@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Şəkil uğurla yükləndi! {originalSize}KB-dan {compressedSize}KB-a sıxıldı",
+  "userPhotoUploadError": "Profil şəkli yüklənmədi. Zəhmət olmasa yenidən cəhd edin.",
+  "userPhotoUploadSuccess": "Profil şəkli yeniləndi! {originalSize}KB-dan {compressedSize}KB-a sıxıldı",
+  "userPhotoValidationError": "Zəhmət olmasa etibarlı şəkil faylı seçin (PNG, JPG, JPEG, WebP) {maxSize}KB-a qədər",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiqurasiyası tapılmadı. Zəhmət olmasa mühit dəyişənlərini yoxlayın.",
+  "userPhotoUploading": "Yüklənir...",
+  "userPhotoUploadTitle": "Şəkil yüklə",
+  "sharedNoDevicesFound": "Cihaz tapılmadı"
 }

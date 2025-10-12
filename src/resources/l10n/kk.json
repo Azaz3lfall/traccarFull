@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Сурет сәтті жүктелді! {originalSize}KB-дан {compressedSize}KB-ға сығылды",
+  "userPhotoUploadError": "Профиль суретін жүктеу сәтсіз. Қайталап көріңіз.",
+  "userPhotoUploadSuccess": "Профиль суреті жаңартылды! {originalSize}KB-дан {compressedSize}KB-ға сығылды",
+  "userPhotoValidationError": "Жарамды сурет файлын таңдаңыз (PNG, JPG, JPEG, WebP) {maxSize}KB-ға дейін",
+  "userPhotoCloudinaryConfigError": "Cloudinary конфигурациясы табылмады. Орта айнымалыларын тексеріңіз.",
+  "userPhotoUploading": "Жүктелуде...",
+  "userPhotoUploadTitle": "Сурет жүктеу",
+  "sharedNoDevicesFound": "Құрылғылар табылмады"
 }

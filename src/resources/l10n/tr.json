@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Bu alan adı için günlük mevcut değil",
   "logsEntries": "günlük girişi",
   "logsTitle": "Günlükler",
-  "logsError": "Hata"
+  "logsError": "Hata",
+  "deviceImageCompressedSuccess": "Resim başarıyla yüklendi! {originalSize}KB'dan {compressedSize}KB'a sıkıştırıldı",
+  "userPhotoUploadError": "Profil fotoğrafı yüklenemedi. Lütfen tekrar deneyin.",
+  "userPhotoUploadSuccess": "Profil fotoğrafı güncellendi! {originalSize}KB'dan {compressedSize}KB'a sıkıştırıldı",
+  "userPhotoValidationError": "Lütfen geçerli bir resim dosyası seçin (PNG, JPG, JPEG, WebP) {maxSize}KB'a kadar",
+  "userPhotoCloudinaryConfigError": "Cloudinary yapılandırması bulunamadı. Lütfen ortam değişkenlerini kontrol edin.",
+  "userPhotoUploading": "Yükleniyor...",
+  "userPhotoUploadTitle": "Fotoğraf yükle",
+  "sharedNoDevicesFound": "Cihaz bulunamadı"
 }

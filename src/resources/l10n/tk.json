@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Surat üstünlikli ýüklenildi! {originalSize}KB-dan {compressedSize}KB-a gysyldy",
+  "userPhotoUploadError": "Profil suratyny ýüklemek şowsuz boldy. Gaýtadan synanyşyň.",
+  "userPhotoUploadSuccess": "Profil suraty täzelendi! {originalSize}KB-dan {compressedSize}KB-a gysyldy",
+  "userPhotoValidationError": "Dogry surat faýlyny saýlaň (PNG, JPG, JPEG, WebP) {maxSize}KB çenli",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfigurasiýasy tapylmady. Dürli üýtgeýänleri barlaň.",
+  "userPhotoUploading": "Ýüklenýär...",
+  "userPhotoUploadTitle": "Surat ýükle",
+  "sharedNoDevicesFound": "Enjam tapylmady"
 }

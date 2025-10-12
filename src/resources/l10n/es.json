@@ -781,5 +781,6 @@
   "logsNoLogsAvailable": "No hay registros disponibles para este dominio",
   "logsEntries": "entradas de registro",
   "logsTitle": "Registros",
-  "logsError": "Error"
+  "logsError": "Error",
+  "sharedNoDevicesFound": "No se encontraron dispositivos"
 }

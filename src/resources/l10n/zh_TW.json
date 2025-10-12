@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "此網域沒有可用的日誌",
   "logsEntries": "日誌項目",
   "logsTitle": "日誌",
-  "logsError": "錯誤"
+  "logsError": "錯誤",
+  "deviceImageCompressedSuccess": "圖片上傳成功！從 {originalSize}KB 壓縮到 {compressedSize}KB",
+  "userPhotoUploadError": "上傳頭像失敗，請重試。",
+  "userPhotoUploadSuccess": "頭像已更新！從 {originalSize}KB 壓縮到 {compressedSize}KB",
+  "userPhotoValidationError": "請選擇有效的圖片檔案（PNG、JPG、JPEG、WebP）最大 {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "未找到 Cloudinary 設定，請檢查環境變數。",
+  "userPhotoUploading": "上傳中...",
+  "userPhotoUploadTitle": "上傳照片",
+  "sharedNoDevicesFound": "未找到裝置"
 }

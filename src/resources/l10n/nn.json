@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Bilde lasta opp vellykka! Komprimert frå {originalSize}KB til {compressedSize}KB",
+  "userPhotoUploadError": "Kunne ikkje lasta opp profilbilde. Prøv igjen.",
+  "userPhotoUploadSuccess": "Profilbilde oppdatert! Komprimert frå {originalSize}KB til {compressedSize}KB",
+  "userPhotoValidationError": "Vel ein gyldig bildefil (PNG, JPG, JPEG, WebP) opp til {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary-konfigurasjon ikkje funne. Sjekk miljøvariablar.",
+  "userPhotoUploading": "Lastar opp...",
+  "userPhotoUploadTitle": "Last opp bilde",
+  "sharedNoDevicesFound": "Ingen einingar funne"
 }

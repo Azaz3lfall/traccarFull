@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Šim domēnam nav pieejamu žurnālu",
   "logsEntries": "žurnāla ieraksti",
   "logsTitle": "Žurnāli",
-  "logsError": "Kļūda"
+  "logsError": "Kļūda",
+  "deviceImageCompressedSuccess": "Attēls veiksmīgi augšupielādēts! Saspiešts no {originalSize}KB līdz {compressedSize}KB",
+  "userPhotoUploadError": "Neizdevās augšupielādēt profila foto. Lūdzu, mēģiniet vēlreiz.",
+  "userPhotoUploadSuccess": "Profila foto atjaunots! Saspiešts no {originalSize}KB līdz {compressedSize}KB",
+  "userPhotoValidationError": "Lūdzu, izvēlieties derīgu attēla failu (PNG, JPG, JPEG, WebP) līdz {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfigurācija nav atrasta. Lūdzu, pārbaudiet vides mainīgos.",
+  "userPhotoUploading": "Augšupielādē...",
+  "userPhotoUploadTitle": "Augšupielādēt foto",
+  "sharedNoDevicesFound": "Ierīces nav atrastas"
 }

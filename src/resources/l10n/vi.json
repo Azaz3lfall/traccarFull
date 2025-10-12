@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Không có nhật ký nào có sẵn cho miền này",
   "logsEntries": "mục nhật ký",
   "logsTitle": "Nhật ký",
-  "logsError": "Lỗi"
+  "logsError": "Lỗi",
+  "deviceImageCompressedSuccess": "Hình ảnh đã tải lên thành công! Nén từ {originalSize}KB xuống {compressedSize}KB",
+  "userPhotoUploadError": "Không thể tải lên ảnh đại diện. Vui lòng thử lại.",
+  "userPhotoUploadSuccess": "Ảnh đại diện đã được cập nhật! Nén từ {originalSize}KB xuống {compressedSize}KB",
+  "userPhotoValidationError": "Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, JPEG, WebP) tối đa {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Không tìm thấy cấu hình Cloudinary. Vui lòng kiểm tra các biến môi trường.",
+  "userPhotoUploading": "Đang tải lên...",
+  "userPhotoUploadTitle": "Tải lên ảnh",
+  "sharedNoDevicesFound": "Không tìm thấy thiết bị"
 }

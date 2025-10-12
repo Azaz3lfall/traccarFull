@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Rasm muvaffaqiyatli yuklandi! {originalSize}KB dan {compressedSize}KB ga siqildi",
+  "userPhotoUploadError": "Profil rasmini yuklash muvaffaqiyatsiz. Iltimos, qayta urinib ko'ring.",
+  "userPhotoUploadSuccess": "Profil rasmi yangilandi! {originalSize}KB dan {compressedSize}KB ga siqildi",
+  "userPhotoValidationError": "Iltimos, to'g'ri rasm faylini tanlang (PNG, JPG, JPEG, WebP) {maxSize}KB gacha",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguratsiyasi topilmadi. Iltimos, muhit o'zgaruvchilarini tekshiring.",
+  "userPhotoUploading": "Yuklanmoqda...",
+  "userPhotoUploadTitle": "Rasm yuklash",
+  "sharedNoDevicesFound": "Qurilmalar topilmadi"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "ছবি সফলভাবে আপলোড হয়েছে! {originalSize}KB থেকে {compressedSize}KB এ সংকুচিত",
+  "userPhotoUploadError": "প্রোফাইল ছবি আপলোড করতে ব্যর্থ। দয়া করে আবার চেষ্টা করুন।",
+  "userPhotoUploadSuccess": "প্রোফাইল ছবি আপডেট হয়েছে! {originalSize}KB থেকে {compressedSize}KB এ সংকুচিত",
+  "userPhotoValidationError": "দয়া করে একটি বৈধ ছবি ফাইল নির্বাচন করুন (PNG, JPG, JPEG, WebP) {maxSize}KB পর্যন্ত",
+  "userPhotoCloudinaryConfigError": "Cloudinary কনফিগারেশন পাওয়া যায়নি। দয়া করে পরিবেশের ভেরিয়েবলগুলি পরীক্ষা করুন।",
+  "userPhotoUploading": "আপলোড হচ্ছে...",
+  "userPhotoUploadTitle": "ছবি আপলোড করুন",
+  "sharedNoDevicesFound": "কোনো ডিভাইস পাওয়া যায়নি"
 }

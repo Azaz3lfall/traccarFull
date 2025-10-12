@@ -777,5 +777,13 @@
   "logsNoLogsAvailable": "Nenhum registro disponível para este domínio",
   "logsEntries": "entradas de registro",
   "logsTitle": "Registros",
-  "logsError": "Erro"
+  "logsError": "Erro",
+  "deviceImageCompressedSuccess": "Imagem carregada com sucesso! Comprimida de {originalSize}KB para {compressedSize}KB",
+  "userPhotoUploadError": "Falha ao carregar foto de perfil. Tente novamente.",
+  "userPhotoUploadSuccess": "Foto de perfil atualizada! Comprimida de {originalSize}KB para {compressedSize}KB",
+  "userPhotoValidationError": "Selecione um arquivo de imagem válido (PNG, JPG, JPEG, WebP) até {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Configuração do Cloudinary não encontrada. Verifique as variáveis de ambiente.",
+  "userPhotoUploading": "Carregando...",
+  "userPhotoUploadTitle": "Carregar foto",
+  "sharedNoDevicesFound": "Nenhum dispositivo encontrado"
 }

@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Δεν υπάρχουν διαθέσιμα αρχεία καταγραφής για αυτόν τον τομέα",
   "logsEntries": "καταχωρήσεις αρχείου καταγραφής",
   "logsTitle": "Αρχεία καταγραφής",
-  "logsError": "Σφάλμα"
+  "logsError": "Σφάλμα",
+  "deviceImageCompressedSuccess": "Η εικόνα ανέβηκε επιτυχώς! Συμπιεσμένη από {originalSize}KB σε {compressedSize}KB",
+  "userPhotoUploadError": "Αποτυχία ανεβάσματος φωτογραφίας προφίλ. Παρακαλώ δοκιμάστε ξανά.",
+  "userPhotoUploadSuccess": "Η φωτογραφία προφίλ ενημερώθηκε! Συμπιεσμένη από {originalSize}KB σε {compressedSize}KB",
+  "userPhotoValidationError": "Παρακαλώ επιλέξτε ένα έγκυρο αρχείο εικόνας (PNG, JPG, JPEG, WebP) έως {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Η διαμόρφωση Cloudinary δεν βρέθηκε. Παρακαλώ ελέγξτε τις μεταβλητές περιβάλλοντος.",
+  "userPhotoUploading": "Ανεβάζει...",
+  "userPhotoUploadTitle": "Ανέβασμα φωτογραφίας",
+  "sharedNoDevicesFound": "Δεν βρέθηκαν συσκευές"
 }

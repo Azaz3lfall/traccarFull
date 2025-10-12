@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "Beeld suksesvol opgelaai! Saamgepers van {originalSize}KB na {compressedSize}KB",
+  "userPhotoUploadError": "Kon nie profielfoto oplaai nie. Probeer asseblief weer.",
+  "userPhotoUploadSuccess": "Profielfoto opgedateer! Saamgepers van {originalSize}KB na {compressedSize}KB",
+  "userPhotoValidationError": "Kies asseblief 'n geldige beeldlêer (PNG, JPG, JPEG, WebP) tot {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfigurasie nie gevind nie. Gaan asseblief omgewingsveranderlikes na.",
+  "userPhotoUploading": "Laai op...",
+  "userPhotoUploadTitle": "Laai foto op",
+  "sharedNoDevicesFound": "Geen toestelle gevind nie"
 }

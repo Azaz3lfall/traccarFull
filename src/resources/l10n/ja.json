@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "このドメインにはログがありません",
   "logsEntries": "ログエントリ",
   "logsTitle": "ログ",
-  "logsError": "エラー"
+  "logsError": "エラー",
+  "deviceImageCompressedSuccess": "画像が正常にアップロードされました！{originalSize}KBから{compressedSize}KBに圧縮",
+  "userPhotoUploadError": "プロフィール写真のアップロードに失敗しました。再試行してください。",
+  "userPhotoUploadSuccess": "プロフィール写真が更新されました！{originalSize}KBから{compressedSize}KBに圧縮",
+  "userPhotoValidationError": "有効な画像ファイル（PNG、JPG、JPEG、WebP）を{maxSize}KBまで選択してください",
+  "userPhotoCloudinaryConfigError": "Cloudinary設定が見つかりません。環境変数を確認してください。",
+  "userPhotoUploading": "アップロード中...",
+  "userPhotoUploadTitle": "写真をアップロード",
+  "sharedNoDevicesFound": "デバイスが見つかりません"
 }

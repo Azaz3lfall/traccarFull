@@ -781,5 +781,6 @@
   "logsNoLogsAvailable": "Aucun journal disponible pour ce domaine",
   "logsEntries": "entrées de journal",
   "logsTitle": "Journaux",
-  "logsError": "Erreur"
+  "logsError": "Erreur",
+  "sharedNoDevicesFound": "Aucun appareil trouvé"
 }

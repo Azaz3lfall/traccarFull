@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "此域名没有可用的日志",
   "logsEntries": "日志条目",
   "logsTitle": "日志",
-  "logsError": "错误"
+  "logsError": "错误",
+  "deviceImageCompressedSuccess": "图片上传成功！从 {originalSize}KB 压缩到 {compressedSize}KB",
+  "userPhotoUploadError": "上传头像失败，请重试。",
+  "userPhotoUploadSuccess": "头像已更新！从 {originalSize}KB 压缩到 {compressedSize}KB",
+  "userPhotoValidationError": "请选择有效的图片文件（PNG、JPG、JPEG、WebP）最大 {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "未找到 Cloudinary 配置，请检查环境变量。",
+  "userPhotoUploading": "上传中...",
+  "userPhotoUploadTitle": "上传照片",
+  "sharedNoDevicesFound": "未找到设备"
 }

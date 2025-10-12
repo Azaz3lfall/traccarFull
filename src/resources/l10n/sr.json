@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Nema dostupnih zapisa za ovu domenu",
   "logsEntries": "записи дневника",
   "logsTitle": "Записи",
-  "logsError": "Greška"
+  "logsError": "Greška",
+  "deviceImageCompressedSuccess": "Слика успешно прикачена! Компресирана са {originalSize}KB на {compressedSize}KB",
+  "userPhotoUploadError": "Неуспешно прикачивање профилне слике. Молимо покушајте поново.",
+  "userPhotoUploadSuccess": "Профилна слика ажурирана! Компресирана са {originalSize}KB на {compressedSize}KB",
+  "userPhotoValidationError": "Молимо изаберите важећу сликовну датотеку (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary конфигурација није пронађена. Молимо проверите променљиве окружења.",
+  "userPhotoUploading": "Прикачивање...",
+  "userPhotoUploadTitle": "Прикачи слику",
+  "sharedNoDevicesFound": "Уређаји нису пронађени"
 }

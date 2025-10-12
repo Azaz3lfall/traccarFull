@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Tidak ada log yang tersedia untuk domain ini",
   "logsEntries": "entri log",
   "logsTitle": "Log",
-  "logsError": "Kesalahan"
+  "logsError": "Kesalahan",
+  "deviceImageCompressedSuccess": "Gambar berhasil diunggah! Dikompres dari {originalSize}KB ke {compressedSize}KB",
+  "userPhotoUploadError": "Gagal mengunggah foto profil. Silakan coba lagi.",
+  "userPhotoUploadSuccess": "Foto profil diperbarui! Dikompres dari {originalSize}KB ke {compressedSize}KB",
+  "userPhotoValidationError": "Silakan pilih file gambar yang valid (PNG, JPG, JPEG, WebP) hingga {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Konfigurasi Cloudinary tidak ditemukan. Silakan periksa variabel lingkungan.",
+  "userPhotoUploading": "Mengunggah...",
+  "userPhotoUploadTitle": "Unggah foto",
+  "sharedNoDevicesFound": "Tidak ada perangkat yang ditemukan"
 }

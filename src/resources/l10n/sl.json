@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "Za to domeno ni na voljo dnevnikov",
   "logsEntries": "vnosov dnevnika",
   "logsTitle": "Dnevniki",
-  "logsError": "Napaka"
+  "logsError": "Napaka",
+  "deviceImageCompressedSuccess": "Slika uspešno naložena! Stisnjena iz {originalSize}KB v {compressedSize}KB",
+  "userPhotoUploadError": "Nalaganje profilne slike ni uspelo. Poskusite znova.",
+  "userPhotoUploadSuccess": "Profilna slika posodobljena! Stisnjena iz {originalSize}KB v {compressedSize}KB",
+  "userPhotoValidationError": "Izberite veljaven slikovni datoteki (PNG, JPG, JPEG, WebP) do {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary konfiguracija ni najdena. Preverite spremenljivke okolja.",
+  "userPhotoUploading": "Nalaganje...",
+  "userPhotoUploadTitle": "Naloži sliko",
+  "sharedNoDevicesFound": "Ni najdenih naprav"
 }

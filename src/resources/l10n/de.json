@@ -774,5 +774,13 @@
   "logsNoLogsAvailable": "Keine Protokolle für diese Domain verfügbar",
   "logsEntries": "Protokolleinträge",
   "logsTitle": "Protokolle",
-  "logsError": "Fehler"
+  "logsError": "Fehler",
+  "deviceImageCompressedSuccess": "Bild erfolgreich hochgeladen! Komprimiert von {originalSize}KB auf {compressedSize}KB",
+  "userPhotoUploadError": "Profilbild konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
+  "userPhotoUploadSuccess": "Profilbild aktualisiert! Komprimiert von {originalSize}KB auf {compressedSize}KB",
+  "userPhotoValidationError": "Bitte wählen Sie eine gültige Bilddatei (PNG, JPG, JPEG, WebP) bis zu {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary-Konfiguration nicht gefunden. Bitte überprüfen Sie die Umgebungsvariablen.",
+  "userPhotoUploading": "Wird hochgeladen...",
+  "userPhotoUploadTitle": "Foto hochladen",
+  "sharedNoDevicesFound": "Keine Geräte gefunden"
 }

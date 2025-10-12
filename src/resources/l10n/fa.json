@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "هیچ گزارشی برای این دامنه موجود نیست",
   "logsEntries": "ورودی‌های گزارش",
   "logsTitle": "گزارش‌ها",
-  "logsError": "خطا"
+  "logsError": "خطا",
+  "deviceImageCompressedSuccess": "تصویر با موفقیت آپلود شد! فشرده شده از {originalSize}KB به {compressedSize}KB",
+  "userPhotoUploadError": "آپلود عکس پروفایل ناموفق بود. لطفاً دوباره تلاش کنید.",
+  "userPhotoUploadSuccess": "عکس پروفایل به‌روزرسانی شد! فشرده شده از {originalSize}KB به {compressedSize}KB",
+  "userPhotoValidationError": "لطفاً یک فایل تصویر معتبر انتخاب کنید (PNG, JPG, JPEG, WebP) تا {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "پیکربندی Cloudinary یافت نشد. لطفاً متغیرهای محیطی را بررسی کنید.",
+  "userPhotoUploading": "در حال آپلود...",
+  "userPhotoUploadTitle": "آپلود عکس",
+  "sharedNoDevicesFound": "دستگاهی یافت نشد"
 }

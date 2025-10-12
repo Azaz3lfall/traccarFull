@@ -775,5 +775,13 @@
   "logsNoLogsAvailable": "Tälle verkkotunnukselle ei ole lokitiedostoja saatavilla",
   "logsEntries": "lokimerkintää",
   "logsTitle": "Lokit",
-  "logsError": "Virhe"
+  "logsError": "Virhe",
+  "deviceImageCompressedSuccess": "Kuva ladattu onnistuneesti! Pakattu {originalSize}KB:sta {compressedSize}KB:ksi",
+  "userPhotoUploadError": "Profiilikuvan lataus epäonnistui. Yritä uudelleen.",
+  "userPhotoUploadSuccess": "Profiilikuva päivitetty! Pakattu {originalSize}KB:sta {compressedSize}KB:ksi",
+  "userPhotoValidationError": "Valitse kelvollinen kuvatiedosto (PNG, JPG, JPEG, WebP) enintään {maxSize}KB",
+  "userPhotoCloudinaryConfigError": "Cloudinary-konfiguraatiota ei löytynyt. Tarkista ympäristömuuttujat.",
+  "userPhotoUploading": "Ladataan...",
+  "userPhotoUploadTitle": "Lataa kuva",
+  "sharedNoDevicesFound": "Laitteita ei löytynyt"
 }

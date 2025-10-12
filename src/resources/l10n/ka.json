@@ -771,5 +771,13 @@
   "logsNoLogsAvailable": "No logs available for this domain",
   "logsEntries": "log entries",
   "logsTitle": "Logs",
-  "logsError": "Error"
+  "logsError": "Error",
+  "deviceImageCompressedSuccess": "სურათი წარმატებით ატვირთულია! შეკუმშული {originalSize}KB-დან {compressedSize}KB-მდე",
+  "userPhotoUploadError": "პროფილის სურათის ატვირთვა ვერ მოხერხდა. გთხოვთ, კვლავ სცადოთ.",
+  "userPhotoUploadSuccess": "პროფილის სურათი განახლდა! შეკუმშული {originalSize}KB-დან {compressedSize}KB-მდე",
+  "userPhotoValidationError": "გთხოვთ, აირჩიოთ სწორი სურათის ფაილი (PNG, JPG, JPEG, WebP) {maxSize}KB-მდე",
+  "userPhotoCloudinaryConfigError": "Cloudinary კონფიგურაცია ვერ მოიძებნა. გთხოვთ, შეამოწმოთ გარემოს ცვლადები.",
+  "userPhotoUploading": "ატვირთვა...",
+  "userPhotoUploadTitle": "სურათის ატვირთვა",
+  "sharedNoDevicesFound": "მოწყობილობები ვერ მოიძებნა"
 }
