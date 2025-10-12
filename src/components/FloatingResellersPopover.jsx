@@ -132,7 +132,8 @@ const FloatingResellersPopover = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          parentUserId: user.id
+          parentUserId: user.id,
+          currentUrl: window.location.hostname
         }),
       });
 
@@ -516,7 +517,7 @@ const FloatingResellersPopover = ({
 
     // Create payload matching the exact structure you specified
     const fullPayload = {
-      currentDomain: window.location.hostname,
+      currentUrl: window.location.hostname,
       parentUserId: user?.id || '',
       parentUser: user?.name || user?.login || '',
       parentEmail: user?.email || '',
