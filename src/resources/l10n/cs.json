@@ -787,8 +787,8 @@
   "sharedStatus": "Stav",
   "sharedActions": "Akce",
   "sharedActive": "Aktivní",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Vyberte prosím platný soubor obrázku (PNG, JPG, JPEG, WebP) až {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo prodejce komprimováno! Zmenšeno z {originalSize}KB na {compressedSize}KB",
+  "resellerImageCompressionError": "Nepodařilo se komprimovat obrázek. Zkuste to prosím znovu.",
+  "resellerCompressingImage": "Komprimuje se..."
 }

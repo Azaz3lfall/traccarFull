@@ -783,8 +783,8 @@
   "sharedStatus": "Күй",
   "sharedActions": "Әрекеттер",
   "sharedActive": "Белсенді",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Жарамды сурет файлын таңдаңыз (PNG, JPG, JPEG, WebP) {maxSize}KB-ға дейін",
+  "resellerImageCompressedSuccess": "Қайта сатушы логотипі сығылды! {originalSize}KB-дан {compressedSize}KB-ға азайтылды",
+  "resellerImageCompressionError": "Суретті сығу мүмкін болмады. Қайталап көріңіз.",
+  "resellerCompressingImage": "Сығылуда..."
 }

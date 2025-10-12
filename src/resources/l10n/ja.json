@@ -786,8 +786,8 @@
   "sharedStatus": "ステータス",
   "sharedActions": "アクション",
   "sharedActive": "アクティブ",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "有効な画像ファイル（PNG、JPG、JPEG、WebP）を{maxSize}KBまで選択してください",
+  "resellerImageCompressedSuccess": "リセラーロゴを圧縮しました！{originalSize}KBから{compressedSize}KBに削減",
+  "resellerImageCompressionError": "画像の圧縮に失敗しました。もう一度お試しください。",
+  "resellerCompressingImage": "圧縮中..."
 }

@@ -783,8 +783,8 @@
   "sharedStatus": "Статус",
   "sharedActions": "Акции",
   "sharedActive": "Активен",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Ве молиме изберете валидна слика (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "resellerImageCompressedSuccess": "Логото на препродавачот е компресирано! Намалено од {originalSize}KB на {compressedSize}KB",
+  "resellerImageCompressionError": "Неуспешно компресирање на сликата. Ве молиме обидете се повторно.",
+  "resellerCompressingImage": "Компресирање..."
 }

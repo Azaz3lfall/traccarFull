@@ -787,8 +787,8 @@
   "sharedStatus": "Trạng thái",
   "sharedActions": "Hành động",
   "sharedActive": "Hoạt động",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, JPEG, WebP) lên đến {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo đại lý đã được nén! Giảm từ {originalSize}KB xuống {compressedSize}KB",
+  "resellerImageCompressionError": "Không thể nén hình ảnh. Vui lòng thử lại.",
+  "resellerCompressingImage": "Đang nén..."
 }

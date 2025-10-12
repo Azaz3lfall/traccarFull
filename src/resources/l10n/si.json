@@ -783,8 +783,8 @@
   "sharedStatus": "තත්වය",
   "sharedActions": "ක්‍රියා",
   "sharedActive": "ක්‍රියාකාරී",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "කරුණාකර වලංගු රූප ගොනුවක් තෝරන්න (PNG, JPG, JPEG, WebP) {maxSize}KB දක්වා",
+  "resellerImageCompressedSuccess": "විකුණුම්කරු ලෝගෝ සම්පීඩනය කරන ලදී! {originalSize}KB සිට {compressedSize}KB දක්වා අඩු කරන ලදී",
+  "resellerImageCompressionError": "රූපය සම්පීඩනය කිරීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "resellerCompressingImage": "සම්පීඩනය..."
 }

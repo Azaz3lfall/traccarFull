@@ -783,8 +783,8 @@
   "sharedStatus": "وضعیت",
   "sharedActions": "اقدامات",
   "sharedActive": "فعال",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "لطفاً یک فایل تصویر معتبر انتخاب کنید (PNG, JPG, JPEG, WebP) تا {maxSize}KB",
+  "resellerImageCompressedSuccess": "لوگوی فروشنده فشرده شد! از {originalSize}KB به {compressedSize}KB کاهش یافت",
+  "resellerImageCompressionError": "فشل در فشرده‌سازی تصویر. لطفاً دوباره تلاش کنید.",
+  "resellerCompressingImage": "در حال فشرده‌سازی..."
 }

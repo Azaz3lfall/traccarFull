@@ -787,8 +787,8 @@
   "sharedStatus": "Stare",
   "sharedActions": "Acțiuni",
   "sharedActive": "Activ",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Vă rugăm să selectați un fișier imagine valid (PNG, JPG, JPEG, WebP) până la {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo-ul revânzătorului comprimat! Redus de la {originalSize}KB la {compressedSize}KB",
+  "resellerImageCompressionError": "Eșec la comprimarea imaginii. Vă rugăm să încercați din nou.",
+  "resellerCompressingImage": "Se comprimă..."
 }

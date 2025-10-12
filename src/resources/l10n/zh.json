@@ -786,8 +786,8 @@
   "sharedStatus": "状态",
   "sharedActions": "操作",
   "sharedActive": "活跃",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "请选择有效的图像文件（PNG、JPG、JPEG、WebP）最大{maxSize}KB",
+  "resellerImageCompressedSuccess": "经销商标志已压缩！从{originalSize}KB减少到{compressedSize}KB",
+  "resellerImageCompressionError": "图像压缩失败。请重试。",
+  "resellerCompressingImage": "压缩中..."
 }

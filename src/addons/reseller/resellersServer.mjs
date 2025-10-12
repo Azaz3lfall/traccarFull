@@ -868,16 +868,18 @@ app.put('/api/resellers/:id', async (req, res) => {
                 const filenameParts = jsonFile.replace('.json', '').split('_');
                 
                 if (filenameParts.length >= 4 && filenameParts[0] === 'reseller') {
-                    let fileCurrentUrl, fileParentUserId, fileResellerId;
+                    let fileCurrentUrl, fileAppUrl, fileParentUserId, fileResellerId;
                     
                     if (filenameParts.length === 5) {
                         // New pattern: reseller_{currentUrl}_{appUrl}_{parentUserId}_{resellerId}.json
                         fileCurrentUrl = filenameParts[1];
+                        fileAppUrl = filenameParts[2];
                         fileParentUserId = filenameParts[3];
                         fileResellerId = filenameParts[4];
                     } else if (filenameParts.length === 4) {
                         // Old pattern: reseller_{appUrl}_{parentUserId}_{resellerId}.json (backward compatibility)
                         fileCurrentUrl = null;
+                        fileAppUrl = filenameParts[1];
                         fileParentUserId = filenameParts[2];
                         fileResellerId = filenameParts[3];
                     } else {
@@ -888,8 +890,9 @@ app.put('/api/resellers/:id', async (req, res) => {
                     const matchesParentUserId = fileParentUserId === body.parentUserId.toString();
                     const matchesResellerId = fileResellerId === body.resellerId;
                     const matchesCurrentDomain = !fileCurrentUrl || fileCurrentUrl === body.currentDomain;
+                    const matchesAppUrl = fileAppUrl === body.appUrl;
                     
-                    if (matchesParentUserId && matchesResellerId && matchesCurrentDomain) {
+                    if (matchesParentUserId && matchesResellerId && matchesCurrentDomain && matchesAppUrl) {
                         const filePath = path.join(dataDir, jsonFile);
                         const fileContent = fs.readFileSync(filePath, 'utf8');
                         existingReseller = JSON.parse(fileContent);
@@ -1068,17 +1071,17 @@ app.post('/api/resellers/logs/delete', async (req, res) => {
 // DELETE endpoint for resellers - POST for security
 app.post('/api/resellers/delete', async (req, res) => {
   try {
-    const { appUrl, parentUserId } = req.body;
+    const { currentDomain, appUrl, parentUserId } = req.body;
     
-    if (!appUrl || !parentUserId) {
+    if (!currentDomain || !appUrl || !parentUserId) {
       return res.status(400).json({
-        error: 'appUrl and parentUserId are required',
+        error: 'currentDomain, appUrl and parentUserId are required',
         timestamp: new Date().toISOString()
       });
     }
 
 
-    // Find the reseller file that matches both appUrl and parentUserId
+    // Find the reseller file that matches both currentDomain and parentUserId
     const dataDir = DATA_DIR;
     const jsonFiles = await glob('*.json', { cwd: dataDir });
     
@@ -1087,15 +1090,32 @@ app.post('/api/resellers/delete', async (req, res) => {
     
     for (const jsonFile of jsonFiles) {
       try {
-        // Parse filename to extract components: reseller_{appUrl}_{parentUserId}_{resellerId}.json
+        // Parse filename to extract components
         const filenameParts = jsonFile.replace('.json', '').split('_');
         
         if (filenameParts.length >= 4 && filenameParts[0] === 'reseller') {
-          const fileAppUrl = filenameParts[1];
-          const fileParentUserId = filenameParts[2];
+          let fileCurrentUrl, fileAppUrl, fileParentUserId;
+          
+          if (filenameParts.length === 5) {
+            // New pattern: reseller_{currentUrl}_{appUrl}_{parentUserId}_{resellerId}.json
+            fileCurrentUrl = filenameParts[1];
+            fileAppUrl = filenameParts[2];
+            fileParentUserId = filenameParts[3];
+          } else if (filenameParts.length === 4) {
+            // Old pattern: reseller_{appUrl}_{parentUserId}_{resellerId}.json (backward compatibility)
+            fileCurrentUrl = null;
+            fileAppUrl = filenameParts[1];
+            fileParentUserId = filenameParts[2];
+          } else {
+            continue; // Skip invalid filename patterns
+          }
           
           // Check if this file matches the delete request
-          if (fileAppUrl === appUrl && fileParentUserId === parentUserId.toString()) {
+          const matchesParentUserId = fileParentUserId === parentUserId.toString();
+          const matchesCurrentDomain = !fileCurrentUrl || fileCurrentUrl === currentDomain;
+          const matchesAppUrl = fileAppUrl === appUrl;
+          
+          if (matchesParentUserId && matchesCurrentDomain && matchesAppUrl) {
             const filePath = path.join(dataDir, jsonFile);
             const fileContent = fs.readFileSync(filePath, 'utf8');
             resellerData = JSON.parse(fileContent);
@@ -1112,7 +1132,7 @@ app.post('/api/resellers/delete', async (req, res) => {
     if (!resellerFile || !resellerData) {
       return res.status(404).json({
         error: 'Reseller not found',
-        message: `No reseller found with appUrl '${appUrl}' for user '${parentUserId}'`,
+        message: `No reseller found with currentDomain '${currentDomain}', appUrl '${appUrl}' for user '${parentUserId}'`,
         timestamp: new Date().toISOString()
       });
     }
@@ -1134,7 +1154,7 @@ app.post('/api/resellers/delete', async (req, res) => {
     }
 
     // Cleanup nginx configuration for the deleted reseller (non-blocking)
-    cleanupResellerNginx(appUrl);
+    cleanupResellerNginx(resellerData.appUrl);
 
     res.json({
       success: true,
@@ -1142,11 +1162,11 @@ app.post('/api/resellers/delete', async (req, res) => {
       deletedFiles: {
         json: resellerFile,
         image: resellerData.logotype || 'none',
-        nginx: `${appUrl}.conf`
+        nginx: `${resellerData.appUrl}.conf`
       },
       cleanup: {
         nginx: 'Configuration removed and nginx reloaded',
-        domain: appUrl
+        domain: resellerData.appUrl
       },
       timestamp: new Date().toISOString()
     });

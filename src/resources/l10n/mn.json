@@ -783,8 +783,8 @@
   "sharedStatus": "Төлөв",
   "sharedActions": "Үйлдлүүд",
   "sharedActive": "Идэвхтэй",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Хүчинтэй зураг файл сонгоно уу (PNG, JPG, JPEG, WebP) {maxSize}KB хүртэл",
+  "resellerImageCompressedSuccess": "Дахин худалдагчийн лого шахагдсан! {originalSize}KB-аас {compressedSize}KB болж бууруулсан",
+  "resellerImageCompressionError": "Зураг шахах амжилтгүй болсон. Дахин оролдоно уу.",
+  "resellerCompressingImage": "Шахж байна..."
 }

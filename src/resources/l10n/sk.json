@@ -783,8 +783,8 @@
   "sharedStatus": "Stav",
   "sharedActions": "Akcie",
   "sharedActive": "Aktívny",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Prosím, vyberte platný súbor obrázka (PNG, JPG, JPEG, WebP) do {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo predajcu komprimovaný! Zmenšený z {originalSize}KB na {compressedSize}KB",
+  "resellerImageCompressionError": "Nepodarilo sa komprimovať obrázok. Skúste to znovu.",
+  "resellerCompressingImage": "Komprimuje sa..."
 }

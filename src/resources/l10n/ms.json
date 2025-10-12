@@ -783,8 +783,8 @@
   "sharedStatus": "Status",
   "sharedActions": "Tindakan",
   "sharedActive": "Aktif",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Sila pilih fail imej yang sah (PNG, JPG, JPEG, WebP) sehingga {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo penjual semula dimampatkan! Dikurangkan dari {originalSize}KB kepada {compressedSize}KB",
+  "resellerImageCompressionError": "Gagal memampatkan imej. Sila cuba lagi.",
+  "resellerCompressingImage": "Memampatkan..."
 }

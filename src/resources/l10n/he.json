@@ -787,8 +787,8 @@
   "sharedStatus": "סטטוס",
   "sharedActions": "פעולות",
   "sharedActive": "פעיל",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "אנא בחר קובץ תמונה תקין (PNG, JPG, JPEG, WebP) עד {maxSize}KB",
+  "resellerImageCompressedSuccess": "לוגו המשווק דחוס! הופחת מ-{originalSize}KB ל-{compressedSize}KB",
+  "resellerImageCompressionError": "נכשל בדחיסת התמונה. אנא נסה שוב.",
+  "resellerCompressingImage": "דוחס..."
 }

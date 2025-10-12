@@ -783,8 +783,8 @@
   "sharedStatus": "Statusi",
   "sharedActions": "Veprimet",
   "sharedActive": "Aktiv",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Ju lutemi zgjidhni një skedar imazhi të vlefshëm (PNG, JPG, JPEG, WebP) deri në {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo e rishitësit i kompresuar! U reduktua nga {originalSize}KB në {compressedSize}KB",
+  "resellerImageCompressionError": "Dështoi kompresimi i imazhit. Ju lutemi provoni përsëri.",
+  "resellerCompressingImage": "Duke kompresuar..."
 }

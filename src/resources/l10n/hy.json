@@ -783,8 +783,8 @@
   "sharedStatus": "Կարգավիճակ",
   "sharedActions": "Գործողություններ",
   "sharedActive": "Ակտիվ",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Խնդրում ենք ընտրել վավեր պատկերի ֆայլ (PNG, JPG, JPEG, WebP) մինչև {maxSize}KB",
+  "resellerImageCompressedSuccess": "Վերավաճառողի լոգոն սեղմված է! Նվազել {originalSize}KB-ից {compressedSize}KB",
+  "resellerImageCompressionError": "Պատկերի սեղմումը ձախողվեց: Խնդրում ենք կրկին փորձել:",
+  "resellerCompressingImage": "Սեղմվում է..."
 }

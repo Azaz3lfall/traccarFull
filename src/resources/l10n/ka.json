@@ -783,8 +783,8 @@
   "sharedStatus": "სტატუსი",
   "sharedActions": "მოქმედებები",
   "sharedActive": "აქტიური",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "გთხოვთ აირჩიოთ სწორი სურათის ფაილი (PNG, JPG, JPEG, WebP) {maxSize}KB-მდე",
+  "resellerImageCompressedSuccess": "გადამყიდველის ლოგო შეკუმშული! შემცირდა {originalSize}KB-დან {compressedSize}KB-მდე",
+  "resellerImageCompressionError": "სურათის შეკუმშვა ვერ მოხერხდა. გთხოვთ, კვლავ სცადეთ.",
+  "resellerCompressingImage": "შეკუმშვა..."
 }

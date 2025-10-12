@@ -787,8 +787,8 @@
   "sharedStatus": "Tila",
   "sharedActions": "Toiminnot",
   "sharedActive": "Aktiivinen",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Valitse kelvollinen kuvatiedosto (PNG, JPG, JPEG, WebP) enintään {maxSize}KB",
+  "resellerImageCompressedSuccess": "Uudelleenmyyjän logo pakattu! Pienennetty {originalSize}KB:sta {compressedSize}KB:een",
+  "resellerImageCompressionError": "Kuvan pakkaaminen epäonnistui. Yritä uudelleen.",
+  "resellerCompressingImage": "Pakataan..."
 }

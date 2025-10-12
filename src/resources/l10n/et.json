@@ -787,8 +787,8 @@
   "sharedStatus": "Olek",
   "sharedActions": "Tegevused",
   "sharedActive": "Aktiivne",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Palun valige kehtiv pildifail (PNG, JPG, JPEG, WebP) kuni {maxSize}KB",
+  "resellerImageCompressedSuccess": "Edasimüüja logo kokku surutud! Vähendatud {originalSize}KB-lt {compressedSize}KB-le",
+  "resellerImageCompressionError": "Pildi kokku surumine ebaõnnestus. Palun proovige uuesti.",
+  "resellerCompressingImage": "Kokku surutakse..."
 }

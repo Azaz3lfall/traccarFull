@@ -787,8 +787,8 @@
   "sharedStatus": "Durum",
   "sharedActions": "İşlemler",
   "sharedActive": "Aktif",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Lütfen geçerli bir resim dosyası seçin (PNG, JPG, JPEG, WebP) {maxSize}KB'a kadar",
+  "resellerImageCompressedSuccess": "Bayi logosu sıkıştırıldı! {originalSize}KB'dan {compressedSize}KB'a düşürüldü",
+  "resellerImageCompressionError": "Görüntü sıkıştırılamadı. Lütfen tekrar deneyin.",
+  "resellerCompressingImage": "Sıkıştırılıyor..."
 }

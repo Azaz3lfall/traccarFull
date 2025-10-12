@@ -787,8 +787,8 @@
   "sharedStatus": "狀態",
   "sharedActions": "操作",
   "sharedActive": "活躍",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "請選擇有效的圖像文件（PNG、JPG、JPEG、WebP）最大{maxSize}KB",
+  "resellerImageCompressedSuccess": "經銷商標誌已壓縮！從{originalSize}KB減少到{compressedSize}KB",
+  "resellerImageCompressionError": "圖像壓縮失敗。請重試。",
+  "resellerCompressingImage": "壓縮中..."
 }

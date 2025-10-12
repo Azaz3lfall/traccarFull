@@ -787,8 +787,8 @@
   "sharedStatus": "Status",
   "sharedActions": "Tədbirlər",
   "sharedActive": "Aktiv",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Zəhmət olmasa {maxSize}KB-a qədər etibarlı şəkil faylı seçin (PNG, JPG, JPEG, WebP)",
+  "resellerImageCompressedSuccess": "Yenidən satıcı loqosu sıxıldı! {originalSize}KB-dan {compressedSize}KB-a azaldıldı",
+  "resellerImageCompressionError": "Şəkli sıxmaq mümkün olmadı. Zəhmət olmasa yenidən cəhd edin.",
+  "resellerCompressingImage": "Sıxılır..."
 }

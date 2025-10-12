@@ -786,8 +786,8 @@
   "sharedStatus": "상태",
   "sharedActions": "작업",
   "sharedActive": "활성",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "유효한 이미지 파일(PNG, JPG, JPEG, WebP)을 {maxSize}KB까지 선택해 주세요",
+  "resellerImageCompressedSuccess": "리셀러 로고 압축됨! {originalSize}KB에서 {compressedSize}KB로 감소",
+  "resellerImageCompressionError": "이미지 압축에 실패했습니다. 다시 시도해 주세요.",
+  "resellerCompressingImage": "압축 중..."
 }

@@ -783,8 +783,8 @@
   "sharedStatus": "ស្ថានភាព",
   "sharedActions": "សកម្មភាព",
   "sharedActive": "សកម្ម",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "សូមជ្រើសរើសឯកសាររូបភាពត្រឹមត្រូវ (PNG, JPG, JPEG, WebP) រហូតដល់ {maxSize}KB",
+  "resellerImageCompressedSuccess": "ឡូហ្គូរីសេលឺត្រូវបានបង្ហាប់! កាត់បន្ថយពី {originalSize}KB ទៅ {compressedSize}KB",
+  "resellerImageCompressionError": "បរាជ័យក្នុងការបង្ហាប់រូបភាព។ សូមព្យាយាមម្តងទៀត។",
+  "resellerCompressingImage": "កំពុងបង្ហាប់..."
 }

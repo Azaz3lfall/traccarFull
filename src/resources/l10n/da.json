@@ -787,8 +787,8 @@
   "sharedStatus": "Status",
   "sharedActions": "Handlinger",
   "sharedActive": "Aktiv",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Vælg venligst en gyldig billedfil (PNG, JPG, JPEG, WebP) op til {maxSize}KB",
+  "resellerImageCompressedSuccess": "Forhandler-logo komprimeret! Reduceret fra {originalSize}KB til {compressedSize}KB",
+  "resellerImageCompressionError": "Kunne ikke komprimere billede. Prøv venligst igen.",
+  "resellerCompressingImage": "Komprimerer..."
 }

@@ -787,8 +787,8 @@
   "sharedStatus": "Állapot",
   "sharedActions": "Műveletek",
   "sharedActive": "Aktív",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Kérjük, válasszon egy érvényes képfájlt (PNG, JPG, JPEG, WebP) {maxSize}KB-ig",
+  "resellerImageCompressedSuccess": "Viszonteladó logó tömörítve! Csökkentve {originalSize}KB-ról {compressedSize}KB-ra",
+  "resellerImageCompressionError": "A kép tömörítése sikertelen. Kérjük, próbálja újra.",
+  "resellerCompressingImage": "Tömörítés..."
 }

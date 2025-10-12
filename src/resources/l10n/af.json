@@ -787,8 +787,8 @@
   "sharedStatus": "Status",
   "sharedActions": "Aksies",
   "sharedActive": "Aktief",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Kies 'n geldige beeldlêer (PNG, JPG, JPEG, WebP) tot {maxSize}KB",
+  "resellerImageCompressedSuccess": "Herverkoper-logo saamgepers! Verminder van {originalSize}KB na {compressedSize}KB",
+  "resellerImageCompressionError": "Kon nie beeld saamper nie. Probeer asseblief weer.",
+  "resellerCompressingImage": "Saamper..."
 }

@@ -783,8 +783,8 @@
   "sharedStatus": "स्थिति",
   "sharedActions": "कार्यहरू",
   "sharedActive": "सक्रिय",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "कृपया एक वैध छवि फाइल छनोट गर्नुहोस् (PNG, JPG, JPEG, WebP) {maxSize}KB सम्म",
+  "resellerImageCompressedSuccess": "रिसेलर लोगो संकुचित! {originalSize}KB बाट {compressedSize}KB मा कम गरियो",
+  "resellerImageCompressionError": "छवि संकुचन असफल। कृपया फेरि प्रयास गर्नुहोस्।",
+  "resellerCompressingImage": "संकुचन गर्दै..."
 }

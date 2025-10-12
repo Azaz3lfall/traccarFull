@@ -783,8 +783,8 @@
   "sharedStatus": "நிலை",
   "sharedActions": "செயல்கள்",
   "sharedActive": "செயலில்",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "சரியான பட கோப்பைத் தேர்ந்தெடுக்கவும் (PNG, JPG, JPEG, WebP) {maxSize}KB வரை",
+  "resellerImageCompressedSuccess": "ரீசெல்லர் லோகோ சுருக்கப்பட்டது! {originalSize}KB-இலிருந்து {compressedSize}KB-க்கு குறைக்கப்பட்டது",
+  "resellerImageCompressionError": "படத்தை சுருக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
+  "resellerCompressingImage": "சுருக்குகிறது..."
 }

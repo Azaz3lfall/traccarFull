@@ -787,8 +787,8 @@
   "sharedStatus": "Estat",
   "sharedActions": "Accions",
   "sharedActive": "Actiu",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Si us plau, seleccioneu un fitxer d'imatge vàlid (PNG, JPG, JPEG, WebP) fins a {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo del distribuïdor comprimit! Reduït de {originalSize}KB a {compressedSize}KB",
+  "resellerImageCompressionError": "Error en comprimir la imatge. Si us plau, torneu-ho a intentar.",
+  "resellerCompressingImage": "Comprimint..."
 }

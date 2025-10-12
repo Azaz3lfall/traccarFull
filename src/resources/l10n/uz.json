@@ -783,8 +783,8 @@
   "sharedStatus": "Holat",
   "sharedActions": "Amallar",
   "sharedActive": "Faol",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Iltimos, haqiqiy rasm faylini tanlang (PNG, JPG, JPEG, WebP) {maxSize}KB gacha",
+  "resellerImageCompressedSuccess": "Qayta sotuvchi logotipi siqildi! {originalSize}KB dan {compressedSize}KB ga kamaytirildi",
+  "resellerImageCompressionError": "Rasmni siqish muvaffaqiyatsiz. Iltimos, qayta urinib ko'ring.",
+  "resellerCompressingImage": "Siqilmoqda..."
 }

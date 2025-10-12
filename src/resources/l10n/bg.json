@@ -787,8 +787,8 @@
   "sharedStatus": "Статус",
   "sharedActions": "Действия",
   "sharedActive": "Активен",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Моля, изберете валиден файл с изображение (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "resellerImageCompressedSuccess": "Логото на дистрибутора е компресирано! Намалено от {originalSize}KB на {compressedSize}KB",
+  "resellerImageCompressionError": "Неуспешно компресиране на изображението. Моля, опитайте отново.",
+  "resellerCompressingImage": "Компресиране..."
 }

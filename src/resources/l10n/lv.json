@@ -783,8 +783,8 @@
   "sharedStatus": "Statuss",
   "sharedActions": "Darbības",
   "sharedActive": "Aktīvs",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Lūdzu, izvēlieties derīgu attēla failu (PNG, JPG, JPEG, WebP) līdz {maxSize}KB",
+  "resellerImageCompressedSuccess": "Pārdevēja logotips saspiests! Samazināts no {originalSize}KB līdz {compressedSize}KB",
+  "resellerImageCompressionError": "Neizdevās saspiest attēlu. Lūdzu, mēģiniet vēlreiz.",
+  "resellerCompressingImage": "Saspiež..."
 }

@@ -787,8 +787,8 @@
   "sharedStatus": "สถานะ",
   "sharedActions": "การดำเนินการ",
   "sharedActive": "ใช้งานอยู่",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง (PNG, JPG, JPEG, WebP) สูงสุด {maxSize}KB",
+  "resellerImageCompressedSuccess": "โลโก้ตัวแทนจำหน่ายถูกบีบอัด! ลดจาก {originalSize}KB เป็น {compressedSize}KB",
+  "resellerImageCompressionError": "การบีบอัดภาพล้มเหลว กรุณาลองใหม่อีกครั้ง",
+  "resellerCompressingImage": "กำลังบีบอัด..."
 }

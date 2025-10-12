@@ -783,8 +783,8 @@
   "sharedStatus": "Estado",
   "sharedActions": "Accións",
   "sharedActive": "Activo",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Por favor, seleccione un ficheiro de imaxe válido (PNG, JPG, JPEG, WebP) ata {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo do revendedor comprimido! Reducido de {originalSize}KB a {compressedSize}KB",
+  "resellerImageCompressionError": "Erro ao comprimir a imaxe. Por favor, téntao de novo.",
+  "resellerCompressingImage": "Comprimindo..."
 }

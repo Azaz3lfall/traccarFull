@@ -783,8 +783,8 @@
   "sharedStatus": "Hali",
   "sharedActions": "Vitendo",
   "sharedActive": "Hai",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Tafadhali chagua faili halali la picha (PNG, JPG, JPEG, WebP) hadi {maxSize}KB",
+  "resellerImageCompressedSuccess": "Logo ya muuzaji imeunganishwa! Imepunguzwa kutoka {originalSize}KB hadi {compressedSize}KB",
+  "resellerImageCompressionError": "Imeshindwa kukusanya picha. Tafadhali jaribu tena.",
+  "resellerCompressingImage": "Inakusanya..."
 }

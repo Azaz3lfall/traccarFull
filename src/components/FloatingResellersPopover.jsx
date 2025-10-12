@@ -475,6 +475,7 @@ const FloatingResellersPopover = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          currentDomain: window.location.hostname,
           appUrl: reseller.appUrl,
           parentUserId: user?.id
         }),

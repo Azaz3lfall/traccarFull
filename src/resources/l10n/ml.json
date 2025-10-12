@@ -783,8 +783,8 @@
   "sharedStatus": "അവസ്ഥ",
   "sharedActions": "പ്രവർത്തനങ്ങൾ",
   "sharedActive": "സജീവം",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "ദയവായി ഒരു സാധുവായ ഇമേജ് ഫയൽ തിരഞ്ഞെടുക്കുക (PNG, JPG, JPEG, WebP) {maxSize}KB വരെ",
+  "resellerImageCompressedSuccess": "റീസെലർ ലോഗോ കംപ്രസ് ചെയ്തു! {originalSize}KB-ൽ നിന്ന് {compressedSize}KB-ലേക്ക് കുറച്ചു",
+  "resellerImageCompressionError": "ചിത്രം കംപ്രസ് ചെയ്യാൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+  "resellerCompressingImage": "കംപ്രസ് ചെയ്യുന്നു..."
 }

@@ -787,8 +787,8 @@
   "sharedStatus": "Статус",
   "sharedActions": "Дії",
   "sharedActive": "Активний",
-  "resellerImageValidationError": "Please select a valid image file (PNG, JPG, JPEG, WebP) up to {maxSize}KB",
-  "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
-  "resellerImageCompressionError": "Failed to compress image. Please try again.",
-  "resellerCompressingImage": "Compressing..."
+  "resellerImageValidationError": "Будь ласка, виберіть дійсний файл зображення (PNG, JPG, JPEG, WebP) до {maxSize}KB",
+  "resellerImageCompressedSuccess": "Логотип реселлера стиснуто! Зменшено з {originalSize}KB до {compressedSize}KB",
+  "resellerImageCompressionError": "Не вдалося стиснути зображення. Спробуйте ще раз.",
+  "resellerCompressingImage": "Стискання..."
 }
