@@ -119,6 +119,48 @@ const FloatingDevicesPopover = ({
     default: defaultIcon,
   };
 
+  // Icon loading component with circular progress
+  const IconWithLoading = ({ src, alt, style, fallbackSrc = defaultIcon }) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
+
+    const handleLoad = () => {
+      setIsLoading(false);
+    };
+
+    const handleError = () => {
+      setIsLoading(false);
+      setHasError(true);
+    };
+
+    return (
+      <div style={{ position: 'relative', ...style }}>
+        {isLoading && (
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1
+          }}>
+            <CircularProgress size={16} style={{ color: colors.primary }} />
+          </div>
+        )}
+        <img
+          src={hasError ? fallbackSrc : src}
+          alt={alt}
+          style={{
+            ...style,
+            opacity: isLoading ? 0.3 : 1,
+            transition: 'opacity 0.2s ease'
+          }}
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+      </div>
+    );
+  };
+
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -1014,8 +1056,8 @@ const FloatingDevicesPopover = ({
                           ref={setCategoryInputRef}
                           InputProps={{
                             startAdornment: (
-                              <img 
-                                src={categoryIcons[editingDevice?.category || 'default'] || categoryIcons.default} 
+                              <IconWithLoading
+                                src={categoryIcons[editingDevice?.category || 'default'] || categoryIcons.default}
                                 alt={editingDevice?.category || 'default'}
                                 style={{ 
                                   width: '24px', 
@@ -1077,8 +1119,8 @@ const FloatingDevicesPopover = ({
                                   }}
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <img 
-                                      src={iconSrc} 
+                                    <IconWithLoading
+                                      src={iconSrc}
                                       alt={category}
                                       style={{ 
                                         width: '26px', 
