@@ -1492,7 +1492,7 @@ app.post('/api/domain-lookup', async (req, res) => {
 
     // Search for JSON files that contain this domain in filename
     const dataDir = DATA_DIR;
-    const jsonPattern = `reseller_${domain}_*.json`;
+    const jsonPattern = `reseller_*_${domain}_*.json`;
     
 
 
