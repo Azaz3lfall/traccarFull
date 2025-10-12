@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfiguration ikke fundet. Tjek venligst miljøvariabler.",
   "userPhotoUploading": "Uploader...",
   "userPhotoUploadTitle": "Upload billede",
-  "sharedNoDevicesFound": "Ingen enheder fundet"
+  "sharedNoDevicesFound": "Ingen enheder fundet",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "មិនរកឃើញការកំណត់រចនាសម្ព័ន្ធ Cloudinary។ សូមពិនិត្យមើលអថេរបរិស្ថាន។",
   "userPhotoUploading": "កំពុងផ្ទុកឡើង...",
   "userPhotoUploadTitle": "ផ្ទុកឡើងរូបភាព",
-  "sharedNoDevicesFound": "រកមិនឃើញឧបករណ៍"
+  "sharedNoDevicesFound": "រកមិនឃើញឧបករណ៍",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

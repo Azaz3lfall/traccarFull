@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfiguratsiooni ei leitud. Palun kontrollige keskkonna muutujaid.",
   "userPhotoUploading": "Laadib üles...",
   "userPhotoUploadTitle": "Laadi foto üles",
-  "sharedNoDevicesFound": "Seadmeid ei leitud"
+  "sharedNoDevicesFound": "Seadmeid ei leitud",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

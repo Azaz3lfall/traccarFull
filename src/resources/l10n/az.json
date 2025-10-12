@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfiqurasiyası tapılmadı. Zəhmət olmasa mühit dəyişənlərini yoxlayın.",
   "userPhotoUploading": "Yüklənir...",
   "userPhotoUploadTitle": "Şəkil yüklə",
-  "sharedNoDevicesFound": "Cihaz tapılmadı"
+  "sharedNoDevicesFound": "Cihaz tapılmadı",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

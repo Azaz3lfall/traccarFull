@@ -782,5 +782,8 @@
   "logsEntries": "entrées de journal",
   "logsTitle": "Journaux",
   "logsError": "Erreur",
-  "sharedNoDevicesFound": "Aucun appareil trouvé"
+  "sharedNoDevicesFound": "Aucun appareil trouvé",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

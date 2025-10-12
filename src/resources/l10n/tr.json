@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary yapılandırması bulunamadı. Lütfen ortam değişkenlerini kontrol edin.",
   "userPhotoUploading": "Yükleniyor...",
   "userPhotoUploadTitle": "Fotoğraf yükle",
-  "sharedNoDevicesFound": "Cihaz bulunamadı"
+  "sharedNoDevicesFound": "Cihaz bulunamadı",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

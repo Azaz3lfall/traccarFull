@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary конфигурација није пронађена. Молимо проверите променљиве окружења.",
   "userPhotoUploading": "Прикачивање...",
   "userPhotoUploadTitle": "Прикачи слику",
-  "sharedNoDevicesFound": "Уређаји нису пронађени"
+  "sharedNoDevicesFound": "Уређаји нису пронађени",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

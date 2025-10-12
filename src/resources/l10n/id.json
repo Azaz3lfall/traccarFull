@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Konfigurasi Cloudinary tidak ditemukan. Silakan periksa variabel lingkungan.",
   "userPhotoUploading": "Mengunggah...",
   "userPhotoUploadTitle": "Unggah foto",
-  "sharedNoDevicesFound": "Tidak ada perangkat yang ditemukan"
+  "sharedNoDevicesFound": "Tidak ada perangkat yang ditemukan",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Konfigurasi Cloudinary tidak dijumpai. Sila semak pembolehubah persekitaran.",
   "userPhotoUploading": "Memuat naik...",
   "userPhotoUploadTitle": "Muat naik foto",
-  "sharedNoDevicesFound": "Tiada peranti dijumpai"
+  "sharedNoDevicesFound": "Tiada peranti dijumpai",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

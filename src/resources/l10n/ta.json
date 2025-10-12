@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary கட்டமைப்பு கிடைக்கவில்லை. சூழல் மாறிகளைச் சரிபார்க்கவும்.",
   "userPhotoUploading": "பதிவேற்றுகிறது...",
   "userPhotoUploadTitle": "படத்தை பதிவேற்றவும்",
-  "sharedNoDevicesFound": "சாதனங்கள் கிடைக்கவில்லை"
+  "sharedNoDevicesFound": "சாதனங்கள் கிடைக்கவில்லை",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary 구성을 찾을 수 없습니다. 환경 변수를 확인해 주세요.",
   "userPhotoUploading": "업로드 중...",
   "userPhotoUploadTitle": "사진 업로드",
-  "sharedNoDevicesFound": "디바이스를 찾을 수 없습니다"
+  "sharedNoDevicesFound": "디바이스를 찾을 수 없습니다",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

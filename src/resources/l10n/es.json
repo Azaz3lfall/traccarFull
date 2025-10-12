@@ -782,5 +782,8 @@
   "logsEntries": "entradas de registro",
   "logsTitle": "Registros",
   "logsError": "Error",
-  "sharedNoDevicesFound": "No se encontraron dispositivos"
+  "sharedNoDevicesFound": "No se encontraron dispositivos",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

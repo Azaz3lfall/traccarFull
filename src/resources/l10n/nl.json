@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary configuratie niet gevonden. Controleer omgevingsvariabelen.",
   "userPhotoUploading": "Uploaden...",
   "userPhotoUploadTitle": "Foto uploaden",
-  "sharedNoDevicesFound": "Geen apparaten gevonden"
+  "sharedNoDevicesFound": "Geen apparaten gevonden",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

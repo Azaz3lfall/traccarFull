@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Η διαμόρφωση Cloudinary δεν βρέθηκε. Παρακαλώ ελέγξτε τις μεταβλητές περιβάλλοντος.",
   "userPhotoUploading": "Ανεβάζει...",
   "userPhotoUploadTitle": "Ανέβασμα φωτογραφίας",
-  "sharedNoDevicesFound": "Δεν βρέθηκαν συσκευές"
+  "sharedNoDevicesFound": "Δεν βρέθηκαν συσκευές",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

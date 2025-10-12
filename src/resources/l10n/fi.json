@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary-konfiguraatiota ei löytynyt. Tarkista ympäristömuuttujat.",
   "userPhotoUploading": "Ladataan...",
   "userPhotoUploadTitle": "Lataa kuva",
-  "sharedNoDevicesFound": "Laitteita ei löytynyt"
+  "sharedNoDevicesFound": "Laitteita ei löytynyt",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary-Konfiguration nicht gefunden. Bitte überprüfen Sie die Umgebungsvariablen.",
   "userPhotoUploading": "Wird hochgeladen...",
   "userPhotoUploadTitle": "Foto hochladen",
-  "sharedNoDevicesFound": "Keine Geräte gefunden"
+  "sharedNoDevicesFound": "Keine Geräte gefunden",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

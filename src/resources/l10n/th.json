@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "ไม่พบการตั้งค่า Cloudinary กรุณาตรวจสอบตัวแปรสภาพแวดล้อม",
   "userPhotoUploading": "กำลังอัปโหลด...",
   "userPhotoUploadTitle": "อัปโหลดรูป",
-  "sharedNoDevicesFound": "ไม่พบอุปกรณ์"
+  "sharedNoDevicesFound": "ไม่พบอุปกรณ์",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

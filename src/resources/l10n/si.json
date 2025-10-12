@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary වින්‍යාසය හමු නොවීය. කරුණාකර පරිසර විචල්‍යයන් පරීක්ෂා කරන්න.",
   "userPhotoUploading": "උඩුගත වෙමින්...",
   "userPhotoUploadTitle": "ඡායාරූපය උඩුගත කරන්න",
-  "sharedNoDevicesFound": "උපාංග හමු නොවීය"
+  "sharedNoDevicesFound": "උපාංග හමු නොවීය",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Mpangilio wa Cloudinary haujapatikana. Tafadhali angalia vigezo vya mazingira.",
   "userPhotoUploading": "Inapakia...",
   "userPhotoUploadTitle": "Pakia picha",
-  "sharedNoDevicesFound": "Hakuna vifaa vilivyopatikana"
+  "sharedNoDevicesFound": "Hakuna vifaa vilivyopatikana",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

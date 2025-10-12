@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Configurația Cloudinary nu a fost găsită. Vă rugăm să verificați variabilele de mediu.",
   "userPhotoUploading": "Se încarcă...",
   "userPhotoUploadTitle": "Încarcă fotografia",
-  "sharedNoDevicesFound": "Nu au fost găsite dispozitive"
+  "sharedNoDevicesFound": "Nu au fost găsite dispozitive",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

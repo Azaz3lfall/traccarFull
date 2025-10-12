@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary-konfiguration hittades inte. Kontrollera miljövariabler.",
   "userPhotoUploading": "Laddar upp...",
   "userPhotoUploadTitle": "Ladda upp foto",
-  "sharedNoDevicesFound": "Inga enheter hittades"
+  "sharedNoDevicesFound": "Inga enheter hittades",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

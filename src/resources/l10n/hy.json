@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary կարգավորումը չի գտնվել: Խնդրում ենք ստուգել միջավայրի փոփոխականները:",
   "userPhotoUploading": "Բեռնվում է...",
   "userPhotoUploadTitle": "Բեռնել նկար",
-  "sharedNoDevicesFound": "Սարքեր չեն գտնվել"
+  "sharedNoDevicesFound": "Սարքեր չեն գտնվել",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Không tìm thấy cấu hình Cloudinary. Vui lòng kiểm tra các biến môi trường.",
   "userPhotoUploading": "Đang tải lên...",
   "userPhotoUploadTitle": "Tải lên ảnh",
-  "sharedNoDevicesFound": "Không tìm thấy thiết bị"
+  "sharedNoDevicesFound": "Không tìm thấy thiết bị",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Configuració de Cloudinary no trobada. Si us plau, verifica les variables d'entorn.",
   "userPhotoUploading": "Pujant...",
   "userPhotoUploadTitle": "Pujar foto",
-  "sharedNoDevicesFound": "No s'han trobat dispositius"
+  "sharedNoDevicesFound": "No s'han trobat dispositius",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

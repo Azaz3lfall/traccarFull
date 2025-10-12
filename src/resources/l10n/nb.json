@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary-konfigurasjon ikke funnet. Sjekk miljøvariabler.",
   "userPhotoUploading": "Laster opp...",
   "userPhotoUploadTitle": "Last opp bilde",
-  "sharedNoDevicesFound": "Ingen enheter funnet"
+  "sharedNoDevicesFound": "Ingen enheter funnet",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

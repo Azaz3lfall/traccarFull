@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary конфигурациясы табылмады. Орта айнымалыларын тексеріңіз.",
   "userPhotoUploading": "Жүктелуде...",
   "userPhotoUploadTitle": "Сурет жүктеу",
-  "sharedNoDevicesFound": "Құрылғылар табылмады"
+  "sharedNoDevicesFound": "Құрылғылар табылмады",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

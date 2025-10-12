@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "لم يتم العثور على إعدادات Cloudinary. يرجى التحقق من متغيرات البيئة.",
   "userPhotoUploading": "جاري الرفع...",
   "userPhotoUploadTitle": "رفع صورة",
-  "sharedNoDevicesFound": "لم يتم العثور على أجهزة"
+  "sharedNoDevicesFound": "لم يتم العثور على أجهزة",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

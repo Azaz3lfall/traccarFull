@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Konfigurácia Cloudinary nebola nájdená. Skontrolujte premenné prostredia.",
   "userPhotoUploading": "Nahráva sa...",
   "userPhotoUploadTitle": "Nahrať fotku",
-  "sharedNoDevicesFound": "Neboli nájdené žiadne zariadenia"
+  "sharedNoDevicesFound": "Neboli nájdené žiadne zariadenia",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

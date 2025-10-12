@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfigurasie nie gevind nie. Gaan asseblief omgewingsveranderlikes na.",
   "userPhotoUploading": "Laai op...",
   "userPhotoUploadTitle": "Laai foto op",
-  "sharedNoDevicesFound": "Geen toestelle gevind nie"
+  "sharedNoDevicesFound": "Geen toestelle gevind nie",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

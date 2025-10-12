@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary কনফিগারেশন পাওয়া যায়নি। দয়া করে পরিবেশের ভেরিয়েবলগুলি পরীক্ষা করুন।",
   "userPhotoUploading": "আপলোড হচ্ছে...",
   "userPhotoUploadTitle": "ছবি আপলোড করুন",
-  "sharedNoDevicesFound": "কোনো ডিভাইস পাওয়া যায়নি"
+  "sharedNoDevicesFound": "কোনো ডিভাইস পাওয়া যায়নি",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

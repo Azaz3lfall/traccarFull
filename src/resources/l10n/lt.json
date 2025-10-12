@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfigūracija nerasta. Patikrinkite aplinkos kintamuosius.",
   "userPhotoUploading": "Įkeliama...",
   "userPhotoUploadTitle": "Įkelti nuotrauką",
-  "sharedNoDevicesFound": "Įrenginių nerasta"
+  "sharedNoDevicesFound": "Įrenginių nerasta",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

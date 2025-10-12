@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary കോൺഫിഗറേഷൻ കണ്ടെത്തിയില്ല. ദയവായി പരിസ്ഥിതി വേരിയബിളുകൾ പരിശോധിക്കുക.",
   "userPhotoUploading": "അപ്‌ലോഡ് ചെയ്യുന്നു...",
   "userPhotoUploadTitle": "ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യുക",
-  "sharedNoDevicesFound": "ഉപകരണങ്ങൾ കണ്ടെത്തിയില്ല"
+  "sharedNoDevicesFound": "ഉപകരണങ്ങൾ കണ്ടെത്തിയില്ല",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

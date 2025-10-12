@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Configurazione Cloudinary non trovata. Controlla le variabili d'ambiente.",
   "userPhotoUploading": "Caricamento...",
   "userPhotoUploadTitle": "Carica foto",
-  "sharedNoDevicesFound": "Nessun dispositivo trovato"
+  "sharedNoDevicesFound": "Nessun dispositivo trovato",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

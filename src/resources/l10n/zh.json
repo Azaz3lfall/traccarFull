@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "未找到 Cloudinary 配置，请检查环境变量。",
   "userPhotoUploading": "上传中...",
   "userPhotoUploadTitle": "上传照片",
-  "sharedNoDevicesFound": "未找到设备"
+  "sharedNoDevicesFound": "未找到设备",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

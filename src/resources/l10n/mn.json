@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary тохиргоо олдсонгүй. Орчны хувьсагчдыг шалгана уу.",
   "userPhotoUploading": "Хүргэж байна...",
   "userPhotoUploadTitle": "Зураг хүргэх",
-  "sharedNoDevicesFound": "Төхөөрөмж олдсонгүй"
+  "sharedNoDevicesFound": "Төхөөрөмж олдсонгүй",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

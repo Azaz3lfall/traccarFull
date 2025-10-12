@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfiguracija nije pronađena. Molimo provjerite varijable okruženja.",
   "userPhotoUploading": "Učitava se...",
   "userPhotoUploadTitle": "Učitaj sliku",
-  "sharedNoDevicesFound": "Nisu pronađeni uređaji"
+  "sharedNoDevicesFound": "Nisu pronađeni uređaji",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

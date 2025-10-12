@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfigurācija nav atrasta. Lūdzu, pārbaudiet vides mainīgos.",
   "userPhotoUploading": "Augšupielādē...",
   "userPhotoUploadTitle": "Augšupielādēt foto",
-  "sharedNoDevicesFound": "Ierīces nav atrastas"
+  "sharedNoDevicesFound": "Ierīces nav atrastas",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

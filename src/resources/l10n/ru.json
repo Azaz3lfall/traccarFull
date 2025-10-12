@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Конфигурация Cloudinary не найдена. Проверьте переменные окружения.",
   "userPhotoUploading": "Загружается...",
   "userPhotoUploadTitle": "Загрузить фото",
-  "sharedNoDevicesFound": "Устройства не найдены"
+  "sharedNoDevicesFound": "Устройства не найдены",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

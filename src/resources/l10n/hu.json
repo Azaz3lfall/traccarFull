@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary konfiguráció nem található. Kérjük, ellenőrizze a környezeti változókat.",
   "userPhotoUploading": "Feltöltés...",
   "userPhotoUploadTitle": "Kép feltöltése",
-  "sharedNoDevicesFound": "Nem találhatók eszközök"
+  "sharedNoDevicesFound": "Nem találhatók eszközök",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

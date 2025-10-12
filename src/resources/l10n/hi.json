@@ -782,5 +782,8 @@
   "userPhotoCloudinaryConfigError": "Cloudinary कॉन्फ़िगरेशन नहीं मिला। कृपया पर्यावरण चर जांचें।",
   "userPhotoUploading": "अपलोड हो रहा है...",
   "userPhotoUploadTitle": "फोटो अपलोड करें",
-  "sharedNoDevicesFound": "कोई डिवाइस नहीं मिला"
+  "sharedNoDevicesFound": "कोई डिवाइस नहीं मिला",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

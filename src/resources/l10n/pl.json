@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Nie znaleziono konfiguracji Cloudinary. Sprawdź zmienne środowiskowe.",
   "userPhotoUploading": "Przesyłanie...",
   "userPhotoUploadTitle": "Prześlij zdjęcie",
-  "sharedNoDevicesFound": "Nie znaleziono urządzeń"
+  "sharedNoDevicesFound": "Nie znaleziono urządzeń",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

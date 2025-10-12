@@ -779,5 +779,8 @@
   "userPhotoCloudinaryConfigError": "ບໍ່ພົບການຕັ້ງຄ່າ Cloudinary. ກະລຸນາກວດສອບຕົວແປຂອງສະພາບແວດລ້ອມ.",
   "userPhotoUploading": "ກຳລັງອັບໂລດ...",
   "userPhotoUploadTitle": "ອັບໂລດຮູບພາບ",
-  "sharedNoDevicesFound": "ບໍ່ພົບອຸປະກອນ"
+  "sharedNoDevicesFound": "ບໍ່ພົບອຸປະກອນ",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }

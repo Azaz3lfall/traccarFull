@@ -783,5 +783,8 @@
   "userPhotoCloudinaryConfigError": "Konfigurace Cloudinary nebyla nalezena. Zkontrolujte prosím proměnné prostředí.",
   "userPhotoUploading": "Nahrávání...",
   "userPhotoUploadTitle": "Nahrát fotku",
-  "sharedNoDevicesFound": "Žádná zařízení nebyla nalezena"
+  "sharedNoDevicesFound": "Žádná zařízení nebyla nalezena",
+  "sharedStatus": "Status",
+  "sharedActions": "Actions",
+  "sharedActive": "Active"
 }
