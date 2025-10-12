@@ -862,7 +862,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           const resellerId = req.body.resellerId;
           
           // Generate unique filename for image
-          const imageFilename = `reseller_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
+          const imageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
           const imagesDir = IMAGES_DIR;
           const imagePath = path.join(imagesDir, imageFilename);
           
@@ -887,7 +887,7 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       try {
         const base64Data = body.logotype.replace(/^data:image\/\w+;base64,/, "");
         const buffer = Buffer.from(base64Data, 'base64');
-        const imageFilename = `reseller_${body.appUrl}_${body.parentUserId}_${body.resellerId}_${Date.now()}.png`;
+        const imageFilename = `reseller_${body.currentDomain}_${body.appUrl}_${body.parentUserId}_${body.resellerId}_${Date.now()}.png`;
         const imagesDir = IMAGES_DIR;
         const imagePath = path.join(imagesDir, imageFilename);
         
@@ -1515,14 +1515,23 @@ app.post('/api/domain-lookup', async (req, res) => {
         
         domainData = data;
         
-        // Look for corresponding image file using the same pattern
-        const imagePattern = `reseller_${data.currentDomain}_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
+        // Look for corresponding image file using both old and new patterns
+        const newImagePattern = `reseller_${data.currentDomain}_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
+        const oldImagePattern = `reseller_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
         
-        console.log(`🔍 Looking for image with pattern: ${imagePattern}`);
+        console.log(`🔍 Looking for image with new pattern: ${newImagePattern}`);
+        console.log(`🔍 Looking for image with old pattern: ${oldImagePattern}`);
         console.log(`🔍 In directory: ${IMAGES_DIR}`);
         
-        const imageFiles = await glob(imagePattern, { cwd: IMAGES_DIR });
-        console.log(`🔍 Found ${imageFiles.length} image files:`, imageFiles);
+        // Try new pattern first
+        let imageFiles = await glob(newImagePattern, { cwd: IMAGES_DIR });
+        console.log(`🔍 Found ${imageFiles.length} image files with new pattern:`, imageFiles);
+        
+        // If no files found with new pattern, try old pattern
+        if (imageFiles.length === 0) {
+          imageFiles = await glob(oldImagePattern, { cwd: IMAGES_DIR });
+          console.log(`🔍 Found ${imageFiles.length} image files with old pattern:`, imageFiles);
+        }
         
         if (imageFiles.length > 0) {
           const imagePath = path.join(IMAGES_DIR, imageFiles[0]);
@@ -1531,7 +1540,7 @@ app.post('/api/domain-lookup', async (req, res) => {
           imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
           console.log(`🔍 Image loaded successfully, size: ${imageBuffer.length} bytes`);
         } else {
-          console.log(`❌ No image files found for pattern: ${imagePattern}`);
+          console.log(`❌ No image files found for either pattern`);
         }
       } catch (fileError) {
         console.error('❌ Error reading file:', jsonFile, fileError.message);
