@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Ver venleg vel ein gyldig biletefil (PNG, JPG, JPEG, WebP) opp til {maxSize}KB",
   "resellerImageCompressedSuccess": "Forhandlar-logo komprimert! Redusert frå {originalSize}KB til {compressedSize}KB",
   "resellerImageCompressionError": "Kunne ikkje komprimere bilete. Prøv igjen.",
-  "resellerCompressingImage": "Komprimerer..."
+  "resellerCompressingImage": "Komprimerer...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

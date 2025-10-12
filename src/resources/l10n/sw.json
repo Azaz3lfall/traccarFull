@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Tafadhali chagua faili halali la picha (PNG, JPG, JPEG, WebP) hadi {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo ya muuzaji imeunganishwa! Imepunguzwa kutoka {originalSize}KB hadi {compressedSize}KB",
   "resellerImageCompressionError": "Imeshindwa kukusanya picha. Tafadhali jaribu tena.",
-  "resellerCompressingImage": "Inakusanya..."
+  "resellerCompressingImage": "Inakusanya...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

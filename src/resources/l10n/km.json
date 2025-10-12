@@ -786,5 +786,6 @@
   "resellerImageValidationError": "សូមជ្រើសរើសឯកសាររូបភាពត្រឹមត្រូវ (PNG, JPG, JPEG, WebP) រហូតដល់ {maxSize}KB",
   "resellerImageCompressedSuccess": "ឡូហ្គូរីសេលឺត្រូវបានបង្ហាប់! កាត់បន្ថយពី {originalSize}KB ទៅ {compressedSize}KB",
   "resellerImageCompressionError": "បរាជ័យក្នុងការបង្ហាប់រូបភាព។ សូមព្យាយាមម្តងទៀត។",
-  "resellerCompressingImage": "កំពុងបង្ហាប់..."
+  "resellerCompressingImage": "កំពុងបង្ហាប់...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

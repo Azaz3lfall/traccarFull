@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Si us plau, seleccioneu un fitxer d'imatge vàlid (PNG, JPG, JPEG, WebP) fins a {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo del distribuïdor comprimit! Reduït de {originalSize}KB a {compressedSize}KB",
   "resellerImageCompressionError": "Error en comprimir la imatge. Si us plau, torneu-ho a intentar.",
-  "resellerCompressingImage": "Comprimint..."
+  "resellerCompressingImage": "Comprimint...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

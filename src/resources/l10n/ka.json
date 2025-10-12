@@ -786,5 +786,6 @@
   "resellerImageValidationError": "გთხოვთ აირჩიოთ სწორი სურათის ფაილი (PNG, JPG, JPEG, WebP) {maxSize}KB-მდე",
   "resellerImageCompressedSuccess": "გადამყიდველის ლოგო შეკუმშული! შემცირდა {originalSize}KB-დან {compressedSize}KB-მდე",
   "resellerImageCompressionError": "სურათის შეკუმშვა ვერ მოხერხდა. გთხოვთ, კვლავ სცადეთ.",
-  "resellerCompressingImage": "შეკუმშვა..."
+  "resellerCompressingImage": "შეკუმშვა...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

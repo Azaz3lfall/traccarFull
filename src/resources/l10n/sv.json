@@ -789,5 +789,6 @@
   "resellerImageValidationError": "Välj en giltig bildfil (PNG, JPG, JPEG, WebP) upp till {maxSize}KB",
   "resellerImageCompressedSuccess": "Återförsäljare-logo komprimerad! Minskad från {originalSize}KB till {compressedSize}KB",
   "resellerImageCompressionError": "Kunde inte komprimera bild. Försök igen.",
-  "resellerCompressingImage": "Komprimerar..."
+  "resellerCompressingImage": "Komprimerar...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Zəhmət olmasa {maxSize}KB-a qədər etibarlı şəkil faylı seçin (PNG, JPG, JPEG, WebP)",
   "resellerImageCompressedSuccess": "Yenidən satıcı loqosu sıxıldı! {originalSize}KB-dan {compressedSize}KB-a azaldıldı",
   "resellerImageCompressionError": "Şəkli sıxmaq mümkün olmadı. Zəhmət olmasa yenidən cəhd edin.",
-  "resellerCompressingImage": "Sıxılır..."
+  "resellerCompressingImage": "Sıxılır...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

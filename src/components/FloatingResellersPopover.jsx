@@ -584,34 +584,54 @@ const FloatingResellersPopover = ({
     setIsCompressingImage(true);
 
     try {
-      // Compress the image
-      const compressedFile = await compressImage(file, {
-        maxSizeKB: 15,
-        minSizeKB: 10,
-        maxWidth: 400,
-        maxHeight: 400,
-        outputFormat: 'image/png',
-        initialQuality: 0.8
-      });
-
-      // Set the compressed image
-      setSelectedImage(compressedFile);
-
-      // Create preview from compressed file
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(compressedFile);
-
-      // Show compression success message
       const originalSizeKB = (file.size / 1024).toFixed(1);
-      const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
-      setSnackbar({
-        open: true,
-        message: t('resellerImageCompressedSuccess', { originalSize: originalSizeKB, compressedSize: compressedSizeKB }),
-        severity: 'success'
-      });
+      
+      // Check if image is already small enough (under 15KB)
+      if (file.size <= 15 * 1024) {
+        // Image is already small enough, no compression needed
+        setSelectedImage(file);
+        
+        // Create preview from original file
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+        
+        setSnackbar({
+          open: true,
+          message: t('resellerImageAlreadySmall', { size: originalSizeKB }),
+          severity: 'success'
+        });
+      } else {
+        // Compress the image
+        const compressedFile = await compressImage(file, {
+          maxSizeKB: 15,
+          minSizeKB: 10,
+          maxWidth: 400,
+          maxHeight: 400,
+          outputFormat: 'image/png',
+          initialQuality: 0.8
+        });
+
+        // Set the compressed image
+        setSelectedImage(compressedFile);
+
+        // Create preview from compressed file
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+
+        // Show compression success message
+        const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
+        setSnackbar({
+          open: true,
+          message: t('resellerImageCompressedSuccess', { originalSize: originalSizeKB, compressedSize: compressedSizeKB }),
+          severity: 'success'
+        });
+      }
 
     } catch (error) {
       console.error('Error compressing image:', error);

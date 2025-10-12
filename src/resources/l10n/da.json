@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Vælg venligst en gyldig billedfil (PNG, JPG, JPEG, WebP) op til {maxSize}KB",
   "resellerImageCompressedSuccess": "Forhandler-logo komprimeret! Reduceret fra {originalSize}KB til {compressedSize}KB",
   "resellerImageCompressionError": "Kunne ikke komprimere billede. Prøv venligst igen.",
-  "resellerCompressingImage": "Komprimerer..."
+  "resellerCompressingImage": "Komprimerer...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

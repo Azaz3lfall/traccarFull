@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Παρακαλώ επιλέξτε ένα έγκυρο αρχείο εικόνας (PNG, JPG, JPEG, WebP) έως {maxSize}KB",
   "resellerImageCompressedSuccess": "Συμπιεσμένο λογότυπο αναπωλητή! Μειώθηκε από {originalSize}KB σε {compressedSize}KB",
   "resellerImageCompressionError": "Αποτυχία συμπίεσης εικόνας. Παρακαλώ δοκιμάστε ξανά.",
-  "resellerCompressingImage": "Συμπιέζεται..."
+  "resellerCompressingImage": "Συμπιέζεται...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

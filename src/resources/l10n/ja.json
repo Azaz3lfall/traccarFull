@@ -789,5 +789,6 @@
   "resellerImageValidationError": "有効な画像ファイル（PNG、JPG、JPEG、WebP）を{maxSize}KBまで選択してください",
   "resellerImageCompressedSuccess": "リセラーロゴを圧縮しました！{originalSize}KBから{compressedSize}KBに削減",
   "resellerImageCompressionError": "画像の圧縮に失敗しました。もう一度お試しください。",
-  "resellerCompressingImage": "圧縮中..."
+  "resellerCompressingImage": "圧縮中...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

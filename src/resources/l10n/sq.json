@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Ju lutemi zgjidhni një skedar imazhi të vlefshëm (PNG, JPG, JPEG, WebP) deri në {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo e rishitësit i kompresuar! U reduktua nga {originalSize}KB në {compressedSize}KB",
   "resellerImageCompressionError": "Dështoi kompresimi i imazhit. Ju lutemi provoni përsëri.",
-  "resellerCompressingImage": "Duke kompresuar..."
+  "resellerCompressingImage": "Duke kompresuar...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

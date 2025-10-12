@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Palun valige kehtiv pildifail (PNG, JPG, JPEG, WebP) kuni {maxSize}KB",
   "resellerImageCompressedSuccess": "Edasimüüja logo kokku surutud! Vähendatud {originalSize}KB-lt {compressedSize}KB-le",
   "resellerImageCompressionError": "Pildi kokku surumine ebaõnnestus. Palun proovige uuesti.",
-  "resellerCompressingImage": "Kokku surutakse..."
+  "resellerCompressingImage": "Kokku surutakse...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

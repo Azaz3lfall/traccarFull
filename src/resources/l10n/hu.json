@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Kérjük, válasszon egy érvényes képfájlt (PNG, JPG, JPEG, WebP) {maxSize}KB-ig",
   "resellerImageCompressedSuccess": "Viszonteladó logó tömörítve! Csökkentve {originalSize}KB-ról {compressedSize}KB-ra",
   "resellerImageCompressionError": "A kép tömörítése sikertelen. Kérjük, próbálja újra.",
-  "resellerCompressingImage": "Tömörítés..."
+  "resellerCompressingImage": "Tömörítés...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

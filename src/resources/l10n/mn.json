@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Хүчинтэй зураг файл сонгоно уу (PNG, JPG, JPEG, WebP) {maxSize}KB хүртэл",
   "resellerImageCompressedSuccess": "Дахин худалдагчийн лого шахагдсан! {originalSize}KB-аас {compressedSize}KB болж бууруулсан",
   "resellerImageCompressionError": "Зураг шахах амжилтгүй болсон. Дахин оролдоно уу.",
-  "resellerCompressingImage": "Шахж байна..."
+  "resellerCompressingImage": "Шахж байна...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

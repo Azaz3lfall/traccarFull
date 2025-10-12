@@ -786,5 +786,6 @@
   "resellerImageValidationError": "කරුණාකර වලංගු රූප ගොනුවක් තෝරන්න (PNG, JPG, JPEG, WebP) {maxSize}KB දක්වා",
   "resellerImageCompressedSuccess": "විකුණුම්කරු ලෝගෝ සම්පීඩනය කරන ලදී! {originalSize}KB සිට {compressedSize}KB දක්වා අඩු කරන ලදී",
   "resellerImageCompressionError": "රූපය සම්පීඩනය කිරීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.",
-  "resellerCompressingImage": "සම්පීඩනය..."
+  "resellerCompressingImage": "සම්පීඩනය...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

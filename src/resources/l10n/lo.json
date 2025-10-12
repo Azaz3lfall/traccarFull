@@ -786,5 +786,6 @@
   "resellerImageValidationError": "ກະລຸນາເລືອກໄຟລ໌ຮູບພາບທີ່ຖືກຕ້ອງ (PNG, JPG, JPEG, WebP) ສູງສຸດ {maxSize}KB",
   "resellerImageCompressedSuccess": "ລ໋ອກໂອຂາຍຄືນຖືກບີບອັດ! ຫຼຸດຈາກ {originalSize}KB ເປັນ {compressedSize}KB",
   "resellerImageCompressionError": "ບໍ່ສາມາດບີບອັດຮູບພາບໄດ້. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ.",
-  "resellerCompressingImage": "ກຳລັງບີບອັດ..."
+  "resellerCompressingImage": "ກຳລັງບີບອັດ...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

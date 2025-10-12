@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Lūdzu, izvēlieties derīgu attēla failu (PNG, JPG, JPEG, WebP) līdz {maxSize}KB",
   "resellerImageCompressedSuccess": "Pārdevēja logotips saspiests! Samazināts no {originalSize}KB līdz {compressedSize}KB",
   "resellerImageCompressionError": "Neizdevās saspiest attēlu. Lūdzu, mēģiniet vēlreiz.",
-  "resellerCompressingImage": "Saspiež..."
+  "resellerCompressingImage": "Saspiež...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

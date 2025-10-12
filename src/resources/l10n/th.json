@@ -790,5 +790,6 @@
   "resellerImageValidationError": "กรุณาเลือกไฟล์รูปภาพที่ถูกต้อง (PNG, JPG, JPEG, WebP) สูงสุด {maxSize}KB",
   "resellerImageCompressedSuccess": "โลโก้ตัวแทนจำหน่ายถูกบีบอัด! ลดจาก {originalSize}KB เป็น {compressedSize}KB",
   "resellerImageCompressionError": "การบีบอัดภาพล้มเหลว กรุณาลองใหม่อีกครั้ง",
-  "resellerCompressingImage": "กำลังบีบอัด..."
+  "resellerCompressingImage": "กำลังบีบอัด...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

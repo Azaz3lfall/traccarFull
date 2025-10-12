@@ -789,5 +789,6 @@
   "resellerImageValidationError": "يرجى اختيار ملف صورة صالح (PNG, JPG, JPEG, WebP) حتى {maxSize}KB",
   "resellerImageCompressedSuccess": "تم ضغط شعار الموزع! تم تقليل الحجم من {originalSize}KB إلى {compressedSize}KB",
   "resellerImageCompressionError": "فشل في ضغط الصورة. يرجى المحاولة مرة أخرى.",
-  "resellerCompressingImage": "جاري الضغط..."
+  "resellerCompressingImage": "جاري الضغط...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

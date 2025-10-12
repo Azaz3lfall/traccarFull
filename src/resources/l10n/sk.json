@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Prosím, vyberte platný súbor obrázka (PNG, JPG, JPEG, WebP) do {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo predajcu komprimovaný! Zmenšený z {originalSize}KB na {compressedSize}KB",
   "resellerImageCompressionError": "Nepodarilo sa komprimovať obrázok. Skúste to znovu.",
-  "resellerCompressingImage": "Komprimuje sa..."
+  "resellerCompressingImage": "Komprimuje sa...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

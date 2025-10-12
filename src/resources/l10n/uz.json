@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Iltimos, haqiqiy rasm faylini tanlang (PNG, JPG, JPEG, WebP) {maxSize}KB gacha",
   "resellerImageCompressedSuccess": "Qayta sotuvchi logotipi siqildi! {originalSize}KB dan {compressedSize}KB ga kamaytirildi",
   "resellerImageCompressionError": "Rasmni siqish muvaffaqiyatsiz. Iltimos, qayta urinib ko'ring.",
-  "resellerCompressingImage": "Siqilmoqda..."
+  "resellerCompressingImage": "Siqilmoqda...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

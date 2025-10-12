@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Моля, изберете валиден файл с изображение (PNG, JPG, JPEG, WebP) до {maxSize}KB",
   "resellerImageCompressedSuccess": "Логото на дистрибутора е компресирано! Намалено от {originalSize}KB на {compressedSize}KB",
   "resellerImageCompressionError": "Неуспешно компресиране на изображението. Моля, опитайте отново.",
-  "resellerCompressingImage": "Компресиране..."
+  "resellerCompressingImage": "Компресиране...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

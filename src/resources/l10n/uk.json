@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Будь ласка, виберіть дійсний файл зображення (PNG, JPG, JPEG, WebP) до {maxSize}KB",
   "resellerImageCompressedSuccess": "Логотип реселлера стиснуто! Зменшено з {originalSize}KB до {compressedSize}KB",
   "resellerImageCompressionError": "Не вдалося стиснути зображення. Спробуйте ще раз.",
-  "resellerCompressingImage": "Стискання..."
+  "resellerCompressingImage": "Стискання...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

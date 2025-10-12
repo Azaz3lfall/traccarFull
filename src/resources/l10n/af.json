@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Kies 'n geldige beeldlêer (PNG, JPG, JPEG, WebP) tot {maxSize}KB",
   "resellerImageCompressedSuccess": "Herverkoper-logo saamgepers! Verminder van {originalSize}KB na {compressedSize}KB",
   "resellerImageCompressionError": "Kon nie beeld saamper nie. Probeer asseblief weer.",
-  "resellerCompressingImage": "Saamper..."
+  "resellerCompressingImage": "Saamper...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

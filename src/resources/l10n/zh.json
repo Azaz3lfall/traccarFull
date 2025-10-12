@@ -789,5 +789,6 @@
   "resellerImageValidationError": "请选择有效的图像文件（PNG、JPG、JPEG、WebP）最大{maxSize}KB",
   "resellerImageCompressedSuccess": "经销商标志已压缩！从{originalSize}KB减少到{compressedSize}KB",
   "resellerImageCompressionError": "图像压缩失败。请重试。",
-  "resellerCompressingImage": "压缩中..."
+  "resellerCompressingImage": "压缩中...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

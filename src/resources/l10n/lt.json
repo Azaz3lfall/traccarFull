@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Prašome pasirinkti galiojantį paveikslėlio failą (PNG, JPG, JPEG, WebP) iki {maxSize}KB",
   "resellerImageCompressedSuccess": "Perpardavėjo logotipas suspaustas! Sumažinta nuo {originalSize}KB iki {compressedSize}KB",
   "resellerImageCompressionError": "Nepavyko suspausti paveikslėlį. Bandykite dar kartą.",
-  "resellerCompressingImage": "Suspaudžiama..."
+  "resellerCompressingImage": "Suspaudžiama...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

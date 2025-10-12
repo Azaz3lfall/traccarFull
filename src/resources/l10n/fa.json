@@ -786,5 +786,6 @@
   "resellerImageValidationError": "لطفاً یک فایل تصویر معتبر انتخاب کنید (PNG, JPG, JPEG, WebP) تا {maxSize}KB",
   "resellerImageCompressedSuccess": "لوگوی فروشنده فشرده شد! از {originalSize}KB به {compressedSize}KB کاهش یافت",
   "resellerImageCompressionError": "فشل در فشرده‌سازی تصویر. لطفاً دوباره تلاش کنید.",
-  "resellerCompressingImage": "در حال فشرده‌سازی..."
+  "resellerCompressingImage": "در حال فشرده‌سازی...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

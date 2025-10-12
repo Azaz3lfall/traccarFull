@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Խնդրում ենք ընտրել վավեր պատկերի ֆայլ (PNG, JPG, JPEG, WebP) մինչև {maxSize}KB",
   "resellerImageCompressedSuccess": "Վերավաճառողի լոգոն սեղմված է! Նվազել {originalSize}KB-ից {compressedSize}KB",
   "resellerImageCompressionError": "Պատկերի սեղմումը ձախողվեց: Խնդրում ենք կրկին փորձել:",
-  "resellerCompressingImage": "Սեղմվում է..."
+  "resellerCompressingImage": "Սեղմվում է...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

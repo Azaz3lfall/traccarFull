@@ -790,5 +790,6 @@
   "resellerImageValidationError": "אנא בחר קובץ תמונה תקין (PNG, JPG, JPEG, WebP) עד {maxSize}KB",
   "resellerImageCompressedSuccess": "לוגו המשווק דחוס! הופחת מ-{originalSize}KB ל-{compressedSize}KB",
   "resellerImageCompressionError": "נכשל בדחיסת התמונה. אנא נסה שוב.",
-  "resellerCompressingImage": "דוחס..."
+  "resellerCompressingImage": "דוחס...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

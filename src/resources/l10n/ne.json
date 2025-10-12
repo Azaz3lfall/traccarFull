@@ -786,5 +786,6 @@
   "resellerImageValidationError": "कृपया एक वैध छवि फाइल छनोट गर्नुहोस् (PNG, JPG, JPEG, WebP) {maxSize}KB सम्म",
   "resellerImageCompressedSuccess": "रिसेलर लोगो संकुचित! {originalSize}KB बाट {compressedSize}KB मा कम गरियो",
   "resellerImageCompressionError": "छवि संकुचन असफल। कृपया फेरि प्रयास गर्नुहोस्।",
-  "resellerCompressingImage": "संकुचन गर्दै..."
+  "resellerCompressingImage": "संकुचन गर्दै...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

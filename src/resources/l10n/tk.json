@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Gowy surat faýlyny saýlaň (PNG, JPG, JPEG, WebP) {maxSize}KB çenli",
   "resellerImageCompressedSuccess": "Dyn satyjy logotipi sıyldy! {originalSize}KB-dan {compressedSize}KB-a azaldıldy",
   "resellerImageCompressionError": "Surat sıyıp bolmady. Gaýtadan synanyşyň.",
-  "resellerCompressingImage": "Sıyılyar..."
+  "resellerCompressingImage": "Sıyılyar...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

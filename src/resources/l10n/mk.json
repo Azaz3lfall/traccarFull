@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Ве молиме изберете валидна слика (PNG, JPG, JPEG, WebP) до {maxSize}KB",
   "resellerImageCompressedSuccess": "Логото на препродавачот е компресирано! Намалено од {originalSize}KB на {compressedSize}KB",
   "resellerImageCompressionError": "Неуспешно компресирање на сликата. Ве молиме обидете се повторно.",
-  "resellerCompressingImage": "Компресирање..."
+  "resellerCompressingImage": "Компресирање...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

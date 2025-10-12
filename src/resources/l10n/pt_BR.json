@@ -792,5 +792,6 @@
   "resellerImageValidationError": "Por favor, selecione um arquivo de imagem válido (PNG, JPG, JPEG, WebP) até {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo do revendedor comprimido! Reduzido de {originalSize}KB para {compressedSize}KB",
   "resellerImageCompressionError": "Falha ao comprimir imagem. Tente novamente.",
-  "resellerCompressingImage": "Comprimindo..."
+  "resellerCompressingImage": "Comprimindo...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

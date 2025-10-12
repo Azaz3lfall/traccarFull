@@ -786,5 +786,6 @@
   "resellerImageValidationError": "Sila pilih fail imej yang sah (PNG, JPG, JPEG, WebP) sehingga {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo penjual semula dimampatkan! Dikurangkan dari {originalSize}KB kepada {compressedSize}KB",
   "resellerImageCompressionError": "Gagal memampatkan imej. Sila cuba lagi.",
-  "resellerCompressingImage": "Memampatkan..."
+  "resellerCompressingImage": "Memampatkan...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

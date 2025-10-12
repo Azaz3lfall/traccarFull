@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Silakan pilih file gambar yang valid (PNG, JPG, JPEG, WebP) hingga {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo reseller dikompres! Dikurangi dari {originalSize}KB menjadi {compressedSize}KB",
   "resellerImageCompressionError": "Gagal mengompresi gambar. Silakan coba lagi.",
-  "resellerCompressingImage": "Mengompresi..."
+  "resellerCompressingImage": "Mengompresi...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

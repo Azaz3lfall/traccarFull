@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Lütfen geçerli bir resim dosyası seçin (PNG, JPG, JPEG, WebP) {maxSize}KB'a kadar",
   "resellerImageCompressedSuccess": "Bayi logosu sıkıştırıldı! {originalSize}KB'dan {compressedSize}KB'a düşürüldü",
   "resellerImageCompressionError": "Görüntü sıkıştırılamadı. Lütfen tekrar deneyin.",
-  "resellerCompressingImage": "Sıkıştırılıyor..."
+  "resellerCompressingImage": "Sıkıştırılıyor...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

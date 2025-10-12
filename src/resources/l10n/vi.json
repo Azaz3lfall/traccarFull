@@ -790,5 +790,6 @@
   "resellerImageValidationError": "Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, JPEG, WebP) lên đến {maxSize}KB",
   "resellerImageCompressedSuccess": "Logo đại lý đã được nén! Giảm từ {originalSize}KB xuống {compressedSize}KB",
   "resellerImageCompressionError": "Không thể nén hình ảnh. Vui lòng thử lại.",
-  "resellerCompressingImage": "Đang nén..."
+  "resellerCompressingImage": "Đang nén...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }

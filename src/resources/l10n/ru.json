@@ -789,5 +789,6 @@
   "resellerImageValidationError": "Пожалуйста, выберите действительный файл изображения (PNG, JPG, JPEG, WebP) до {maxSize}KB",
   "resellerImageCompressedSuccess": "Логотип реселлера сжат! Уменьшен с {originalSize}KB до {compressedSize}KB",
   "resellerImageCompressionError": "Не удалось сжать изображение. Попробуйте еще раз.",
-  "resellerCompressingImage": "Сжатие..."
+  "resellerCompressingImage": "Сжатие...",
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
 }
