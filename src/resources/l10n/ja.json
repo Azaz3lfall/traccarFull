@@ -790,5 +790,5 @@
   "resellerImageCompressedSuccess": "リセラーロゴを圧縮しました！{originalSize}KBから{compressedSize}KBに削減",
   "resellerImageCompressionError": "画像の圧縮に失敗しました。もう一度お試しください。",
   "resellerCompressingImage": "圧縮中...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "リセラーロゴは既に最適化されています！サイズ: {size}KB"
 }

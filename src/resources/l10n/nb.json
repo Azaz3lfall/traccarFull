@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Forhandler-logo komprimert! Redusert fra {originalSize}KB til {compressedSize}KB",
   "resellerImageCompressionError": "Kunne ikke komprimere bilde. Prøv igjen.",
   "resellerCompressingImage": "Komprimerer...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Forhandler-logo er allerede optimalisert! Størrelse: {size}KB"
 }

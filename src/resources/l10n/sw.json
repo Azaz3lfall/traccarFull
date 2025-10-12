@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Logo ya muuzaji imeunganishwa! Imepunguzwa kutoka {originalSize}KB hadi {compressedSize}KB",
   "resellerImageCompressionError": "Imeshindwa kukusanya picha. Tafadhali jaribu tena.",
   "resellerCompressingImage": "Inakusanya...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Logo ya muuzaji tayari imeboreshwa! Ukubwa: {size}KB"
 }

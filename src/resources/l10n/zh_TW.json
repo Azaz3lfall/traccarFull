@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "經銷商標誌已壓縮！從{originalSize}KB減少到{compressedSize}KB",
   "resellerImageCompressionError": "圖像壓縮失敗。請重試。",
   "resellerCompressingImage": "壓縮中...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "經銷商標誌已優化！大小：{size}KB"
 }

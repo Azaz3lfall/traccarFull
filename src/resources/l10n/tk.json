@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Dyn satyjy logotipi sıyldy! {originalSize}KB-dan {compressedSize}KB-a azaldıldy",
   "resellerImageCompressionError": "Surat sıyıp bolmady. Gaýtadan synanyşyň.",
   "resellerCompressingImage": "Sıyılyar...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Dyn satyjy logotipi eýýäm optimallaşdyryldy! Ölçegi: {size}KB"
 }

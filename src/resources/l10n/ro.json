@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Logo-ul revânzătorului comprimat! Redus de la {originalSize}KB la {compressedSize}KB",
   "resellerImageCompressionError": "Eșec la comprimarea imaginii. Vă rugăm să încercați din nou.",
   "resellerCompressingImage": "Se comprimă...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Logo-ul revânzătorului este deja optimizat! Mărimea: {size}KB"
 }

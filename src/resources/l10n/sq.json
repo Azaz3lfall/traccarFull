@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Logo e rishitësit i kompresuar! U reduktua nga {originalSize}KB në {compressedSize}KB",
   "resellerImageCompressionError": "Dështoi kompresimi i imazhit. Ju lutemi provoni përsëri.",
   "resellerCompressingImage": "Duke kompresuar...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Logo e rishitësit është tashmë i optimizuar! Madhësia: {size}KB"
 }

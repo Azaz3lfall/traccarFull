@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "გადამყიდველის ლოგო შეკუმშული! შემცირდა {originalSize}KB-დან {compressedSize}KB-მდე",
   "resellerImageCompressionError": "სურათის შეკუმშვა ვერ მოხერხდა. გთხოვთ, კვლავ სცადეთ.",
   "resellerCompressingImage": "შეკუმშვა...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "გადამყიდველის ლოგო უკვე ოპტიმიზებულია! ზომა: {size}KB"
 }

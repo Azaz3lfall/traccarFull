@@ -790,5 +790,5 @@
   "resellerImageCompressedSuccess": "रीसेलर लोगो संपीड़ित! {originalSize}KB से {compressedSize}KB तक कम किया गया",
   "resellerImageCompressionError": "छवि को संपीड़ित करने में विफल। कृपया पुनः प्रयास करें।",
   "resellerCompressingImage": "संपीड़ित कर रहे हैं...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "रीसेलर लोगो पहले से ही अनुकूलित है! आकार: {size}KB"
 }

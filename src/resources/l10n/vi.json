@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Logo đại lý đã được nén! Giảm từ {originalSize}KB xuống {compressedSize}KB",
   "resellerImageCompressionError": "Không thể nén hình ảnh. Vui lòng thử lại.",
   "resellerCompressingImage": "Đang nén...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Logo đại lý đã được tối ưu hóa! Kích thước: {size}KB"
 }

@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Pārdevēja logotips saspiests! Samazināts no {originalSize}KB līdz {compressedSize}KB",
   "resellerImageCompressionError": "Neizdevās saspiest attēlu. Lūdzu, mēģiniet vēlreiz.",
   "resellerCompressingImage": "Saspiež...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Pārdevēja logotips jau ir optimizēts! Izmērs: {size}KB"
 }

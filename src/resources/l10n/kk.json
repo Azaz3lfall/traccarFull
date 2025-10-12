@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Қайта сатушы логотипі сығылды! {originalSize}KB-дан {compressedSize}KB-ға азайтылды",
   "resellerImageCompressionError": "Суретті сығу мүмкін болмады. Қайталап көріңіз.",
   "resellerCompressingImage": "Сығылуда...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Қайта сатушы логотипі қазірдің өзінде оңтайландырылған! Өлшемі: {size}KB"
 }

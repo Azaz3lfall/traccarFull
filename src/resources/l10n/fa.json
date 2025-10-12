@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "لوگوی فروشنده فشرده شد! از {originalSize}KB به {compressedSize}KB کاهش یافت",
   "resellerImageCompressionError": "فشل در فشرده‌سازی تصویر. لطفاً دوباره تلاش کنید.",
   "resellerCompressingImage": "در حال فشرده‌سازی...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "لوگوی فروشنده قبلاً بهینه شده است! اندازه: {size}KB"
 }

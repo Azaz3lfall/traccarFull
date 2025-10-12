@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Yenidən satıcı loqosu sıxıldı! {originalSize}KB-dan {compressedSize}KB-a azaldıldı",
   "resellerImageCompressionError": "Şəkli sıxmaq mümkün olmadı. Zəhmət olmasa yenidən cəhd edin.",
   "resellerCompressingImage": "Sıxılır...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Yenidən satıcı loqosu artıq optimallaşdırılıb! Ölçü: {size}KB"
 }

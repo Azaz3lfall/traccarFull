@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Edasimüüja logo kokku surutud! Vähendatud {originalSize}KB-lt {compressedSize}KB-le",
   "resellerImageCompressionError": "Pildi kokku surumine ebaõnnestus. Palun proovige uuesti.",
   "resellerCompressingImage": "Kokku surutakse...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Edasimüüja logo on juba optimeeritud! Suurus: {size}KB"
 }

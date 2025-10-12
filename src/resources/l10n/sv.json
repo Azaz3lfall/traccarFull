@@ -790,5 +790,5 @@
   "resellerImageCompressedSuccess": "Återförsäljare-logo komprimerad! Minskad från {originalSize}KB till {compressedSize}KB",
   "resellerImageCompressionError": "Kunde inte komprimera bild. Försök igen.",
   "resellerCompressingImage": "Komprimerar...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Återförsäljare-logo är redan optimerad! Storlek: {size}KB"
 }

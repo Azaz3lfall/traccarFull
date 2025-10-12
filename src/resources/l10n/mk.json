@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "Логото на препродавачот е компресирано! Намалено од {originalSize}KB на {compressedSize}KB",
   "resellerImageCompressionError": "Неуспешно компресирање на сликата. Ве молиме обидете се повторно.",
   "resellerCompressingImage": "Компресирање...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Логото на препродавачот веќе е оптимизирано! Големина: {size}KB"
 }

@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "Логото на дистрибутора е компресирано! Намалено от {originalSize}KB на {compressedSize}KB",
   "resellerImageCompressionError": "Неуспешно компресиране на изображението. Моля, опитайте отново.",
   "resellerCompressingImage": "Компресиране...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Логото на дистрибутора вече е оптимизирано! Размер: {size}KB"
 }

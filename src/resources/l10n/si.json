@@ -787,5 +787,5 @@
   "resellerImageCompressedSuccess": "විකුණුම්කරු ලෝගෝ සම්පීඩනය කරන ලදී! {originalSize}KB සිට {compressedSize}KB දක්වා අඩු කරන ලදී",
   "resellerImageCompressionError": "රූපය සම්පීඩනය කිරීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.",
   "resellerCompressingImage": "සම්පීඩනය...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "විකුණුම්කරු ලෝගෝ දැනටමත් ප්‍රශස්ත කර ඇත! ප්‍රමාණය: {size}KB"
 }

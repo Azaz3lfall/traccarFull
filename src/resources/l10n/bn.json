@@ -791,5 +791,5 @@
   "resellerImageCompressedSuccess": "রিসেলার লোগো কম্প্রেস করা হয়েছে! {originalSize}KB থেকে {compressedSize}KB এ কমেছে",
   "resellerImageCompressionError": "ছবি কম্প্রেস করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "resellerCompressingImage": "কম্প্রেস করা হচ্ছে...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "রিসেলার লোগো ইতিমধ্যে অপ্টিমাইজড! আকার: {size}KB"
 }
