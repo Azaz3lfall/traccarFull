@@ -57,8 +57,26 @@ import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import deviceCategories from '../common/util/deviceCategories';
 
-// Only import default icon for fallback
+// Import device category icons (same as map markers) - optimized imports
+import bicycleIcon from '../resources/images/newIcons/bicycle.png';
+import boatIcon from '../resources/images/newIcons/boat.png';
+import busIcon from '../resources/images/newIcons/bus.png';
+import carIcon from '../resources/images/newIcons/car.png';
+import camperIcon from '../resources/images/newIcons/camper.png';
+import craneIcon from '../resources/images/newIcons/crane.png';
+import helicopterIcon from '../resources/images/newIcons/helicopter.png';
+import motorcycleIcon from '../resources/images/newIcons/motorcycle.png';
+import personIcon from '../resources/images/newIcons/person.png';
+import planeIcon from '../resources/images/newIcons/plane.png';
+import scooterIcon from '../resources/images/newIcons/scooter.png';
+import shipIcon from '../resources/images/newIcons/ship.png';
+import tractorIcon from '../resources/images/newIcons/tractor.png';
+import trainIcon from '../resources/images/newIcons/train.png';
+import tramIcon from '../resources/images/newIcons/tram.png';
+import truckIcon from '../resources/images/newIcons/truck.png';
+import vanIcon from '../resources/images/newIcons/van.png';
 import defaultIcon from '../resources/images/newIcons/default.png';
+import animalIcon from '../resources/images/newIcons/animal.png';
 
 const FloatingDevicesPopover = ({ 
   desktop, 
@@ -78,10 +96,27 @@ const FloatingDevicesPopover = ({
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const deviceAttributes = useDeviceAttributes(t);
 
-  // Function to get icon path for device category (optimized)
-  const getCategoryIconPath = (category) => {
-    // Use dynamic path for better performance
-    return `/images/newIcons/${category}.png`;
+  // Device category icons mapping (same as map markers)
+  const categoryIcons = {
+    animal: animalIcon,
+    bicycle: bicycleIcon,
+    boat: boatIcon,
+    bus: busIcon,
+    car: carIcon,
+    camper: camperIcon,
+    crane: craneIcon,
+    helicopter: helicopterIcon,
+    motorcycle: motorcycleIcon,
+    person: personIcon,
+    plane: planeIcon,
+    scooter: scooterIcon,
+    ship: shipIcon,
+    tractor: tractorIcon,
+    train: trainIcon,
+    tram: tramIcon,
+    truck: truckIcon,
+    van: vanIcon,
+    default: defaultIcon,
   };
 
   // State management
@@ -980,16 +1015,13 @@ const FloatingDevicesPopover = ({
                           InputProps={{
                             startAdornment: (
                               <img 
-                                src={getCategoryIconPath(editingDevice?.category || 'default')} 
+                                src={categoryIcons[editingDevice?.category || 'default'] || categoryIcons.default} 
                                 alt={editingDevice?.category || 'default'}
                                 style={{ 
                                   width: '24px', 
                                   height: '24px',
                                   objectFit: 'contain',
                                   marginRight: '8px'
-                                }}
-                                onError={(e) => {
-                                  e.target.src = defaultIcon;
                                 }}
                               />
                             ),
@@ -1022,7 +1054,7 @@ const FloatingDevicesPopover = ({
                             width: categoryInputRef?.getBoundingClientRect().width || 200,
                           }}>
                             {deviceCategories.map((category) => {
-                              const iconSrc = getCategoryIconPath(category);
+                              const iconSrc = categoryIcons[category] || categoryIcons.default;
                               const isSelected = editingDevice?.category === category;
                               return (
                                 <div
@@ -1052,9 +1084,6 @@ const FloatingDevicesPopover = ({
                                         width: '26px', 
                                         height: '26px',
                                         objectFit: 'contain'
-                                      }}
-                                      onError={(e) => {
-                                        e.target.src = defaultIcon;
                                       }}
                                     />
                                     {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
