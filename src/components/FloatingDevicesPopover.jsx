@@ -670,18 +670,17 @@ const FloatingDevicesPopover = ({
                   {/* Pagination */}
                   {totalPages > 1 && (
                     <div style={{
-                      position: 'fixed',
-                      bottom: '0',
-                      left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
-                      right: '0',
-                      padding: '8px 16px',
-                      borderTop: `1px solid ${colors.border}`,
                       backgroundColor: colors.surface,
+                      borderTop: `1px solid ${colors.border}`,
+                      padding: '12px 0',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       gap: '8px',
-                      zIndex: 10001,
+                      marginTop: '16px',
+                      position: 'sticky',
+                      bottom: 0,
+                      zIndex: 1,
                     }}>
                       <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
                         {page} / {totalPages} ({filteredDevices.length} {t('sharedDevices')})
