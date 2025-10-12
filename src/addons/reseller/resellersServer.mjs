@@ -79,19 +79,84 @@ const checkDomainPropagation = async (domain) => {
 const createNginxConfig = async (appUrl) => {
   try {
     const nginxConfig = `server {
-  server_name ${appUrl};
+    listen 80;
+    server_name ${appUrl};
 
-  location / {
-    proxy_pass http://127.0.0.1:8082;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_cache_bypass $http_upgrade;
-  }
+    # --- Performance fixes ---
+    sendfile off;                 # Avoid stalls on virtualized servers
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    # --- GZIP Compression ---
+    gzip on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 5;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types
+        text/plain
+        text/css
+        text/javascript
+        application/javascript
+        application/x-javascript
+        application/json
+        application/xml
+        application/xml+rss
+        application/xhtml+xml
+        application/font-woff
+        application/font-woff2
+        image/svg+xml;
+
+    # --- Brotli (optional, enable only if supported) ---
+    # brotli on;
+    # brotli_comp_level 6;
+    # brotli_types
+    #     text/plain
+    #     text/css
+    #     application/javascript
+    #     application/json
+    #     application/xml
+    #     image/svg+xml
+    #     font/woff2;
+
+    # --- Proxy section (your app) ---
+    location / {
+        proxy_pass http://127.0.0.1:8082;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_buffering off;          # Disable buffering to prevent pending JS/WS stalls
+        proxy_request_buffering off;
+
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    # --- Optional: Static file caching ---
+    location ~* \\.(?:js|css|jpg|jpeg|gif|png|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+        try_files $uri @backend;
+    }
+
+    location @backend {
+        proxy_pass http://127.0.0.1:8082;
+    }
+
+    # --- Basic security headers ---
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-XSS-Protection "1; mode=block" always;
 }`;
 
     // Create nginx sites-available directory if it doesn't exist
@@ -349,6 +414,56 @@ const cleanupResellerNginx = async (appUrl) => {
   } catch (error) {
     console.error('❌ Error in nginx cleanup (non-blocking):', error.message);
     // Don't throw - this is non-blocking
+  }
+};
+
+// Helper function to update existing nginx configs with new template
+const updateExistingNginxConfigs = async () => {
+  try {
+    console.log('🔄 Updating existing nginx configurations with new template...');
+    
+    const sitesAvailableDir = '/etc/nginx/sites-available';
+    if (!fs.existsSync(sitesAvailableDir)) {
+      console.log('⚠️ No sites-available directory found, skipping nginx update');
+      return;
+    }
+
+    const files = fs.readdirSync(sitesAvailableDir);
+    const resellerConfigs = files.filter(file => file.endsWith('.conf') && file.startsWith('reseller_'));
+    
+    console.log(`📁 Found ${resellerConfigs.length} existing reseller nginx configs to update`);
+    
+    for (const configFile of resellerConfigs) {
+      try {
+        // Extract appUrl from filename (assuming format: reseller_appUrl.conf or similar)
+        const appUrl = configFile.replace('.conf', '');
+        
+        // Read current config to check if it needs updating
+        const currentConfigPath = path.join(sitesAvailableDir, configFile);
+        const currentConfig = fs.readFileSync(currentConfigPath, 'utf8');
+        
+        // Check if it's the old template (doesn't have gzip or performance optimizations)
+        if (!currentConfig.includes('gzip on') || !currentConfig.includes('sendfile off')) {
+          console.log(`🔄 Updating nginx config for: ${appUrl}`);
+          
+          // Create new config with updated template
+          await createNginxConfig(appUrl);
+          
+          // Reload nginx
+          await reloadNginx(appUrl);
+          
+          console.log(`✅ Updated nginx config for: ${appUrl}`);
+        } else {
+          console.log(`⏭️ Config for ${appUrl} already up to date`);
+        }
+      } catch (fileError) {
+        console.error(`❌ Error updating config ${configFile}:`, fileError.message);
+      }
+    }
+    
+    console.log('✅ Nginx configuration update completed');
+  } catch (error) {
+    console.error('❌ Error updating existing nginx configs:', error);
   }
 };
 
@@ -1153,8 +1268,13 @@ app.post('/api/resellers/delete', async (req, res) => {
       }
     }
 
-    // Cleanup nginx configuration for the deleted reseller (non-blocking)
-    cleanupResellerNginx(resellerData.appUrl);
+    // Cleanup nginx configuration for the deleted reseller
+    try {
+      await cleanupResellerNginx(resellerData.appUrl);
+    } catch (cleanupError) {
+      console.error('❌ Error during nginx cleanup (non-blocking):', cleanupError);
+      // Don't fail the delete operation if cleanup fails
+    }
 
     res.json({
       success: true,
@@ -1175,6 +1295,25 @@ app.post('/api/resellers/delete', async (req, res) => {
     console.error('❌ Error deleting reseller:', error);
     res.status(500).json({
       error: 'Delete failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Endpoint to update existing nginx configs
+app.post('/api/nginx/update-configs', async (req, res) => {
+  try {
+    await updateExistingNginxConfigs();
+    res.json({
+      success: true,
+      message: 'Nginx configurations updated successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error updating nginx configs:', error);
+    res.status(500).json({
+      error: 'Failed to update nginx configs',
       message: error.message,
       timestamp: new Date().toISOString()
     });
@@ -1492,8 +1631,11 @@ const ensureDirectories = () => {
 ensureDirectories();
 
 // Start server
-app.listen(PORT, () => {
-
+app.listen(PORT, async () => {
+  console.log(`🚀 Reseller server running on port ${PORT}`);
+  
+  // Update existing nginx configs with new template
+  await updateExistingNginxConfigs();
 });
 
 // Graceful shutdown
