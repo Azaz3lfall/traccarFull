@@ -40,6 +40,26 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Link as LinkIcon,
   Save as SaveIcon,
+  DirectionsCar as CarIcon,
+  DirectionsBike as BicycleIcon,
+  DirectionsBoat as BoatIcon,
+  DirectionsBus as BusIcon,
+  DirectionsSubway as TrainIcon,
+  Flight as PlaneIcon,
+  Motorcycle as MotorcycleIcon,
+  Person as PersonIcon,
+  DirectionsWalk as PersonWalkIcon,
+  LocalShipping as TruckIcon,
+  DirectionsRailway as TramIcon,
+  Agriculture as TractorIcon,
+  LocalShipping as VanIcon,
+  DirectionsCar as DefaultIcon,
+  DirectionsCar as CamperIcon,
+  Construction as CraneIcon,
+  Flight as HelicopterIcon,
+  DirectionsBoat as ShipIcon,
+  LocalShipping as TrailerIcon,
+  DirectionsBike as ScooterIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
@@ -73,6 +93,33 @@ const FloatingDevicesPopover = ({
   const limitDevices = useRestriction('limitDevices');
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const deviceAttributes = useDeviceAttributes(t);
+
+  // Function to get icon for device category
+  const getCategoryIcon = (category) => {
+    const iconMap = {
+      'default': DefaultIcon,
+      'animal': PersonWalkIcon,
+      'bicycle': BicycleIcon,
+      'boat': BoatIcon,
+      'bus': BusIcon,
+      'car': CarIcon,
+      'camper': CamperIcon,
+      'crane': CraneIcon,
+      'helicopter': HelicopterIcon,
+      'motorcycle': MotorcycleIcon,
+      'person': PersonIcon,
+      'plane': PlaneIcon,
+      'ship': ShipIcon,
+      'tractor': TractorIcon,
+      'trailer': TrailerIcon,
+      'train': TrainIcon,
+      'tram': TramIcon,
+      'truck': TruckIcon,
+      'van': VanIcon,
+      'scooter': ScooterIcon,
+    };
+    return iconMap[category] || DefaultIcon;
+  };
 
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -994,25 +1041,32 @@ const FloatingDevicesPopover = ({
                             top: (categoryInputRef?.getBoundingClientRect().bottom || 0) + 4,
                             width: categoryInputRef?.getBoundingClientRect().width || 200,
                           }}>
-                            {deviceCategories.map((category) => (
-                              <div
-                                key={category}
-                                style={{
-                                  padding: '8px 12px',
-                                  cursor: 'pointer',
-                                  color: colors.text,
-                                  fontSize: '14px',
-                                  borderBottom: `1px solid ${colors.border}`,
-                                }}
-                                onMouseDown={(e) => {
-                                  e.preventDefault();
-                                  setEditingDevice({ ...editingDevice, category: category });
-                                  setCategoryDropdownOpen(false);
-                                }}
-                              >
-                                {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
-                              </div>
-                            ))}
+                            {deviceCategories.map((category) => {
+                              const IconComponent = getCategoryIcon(category);
+                              return (
+                                <div
+                                  key={category}
+                                  style={{
+                                    padding: '8px 12px',
+                                    cursor: 'pointer',
+                                    color: colors.text,
+                                    fontSize: '14px',
+                                    borderBottom: `1px solid ${colors.border}`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setEditingDevice({ ...editingDevice, category: category });
+                                    setCategoryDropdownOpen(false);
+                                  }}
+                                >
+                                  <IconComponent style={{ fontSize: '18px', color: colors.textSecondary }} />
+                                  {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
 
