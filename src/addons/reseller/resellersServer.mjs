@@ -141,8 +141,22 @@ const createNginxConfig = async (appUrl) => {
         proxy_send_timeout 300s;
     }
 
-    # --- Optional: Static file caching ---
-    location ~* \\.(?:js|css|jpg|jpeg|gif|png|ico|svg|woff|woff2|ttf|eot)$ {
+    # --- Images served by Express server ---
+    location /images/ {
+        proxy_pass http://127.0.0.1:8082;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        # Cache images for 30 days
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000";
+    }
+
+    # --- Optional: Static file caching for other assets ---
+    location ~* \\.(?:js|css|woff|woff2|ttf|eot)$ {
         expires 30d;
         add_header Cache-Control "public, max-age=2592000, immutable";
         try_files $uri @backend;
