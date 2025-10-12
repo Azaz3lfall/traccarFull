@@ -784,7 +784,7 @@
   "userPhotoUploading": "上傳中...",
   "userPhotoUploadTitle": "上傳照片",
   "sharedNoDevicesFound": "未找到裝置",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "狀態",
+  "sharedActions": "操作",
+  "sharedActive": "活躍"
 }

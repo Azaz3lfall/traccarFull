@@ -783,7 +783,7 @@
   "userPhotoUploading": "جاري الرفع...",
   "userPhotoUploadTitle": "رفع صورة",
   "sharedNoDevicesFound": "لم يتم العثور على أجهزة",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "الحالة",
+  "sharedActions": "الإجراءات",
+  "sharedActive": "نشط"
 }

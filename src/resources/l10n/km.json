@@ -780,7 +780,7 @@
   "userPhotoUploading": "កំពុងផ្ទុកឡើង...",
   "userPhotoUploadTitle": "ផ្ទុកឡើងរូបភាព",
   "sharedNoDevicesFound": "រកមិនឃើញឧបករណ៍",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "ស្ថានភាព",
+  "sharedActions": "សកម្មភាព",
+  "sharedActive": "សកម្ម"
 }

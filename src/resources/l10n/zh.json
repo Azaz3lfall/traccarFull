@@ -783,7 +783,7 @@
   "userPhotoUploading": "上传中...",
   "userPhotoUploadTitle": "上传照片",
   "sharedNoDevicesFound": "未找到设备",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "状态",
+  "sharedActions": "操作",
+  "sharedActive": "活跃"
 }

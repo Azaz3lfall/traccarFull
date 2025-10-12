@@ -784,7 +784,7 @@
   "userPhotoUploading": "Feltöltés...",
   "userPhotoUploadTitle": "Kép feltöltése",
   "sharedNoDevicesFound": "Nem találhatók eszközök",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Állapot",
+  "sharedActions": "Műveletek",
+  "sharedActive": "Aktív"
 }

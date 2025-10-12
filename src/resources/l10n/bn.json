@@ -784,7 +784,7 @@
   "userPhotoUploading": "আপলোড হচ্ছে...",
   "userPhotoUploadTitle": "ছবি আপলোড করুন",
   "sharedNoDevicesFound": "কোনো ডিভাইস পাওয়া যায়নি",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "অবস্থা",
+  "sharedActions": "ক্রিয়াকলাপ",
+  "sharedActive": "সক্রিয়"
 }

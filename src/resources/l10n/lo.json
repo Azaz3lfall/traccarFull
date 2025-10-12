@@ -780,7 +780,7 @@
   "userPhotoUploading": "ກຳລັງອັບໂລດ...",
   "userPhotoUploadTitle": "ອັບໂລດຮູບພາບ",
   "sharedNoDevicesFound": "ບໍ່ພົບອຸປະກອນ",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "ສະຖານະ",
+  "sharedActions": "ການດຳເນີນການ",
+  "sharedActive": "ມີການເຄື່ອນໄຫວ"
 }

@@ -784,7 +784,7 @@
   "userPhotoUploading": "Yükleniyor...",
   "userPhotoUploadTitle": "Fotoğraf yükle",
   "sharedNoDevicesFound": "Cihaz bulunamadı",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Durum",
+  "sharedActions": "İşlemler",
+  "sharedActive": "Aktif"
 }

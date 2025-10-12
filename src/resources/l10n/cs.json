@@ -784,7 +784,7 @@
   "userPhotoUploading": "Nahrávání...",
   "userPhotoUploadTitle": "Nahrát fotku",
   "sharedNoDevicesFound": "Žádná zařízení nebyla nalezena",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Stav",
+  "sharedActions": "Akce",
+  "sharedActive": "Aktivní"
 }

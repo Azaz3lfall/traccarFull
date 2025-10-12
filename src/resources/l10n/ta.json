@@ -780,7 +780,7 @@
   "userPhotoUploading": "பதிவேற்றுகிறது...",
   "userPhotoUploadTitle": "படத்தை பதிவேற்றவும்",
   "sharedNoDevicesFound": "சாதனங்கள் கிடைக்கவில்லை",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "நிலை",
+  "sharedActions": "செயல்கள்",
+  "sharedActive": "செயலில்"
 }

@@ -784,7 +784,7 @@
   "userPhotoUploading": "Ladataan...",
   "userPhotoUploadTitle": "Lataa kuva",
   "sharedNoDevicesFound": "Laitteita ei löytynyt",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Tila",
+  "sharedActions": "Toiminnot",
+  "sharedActive": "Aktiivinen"
 }

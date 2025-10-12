@@ -784,7 +784,7 @@
   "userPhotoUploading": "Đang tải lên...",
   "userPhotoUploadTitle": "Tải lên ảnh",
   "sharedNoDevicesFound": "Không tìm thấy thiết bị",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Trạng thái",
+  "sharedActions": "Hành động",
+  "sharedActive": "Hoạt động"
 }

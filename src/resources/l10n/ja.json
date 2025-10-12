@@ -783,7 +783,7 @@
   "userPhotoUploading": "アップロード中...",
   "userPhotoUploadTitle": "写真をアップロード",
   "sharedNoDevicesFound": "デバイスが見つかりません",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "ステータス",
+  "sharedActions": "アクション",
+  "sharedActive": "アクティブ"
 }

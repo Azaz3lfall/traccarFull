@@ -783,7 +783,7 @@
   "userPhotoUploading": "업로드 중...",
   "userPhotoUploadTitle": "사진 업로드",
   "sharedNoDevicesFound": "디바이스를 찾을 수 없습니다",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "상태",
+  "sharedActions": "작업",
+  "sharedActive": "활성"
 }

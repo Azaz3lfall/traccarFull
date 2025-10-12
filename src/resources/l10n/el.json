@@ -784,7 +784,7 @@
   "userPhotoUploading": "Ανεβάζει...",
   "userPhotoUploadTitle": "Ανέβασμα φωτογραφίας",
   "sharedNoDevicesFound": "Δεν βρέθηκαν συσκευές",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Κατάσταση",
+  "sharedActions": "Ενέργειες",
+  "sharedActive": "Ενεργό"
 }

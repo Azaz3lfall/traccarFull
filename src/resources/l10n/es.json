@@ -783,7 +783,7 @@
   "logsTitle": "Registros",
   "logsError": "Error",
   "sharedNoDevicesFound": "No se encontraron dispositivos",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Estado",
+  "sharedActions": "Acciones",
+  "sharedActive": "Activo"
 }

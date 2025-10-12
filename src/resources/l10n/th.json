@@ -784,7 +784,7 @@
   "userPhotoUploading": "กำลังอัปโหลด...",
   "userPhotoUploadTitle": "อัปโหลดรูป",
   "sharedNoDevicesFound": "ไม่พบอุปกรณ์",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "สถานะ",
+  "sharedActions": "การดำเนินการ",
+  "sharedActive": "ใช้งานอยู่"
 }

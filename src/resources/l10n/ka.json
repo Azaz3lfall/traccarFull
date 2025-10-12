@@ -780,7 +780,7 @@
   "userPhotoUploading": "ატვირთვა...",
   "userPhotoUploadTitle": "სურათის ატვირთვა",
   "sharedNoDevicesFound": "მოწყობილობები ვერ მოიძებნა",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "სტატუსი",
+  "sharedActions": "მოქმედებები",
+  "sharedActive": "აქტიური"
 }

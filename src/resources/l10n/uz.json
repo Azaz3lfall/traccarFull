@@ -780,7 +780,7 @@
   "userPhotoUploading": "Yuklanmoqda...",
   "userPhotoUploadTitle": "Rasm yuklash",
   "sharedNoDevicesFound": "Qurilmalar topilmadi",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Holat",
+  "sharedActions": "Amallar",
+  "sharedActive": "Faol"
 }

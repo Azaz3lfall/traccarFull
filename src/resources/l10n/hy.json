@@ -780,7 +780,7 @@
   "userPhotoUploading": "Բեռնվում է...",
   "userPhotoUploadTitle": "Բեռնել նկար",
   "sharedNoDevicesFound": "Սարքեր չեն գտնվել",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "Կարգավիճակ",
+  "sharedActions": "Գործողություններ",
+  "sharedActive": "Ակտիվ"
 }

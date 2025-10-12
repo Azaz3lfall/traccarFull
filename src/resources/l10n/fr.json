@@ -783,7 +783,7 @@
   "logsTitle": "Journaux",
   "logsError": "Erreur",
   "sharedNoDevicesFound": "Aucun appareil trouvé",
-  "sharedStatus": "Status",
+  "sharedStatus": "Statut",
   "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedActive": "Actif"
 }

@@ -780,7 +780,7 @@
   "userPhotoUploading": "അപ്‌ലോഡ് ചെയ്യുന്നു...",
   "userPhotoUploadTitle": "ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യുക",
   "sharedNoDevicesFound": "ഉപകരണങ്ങൾ കണ്ടെത്തിയില്ല",
-  "sharedStatus": "Status",
-  "sharedActions": "Actions",
-  "sharedActive": "Active"
+  "sharedStatus": "അവസ്ഥ",
+  "sharedActions": "പ്രവർത്തനങ്ങൾ",
+  "sharedActive": "സജീവം"
 }
