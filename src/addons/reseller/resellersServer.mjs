@@ -440,7 +440,7 @@ app.get('/health', (req, res) => {
 // GET endpoint for listing resellers (filtered by currentUrl and parentUserId)
 app.post('/api/resellers/list', async (req, res) => {
   try {
-    const { parentUserId, currentUrl } = req.body;
+    const { parentUserId, currentDomain } = req.body;
     
     if (!parentUserId) {
       return res.status(400).json({
@@ -449,9 +449,9 @@ app.post('/api/resellers/list', async (req, res) => {
       });
     }
 
-    if (!currentUrl) {
+    if (!currentDomain) {
       return res.status(400).json({
-        error: 'currentUrl is required',
+        error: 'currentDomain is required',
         timestamp: new Date().toISOString()
       });
     }
@@ -490,11 +490,11 @@ app.post('/api/resellers/list', async (req, res) => {
             continue; // Skip invalid filename patterns
           }
           
-          // Filter by both currentUrl and parentUserId
+          // Filter by both currentDomain and parentUserId
           const matchesParentUserId = fileParentUserId === parentUserId.toString();
-          const matchesCurrentUrl = !fileCurrentUrl || fileCurrentUrl === currentUrl;
+          const matchesCurrentDomain = !fileCurrentUrl || fileCurrentUrl === currentDomain;
           
-          if (matchesParentUserId && matchesCurrentUrl) {
+          if (matchesParentUserId && matchesCurrentDomain) {
             const filePath = path.join(dataDir, jsonFile);
             const fileContent = fs.readFileSync(filePath, 'utf8');
             const resellerData = JSON.parse(fileContent);
@@ -797,8 +797,8 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
     
     // Create JSON file with reseller data
     try {
-      // Create filename: reseller_{currentUrl}_{appUrl}_{parentUserId}_{resellerId}.json
-      const filename = `reseller_${body.currentUrl}_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
+      // Create filename: reseller_{currentDomain}_{appUrl}_{parentUserId}_{resellerId}.json
+      const filename = `reseller_${body.currentDomain}_${body.appUrl}_${body.parentUserId}_${body.resellerId}.json`;
       
       // Data directory is ensured to exist at startup
       const dataDir = DATA_DIR;
@@ -887,9 +887,9 @@ app.put('/api/resellers/:id', async (req, res) => {
                     // Check if this file matches the update request
                     const matchesParentUserId = fileParentUserId === body.parentUserId.toString();
                     const matchesResellerId = fileResellerId === body.resellerId;
-                    const matchesCurrentUrl = !fileCurrentUrl || fileCurrentUrl === body.currentUrl;
+                    const matchesCurrentDomain = !fileCurrentUrl || fileCurrentUrl === body.currentDomain;
                     
-                    if (matchesParentUserId && matchesResellerId && matchesCurrentUrl) {
+                    if (matchesParentUserId && matchesResellerId && matchesCurrentDomain) {
                         const filePath = path.join(dataDir, jsonFile);
                         const fileContent = fs.readFileSync(filePath, 'utf8');
                         existingReseller = JSON.parse(fileContent);
@@ -930,7 +930,7 @@ app.put('/api/resellers/:id', async (req, res) => {
         }
         
         // Create filename for the reseller (use merged data)
-        const filename = `reseller_${updatedData.currentUrl}_${updatedData.appUrl}_${updatedData.parentUserId}_${updatedData.resellerId}.json`;
+        const filename = `reseller_${updatedData.currentDomain}_${updatedData.appUrl}_${updatedData.parentUserId}_${updatedData.resellerId}.json`;
         const filePath = path.join(dataDir, filename);
         
         // Add metadata to the data
