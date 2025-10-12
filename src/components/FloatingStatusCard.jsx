@@ -41,6 +41,7 @@ import {
 } from '../common/util/formatter';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import localStorageAsync from '../common/util/localStorageAsync';
+import { compressImage, validateImageFile } from '../utils/imageCompression';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -1135,25 +1136,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Reset file input value to allow same file selection again
     event.target.value = '';
 
-    // Check file size (120KB = 120 * 1024 bytes)
-    const maxSize = 120 * 1024;
-    if (file.size > maxSize) {
-      showSnackbar(t('deviceImageSizeError').replace('{maxSize}', '120KB'), 'error');
-      return;
-    }
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      showSnackbar(t('deviceImageTypeError'), 'error');
+    // Validate file
+    const validation = validateImageFile(file, 120); // 120KB max input
+    if (!validation.success) {
+      showSnackbar(validation.message, 'error');
       return;
     }
 
     setIsUploadingImage(true);
     try {
-      // Upload the image to get the image URL
+      // Compress the image to target size (10-15KB)
+      const compressedFile = await compressImage(file, {
+        maxSizeKB: 15,
+        minSizeKB: 10,
+        maxWidth: 800,
+        maxHeight: 600,
+        outputFormat: 'image/jpeg',
+        initialQuality: 0.8
+      });
+
+      // Upload the compressed image to get the image URL
       const response = await fetchOrThrow(`/api/devices/${device.id}/image`, {
         method: 'POST',
-        body: file,
+        body: compressedFile,
       });
       
       const imageUrl = await response.text();
@@ -1179,7 +1184,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Invalidate queries to refresh UI
       queryClient.invalidateQueries(['devices']);
-      } catch (error) {
+      
+      // Show success message with compression info
+      const originalSizeKB = (file.size / 1024).toFixed(1);
+      const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
+      showSnackbar(
+        `Image uploaded successfully! Compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB`, 
+        'success'
+      );
+    } catch (error) {
       console.error('Error uploading device image:', error);
       showSnackbar(t('deviceImageUploadError'), 'error');
     } finally {

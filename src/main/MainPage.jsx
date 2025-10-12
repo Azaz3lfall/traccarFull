@@ -82,6 +82,8 @@ import { useTranslation, useLocalization } from '../common/components/Localizati
 import { useTheme as useCustomTheme, useThemeColors } from '../common/components/ThemeProvider';
 import ReactCountryFlag from 'react-country-flag';
 import { useResellerBranding } from '../common/hooks/useResellerBranding';
+import { uploadToCloudinary, validateCloudinaryConfig } from '../utils/cloudinary';
+import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { 
   Box, 
   TextField, 
@@ -106,7 +108,9 @@ import {
   ListItem,
   ListItemText,
   Chip,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { 
   useAdministrator, 
@@ -182,11 +186,23 @@ const MainPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showUserPopover, setShowUserPopover] = useState(false);
   const [userRef, setUserRef] = useState(null);
+  const [userPopoverRef, setUserPopoverRef] = useState(null);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showUsersPopover, setShowUsersPopover] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+
+  // Snackbar handler
+  const showSnackbar = (message, severity = 'error') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
   const [showCommandsPopover, setShowCommandsPopover] = useState(false);
   const [showMaintenancePopover, setShowMaintenancePopover] = useState(false);
   const [showComputedAttributesPopover, setShowComputedAttributesPopover] = useState(false);
@@ -956,6 +972,90 @@ const MainPage = () => {
     throw Error(response.statusText);
   });
 
+  // User photo upload handler
+  const handlePhotoUpload = useCatch(async (event) => {
+    const file = event.target.files[0];
+    if (!file || !user?.id) return;
+    
+    // Reset file input value to allow same file selection again
+    event.target.value = '';
+
+    // Validate file
+    const validation = validateImageFile(file, 120); // 120KB max input
+    if (!validation.success) {
+      showSnackbar(validation.message, 'error');
+      return;
+    }
+
+    // Check Cloudinary configuration
+    if (!validateCloudinaryConfig()) {
+      showSnackbar('Cloudinary configuration not found. Please check environment variables.', 'error');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    try {
+      // Compress the image to target size (10-15KB)
+      const compressedFile = await compressImage(file, {
+        maxSizeKB: 15,
+        minSizeKB: 10,
+        maxWidth: 400,
+        maxHeight: 400,
+        outputFormat: 'image/jpeg',
+        initialQuality: 0.8
+      });
+
+      // Upload to Cloudinary
+      const uploadResult = await uploadToCloudinary(compressedFile, {
+        folder: 'traccar-profiles',
+        publicId: `user_${user.id}_${Date.now()}`,
+        transformations: {
+          width: 200,
+          height: 200,
+          crop: 'fill',
+          gravity: 'face',
+          quality: 'auto'
+        }
+      });
+
+      // Update user with profilePhoto attribute
+      const updatedUserData = {
+        ...user,
+        attributes: {
+          ...user.attributes,
+          profilePhoto: uploadResult.url
+        }
+      };
+
+      console.log('Updating user with profilePhoto:', uploadResult.url);
+      console.log('Updated user data:', updatedUserData);
+
+      // Save updated user data
+      const response = await fetchOrThrow(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUserData),
+      });
+
+      // Update Redux store with the response from server
+      const updatedUserFromServer = await response.json();
+      dispatch(sessionActions.updateUser(updatedUserFromServer));
+
+      // Show success message with compression info
+      const originalSizeKB = (file.size / 1024).toFixed(1);
+      const compressedSizeKB = (compressedFile.size / 1024).toFixed(1);
+      showSnackbar(
+        `Profile photo updated! Compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB`, 
+        'success'
+      );
+    } catch (error) {
+      console.error('Error uploading profile photo:', error);
+      showSnackbar('Failed to upload profile photo. Please try again.', 'error');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  });
+
   // Initialize preferences attributes when drawer opens
   useEffect(() => {
     if (showPreferencesDrawer && user) {
@@ -1241,7 +1341,8 @@ const MainPage = () => {
       if (showLanguagePopover && languageRef && !languageRef.contains(event.target)) {
         setShowLanguagePopover(false);
       }
-      if (showUserPopover && userRef && !userRef.contains(event.target)) {
+      if (showUserPopover && userRef && userPopoverRef && 
+          !userRef.contains(event.target) && !userPopoverRef.contains(event.target)) {
         setShowUserPopover(false);
       }
     };
@@ -1253,7 +1354,7 @@ const MainPage = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef, showLanguagePopover, languageRef, showUserPopover, userRef]);
+  }, [showEventsPopover, eventsButtonRef, showMapSwitcher, mapSwitcherRef, showSearch, searchRef, showLanguagePopover, languageRef, showUserPopover, userRef, userPopoverRef]);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -2929,19 +3030,40 @@ const MainPage = () => {
           }}
           onClick={() => setShowUserPopover(!showUserPopover)}
 >
-          <Avatar style={{ width: '28px', height: '28px', userSelect: 'none', pointerEvents: 'none' }}>
-            {user?.attributes?.avatar && (
-              <AvatarImage src={user.attributes.avatar} alt="User" />
-            )}
-            <AvatarFallback style={{ 
-              backgroundColor: colors.avatarBackground, 
-              color: colors.avatarText, 
-              fontSize: '13px',
-              fontWeight: '500'
+          <div style={{
+            position: 'relative',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            border: `2px solid #10B981`,
+            padding: '1px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Avatar style={{ 
+              width: '24px', 
+              height: '24px', 
+              userSelect: 'none', 
+              pointerEvents: 'none',
+              backgroundColor: colors.avatarBackground
             }}>
-              {getUserInitials(user)}
-            </AvatarFallback>
-          </Avatar>
+              {(user?.attributes?.profilePhoto || user?.attributes?.avatar) && (
+                <AvatarImage 
+                  src={user.attributes.profilePhoto || user.attributes.avatar} 
+                  alt="User" 
+                />
+              )}
+              <AvatarFallback style={{ 
+                backgroundColor: colors.avatarBackground, 
+                color: colors.avatarText, 
+                fontSize: '13px',
+                fontWeight: '500'
+              }}>
+                {getUserInitials(user)}
+              </AvatarFallback>
+            </Avatar>
+          </div>
         </button>
         <button 
           data-control-button
@@ -3658,6 +3780,7 @@ const MainPage = () => {
       <AnimatePresence>
         {showUserPopover && userRef && (
           <motion.div
+            ref={setUserPopoverRef}
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -3687,24 +3810,120 @@ const MainPage = () => {
               borderBottom: `1px solid ${colors.border}`
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  marginRight: '12px',
-                  backgroundColor: colors.avatarBackground
-                }}>
-                  {user?.attributes?.avatar && (
-                    <AvatarImage src={user.attributes.avatar} alt="User" />
-                  )}
-                  <AvatarFallback style={{ 
-                    backgroundColor: colors.avatarBackground, 
-                    color: colors.avatarText, 
-                    fontSize: '18px',
-                    fontWeight: '500'
+                <div style={{ position: 'relative' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '48px',
+                    height: '48px',
+                    marginRight: '12px',
+                    borderRadius: '50%',
+                    border: `2px solid #10B981`,
+                    padding: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}>
-                    {getUserInitials(user)}
-                  </AvatarFallback>
-                </Avatar>
+                    <Avatar style={{ 
+                      width: '44px', 
+                      height: '44px',
+                      backgroundColor: colors.avatarBackground
+                    }}>
+                      {(user?.attributes?.profilePhoto || user?.attributes?.avatar) && (
+                        <AvatarImage 
+                          src={user.attributes.profilePhoto || user.attributes.avatar} 
+                          alt="User"
+                          onLoad={() => {
+                            // Image loaded successfully
+                          }}
+                          onError={() => {
+                            // Image failed to load, will show fallback
+                          }}
+                        />
+                      )}
+                      <AvatarFallback style={{ 
+                        backgroundColor: colors.avatarBackground, 
+                        color: colors.avatarText, 
+                        fontSize: '18px',
+                        fontWeight: '500'
+                      }}>
+                        {getUserInitials(user)}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    {/* Loading indicator when uploading */}
+                    {isUploadingPhoto && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1001
+                      }}>
+                        <div style={{
+                          width: '12px',
+                          height: '12px',
+                          border: `2px solid ${colors.background}`,
+                          borderTop: `2px solid ${colors.primary}`,
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Photo Upload Button */}
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (!isUploadingPhoto) {
+                        document.getElementById('user-photo-upload').click();
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '-2px',
+                      right: '6px',
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: isUploadingPhoto ? colors.textSecondary : colors.primary,
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: isUploadingPhoto ? 'not-allowed' : 'pointer',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                      zIndex: 1002,
+                      border: 'none',
+                      opacity: isUploadingPhoto ? 0.7 : 1,
+                      transition: 'all 0.2s'
+                    }}
+                    title={isUploadingPhoto ? 'Uploading...' : 'Upload photo'}
+                  >
+                    {isUploadingPhoto ? (
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        border: `2px solid ${colors.background}`,
+                        borderTop: `2px solid ${colors.primary}`,
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="13" r="4" stroke={colors.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                </div>
                 <div>
                   <h3 style={{
                     color: colors.text,
@@ -7289,6 +7508,31 @@ const MainPage = () => {
       )}
 
       
+      {/* Hidden file input for user photo upload */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handlePhotoUpload}
+        style={{ display: 'none' }}
+        id="user-photo-upload"
+        disabled={isUploadingPhoto}
+      />
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
