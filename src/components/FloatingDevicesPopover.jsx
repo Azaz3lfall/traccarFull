@@ -80,7 +80,7 @@ const FloatingDevicesPopover = ({
 
   // Function to get icon path for device category (optimized)
   const getCategoryIconPath = (category) => {
-    // Use dynamic import for better performance
+    // Use dynamic path for better performance
     return `/images/newIcons/${category}.png`;
   };
 
