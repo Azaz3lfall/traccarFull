@@ -1517,13 +1517,21 @@ app.post('/api/domain-lookup', async (req, res) => {
         
         // Look for corresponding image file using the same pattern
         const imagePattern = `reseller_${data.currentDomain}_${data.appUrl}_${data.parentUserId}_${data.resellerId}_*.png`;
-      
+        
+        console.log(`🔍 Looking for image with pattern: ${imagePattern}`);
+        console.log(`🔍 In directory: ${IMAGES_DIR}`);
+        
         const imageFiles = await glob(imagePattern, { cwd: IMAGES_DIR });
+        console.log(`🔍 Found ${imageFiles.length} image files:`, imageFiles);
         
         if (imageFiles.length > 0) {
           const imagePath = path.join(IMAGES_DIR, imageFiles[0]);
+          console.log(`🔍 Using image file: ${imagePath}`);
           const imageBuffer = fs.readFileSync(imagePath);
           imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+          console.log(`🔍 Image loaded successfully, size: ${imageBuffer.length} bytes`);
+        } else {
+          console.log(`❌ No image files found for pattern: ${imagePattern}`);
         }
       } catch (fileError) {
         console.error('❌ Error reading file:', jsonFile, fileError.message);
