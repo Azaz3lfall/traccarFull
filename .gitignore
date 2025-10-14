@@ -33,6 +33,13 @@ src/addons/reseller/data/
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+
+# Android build outputs
+*.apk
+*.aab
+**/build/app/outputs/
+**/build/app/outputs/apk/
+**/build/app/outputs/bundle/
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Flutter.podspec
