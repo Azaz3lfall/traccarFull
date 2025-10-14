@@ -1515,7 +1515,7 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
 }
 
 // POST endpoint for building mobile app with reseller data
-// Function to copy and replace app images
+// Function to copy and replace mobile app images (appImage and notificationIcon only)
 async function copyAppImages(resellerDirPath, resellerData) {
   try {
     console.log('🖼️ Copying app images...');
@@ -1621,10 +1621,10 @@ async function resizeAndCopyImage(sourcePath, targetPath, width, height) {
   }
 }
 
-// Function to copy favicon for web app
+// Function to copy favicon for web app (browser tab icon only)
 async function copyFaviconForWebApp(resellerData) {
   try {
-    console.log('🌐 Copying favicon for web app...');
+    console.log('🌐 Copying favicon for web app (browser tab icon)...');
     
     if (!resellerData.favicon) {
       console.log('⚠️ No favicon provided, skipping web app favicon');
@@ -1638,7 +1638,7 @@ async function copyFaviconForWebApp(resellerData) {
       return;
     }
     
-    // Copy favicon to web app public directory
+    // Copy favicon to web app public directory (browser tab icon only)
     const webAppFaviconPath = path.join(process.cwd(), 'public', 'favicon.ico');
     const webAppFaviconPngPath = path.join(process.cwd(), 'public', 'favicon.png');
     
@@ -1646,7 +1646,8 @@ async function copyFaviconForWebApp(resellerData) {
     fs.copyFileSync(faviconPath, webAppFaviconPath);
     fs.copyFileSync(faviconPath, webAppFaviconPngPath);
     
-    console.log('✅ Web app favicon updated');
+    console.log('✅ Web app favicon updated (browser tab icon only)');
+    console.log('ℹ️ Note: Web app logo (logotype) remains unchanged for main branding');
     
   } catch (error) {
     console.error('❌ Error copying favicon for web app:', error);
@@ -1758,10 +1759,10 @@ app.post('/api/resellers/build', async (req, res) => {
     // Note: google-services.json is already in source code, no need to copy
     console.log('✅ Using existing google-services.json from source code');
 
-    // Copy and replace app images
+    // Copy and replace mobile app images (appImage and notificationIcon)
     await copyAppImages(resellerDirPath, resellerData);
 
-    // Copy favicon for web app
+    // Copy favicon for web app browser tab (logo remains for main web branding)
     await copyFaviconForWebApp(resellerData);
 
     // Start Flutter build process asynchronously
