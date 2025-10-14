@@ -2064,10 +2064,24 @@ app.get('/api/reseller-logo', async (req, res) => {
       });
     }
     
-    // Return the logo URL
+    // Convert logo to base64
+    let logoBase64 = null;
+    if (resellerData.logotype && resellerData.logotype.startsWith('images/')) {
+      try {
+        const logoPath = path.join(IMAGES_DIR, resellerData.logotype.replace('images/', ''));
+        if (fs.existsSync(logoPath)) {
+          const logoBuffer = fs.readFileSync(logoPath);
+          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        }
+      } catch (error) {
+        console.error('❌ Error converting logo to base64:', error);
+      }
+    }
+
+    // Return the logo as base64
     res.json({
       success: true,
-      logo: resellerData.logotype || null,
+      logo: logoBase64,
       companyName: resellerData.companyName || null,
       timestamp: new Date().toISOString()
     });
