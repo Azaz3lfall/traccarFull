@@ -301,8 +301,30 @@ const FloatingResellersPopover = ({
   // Download build file
   const downloadBuild = async (reseller, buildType) => {
     try {
-      // This would call a download endpoint
       console.log(`📥 Downloading ${buildType.toUpperCase()} for reseller:`, reseller);
+      
+      // Construct download URL
+      const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
+        reseller.resellerId,
+        reseller.appUrl,
+        reseller.parentUserId,
+        reseller.currentDomain || 'gps',
+        buildType
+      );
+      
+      console.log('🌐 Download URL:', downloadUrl);
+      
+      // Create a temporary link element to trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${reseller.appUrl}.${buildType}`;
+      link.target = '_blank';
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
       setSnackbar({
         open: true,
         message: `${buildType.toUpperCase()} download started!`,
@@ -2280,6 +2302,7 @@ const FloatingResellersPopover = ({
                 await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
               }}
               colors={colors}
+              resellersConfig={resellersConfig}
             />
           )}
         </DialogContent>
@@ -2290,7 +2313,7 @@ const FloatingResellersPopover = ({
 };
 
 // Build Status Modal Content Component
-const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry, colors }) => {
+const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry, colors, resellersConfig }) => {
   const [statusData, setStatusData] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
@@ -2383,8 +2406,22 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
           <Button
             variant="contained"
             onClick={() => {
-              // Download logic here
-              console.log('Downloading...');
+              // Trigger download
+              const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
+                reseller.resellerId,
+                reseller.appUrl,
+                reseller.parentUserId,
+                reseller.currentDomain || 'gps',
+                buildType
+              );
+              
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.download = `${reseller.appUrl}.${buildType}`;
+              link.target = '_blank';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
             }}
             style={{ backgroundColor: colors.primary, color: 'white', marginRight: '8px' }}
           >

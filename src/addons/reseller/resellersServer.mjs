@@ -1899,6 +1899,71 @@ app.listen(PORT, async () => {
   await updateExistingNginxConfigs();
 });
 
+// GET endpoint for downloading build files
+app.get('/api/resellers/download/:resellerId', async (req, res) => {
+  try {
+    const { resellerId } = req.params;
+    const { appUrl, parentUserId, currentDomain = 'gps', buildType = 'apk' } = req.query;
+
+    console.log('📥 Download request received:', { resellerId, appUrl, parentUserId, currentDomain, buildType });
+
+    // Validate required parameters
+    if (!appUrl || !parentUserId) {
+      return res.status(400).json({
+        error: 'Missing required parameters',
+        message: 'appUrl and parentUserId are required'
+      });
+    }
+
+    // Construct the expected filename
+    const filename = `${appUrl}.${buildType}`;
+    const filePath = path.join(DATA_DIR, filename);
+
+    console.log('🔍 Looking for file:', filePath);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.log('❌ File not found:', filePath);
+      return res.status(404).json({
+        error: 'File not found',
+        message: `Build file ${filename} not found. Please ensure the build completed successfully.`
+      });
+    }
+
+    // Get file stats
+    const stats = fs.statSync(filePath);
+    console.log('✅ File found:', { filename, size: stats.size });
+
+    // Set appropriate headers for download
+    res.setHeader('Content-Type', buildType === 'apk' ? 'application/vnd.android.package-archive' : 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', stats.size);
+
+    // Stream the file to the client
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (error) => {
+      console.error('❌ Error streaming file:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          error: 'File streaming error',
+          message: error.message
+        });
+      }
+    });
+
+    console.log('📤 File download started:', filename);
+
+  } catch (error) {
+    console.error('❌ Error handling download request:', error);
+    res.status(500).json({
+      error: 'Download failed',
+      message: error.message
+    });
+  }
+});
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
   process.exit(0);
