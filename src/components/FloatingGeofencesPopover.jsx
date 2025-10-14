@@ -174,6 +174,15 @@ const FloatingGeofencesPopover = ({
   const totalPages = Math.ceil(filteredGeofences.length / pageSize);
   const paginatedGeofences = filteredGeofences.slice((page - 1) * pageSize, page * pageSize);
 
+  // Adjust page if current page is beyond available pages (e.g., after deleting last item)
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(totalPages);
+    } else if (totalPages === 0 && page > 1) {
+      setPage(1); // Reset to page 1 if no geofences exist
+    }
+  }, [totalPages, page]);
+
   // Create geofence mutation
   const createGeofenceMutation = useMutation({
     mutationFn: async (geofenceData) => {
