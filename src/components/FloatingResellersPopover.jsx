@@ -130,6 +130,7 @@ const FloatingResellersPopover = ({
   // Build state management with localStorage
   const [buildStates, setBuildStates] = useState({});
   const [buildStatusModal, setBuildStatusModal] = useState({ open: false, reseller: null, buildType: null });
+  const [buildLoading, setBuildLoading] = useState({});
 
   // Load build states from localStorage on component mount
   useEffect(() => {
@@ -202,6 +203,8 @@ const FloatingResellersPopover = ({
 
   // Start a new build
   const startBuild = async (reseller, buildType) => {
+    const buildKey = `${reseller.id}_${buildType}`;
+    
     try {
       const buildData = {
         appUrl: reseller.appUrl,
@@ -213,8 +216,8 @@ const FloatingResellersPopover = ({
 
       console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
 
-      // Update state to BUILDING
-      updateBuildState(reseller.id, buildType, 'BUILDING');
+      // Show loading while waiting for API response
+      setBuildLoading(prev => ({ ...prev, [buildKey]: true }));
 
       const response = await fetch(resellersConfig.ENDPOINTS.BUILD, {
         method: 'POST',
@@ -230,6 +233,9 @@ const FloatingResellersPopover = ({
 
       const result = await response.json();
       console.log(`✅ ${buildType.toUpperCase()} build started:`, result);
+
+      // Update state to BUILDING after successful API call
+      updateBuildState(reseller.id, buildType, 'BUILDING');
 
       setSnackbar({
         open: true,
@@ -252,6 +258,9 @@ const FloatingResellersPopover = ({
         message: `Failed to start ${buildType.toUpperCase()} build: ${error.message}`,
         severity: 'error'
       });
+    } finally {
+      // Always clear loading state
+      setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
     }
   };
 
@@ -1036,13 +1045,13 @@ const FloatingResellersPopover = ({
                         </TableCell>
                       )}
                       {desktop && (
-                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                          {t('sharedPhone')}
-                        </TableCell>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('sharedPhone')}
+                          </TableCell>
                       )}
-                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         Apps
-                      </TableCell>
+                          </TableCell>
                       <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('sharedActions')}
                       </TableCell>
@@ -1107,26 +1116,26 @@ const FloatingResellersPopover = ({
                               </TableCell>
                             )}
                             {desktop && (
-                              <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
-                                {reseller.whatsapp || '-'}
-                              </TableCell>
+                                <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {reseller.whatsapp || '-'}
+                                </TableCell>
                             )}
-                            <TableCell>
+                                <TableCell>
                               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                                 <IconButton
-                                  size="small"
-                                  style={{
+                                    size="small"
+                                    style={{
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: getBuildState(reseller.id, 'aab') === 'BUILDING' ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.id}_aab`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'aab')}
-                                  disabled={getBuildState(reseller.id, 'aab') === 'BUILDING'}
-                                  title={`AAB ${getBuildState(reseller.id, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'aab') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.id}_aab`]}
+                                  title={`AAB ${getBuildState(reseller.id, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'aab') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {getBuildState(reseller.id, 'aab') === 'BUILDING' ? (
+                                  {buildLoading[`${reseller.id}_aab`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <BsGooglePlay style={{ fontSize: '14px' }} />
@@ -1138,14 +1147,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: getBuildState(reseller.id, 'apk') === 'BUILDING' ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.id}_apk`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'apk')}
-                                  disabled={getBuildState(reseller.id, 'apk') === 'BUILDING'}
-                                  title={`APK ${getBuildState(reseller.id, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'apk') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.id}_apk`]}
+                                  title={`APK ${getBuildState(reseller.id, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'apk') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {getBuildState(reseller.id, 'apk') === 'BUILDING' ? (
+                                  {buildLoading[`${reseller.id}_apk`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AndroidIcon style={{ fontSize: '16px' }} />
@@ -1157,14 +1166,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: getBuildState(reseller.id, 'ios') === 'BUILDING' ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.id}_ios`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'ios')}
-                                  disabled={getBuildState(reseller.id, 'ios') === 'BUILDING'}
-                                  title={`iOS ${getBuildState(reseller.id, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'ios') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.id}_ios`]}
+                                  title={`iOS ${getBuildState(reseller.id, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'ios') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {getBuildState(reseller.id, 'ios') === 'BUILDING' ? (
+                                  {buildLoading[`${reseller.id}_ios`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AppleIcon style={{ fontSize: '16px' }} />
@@ -2265,6 +2274,7 @@ const FloatingResellersPopover = ({
               onRetry={async () => {
                 await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
               }}
+              colors={colors}
             />
           )}
         </DialogContent>
@@ -2274,7 +2284,7 @@ const FloatingResellersPopover = ({
 };
 
 // Build Status Modal Content Component
-const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry }) => {
+const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry, colors }) => {
   const [statusData, setStatusData] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
