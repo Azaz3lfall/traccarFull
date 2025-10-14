@@ -31,6 +31,9 @@ import {
   Alert,
   Snackbar,
   Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -124,7 +127,41 @@ const FloatingResellersPopover = ({
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState(null);
-  const [buildLoading, setBuildLoading] = useState({});
+  // Build state management with localStorage
+  const [buildStates, setBuildStates] = useState({});
+  const [buildStatusModal, setBuildStatusModal] = useState({ open: false, reseller: null, buildType: null });
+
+  // Load build states from localStorage on component mount
+  useEffect(() => {
+    const savedStates = localStorage.getItem('resellerBuildStates');
+    if (savedStates) {
+      try {
+        setBuildStates(JSON.parse(savedStates));
+      } catch (error) {
+        console.error('Error loading build states from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save build states to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
+  }, [buildStates]);
+
+  // Get build state for a specific reseller and build type
+  const getBuildState = (resellerId, buildType) => {
+    const key = `${resellerId}_${buildType}`;
+    return buildStates[key] || 'NOT_BUILDED';
+  };
+
+  // Update build state for a specific reseller and build type
+  const updateBuildState = (resellerId, buildType, state) => {
+    const key = `${resellerId}_${buildType}`;
+    setBuildStates(prev => ({
+      ...prev,
+      [key]: state
+    }));
+  };
 
   // Build functions for mobile apps
   const handleBuildApp = async (reseller, buildType) => {
@@ -137,9 +174,34 @@ const FloatingResellersPopover = ({
       return;
     }
 
-    const buildKey = `${reseller.id}_${buildType}`;
-    setBuildLoading(prev => ({ ...prev, [buildKey]: true }));
+    const currentState = getBuildState(reseller.id, buildType);
+    
+    // Handle different states
+    if (currentState === 'NOT_BUILDED') {
+      // Start new build
+      await startBuild(reseller, buildType);
+    } else if (currentState === 'BUILDING') {
+      // Show status modal
+      setBuildStatusModal({
+        open: true,
+        reseller,
+        buildType
+      });
+    } else if (currentState === 'BUILD_ERROR') {
+      // Show error modal with retry option
+      setBuildStatusModal({
+        open: true,
+        reseller,
+        buildType
+      });
+    } else if (currentState === 'BUILDED') {
+      // Download the file
+      await downloadBuild(reseller, buildType);
+    }
+  };
 
+  // Start a new build
+  const startBuild = async (reseller, buildType) => {
     try {
       const buildData = {
         appUrl: reseller.appUrl,
@@ -150,10 +212,10 @@ const FloatingResellersPopover = ({
       };
 
       console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
-      console.log(`🌐 Build endpoint URL:`, resellersConfig.ENDPOINTS.BUILD);
-      console.log(`🌐 Resellers server URL:`, resellersConfig.RESELLERS_SERVER_URL);
 
-      // Start the build process (non-blocking)
+      // Update state to BUILDING
+      updateBuildState(reseller.id, buildType, 'BUILDING');
+
       const response = await fetch(resellersConfig.ENDPOINTS.BUILD, {
         method: 'POST',
         headers: {
@@ -163,93 +225,90 @@ const FloatingResellersPopover = ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Build failed: ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      console.log(`🚀 ${buildType.toUpperCase()} build started, polling for status...`);
+      const result = await response.json();
+      console.log(`✅ ${buildType.toUpperCase()} build started:`, result);
 
-      // Start polling for build status
-      pollBuildStatus(reseller, buildType, buildKey);
+      setSnackbar({
+        open: true,
+        message: `${buildType.toUpperCase()} build started successfully!`,
+        severity: 'success'
+      });
+
+      // Show status modal
+      setBuildStatusModal({
+        open: true,
+        reseller,
+        buildType
+      });
 
     } catch (error) {
       console.error(`❌ Error starting ${buildType.toUpperCase()} build:`, error);
+      updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
       setSnackbar({
         open: true,
-        message: `Build failed to start: ${error.message}`,
+        message: `Failed to start ${buildType.toUpperCase()} build: ${error.message}`,
         severity: 'error'
       });
-      setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
     }
   };
 
-  // Poll build status
-  const pollBuildStatus = async (reseller, buildType, buildKey) => {
-    const maxAttempts = 120; // 10 minutes of polling (5 second intervals)
-    let attempts = 0;
+  // Check build status
+  const checkBuildStatus = async (reseller, buildType) => {
+    try {
+      const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
+        reseller.resellerId,
+        reseller.appUrl,
+        reseller.parentUserId,
+        reseller.currentDomain || 'gps'
+      );
+      
+      console.log(`🔍 Checking build status:`, statusUrl);
+      
+      const response = await fetch(statusUrl);
+      const status = await response.json();
+      
+      console.log(`📊 Build status response:`, status);
 
-    const poll = async () => {
-      try {
-        attempts++;
-        const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
-          reseller.resellerId,
-          reseller.appUrl,
-          reseller.parentUserId,
-          reseller.currentDomain || 'gps'
-        );
-
-        const response = await fetch(statusUrl);
-        if (!response.ok) {
-          throw new Error(`Status check failed: ${response.statusText}`);
-        }
-
-        const status = await response.json();
-        console.log(`📊 Build status check ${attempts}/${maxAttempts}:`, status.data);
-
-        if (status.data.buildComplete) {
-          console.log(`✅ ${buildType.toUpperCase()} build completed!`);
-          setSnackbar({
-            open: true,
-            message: `${buildType.toUpperCase()} build completed successfully!`,
-            severity: 'success'
-          });
-          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
-          return;
-        }
-
-        if (attempts >= maxAttempts) {
-          console.log(`⏰ Build status polling timeout after ${maxAttempts} attempts`);
-          setSnackbar({
-            open: true,
-            message: `${buildType.toUpperCase()} build is taking longer than expected. Please check back later.`,
-            severity: 'warning'
-          });
-          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
-          return;
-        }
-
-        // Continue polling every 5 seconds
-        setTimeout(poll, 5000);
-
-      } catch (error) {
-        console.error(`❌ Error checking build status:`, error);
-        if (attempts >= maxAttempts) {
-          setSnackbar({
-            open: true,
-            message: `Build status check failed: ${error.message}`,
-            severity: 'error'
-          });
-          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
-        } else {
-          // Retry on error
-          setTimeout(poll, 5000);
-        }
+      if (status.data.buildComplete) {
+        updateBuildState(reseller.id, buildType, 'BUILDED');
+        return { status: 'BUILDED', data: status.data };
+      } else if (status.data.isBuilding) {
+        updateBuildState(reseller.id, buildType, 'BUILDING');
+        return { status: 'BUILDING', data: status.data };
+      } else {
+        updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
+        return { status: 'BUILD_ERROR', data: status.data };
       }
-    };
-
-    // Start polling after 2 seconds
-    setTimeout(poll, 2000);
+    } catch (error) {
+      console.error(`❌ Error checking build status:`, error);
+      updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
+      return { status: 'BUILD_ERROR', error: error.message };
+    }
   };
+
+  // Download build file
+  const downloadBuild = async (reseller, buildType) => {
+    try {
+      // This would call a download endpoint
+      console.log(`📥 Downloading ${buildType.toUpperCase()} for reseller:`, reseller);
+      setSnackbar({
+        open: true,
+        message: `${buildType.toUpperCase()} download started!`,
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error(`❌ Error downloading ${buildType.toUpperCase()}:`, error);
+      setSnackbar({
+        open: true,
+        message: `Failed to download ${buildType.toUpperCase()}: ${error.message}`,
+        severity: 'error'
+      });
+    }
+  };
+
   const [usersFetched, setUsersFetched] = useState(false);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
   const [domainCheckResult, setDomainCheckResult] = useState(null);
@@ -1060,14 +1119,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: colors.text,
+                                    color: getBuildState(reseller.id, 'aab') === 'BUILDING' ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'aab')}
-                                  disabled={buildLoading[`${reseller.id}_aab`]}
-                                  title="AAB Download"
+                                  disabled={getBuildState(reseller.id, 'aab') === 'BUILDING'}
+                                  title={`AAB ${getBuildState(reseller.id, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'aab') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_aab`] ? (
+                                  {getBuildState(reseller.id, 'aab') === 'BUILDING' ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <BsGooglePlay style={{ fontSize: '14px' }} />
@@ -1079,14 +1138,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: colors.text,
+                                    color: getBuildState(reseller.id, 'apk') === 'BUILDING' ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'apk')}
-                                  disabled={buildLoading[`${reseller.id}_apk`]}
-                                  title="APK Download"
+                                  disabled={getBuildState(reseller.id, 'apk') === 'BUILDING'}
+                                  title={`APK ${getBuildState(reseller.id, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'apk') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_apk`] ? (
+                                  {getBuildState(reseller.id, 'apk') === 'BUILDING' ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AndroidIcon style={{ fontSize: '16px' }} />
@@ -1098,14 +1157,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: colors.text,
+                                    color: getBuildState(reseller.id, 'ios') === 'BUILDING' ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'ios')}
-                                  disabled={buildLoading[`${reseller.id}_ios`]}
-                                  title="iOS Download"
+                                  disabled={getBuildState(reseller.id, 'ios') === 'BUILDING'}
+                                  title={`iOS ${getBuildState(reseller.id, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'ios') === 'BUILDING' ? 'Building...' : getBuildState(reseller.id, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_ios`] ? (
+                                  {getBuildState(reseller.id, 'ios') === 'BUILDING' ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AppleIcon style={{ fontSize: '16px' }} />
@@ -2183,7 +2242,172 @@ const FloatingResellersPopover = ({
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Build Status Modal */}
+      <Dialog
+        open={buildStatusModal.open}
+        onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
+          Build Status - {buildStatusModal.reseller?.companyName}
+        </DialogTitle>
+        <DialogContent style={{ padding: '24px' }}>
+          {buildStatusModal.reseller && buildStatusModal.buildType && (
+            <BuildStatusContent
+              reseller={buildStatusModal.reseller}
+              buildType={buildStatusModal.buildType}
+              getBuildState={getBuildState}
+              checkBuildStatus={checkBuildStatus}
+              updateBuildState={updateBuildState}
+              onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+              onRetry={async () => {
+                await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </AnimatePresence>
+  );
+};
+
+// Build Status Modal Content Component
+const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry }) => {
+  const [statusData, setStatusData] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState(null);
+
+  const currentState = getBuildState(reseller.id, buildType);
+
+  const handleCheckStatus = async () => {
+    setIsChecking(true);
+    setError(null);
+    try {
+      const result = await checkBuildStatus(reseller, buildType);
+      setStatusData(result.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    updateBuildState(reseller.id, buildType, 'NOT_BUILDED');
+    await onRetry();
+  };
+
+  useEffect(() => {
+    if (currentState === 'BUILDING') {
+      handleCheckStatus();
+    }
+  }, [currentState]);
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px' }}>
+          {buildType.toUpperCase()} Build Status
+        </Typography>
+        <Typography variant="body2" style={{ color: colors.textSecondary }}>
+          {reseller.companyName} - {reseller.appUrl}
+        </Typography>
+      </div>
+
+      {currentState === 'NOT_BUILDED' && (
+        <div>
+          <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
+            Build not started yet.
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleRetry}
+            style={{ backgroundColor: colors.primary, color: 'white' }}
+          >
+            Start Build
+          </Button>
+        </div>
+      )}
+
+      {currentState === 'BUILDING' && (
+        <div>
+          <CircularProgress size={48} style={{ color: colors.primary, marginBottom: '16px' }} />
+          <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
+            Building {buildType.toUpperCase()}...
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={handleCheckStatus}
+            disabled={isChecking}
+            style={{ borderColor: colors.primary, color: colors.primary }}
+          >
+            {isChecking ? 'Checking...' : 'Check Status'}
+          </Button>
+        </div>
+      )}
+
+      {currentState === 'BUILDED' && (
+        <div>
+          <CheckIcon style={{ fontSize: 48, color: colors.success, marginBottom: '16px' }} />
+          <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
+            Build completed successfully!
+          </Typography>
+          {statusData && (
+            <div style={{ marginBottom: '16px' }}>
+              <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                APK Size: {statusData.apkSize ? `${(statusData.apkSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
+              </Typography>
+              <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                AAB Size: {statusData.aabSize ? `${(statusData.aabSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
+              </Typography>
+            </div>
+          )}
+          <Button
+            variant="contained"
+            onClick={() => {
+              // Download logic here
+              console.log('Downloading...');
+            }}
+            style={{ backgroundColor: colors.primary, color: 'white', marginRight: '8px' }}
+          >
+            Download
+          </Button>
+        </div>
+      )}
+
+      {currentState === 'BUILD_ERROR' && (
+        <div>
+          <BlockIcon style={{ fontSize: 48, color: colors.error, marginBottom: '16px' }} />
+          <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
+            Build failed
+          </Typography>
+          {error && (
+            <Typography variant="body2" style={{ color: colors.error, marginBottom: '16px' }}>
+              {error}
+            </Typography>
+          )}
+          <Button
+            variant="contained"
+            onClick={handleRetry}
+            style={{ backgroundColor: colors.primary, color: 'white' }}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
+
+      <div style={{ marginTop: '24px' }}>
+        <Button
+          variant="outlined"
+          onClick={onClose}
+          style={{ borderColor: colors.border, color: colors.text }}
+        >
+          Close
+        </Button>
+      </div>
+    </div>
   );
 };
 

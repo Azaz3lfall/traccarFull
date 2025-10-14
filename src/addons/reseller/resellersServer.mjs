@@ -1301,7 +1301,61 @@ app.post('/api/resellers/delete', async (req, res) => {
   }
 });
 
+// Async function to handle Flutter build process
+async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
+  try {
+    console.log('🔨 Starting Flutter build process...');
+    const buildDir = path.join(resellerDirPath, 'build');
+    
+    // Clean previous build
+    if (fs.existsSync(buildDir)) {
+      fs.rmSync(buildDir, { recursive: true, force: true });
+    }
+
+    // Run Flutter build
+    console.log('📱 Building APK...');
+    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 }); // 40 minutes
+    console.log('✅ APK build completed');
+
+    console.log('📦 Building AAB...');
+    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
+    console.log('✅ AAB build completed');
+
+    // Rename output files
+    const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
+    const aabSourcePath = path.join(resellerDirPath, 'build/app/outputs/bundle/release/app-release.aab');
+    
+    const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
+    const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
+
+    if (fs.existsSync(apkSourcePath)) {
+      fs.copyFileSync(apkSourcePath, apkTargetPath);
+      console.log('✅ APK renamed to:', apkTargetPath);
+    }
+
+    if (fs.existsSync(aabSourcePath)) {
+      fs.copyFileSync(aabSourcePath, aabTargetPath);
+      console.log('✅ AAB renamed to:', aabTargetPath);
+    }
+
+    // Clean up build directory to save space
+    if (fs.existsSync(buildDir)) {
+      fs.rmSync(buildDir, { recursive: true, force: true });
+      console.log('🧹 Build directory cleaned up');
+    }
+
+    console.log('🎉 Mobile app build process completed successfully!');
+  } catch (error) {
+    console.error('❌ Error in build process:', error);
+  }
+}
+
 // POST endpoint for building mobile app with reseller data
+// STANDARDS: 
+// - Keep original package name (org.traccar.manager) for Firebase compatibility
+// - Only change visual elements: app display name, icons, descriptions
+// - Use same google-services.json for all apps (Traccar server supports only one FCM key)
+// - All apps must use same internal package structure for push notifications
 app.post('/api/resellers/build', async (req, res) => {
   try {
     console.log('🏗️ Starting mobile app build process...');
@@ -1355,25 +1409,24 @@ app.post('/api/resellers/build', async (req, res) => {
     // Update app configuration files
     console.log('⚙️ Updating app configuration...');
     
-    // Update pubspec.yaml
+    // Update pubspec.yaml (keep original package name for Firebase compatibility)
     const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
     if (fs.existsSync(pubspecPath)) {
       let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
-      pubspecContent = pubspecContent.replace(/name: .*/, `name: ${resellerData.appUrl.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase()}`);
+      // Only update description, keep original package name for Firebase
       pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
       fs.writeFileSync(pubspecPath, pubspecContent);
-      console.log('✅ pubspec.yaml updated');
+      console.log('✅ pubspec.yaml updated (description only)');
     }
 
-    // Update Android app configuration
+    // Update Android app configuration (keep original package name for Firebase)
     const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
     if (fs.existsSync(androidManifestPath)) {
       let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
-      const packageName = `com.${resellerData.appUrl.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.manager`;
-      manifestContent = manifestContent.replace(/package="[^"]*"/, `package="${packageName}"`);
+      // Only update display label, keep original package name for Firebase
       manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
       fs.writeFileSync(androidManifestPath, manifestContent);
-      console.log('✅ AndroidManifest.xml updated');
+      console.log('✅ AndroidManifest.xml updated (display name only)');
     }
 
     // Update iOS app configuration
@@ -1388,93 +1441,35 @@ app.post('/api/resellers/build', async (req, res) => {
       console.log('✅ iOS Info.plist updated');
     }
 
-    // Update branding configuration
+    // Update branding configuration (keep original package name for Firebase)
     const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
     if (fs.existsSync(brandDartPath)) {
       let brandContent = fs.readFileSync(brandDartPath, 'utf8');
-      const packageName = `com.${resellerData.appUrl.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.manager`;
+      // Only update app name and URL, keep original package ID for Firebase
       brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
-      brandContent = brandContent.replace(/const packageId = '.*';/, `const packageId = '${packageName}';`);
       brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
       fs.writeFileSync(brandDartPath, brandContent);
-      console.log('✅ brand.dart updated');
+      console.log('✅ brand.dart updated (app name and URL only)');
     }
 
-    // Update Dart import statements to use new package name
-    console.log('🔄 Updating Dart import statements...');
-    const newPackageName = resellerData.appUrl.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
-    const oldPackageName = 'traccar_manager';
+    // Note: google-services.json is already in source code, no need to copy
+    console.log('✅ Using existing google-services.json from source code');
+
+    // Start Flutter build process asynchronously
+    console.log('🔨 Starting Flutter build process...');
     
-    // Find all Dart files and update imports
-    const dartFiles = await glob('**/*.dart', { cwd: resellerDirPath });
-    for (const dartFile of dartFiles) {
-      const filePath = path.join(resellerDirPath, dartFile);
-      let content = fs.readFileSync(filePath, 'utf8');
-      
-      // Update package imports
-      content = content.replace(
-        new RegExp(`package:${oldPackageName}/`, 'g'), 
-        `package:${newPackageName}/`
-      );
-      
-      fs.writeFileSync(filePath, content);
-    }
-    console.log('✅ Dart import statements updated');
-
-    // Build Flutter app
-    console.log('🔨 Building Flutter app...');
-    const buildDir = path.join(resellerDirPath, 'build');
+    // Start build process in background (don't await)
+    buildFlutterApp(resellerDirPath, resellerData, resellerDirName);
     
-    // Clean previous build
-    if (fs.existsSync(buildDir)) {
-      fs.rmSync(buildDir, { recursive: true, force: true });
-    }
-
-    // Run Flutter build
-    console.log('📱 Building APK...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 }); // 40 minutes
-    console.log('✅ APK build completed');
-
-    console.log('📦 Building AAB...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
-    console.log('✅ AAB build completed');
-
-    // Rename output files
-    const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
-    const aabSourcePath = path.join(resellerDirPath, 'build/app/outputs/bundle/release/app-release.aab');
-    
-    const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
-    const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
-
-    if (fs.existsSync(apkSourcePath)) {
-      fs.copyFileSync(apkSourcePath, apkTargetPath);
-      console.log('✅ APK renamed to:', apkTargetPath);
-    }
-
-    if (fs.existsSync(aabSourcePath)) {
-      fs.copyFileSync(aabSourcePath, aabTargetPath);
-      console.log('✅ AAB renamed to:', aabTargetPath);
-    }
-
-    // Clean up build directory to save space
-    if (fs.existsSync(buildDir)) {
-      fs.rmSync(buildDir, { recursive: true, force: true });
-      console.log('🧹 Build directory cleaned up');
-    }
-
-    console.log('🎉 Mobile app build process completed successfully!');
-
+    // Return immediately to frontend
     res.json({
       success: true,
-      message: 'Mobile app built successfully',
+      message: 'Build process started successfully',
       data: {
         resellerDir: resellerDirName,
-        apkPath: apkTargetPath,
-        aabPath: aabTargetPath,
-        appUrl: resellerData.appUrl,
-        companyName: resellerData.companyName
-      },
-      timestamp: new Date().toISOString()
+        status: 'BUILDING',
+        timestamp: new Date().toISOString()
+      }
     });
 
   } catch (error) {
