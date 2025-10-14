@@ -150,6 +150,8 @@ const FloatingResellersPopover = ({
       };
 
       console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
+      console.log(`🌐 Build endpoint URL:`, resellersConfig.ENDPOINTS.BUILD);
+      console.log(`🌐 Resellers server URL:`, resellersConfig.RESELLERS_SERVER_URL);
 
       // Start the build process (non-blocking)
       const response = await fetch(resellersConfig.ENDPOINTS.BUILD, {

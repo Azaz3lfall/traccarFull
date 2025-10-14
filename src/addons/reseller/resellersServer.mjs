@@ -1651,6 +1651,7 @@ ensureDirectories();
 app.post('/api/resellers/build', async (req, res) => {
   try {
     console.log('🏗️ Starting mobile app build process...');
+    console.log('🔥 BUILD ENDPOINT CALLED - THIS IS THE UPDATED VERSION!');
     
     const resellerData = req.body;
     console.log('📋 Reseller data received:', {
