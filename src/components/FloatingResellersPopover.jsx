@@ -887,9 +887,9 @@ const FloatingResellersPopover = ({
     event.target.value = '';
 
     // Validate file type and size
-    const validation = validateImageFile(file, 120); // 120KB max input
+    const validation = validateImageFile(file, 2048); // 2MB max input
     if (!validation.success) {
-      setImageError(t('resellerImageValidationError', { maxSize: 120 }));
+      setImageError(t('resellerImageValidationError', { maxSize: 2048 }));
       setSelectedImage(null);
       setImagePreview(null);
       return;
