@@ -9,15 +9,7 @@ export const fetchResellerBranding = async () => {
   try {
     const currentDomain = window.location.hostname;
 
-    const requestBody = { domain: currentDomain };
-
-    const response = await fetch(`${resellersConfig.RESELLERS_SERVER_URL}/api/domain-lookup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
+    const response = await fetch(resellersConfig.ENDPOINTS.RESELLER_LOGO(currentDomain));
 
     if (response.ok) {
       const data = await response.json();
@@ -40,30 +32,28 @@ export const fetchResellerBranding = async () => {
  * @param {Object} resellerData - Reseller data from API
  */
 export const applyResellerBranding = (resellerData) => {
-  if (!resellerData || !resellerData.success || !resellerData.data) {
+  if (!resellerData || !resellerData.success || !resellerData.logo) {
     applyFallbackBranding();
     return;
   }
 
-  const { data, imageBase64 } = resellerData;
+  const { logo, companyName } = resellerData;
 
   // Update page title
-  if (data.companyName) {
-    document.title = data.companyName;
-  }
-
-  // Update favicon if we have a logo
-  if (imageBase64) {
-    updateFavicon(imageBase64);
+  if (companyName) {
+    document.title = companyName;
   }
 
   // Update meta description
-  if (data.companyName) {
+  if (companyName) {
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', `GPS Tracking System - ${data.companyName}`);
+      metaDescription.setAttribute('content', `GPS Tracking System - ${companyName}`);
     }
   }
+
+  // Store logo URL for use by components
+  window.resellerLogoUrl = logo;
 
 };
 
@@ -136,8 +126,9 @@ const resetFavicon = () => {
  * @returns {string} Logo URL (reseller logo or fallback)
  */
 export const getLogoUrl = (resellerData) => {
-  if (resellerData?.success && resellerData?.imageBase64) {
-    return resellerData.imageBase64;
+  // Use the logo URL stored in window object
+  if (window.resellerLogoUrl) {
+    return window.resellerLogoUrl;
   }
   // Only return fallback logo if fallback branding has been explicitly applied
   if (window.fallbackBrandingApplied) {
@@ -153,8 +144,8 @@ export const getLogoUrl = (resellerData) => {
  * @returns {string} Company name or default
  */
 export const getCompanyName = (resellerData) => {
-  if (resellerData?.success && resellerData?.data?.companyName) {
-    return resellerData.data.companyName;
+  if (resellerData?.success && resellerData?.companyName) {
+    return resellerData.companyName;
   }
   return 'CodeArtisan GPS SaaS';
 };
