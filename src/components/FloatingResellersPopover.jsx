@@ -123,6 +123,19 @@ const FloatingResellersPopover = ({
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageError, setImageError] = useState('');
+  
+  // New image fields for mobile app
+  const [selectedFavicon, setSelectedFavicon] = useState(null);
+  const [faviconPreview, setFaviconPreview] = useState(null);
+  const [faviconError, setFaviconError] = useState('');
+  
+  const [selectedAppImage, setSelectedAppImage] = useState(null);
+  const [appImagePreview, setAppImagePreview] = useState(null);
+  const [appImageError, setAppImageError] = useState('');
+  
+  const [selectedNotificationIcon, setSelectedNotificationIcon] = useState(null);
+  const [notificationIconPreview, setNotificationIconPreview] = useState(null);
+  const [notificationIconError, setNotificationIconError] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
@@ -622,10 +635,28 @@ const FloatingResellersPopover = ({
       formData.append(key, resellerData[key]);
     });
     
-    // Add image if selected
+    // Add images if selected
     if (selectedImage && resellerData.appUrl) {
       formData.append('image', selectedImage);
       formData.append('filename', `${resellerData.appUrl}.png`);
+    }
+    
+    // Add favicon if selected
+    if (selectedFavicon && resellerData.appUrl) {
+      formData.append('favicon', selectedFavicon);
+      formData.append('faviconFilename', `${resellerData.appUrl}_favicon.png`);
+    }
+    
+    // Add app image if selected
+    if (selectedAppImage && resellerData.appUrl) {
+      formData.append('appImage', selectedAppImage);
+      formData.append('appImageFilename', `${resellerData.appUrl}_app.png`);
+    }
+    
+    // Add notification icon if selected
+    if (selectedNotificationIcon && resellerData.appUrl) {
+      formData.append('notificationIcon', selectedNotificationIcon);
+      formData.append('notificationIconFilename', `${resellerData.appUrl}_notification.png`);
     }
 
       const response = await fetch(resellersConfig.ENDPOINTS.CREATE, {
@@ -665,12 +696,44 @@ const FloatingResellersPopover = ({
 
   const updateResellerMutation = useMutation({
     mutationFn: async ({ id, ...resellerData }) => {
+      // Create FormData to send both validation data and images
+      const formData = new FormData();
+      
+      // Add all reseller data as JSON
+      formData.append('resellerData', JSON.stringify(resellerData));
+      
+      // Add individual fields for backend processing
+      Object.keys(resellerData).forEach(key => {
+        formData.append(key, resellerData[key]);
+      });
+      
+      // Add images if selected
+      if (selectedImage && resellerData.appUrl) {
+        formData.append('image', selectedImage);
+        formData.append('filename', `${resellerData.appUrl}.png`);
+      }
+      
+      // Add favicon if selected
+      if (selectedFavicon && resellerData.appUrl) {
+        formData.append('favicon', selectedFavicon);
+        formData.append('faviconFilename', `${resellerData.appUrl}_favicon.png`);
+      }
+      
+      // Add app image if selected
+      if (selectedAppImage && resellerData.appUrl) {
+        formData.append('appImage', selectedAppImage);
+        formData.append('appImageFilename', `${resellerData.appUrl}_app.png`);
+      }
+      
+      // Add notification icon if selected
+      if (selectedNotificationIcon && resellerData.appUrl) {
+        formData.append('notificationIcon', selectedNotificationIcon);
+        formData.append('notificationIconFilename', `${resellerData.appUrl}_notification.png`);
+      }
+
       const response = await fetch(resellersConfig.ENDPOINTS.UPDATE(id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(resellerData),
+        body: formData, // Send as FormData instead of JSON
       });
 
       if (!response.ok) {
@@ -782,6 +845,20 @@ const FloatingResellersPopover = ({
     setSelectedImage(null);
     setImagePreview(null);
     setImageError('');
+    
+    // Reset new image fields
+    setSelectedFavicon(null);
+    setFaviconPreview(null);
+    setFaviconError('');
+    
+    setSelectedAppImage(null);
+    setAppImagePreview(null);
+    setAppImageError('');
+    
+    setSelectedNotificationIcon(null);
+    setNotificationIconPreview(null);
+    setNotificationIconError('');
+    
     setDomainCheckResult(null);
     setDomainValid(false);
   };
@@ -865,6 +942,111 @@ const FloatingResellersPopover = ({
     } finally {
       setIsCompressingImage(false);
     }
+  });
+
+  // Handle favicon selection (must be square)
+  const handleFaviconSelect = useCatch(async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    event.target.value = '';
+    setFaviconError('');
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setFaviconError('Please select a valid image file');
+      return;
+    }
+
+    // Check if image is square
+    const img = new Image();
+    img.onload = () => {
+      if (img.width !== img.height) {
+        setFaviconError('Favicon must be square (width = height)');
+        setSelectedFavicon(null);
+        setFaviconPreview(null);
+        return;
+      }
+
+      // Image is square, proceed
+      setSelectedFavicon(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFaviconPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  // Handle app image selection (must be 1024x1024)
+  const handleAppImageSelect = useCatch(async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    event.target.value = '';
+    setAppImageError('');
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setAppImageError('Please select a valid image file');
+      return;
+    }
+
+    // Check dimensions
+    const img = new Image();
+    img.onload = () => {
+      if (img.width !== 1024 || img.height !== 1024) {
+        setAppImageError('App image must be exactly 1024x1024 pixels');
+        setSelectedAppImage(null);
+        setAppImagePreview(null);
+        return;
+      }
+
+      // Image has correct dimensions, proceed
+      setSelectedAppImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAppImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  // Handle notification icon selection (must be 192x192)
+  const handleNotificationIconSelect = useCatch(async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    event.target.value = '';
+    setNotificationIconError('');
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setNotificationIconError('Please select a valid image file');
+      return;
+    }
+
+    // Check dimensions
+    const img = new Image();
+    img.onload = () => {
+      if (img.width !== 192 || img.height !== 192) {
+        setNotificationIconError('Notification icon must be exactly 192x192 pixels');
+        setSelectedNotificationIcon(null);
+        setNotificationIconPreview(null);
+        return;
+      }
+
+      // Image has correct dimensions, proceed
+      setSelectedNotificationIcon(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNotificationIconPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    };
+    img.src = URL.createObjectURL(file);
   });
 
   // Upload image to server
@@ -1963,6 +2145,198 @@ const FloatingResellersPopover = ({
                                         Current: {editingReseller.logo}
                                       </Typography>
                                     </div>
+                                  )}
+                                </div>
+
+                                {/* Favicon Upload Field */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                    Favicon Image (Square)
+                                  </Typography>
+                                  <input
+                                    type="file"
+                                    accept=".png"
+                                    onChange={handleFaviconSelect}
+                                    style={{ display: 'none' }}
+                                    id="favicon-upload"
+                                  />
+                                  <label htmlFor="favicon-upload">
+                                    <Button
+                                      variant="outlined"
+                                      component="span"
+                                      fullWidth
+                                      style={{
+                                        borderColor: colors.border,
+                                        color: colors.text,
+                                        height: '56px',
+                                        borderStyle: 'dashed',
+                                      }}
+                                    >
+                                      {selectedFavicon ? 'Change Favicon' : 'Select Favicon (Square)'}
+                                    </Button>
+                                  </label>
+                                  
+                                  {/* Favicon Preview */}
+                                  {faviconPreview && (
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      flexDirection: 'column', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      padding: '12px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '8px',
+                                      backgroundColor: colors.secondary
+                                    }}>
+                                      <img
+                                        src={faviconPreview}
+                                        alt="Favicon preview"
+                                        style={{
+                                          width: '64px',
+                                          height: '64px',
+                                          objectFit: 'contain',
+                                          borderRadius: '4px'
+                                        }}
+                                      />
+                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                        {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
+                                      </Typography>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Favicon Error Message */}
+                                  {faviconError && (
+                                    <Typography variant="caption" style={{ color: '#f44336' }}>
+                                      {faviconError}
+                                    </Typography>
+                                  )}
+                                </div>
+
+                                {/* App Image Upload Field */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                    App Image (1024x1024)
+                                  </Typography>
+                                  <input
+                                    type="file"
+                                    accept=".png"
+                                    onChange={handleAppImageSelect}
+                                    style={{ display: 'none' }}
+                                    id="app-image-upload"
+                                  />
+                                  <label htmlFor="app-image-upload">
+                                    <Button
+                                      variant="outlined"
+                                      component="span"
+                                      fullWidth
+                                      style={{
+                                        borderColor: colors.border,
+                                        color: colors.text,
+                                        height: '56px',
+                                        borderStyle: 'dashed',
+                                      }}
+                                    >
+                                      {selectedAppImage ? 'Change App Image' : 'Select App Image (1024x1024)'}
+                                    </Button>
+                                  </label>
+                                  
+                                  {/* App Image Preview */}
+                                  {appImagePreview && (
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      flexDirection: 'column', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      padding: '12px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '8px',
+                                      backgroundColor: colors.secondary
+                                    }}>
+                                      <img
+                                        src={appImagePreview}
+                                        alt="App image preview"
+                                        style={{
+                                          width: '120px',
+                                          height: '120px',
+                                          objectFit: 'contain',
+                                          borderRadius: '4px'
+                                        }}
+                                      />
+                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                        {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
+                                      </Typography>
+                                    </div>
+                                  )}
+                                  
+                                  {/* App Image Error Message */}
+                                  {appImageError && (
+                                    <Typography variant="caption" style={{ color: '#f44336' }}>
+                                      {appImageError}
+                                    </Typography>
+                                  )}
+                                </div>
+
+                                {/* Notification Icon Upload Field */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                    Notification Icon (192x192)
+                                  </Typography>
+                                  <input
+                                    type="file"
+                                    accept=".png"
+                                    onChange={handleNotificationIconSelect}
+                                    style={{ display: 'none' }}
+                                    id="notification-icon-upload"
+                                  />
+                                  <label htmlFor="notification-icon-upload">
+                                    <Button
+                                      variant="outlined"
+                                      component="span"
+                                      fullWidth
+                                      style={{
+                                        borderColor: colors.border,
+                                        color: colors.text,
+                                        height: '56px',
+                                        borderStyle: 'dashed',
+                                      }}
+                                    >
+                                      {selectedNotificationIcon ? 'Change Notification Icon' : 'Select Notification Icon (192x192)'}
+                                    </Button>
+                                  </label>
+                                  
+                                  {/* Notification Icon Preview */}
+                                  {notificationIconPreview && (
+                                    <div style={{ 
+                                      display: 'flex', 
+                                      flexDirection: 'column', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      padding: '12px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '8px',
+                                      backgroundColor: colors.secondary
+                                    }}>
+                                      <img
+                                        src={notificationIconPreview}
+                                        alt="Notification icon preview"
+                                        style={{
+                                          width: '80px',
+                                          height: '80px',
+                                          objectFit: 'contain',
+                                          borderRadius: '4px'
+                                        }}
+                                      />
+                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                        {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
+                                      </Typography>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Notification Icon Error Message */}
+                                  {notificationIconError && (
+                                    <Typography variant="caption" style={{ color: '#f44336' }}>
+                                      {notificationIconError}
+                                    </Typography>
                                   )}
                                 </div>
                                 
