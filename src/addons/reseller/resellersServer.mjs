@@ -1544,6 +1544,78 @@ app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
   }
 });
 
+// GET endpoint for downloading build files
+app.get('/api/resellers/download', async (req, res) => {
+  try {
+    const { appUrl, buildType = 'apk' } = req.query;
+
+    console.log('📥 Download request received:', { appUrl, buildType });
+
+    // Validate required parameters
+    if (!appUrl) {
+      return res.status(400).json({
+        error: 'Missing required parameter',
+        message: 'appUrl is required'
+      });
+    }
+
+    // Validate buildType
+    if (!['apk', 'aab'].includes(buildType)) {
+      return res.status(400).json({
+        error: 'Invalid build type',
+        message: 'buildType must be either "apk" or "aab"'
+      });
+    }
+
+    // Construct the expected filename
+    const filename = `${appUrl}.${buildType}`;
+    const filePath = path.join(DATA_DIR, filename);
+
+    console.log('🔍 Looking for file:', filePath);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.log('❌ File not found:', filePath);
+      return res.status(404).json({
+        error: 'File not found',
+        message: `Build file ${filename} not found. Please ensure the build completed successfully.`
+      });
+    }
+
+    // Get file stats
+    const stats = fs.statSync(filePath);
+    console.log('✅ File found:', { filename, size: stats.size });
+
+    // Set appropriate headers for download
+    res.setHeader('Content-Type', buildType === 'apk' ? 'application/vnd.android.package-archive' : 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', stats.size);
+
+    // Stream the file to the client
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (error) => {
+      console.error('❌ Error streaming file:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          error: 'File streaming error',
+          message: error.message
+        });
+      }
+    });
+
+    console.log('📤 File download started:', filename);
+
+  } catch (error) {
+    console.error('❌ Error handling download request:', error);
+    res.status(500).json({
+      error: 'Download failed',
+      message: error.message
+    });
+  }
+});
+
 // Endpoint to update existing nginx configs
 app.post('/api/nginx/update-configs', async (req, res) => {
   try {
@@ -1897,78 +1969,6 @@ app.listen(PORT, async () => {
   
   // Update existing nginx configs with new template
   await updateExistingNginxConfigs();
-});
-
-// GET endpoint for downloading build files
-app.get('/api/resellers/download', async (req, res) => {
-  try {
-    const { appUrl, buildType = 'apk' } = req.query;
-
-    console.log('📥 Download request received:', { appUrl, buildType });
-
-    // Validate required parameters
-    if (!appUrl) {
-      return res.status(400).json({
-        error: 'Missing required parameter',
-        message: 'appUrl is required'
-      });
-    }
-
-    // Validate buildType
-    if (!['apk', 'aab'].includes(buildType)) {
-      return res.status(400).json({
-        error: 'Invalid build type',
-        message: 'buildType must be either "apk" or "aab"'
-      });
-    }
-
-    // Construct the expected filename
-    const filename = `${appUrl}.${buildType}`;
-    const filePath = path.join(DATA_DIR, filename);
-
-    console.log('🔍 Looking for file:', filePath);
-
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-      console.log('❌ File not found:', filePath);
-      return res.status(404).json({
-        error: 'File not found',
-        message: `Build file ${filename} not found. Please ensure the build completed successfully.`
-      });
-    }
-
-    // Get file stats
-    const stats = fs.statSync(filePath);
-    console.log('✅ File found:', { filename, size: stats.size });
-
-    // Set appropriate headers for download
-    res.setHeader('Content-Type', buildType === 'apk' ? 'application/vnd.android.package-archive' : 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', stats.size);
-
-    // Stream the file to the client
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    fileStream.on('error', (error) => {
-      console.error('❌ Error streaming file:', error);
-      if (!res.headersSent) {
-        res.status(500).json({
-          error: 'File streaming error',
-          message: error.message
-        });
-      }
-    });
-
-    console.log('📤 File download started:', filename);
-
-  } catch (error) {
-    console.error('❌ Error handling download request:', error);
-    res.status(500).json({
-      error: 'Download failed',
-      message: error.message
-    });
-  }
 });
 
 // Graceful shutdown
