@@ -799,9 +799,24 @@ const FloatingResellersPopover = ({
       return;
     }
 
-    // Validate that an image is selected for new resellers
-    if (!isEditMode && (!selectedImage && !editingReseller.logotype && !editingReseller.logo)) {
-      setSnackbar({ open: true, message: t('resellerImageRequired'), severity: 'error' });
+    // Validate that all required images are selected
+    if (!selectedImage && !editingReseller.logotype && !editingReseller.logo) {
+      setSnackbar({ open: true, message: 'Company logo is required', severity: 'error' });
+      return;
+    }
+    
+    if (!selectedFavicon) {
+      setSnackbar({ open: true, message: 'Favicon image is required', severity: 'error' });
+      return;
+    }
+    
+    if (!selectedAppImage) {
+      setSnackbar({ open: true, message: 'App image (1024x1024) is required', severity: 'error' });
+      return;
+    }
+    
+    if (!selectedNotificationIcon) {
+      setSnackbar({ open: true, message: 'Notification icon (192x192) is required', severity: 'error' });
       return;
     }
 
@@ -960,7 +975,7 @@ const FloatingResellersPopover = ({
 
     // Check if image is square
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       if (img.width !== img.height) {
         setFaviconError('Favicon must be square (width = height)');
         setSelectedFavicon(null);
@@ -968,13 +983,27 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image is square, proceed
-      setSelectedFavicon(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFaviconPreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      // Image is square, compress and proceed
+      try {
+        const compressedFile = await compressImage(file, {
+          maxSizeKB: 20,
+          minSizeKB: 5,
+          maxWidth: 64,
+          maxHeight: 64,
+          outputFormat: 'image/png',
+          initialQuality: 0.9
+        });
+
+        setSelectedFavicon(compressedFile);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setFaviconPreview(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing favicon:', error);
+        setFaviconError('Error compressing image');
+      }
     };
     img.src = URL.createObjectURL(file);
   });
@@ -995,7 +1024,7 @@ const FloatingResellersPopover = ({
 
     // Check dimensions
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       if (img.width !== 1024 || img.height !== 1024) {
         setAppImageError('App image must be exactly 1024x1024 pixels');
         setSelectedAppImage(null);
@@ -1003,13 +1032,27 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image has correct dimensions, proceed
-      setSelectedAppImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAppImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      // Image has correct dimensions, compress and proceed
+      try {
+        const compressedFile = await compressImage(file, {
+          maxSizeKB: 200,
+          minSizeKB: 50,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          outputFormat: 'image/png',
+          initialQuality: 0.8
+        });
+
+        setSelectedAppImage(compressedFile);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setAppImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing app image:', error);
+        setAppImageError('Error compressing image');
+      }
     };
     img.src = URL.createObjectURL(file);
   });
@@ -1030,7 +1073,7 @@ const FloatingResellersPopover = ({
 
     // Check dimensions
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       if (img.width !== 192 || img.height !== 192) {
         setNotificationIconError('Notification icon must be exactly 192x192 pixels');
         setSelectedNotificationIcon(null);
@@ -1038,13 +1081,27 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image has correct dimensions, proceed
-      setSelectedNotificationIcon(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setNotificationIconPreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      // Image has correct dimensions, compress and proceed
+      try {
+        const compressedFile = await compressImage(file, {
+          maxSizeKB: 30,
+          minSizeKB: 10,
+          maxWidth: 192,
+          maxHeight: 192,
+          outputFormat: 'image/png',
+          initialQuality: 0.9
+        });
+
+        setSelectedNotificationIcon(compressedFile);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setNotificationIconPreview(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing notification icon:', error);
+        setNotificationIconError('Error compressing image');
+      }
     };
     img.src = URL.createObjectURL(file);
   });

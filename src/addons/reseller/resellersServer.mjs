@@ -851,18 +851,23 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       });
     }
     
-    // Process image if provided (after validation passes)
+    // Process images if provided (after validation passes)
     let imageUrl = body.logotype || '';
+    let faviconUrl = '';
+    let appImageUrl = '';
+    let notificationIconUrl = '';
+    
     if (req.files && req.files.length > 0) {
       try {
-        const imageFile = req.files.find(file => file.fieldname === 'image');
-        if (imageFile) {
           const appUrl = req.body.appUrl;
           const parentUserId = req.body.parentUserId;
           const resellerId = req.body.resellerId;
-          
-          // Generate unique filename for image
-          const imageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${Date.now()}.png`;
+        const timestamp = Date.now();
+        
+        // Process main logo image
+        const imageFile = req.files.find(file => file.fieldname === 'image');
+        if (imageFile) {
+          const imageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}.png`;
           const imagesDir = IMAGES_DIR;
           const imagePath = path.join(imagesDir, imageFilename);
           
@@ -872,10 +877,55 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
           // Update logotype with relative path
           imageUrl = `images/${imageFilename}`;
           body.logotype = imageUrl;
-          
         }
+        
+        // Process favicon image
+        const faviconFile = req.files.find(file => file.fieldname === 'favicon');
+        if (faviconFile) {
+          const faviconFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_favicon.png`;
+          const imagesDir = IMAGES_DIR;
+          const faviconPath = path.join(imagesDir, faviconFilename);
+          
+          // Move uploaded file to final location
+          fs.renameSync(faviconFile.path, faviconPath);
+          
+          // Update favicon with relative path
+          faviconUrl = `images/${faviconFilename}`;
+          body.favicon = faviconUrl;
+        }
+        
+        // Process app image
+        const appImageFile = req.files.find(file => file.fieldname === 'appImage');
+        if (appImageFile) {
+          const appImageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_appImage.png`;
+          const imagesDir = IMAGES_DIR;
+          const appImagePath = path.join(imagesDir, appImageFilename);
+          
+          // Move uploaded file to final location
+          fs.renameSync(appImageFile.path, appImagePath);
+          
+          // Update app image with relative path
+          appImageUrl = `images/${appImageFilename}`;
+          body.appImage = appImageUrl;
+        }
+        
+        // Process notification icon
+        const notificationIconFile = req.files.find(file => file.fieldname === 'notificationIcon');
+        if (notificationIconFile) {
+          const notificationIconFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_notificationIcon.png`;
+          const imagesDir = IMAGES_DIR;
+          const notificationIconPath = path.join(imagesDir, notificationIconFilename);
+          
+          // Move uploaded file to final location
+          fs.renameSync(notificationIconFile.path, notificationIconPath);
+          
+          // Update notification icon with relative path
+          notificationIconUrl = `images/${notificationIconFilename}`;
+          body.notificationIcon = notificationIconUrl;
+        }
+        
       } catch (imageError) {
-        console.error('❌ Error processing image:', imageError);
+        console.error('❌ Error processing images:', imageError);
         return res.status(500).json({
           error: 'Image processing failed',
           message: imageError.message,
@@ -925,6 +975,9 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
       const fileData = {
         ...body,
         logotype: imageUrl, // Use processed image URL
+        favicon: faviconUrl, // Add favicon URL
+        appImage: appImageUrl, // Add app image URL
+        notificationIcon: notificationIconUrl, // Add notification icon URL
         savedAt: new Date().toISOString(),
         filename: filename
       };
@@ -965,10 +1018,40 @@ app.post('/api/resellers', upload.any(), async (req, res) => {
 });
 
 // PUT endpoint for updating resellers
-app.put('/api/resellers/:id', async (req, res) => {
+app.put('/api/resellers/:id', upload.any(), async (req, res) => {
     try {
         const { id } = req.params;
-        const { body } = req;
+        let body;
+        
+        // Check if request is FormData (with images) or JSON
+        if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+            // Handle FormData - use individual fields from form data
+            body = {
+                currentDomain: req.body.currentDomain,
+                parentUserId: req.body.parentUserId,
+                parentUser: req.body.parentUser,
+                parentEmail: req.body.parentEmail,
+                resellerId: req.body.resellerId,
+                resellerUser: req.body.resellerUser,
+                resellerEmail: req.body.resellerEmail,
+                companyName: req.body.companyName,
+                logotype: req.body.logotype || '',
+                appUrl: req.body.appUrl,
+                whatsapp: req.body.whatsapp,
+                billingEmail: req.body.billingEmail,
+                supportEmail: req.body.supportEmail,
+                resellerLimit: parseInt(req.body.resellerLimit) || 0,
+                deviceLimit: parseInt(req.body.deviceLimit) || 0,
+                userLimit: parseInt(req.body.userLimit) || 0,
+                status: req.body.status || 'active',
+                favicon: req.body.favicon || '',
+                appImage: req.body.appImage || '',
+                notificationIcon: req.body.notificationIcon || ''
+            };
+        } else {
+            // Handle JSON request
+            body = req.body;
+        }
         
         
         // Find existing reseller first
@@ -1029,13 +1112,94 @@ app.put('/api/resellers/:id', async (req, res) => {
             });
         }
 
+        // Process images if provided
+        let imageUrl = body.logotype || existingReseller.logotype || '';
+        let faviconUrl = body.favicon || existingReseller.favicon || '';
+        let appImageUrl = body.appImage || existingReseller.appImage || '';
+        let notificationIconUrl = body.notificationIcon || existingReseller.notificationIcon || '';
         
+        if (req.files && req.files.length > 0) {
+            try {
+                const appUrl = req.body.appUrl;
+                const parentUserId = req.body.parentUserId;
+                const resellerId = req.body.resellerId;
+                const timestamp = Date.now();
+                
+                // Process main logo image
+                const imageFile = req.files.find(file => file.fieldname === 'image');
+                if (imageFile) {
+                    const imageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}.png`;
+                    const imagesDir = IMAGES_DIR;
+                    const imagePath = path.join(imagesDir, imageFilename);
+                    
+                    // Move uploaded file to final location
+                    fs.renameSync(imageFile.path, imagePath);
+                    
+                    // Update logotype with relative path
+                    imageUrl = `images/${imageFilename}`;
+                }
+                
+                // Process favicon image
+                const faviconFile = req.files.find(file => file.fieldname === 'favicon');
+                if (faviconFile) {
+                    const faviconFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_favicon.png`;
+                    const imagesDir = IMAGES_DIR;
+                    const faviconPath = path.join(imagesDir, faviconFilename);
+                    
+                    // Move uploaded file to final location
+                    fs.renameSync(faviconFile.path, faviconPath);
+                    
+                    // Update favicon with relative path
+                    faviconUrl = `images/${faviconFilename}`;
+                }
+                
+                // Process app image
+                const appImageFile = req.files.find(file => file.fieldname === 'appImage');
+                if (appImageFile) {
+                    const appImageFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_appImage.png`;
+                    const imagesDir = IMAGES_DIR;
+                    const appImagePath = path.join(imagesDir, appImageFilename);
+                    
+                    // Move uploaded file to final location
+                    fs.renameSync(appImageFile.path, appImagePath);
+                    
+                    // Update app image with relative path
+                    appImageUrl = `images/${appImageFilename}`;
+                }
+                
+                // Process notification icon
+                const notificationIconFile = req.files.find(file => file.fieldname === 'notificationIcon');
+                if (notificationIconFile) {
+                    const notificationIconFilename = `reseller_${body.currentDomain}_${appUrl}_${parentUserId}_${resellerId}_${timestamp}_notificationIcon.png`;
+                    const imagesDir = IMAGES_DIR;
+                    const notificationIconPath = path.join(imagesDir, notificationIconFilename);
+                    
+                    // Move uploaded file to final location
+                    fs.renameSync(notificationIconFile.path, notificationIconPath);
+                    
+                    // Update notification icon with relative path
+                    notificationIconUrl = `images/${notificationIconFilename}`;
+                }
+                
+            } catch (imageError) {
+                console.error('❌ Error processing images during update:', imageError);
+                return res.status(500).json({
+                    error: 'Image processing failed',
+                    message: imageError.message,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
         // Merge with existing data - keep old values if new ones are empty
         const updatedData = {
             ...existingReseller,
             ...body,
-            // Keep old logotype if new one is empty
-            logotype: body.logotype && body.logotype.trim() !== '' ? body.logotype : existingReseller.logotype,
+            // Use processed image URLs
+            logotype: imageUrl,
+            favicon: faviconUrl,
+            appImage: appImageUrl,
+            notificationIcon: notificationIconUrl,
             // Keep old appUrl if new one is empty
             appUrl: body.appUrl && body.appUrl.trim() !== '' ? body.appUrl : existingReseller.appUrl,
             updatedAt: new Date().toISOString()
