@@ -3041,35 +3041,35 @@ const FloatingGeofencesPopover = ({
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      width: '32px',
-                      height: '32px'
+                      width: '18px',
+                      height: '18px'
                     }}>
                       {geofence.area.startsWith('CIRCLE') ? (
                         <CircleIcon 
                           style={{ 
-                            fontSize: '20px', 
+                            fontSize: '14px', 
                             color: geofence.attributes?.color || '#3f51b5' 
                           }} 
                         />
                       ) : geofence.area.startsWith('LINESTRING') ? (
                         <LineIcon 
                           style={{ 
-                            fontSize: '20px', 
+                            fontSize: '14px', 
                             color: geofence.attributes?.color || '#3f51b5' 
                           }} 
                         />
                       ) : geofence.area.startsWith('POLYGON') ? (
                         <PolygonIcon 
                           style={{ 
-                            fontSize: '20px', 
+                            fontSize: '14px', 
                             color: geofence.attributes?.color || '#3f51b5' 
                           }} 
                         />
                       ) : (
                         <div
                           style={{
-                            width: '16px',
-                            height: '16px',
+                            width: '10px',
+                            height: '10px',
                             borderRadius: '50%',
                             backgroundColor: geofence.attributes?.color || '#3f51b5'
                           }}
@@ -3116,8 +3116,8 @@ const FloatingGeofencesPopover = ({
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      width: '32px',
-                      height: '32px'
+                      width: '18px',
+                      height: '18px'
                     }}>
                       <IconButton
                         size="small"
@@ -3127,14 +3127,16 @@ const FloatingGeofencesPopover = ({
                         }}
                         style={{
                           color: colors.textSecondary,
-                          padding: '4px',
+                          padding: '1px',
+                          minWidth: '18px',
+                          minHeight: '18px',
                           '&:hover': {
                             color: colors.error,
                             backgroundColor: 'rgba(244, 67, 54, 0.1)'
                           }
                         }}
                       >
-                        <DeleteIcon style={{ fontSize: 18 }} />
+                        <DeleteIcon style={{ fontSize: 14 }} />
                       </IconButton>
                     </div>
                   </div>
