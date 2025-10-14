@@ -63,8 +63,9 @@ export const applyResellerBranding = (resellerData) => {
     }
   }
 
-  // Store logo URL for use by components
-  window.resellerLogoUrl = logo;
+  // Store logo URL for use by components (make it absolute)
+  const fullLogoUrl = logo.startsWith('http') ? logo : `${resellersConfig.RESELLERS_SERVER_URL}/${logo}`;
+  window.resellerLogoUrl = fullLogoUrl;
   console.log('✅ Logo URL stored:', window.resellerLogoUrl);
 
 };
