@@ -26,6 +26,8 @@ export default {
     `${RESELLERS_SERVER_URL}/api/resellers/build/status/${resellerId}?appUrl=${encodeURIComponent(appUrl)}&parentUserId=${parentUserId}&currentDomain=${currentDomain}`,
   DOWNLOAD: (appUrl, buildType = 'apk') =>
     `${RESELLERS_SERVER_URL}/api/resellers/download?appUrl=${encodeURIComponent(appUrl)}&buildType=${buildType}`,
+  RESELLER_LOGO: (domain) =>
+    `${RESELLERS_SERVER_URL}/api/reseller-logo?domain=${encodeURIComponent(domain)}`,
   }
 };
 

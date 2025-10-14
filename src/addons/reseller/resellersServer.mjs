@@ -2020,6 +2020,68 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 // Serve uploaded images
 app.use('/images', express.static(IMAGES_DIR));
 
+// GET endpoint to get current reseller's logo based on domain
+app.get('/api/reseller-logo', async (req, res) => {
+  try {
+    const { domain } = req.query;
+    
+    if (!domain) {
+      return res.status(400).json({
+        error: 'Missing required parameter',
+        message: 'domain is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Find reseller by domain
+    const dataDir = DATA_DIR;
+    const jsonFiles = await glob('*.json', { cwd: dataDir });
+    
+    let resellerData = null;
+    
+    for (const jsonFile of jsonFiles) {
+      try {
+        const filePath = path.join(dataDir, jsonFile);
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const reseller = JSON.parse(fileContent);
+        
+        // Check if this reseller matches the domain
+        if (reseller.appUrl === domain) {
+          resellerData = reseller;
+          break;
+        }
+      } catch (fileError) {
+        console.error('❌ Error reading file during logo search:', jsonFile, fileError.message);
+        continue;
+      }
+    }
+    
+    if (!resellerData) {
+      return res.status(404).json({
+        error: 'Reseller not found',
+        message: `No reseller found for domain: ${domain}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Return the logo URL
+    res.json({
+      success: true,
+      logo: resellerData.logotype || null,
+      companyName: resellerData.companyName || null,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Error getting reseller logo:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Reseller check endpoint - POST to check if user is a reseller
 app.post('/api/reseller-check', async (req, res) => {
   try {
