@@ -303,12 +303,9 @@ const FloatingResellersPopover = ({
     try {
       console.log(`📥 Downloading ${buildType.toUpperCase()} for reseller:`, reseller);
       
-      // Construct download URL
+      // Construct download URL (simplified - only need appUrl and buildType)
       const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
-        reseller.resellerId,
         reseller.appUrl,
-        reseller.parentUserId,
-        reseller.currentDomain || 'gps',
         buildType
       );
       
@@ -2406,12 +2403,9 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
           <Button
             variant="contained"
             onClick={() => {
-              // Trigger download
+              // Trigger download (simplified - only need appUrl and buildType)
               const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
-                reseller.resellerId,
                 reseller.appUrl,
-                reseller.parentUserId,
-                reseller.currentDomain || 'gps',
                 buildType
               );
               

@@ -1900,18 +1900,25 @@ app.listen(PORT, async () => {
 });
 
 // GET endpoint for downloading build files
-app.get('/api/resellers/download/:resellerId', async (req, res) => {
+app.get('/api/resellers/download', async (req, res) => {
   try {
-    const { resellerId } = req.params;
-    const { appUrl, parentUserId, currentDomain = 'gps', buildType = 'apk' } = req.query;
+    const { appUrl, buildType = 'apk' } = req.query;
 
-    console.log('📥 Download request received:', { resellerId, appUrl, parentUserId, currentDomain, buildType });
+    console.log('📥 Download request received:', { appUrl, buildType });
 
     // Validate required parameters
-    if (!appUrl || !parentUserId) {
+    if (!appUrl) {
       return res.status(400).json({
-        error: 'Missing required parameters',
-        message: 'appUrl and parentUserId are required'
+        error: 'Missing required parameter',
+        message: 'appUrl is required'
+      });
+    }
+
+    // Validate buildType
+    if (!['apk', 'aab'].includes(buildType)) {
+      return res.status(400).json({
+        error: 'Invalid build type',
+        message: 'buildType must be either "apk" or "aab"'
       });
     }
 
