@@ -51,7 +51,18 @@ import {
   LastPage as LastPageIcon,
   Save as SaveIcon,
   BugReport as BugReportIcon,
+  Smartphone as SmartphoneIcon,
+  Android as AndroidIcon,
+  Apple as AppleIcon,
+  Download as DownloadIcon,
+  Inventory as InventoryIcon,
+  Store as StoreIcon,
+  PhoneIphone as PhoneIphoneIcon,
+  ShoppingCart as ShoppingCartIcon,
+  Apps as AppsIcon,
+  Extension as ExtensionIcon,
 } from '@mui/icons-material';
+import { BsGooglePlay } from "react-icons/bs";
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
@@ -840,15 +851,13 @@ const FloatingResellersPopover = ({
                         </TableCell>
                       )}
                       {desktop && (
-                        <>
-                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                            {t('sharedPhone')}
-                          </TableCell>
-                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                            {t('sharedStatus')}
-                          </TableCell>
-                        </>
+                        <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                          {t('sharedPhone')}
+                        </TableCell>
                       )}
+                      <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                        Apps
+                      </TableCell>
                       <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                         {t('sharedActions')}
                       </TableCell>
@@ -913,25 +922,65 @@ const FloatingResellersPopover = ({
                               </TableCell>
                             )}
                             {desktop && (
-                              <>
-                                <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
-                                  {reseller.whatsapp || '-'}
-                                </TableCell>
-                                <TableCell>
-                                  <Chip
-                                    icon={getStatusIcon(reseller)}
-                                    label={reseller.status === 'active' ? t('sharedActive') : t('sharedInactive')}
-                                    size="small"
-                                    style={{
-                                      backgroundColor: getStatusColor(reseller),
-                                      color: colors.text,
-                                      fontSize: '10px',
-                                      height: '16px',
-                                    }}
-                                  />
-                                </TableCell>
-                              </>
+                              <TableCell style={{ color: colors.text, lineHeight: 1.8, fontSize: '13px' }}>
+                                {reseller.whatsapp || '-'}
+                              </TableCell>
                             )}
+                            <TableCell>
+                              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <IconButton
+                                  size="small"
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    border: `1px solid ${colors.border}`,
+                                    color: colors.text,
+                                    padding: '4px'
+                                  }}
+                                  onClick={() => {
+                                    // TODO: Handle AAB download
+                                    console.log('AAB download for reseller:', reseller.id);
+                                  }}
+                                  title="AAB Download"
+                                >
+                                  <BsGooglePlay style={{ fontSize: '14px' }} />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    border: `1px solid ${colors.border}`,
+                                    color: colors.text,
+                                    padding: '4px'
+                                  }}
+                                  onClick={() => {
+                                    // TODO: Handle APK download
+                                    console.log('APK download for reseller:', reseller.id);
+                                  }}
+                                  title="APK Download"
+                                >
+                                  <AndroidIcon style={{ fontSize: '16px' }} />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    border: `1px solid ${colors.border}`,
+                                    color: colors.text,
+                                    padding: '4px'
+                                  }}
+                                  onClick={() => {
+                                    // TODO: Handle iOS download
+                                    console.log('iOS download for reseller:', reseller.id);
+                                  }}
+                                  title="iOS Download"
+                                >
+                                  <AppleIcon style={{ fontSize: '16px' }} />
+                                </IconButton>
+                              </div>
+                            </TableCell>
                             <TableCell align="right">
                               <IconButton
                                 onClick={(e) => {
