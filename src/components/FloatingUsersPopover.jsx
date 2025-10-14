@@ -1319,8 +1319,12 @@ const FloatingUsersPopover = ({
                       value={editingUser.password || ''}
                       onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
                       label={t('userPassword')}
-                      placeholder={editingUser.id ? t('userPassword') + ' (leave empty to keep current)' : t('userPassword')}
+                      placeholder={t('userPassword')}
                       fullWidth
+                      autoComplete="new-password"
+                      inputProps={{
+                        autoComplete: 'new-password'
+                      }}
                     />
                       </div>
                     )}

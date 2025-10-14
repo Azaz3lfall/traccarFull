@@ -675,8 +675,12 @@ const UsersModal = ({ open, onClose }) => {
                   type="password"
                   value={editingUser?.password || ''}
                   onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-                  placeholder={editingUser?.id ? t('userPassword') + ' (leave empty to keep current)' : t('userPassword')}
+                  placeholder={t('userPassword')}
                   fullWidth
+                  autoComplete="new-password"
+                  inputProps={{
+                    autoComplete: 'new-password'
+                  }}
                   style={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 />
                 <div style={{ display: 'flex', gap: '16px' }}>
