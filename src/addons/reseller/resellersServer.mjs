@@ -1647,6 +1647,170 @@ const ensureDirectories = () => {
 // Create directories on startup
 ensureDirectories();
 
+// POST endpoint for building mobile app with reseller data
+app.post('/api/resellers/build', async (req, res) => {
+  try {
+    console.log('🏗️ Starting mobile app build process...');
+    
+    const resellerData = req.body;
+    console.log('📋 Reseller data received:', {
+      appUrl: resellerData.appUrl,
+      companyName: resellerData.companyName,
+      parentUserId: resellerData.parentUserId,
+      resellerId: resellerData.resellerId
+    });
+
+    // Validate required fields
+    if (!resellerData.appUrl || !resellerData.companyName || !resellerData.parentUserId || !resellerData.resellerId) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'appUrl, companyName, parentUserId, and resellerId are required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Create reseller-specific directory name
+    const resellerDirName = `reseller_${resellerData.currentDomain || 'gps'}_${resellerData.appUrl}_${resellerData.parentUserId}_${resellerData.resellerId}`;
+    const resellerDirPath = path.join(DATA_DIR, resellerDirName);
+    const sourceDir = path.join(__dirname, 'traccar-manager');
+    
+    console.log('📁 Source directory:', sourceDir);
+    console.log('📁 Target directory:', resellerDirPath);
+
+    // Check if source directory exists
+    if (!fs.existsSync(sourceDir)) {
+      return res.status(500).json({
+        error: 'Source code not found',
+        message: 'Mobile app source code directory not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Remove existing reseller directory if it exists
+    if (fs.existsSync(resellerDirPath)) {
+      console.log('🗑️ Removing existing directory...');
+      fs.rmSync(resellerDirPath, { recursive: true, force: true });
+    }
+
+    // Copy source code to reseller directory
+    console.log('📋 Copying source code...');
+    await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
+    console.log('✅ Source code copied successfully');
+
+    // Update app configuration files
+    console.log('⚙️ Updating app configuration...');
+    
+    // Update pubspec.yaml
+    const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
+    if (fs.existsSync(pubspecPath)) {
+      let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
+      pubspecContent = pubspecContent.replace(/name: .*/, `name: ${resellerData.appUrl.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase()}`);
+      pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
+      fs.writeFileSync(pubspecPath, pubspecContent);
+      console.log('✅ pubspec.yaml updated');
+    }
+
+    // Update Android app configuration
+    const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
+    if (fs.existsSync(androidManifestPath)) {
+      let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
+      const packageName = `com.${resellerData.appUrl.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.manager`;
+      manifestContent = manifestContent.replace(/package="[^"]*"/, `package="${packageName}"`);
+      manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
+      fs.writeFileSync(androidManifestPath, manifestContent);
+      console.log('✅ AndroidManifest.xml updated');
+    }
+
+    // Update iOS app configuration
+    const iosInfoPlistPath = path.join(resellerDirPath, 'ios/Runner/Info.plist');
+    if (fs.existsSync(iosInfoPlistPath)) {
+      let plistContent = fs.readFileSync(iosInfoPlistPath, 'utf8');
+      plistContent = plistContent.replace(/<key>CFBundleDisplayName<\/key>\s*<string>.*?<\/string>/, 
+        `<key>CFBundleDisplayName</key>\n\t<string>${resellerData.companyName}</string>`);
+      plistContent = plistContent.replace(/<key>CFBundleName<\/key>\s*<string>.*?<\/string>/, 
+        `<key>CFBundleName</key>\n\t<string>${resellerData.companyName}</string>`);
+      fs.writeFileSync(iosInfoPlistPath, plistContent);
+      console.log('✅ iOS Info.plist updated');
+    }
+
+    // Update branding configuration
+    const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
+    if (fs.existsSync(brandDartPath)) {
+      let brandContent = fs.readFileSync(brandDartPath, 'utf8');
+      const packageName = `com.${resellerData.appUrl.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}.manager`;
+      brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
+      brandContent = brandContent.replace(/const packageId = '.*';/, `const packageId = '${packageName}';`);
+      brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
+      fs.writeFileSync(brandDartPath, brandContent);
+      console.log('✅ brand.dart updated');
+    }
+
+    // Build Flutter app
+    console.log('🔨 Building Flutter app...');
+    const buildDir = path.join(resellerDirPath, 'build');
+    
+    // Clean previous build
+    if (fs.existsSync(buildDir)) {
+      fs.rmSync(buildDir, { recursive: true, force: true });
+    }
+
+    // Run Flutter build
+    console.log('📱 Building APK...');
+    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release`, { timeout: 300000 });
+    console.log('✅ APK build completed');
+
+    console.log('📦 Building AAB...');
+    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 300000 });
+    console.log('✅ AAB build completed');
+
+    // Rename output files
+    const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
+    const aabSourcePath = path.join(resellerDirPath, 'build/app/outputs/bundle/release/app-release.aab');
+    
+    const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
+    const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
+
+    if (fs.existsSync(apkSourcePath)) {
+      fs.copyFileSync(apkSourcePath, apkTargetPath);
+      console.log('✅ APK renamed to:', apkTargetPath);
+    }
+
+    if (fs.existsSync(aabSourcePath)) {
+      fs.copyFileSync(aabSourcePath, aabTargetPath);
+      console.log('✅ AAB renamed to:', aabTargetPath);
+    }
+
+    // Clean up build directory to save space
+    if (fs.existsSync(buildDir)) {
+      fs.rmSync(buildDir, { recursive: true, force: true });
+      console.log('🧹 Build directory cleaned up');
+    }
+
+    console.log('🎉 Mobile app build process completed successfully!');
+
+    res.json({
+      success: true,
+      message: 'Mobile app built successfully',
+      data: {
+        resellerDir: resellerDirName,
+        apkPath: apkTargetPath,
+        aabPath: aabTargetPath,
+        appUrl: resellerData.appUrl,
+        companyName: resellerData.companyName
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error building mobile app:', error);
+    res.status(500).json({
+      error: 'Build failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Start server
 app.listen(PORT, async () => {
   console.log(`🚀 Reseller server running on port ${PORT}`);
