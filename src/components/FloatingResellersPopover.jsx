@@ -149,8 +149,9 @@ const FloatingResellersPopover = ({
         currentDomain: reseller.currentDomain || 'gps'
       };
 
-      console.log(`🏗️ Building ${buildType.toUpperCase()} for reseller:`, buildData);
+      console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
 
+      // Start the build process (non-blocking)
       const response = await fetch(resellersConfig.ENDPOINTS.BUILD, {
         method: 'POST',
         headers: {
@@ -164,28 +165,88 @@ const FloatingResellersPopover = ({
         throw new Error(errorData.message || `Build failed: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      console.log(`✅ ${buildType.toUpperCase()} build completed:`, result);
+      console.log(`🚀 ${buildType.toUpperCase()} build started, polling for status...`);
 
-      setSnackbar({
-        open: true,
-        message: `${buildType.toUpperCase()} build completed successfully!`,
-        severity: 'success'
-      });
-
-      // TODO: Implement download functionality when files are ready
-      // For now, just show success message
+      // Start polling for build status
+      pollBuildStatus(reseller, buildType, buildKey);
 
     } catch (error) {
-      console.error(`❌ Error building ${buildType.toUpperCase()}:`, error);
+      console.error(`❌ Error starting ${buildType.toUpperCase()} build:`, error);
       setSnackbar({
         open: true,
-        message: `Build failed: ${error.message}`,
+        message: `Build failed to start: ${error.message}`,
         severity: 'error'
       });
-    } finally {
       setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
     }
+  };
+
+  // Poll build status
+  const pollBuildStatus = async (reseller, buildType, buildKey) => {
+    const maxAttempts = 120; // 10 minutes of polling (5 second intervals)
+    let attempts = 0;
+
+    const poll = async () => {
+      try {
+        attempts++;
+        const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
+          reseller.resellerId,
+          reseller.appUrl,
+          reseller.parentUserId,
+          reseller.currentDomain || 'gps'
+        );
+
+        const response = await fetch(statusUrl);
+        if (!response.ok) {
+          throw new Error(`Status check failed: ${response.statusText}`);
+        }
+
+        const status = await response.json();
+        console.log(`📊 Build status check ${attempts}/${maxAttempts}:`, status.data);
+
+        if (status.data.buildComplete) {
+          console.log(`✅ ${buildType.toUpperCase()} build completed!`);
+          setSnackbar({
+            open: true,
+            message: `${buildType.toUpperCase()} build completed successfully!`,
+            severity: 'success'
+          });
+          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
+          return;
+        }
+
+        if (attempts >= maxAttempts) {
+          console.log(`⏰ Build status polling timeout after ${maxAttempts} attempts`);
+          setSnackbar({
+            open: true,
+            message: `${buildType.toUpperCase()} build is taking longer than expected. Please check back later.`,
+            severity: 'warning'
+          });
+          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
+          return;
+        }
+
+        // Continue polling every 5 seconds
+        setTimeout(poll, 5000);
+
+      } catch (error) {
+        console.error(`❌ Error checking build status:`, error);
+        if (attempts >= maxAttempts) {
+          setSnackbar({
+            open: true,
+            message: `Build status check failed: ${error.message}`,
+            severity: 'error'
+          });
+          setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
+        } else {
+          // Retry on error
+          setTimeout(poll, 5000);
+        }
+      }
+    };
+
+    // Start polling after 2 seconds
+    setTimeout(poll, 2000);
   };
   const [usersFetched, setUsersFetched] = useState(false);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);

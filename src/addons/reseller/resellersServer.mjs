@@ -1811,6 +1811,68 @@ app.post('/api/resellers/build', async (req, res) => {
   }
 });
 
+// GET endpoint for checking build status
+app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
+  try {
+    const { resellerId } = req.params;
+    const { appUrl, parentUserId } = req.query;
+    
+    if (!appUrl || !parentUserId) {
+      return res.status(400).json({
+        error: 'Missing required parameters',
+        message: 'appUrl and parentUserId are required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Create reseller directory name
+    const resellerDirName = `reseller_${req.query.currentDomain || 'gps'}_${appUrl}_${parentUserId}_${resellerId}`;
+    const resellerDirPath = path.join(DATA_DIR, resellerDirName);
+    
+    // Check if build directory exists
+    const buildDir = path.join(resellerDirPath, 'build');
+    const apkPath = path.join(DATA_DIR, `${appUrl}.apk`);
+    const aabPath = path.join(DATA_DIR, `${appUrl}.aab`);
+    
+    // Check build status
+    const isBuilding = fs.existsSync(resellerDirPath) && fs.existsSync(buildDir);
+    const apkExists = fs.existsSync(apkPath);
+    const aabExists = fs.existsSync(aabPath);
+    const buildComplete = apkExists && aabExists;
+    
+    // Get file sizes if they exist
+    const apkSize = apkExists ? fs.statSync(apkPath).size : 0;
+    const aabSize = aabExists ? fs.statSync(aabPath).size : 0;
+    
+    res.json({
+      success: true,
+      data: {
+        resellerId,
+        appUrl,
+        parentUserId,
+        isBuilding,
+        buildComplete,
+        apkExists,
+        aabExists,
+        apkSize,
+        aabSize,
+        apkPath: apkExists ? apkPath : null,
+        aabPath: aabExists ? aabPath : null,
+        resellerDir: resellerDirName
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error checking build status:', error);
+    res.status(500).json({
+      error: 'Status check failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Start server
 app.listen(PORT, async () => {
   console.log(`🚀 Reseller server running on port ${PORT}`);
