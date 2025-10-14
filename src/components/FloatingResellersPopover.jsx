@@ -1265,6 +1265,7 @@ const FloatingResellersPopover = ({
             <AnimatePresence>
               {logsDialog && (
                 <motion.div
+                  key="logs-dialog"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -1474,6 +1475,7 @@ const FloatingResellersPopover = ({
             <AnimatePresence>
               {deleteDialog && (
                 <motion.div
+                  key="delete-dialog"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -1578,6 +1580,7 @@ const FloatingResellersPopover = ({
                 <>
                   {/* Backdrop */}
                   <motion.div
+                    key="edit-drawer-backdrop"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -1595,6 +1598,7 @@ const FloatingResellersPopover = ({
                   
                   {/* Reseller Drawer */}
                   <motion.div
+                    key="edit-drawer-content"
                     initial={{ x: '100%', opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: '100%', opacity: 0 }}
@@ -2253,12 +2257,13 @@ const FloatingResellersPopover = ({
       </Snackbar>
 
       {/* Build Status Modal */}
-      <Dialog
-        open={buildStatusModal.open}
-        onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
-        maxWidth="sm"
-        fullWidth
-      >
+      {buildStatusModal.open && (
+        <Dialog
+          open={buildStatusModal.open}
+          onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+          maxWidth="sm"
+          fullWidth
+        >
         <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
           Build Status - {buildStatusModal.reseller?.companyName}
         </DialogTitle>
@@ -2278,7 +2283,8 @@ const FloatingResellersPopover = ({
             />
           )}
         </DialogContent>
-      </Dialog>
+        </Dialog>
+      )}
     </AnimatePresence>
   );
 };
