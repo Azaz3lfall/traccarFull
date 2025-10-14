@@ -63,12 +63,12 @@ import {
   Extension as ExtensionIcon,
 } from '@mui/icons-material';
 import { BsGooglePlay } from "react-icons/bs";
+import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
-import resellersConfig from '../config/resellersConfig';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { resellersActions } from '../store';
 import { useSelector } from 'react-redux';
@@ -124,6 +124,69 @@ const FloatingResellersPopover = ({
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState(null);
+  const [buildLoading, setBuildLoading] = useState({});
+
+  // Build functions for mobile apps
+  const handleBuildApp = async (reseller, buildType) => {
+    if (!reseller || !reseller.appUrl || !reseller.companyName) {
+      setSnackbar({
+        open: true,
+        message: 'Missing required reseller data for build',
+        severity: 'error'
+      });
+      return;
+    }
+
+    const buildKey = `${reseller.id}_${buildType}`;
+    setBuildLoading(prev => ({ ...prev, [buildKey]: true }));
+
+    try {
+      const buildData = {
+        appUrl: reseller.appUrl,
+        companyName: reseller.companyName,
+        parentUserId: reseller.parentUserId,
+        resellerId: reseller.resellerId,
+        currentDomain: reseller.currentDomain || 'gps'
+      };
+
+      console.log(`🏗️ Building ${buildType.toUpperCase()} for reseller:`, buildData);
+
+      const response = await fetch(resellersConfig.ENDPOINTS.BUILD, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(buildData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Build failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log(`✅ ${buildType.toUpperCase()} build completed:`, result);
+
+      setSnackbar({
+        open: true,
+        message: `${buildType.toUpperCase()} build completed successfully!`,
+        severity: 'success'
+      });
+
+      // TODO: Implement download functionality when files are ready
+      // For now, just show success message
+
+    } catch (error) {
+      console.error(`❌ Error building ${buildType.toUpperCase()}:`, error);
+      setSnackbar({
+        open: true,
+        message: `Build failed: ${error.message}`,
+        severity: 'error'
+      });
+    } finally {
+      setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
+    }
+  };
   const [usersFetched, setUsersFetched] = useState(false);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
   const [domainCheckResult, setDomainCheckResult] = useState(null);
@@ -937,13 +1000,15 @@ const FloatingResellersPopover = ({
                                     color: colors.text,
                                     padding: '4px'
                                   }}
-                                  onClick={() => {
-                                    // TODO: Handle AAB download
-                                    console.log('AAB download for reseller:', reseller.id);
-                                  }}
+                                  onClick={() => handleBuildApp(reseller, 'aab')}
+                                  disabled={buildLoading[`${reseller.id}_aab`]}
                                   title="AAB Download"
                                 >
-                                  <BsGooglePlay style={{ fontSize: '14px' }} />
+                                  {buildLoading[`${reseller.id}_aab`] ? (
+                                    <CircularProgress size={12} />
+                                  ) : (
+                                    <BsGooglePlay style={{ fontSize: '14px' }} />
+                                  )}
                                 </IconButton>
                                 <IconButton
                                   size="small"
@@ -954,13 +1019,15 @@ const FloatingResellersPopover = ({
                                     color: colors.text,
                                     padding: '4px'
                                   }}
-                                  onClick={() => {
-                                    // TODO: Handle APK download
-                                    console.log('APK download for reseller:', reseller.id);
-                                  }}
+                                  onClick={() => handleBuildApp(reseller, 'apk')}
+                                  disabled={buildLoading[`${reseller.id}_apk`]}
                                   title="APK Download"
                                 >
-                                  <AndroidIcon style={{ fontSize: '16px' }} />
+                                  {buildLoading[`${reseller.id}_apk`] ? (
+                                    <CircularProgress size={12} />
+                                  ) : (
+                                    <AndroidIcon style={{ fontSize: '16px' }} />
+                                  )}
                                 </IconButton>
                                 <IconButton
                                   size="small"
@@ -971,13 +1038,15 @@ const FloatingResellersPopover = ({
                                     color: colors.text,
                                     padding: '4px'
                                   }}
-                                  onClick={() => {
-                                    // TODO: Handle iOS download
-                                    console.log('iOS download for reseller:', reseller.id);
-                                  }}
+                                  onClick={() => handleBuildApp(reseller, 'ios')}
+                                  disabled={buildLoading[`${reseller.id}_ios`]}
                                   title="iOS Download"
                                 >
-                                  <AppleIcon style={{ fontSize: '16px' }} />
+                                  {buildLoading[`${reseller.id}_ios`] ? (
+                                    <CircularProgress size={12} />
+                                  ) : (
+                                    <AppleIcon style={{ fontSize: '16px' }} />
+                                  )}
                                 </IconButton>
                               </div>
                             </TableCell>

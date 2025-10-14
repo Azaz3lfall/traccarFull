@@ -1756,11 +1756,11 @@ app.post('/api/resellers/build', async (req, res) => {
 
     // Run Flutter build
     console.log('📱 Building APK...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release`, { timeout: 300000 });
+    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 }); // 40 minutes
     console.log('✅ APK build completed');
 
     console.log('📦 Building AAB...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 300000 });
+    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
     console.log('✅ AAB build completed');
 
     // Rename output files
