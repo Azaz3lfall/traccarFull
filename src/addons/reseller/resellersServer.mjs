@@ -1515,6 +1515,145 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
 }
 
 // POST endpoint for building mobile app with reseller data
+// Function to copy and replace app images
+async function copyAppImages(resellerDirPath, resellerData) {
+  try {
+    console.log('🖼️ Copying app images...');
+    
+    // Get image paths from reseller data
+    const appImagePath = resellerData.appImage ? path.join(IMAGES_DIR, resellerData.appImage.replace('images/', '')) : null;
+    const notificationIconPath = resellerData.notificationIcon ? path.join(IMAGES_DIR, resellerData.notificationIcon.replace('images/', '')) : null;
+    
+    if (!appImagePath || !fs.existsSync(appImagePath)) {
+      console.log('⚠️ App image not found, using default');
+      return;
+    }
+    
+    // Android app icon replacement
+    const androidResPath = path.join(resellerDirPath, 'android/app/src/main/res');
+    const androidIconSizes = [
+      { folder: 'mipmap-hdpi', size: 72 },
+      { folder: 'mipmap-mdpi', size: 48 },
+      { folder: 'mipmap-xhdpi', size: 96 },
+      { folder: 'mipmap-xxhdpi', size: 144 },
+      { folder: 'mipmap-xxxhdpi', size: 192 }
+    ];
+    
+    for (const iconSize of androidIconSizes) {
+      const targetPath = path.join(androidResPath, iconSize.folder, 'ic_launcher.png');
+      if (fs.existsSync(targetPath)) {
+        // Resize and copy app image
+        await resizeAndCopyImage(appImagePath, targetPath, iconSize.size, iconSize.size);
+        console.log(`✅ Android ${iconSize.folder} icon updated`);
+      }
+    }
+    
+    // Android notification icon replacement
+    if (notificationIconPath && fs.existsSync(notificationIconPath)) {
+      const notificationIconSizes = [
+        { folder: 'mipmap-hdpi', size: 24 },
+        { folder: 'mipmap-mdpi', size: 18 },
+        { folder: 'mipmap-xhdpi', size: 36 },
+        { folder: 'mipmap-xxhdpi', size: 48 },
+        { folder: 'mipmap-xxxhdpi', size: 64 }
+      ];
+      
+      for (const iconSize of notificationIconSizes) {
+        const targetPath = path.join(androidResPath, iconSize.folder, 'ic_stat_notify.png');
+        if (fs.existsSync(targetPath)) {
+          // Resize and copy notification icon
+          await resizeAndCopyImage(notificationIconPath, targetPath, iconSize.size, iconSize.size);
+          console.log(`✅ Android ${iconSize.folder} notification icon updated`);
+        }
+      }
+    }
+    
+    // iOS app icon replacement
+    const iosAssetsPath = path.join(resellerDirPath, 'ios/Runner/Assets.xcassets/AppIcon.appiconset');
+    const iosIconSizes = [
+      { name: '20.png', size: 20 },
+      { name: '29.png', size: 29 },
+      { name: '40.png', size: 40 },
+      { name: '50.png', size: 50 },
+      { name: '57.png', size: 57 },
+      { name: '58.png', size: 58 },
+      { name: '60.png', size: 60 },
+      { name: '72.png', size: 72 },
+      { name: '76.png', size: 76 },
+      { name: '80.png', size: 80 },
+      { name: '87.png', size: 87 },
+      { name: '100.png', size: 100 },
+      { name: '114.png', size: 114 },
+      { name: '120.png', size: 120 },
+      { name: '144.png', size: 144 },
+      { name: '152.png', size: 152 },
+      { name: '167.png', size: 167 },
+      { name: '180.png', size: 180 },
+      { name: '1024.png', size: 1024 }
+    ];
+    
+    for (const iconSize of iosIconSizes) {
+      const targetPath = path.join(iosAssetsPath, iconSize.name);
+      if (fs.existsSync(targetPath)) {
+        // Resize and copy app image
+        await resizeAndCopyImage(appImagePath, targetPath, iconSize.size, iconSize.size);
+        console.log(`✅ iOS ${iconSize.name} icon updated`);
+      }
+    }
+    
+    console.log('✅ All app images copied successfully');
+    
+  } catch (error) {
+    console.error('❌ Error copying app images:', error);
+    throw error;
+  }
+}
+
+// Function to resize and copy image
+async function resizeAndCopyImage(sourcePath, targetPath, width, height) {
+  try {
+    // For now, just copy the file (we can add image resizing later if needed)
+    // In a production environment, you'd want to use a library like sharp to resize images
+    fs.copyFileSync(sourcePath, targetPath);
+  } catch (error) {
+    console.error(`❌ Error copying image from ${sourcePath} to ${targetPath}:`, error);
+    throw error;
+  }
+}
+
+// Function to copy favicon for web app
+async function copyFaviconForWebApp(resellerData) {
+  try {
+    console.log('🌐 Copying favicon for web app...');
+    
+    if (!resellerData.favicon) {
+      console.log('⚠️ No favicon provided, skipping web app favicon');
+      return;
+    }
+    
+    const faviconPath = path.join(IMAGES_DIR, resellerData.favicon.replace('images/', ''));
+    
+    if (!fs.existsSync(faviconPath)) {
+      console.log('⚠️ Favicon file not found, skipping web app favicon');
+      return;
+    }
+    
+    // Copy favicon to web app public directory
+    const webAppFaviconPath = path.join(process.cwd(), 'public', 'favicon.ico');
+    const webAppFaviconPngPath = path.join(process.cwd(), 'public', 'favicon.png');
+    
+    // Copy as both .ico and .png for better browser compatibility
+    fs.copyFileSync(faviconPath, webAppFaviconPath);
+    fs.copyFileSync(faviconPath, webAppFaviconPngPath);
+    
+    console.log('✅ Web app favicon updated');
+    
+  } catch (error) {
+    console.error('❌ Error copying favicon for web app:', error);
+    // Don't throw error, this is not critical for the build process
+  }
+}
+
 // STANDARDS: 
 // - Keep original package name (org.traccar.manager) for Firebase compatibility
 // - Only change visual elements: app display name, icons, descriptions
@@ -1618,6 +1757,12 @@ app.post('/api/resellers/build', async (req, res) => {
 
     // Note: google-services.json is already in source code, no need to copy
     console.log('✅ Using existing google-services.json from source code');
+
+    // Copy and replace app images
+    await copyAppImages(resellerDirPath, resellerData);
+
+    // Copy favicon for web app
+    await copyFaviconForWebApp(resellerData);
 
     // Start Flutter build process asynchronously
     console.log('🔨 Starting Flutter build process...');
