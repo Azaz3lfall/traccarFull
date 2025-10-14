@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Bayi logosu sıkıştırıldı! {originalSize}KB'dan {compressedSize}KB'a düşürüldü",
   "resellerImageCompressionError": "Görüntü sıkıştırılamadı. Lütfen tekrar deneyin.",
   "resellerCompressingImage": "Sıkıştırılıyor...",
-  "resellerImageAlreadySmall": "Bayi logosu zaten optimize edilmiş! Boyut: {size}KB"
+  "resellerImageAlreadySmall": "Bayi logosu zaten optimize edilmiş! Boyut: {size}KB",
+  "sharedNoDescription": "Açıklama yok"
 }

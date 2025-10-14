@@ -790,5 +790,6 @@
   "resellerImageCompressedSuccess": "تم ضغط شعار الموزع! تم تقليل الحجم من {originalSize}KB إلى {compressedSize}KB",
   "resellerImageCompressionError": "فشل في ضغط الصورة. يرجى المحاولة مرة أخرى.",
   "resellerCompressingImage": "جاري الضغط...",
-  "resellerImageAlreadySmall": "شعار الموزع محسن بالفعل! الحجم: {size}KB"
+  "resellerImageAlreadySmall": "شعار الموزع محسن بالفعل! الحجم: {size}KB",
+  "sharedNoDescription": "لا يوجد وصف"
 }

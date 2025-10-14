@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Վերավաճառողի լոգոն սեղմված է! Նվազել {originalSize}KB-ից {compressedSize}KB",
   "resellerImageCompressionError": "Պատկերի սեղմումը ձախողվեց: Խնդրում ենք կրկին փորձել:",
   "resellerCompressingImage": "Սեղմվում է...",
-  "resellerImageAlreadySmall": "Վերավաճառողի լոգոն արդեն օպտիմալացված է! Չափը: {size}KB"
+  "resellerImageAlreadySmall": "Վերավաճառողի լոգոն արդեն օպտիմալացված է! Չափը: {size}KB",
+  "sharedNoDescription": "Նկարագրություն չկա"
 }

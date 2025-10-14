@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Logo penjual semula dimampatkan! Dikurangkan dari {originalSize}KB kepada {compressedSize}KB",
   "resellerImageCompressionError": "Gagal memampatkan imej. Sila cuba lagi.",
   "resellerCompressingImage": "Memampatkan...",
-  "resellerImageAlreadySmall": "Logo penjual semula sudah dioptimumkan! Saiz: {size}KB"
+  "resellerImageAlreadySmall": "Logo penjual semula sudah dioptimumkan! Saiz: {size}KB",
+  "sharedNoDescription": "Tiada keterangan"
 }

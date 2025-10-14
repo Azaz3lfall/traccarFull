@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Herverkoper-logo saamgepers! Verminder van {originalSize}KB na {compressedSize}KB",
   "resellerImageCompressionError": "Kon nie beeld saamper nie. Probeer asseblief weer.",
   "resellerCompressingImage": "Saamper...",
-  "resellerImageAlreadySmall": "Herverkoper-logo is reeds geoptimaliseer! Grootte: {size}KB"
+  "resellerImageAlreadySmall": "Herverkoper-logo is reeds geoptimaliseer! Grootte: {size}KB",
+  "sharedNoDescription": "Geen beskrywing"
 }

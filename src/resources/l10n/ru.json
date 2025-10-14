@@ -790,5 +790,6 @@
   "resellerImageCompressedSuccess": "Логотип реселлера сжат! Уменьшен с {originalSize}KB до {compressedSize}KB",
   "resellerImageCompressionError": "Не удалось сжать изображение. Попробуйте еще раз.",
   "resellerCompressingImage": "Сжатие...",
-  "resellerImageAlreadySmall": "Логотип реселлера уже оптимизирован! Размер: {size}KB"
+  "resellerImageAlreadySmall": "Логотип реселлера уже оптимизирован! Размер: {size}KB",
+  "sharedNoDescription": "Нет описания"
 }

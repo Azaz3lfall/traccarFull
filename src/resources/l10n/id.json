@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Logo reseller dikompres! Dikurangi dari {originalSize}KB menjadi {compressedSize}KB",
   "resellerImageCompressionError": "Gagal mengompresi gambar. Silakan coba lagi.",
   "resellerCompressingImage": "Mengompresi...",
-  "resellerImageAlreadySmall": "Logo reseller sudah dioptimalkan! Ukuran: {size}KB"
+  "resellerImageAlreadySmall": "Logo reseller sudah dioptimalkan! Ukuran: {size}KB",
+  "sharedNoDescription": "Tidak ada deskripsi"
 }

@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Perpardavėjo logotipas suspaustas! Sumažinta nuo {originalSize}KB iki {compressedSize}KB",
   "resellerImageCompressionError": "Nepavyko suspausti paveikslėlį. Bandykite dar kartą.",
   "resellerCompressingImage": "Suspaudžiama...",
-  "resellerImageAlreadySmall": "Perpardavėjo logotipas jau optimizuotas! Dydis: {size}KB"
+  "resellerImageAlreadySmall": "Perpardavėjo logotipas jau optimizuotas! Dydis: {size}KB",
+  "sharedNoDescription": "Nėra aprašymo"
 }

@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "โลโก้ตัวแทนจำหน่ายถูกบีบอัด! ลดจาก {originalSize}KB เป็น {compressedSize}KB",
   "resellerImageCompressionError": "การบีบอัดภาพล้มเหลว กรุณาลองใหม่อีกครั้ง",
   "resellerCompressingImage": "กำลังบีบอัด...",
-  "resellerImageAlreadySmall": "โลโก้ตัวแทนจำหน่ายได้รับการปรับปรุงแล้ว! ขนาด: {size}KB"
+  "resellerImageAlreadySmall": "โลโก้ตัวแทนจำหน่ายได้รับการปรับปรุงแล้ว! ขนาด: {size}KB",
+  "sharedNoDescription": "ไม่มีคำอธิบาย"
 }

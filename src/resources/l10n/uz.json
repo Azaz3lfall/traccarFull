@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Qayta sotuvchi logotipi siqildi! {originalSize}KB dan {compressedSize}KB ga kamaytirildi",
   "resellerImageCompressionError": "Rasmni siqish muvaffaqiyatsiz. Iltimos, qayta urinib ko'ring.",
   "resellerCompressingImage": "Siqilmoqda...",
-  "resellerImageAlreadySmall": "Qayta sotuvchi logotipi allaqachon optimallashtirilgan! O'lchami: {size}KB"
+  "resellerImageAlreadySmall": "Qayta sotuvchi logotipi allaqachon optimallashtirilgan! O'lchami: {size}KB",
+  "sharedNoDescription": "Tavsif yo'q"
 }

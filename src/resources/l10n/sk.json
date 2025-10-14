@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Logo predajcu komprimovaný! Zmenšený z {originalSize}KB na {compressedSize}KB",
   "resellerImageCompressionError": "Nepodarilo sa komprimovať obrázok. Skúste to znovu.",
   "resellerCompressingImage": "Komprimuje sa...",
-  "resellerImageAlreadySmall": "Logo predajcu je už optimalizovaný! Veľkosť: {size}KB"
+  "resellerImageAlreadySmall": "Logo predajcu je už optimalizovaný! Veľkosť: {size}KB",
+  "sharedNoDescription": "Bez popisu"
 }

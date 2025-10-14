@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Συμπιεσμένο λογότυπο αναπωλητή! Μειώθηκε από {originalSize}KB σε {compressedSize}KB",
   "resellerImageCompressionError": "Αποτυχία συμπίεσης εικόνας. Παρακαλώ δοκιμάστε ξανά.",
   "resellerCompressingImage": "Συμπιέζεται...",
-  "resellerImageAlreadySmall": "Το λογότυπο αναπωλητή είναι ήδη βελτιστοποιημένο! Μέγεθος: {size}KB"
+  "resellerImageAlreadySmall": "Το λογότυπο αναπωλητή είναι ήδη βελτιστοποιημένο! Μέγεθος: {size}KB",
+  "sharedNoDescription": "Χωρίς περιγραφή"
 }

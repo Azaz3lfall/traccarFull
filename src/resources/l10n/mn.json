@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Дахин худалдагчийн лого шахагдсан! {originalSize}KB-аас {compressedSize}KB болж бууруулсан",
   "resellerImageCompressionError": "Зураг шахах амжилтгүй болсон. Дахин оролдоно уу.",
   "resellerCompressingImage": "Шахж байна...",
-  "resellerImageAlreadySmall": "Дахин худалдагчийн лого аль хэдийн оновчтой болсон! Хэмжээ: {size}KB"
+  "resellerImageAlreadySmall": "Дахин худалдагчийн лого аль хэдийн оновчтой болсон! Хэмжээ: {size}KB",
+  "sharedNoDescription": "Тайлбар байхгүй"
 }

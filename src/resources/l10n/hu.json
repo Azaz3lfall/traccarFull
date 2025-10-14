@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Viszonteladó logó tömörítve! Csökkentve {originalSize}KB-ról {compressedSize}KB-ra",
   "resellerImageCompressionError": "A kép tömörítése sikertelen. Kérjük, próbálja újra.",
   "resellerCompressingImage": "Tömörítés...",
-  "resellerImageAlreadySmall": "Viszonteladó logó már optimalizált! Méret: {size}KB"
+  "resellerImageAlreadySmall": "Viszonteladó logó már optimalizált! Méret: {size}KB",
+  "sharedNoDescription": "Nincs leírás"
 }

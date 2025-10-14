@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "ரீசெல்லர் லோகோ சுருக்கப்பட்டது! {originalSize}KB-இலிருந்து {compressedSize}KB-க்கு குறைக்கப்பட்டது",
   "resellerImageCompressionError": "படத்தை சுருக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
   "resellerCompressingImage": "சுருக்குகிறது...",
-  "resellerImageAlreadySmall": "ரீசெல்லர் லோகோ ஏற்கனவே மேம்படுத்தப்பட்டுள்ளது! அளவு: {size}KB"
+  "resellerImageAlreadySmall": "ரீசெல்லர் லோகோ ஏற்கனவே மேம்படுத்தப்பட்டுள்ளது! அளவு: {size}KB",
+  "sharedNoDescription": "விளக்கம் இல்லை"
 }

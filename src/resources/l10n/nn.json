@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Forhandlar-logo komprimert! Redusert frå {originalSize}KB til {compressedSize}KB",
   "resellerImageCompressionError": "Kunne ikkje komprimere bilete. Prøv igjen.",
   "resellerCompressingImage": "Komprimerer...",
-  "resellerImageAlreadySmall": "Forhandlar-logo er allereie optimalisert! Storleik: {size}KB"
+  "resellerImageAlreadySmall": "Forhandlar-logo er allereie optimalisert! Storleik: {size}KB",
+  "sharedNoDescription": "Ingen skildring"
 }

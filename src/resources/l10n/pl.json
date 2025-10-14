@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Logo sprzedawcy skompresowany! Zmniejszony z {originalSize}KB do {compressedSize}KB",
   "resellerImageCompressionError": "Nie udało się skompresować obrazu. Spróbuj ponownie.",
   "resellerCompressingImage": "Kompresja...",
-  "resellerImageAlreadySmall": "Logo sprzedawcy jest już zoptymalizowany! Rozmiar: {size}KB"
+  "resellerImageAlreadySmall": "Logo sprzedawcy jest już zoptymalizowany! Rozmiar: {size}KB",
+  "sharedNoDescription": "Brak opisu"
 }

@@ -791,5 +791,6 @@
   "resellerImageCompressedSuccess": "Uudelleenmyyjän logo pakattu! Pienennetty {originalSize}KB:sta {compressedSize}KB:een",
   "resellerImageCompressionError": "Kuvan pakkaaminen epäonnistui. Yritä uudelleen.",
   "resellerCompressingImage": "Pakataan...",
-  "resellerImageAlreadySmall": "Uudelleenmyyjän logo on jo optimoitu! Koko: {size}KB"
+  "resellerImageAlreadySmall": "Uudelleenmyyjän logo on jo optimoitu! Koko: {size}KB",
+  "sharedNoDescription": "Ei kuvausta"
 }

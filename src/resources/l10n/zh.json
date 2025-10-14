@@ -790,5 +790,6 @@
   "resellerImageCompressedSuccess": "经销商标志已压缩！从{originalSize}KB减少到{compressedSize}KB",
   "resellerImageCompressionError": "图像压缩失败。请重试。",
   "resellerCompressingImage": "压缩中...",
-  "resellerImageAlreadySmall": "经销商标志已优化！大小：{size}KB"
+  "resellerImageAlreadySmall": "经销商标志已优化！大小：{size}KB",
+  "sharedNoDescription": "无描述"
 }

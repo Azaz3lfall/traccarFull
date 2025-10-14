@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "Logo do revendedor comprimido! Reducido de {originalSize}KB a {compressedSize}KB",
   "resellerImageCompressionError": "Erro ao comprimir a imaxe. Por favor, téntao de novo.",
   "resellerCompressingImage": "Comprimindo...",
-  "resellerImageAlreadySmall": "Logo do revendedor xa está optimizado! Tamaño: {size}KB"
+  "resellerImageAlreadySmall": "Logo do revendedor xa está optimizado! Tamaño: {size}KB",
+  "sharedNoDescription": "Sen descrición"
 }

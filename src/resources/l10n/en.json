@@ -38,6 +38,7 @@
   "sharedDegreesMinutesSeconds": "Degrees Minutes Seconds",
   "sharedName": "Name",
   "sharedDescription": "Description",
+  "sharedNoDescription": "No description",
   "sharedSearch": "Search",
   "sharedPriority": "Priority",
   "sharedIconScale": "Icon Scale",

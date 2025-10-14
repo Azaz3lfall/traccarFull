@@ -790,5 +790,6 @@
   "resellerImageCompressedSuccess": "Reseller-logo gecomprimeerd! Verkleind van {originalSize}KB naar {compressedSize}KB",
   "resellerImageCompressionError": "Afbeelding comprimeren mislukt. Probeer opnieuw.",
   "resellerCompressingImage": "Comprimeren...",
-  "resellerImageAlreadySmall": "Reseller-logo is al geoptimaliseerd! Grootte: {size}KB"
+  "resellerImageAlreadySmall": "Reseller-logo is al geoptimaliseerd! Grootte: {size}KB",
+  "sharedNoDescription": "Geen beschrijving"
 }

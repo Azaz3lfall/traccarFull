@@ -787,5 +787,6 @@
   "resellerImageCompressedSuccess": "റീസെലർ ലോഗോ കംപ്രസ് ചെയ്തു! {originalSize}KB-ൽ നിന്ന് {compressedSize}KB-ലേക്ക് കുറച്ചു",
   "resellerImageCompressionError": "ചിത്രം കംപ്രസ് ചെയ്യാൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
   "resellerCompressingImage": "കംപ്രസ് ചെയ്യുന്നു...",
-  "resellerImageAlreadySmall": "റീസെലർ ലോഗോ ഇതിനകം ഒപ്റ്റിമൈസ് ചെയ്തിരിക്കുന്നു! വലിപ്പം: {size}KB"
+  "resellerImageAlreadySmall": "റീസെലർ ലോഗോ ഇതിനകം ഒപ്റ്റിമൈസ് ചെയ്തിരിക്കുന്നു! വലിപ്പം: {size}KB",
+  "sharedNoDescription": "വിവരണമില്ല"
 }

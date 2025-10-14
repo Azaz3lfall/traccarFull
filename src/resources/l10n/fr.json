@@ -516,6 +516,7 @@
   "sharedDegreesDecimalMinutes": "Degrés Décimaux Minutes",
   "sharedDegreesMinutesSeconds": "Degrés Minutes Secondes",
   "sharedDescription": "Description",
+  "sharedNoDescription": "Aucune description",
   "sharedDevice": "Appareil",
   "sharedDeviceAccumulators": "Accumulateurs",
   "sharedDisabled": "Désactivé",
