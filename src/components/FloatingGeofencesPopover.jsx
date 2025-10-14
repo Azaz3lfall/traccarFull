@@ -7,12 +7,6 @@ import { useAttributePreference } from '../common/util/preferences';
 import {
   TextField,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
   Menu,
   MenuItem,
@@ -3015,86 +3009,137 @@ const FloatingGeofencesPopover = ({
                 </Typography>
               </div>
             ) : (
-              <TableContainer>
-                <Table>
-                  <TableBody>
-                    {paginatedGeofences.map((geofence) => (
-                      <TableRow 
-                        key={geofence.id} 
-                        hover
-                        onClick={() => handleGeofenceClick(geofence)}
+              <div style={{ padding: '0 8px' }}>
+                {paginatedGeofences.map((geofence) => (
+                  <div
+                    key={geofence.id}
+                    onClick={() => handleGeofenceClick(geofence)}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'auto 1fr auto',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px',
+                      marginBottom: '4px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease',
+                      backgroundColor: 'transparent',
+                      '&:hover': {
+                        backgroundColor: colors.hover
+                      }
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.hover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {/* Column 1: Icon centered */}
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      width: '32px',
+                      height: '32px'
+                    }}>
+                      {geofence.area.startsWith('CIRCLE') ? (
+                        <CircleIcon 
+                          style={{ 
+                            fontSize: '20px', 
+                            color: geofence.attributes?.color || '#3f51b5' 
+                          }} 
+                        />
+                      ) : geofence.area.startsWith('LINESTRING') ? (
+                        <LineIcon 
+                          style={{ 
+                            fontSize: '20px', 
+                            color: geofence.attributes?.color || '#3f51b5' 
+                          }} 
+                        />
+                      ) : geofence.area.startsWith('POLYGON') ? (
+                        <PolygonIcon 
+                          style={{ 
+                            fontSize: '20px', 
+                            color: geofence.attributes?.color || '#3f51b5' 
+                          }} 
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            borderRadius: '50%',
+                            backgroundColor: geofence.attributes?.color || '#3f51b5'
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    {/* Column 2: Name and Description with ellipsis */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '4px',
+                      minWidth: 0, // Important for text truncation
+                      overflow: 'hidden'
+                    }}>
+                      <Typography 
+                        variant="body2" 
                         style={{ 
-                          cursor: 'pointer',
+                          color: colors.text,
+                          fontWeight: '500',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {geofence.name}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        style={{ 
+                          color: colors.textSecondary,
+                          fontSize: '0.875rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {geofence.description || t('sharedNoDescription')}
+                      </Typography>
+                    </div>
+
+                    {/* Column 3: Delete Button */}
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      width: '32px',
+                      height: '32px'
+                    }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(geofence);
+                        }}
+                        style={{
+                          color: colors.textSecondary,
+                          padding: '4px',
                           '&:hover': {
-                            backgroundColor: colors.hover
+                            color: colors.error,
+                            backgroundColor: 'rgba(244, 67, 54, 0.1)'
                           }
                         }}
                       >
-                        <TableCell>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            {geofence.area.startsWith('CIRCLE') ? (
-                              <CircleIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : geofence.area.startsWith('LINESTRING') ? (
-                              <LineIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : geofence.area.startsWith('POLYGON') ? (
-                              <PolygonIcon 
-                                style={{ 
-                                  fontSize: '16px', 
-                                  color: geofence.attributes?.color || '#3f51b5' 
-                                }} 
-                              />
-                            ) : (
-                              <div
-                                style={{
-                                  width: '12px',
-                                  height: '12px',
-                                  borderRadius: '50%',
-                                  backgroundColor: geofence.attributes?.color || '#3f51b5'
-                                }}
-                              />
-                            )}
-                            <Typography variant="body2" style={{ color: colors.text }}>
-                              {geofence.name}
-                            </Typography>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                            {geofence.description || t('sharedNoDescription')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(geofence);
-                            }}
-                            style={{
-                              color: colors.textSecondary,
-                              '&:hover': {
-                                color: colors.error
-                              }
-                            }}
-                          >
-                            <DeleteIcon style={{ fontSize: 16 }} />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                        <DeleteIcon style={{ fontSize: 18 }} />
+                      </IconButton>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
           )}
