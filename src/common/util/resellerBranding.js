@@ -8,14 +8,18 @@ import resellersConfig from '../../config/resellersConfig';
 export const fetchResellerBranding = async () => {
   try {
     const currentDomain = window.location.hostname;
+    console.log('🔍 Fetching reseller branding for domain:', currentDomain);
 
     const response = await fetch(resellersConfig.ENDPOINTS.RESELLER_LOGO(currentDomain));
+    console.log('📡 API response status:', response.status);
 
     if (response.ok) {
       const data = await response.json();
+      console.log('✅ Reseller branding data received:', data);
       return data;
     } else if (response.status === 404) {
       // Domain not found - this is a definitive "no reseller" result
+      console.log('❌ No reseller found for domain:', currentDomain);
       return null;
     } else {
       console.error('❌ Error fetching reseller branding:', response.status, response.statusText);
@@ -32,12 +36,19 @@ export const fetchResellerBranding = async () => {
  * @param {Object} resellerData - Reseller data from API
  */
 export const applyResellerBranding = (resellerData) => {
+  console.log('🔍 applyResellerBranding called with:', resellerData);
+  
   if (!resellerData || !resellerData.success || !resellerData.logo) {
+    console.log('❌ Reseller branding failed - using fallback');
+    console.log('  - resellerData:', !!resellerData);
+    console.log('  - success:', resellerData?.success);
+    console.log('  - logo:', resellerData?.logo);
     applyFallbackBranding();
     return;
   }
 
   const { logo, companyName } = resellerData;
+  console.log('✅ Applying reseller branding:', { logo, companyName });
 
   // Update page title
   if (companyName) {
@@ -54,6 +65,7 @@ export const applyResellerBranding = (resellerData) => {
 
   // Store logo URL for use by components
   window.resellerLogoUrl = logo;
+  console.log('✅ Logo URL stored:', window.resellerLogoUrl);
 
 };
 
