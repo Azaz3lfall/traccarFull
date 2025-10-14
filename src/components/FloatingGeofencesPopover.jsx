@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocalization } from '../common/components/LocalizationProvider';
 import { useAttributePreference } from '../common/util/preferences';
+import maplibregl from 'maplibre-gl';
 import {
   TextField,
   Button,
@@ -855,59 +856,58 @@ const FloatingGeofencesPopover = ({
   };
 
 
-  // Handle geofence click - center map and clear selected device
+  // Handle geofence click - fit map to geofence bounds and clear selected device
   const handleGeofenceClick = (geofence) => {
     // Clear selected device
     dispatch(devicesActions.selectId(null));
     
-    // Center map on geofence if it has area data
+    // Fit map to geofence bounds if it has area data
     if (geofence.area && map && map.loaded()) {
       try {
-        let centerLng, centerLat;
+        let coordinates = [];
         
         // Handle different geofence area types
         if (geofence.area.indexOf('CIRCLE') > -1) {
           // CIRCLE (lat lng, radius) format - convert to [lng, lat] for map
-          const coordinates = geofence.area.replace(/CIRCLE|\(|\)|,/g, ' ').trim().split(/ +/);
-          if (coordinates.length >= 3) {
-            centerLat = Number(coordinates[0]); // First is latitude
-            centerLng = Number(coordinates[1]); // Second is longitude
+          const circleData = geofence.area.replace(/CIRCLE|\(|\)|,/g, ' ').trim().split(/ +/);
+          if (circleData.length >= 3) {
+            const lat = Number(circleData[0]); // First is latitude
+            const lng = Number(circleData[1]); // Second is longitude
+            const radius = Number(circleData[2]); // Third is radius in meters
+            
+            // Create a bounding box around the circle
+            // Approximate conversion: 1 degree ≈ 111,320 meters
+            const latOffset = radius / 111320;
+            const lngOffset = radius / (111320 * Math.cos(lat * Math.PI / 180));
+            
+            coordinates = [
+              [lng - lngOffset, lat - latOffset], // Southwest
+              [lng + lngOffset, lat + latOffset]  // Northeast
+            ];
           }
         } else if (geofence.area.indexOf('LINESTRING') > -1) {
           // LINESTRING (lat1 lng1, lat2 lng2, ...) format - convert to [lng, lat] for map
           const areaMatch = geofence.area.match(/LINESTRING\s*\(([^)]+)\)/);
           if (areaMatch) {
-            const coordinates = areaMatch[1].split(',').map(coord => {
+            coordinates = areaMatch[1].split(',').map(coord => {
               const [lat, lng] = coord.trim().split(' ').map(Number);
               return [lng, lat]; // Convert to [lng, lat] format for map
             });
-            
-            if (coordinates.length > 0) {
-              centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
-              centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-            }
           }
         } else if (geofence.area.indexOf('POLYGON') > -1) {
           // POLYGON ((lat1 lng1, lat2 lng2, ...)) format - convert to [lng, lat] for map
           const areaMatch = geofence.area.match(/POLYGON\s*\(\s*\(([^)]+)\)\s*\)/);
           if (areaMatch) {
-            const coordinates = areaMatch[1].split(',').map(coord => {
+            coordinates = areaMatch[1].split(',').map(coord => {
               const [lat, lng] = coord.trim().split(' ').map(Number);
               return [lng, lat]; // Convert to [lng, lat] format for map
             });
-            
-            if (coordinates.length > 0) {
-              centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
-              centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-            }
           }
         } else {
           // Try to parse using wellknown library for other geometry types
           try {
             const geometry = parse(geofence.area);
             if (geometry && geometry.coordinates) {
-              let coordinates = [];
-              
               if (geometry.type === 'Point') {
                 coordinates = [geometry.coordinates];
               } else if (geometry.type === 'LineString') {
@@ -917,27 +917,32 @@ const FloatingGeofencesPopover = ({
               } else if (geometry.type === 'MultiPolygon') {
                 coordinates = geometry.coordinates[0][0]; // Use first polygon's outer ring
               }
-              
-              if (coordinates.length > 0) {
-                centerLng = coordinates.reduce((sum, coord) => sum + coord[0], 0) / coordinates.length;
-                centerLat = coordinates.reduce((sum, coord) => sum + coord[1], 0) / coordinates.length;
-              }
             }
           } catch (parseError) {
             console.warn('Failed to parse geofence area with wellknown:', parseError);
           }
         }
         
-        // Center map if we have valid coordinates
-        if (centerLng !== undefined && centerLat !== undefined) {
-          map.easeTo({
-            center: [centerLng, centerLat],
-            zoom: Math.max(map.getZoom(), 15),
-            duration: 1000
+        // Fit map to geofence bounds if we have valid coordinates
+        if (coordinates.length > 0) {
+          // Calculate bounds from coordinates
+          const bounds = coordinates.reduce((bounds, coord) => {
+            return bounds.extend(coord);
+          }, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
+          
+          // Get canvas dimensions for padding calculation
+          const canvas = map.getCanvas();
+          const padding = Math.min(canvas.width, canvas.height) * 0.1; // 10% padding
+          
+          // Fit bounds with smooth animation
+          map.fitBounds(bounds, {
+            padding: padding,
+            duration: 1000,
+            maxZoom: 18 // Prevent zooming too close
           });
         }
       } catch (error) {
-        console.error('Error centering map on geofence:', error);
+        console.error('Error fitting map to geofence bounds:', error);
       }
     }
   };
