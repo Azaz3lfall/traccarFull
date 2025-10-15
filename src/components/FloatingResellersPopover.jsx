@@ -135,6 +135,7 @@ const FloatingResellersPopover = ({
   const [buildStates, setBuildStates] = useState({});
   const [buildStatusModal, setBuildStatusModal] = useState({ open: false, reseller: null, buildType: null });
   const [cleanAppsModal, setCleanAppsModal] = useState({ open: false, reseller: null });
+  const [iosBuildTypeModal, setIosBuildTypeModal] = useState({ open: false, reseller: null });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
 
@@ -246,7 +247,12 @@ const FloatingResellersPopover = ({
     
     // Handle different states
     if (currentState === 'NOT_BUILDED') {
-      // Start new build
+      // For iOS, show build type selection modal
+      if (buildType === 'ios') {
+        setIosBuildTypeModal({ open: true, reseller });
+        return;
+      }
+      // Start new build for other types
       await startBuild(reseller, buildType);
     } else if (currentState === 'BUILDING') {
       // Show status modal
@@ -266,6 +272,12 @@ const FloatingResellersPopover = ({
       // Download the file
       await downloadBuild(reseller, buildType);
     }
+  };
+
+  // Handle iOS build type selection
+  const handleIosBuildType = async (reseller, iosBuildType) => {
+    setIosBuildTypeModal({ open: false, reseller: null });
+    await startBuild(reseller, `ios_${iosBuildType}`);
   };
 
   // Start a new build
@@ -3190,6 +3202,181 @@ const FloatingResellersPopover = ({
                   {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning All...' : 'Clean All (APK, AAB & iOS)'}
                 </button>
           </div>
+            </div>
+          </motion.div>
+        </motion.div>
+    )}
+    </AnimatePresence>
+
+    {/* iOS Build Type Selection Modal */}
+    <AnimatePresence>
+    {iosBuildTypeModal.open && (
+        <motion.div
+          key="ios-build-type-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 10006,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setIosBuildTypeModal({ open: false, reseller: null })}
+        >
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '12px',
+              border: `1px solid ${colors.border}`,
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <button
+                  onClick={() => setIosBuildTypeModal({ open: false, reseller: null })}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: colors.text,
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <ChevronLeftIcon style={{ fontSize: '24px' }} />
+                </button>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600' }}>
+                  iOS Build Type
+                </Typography>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              <Typography variant="body1" style={{ color: colors.text, marginBottom: '24px', textAlign: 'center' }}>
+                Choose the iOS build type for <strong>{iosBuildTypeModal.reseller?.companyName}</strong>
+              </Typography>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Simulator Build */}
+                <button
+                  onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'simulator')}
+                  style={{
+                    border: `2px solid ${colors.primary}`,
+                    color: colors.text,
+                    backgroundColor: colors.surface,
+                    padding: '20px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.primary + '20';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = colors.surface;
+                  }}
+                >
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    backgroundColor: colors.primary + '20',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <AppleIcon style={{ fontSize: '24px', color: colors.primary }} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>iOS Simulator</div>
+                    <div style={{ fontSize: '14px', opacity: 0.8 }}>
+                      For testing on iOS Simulator (x86_64/arm64)
+                    </div>
+                  </div>
+                </button>
+
+                {/* Physical Device Build */}
+                <button
+                  onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'device')}
+                  style={{
+                    border: `2px solid ${colors.primary}`,
+                    color: colors.text,
+                    backgroundColor: colors.surface,
+                    padding: '20px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.primary + '20';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = colors.surface;
+                  }}
+                >
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    backgroundColor: colors.primary + '20',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <SmartphoneIcon style={{ fontSize: '24px', color: colors.primary }} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>Physical Device</div>
+                    <div style={{ fontSize: '14px', opacity: 0.8 }}>
+                      For installation on real iOS devices (arm64)
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>

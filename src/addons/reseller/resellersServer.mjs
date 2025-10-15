@@ -1557,8 +1557,17 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       console.log('📦 Building AAB...');
       await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ AAB build completed');
-    } else if (buildType === 'ios') {
+    } else if (buildType === 'ios_simulator') {
       console.log('🍎 Building iOS for Simulator...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign --simulator`, { timeout: 2400000 }); // 40 minutes
+      console.log('✅ iOS Simulator build completed');
+    } else if (buildType === 'ios_device') {
+      console.log('🍎 Building iOS for Physical Device...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 }); // 40 minutes
+      console.log('✅ iOS Device build completed');
+    } else if (buildType === 'ios') {
+      // Default to simulator for backward compatibility
+      console.log('🍎 Building iOS for Simulator (default)...');
       await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign --simulator`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ iOS build completed');
     } else {
@@ -1601,8 +1610,17 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       }
     }
     
-    if (buildType === 'ios' || buildType === 'both') {
-      const iosSourcePath = path.join(resellerDirPath, 'build/ios/iphoneos/Runner.app');
+    if (buildType === 'ios' || buildType === 'ios_simulator' || buildType === 'ios_device' || buildType === 'both') {
+      // Determine the correct source path based on build type
+      let iosSourcePath;
+      if (buildType === 'ios_simulator' || buildType === 'ios') {
+        // Simulator builds go to iphonesimulator directory
+        iosSourcePath = path.join(resellerDirPath, 'build/ios/iphonesimulator/Runner.app');
+      } else {
+        // Device builds go to iphoneos directory
+        iosSourcePath = path.join(resellerDirPath, 'build/ios/iphoneos/Runner.app');
+      }
+      
       const iosTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.app`);
       
       if (fs.existsSync(iosSourcePath)) {
@@ -2166,7 +2184,7 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     } else if (buildType === 'aab' && aabExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
-    } else if (buildType === 'ios' && iosExists) {
+    } else if ((buildType === 'ios' || buildType === 'ios_simulator' || buildType === 'ios_device') && iosExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
     } else if (buildType === 'both' && apkExists && aabExists) {
@@ -2232,16 +2250,16 @@ app.get('/api/resellers/download', async (req, res) => {
     }
 
     // Validate buildType
-    if (!['apk', 'aab', 'ios'].includes(buildType)) {
+    if (!['apk', 'aab', 'ios', 'ios_simulator', 'ios_device'].includes(buildType)) {
       return res.status(400).json({
         error: 'Invalid build type',
-        message: 'buildType must be either "apk", "aab", or "ios"'
+        message: 'buildType must be either "apk", "aab", "ios", "ios_simulator", or "ios_device"'
       });
     }
 
     // Construct the expected filename
     let filename;
-    if (buildType === 'ios') {
+    if (buildType === 'ios' || buildType === 'ios_simulator' || buildType === 'ios_device') {
       filename = `${appUrl}.app`;
     } else {
       filename = `${appUrl}.${buildType}`;
@@ -2260,7 +2278,7 @@ app.get('/api/resellers/download', async (req, res) => {
     }
 
     // Handle iOS app bundle differently (it's a directory, needs to be zipped)
-    if (buildType === 'ios') {
+    if (buildType === 'ios' || buildType === 'ios_simulator' || buildType === 'ios_device') {
       const zipFilename = `${appUrl}.app.zip`;
       const zipPath = path.join(DATA_DIR, zipFilename);
       
