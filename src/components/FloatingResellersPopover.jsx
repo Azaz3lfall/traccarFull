@@ -374,8 +374,13 @@ const FloatingResellersPopover = ({
         body: JSON.stringify(requestBody)
       });
 
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response ok:', response.ok);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Response error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const result = await response.json();
@@ -1232,7 +1237,10 @@ const FloatingResellersPopover = ({
       key: 'clean-apps',
       title: 'Clean Apps',
       icon: <DeleteIcon fontSize="small" />,
-      handler: (reseller) => setCleanAppsModal({ open: true, reseller }),
+      handler: (reseller) => {
+        setCleanAppsModal({ open: true, reseller });
+        setAnchorEl(null); // Close the action menu
+      },
       show: (reseller) => canEditReseller(reseller),
     },
     {
@@ -2836,8 +2844,17 @@ const FloatingResellersPopover = ({
           style: { zIndex: 10003 }
         }}
       >
-        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
-          Clean Apps - {cleanAppsModal.reseller?.companyName}
+        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <IconButton
+              onClick={() => setCleanAppsModal({ open: false, reseller: null })}
+              size="small"
+              style={{ color: colors.textSecondary }}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+            <span>Clean Apps - {cleanAppsModal.reseller?.companyName}</span>
+          </div>
         </DialogTitle>
         <DialogContent style={{ padding: '24px' }}>
           <Typography variant="body1" style={{ marginBottom: '24px', color: colors.text }}>
@@ -2888,14 +2905,6 @@ const FloatingResellersPopover = ({
             </Button>
           </div>
         </DialogContent>
-        <DialogActions style={{ padding: '16px 24px', borderTop: `1px solid ${colors.border}` }}>
-          <Button
-            onClick={() => setCleanAppsModal({ open: false, reseller: null })}
-            style={{ color: colors.text }}
-          >
-            Cancel
-          </Button>
-        </DialogActions>
       </Dialog>
     )}
     </>
