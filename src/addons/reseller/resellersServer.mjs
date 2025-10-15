@@ -2259,38 +2259,88 @@ app.get('/api/resellers/download', async (req, res) => {
       });
     }
 
-    // Get file stats
-    const stats = fs.statSync(filePath);
-    console.log('✅ File found:', { filename, size: stats.size });
-
-    // Set appropriate headers for download
-    let contentType = 'application/octet-stream';
-    if (buildType === 'apk') {
-      contentType = 'application/vnd.android.package-archive';
-    } else if (buildType === 'aab') {
-      contentType = 'application/octet-stream';
-    } else if (buildType === 'ios') {
-      contentType = 'application/octet-stream'; // iOS app bundle
-    }
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', stats.size);
-
-    // Stream the file to the client
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    fileStream.on('error', (error) => {
-      console.error('❌ Error streaming file:', error);
-      if (!res.headersSent) {
-        res.status(500).json({
-          error: 'File streaming error',
-          message: error.message
-        });
+    // Handle iOS app bundle differently (it's a directory, needs to be zipped)
+    if (buildType === 'ios') {
+      const zipFilename = `${appUrl}.app.zip`;
+      const zipPath = path.join(DATA_DIR, zipFilename);
+      
+      // Check if zip already exists
+      if (!fs.existsSync(zipPath)) {
+        console.log('📦 Creating zip for iOS app bundle...');
+        try {
+          await new Promise((resolve, reject) => {
+            exec(`cd "${DATA_DIR}" && zip -r "${zipFilename}" "${filename}"`, (error, stdout, stderr) => {
+              if (error) {
+                console.error('❌ Error creating zip:', error);
+                reject(error);
+              } else {
+                console.log('✅ iOS app bundle zipped successfully');
+                resolve();
+              }
+            });
+          });
+        } catch (error) {
+          console.error('❌ Failed to create zip:', error);
+          return res.status(500).json({
+            error: 'Failed to create zip',
+            message: 'Could not create zip file for iOS app bundle'
+          });
+        }
       }
-    });
+      
+      // Update file path and filename for zip
+      const zipStats = fs.statSync(zipPath);
+      console.log('✅ Zip file found:', { filename: zipFilename, size: zipStats.size });
+      
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+      res.setHeader('Content-Length', zipStats.size);
+      
+      // Stream the zip file to the client
+      const fileStream = fs.createReadStream(zipPath);
+      fileStream.pipe(res);
+      
+      fileStream.on('error', (error) => {
+        console.error('❌ Error streaming iOS zip file:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            error: 'File streaming error',
+            message: error.message
+          });
+        }
+      });
+    } else {
+      // Handle regular files (APK, AAB)
+      const stats = fs.statSync(filePath);
+      console.log('✅ File found:', { filename, size: stats.size });
 
-    console.log('📤 File download started:', filename);
+      // Set appropriate headers for download
+      let contentType = 'application/octet-stream';
+      if (buildType === 'apk') {
+        contentType = 'application/vnd.android.package-archive';
+      } else if (buildType === 'aab') {
+        contentType = 'application/octet-stream';
+      }
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', stats.size);
+
+      // Stream the file to the client
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+      fileStream.on('error', (error) => {
+        console.error('❌ Error streaming file:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            error: 'File streaming error',
+            message: error.message
+          });
+        }
+      });
+    }
+
+    console.log('📤 File download started:', buildType === 'ios' ? `${appUrl}.app.zip` : filename);
 
   } catch (error) {
     console.error('❌ Error handling download request:', error);
