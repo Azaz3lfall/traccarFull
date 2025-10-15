@@ -361,10 +361,12 @@ const FloatingResellersPopover = ({
       console.log('🔍 Reseller keys:', Object.keys(reseller));
       console.log('🔍 Reseller appUrl:', reseller.appUrl);
       console.log('🔍 Reseller id:', reseller.id);
+      console.log('🔍 Reseller resellerId:', reseller.resellerId);
+      console.log('🔍 Reseller parentUserId:', reseller.parentUserId);
       
       const requestBody = {
         appUrl: reseller.appUrl,
-        resellerId: reseller.id, // Use reseller.id instead of reseller.resellerId
+        resellerId: reseller.resellerId, // Use reseller.resellerId (not reseller.id)
         cleanType: cleanType
       };
       console.log('📤 Request body:', requestBody);
@@ -390,8 +392,8 @@ const FloatingResellersPopover = ({
       console.log('✅ Clean apps result:', result);
 
       // Reset build states in localStorage
-      const buildKey = `${reseller.id}_apk`;
-      const buildKeyAab = `${reseller.id}_aab`;
+      const buildKey = `${reseller.resellerId}_apk`;
+      const buildKeyAab = `${reseller.resellerId}_aab`;
       console.log('🔑 Build keys to reset:', { buildKey, buildKeyAab, cleanType });
       
       setBuildStates(prev => {
