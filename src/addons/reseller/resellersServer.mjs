@@ -1557,8 +1557,12 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       console.log('📦 Building AAB...');
       await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ AAB build completed');
+    } else if (buildType === 'ios') {
+      console.log('🍎 Building iOS...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 }); // 40 minutes
+      console.log('✅ iOS build completed');
     } else {
-      // Build both if no specific type requested
+      // Build all if no specific type requested
       console.log('📱 Building APK...');
       await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 });
       console.log('✅ APK build completed');
@@ -1566,6 +1570,10 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       console.log('📦 Building AAB...');
       await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 });
       console.log('✅ AAB build completed');
+
+      console.log('🍎 Building iOS...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 });
+      console.log('✅ iOS build completed');
     }
 
     // Rename output files based on what was built
@@ -1590,6 +1598,28 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
         console.log('✅ AAB renamed to:', aabTargetPath);
       } else {
         console.log('❌ AAB file not found after build');
+      }
+    }
+    
+    if (buildType === 'ios' || buildType === 'both') {
+      const iosSourcePath = path.join(resellerDirPath, 'build/ios/iphoneos/Runner.app');
+      const iosTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.app`);
+      
+      if (fs.existsSync(iosSourcePath)) {
+        // Copy the entire .app bundle
+        await new Promise((resolve, reject) => {
+          exec(`cp -r "${iosSourcePath}" "${iosTargetPath}"`, (error, stdout, stderr) => {
+            if (error) {
+              console.error('❌ Error copying iOS app:', error);
+              reject(error);
+            } else {
+              console.log('✅ iOS app copied to:', iosTargetPath);
+              resolve();
+            }
+          });
+        });
+      } else {
+        console.log('❌ iOS app not found after build');
       }
     }
 
@@ -1856,8 +1886,22 @@ app.post('/api/resellers/build', async (req, res) => {
     // Remove existing reseller directory if it exists
     if (fs.existsSync(resellerDirPath)) {
       console.log('🗑️ Removing existing directory...');
-      fs.rmSync(resellerDirPath, { recursive: true, force: true });
-      console.log('✅ Directory removed successfully');
+      try {
+        await new Promise((resolve, reject) => {
+          exec(`rm -rf "${resellerDirPath}"`, (error, stdout, stderr) => {
+            if (error) {
+              console.error('❌ Error removing directory:', error);
+              reject(error);
+            } else {
+              console.log('✅ Directory removed successfully');
+              resolve();
+            }
+          });
+        });
+      } catch (error) {
+        console.error('❌ Failed to remove directory:', error);
+        throw error;
+      }
     }
 
     // Get build type from request body (default to 'apk')
@@ -1880,30 +1924,30 @@ app.post('/api/resellers/build', async (req, res) => {
     // Run the build process asynchronously
     (async () => {
       try {
-        // Copy source code to reseller directory
-        console.log('📋 Copying source code...');
-        await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
-        console.log('✅ Source code copied successfully');
+    // Copy source code to reseller directory
+    console.log('📋 Copying source code...');
+    await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
+    console.log('✅ Source code copied successfully');
 
-        // Update app configuration files
-        console.log('⚙️ Updating app configuration...');
-        
-        // Update pubspec.yaml (keep original package name for Firebase compatibility)
-        const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
-        if (fs.existsSync(pubspecPath)) {
-          let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
-          // Only update description, keep original package name for Firebase
-          pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
-          fs.writeFileSync(pubspecPath, pubspecContent);
-          console.log('✅ pubspec.yaml updated (description only)');
-        }
+    // Update app configuration files
+    console.log('⚙️ Updating app configuration...');
+    
+    // Update pubspec.yaml (keep original package name for Firebase compatibility)
+    const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
+    if (fs.existsSync(pubspecPath)) {
+      let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
+      // Only update description, keep original package name for Firebase
+      pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
+      fs.writeFileSync(pubspecPath, pubspecContent);
+      console.log('✅ pubspec.yaml updated (description only)');
+    }
 
-        // Update Android app configuration (keep original package name for Firebase)
-        const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
-        if (fs.existsSync(androidManifestPath)) {
-          let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
-          // Only update display label, keep original package name for Firebase
-          manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
+    // Update Android app configuration (keep original package name for Firebase)
+    const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
+    if (fs.existsSync(androidManifestPath)) {
+      let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
+      // Only update display label, keep original package name for Firebase
+      manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
           
           // Update notification icon to use PNG instead of vector drawable
           manifestContent = manifestContent.replace(
@@ -1911,35 +1955,35 @@ app.post('/api/resellers/build', async (req, res) => {
             'android:resource="@drawable/ic_stat_notify"'
           );
           
-          fs.writeFileSync(androidManifestPath, manifestContent);
+      fs.writeFileSync(androidManifestPath, manifestContent);
           console.log('✅ AndroidManifest.xml updated (display name and PNG icons)');
-        }
+    }
 
-        // Update iOS app configuration
-        const iosInfoPlistPath = path.join(resellerDirPath, 'ios/Runner/Info.plist');
-        if (fs.existsSync(iosInfoPlistPath)) {
-          let plistContent = fs.readFileSync(iosInfoPlistPath, 'utf8');
-          plistContent = plistContent.replace(/<key>CFBundleDisplayName<\/key>\s*<string>.*?<\/string>/, 
-            `<key>CFBundleDisplayName</key>\n\t<string>${resellerData.companyName}</string>`);
-          plistContent = plistContent.replace(/<key>CFBundleName<\/key>\s*<string>.*?<\/string>/, 
-            `<key>CFBundleName</key>\n\t<string>${resellerData.companyName}</string>`);
-          fs.writeFileSync(iosInfoPlistPath, plistContent);
-          console.log('✅ iOS Info.plist updated');
-        }
+    // Update iOS app configuration
+    const iosInfoPlistPath = path.join(resellerDirPath, 'ios/Runner/Info.plist');
+    if (fs.existsSync(iosInfoPlistPath)) {
+      let plistContent = fs.readFileSync(iosInfoPlistPath, 'utf8');
+      plistContent = plistContent.replace(/<key>CFBundleDisplayName<\/key>\s*<string>.*?<\/string>/, 
+        `<key>CFBundleDisplayName</key>\n\t<string>${resellerData.companyName}</string>`);
+      plistContent = plistContent.replace(/<key>CFBundleName<\/key>\s*<string>.*?<\/string>/, 
+        `<key>CFBundleName</key>\n\t<string>${resellerData.companyName}</string>`);
+      fs.writeFileSync(iosInfoPlistPath, plistContent);
+      console.log('✅ iOS Info.plist updated');
+    }
 
-        // Update branding configuration (keep original package name for Firebase)
-        const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
-        if (fs.existsSync(brandDartPath)) {
-          let brandContent = fs.readFileSync(brandDartPath, 'utf8');
-          // Only update app name and URL, keep original package ID for Firebase
-          brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
-          brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
+    // Update branding configuration (keep original package name for Firebase)
+    const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
+    if (fs.existsSync(brandDartPath)) {
+      let brandContent = fs.readFileSync(brandDartPath, 'utf8');
+      // Only update app name and URL, keep original package ID for Firebase
+      brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
+      brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
           // Also update the RegExp pattern to match the reseller URL
           brandContent = brandContent.replace(
             /RegExp\(r'https:\/\/demo\.traccar\.org'\)/,
             `RegExp(r'https://${resellerData.appUrl}')`
           );
-          fs.writeFileSync(brandDartPath, brandContent);
+      fs.writeFileSync(brandDartPath, brandContent);
           console.log('✅ brand.dart updated (app name, URL, and RegExp pattern)');
         }
 
@@ -1967,28 +2011,28 @@ app.post('/api/resellers/build', async (req, res) => {
           );
           fs.writeFileSync(icLauncherXmlPath, launcherXmlContent);
           console.log('✅ ic_launcher.xml updated to use PNG foreground');
-        }
+    }
 
-        // Note: google-services.json is already in source code, no need to copy
-        console.log('✅ Using existing google-services.json from source code');
+    // Note: google-services.json is already in source code, no need to copy
+    console.log('✅ Using existing google-services.json from source code');
 
-        // Get complete reseller data from JSON file to access all image fields
-        const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
-        let completeResellerData = resellerData;
-        
-        if (fs.existsSync(resellerFilePath)) {
-          try {
-            const fileContent = fs.readFileSync(resellerFilePath, 'utf8');
-            completeResellerData = JSON.parse(fileContent);
-            console.log('✅ Loaded complete reseller data from JSON file');
-          } catch (error) {
-            console.error('⚠️ Error loading reseller data from JSON file:', error);
-          }
-        }
+    // Get complete reseller data from JSON file to access all image fields
+    const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
+    let completeResellerData = resellerData;
+    
+    if (fs.existsSync(resellerFilePath)) {
+      try {
+        const fileContent = fs.readFileSync(resellerFilePath, 'utf8');
+        completeResellerData = JSON.parse(fileContent);
+        console.log('✅ Loaded complete reseller data from JSON file');
+      } catch (error) {
+        console.error('⚠️ Error loading reseller data from JSON file:', error);
+      }
+    }
 
-        // Copy and replace mobile app images (appImage and notificationIcon)
-        await copyAppImages(resellerDirPath, completeResellerData);
-        
+    // Copy and replace mobile app images (appImage and notificationIcon)
+    await copyAppImages(resellerDirPath, completeResellerData);
+
         // Start Flutter build process
         await buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType);
       } catch (error) {
@@ -2061,25 +2105,28 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     const buildDir = path.join(resellerDirPath, 'build');
     const apkPath = path.join(DATA_DIR, `${appUrl}.apk`);
     const aabPath = path.join(DATA_DIR, `${appUrl}.aab`);
+    const iosPath = path.join(DATA_DIR, `${appUrl}.app`);
     
     // Check build status
     const resellerDirExists = fs.existsSync(resellerDirPath);
     const buildDirExists = fs.existsSync(buildDir);
     const apkExists = fs.existsSync(apkPath);
     const aabExists = fs.existsSync(aabPath);
+    const iosExists = fs.existsSync(iosPath);
     
     console.log(`🔍 Build status check for ${appUrl}:`);
     console.log(`📁 Reseller dir exists: ${resellerDirExists}`);
     console.log(`📁 Build dir exists: ${buildDirExists}`);
     console.log(`📁 APK exists: ${apkExists} at ${apkPath}`);
     console.log(`📁 AAB exists: ${aabExists} at ${aabPath}`);
+    console.log(`📁 iOS exists: ${iosExists} at ${iosPath}`);
     
     // Determine build status based on buildType and file existence
     let buildStatus = 'NOT_BUILDED';
     let buildComplete = false;
     
     // If reseller directory exists but no build files yet, it's building
-    if (resellerDirExists && !apkExists && !aabExists) {
+    if (resellerDirExists && !apkExists && !aabExists && !iosExists) {
       buildStatus = 'BUILDING';
       console.log(`🔨 Status: BUILDING (reseller dir exists, no build files yet)`);
     } else if (buildDirExists) {
@@ -2091,18 +2138,22 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     } else if (buildType === 'aab' && aabExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
+    } else if (buildType === 'ios' && iosExists) {
+      buildStatus = 'BUILDED';
+      buildComplete = true;
     } else if (buildType === 'both' && apkExists && aabExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
     } else if (buildType === 'both' && (apkExists || aabExists)) {
       buildStatus = 'PARTIAL_BUILDED';
-    } else if (!isBuilding && !apkExists && !aabExists) {
+    } else if (!apkExists && !aabExists && !iosExists) {
       buildStatus = 'NOT_BUILDED';
     }
     
     // Get file sizes if they exist
     const apkSize = apkExists ? fs.statSync(apkPath).size : 0;
     const aabSize = aabExists ? fs.statSync(aabPath).size : 0;
+    const iosSize = iosExists ? fs.statSync(iosPath).size : 0;
     
     res.json({
       success: true,
@@ -2115,10 +2166,13 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
         buildStatus,
         apkExists,
         aabExists,
+        iosExists,
         apkSize,
         aabSize,
+        iosSize,
         apkPath: apkExists ? apkPath : null,
         aabPath: aabExists ? aabPath : null,
+        iosPath: iosExists ? iosPath : null,
         resellerDir: resellerDirName
       },
       timestamp: new Date().toISOString()
@@ -2150,10 +2204,10 @@ app.get('/api/resellers/download', async (req, res) => {
     }
 
     // Validate buildType
-    if (!['apk', 'aab'].includes(buildType)) {
+    if (!['apk', 'aab', 'ios'].includes(buildType)) {
       return res.status(400).json({
         error: 'Invalid build type',
-        message: 'buildType must be either "apk" or "aab"'
+        message: 'buildType must be either "apk", "aab", or "ios"'
       });
     }
 
@@ -2177,7 +2231,15 @@ app.get('/api/resellers/download', async (req, res) => {
     console.log('✅ File found:', { filename, size: stats.size });
 
     // Set appropriate headers for download
-    res.setHeader('Content-Type', buildType === 'apk' ? 'application/vnd.android.package-archive' : 'application/octet-stream');
+    let contentType = 'application/octet-stream';
+    if (buildType === 'apk') {
+      contentType = 'application/vnd.android.package-archive';
+    } else if (buildType === 'aab') {
+      contentType = 'application/octet-stream';
+    } else if (buildType === 'ios') {
+      contentType = 'application/octet-stream'; // iOS app bundle
+    }
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Length', stats.size);
 
@@ -2221,10 +2283,10 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
       });
     }
 
-    if (!['apk', 'aab', 'both'].includes(cleanType)) {
+    if (!['apk', 'aab', 'ios', 'both'].includes(cleanType)) {
       return res.status(400).json({
         error: 'Bad request',
-        message: 'cleanType must be apk, aab, or both',
+        message: 'cleanType must be apk, aab, ios, or both',
         timestamp: new Date().toISOString()
       });
     }
@@ -2264,7 +2326,32 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
       }
     }
 
-    // Clean source code directory if both are being cleaned
+    // Clean iOS files
+    if (cleanType === 'ios' || cleanType === 'both') {
+      const iosPath = path.join(DATA_DIR, `${appUrl}.app`);
+      if (fs.existsSync(iosPath)) {
+        try {
+          // Use rm -rf for iOS app bundle (it's a directory)
+          await new Promise((resolve, reject) => {
+            exec(`rm -rf "${iosPath}"`, (error, stdout, stderr) => {
+              if (error) {
+                console.error('❌ Error deleting iOS app:', error);
+                reject(error);
+              } else {
+                console.log(`✅ Deleted iOS app: ${iosPath}`);
+                resolve();
+              }
+            });
+          });
+          cleanedFiles.push('iOS');
+        } catch (error) {
+          errors.push(`Failed to delete iOS app: ${error.message}`);
+          console.error(`❌ Error deleting iOS app:`, error);
+        }
+      }
+    }
+
+    // Clean source code directory if all are being cleaned
     if (cleanType === 'both') {
       const sourceDirPattern = `reseller_*_${appUrl}_*_${resellerId}`;
       const files = fs.readdirSync(DATA_DIR);

@@ -3268,6 +3268,9 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
               <Typography variant="body2" style={{ color: colors.textSecondary }}>
                 AAB Size: {statusData.aabSize ? `${(statusData.aabSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
               </Typography>
+              <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                iOS Size: {statusData.iosSize ? `${(statusData.iosSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
+              </Typography>
             </div>
           )}
           <Button
