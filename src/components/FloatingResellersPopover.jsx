@@ -18,24 +18,12 @@ import {
   Typography,
   InputAdornment,
   CircularProgress,
-  Pagination,
   Tabs,
   Tab,
   Box,
-  Chip,
-  FormControl,
-  InputLabel,
-  Select,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
   Alert,
   Snackbar,
   Autocomplete,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -43,6 +31,7 @@ import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  Refresh as RefreshIcon,
   ChevronLeft as ChevronLeftIcon,
   Folder as FolderIcon,
   Business as BusinessIcon,
@@ -2931,115 +2920,251 @@ const FloatingResellersPopover = ({
       </Snackbar>
 
       {/* Build Status Modal */}
-      {buildStatusModal.open && (
-        <Dialog
-          open={buildStatusModal.open}
-          onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
-          maxWidth="sm"
-          fullWidth
-          style={{ zIndex: 10005 }}
-          PaperProps={{ style: { zIndex: 10005 } }}
-        >
-        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
-          Build Status - {buildStatusModal.reseller?.companyName}
-        </DialogTitle>
-        <DialogContent style={{ padding: '24px' }}>
-          {buildStatusModal.reseller && buildStatusModal.buildType && (
-            <BuildStatusContent
-              reseller={buildStatusModal.reseller}
-              buildType={buildStatusModal.buildType}
-              getBuildState={getBuildState}
-              checkBuildStatus={checkBuildStatus}
-              updateBuildState={updateBuildState}
-              onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
-              onRetry={async () => {
-                await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
+      <AnimatePresence>
+        {buildStatusModal.open && (
+          <motion.div
+            key="build-status-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 10005,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }}
+            onClick={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+          >
+            <motion.div
+              initial={{ y: -100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -100, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '12px',
+                border: `1px solid ${colors.border}`,
+                maxWidth: '500px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'hidden',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
               }}
-              colors={colors}
-              resellersConfig={resellersConfig}
-            />
-          )}
-        </DialogContent>
-        </Dialog>
-      )}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '20px 24px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <h3 style={{
+                  margin: 0,
+                  color: colors.text,
+                  fontSize: '18px',
+                  fontWeight: '600'
+                }}>
+                  Build Status - {buildStatusModal.reseller?.companyName}
+                </h3>
+                <button
+                  onClick={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: colors.textSecondary,
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '24px' }}>
+                {buildStatusModal.reseller && buildStatusModal.buildType && (
+                  <BuildStatusContent
+                    reseller={buildStatusModal.reseller}
+                    buildType={buildStatusModal.buildType}
+                    getBuildState={getBuildState}
+                    checkBuildStatus={checkBuildStatus}
+                    updateBuildState={updateBuildState}
+                    onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+                    onRetry={async () => {
+                      await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
+                    }}
+                    colors={colors}
+                    resellersConfig={resellersConfig}
+                  />
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </AnimatePresence>
 
-    {/* Clean Apps Modal - Outside AnimatePresence to avoid key conflicts */}
-    {cleanAppsModal.open && (
-      <Dialog
-        open={cleanAppsModal.open}
-        onClose={() => setCleanAppsModal({ open: false, reseller: null })}
-        maxWidth="sm"
-        fullWidth
-        style={{ zIndex: 10003 }}
-        PaperProps={{
-          style: { zIndex: 10003 }
-        }}
-      >
-        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <IconButton
-              onClick={() => setCleanAppsModal({ open: false, reseller: null })}
-              size="small"
-              style={{ color: colors.textSecondary }}
-            >
-              <ChevronLeftIcon />
-            </IconButton>
-            <span>Clean Apps - {cleanAppsModal.reseller?.companyName}</span>
-          </div>
-        </DialogTitle>
-        <DialogContent style={{ padding: '24px' }}>
-          <Typography variant="body1" style={{ marginBottom: '24px', color: colors.text }}>
-            Select which apps you want to clean for this reseller:
-          </Typography>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Button
-              variant="outlined"
-              onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
-              style={{ 
-                borderColor: colors.border, 
-                color: colors.text,
-                justifyContent: 'flex-start',
-                padding: '12px 16px'
-              }}
-              startIcon={<BsAndroid size={20} />}
-            >
-              Clean APK Only
-            </Button>
-            
-            <Button
-              variant="outlined"
-              onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
-              style={{ 
-                borderColor: colors.border, 
-                color: colors.text,
-                justifyContent: 'flex-start',
-                padding: '12px 16px'
-              }}
-              startIcon={<BsGooglePlay size={20} />}
-            >
-              Clean AAB Only
-            </Button>
-            
-            <Button
-              variant="outlined"
-              onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
-              style={{ 
-                borderColor: colors.error, 
-                color: colors.error,
-                justifyContent: 'flex-start',
-                padding: '12px 16px'
-              }}
-              startIcon={<DeleteIcon />}
-            >
-              Clean Both APK & AAB
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    )}
+    {/* Clean Apps Modal */}
+    <AnimatePresence>
+      {cleanAppsModal.open && (
+        <motion.div
+          key="clean-apps-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 10003,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setCleanAppsModal({ open: false, reseller: null })}
+        >
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '12px',
+              border: `1px solid ${colors.border}`,
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <button
+                  onClick={() => setCleanAppsModal({ open: false, reseller: null })}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: colors.textSecondary,
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  ‹
+                </button>
+                <span style={{ color: colors.text, fontSize: '18px', fontWeight: '600' }}>
+                  Clean Apps - {cleanAppsModal.reseller?.companyName}
+                </span>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              <div style={{ marginBottom: '24px', color: colors.text, fontSize: '16px' }}>
+                Select which apps you want to clean for this reseller:
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button
+                  onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
+                    color: colors.text,
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  <BsAndroid size={20} />
+                  Clean APK Only
+                </button>
+                
+                <button
+                  onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
+                    color: colors.text,
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  <BsGooglePlay size={20} />
+                  Clean AAB Only
+                </button>
+                
+                <button
+                  onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
+                    color: colors.text,
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  <RefreshIcon />
+                  Clean Both APK & AAB
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
     </>
   );
 };
