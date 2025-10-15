@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
+import getBuildStatusManager from '../utils/simpleBuildStatusManager';
 import {
   TextField,
   Button,
@@ -149,34 +150,90 @@ const FloatingResellersPopover = ({
 
   // Load build states from localStorage on component mount
   useEffect(() => {
-    const savedStates = localStorage.getItem('resellerBuildStates');
-    if (savedStates) {
+    const loadBuildStates = async () => {
       try {
-        setBuildStates(JSON.parse(savedStates));
+        const savedStates = localStorage.getItem('resellerBuildStates');
+        if (savedStates) {
+          const parsedStates = JSON.parse(savedStates);
+          setBuildStates(parsedStates);
+          console.log('📱 Loaded build states from localStorage:', parsedStates);
+        }
       } catch (error) {
         console.error('Error loading build states from localStorage:', error);
       }
-    }
+    };
+    
+    loadBuildStates();
   }, []);
 
   // Save build states to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
+    const saveBuildStates = async () => {
+      try {
+        localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
+      } catch (error) {
+        console.error('Error saving build states to localStorage:', error);
+      }
+    };
+    
+    saveBuildStates();
   }, [buildStates]);
+
+  // Expose updateBuildState globally for polling system
+  useEffect(() => {
+    window.updateReactBuildState = (key, state) => {
+      console.log(`🌐 Global updateReactBuildState called: ${key} = ${state}`);
+      const [resellerId, buildType] = key.split('_');
+      if (resellerId && buildType) {
+        setBuildStates(prev => ({
+          ...prev,
+          [`${resellerId}_${buildType}`]: state
+        }));
+      }
+    };
+    
+    return () => {
+      delete window.updateReactBuildState;
+    };
+  }, []);
+
+  // Optional: Clean up global polling when component unmounts
+  // Note: This is optional since polling is global and should continue
+  // even when the reseller panel is closed
+  useEffect(() => {
+    return () => {
+      // Uncomment if you want to stop global polling when this component unmounts
+      // buildStatusManager.stopGlobalPolling();
+    };
+  }, []);
 
   // Get build state for a specific reseller and build type
   const getBuildState = (resellerId, buildType) => {
     const key = `${resellerId}_${buildType}`;
-    return buildStates[key] || 'NOT_BUILDED';
+    const buildData = buildStates[key];
+    if (buildData && typeof buildData === 'object') {
+      return buildData.status || 'NOT_BUILDED';
+    }
+    return buildData || 'NOT_BUILDED';
   };
 
   // Update build state for a specific reseller and build type
-  const updateBuildState = (resellerId, buildType, state) => {
+  const updateBuildState = (resellerId, buildType, state, resellerData = null) => {
     const key = `${resellerId}_${buildType}`;
-    setBuildStates(prev => ({
-      ...prev,
-      [key]: state
-    }));
+    console.log(`🔄 updateBuildState called: ${key} = ${state}`);
+    
+    setBuildStates(prev => {
+      const newState = {
+        ...prev,
+        [key]: {
+          status: state,
+          resellerData: resellerData || prev[key]?.resellerData || null,
+          timestamp: new Date().toISOString()
+        }
+      };
+      console.log(`🔄 New build states after update:`, newState);
+      return newState;
+    });
   };
 
   // Build functions for mobile apps
@@ -190,7 +247,9 @@ const FloatingResellersPopover = ({
       return;
     }
 
-    const currentState = getBuildState(reseller.id, buildType);
+    // Use appUrl as the unique identifier
+    const resellerId = reseller.appUrl;
+    const currentState = getBuildState(resellerId, buildType);
     
     // Handle different states
     if (currentState === 'NOT_BUILDED') {
@@ -218,7 +277,8 @@ const FloatingResellersPopover = ({
 
   // Start a new build
   const startBuild = async (reseller, buildType) => {
-    const buildKey = `${reseller.id}_${buildType}`;
+    const resellerId = reseller.appUrl;
+    const buildKey = `${resellerId}_${buildType}`;
     
     try {
       const buildData = {
@@ -250,8 +310,22 @@ const FloatingResellersPopover = ({
       const result = await response.json();
       console.log(`✅ ${buildType.toUpperCase()} build started:`, result);
 
-      // Update state to BUILDING after successful API call
-      updateBuildState(reseller.id, buildType, 'BUILDING');
+      // Store reseller data for polling system
+      const resellerDataForPolling = {
+        appUrl: reseller.appUrl,
+        parentUserId: reseller.parentUserId,
+        currentDomain: reseller.currentDomain || 'gps'
+      };
+
+      // Update state to BUILDING after successful API call with reseller data
+      console.log(`🔄 Setting state to BUILDING for ${resellerId}_${buildType}`);
+      updateBuildState(resellerId, buildType, 'BUILDING', resellerDataForPolling);
+      
+      // Verify the state was set
+      setTimeout(() => {
+        const currentState = getBuildState(resellerId, buildType);
+        console.log(`🔍 State after setting BUILDING: ${resellerId}_${buildType} = ${currentState}`);
+      }, 100);
 
       setSnackbar({
         open: true,
@@ -266,28 +340,40 @@ const FloatingResellersPopover = ({
         buildType
       });
 
+      // Clear loading state immediately after API call
+      console.log(`🔄 Clearing loading state for ${buildKey}`);
+      setBuildLoading(prev => {
+        const newState = { ...prev, [buildKey]: false };
+        console.log(`🔄 New loading state:`, newState);
+        return newState;
+      });
+      
+      // Add build to global polling system
+      getBuildStatusManager().addBuildToPolling(resellerId, buildType);
+
     } catch (error) {
       console.error(`❌ Error starting ${buildType.toUpperCase()} build:`, error);
-      updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
+      updateBuildState(resellerId, buildType, 'BUILD_ERROR');
       setSnackbar({
         open: true,
         message: `Failed to start ${buildType.toUpperCase()} build: ${error.message}`,
         severity: 'error'
       });
-    } finally {
-      // Always clear loading state
+      // Clear loading state on error too
       setBuildLoading(prev => ({ ...prev, [buildKey]: false }));
     }
   };
 
   // Check build status
   const checkBuildStatus = async (reseller, buildType) => {
+    const resellerId = reseller.appUrl; // Use appUrl as unique identifier
+    
     try {
       const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
-        reseller.resellerId,
         reseller.appUrl,
         reseller.parentUserId,
-        reseller.currentDomain || 'gps'
+        reseller.currentDomain || 'gps',
+        buildType
       );
       
       console.log(`🔍 Checking build status:`, statusUrl);
@@ -297,22 +383,31 @@ const FloatingResellersPopover = ({
       
       console.log(`📊 Build status response:`, status);
 
-      if (status.data.buildComplete) {
-        updateBuildState(reseller.id, buildType, 'BUILDED');
+      // Use the buildStatus from the server response
+      const serverBuildStatus = status.data.buildStatus;
+      
+      if (serverBuildStatus === 'BUILDED') {
+        updateBuildState(resellerId, buildType, 'BUILDED');
         return { status: 'BUILDED', data: status.data };
-      } else if (status.data.isBuilding) {
-        updateBuildState(reseller.id, buildType, 'BUILDING');
+      } else if (serverBuildStatus === 'BUILDING') {
+        updateBuildState(resellerId, buildType, 'BUILDING');
         return { status: 'BUILDING', data: status.data };
+      } else if (serverBuildStatus === 'PARTIAL_BUILDED') {
+        updateBuildState(resellerId, buildType, 'PARTIAL_BUILDED');
+        return { status: 'PARTIAL_BUILDED', data: status.data };
       } else {
-        updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
-        return { status: 'BUILD_ERROR', data: status.data };
+        updateBuildState(resellerId, buildType, 'NOT_BUILDED');
+        return { status: 'NOT_BUILDED', data: status.data };
       }
     } catch (error) {
       console.error(`❌ Error checking build status:`, error);
-      updateBuildState(reseller.id, buildType, 'BUILD_ERROR');
+      updateBuildState(resellerId, buildType, 'BUILD_ERROR');
       return { status: 'BUILD_ERROR', error: error.message };
     }
   };
+
+  // Note: Polling is now handled by the global buildStatusManager
+  // No need for individual polling functions in this component
 
   // Download build file
   const downloadBuild = async (reseller, buildType) => {
@@ -485,11 +580,13 @@ const FloatingResellersPopover = ({
     retry: 2,
   });
 
-  // Add missing id field to resellers (use resellerId as id)
-  const resellersWithId = (resellersData || []).map(reseller => ({
-    ...reseller,
-    id: reseller.resellerId // Add missing id field
-  }));
+  // Add missing id field to resellers (use appUrl as id since it's unique)
+  const resellersWithId = (resellersData || [])
+    .filter(reseller => reseller.appUrl) // Filter out resellers without appUrl
+    .map((reseller, index) => ({
+      ...reseller,
+      id: reseller.appUrl || `reseller_${index}` // Use appUrl as unique identifier, fallback to index
+    }));
 
   // Filter resellers based on search keyword
   const filteredResellers = resellersWithId.filter(reseller =>
@@ -1500,14 +1597,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: buildLoading[`${reseller.id}_aab`] ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.appUrl}_aab`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'aab')}
-                                  disabled={buildLoading[`${reseller.id}_aab`]}
-                                  title={`AAB ${getBuildState(reseller.id, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'aab') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.appUrl}_aab`]}
+                                  title={`AAB ${getBuildState(reseller.appUrl, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'aab') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_aab`] ? (
+                                  {buildLoading[`${reseller.appUrl}_aab`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <BsGooglePlay style={{ fontSize: '14px' }} />
@@ -1519,14 +1616,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: buildLoading[`${reseller.id}_apk`] ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.appUrl}_apk`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'apk')}
-                                  disabled={buildLoading[`${reseller.id}_apk`]}
-                                  title={`APK ${getBuildState(reseller.id, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'apk') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.appUrl}_apk`]}
+                                  title={`APK ${getBuildState(reseller.appUrl, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'apk') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_apk`] ? (
+                                  {buildLoading[`${reseller.appUrl}_apk`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AndroidIcon style={{ fontSize: '16px' }} />
@@ -1538,14 +1635,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: buildLoading[`${reseller.id}_ios`] ? colors.primary : colors.text,
+                                    color: buildLoading[`${reseller.appUrl}_ios`] ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
                                   onClick={() => handleBuildApp(reseller, 'ios')}
-                                  disabled={buildLoading[`${reseller.id}_ios`]}
-                                  title={`iOS ${getBuildState(reseller.id, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.id, 'ios') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.id, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  disabled={buildLoading[`${reseller.appUrl}_ios`]}
+                                  title={`iOS ${getBuildState(reseller.appUrl, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'ios') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
                                 >
-                                  {buildLoading[`${reseller.id}_ios`] ? (
+                                  {buildLoading[`${reseller.appUrl}_ios`] ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AppleIcon style={{ fontSize: '16px' }} />
@@ -2938,7 +3035,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
 
-  const currentState = getBuildState(reseller.id, buildType);
+  const currentState = getBuildState(reseller.appUrl, buildType);
 
   const handleCheckStatus = async () => {
     setIsChecking(true);
@@ -2954,7 +3051,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
   };
 
   const handleRetry = async () => {
-    updateBuildState(reseller.id, buildType, 'NOT_BUILDED');
+    updateBuildState(reseller.appUrl, buildType, 'NOT_BUILDED');
     await onRetry();
   };
 

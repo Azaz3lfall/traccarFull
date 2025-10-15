@@ -22,8 +22,8 @@ export default {
     LOGS: `${RESELLERS_SERVER_URL}/api/resellers/logs`,
     LOGS_DELETE: `${RESELLERS_SERVER_URL}/api/resellers/logs/delete`,
     BUILD: `${RESELLERS_SERVER_URL}/api/resellers/build`,
-  BUILD_STATUS: (resellerId, appUrl, parentUserId, currentDomain = 'gps') =>
-    `${RESELLERS_SERVER_URL}/api/resellers/build/status/${resellerId}?appUrl=${encodeURIComponent(appUrl)}&parentUserId=${parentUserId}&currentDomain=${currentDomain}`,
+  BUILD_STATUS: (appUrl, parentUserId, currentDomain = 'gps', buildType = 'apk') =>
+    `${RESELLERS_SERVER_URL}/api/resellers/build/status/${encodeURIComponent(appUrl)}?parentUserId=${parentUserId}&currentDomain=${currentDomain}&buildType=${buildType}`,
   DOWNLOAD: (appUrl, buildType = 'apk') =>
     `${RESELLERS_SERVER_URL}/api/resellers/download?appUrl=${encodeURIComponent(appUrl)}&buildType=${buildType}`,
   RESELLER_LOGO: (domain) =>

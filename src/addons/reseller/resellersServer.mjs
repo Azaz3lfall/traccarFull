@@ -1539,6 +1539,15 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       fs.rmSync(buildDir, { recursive: true, force: true });
     }
 
+                // Clean and initialize Flutter project first
+                console.log('🧹 Cleaning Flutter project...');
+                await execAsync(`cd "${resellerDirPath}" && flutter clean`, { timeout: 60000 }); // 1 minute
+                console.log('✅ Flutter project cleaned');
+                
+                console.log('🔧 Initializing Flutter project...');
+                await execAsync(`cd "${resellerDirPath}" && flutter pub get`, { timeout: 300000 }); // 5 minutes
+                console.log('✅ Flutter project initialized');
+
     // Run Flutter build based on requested type
     if (buildType === 'apk') {
       console.log('📱 Building APK...');
@@ -1631,10 +1640,16 @@ async function copyAppImages(resellerDirPath, resellerData) {
     
     for (const iconSize of androidIconSizes) {
       const targetPath = path.join(androidResPath, iconSize.folder, 'ic_launcher.png');
+      console.log(`🔍 Checking target path: ${targetPath}`);
+      console.log(`📁 Target exists: ${fs.existsSync(targetPath)}`);
+      
       if (fs.existsSync(targetPath)) {
         // Resize and copy app image
+        console.log(`🔄 Replacing Android ${iconSize.folder} icon...`);
         await resizeAndCopyImage(appImagePath, targetPath, iconSize.size, iconSize.size);
         console.log(`✅ Android ${iconSize.folder} icon updated`);
+      } else {
+        console.log(`⚠️ Target path does not exist: ${targetPath}`);
       }
     }
     
@@ -1702,12 +1717,31 @@ async function copyAppImages(resellerDirPath, resellerData) {
 // Function to resize and copy image
 async function resizeAndCopyImage(sourcePath, targetPath, width, height) {
   try {
-    // For now, just copy the file (we can add image resizing later if needed)
-    // In a production environment, you'd want to use a library like sharp to resize images
-    fs.copyFileSync(sourcePath, targetPath);
+    console.log(`🔄 Resizing image: ${sourcePath} -> ${targetPath} (${width}x${height})`);
+    
+    const sharp = (await import('sharp')).default;
+    
+    // Resize and copy the image
+    await sharp(sourcePath)
+      .resize(width, height, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .png()
+      .toFile(targetPath);
+      
+    console.log(`✅ Image resized and copied: ${width}x${height} -> ${targetPath}`);
   } catch (error) {
-    console.error(`❌ Error copying image from ${sourcePath} to ${targetPath}:`, error);
-    throw error;
+    console.error(`❌ Error resizing image from ${sourcePath} to ${targetPath}:`, error);
+    // Fallback to simple copy if sharp fails
+    try {
+      console.log(`⚠️ Fallback: Copying image without resizing...`);
+      fs.copyFileSync(sourcePath, targetPath);
+      console.log(`⚠️ Fallback: Image copied without resizing: ${targetPath}`);
+    } catch (copyError) {
+      console.error(`❌ Error copying image as fallback:`, copyError);
+      throw copyError;
+    }
   }
 }
 
@@ -1793,90 +1827,11 @@ app.post('/api/resellers/build', async (req, res) => {
     if (fs.existsSync(resellerDirPath)) {
       console.log('🗑️ Removing existing directory...');
       fs.rmSync(resellerDirPath, { recursive: true, force: true });
+      console.log('✅ Directory removed successfully');
     }
 
-    // Copy source code to reseller directory
-    console.log('📋 Copying source code...');
-    await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
-    console.log('✅ Source code copied successfully');
-
-    // Update app configuration files
-    console.log('⚙️ Updating app configuration...');
-    
-    // Update pubspec.yaml (keep original package name for Firebase compatibility)
-    const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
-    if (fs.existsSync(pubspecPath)) {
-      let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
-      // Only update description, keep original package name for Firebase
-      pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
-      fs.writeFileSync(pubspecPath, pubspecContent);
-      console.log('✅ pubspec.yaml updated (description only)');
-    }
-
-    // Update Android app configuration (keep original package name for Firebase)
-    const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
-    if (fs.existsSync(androidManifestPath)) {
-      let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
-      // Only update display label, keep original package name for Firebase
-      manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
-      fs.writeFileSync(androidManifestPath, manifestContent);
-      console.log('✅ AndroidManifest.xml updated (display name only)');
-    }
-
-    // Update iOS app configuration
-    const iosInfoPlistPath = path.join(resellerDirPath, 'ios/Runner/Info.plist');
-    if (fs.existsSync(iosInfoPlistPath)) {
-      let plistContent = fs.readFileSync(iosInfoPlistPath, 'utf8');
-      plistContent = plistContent.replace(/<key>CFBundleDisplayName<\/key>\s*<string>.*?<\/string>/, 
-        `<key>CFBundleDisplayName</key>\n\t<string>${resellerData.companyName}</string>`);
-      plistContent = plistContent.replace(/<key>CFBundleName<\/key>\s*<string>.*?<\/string>/, 
-        `<key>CFBundleName</key>\n\t<string>${resellerData.companyName}</string>`);
-      fs.writeFileSync(iosInfoPlistPath, plistContent);
-      console.log('✅ iOS Info.plist updated');
-    }
-
-    // Update branding configuration (keep original package name for Firebase)
-    const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
-    if (fs.existsSync(brandDartPath)) {
-      let brandContent = fs.readFileSync(brandDartPath, 'utf8');
-      // Only update app name and URL, keep original package ID for Firebase
-      brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
-      brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
-      fs.writeFileSync(brandDartPath, brandContent);
-      console.log('✅ brand.dart updated (app name and URL only)');
-    }
-
-    // Note: google-services.json is already in source code, no need to copy
-    console.log('✅ Using existing google-services.json from source code');
-
-    // Get complete reseller data from JSON file to access all image fields
-    const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
-    let completeResellerData = resellerData;
-    
-    if (fs.existsSync(resellerFilePath)) {
-      try {
-        const fileContent = fs.readFileSync(resellerFilePath, 'utf8');
-        completeResellerData = JSON.parse(fileContent);
-        console.log('✅ Loaded complete reseller data from JSON file');
-      } catch (error) {
-        console.error('⚠️ Error loading reseller data from JSON file:', error);
-      }
-    }
-
-    // Copy and replace mobile app images (appImage and notificationIcon)
-    await copyAppImages(resellerDirPath, completeResellerData);
-
-    // Copy favicon for web app browser tab (logo remains for main web branding)
-    await copyFaviconForWebApp(completeResellerData);
-
-    // Start Flutter build process asynchronously
-    console.log('🔨 Starting Flutter build process...');
-    
     // Get build type from request body (default to 'apk')
     const buildType = resellerData.buildType || 'apk';
-    
-    // Start build process in background (don't await)
-    buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType);
     
     // Return immediately to frontend
     res.json({
@@ -1888,6 +1843,90 @@ app.post('/api/resellers/build', async (req, res) => {
         timestamp: new Date().toISOString()
       }
     });
+    
+    // Start build process in background (don't await)
+    console.log('🔨 Starting Flutter build process in background...');
+    
+    // Run the build process asynchronously
+    (async () => {
+      try {
+        // Copy source code to reseller directory
+        console.log('📋 Copying source code...');
+        await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
+        console.log('✅ Source code copied successfully');
+
+        // Update app configuration files
+        console.log('⚙️ Updating app configuration...');
+        
+        // Update pubspec.yaml (keep original package name for Firebase compatibility)
+        const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
+        if (fs.existsSync(pubspecPath)) {
+          let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
+          // Only update description, keep original package name for Firebase
+          pubspecContent = pubspecContent.replace(/description: .*/, `description: ${resellerData.companyName} - GPS Tracking App`);
+          fs.writeFileSync(pubspecPath, pubspecContent);
+          console.log('✅ pubspec.yaml updated (description only)');
+        }
+
+        // Update Android app configuration (keep original package name for Firebase)
+        const androidManifestPath = path.join(resellerDirPath, 'android/app/src/main/AndroidManifest.xml');
+        if (fs.existsSync(androidManifestPath)) {
+          let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
+          // Only update display label, keep original package name for Firebase
+          manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
+          fs.writeFileSync(androidManifestPath, manifestContent);
+          console.log('✅ AndroidManifest.xml updated (display name only)');
+        }
+
+        // Update iOS app configuration
+        const iosInfoPlistPath = path.join(resellerDirPath, 'ios/Runner/Info.plist');
+        if (fs.existsSync(iosInfoPlistPath)) {
+          let plistContent = fs.readFileSync(iosInfoPlistPath, 'utf8');
+          plistContent = plistContent.replace(/<key>CFBundleDisplayName<\/key>\s*<string>.*?<\/string>/, 
+            `<key>CFBundleDisplayName</key>\n\t<string>${resellerData.companyName}</string>`);
+          plistContent = plistContent.replace(/<key>CFBundleName<\/key>\s*<string>.*?<\/string>/, 
+            `<key>CFBundleName</key>\n\t<string>${resellerData.companyName}</string>`);
+          fs.writeFileSync(iosInfoPlistPath, plistContent);
+          console.log('✅ iOS Info.plist updated');
+        }
+
+        // Update branding configuration (keep original package name for Firebase)
+        const brandDartPath = path.join(resellerDirPath, 'tool/brand.dart');
+        if (fs.existsSync(brandDartPath)) {
+          let brandContent = fs.readFileSync(brandDartPath, 'utf8');
+          // Only update app name and URL, keep original package ID for Firebase
+          brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
+          brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
+          fs.writeFileSync(brandDartPath, brandContent);
+          console.log('✅ brand.dart updated (app name and URL only)');
+        }
+
+        // Note: google-services.json is already in source code, no need to copy
+        console.log('✅ Using existing google-services.json from source code');
+
+        // Get complete reseller data from JSON file to access all image fields
+        const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
+        let completeResellerData = resellerData;
+        
+        if (fs.existsSync(resellerFilePath)) {
+          try {
+            const fileContent = fs.readFileSync(resellerFilePath, 'utf8');
+            completeResellerData = JSON.parse(fileContent);
+            console.log('✅ Loaded complete reseller data from JSON file');
+          } catch (error) {
+            console.error('⚠️ Error loading reseller data from JSON file:', error);
+          }
+        }
+
+        // Copy and replace mobile app images (appImage and notificationIcon)
+        await copyAppImages(resellerDirPath, completeResellerData);
+        
+        // Start Flutter build process
+        await buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType);
+      } catch (error) {
+        console.error('❌ Error in background build process:', error);
+      }
+    })();
 
   } catch (error) {
     console.error('❌ Error building mobile app:', error);
@@ -1900,10 +1939,10 @@ app.post('/api/resellers/build', async (req, res) => {
 });
 
 // GET endpoint for checking build status
-app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
+app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
   try {
-    const { resellerId } = req.params;
-    const { appUrl, parentUserId } = req.query;
+    const { appUrl } = req.params;
+    const { parentUserId, buildType = 'apk' } = req.query;
     
     if (!appUrl || !parentUserId) {
       return res.status(400).json({
@@ -1913,8 +1952,41 @@ app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
       });
     }
 
+    // Create reseller directory name - we need to find the resellerId from the JSON files
+    // First, find the reseller data to get the resellerId
+    const dataDir = DATA_DIR;
+    const jsonFiles = await glob('*.json', { cwd: dataDir });
+    
+    let resellerData = null;
+    let resellerId = null;
+    
+    for (const jsonFile of jsonFiles) {
+      try {
+        const filePath = path.join(dataDir, jsonFile);
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const data = JSON.parse(fileContent);
+        
+        if (data.appUrl === appUrl && data.parentUserId === parentUserId) {
+          resellerData = data;
+          resellerId = data.resellerId;
+          break;
+        }
+      } catch (fileError) {
+        console.error('❌ Error reading file during build status check:', jsonFile, fileError.message);
+        continue;
+      }
+    }
+    
+    if (!resellerData || !resellerId) {
+      return res.status(404).json({
+        error: 'Reseller not found',
+        message: `No reseller found with appUrl '${appUrl}' for user '${parentUserId}'`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Create reseller directory name
-    const resellerDirName = `reseller_${req.query.currentDomain || 'gps'}_${appUrl}_${parentUserId}_${resellerId}`;
+    const resellerDirName = `reseller_${resellerData.currentDomain || 'gps'}_${appUrl}_${parentUserId}_${resellerId}`;
     const resellerDirPath = path.join(DATA_DIR, resellerDirName);
     
     // Check if build directory exists
@@ -1926,7 +1998,34 @@ app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
     const isBuilding = fs.existsSync(resellerDirPath) && fs.existsSync(buildDir);
     const apkExists = fs.existsSync(apkPath);
     const aabExists = fs.existsSync(aabPath);
-    const buildComplete = apkExists && aabExists;
+    
+    console.log(`🔍 Build status check for ${appUrl}:`);
+    console.log(`📁 Reseller dir exists: ${fs.existsSync(resellerDirPath)}`);
+    console.log(`📁 Build dir exists: ${fs.existsSync(buildDir)}`);
+    console.log(`📁 APK exists: ${apkExists} at ${apkPath}`);
+    console.log(`📁 AAB exists: ${aabExists} at ${aabPath}`);
+    console.log(`🔨 Is building: ${isBuilding}`);
+    
+    // Determine build status based on buildType and file existence
+    let buildStatus = 'NOT_BUILDED';
+    let buildComplete = false;
+    
+    if (isBuilding) {
+      buildStatus = 'BUILDING';
+    } else if (buildType === 'apk' && apkExists) {
+      buildStatus = 'BUILDED';
+      buildComplete = true;
+    } else if (buildType === 'aab' && aabExists) {
+      buildStatus = 'BUILDED';
+      buildComplete = true;
+    } else if (buildType === 'both' && apkExists && aabExists) {
+      buildStatus = 'BUILDED';
+      buildComplete = true;
+    } else if (buildType === 'both' && (apkExists || aabExists)) {
+      buildStatus = 'PARTIAL_BUILDED';
+    } else if (!isBuilding && !apkExists && !aabExists) {
+      buildStatus = 'NOT_BUILDED';
+    }
     
     // Get file sizes if they exist
     const apkSize = apkExists ? fs.statSync(apkPath).size : 0;
@@ -1935,11 +2034,12 @@ app.get('/api/resellers/build/status/:resellerId', async (req, res) => {
     res.json({
       success: true,
       data: {
-        resellerId,
         appUrl,
         parentUserId,
+        buildType,
         isBuilding,
         buildComplete,
+        buildStatus,
         apkExists,
         aabExists,
         apkSize,

@@ -8,6 +8,10 @@ import { useCatch, useEffectAsync } from './reactHelper';
 import { sessionActions } from './store';
 import UpdateController from './UpdateController';
 import TermsDialog from './common/components/TermsDialog';
+import getBuildStatusManager from './utils/simpleBuildStatusManager'; // Initialize global build status polling
+
+// Initialize the build status manager
+getBuildStatusManager();
 import Loader from './common/components/Loader';
 import fetchOrThrow from './common/util/fetchOrThrow';
 
