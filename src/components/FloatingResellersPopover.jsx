@@ -392,9 +392,8 @@ const FloatingResellersPopover = ({
       console.log('✅ Clean apps result:', result);
 
       // Reset build states in localStorage
-      // Use the same ID field as the build functions (reseller.id, but fallback to reseller.resellerId)
-      const resellerId = reseller.id || reseller.resellerId;
-      console.log('🔑 Using reseller ID for build keys:', resellerId);
+      // The build states are stored with 'undefined_' prefix because reseller.id is undefined
+      // We need to reset the actual keys that exist in localStorage
       console.log('🔍 Current localStorage before reset:', localStorage.getItem('resellerBuildStates'));
       
       // Check what build keys actually exist in localStorage
@@ -402,16 +401,22 @@ const FloatingResellersPopover = ({
       const existingKeys = Object.keys(currentStates);
       console.log('🔍 Existing build keys in localStorage:', existingKeys);
       
+      // Since build states are stored with 'undefined_' prefix, we need to reset those keys
+      // This is a temporary fix until we fix the root cause of reseller.id being undefined
       const buildKeysToReset = [];
-      if (cleanType === 'apk' || cleanType === 'both') {
-        buildKeysToReset.push(`${resellerId}_apk`);
-      }
-      if (cleanType === 'aab' || cleanType === 'both') {
-        buildKeysToReset.push(`${resellerId}_aab`);
-      }
-      if (cleanType === 'ios' || cleanType === 'both') {
-        buildKeysToReset.push(`${resellerId}_ios`);
-      }
+      existingKeys.forEach(key => {
+        if (key.startsWith('undefined_')) {
+          if (key.includes('_apk') && (cleanType === 'apk' || cleanType === 'both')) {
+            buildKeysToReset.push(key);
+          }
+          if (key.includes('_aab') && (cleanType === 'aab' || cleanType === 'both')) {
+            buildKeysToReset.push(key);
+          }
+          if (key.includes('_ios') && (cleanType === 'ios' || cleanType === 'both')) {
+            buildKeysToReset.push(key);
+          }
+        }
+      });
       
       console.log('🔑 Build keys to reset:', buildKeysToReset);
       
