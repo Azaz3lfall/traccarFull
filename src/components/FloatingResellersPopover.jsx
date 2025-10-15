@@ -2937,6 +2937,8 @@ const FloatingResellersPopover = ({
           onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
           maxWidth="sm"
           fullWidth
+          style={{ zIndex: 10005 }}
+          PaperProps={{ style: { zIndex: 10005 } }}
         >
         <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
           Build Status - {buildStatusModal.reseller?.companyName}
@@ -3051,12 +3053,15 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
   const currentState = getBuildState(reseller.appUrl, buildType);
 
   const handleCheckStatus = async () => {
+    console.log(`🔍 BuildStatusContent: handleCheckStatus called for ${reseller.appUrl}_${buildType}`);
     setIsChecking(true);
     setError(null);
     try {
       const result = await checkBuildStatus(reseller, buildType);
+      console.log(`📊 BuildStatusContent: Status check result:`, result);
       setStatusData(result.data);
     } catch (err) {
+      console.error(`❌ BuildStatusContent: Error checking status:`, err);
       setError(err.message);
     } finally {
       setIsChecking(false);

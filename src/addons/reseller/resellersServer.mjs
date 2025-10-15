@@ -1934,8 +1934,26 @@ app.post('/api/resellers/build', async (req, res) => {
           // Only update app name and URL, keep original package ID for Firebase
           brandContent = brandContent.replace(/const appName = '.*';/, `const appName = '${resellerData.companyName}';`);
           brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
+          // Also update the RegExp pattern to match the reseller URL
+          brandContent = brandContent.replace(
+            /RegExp\(r'https:\/\/demo\.traccar\.org'\)/,
+            `RegExp(r'https://${resellerData.appUrl}')`
+          );
           fs.writeFileSync(brandDartPath, brandContent);
-          console.log('✅ brand.dart updated (app name and URL only)');
+          console.log('✅ brand.dart updated (app name, URL, and RegExp pattern)');
+        }
+
+        // Update main_screen.dart to use reseller URL instead of demo.traccar.org
+        const mainScreenPath = path.join(resellerDirPath, 'lib/main_screen.dart');
+        if (fs.existsSync(mainScreenPath)) {
+          let mainScreenContent = fs.readFileSync(mainScreenPath, 'utf8');
+          // Replace the default demo URL with reseller URL
+          mainScreenContent = mainScreenContent.replace(
+            /return _preferences\.getString\(_urlKey\) \?\? 'https:\/\/demo\.traccar\.org';/,
+            `return _preferences.getString(_urlKey) ?? 'https://${resellerData.appUrl}';`
+          );
+          fs.writeFileSync(mainScreenPath, mainScreenContent);
+          console.log('✅ main_screen.dart updated with reseller URL');
         }
 
         // Update ic_launcher.xml to use PNG instead of vector drawable
