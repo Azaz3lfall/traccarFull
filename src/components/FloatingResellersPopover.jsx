@@ -2821,77 +2821,82 @@ const FloatingResellersPopover = ({
         </Dialog>
       )}
 
-      {/* Clean Apps Modal */}
-      {cleanAppsModal.open && (
-        <Dialog
-          open={cleanAppsModal.open}
-          onClose={() => setCleanAppsModal({ open: false, reseller: null })}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
-            Clean Apps - {cleanAppsModal.reseller?.companyName}
-          </DialogTitle>
-          <DialogContent style={{ padding: '24px' }}>
-            <Typography variant="body1" style={{ marginBottom: '24px', color: colors.text }}>
-              Select which apps you want to clean for this reseller:
-            </Typography>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Button
-                variant="outlined"
-                onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
-                style={{ 
-                  borderColor: colors.border, 
-                  color: colors.text,
-                  justifyContent: 'flex-start',
-                  padding: '12px 16px'
-                }}
-                startIcon={<BsAndroid size={20} />}
-              >
-                Clean APK Only
-              </Button>
-              
-              <Button
-                variant="outlined"
-                onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
-                style={{ 
-                  borderColor: colors.border, 
-                  color: colors.text,
-                  justifyContent: 'flex-start',
-                  padding: '12px 16px'
-                }}
-                startIcon={<BsGooglePlay size={20} />}
-              >
-                Clean AAB Only
-              </Button>
-              
-              <Button
-                variant="outlined"
-                onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
-                style={{ 
-                  borderColor: colors.error, 
-                  color: colors.error,
-                  justifyContent: 'flex-start',
-                  padding: '12px 16px'
-                }}
-                startIcon={<DeleteIcon />}
-              >
-                Clean Both APK & AAB
-              </Button>
-            </div>
-          </DialogContent>
-          <DialogActions style={{ padding: '16px 24px', borderTop: `1px solid ${colors.border}` }}>
-            <Button
-              onClick={() => setCleanAppsModal({ open: false, reseller: null })}
-              style={{ color: colors.text }}
-            >
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </AnimatePresence>
+
+    {/* Clean Apps Modal - Outside AnimatePresence to avoid key conflicts */}
+    {cleanAppsModal.open && (
+      <Dialog
+        open={cleanAppsModal.open}
+        onClose={() => setCleanAppsModal({ open: false, reseller: null })}
+        maxWidth="sm"
+        fullWidth
+        style={{ zIndex: 10003 }}
+        PaperProps={{
+          style: { zIndex: 10003 }
+        }}
+      >
+        <DialogTitle style={{ color: colors.text, borderBottom: `1px solid ${colors.border}` }}>
+          Clean Apps - {cleanAppsModal.reseller?.companyName}
+        </DialogTitle>
+        <DialogContent style={{ padding: '24px' }}>
+          <Typography variant="body1" style={{ marginBottom: '24px', color: colors.text }}>
+            Select which apps you want to clean for this reseller:
+          </Typography>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <Button
+              variant="outlined"
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
+              style={{ 
+                borderColor: colors.border, 
+                color: colors.text,
+                justifyContent: 'flex-start',
+                padding: '12px 16px'
+              }}
+              startIcon={<BsAndroid size={20} />}
+            >
+              Clean APK Only
+            </Button>
+            
+            <Button
+              variant="outlined"
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
+              style={{ 
+                borderColor: colors.border, 
+                color: colors.text,
+                justifyContent: 'flex-start',
+                padding: '12px 16px'
+              }}
+              startIcon={<BsGooglePlay size={20} />}
+            >
+              Clean AAB Only
+            </Button>
+            
+            <Button
+              variant="outlined"
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
+              style={{ 
+                borderColor: colors.error, 
+                color: colors.error,
+                justifyContent: 'flex-start',
+                padding: '12px 16px'
+              }}
+              startIcon={<DeleteIcon />}
+            >
+              Clean Both APK & AAB
+            </Button>
+          </div>
+        </DialogContent>
+        <DialogActions style={{ padding: '16px 24px', borderTop: `1px solid ${colors.border}` }}>
+          <Button
+            onClick={() => setCleanAppsModal({ open: false, reseller: null })}
+            style={{ color: colors.text }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )}
   );
 };
 
