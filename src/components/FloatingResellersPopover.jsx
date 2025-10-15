@@ -395,6 +395,12 @@ const FloatingResellersPopover = ({
       // Use the same ID field as the build functions (reseller.id, but fallback to reseller.resellerId)
       const resellerId = reseller.id || reseller.resellerId;
       console.log('🔑 Using reseller ID for build keys:', resellerId);
+      console.log('🔍 Current localStorage before reset:', localStorage.getItem('resellerBuildStates'));
+      
+      // Check what build keys actually exist in localStorage
+      const currentStates = JSON.parse(localStorage.getItem('resellerBuildStates') || '{}');
+      const existingKeys = Object.keys(currentStates);
+      console.log('🔍 Existing build keys in localStorage:', existingKeys);
       
       const buildKeysToReset = [];
       if (cleanType === 'apk' || cleanType === 'both') {
@@ -426,6 +432,7 @@ const FloatingResellersPopover = ({
         });
         localStorage.setItem('resellerBuildStates', JSON.stringify(states));
         console.log('✅ localStorage updated, removed keys:', buildKeysToReset);
+        console.log('🔍 localStorage after reset:', localStorage.getItem('resellerBuildStates'));
       }
 
       setSnackbar({
