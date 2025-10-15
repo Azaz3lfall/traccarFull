@@ -1887,11 +1887,39 @@ app.post('/api/resellers/build', async (req, res) => {
     if (fs.existsSync(resellerDirPath)) {
       console.log('🗑️ Removing existing directory...');
       try {
+        // Try multiple approaches for stubborn directories
         await new Promise((resolve, reject) => {
           exec(`rm -rf "${resellerDirPath}"`, (error, stdout, stderr) => {
             if (error) {
-              console.error('❌ Error removing directory:', error);
-              reject(error);
+              console.log('⚠️ First rm -rf failed, trying with force...');
+              // Try with force flag
+              exec(`rm -rf -f "${resellerDirPath}"`, (error2, stdout2, stderr2) => {
+                if (error2) {
+                  console.log('⚠️ Force rm -rf failed, trying find + rm...');
+                  // Try find + rm approach
+                  exec(`find "${resellerDirPath}" -type f -delete && find "${resellerDirPath}" -type d -empty -delete && rmdir "${resellerDirPath}" 2>/dev/null || true`, (error3, stdout3, stderr3) => {
+                    if (error3) {
+                      console.log('⚠️ Find approach failed, trying chmod + rm...');
+                      // Try chmod + rm approach
+                      exec(`chmod -R 777 "${resellerDirPath}" 2>/dev/null && rm -rf "${resellerDirPath}" 2>/dev/null || true`, (error4, stdout4, stderr4) => {
+                        if (error4) {
+                          console.error('❌ All removal methods failed:', error4);
+                          reject(error4);
+                        } else {
+                          console.log('✅ Directory removed with chmod + rm');
+                          resolve();
+                        }
+                      });
+                    } else {
+                      console.log('✅ Directory removed with find approach');
+                      resolve();
+                    }
+                  });
+                } else {
+                  console.log('✅ Directory removed with force flag');
+                  resolve();
+                }
+              });
             } else {
               console.log('✅ Directory removed successfully');
               resolve();
@@ -2331,12 +2359,30 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
       const iosPath = path.join(DATA_DIR, `${appUrl}.app`);
       if (fs.existsSync(iosPath)) {
         try {
-          // Use rm -rf for iOS app bundle (it's a directory)
+          // Use robust removal for iOS app bundle (it's a directory)
           await new Promise((resolve, reject) => {
             exec(`rm -rf "${iosPath}"`, (error, stdout, stderr) => {
               if (error) {
-                console.error('❌ Error deleting iOS app:', error);
-                reject(error);
+                console.log('⚠️ First rm -rf failed for iOS, trying with force...');
+                // Try with force flag
+                exec(`rm -rf -f "${iosPath}"`, (error2, stdout2, stderr2) => {
+                  if (error2) {
+                    console.log('⚠️ Force rm -rf failed for iOS, trying chmod + rm...');
+                    // Try chmod + rm approach
+                    exec(`chmod -R 777 "${iosPath}" 2>/dev/null && rm -rf "${iosPath}" 2>/dev/null || true`, (error3, stdout3, stderr3) => {
+                      if (error3) {
+                        console.error('❌ All iOS removal methods failed:', error3);
+                        reject(error3);
+                      } else {
+                        console.log(`✅ Deleted iOS app with chmod + rm: ${iosPath}`);
+                        resolve();
+                      }
+                    });
+                  } else {
+                    console.log(`✅ Deleted iOS app with force flag: ${iosPath}`);
+                    resolve();
+                  }
+                });
               } else {
                 console.log(`✅ Deleted iOS app: ${iosPath}`);
                 resolve();
