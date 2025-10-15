@@ -136,6 +136,7 @@ const FloatingResellersPopover = ({
   const [buildStatusModal, setBuildStatusModal] = useState({ open: false, reseller: null, buildType: null });
   const [cleanAppsModal, setCleanAppsModal] = useState({ open: false, reseller: null });
   const [buildLoading, setBuildLoading] = useState({});
+  const [cleanLoading, setCleanLoading] = useState({});
 
   // Load build states from localStorage on component mount
   useEffect(() => {
@@ -452,7 +453,12 @@ const FloatingResellersPopover = ({
 
   // Clean apps function
   const cleanApps = async (reseller, cleanType) => {
+    const cleanKey = `${reseller.appUrl}_${cleanType}`;
+    
     try {
+      // Set loading state
+      setCleanLoading(prev => ({ ...prev, [cleanKey]: true }));
+      
       console.log(`🧹 Cleaning ${cleanType} for reseller:`, reseller);
       console.log('🔗 Clean apps endpoint:', resellersConfig.ENDPOINTS.CLEAN_APPS);
       console.log('🔍 Reseller keys:', Object.keys(reseller));
@@ -541,6 +547,9 @@ const FloatingResellersPopover = ({
         message: `Error cleaning ${cleanType}`,
         severity: 'error'
       });
+    } finally {
+      // Clear loading state
+      setCleanLoading(prev => ({ ...prev, [cleanKey]: false }));
     }
   };
 
@@ -3102,62 +3111,80 @@ const FloatingResellersPopover = ({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button
                   onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
+                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`]}
                   style={{ 
                     border: `1px solid ${colors.border}`, 
                     color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
-                    cursor: 'pointer',
+                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     fontSize: '14px',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? 0.6 : 1
                   }}
                 >
-                  <BsAndroid size={20} />
-                  Clean APK Only
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <BsAndroid size={20} />
+                  )}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? 'Cleaning APK...' : 'Clean APK Only'}
                 </button>
                 
                 <button
                   onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
+                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`]}
                   style={{ 
                     border: `1px solid ${colors.border}`, 
                     color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
-                    cursor: 'pointer',
+                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     fontSize: '14px',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? 0.6 : 1
                   }}
                 >
-                  <BsGooglePlay size={20} />
-                  Clean AAB Only
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <BsGooglePlay size={20} />
+                  )}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? 'Cleaning AAB...' : 'Clean AAB Only'}
                 </button>
                 
                 <button
                   onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
+                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`]}
                   style={{ 
                     border: `1px solid ${colors.border}`, 
                     color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
-                    cursor: 'pointer',
+                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     fontSize: '14px',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 0.6 : 1
                   }}
                 >
-                  <RefreshIcon />
-                  Clean Both APK & AAB
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <RefreshIcon />
+                  )}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning Both...' : 'Clean Both APK & AAB'}
                 </button>
               </div>
             </div>
