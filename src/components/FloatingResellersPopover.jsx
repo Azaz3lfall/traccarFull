@@ -142,8 +142,8 @@ const FloatingResellersPopover = ({
   useEffect(() => {
     const loadBuildStates = async () => {
       try {
-        const savedStates = localStorage.getItem('resellerBuildStates');
-        if (savedStates) {
+    const savedStates = localStorage.getItem('resellerBuildStates');
+    if (savedStates) {
           const parsedStates = JSON.parse(savedStates);
           setBuildStates(parsedStates);
           console.log('📱 Loaded build states from localStorage:', parsedStates);
@@ -160,7 +160,7 @@ const FloatingResellersPopover = ({
   useEffect(() => {
     const saveBuildStates = async () => {
       try {
-        localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
+    localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
       } catch (error) {
         console.error('Error saving build states to localStorage:', error);
       }
@@ -216,7 +216,7 @@ const FloatingResellersPopover = ({
     
     setBuildStates(prev => {
       const newState = {
-        ...prev,
+      ...prev,
         [key]: {
           status: state,
           resellerData: resellerData || prev[key]?.resellerData || null,
@@ -595,9 +595,9 @@ const FloatingResellersPopover = ({
   const resellersWithId = (resellersData || [])
     .filter(reseller => reseller.appUrl) // Filter out resellers without appUrl
     .map((reseller, index) => ({
-      ...reseller,
+    ...reseller,
       id: reseller.appUrl || `reseller_${index}` // Use appUrl as unique identifier, fallback to index
-    }));
+  }));
 
   // Filter resellers based on search keyword
   const filteredResellers = resellersWithId.filter(reseller =>
@@ -2930,7 +2930,7 @@ const FloatingResellersPopover = ({
 
       {/* Build Status Modal */}
       <AnimatePresence>
-        {buildStatusModal.open && (
+      {buildStatusModal.open && (
           <motion.div
             key="build-status-modal"
             initial={{ opacity: 0 }}
@@ -2977,61 +2977,48 @@ const FloatingResellersPopover = ({
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-                <h3 style={{
-                  margin: 0,
-                  color: colors.text,
-                  fontSize: '18px',
-                  fontWeight: '600'
-                }}>
-                  Build Status - {buildStatusModal.reseller?.companyName}
-                </h3>
-                <button
-                  onClick={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: colors.textSecondary,
-                    fontSize: '24px',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  ×
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    Build Status - {buildStatusModal.reseller?.companyName}
+                  </Typography>
+                </div>
               </div>
 
               {/* Content */}
               <div style={{ padding: '24px' }}>
-                {buildStatusModal.reseller && buildStatusModal.buildType && (
-                  <BuildStatusContent
-                    reseller={buildStatusModal.reseller}
-                    buildType={buildStatusModal.buildType}
-                    getBuildState={getBuildState}
-                    checkBuildStatus={checkBuildStatus}
-                    updateBuildState={updateBuildState}
-                    onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
-                    onRetry={async () => {
-                      await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
-                    }}
-                    colors={colors}
-                    resellersConfig={resellersConfig}
-                  />
-                )}
+          {buildStatusModal.reseller && buildStatusModal.buildType && (
+            <BuildStatusContent
+              reseller={buildStatusModal.reseller}
+              buildType={buildStatusModal.buildType}
+              getBuildState={getBuildState}
+              checkBuildStatus={checkBuildStatus}
+              updateBuildState={updateBuildState}
+              onClose={() => setBuildStatusModal({ open: false, reseller: null, buildType: null })}
+              onRetry={async () => {
+                await startBuild(buildStatusModal.reseller, buildStatusModal.buildType);
+              }}
+              colors={colors}
+              resellersConfig={resellersConfig}
+            />
+          )}
               </div>
             </motion.div>
           </motion.div>
-        )}
+      )}
       </AnimatePresence>
 
     </AnimatePresence>
 
     {/* Clean Apps Modal */}
     <AnimatePresence>
-      {cleanAppsModal.open && (
+    {cleanAppsModal.open && (
         <motion.div
           key="clean-apps-modal"
           initial={{ opacity: 0 }}
@@ -3079,42 +3066,32 @@ const FloatingResellersPopover = ({
               justifyContent: 'space-between'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <button
+                <IconButton
                   onClick={() => setCleanAppsModal({ open: false, reseller: null })}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: colors.textSecondary,
-                    fontSize: '20px',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
+                  size="small"
+                  style={{ color: colors.textSecondary }}
                 >
-                  ‹
-                </button>
-                <span style={{ color: colors.text, fontSize: '18px', fontWeight: '600' }}>
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
                   Clean Apps - {cleanAppsModal.reseller?.companyName}
-                </span>
+                </Typography>
               </div>
             </div>
 
             {/* Content */}
             <div style={{ padding: '24px' }}>
               <div style={{ marginBottom: '24px', color: colors.text, fontSize: '16px' }}>
-                Select which apps you want to clean for this reseller:
+            Select which apps you want to clean for this reseller:
               </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button
-                  onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'apk')}
                   disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`]}
-                  style={{ 
+              style={{ 
                     border: `1px solid ${colors.border}`, 
-                    color: colors.text,
+                color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
@@ -3136,11 +3113,11 @@ const FloatingResellersPopover = ({
                 </button>
                 
                 <button
-                  onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'aab')}
                   disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`]}
-                  style={{ 
+              style={{ 
                     border: `1px solid ${colors.border}`, 
-                    color: colors.text,
+                color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
@@ -3162,9 +3139,9 @@ const FloatingResellersPopover = ({
                 </button>
                 
                 <button
-                  onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
+              onClick={() => cleanApps(cleanAppsModal.reseller, 'both')}
                   disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`]}
-                  style={{ 
+              style={{ 
                     border: `1px solid ${colors.border}`, 
                     color: colors.text,
                     backgroundColor: 'transparent',
@@ -3186,11 +3163,11 @@ const FloatingResellersPopover = ({
                   )}
                   {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning Both...' : 'Clean Both APK & AAB'}
                 </button>
-              </div>
+          </div>
             </div>
           </motion.div>
         </motion.div>
-      )}
+    )}
     </AnimatePresence>
     </>
   );
@@ -3259,7 +3236,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
 
       {currentState === 'BUILDING' && (
         <div>
-          <CircularProgress size={48} style={{ color: colors.primary, marginBottom: '16px' }} />
+          <CircularProgress size={48} color="inherit" style={{ marginBottom: '16px' }} />
           <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
             Building {buildType.toUpperCase()}...
           </Typography>
@@ -3267,7 +3244,10 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
             variant="outlined"
             onClick={handleCheckStatus}
             disabled={isChecking}
-            style={{ borderColor: colors.primary, color: colors.primary }}
+            sx={{
+              borderColor: colors.border,
+              color: isChecking ? colors.primary : colors.text
+            }}
           >
             {isChecking ? 'Checking...' : 'Check Status'}
           </Button>
@@ -3291,7 +3271,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
             </div>
           )}
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => {
               // Trigger download (simplified - only need appUrl and buildType)
               const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
@@ -3307,7 +3287,11 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
               link.click();
               document.body.removeChild(link);
             }}
-            style={{ backgroundColor: colors.primary, color: 'white', marginRight: '8px' }}
+            sx={{
+              borderColor: colors.border,
+              color: colors.text,
+              marginRight: '8px'
+            }}
           >
             Download
           </Button>
@@ -3326,24 +3310,18 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
             </Typography>
           )}
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={handleRetry}
-            style={{ backgroundColor: colors.primary, color: 'white' }}
+            sx={{
+              borderColor: colors.border,
+              color: colors.text
+            }}
           >
             Try Again
           </Button>
         </div>
       )}
 
-      <div style={{ marginTop: '24px' }}>
-        <Button
-          variant="outlined"
-          onClick={onClose}
-          style={{ borderColor: colors.border, color: colors.text }}
-        >
-          Close
-        </Button>
-      </div>
     </div>
   );
 };
