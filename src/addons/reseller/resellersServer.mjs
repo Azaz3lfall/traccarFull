@@ -1606,6 +1606,7 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
 }
 
 // POST endpoint for building mobile app with reseller data
+
 // Function to copy and replace mobile app images (appImage and notificationIcon only)
 async function copyAppImages(resellerDirPath, resellerData) {
   try {
@@ -1670,6 +1671,35 @@ async function copyAppImages(resellerDirPath, resellerData) {
           await resizeAndCopyImage(notificationIconPath, targetPath, iconSize.size, iconSize.size);
           console.log(`✅ Android ${iconSize.folder} notification icon updated`);
         }
+      }
+    }
+    
+    // Android PNG image replacement (replace vector drawables with PNGs)
+    console.log('🎨 Replacing Android vector drawables with PNG images...');
+    
+    // Replace ic_launcher_foreground.xml with reseller app image as PNG
+    if (appImagePath && fs.existsSync(appImagePath)) {
+      const launcherForegroundPath = path.join(androidResPath, 'drawable', 'ic_launcher_foreground.xml');
+      const launcherPngPath = path.join(androidResPath, 'drawable', 'ic_launcher_foreground.png');
+      
+      if (fs.existsSync(launcherForegroundPath)) {
+        // Copy reseller image as PNG and remove the XML vector drawable
+        await resizeAndCopyImage(appImagePath, launcherPngPath, 108, 108);
+        fs.unlinkSync(launcherForegroundPath); // Remove the XML file
+        console.log('✅ Android launcher foreground replaced with PNG image');
+      }
+    }
+    
+    // Replace ic_stat_notify.xml with reseller notification icon as PNG
+    if (notificationIconPath && fs.existsSync(notificationIconPath)) {
+      const notificationDrawablePath = path.join(androidResPath, 'drawable', 'ic_stat_notify.xml');
+      const notificationPngPath = path.join(androidResPath, 'drawable', 'ic_stat_notify.png');
+      
+      if (fs.existsSync(notificationDrawablePath)) {
+        // Copy reseller notification icon as PNG and remove the XML vector drawable
+        await resizeAndCopyImage(notificationIconPath, notificationPngPath, 24, 24);
+        fs.unlinkSync(notificationDrawablePath); // Remove the XML file
+        console.log('✅ Android notification icon replaced with PNG image');
       }
     }
     
@@ -1874,8 +1904,15 @@ app.post('/api/resellers/build', async (req, res) => {
           let manifestContent = fs.readFileSync(androidManifestPath, 'utf8');
           // Only update display label, keep original package name for Firebase
           manifestContent = manifestContent.replace(/android:label="[^"]*"/, `android:label="${resellerData.companyName}"`);
+          
+          // Update notification icon to use PNG instead of vector drawable
+          manifestContent = manifestContent.replace(
+            /android:resource="@drawable\/ic_stat_notify"/,
+            'android:resource="@drawable/ic_stat_notify"'
+          );
+          
           fs.writeFileSync(androidManifestPath, manifestContent);
-          console.log('✅ AndroidManifest.xml updated (display name only)');
+          console.log('✅ AndroidManifest.xml updated (display name and PNG icons)');
         }
 
         // Update iOS app configuration
@@ -1899,6 +1936,19 @@ app.post('/api/resellers/build', async (req, res) => {
           brandContent = brandContent.replace(/const url = ".*";/, `const url = "https://${resellerData.appUrl}";`);
           fs.writeFileSync(brandDartPath, brandContent);
           console.log('✅ brand.dart updated (app name and URL only)');
+        }
+
+        // Update ic_launcher.xml to use PNG instead of vector drawable
+        const icLauncherXmlPath = path.join(resellerDirPath, 'android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml');
+        if (fs.existsSync(icLauncherXmlPath)) {
+          let launcherXmlContent = fs.readFileSync(icLauncherXmlPath, 'utf8');
+          // Replace vector drawable reference with PNG
+          launcherXmlContent = launcherXmlContent.replace(
+            /android:drawable="@drawable\/ic_launcher_foreground"/,
+            'android:drawable="@drawable/ic_launcher_foreground"'
+          );
+          fs.writeFileSync(icLauncherXmlPath, launcherXmlContent);
+          console.log('✅ ic_launcher.xml updated to use PNG foreground');
         }
 
         // Note: google-services.json is already in source code, no need to copy
