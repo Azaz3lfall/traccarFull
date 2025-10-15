@@ -392,31 +392,21 @@ const FloatingResellersPopover = ({
       console.log('✅ Clean apps result:', result);
 
       // Reset build states in localStorage
-      // The build states are stored with 'undefined_' prefix because reseller.id is undefined
-      // We need to reset the actual keys that exist in localStorage
+      // Now that reseller.id is properly set, we can use it for build keys
+      const resellerId = reseller.id;
+      console.log('🔑 Using reseller ID for build keys:', resellerId);
       console.log('🔍 Current localStorage before reset:', localStorage.getItem('resellerBuildStates'));
       
-      // Check what build keys actually exist in localStorage
-      const currentStates = JSON.parse(localStorage.getItem('resellerBuildStates') || '{}');
-      const existingKeys = Object.keys(currentStates);
-      console.log('🔍 Existing build keys in localStorage:', existingKeys);
-      
-      // Since build states are stored with 'undefined_' prefix, we need to reset those keys
-      // This is a temporary fix until we fix the root cause of reseller.id being undefined
       const buildKeysToReset = [];
-      existingKeys.forEach(key => {
-        if (key.startsWith('undefined_')) {
-          if (key.includes('_apk') && (cleanType === 'apk' || cleanType === 'both')) {
-            buildKeysToReset.push(key);
-          }
-          if (key.includes('_aab') && (cleanType === 'aab' || cleanType === 'both')) {
-            buildKeysToReset.push(key);
-          }
-          if (key.includes('_ios') && (cleanType === 'ios' || cleanType === 'both')) {
-            buildKeysToReset.push(key);
-          }
-        }
-      });
+      if (cleanType === 'apk' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_apk`);
+      }
+      if (cleanType === 'aab' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_aab`);
+      }
+      if (cleanType === 'ios' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_ios`);
+      }
       
       console.log('🔑 Build keys to reset:', buildKeysToReset);
       
@@ -495,8 +485,14 @@ const FloatingResellersPopover = ({
     retry: 2,
   });
 
+  // Add missing id field to resellers (use resellerId as id)
+  const resellersWithId = (resellersData || []).map(reseller => ({
+    ...reseller,
+    id: reseller.resellerId // Add missing id field
+  }));
+
   // Filter resellers based on search keyword
-  const filteredResellers = (resellersData || []).filter(reseller =>
+  const filteredResellers = resellersWithId.filter(reseller =>
     reseller.companyName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
     reseller.appUrl?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
     reseller.resellerEmail?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
