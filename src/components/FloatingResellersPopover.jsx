@@ -357,17 +357,21 @@ const FloatingResellersPopover = ({
   const cleanApps = async (reseller, cleanType) => {
     try {
       console.log(`🧹 Cleaning ${cleanType} for reseller:`, reseller);
+      console.log('🔗 Clean apps endpoint:', resellersConfig.ENDPOINTS.CLEAN_APPS);
+      
+      const requestBody = {
+        appUrl: reseller.appUrl,
+        resellerId: reseller.id, // Use reseller.id instead of reseller.resellerId
+        cleanType: cleanType
+      };
+      console.log('📤 Request body:', requestBody);
       
       const response = await fetch(resellersConfig.ENDPOINTS.CLEAN_APPS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          appUrl: reseller.appUrl,
-          resellerId: reseller.resellerId,
-          cleanType: cleanType
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -380,6 +384,7 @@ const FloatingResellersPopover = ({
       // Reset build states in localStorage
       const buildKey = `${reseller.id}_apk`;
       const buildKeyAab = `${reseller.id}_aab`;
+      console.log('🔑 Build keys to reset:', { buildKey, buildKeyAab, cleanType });
       
       setBuildStates(prev => {
         const newStates = { ...prev };
