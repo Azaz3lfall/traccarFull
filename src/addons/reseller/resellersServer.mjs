@@ -1440,6 +1440,69 @@ app.post('/api/resellers/delete', async (req, res) => {
       // Don't fail the delete operation if cleanup fails
     }
 
+    // Cleanup generated apps and source code for the deleted reseller
+    try {
+      console.log(`🧹 Cleaning up generated apps and source code for reseller: ${resellerData.appUrl}`);
+      
+      const cleanedFiles = [];
+      const errors = [];
+
+      // Clean APK file
+      const apkPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
+      if (fs.existsSync(apkPath)) {
+        try {
+          fs.unlinkSync(apkPath);
+          cleanedFiles.push('APK');
+          console.log(`✅ Deleted APK: ${apkPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete APK: ${error.message}`);
+          console.error(`❌ Error deleting APK:`, error);
+        }
+      }
+
+      // Clean AAB file
+      const aabPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
+      if (fs.existsSync(aabPath)) {
+        try {
+          fs.unlinkSync(aabPath);
+          cleanedFiles.push('AAB');
+          console.log(`✅ Deleted AAB: ${aabPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete AAB: ${error.message}`);
+          console.error(`❌ Error deleting AAB:`, error);
+        }
+      }
+
+      // Clean source code directory
+      const files = fs.readdirSync(DATA_DIR);
+      const matchingDirs = files.filter(file => {
+        const fullPath = path.join(DATA_DIR, file);
+        return fs.statSync(fullPath).isDirectory() && file.includes(resellerData.appUrl) && file.includes(resellerData.resellerId);
+      });
+
+      for (const dir of matchingDirs) {
+        const dirPath = path.join(DATA_DIR, dir);
+        try {
+          fs.rmSync(dirPath, { recursive: true, force: true });
+          cleanedFiles.push(`Source code (${dir})`);
+          console.log(`✅ Deleted source directory: ${dirPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete source directory ${dir}: ${error.message}`);
+          console.error(`❌ Error deleting source directory:`, error);
+        }
+      }
+
+      if (cleanedFiles.length > 0) {
+        console.log(`✅ Cleaned up: ${cleanedFiles.join(', ')}`);
+      }
+      if (errors.length > 0) {
+        console.error(`⚠️ Cleanup errors: ${errors.join(', ')}`);
+      }
+    } catch (cleanupError) {
+      console.error('❌ Error during app cleanup (non-blocking):', cleanupError);
+      // Don't fail the delete operation if cleanup fails
+    }
+
     res.json({
       success: true,
       message: `Reseller '${resellerData.companyName}' deleted successfully`,
@@ -1966,6 +2029,104 @@ app.get('/api/resellers/download', async (req, res) => {
     res.status(500).json({
       error: 'Download failed',
       message: error.message
+    });
+  }
+});
+
+// POST endpoint for cleaning apps
+app.post('/api/resellers/clean-apps', async (req, res) => {
+  try {
+    const { appUrl, resellerId, cleanType } = req.body;
+    
+    console.log('🧹 Clean apps request received:', { appUrl, resellerId, cleanType });
+    
+    if (!appUrl || !resellerId || !cleanType) {
+      return res.status(400).json({
+        error: 'Bad request',
+        message: 'appUrl, resellerId, and cleanType are required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!['apk', 'aab', 'both'].includes(cleanType)) {
+      return res.status(400).json({
+        error: 'Bad request',
+        message: 'cleanType must be apk, aab, or both',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    console.log(`🧹 Cleaning ${cleanType} apps for reseller ${resellerId} (${appUrl})`);
+
+    const cleanedFiles = [];
+    const errors = [];
+
+    // Clean APK files
+    if (cleanType === 'apk' || cleanType === 'both') {
+      const apkPath = path.join(DATA_DIR, `${appUrl}.apk`);
+      if (fs.existsSync(apkPath)) {
+        try {
+          fs.unlinkSync(apkPath);
+          cleanedFiles.push('APK');
+          console.log(`✅ Deleted APK: ${apkPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete APK: ${error.message}`);
+          console.error(`❌ Error deleting APK:`, error);
+        }
+      }
+    }
+
+    // Clean AAB files
+    if (cleanType === 'aab' || cleanType === 'both') {
+      const aabPath = path.join(DATA_DIR, `${appUrl}.aab`);
+      if (fs.existsSync(aabPath)) {
+        try {
+          fs.unlinkSync(aabPath);
+          cleanedFiles.push('AAB');
+          console.log(`✅ Deleted AAB: ${aabPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete AAB: ${error.message}`);
+          console.error(`❌ Error deleting AAB:`, error);
+        }
+      }
+    }
+
+    // Clean source code directory if both are being cleaned
+    if (cleanType === 'both') {
+      const sourceDirPattern = `reseller_*_${appUrl}_*_${resellerId}`;
+      const files = fs.readdirSync(DATA_DIR);
+      const matchingDirs = files.filter(file => {
+        const fullPath = path.join(DATA_DIR, file);
+        return fs.statSync(fullPath).isDirectory() && file.includes(appUrl) && file.includes(resellerId);
+      });
+
+      for (const dir of matchingDirs) {
+        const dirPath = path.join(DATA_DIR, dir);
+        try {
+          fs.rmSync(dirPath, { recursive: true, force: true });
+          cleanedFiles.push(`Source code (${dir})`);
+          console.log(`✅ Deleted source directory: ${dirPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete source directory ${dir}: ${error.message}`);
+          console.error(`❌ Error deleting source directory:`, error);
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Successfully cleaned ${cleanedFiles.join(', ')}`,
+      cleanedFiles,
+      errors: errors.length > 0 ? errors : undefined,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error cleaning apps:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });

@@ -28,6 +28,7 @@ export default {
     `${RESELLERS_SERVER_URL}/api/resellers/download?appUrl=${encodeURIComponent(appUrl)}&buildType=${buildType}`,
   RESELLER_LOGO: (domain) =>
     `${RESELLERS_SERVER_URL}/api/reseller-logo?domain=${encodeURIComponent(domain)}`,
+  CLEAN_APPS: `${RESELLERS_SERVER_URL}/api/resellers/clean-apps`,
   }
 };
 
