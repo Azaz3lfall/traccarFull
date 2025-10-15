@@ -2045,23 +2045,28 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     const aabPath = path.join(DATA_DIR, `${appUrl}.aab`);
     
     // Check build status
-    const isBuilding = fs.existsSync(resellerDirPath) && fs.existsSync(buildDir);
+    const resellerDirExists = fs.existsSync(resellerDirPath);
+    const buildDirExists = fs.existsSync(buildDir);
     const apkExists = fs.existsSync(apkPath);
     const aabExists = fs.existsSync(aabPath);
     
     console.log(`🔍 Build status check for ${appUrl}:`);
-    console.log(`📁 Reseller dir exists: ${fs.existsSync(resellerDirPath)}`);
-    console.log(`📁 Build dir exists: ${fs.existsSync(buildDir)}`);
+    console.log(`📁 Reseller dir exists: ${resellerDirExists}`);
+    console.log(`📁 Build dir exists: ${buildDirExists}`);
     console.log(`📁 APK exists: ${apkExists} at ${apkPath}`);
     console.log(`📁 AAB exists: ${aabExists} at ${aabPath}`);
-    console.log(`🔨 Is building: ${isBuilding}`);
     
     // Determine build status based on buildType and file existence
     let buildStatus = 'NOT_BUILDED';
     let buildComplete = false;
     
-    if (isBuilding) {
+    // If reseller directory exists but no build files yet, it's building
+    if (resellerDirExists && !apkExists && !aabExists) {
       buildStatus = 'BUILDING';
+      console.log(`🔨 Status: BUILDING (reseller dir exists, no build files yet)`);
+    } else if (buildDirExists) {
+      buildStatus = 'BUILDING';
+      console.log(`🔨 Status: BUILDING (build dir exists)`);
     } else if (buildType === 'apk' && apkExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
@@ -2087,7 +2092,7 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
         appUrl,
         parentUserId,
         buildType,
-        isBuilding,
+        isBuilding: buildStatus === 'BUILDING',
         buildComplete,
         buildStatus,
         apkExists,

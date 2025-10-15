@@ -221,6 +221,8 @@ const FloatingResellersPopover = ({
   const updateBuildState = (resellerId, buildType, state, resellerData = null) => {
     const key = `${resellerId}_${buildType}`;
     console.log(`🔄 updateBuildState called: ${key} = ${state}`);
+    console.log(`🔄 Reseller data passed:`, resellerData);
+    console.log(`🔄 Current buildStates before update:`, buildStates);
     
     setBuildStates(prev => {
       const newState = {
@@ -232,6 +234,7 @@ const FloatingResellersPopover = ({
         }
       };
       console.log(`🔄 New build states after update:`, newState);
+      console.log(`🔄 Specific key ${key} value:`, newState[key]);
       return newState;
     });
   };
@@ -319,12 +322,22 @@ const FloatingResellersPopover = ({
 
       // Update state to BUILDING after successful API call with reseller data
       console.log(`🔄 Setting state to BUILDING for ${resellerId}_${buildType}`);
+      console.log(`🔄 Reseller data for polling:`, resellerDataForPolling);
+      
       updateBuildState(resellerId, buildType, 'BUILDING', resellerDataForPolling);
       
-      // Verify the state was set
+      // Verify the state was set immediately
+      const immediateState = getBuildState(resellerId, buildType);
+      console.log(`🔍 Immediate state after setting BUILDING: ${resellerId}_${buildType} = ${immediateState}`);
+      
+      // Verify the state was set after a delay
       setTimeout(() => {
         const currentState = getBuildState(resellerId, buildType);
-        console.log(`🔍 State after setting BUILDING: ${resellerId}_${buildType} = ${currentState}`);
+        console.log(`🔍 Delayed state after setting BUILDING: ${resellerId}_${buildType} = ${currentState}`);
+        
+        // Also check localStorage directly
+        const localStorageState = localStorage.getItem('resellerBuildStates');
+        console.log(`🔍 localStorage state:`, localStorageState);
       }, 100);
 
       setSnackbar({

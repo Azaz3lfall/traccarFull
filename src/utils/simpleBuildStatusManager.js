@@ -58,7 +58,10 @@ class SimpleBuildStatusManager {
   async pollActiveBuilds() {
     try {
       const buildStates = this.getBuildStates();
+      console.log('🔍 Current build states in polling:', buildStates);
+      
       const activeBuilds = this.getActiveBuilds(buildStates);
+      console.log('🔍 Active builds found:', activeBuilds);
       
       if (activeBuilds.length === 0) {
         console.log('📊 No active builds to poll');
@@ -183,9 +186,31 @@ class SimpleBuildStatusManager {
   updateBuildState(key, state) {
     try {
       const buildStates = this.getBuildStates();
-      buildStates[key] = state;
+      
+      // Handle both old format (string) and new format (object)
+      if (typeof buildStates[key] === 'object' && buildStates[key] !== null) {
+        // Update existing object
+        buildStates[key] = {
+          ...buildStates[key],
+          status: state,
+          timestamp: new Date().toISOString()
+        };
+      } else {
+        // Create new object
+        buildStates[key] = {
+          status: state,
+          resellerData: null,
+          timestamp: new Date().toISOString()
+        };
+      }
+      
       localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
       console.log(`💾 Updated build state: ${key} = ${state}`);
+      
+      // Also trigger React state update
+      if (window.updateReactBuildState) {
+        window.updateReactBuildState(key, state);
+      }
     } catch (error) {
       console.error(`❌ Error updating build state:`, error);
     }
@@ -209,7 +234,13 @@ class SimpleBuildStatusManager {
     setTimeout(() => {
       console.log(`🔄 Force polling build ${key}`);
       this.pollActiveBuilds();
-    }, 2000);
+    }, 1000);
+    
+    // Also force another poll after 5 seconds to catch any state changes
+    setTimeout(() => {
+      console.log(`🔄 Second force polling build ${key}`);
+      this.pollActiveBuilds();
+    }, 5000);
   }
 
 }
