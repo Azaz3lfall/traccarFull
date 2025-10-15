@@ -2240,7 +2240,12 @@ app.get('/api/resellers/download', async (req, res) => {
     }
 
     // Construct the expected filename
-    const filename = `${appUrl}.${buildType}`;
+    let filename;
+    if (buildType === 'ios') {
+      filename = `${appUrl}.app`;
+    } else {
+      filename = `${appUrl}.${buildType}`;
+    }
     const filePath = path.join(DATA_DIR, filename);
 
     console.log('🔍 Looking for file:', filePath);
