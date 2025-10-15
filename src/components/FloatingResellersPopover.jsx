@@ -65,7 +65,7 @@ import {
   Apps as AppsIcon,
   Extension as ExtensionIcon,
 } from '@mui/icons-material';
-import { BsGooglePlay } from "react-icons/bs";
+import { BsGooglePlay, BsAndroid } from "react-icons/bs";
 import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
