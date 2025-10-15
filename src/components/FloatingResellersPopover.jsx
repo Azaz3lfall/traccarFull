@@ -3224,7 +3224,7 @@ const FloatingResellersPopover = ({
             right: 0,
             bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 10006,
+            zIndex: 10004,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -3288,28 +3288,27 @@ const FloatingResellersPopover = ({
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Simulator Build */}
-                <button
+                <Button
                   onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'simulator')}
-                  style={{
+                  variant="outlined"
+                  sx={{
                     border: `2px solid ${colors.primary}`,
                     color: colors.text,
                     backgroundColor: colors.surface,
                     padding: '20px',
                     borderRadius: '12px',
-                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '16px',
                     fontSize: '16px',
                     fontWeight: '500',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'left'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.primary + '20';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = colors.surface;
+                    textAlign: 'left',
+                    justifyContent: 'flex-start',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: colors.primary + '20',
+                      borderColor: colors.primary
+                    }
                   }}
                 >
                   <div style={{
@@ -3330,31 +3329,30 @@ const FloatingResellersPopover = ({
                       For testing on iOS Simulator (x86_64/arm64)
                     </div>
                   </div>
-                </button>
+                </Button>
 
                 {/* Physical Device Build */}
-                <button
+                <Button
                   onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'device')}
-                  style={{
+                  variant="outlined"
+                  sx={{
                     border: `2px solid ${colors.primary}`,
                     color: colors.text,
                     backgroundColor: colors.surface,
                     padding: '20px',
                     borderRadius: '12px',
-                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '16px',
                     fontSize: '16px',
                     fontWeight: '500',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'left'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.primary + '20';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = colors.surface;
+                    textAlign: 'left',
+                    justifyContent: 'flex-start',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: colors.primary + '20',
+                      borderColor: colors.primary
+                    }
                   }}
                 >
                   <div style={{
@@ -3375,7 +3373,7 @@ const FloatingResellersPopover = ({
                       For installation on real iOS devices (arm64)
                     </div>
                   </div>
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>
