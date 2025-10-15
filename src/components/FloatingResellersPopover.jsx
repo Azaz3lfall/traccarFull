@@ -358,6 +358,9 @@ const FloatingResellersPopover = ({
     try {
       console.log(`🧹 Cleaning ${cleanType} for reseller:`, reseller);
       console.log('🔗 Clean apps endpoint:', resellersConfig.ENDPOINTS.CLEAN_APPS);
+      console.log('🔍 Reseller keys:', Object.keys(reseller));
+      console.log('🔍 Reseller appUrl:', reseller.appUrl);
+      console.log('🔍 Reseller id:', reseller.id);
       
       const requestBody = {
         appUrl: reseller.appUrl,
