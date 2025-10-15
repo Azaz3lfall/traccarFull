@@ -1558,8 +1558,8 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ AAB build completed');
     } else if (buildType === 'ios') {
-      console.log('🍎 Building iOS...');
-      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 }); // 40 minutes
+      console.log('🍎 Building iOS for Simulator...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign --simulator`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ iOS build completed');
     } else {
       // Build all if no specific type requested
@@ -1571,8 +1571,8 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 });
       console.log('✅ AAB build completed');
 
-      console.log('🍎 Building iOS...');
-      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 });
+      console.log('🍎 Building iOS for Simulator...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign --simulator`, { timeout: 2400000 });
       console.log('✅ iOS build completed');
     }
 
