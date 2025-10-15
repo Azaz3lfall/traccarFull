@@ -1990,7 +1990,7 @@ app.post('/api/resellers/build', async (req, res) => {
     console.log('⚙️ Updating app configuration...');
     
     // Update pubspec.yaml (keep original package name for Firebase compatibility)
-    const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
+    // pubspecPath already declared above
     if (fs.existsSync(pubspecPath)) {
       let pubspecContent = fs.readFileSync(pubspecPath, 'utf8');
       // Only update description, keep original package name for Firebase
