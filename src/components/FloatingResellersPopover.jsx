@@ -34,6 +34,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   Search as SearchIcon,
