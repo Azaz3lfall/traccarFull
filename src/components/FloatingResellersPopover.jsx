@@ -392,18 +392,28 @@ const FloatingResellersPopover = ({
       console.log('✅ Clean apps result:', result);
 
       // Reset build states in localStorage
-      const buildKey = `${reseller.resellerId}_apk`;
-      const buildKeyAab = `${reseller.resellerId}_aab`;
-      console.log('🔑 Build keys to reset:', { buildKey, buildKeyAab, cleanType });
+      // Use the same ID field as the build functions (reseller.id, but fallback to reseller.resellerId)
+      const resellerId = reseller.id || reseller.resellerId;
+      console.log('🔑 Using reseller ID for build keys:', resellerId);
+      
+      const buildKeysToReset = [];
+      if (cleanType === 'apk' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_apk`);
+      }
+      if (cleanType === 'aab' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_aab`);
+      }
+      if (cleanType === 'ios' || cleanType === 'both') {
+        buildKeysToReset.push(`${resellerId}_ios`);
+      }
+      
+      console.log('🔑 Build keys to reset:', buildKeysToReset);
       
       setBuildStates(prev => {
         const newStates = { ...prev };
-        if (cleanType === 'apk' || cleanType === 'both') {
-          delete newStates[buildKey];
-        }
-        if (cleanType === 'aab' || cleanType === 'both') {
-          delete newStates[buildKeyAab];
-        }
+        buildKeysToReset.forEach(key => {
+          delete newStates[key];
+        });
         return newStates;
       });
 
@@ -411,13 +421,11 @@ const FloatingResellersPopover = ({
       const savedStates = localStorage.getItem('resellerBuildStates');
       if (savedStates) {
         const states = JSON.parse(savedStates);
-        if (cleanType === 'apk' || cleanType === 'both') {
-          delete states[buildKey];
-        }
-        if (cleanType === 'aab' || cleanType === 'both') {
-          delete states[buildKeyAab];
-        }
+        buildKeysToReset.forEach(key => {
+          delete states[key];
+        });
         localStorage.setItem('resellerBuildStates', JSON.stringify(states));
+        console.log('✅ localStorage updated, removed keys:', buildKeysToReset);
       }
 
       setSnackbar({
