@@ -1254,6 +1254,7 @@ const FloatingResellersPopover = ({
   }, [colors.success, colors.error]);
 
   return (
+    <>
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -2897,7 +2898,7 @@ const FloatingResellersPopover = ({
         </DialogActions>
       </Dialog>
     )}
-  );
+  </>;
 };
 
 // Build Status Modal Content Component
