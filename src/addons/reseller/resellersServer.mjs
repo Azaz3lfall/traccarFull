@@ -1950,6 +1950,11 @@ app.post('/api/resellers/build', async (req, res) => {
       }
     }
 
+    // Create the reseller directory
+    console.log('📁 Creating reseller directory...');
+    fs.mkdirSync(resellerDirPath, { recursive: true });
+    console.log('✅ Reseller directory created:', resellerDirPath);
+
     // Get build type from request body (default to 'apk')
     const buildType = resellerData.buildType || 'apk';
     
