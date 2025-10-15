@@ -1972,8 +1972,19 @@ app.post('/api/resellers/build', async (req, res) => {
       try {
     // Copy source code to reseller directory
     console.log('📋 Copying source code...');
-    await execAsync(`cp -r "${sourceDir}" "${resellerDirPath}"`);
+    console.log('📁 Source dir contents:', fs.readdirSync(sourceDir));
+    await execAsync(`cp -r "${sourceDir}"/* "${resellerDirPath}/"`);
     console.log('✅ Source code copied successfully');
+    
+    // Verify pubspec.yaml exists
+    const pubspecPath = path.join(resellerDirPath, 'pubspec.yaml');
+    if (fs.existsSync(pubspecPath)) {
+      console.log('✅ pubspec.yaml found in target directory');
+    } else {
+      console.error('❌ pubspec.yaml NOT found in target directory');
+      console.log('📁 Target directory contents:', fs.readdirSync(resellerDirPath));
+      throw new Error('pubspec.yaml not found after copy operation');
+    }
 
     // Update app configuration files
     console.log('⚙️ Updating app configuration...');
