@@ -2898,7 +2898,8 @@ const FloatingResellersPopover = ({
         </DialogActions>
       </Dialog>
     )}
-  </>;
+    </>
+  );
 };
 
 // Build Status Modal Content Component
