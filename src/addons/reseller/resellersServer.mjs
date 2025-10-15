@@ -1466,9 +1466,9 @@ app.post('/api/resellers/delete', async (req, res) => {
 });
 
 // Async function to handle Flutter build process
-async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
+async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType = 'apk') {
   try {
-    console.log('🔨 Starting Flutter build process...');
+    console.log(`🔨 Starting Flutter build process for ${buildType.toUpperCase()}...`);
     const buildDir = path.join(resellerDirPath, 'build');
     
     // Clean previous build
@@ -1476,30 +1476,49 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
       fs.rmSync(buildDir, { recursive: true, force: true });
     }
 
-    // Run Flutter build
-    console.log('📱 Building APK...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 }); // 40 minutes
-    console.log('✅ APK build completed');
+    // Run Flutter build based on requested type
+    if (buildType === 'apk') {
+      console.log('📱 Building APK...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 }); // 40 minutes
+      console.log('✅ APK build completed');
+    } else if (buildType === 'aab') {
+      console.log('📦 Building AAB...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
+      console.log('✅ AAB build completed');
+    } else {
+      // Build both if no specific type requested
+      console.log('📱 Building APK...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build apk --release --target-platform android-arm,android-arm64,android-x64`, { timeout: 2400000 });
+      console.log('✅ APK build completed');
 
-    console.log('📦 Building AAB...');
-    await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 }); // 40 minutes
-    console.log('✅ AAB build completed');
-
-    // Rename output files
-    const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
-    const aabSourcePath = path.join(resellerDirPath, 'build/app/outputs/bundle/release/app-release.aab');
-    
-    const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
-    const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
-
-    if (fs.existsSync(apkSourcePath)) {
-      fs.copyFileSync(apkSourcePath, apkTargetPath);
-      console.log('✅ APK renamed to:', apkTargetPath);
+      console.log('📦 Building AAB...');
+      await execAsync(`cd "${resellerDirPath}" && flutter build appbundle --release`, { timeout: 2400000 });
+      console.log('✅ AAB build completed');
     }
 
-    if (fs.existsSync(aabSourcePath)) {
-      fs.copyFileSync(aabSourcePath, aabTargetPath);
-      console.log('✅ AAB renamed to:', aabTargetPath);
+    // Rename output files based on what was built
+    if (buildType === 'apk' || buildType === 'both') {
+      const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
+      const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
+      
+      if (fs.existsSync(apkSourcePath)) {
+        fs.copyFileSync(apkSourcePath, apkTargetPath);
+        console.log('✅ APK renamed to:', apkTargetPath);
+      } else {
+        console.log('❌ APK file not found after build');
+      }
+    }
+    
+    if (buildType === 'aab' || buildType === 'both') {
+      const aabSourcePath = path.join(resellerDirPath, 'build/app/outputs/bundle/release/app-release.aab');
+      const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
+      
+      if (fs.existsSync(aabSourcePath)) {
+        fs.copyFileSync(aabSourcePath, aabTargetPath);
+        console.log('✅ AAB renamed to:', aabTargetPath);
+      } else {
+        console.log('❌ AAB file not found after build');
+      }
     }
 
     // Clean up build directory to save space
@@ -1519,10 +1538,18 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName) {
 async function copyAppImages(resellerDirPath, resellerData) {
   try {
     console.log('🖼️ Copying app images...');
+    console.log('📋 Reseller data keys:', Object.keys(resellerData));
+    console.log('🖼️ App image field:', resellerData.appImage);
+    console.log('🔔 Notification icon field:', resellerData.notificationIcon);
     
     // Get image paths from reseller data
     const appImagePath = resellerData.appImage ? path.join(IMAGES_DIR, resellerData.appImage.replace('images/', '')) : null;
     const notificationIconPath = resellerData.notificationIcon ? path.join(IMAGES_DIR, resellerData.notificationIcon.replace('images/', '')) : null;
+    
+    console.log('📁 App image path:', appImagePath);
+    console.log('📁 Notification icon path:', notificationIconPath);
+    console.log('📁 App image exists:', appImagePath ? fs.existsSync(appImagePath) : false);
+    console.log('📁 Notification icon exists:', notificationIconPath ? fs.existsSync(notificationIconPath) : false);
     
     if (!appImagePath || !fs.existsSync(appImagePath)) {
       console.log('⚠️ App image not found, using default');
@@ -1759,17 +1786,34 @@ app.post('/api/resellers/build', async (req, res) => {
     // Note: google-services.json is already in source code, no need to copy
     console.log('✅ Using existing google-services.json from source code');
 
+    // Get complete reseller data from JSON file to access all image fields
+    const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
+    let completeResellerData = resellerData;
+    
+    if (fs.existsSync(resellerFilePath)) {
+      try {
+        const fileContent = fs.readFileSync(resellerFilePath, 'utf8');
+        completeResellerData = JSON.parse(fileContent);
+        console.log('✅ Loaded complete reseller data from JSON file');
+      } catch (error) {
+        console.error('⚠️ Error loading reseller data from JSON file:', error);
+      }
+    }
+
     // Copy and replace mobile app images (appImage and notificationIcon)
-    await copyAppImages(resellerDirPath, resellerData);
+    await copyAppImages(resellerDirPath, completeResellerData);
 
     // Copy favicon for web app browser tab (logo remains for main web branding)
-    await copyFaviconForWebApp(resellerData);
+    await copyFaviconForWebApp(completeResellerData);
 
     // Start Flutter build process asynchronously
     console.log('🔨 Starting Flutter build process...');
     
+    // Get build type from request body (default to 'apk')
+    const buildType = resellerData.buildType || 'apk';
+    
     // Start build process in background (don't await)
-    buildFlutterApp(resellerDirPath, resellerData, resellerDirName);
+    buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType);
     
     // Return immediately to frontend
     res.json({

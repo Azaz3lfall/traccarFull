@@ -224,7 +224,8 @@ const FloatingResellersPopover = ({
         companyName: reseller.companyName,
         parentUserId: reseller.parentUserId,
         resellerId: reseller.resellerId,
-        currentDomain: reseller.currentDomain || 'gps'
+        currentDomain: reseller.currentDomain || 'gps',
+        buildType: buildType // Add build type to request
       };
 
       console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
