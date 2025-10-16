@@ -572,7 +572,12 @@ const FloatingResellersPopover = ({
       if (cleanType === 'aab' || cleanType === 'both') {
         buildKeysToReset.push(`${resellerId}_aab`);
       }
-      if (cleanType === 'ios' || cleanType === 'both') {
+      if (cleanType === 'ios' || cleanType === 'ios_simulator' || cleanType === 'ios_device' || cleanType === 'both') {
+        // For iOS cleaning, we need to reset both ios_simulator and ios_device keys
+        // since the backend cleans the same .app file for all iOS build types
+        buildKeysToReset.push(`${resellerId}_ios_simulator`);
+        buildKeysToReset.push(`${resellerId}_ios_device`);
+        // Also reset the old ios key for backward compatibility
         buildKeysToReset.push(`${resellerId}_ios`);
       }
       
