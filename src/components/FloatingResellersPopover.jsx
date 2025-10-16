@@ -3286,94 +3286,48 @@ const FloatingResellersPopover = ({
                 Choose the iOS build type for <strong>{iosBuildTypeModal.reseller?.companyName}</strong>
               </Typography>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {/* Simulator Build */}
-                <Button
+                <button
                   onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'simulator')}
-                  variant="outlined"
-                  sx={{
-                    border: `2px solid ${colors.primary}`,
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
                     color: colors.text,
-                    backgroundColor: colors.surface,
-                    padding: '20px',
-                    borderRadius: '12px',
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    textAlign: 'left',
-                    justifyContent: 'flex-start',
-                    textTransform: 'none',
-                    '&:hover': {
-                      backgroundColor: colors.border,
-                      borderColor: colors.primary
-                    }
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500'
                   }}
                 >
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    backgroundColor: colors.border,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <AppleIcon style={{ fontSize: '24px', color: colors.text }} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>iOS Simulator</div>
-                    <div style={{ fontSize: '14px', opacity: 0.8 }}>
-                      For testing on iOS Simulator (x86_64/arm64)
-                    </div>
-                  </div>
-                </Button>
+                  <AppleIcon size={20} />
+                  iOS Simulator
+                </button>
 
                 {/* Physical Device Build */}
-                <Button
+                <button
                   onClick={() => handleIosBuildType(iosBuildTypeModal.reseller, 'device')}
-                  variant="outlined"
-                  sx={{
-                    border: `2px solid ${colors.primary}`,
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
                     color: colors.text,
-                    backgroundColor: colors.surface,
-                    padding: '20px',
-                    borderRadius: '12px',
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    textAlign: 'left',
-                    justifyContent: 'flex-start',
-                    textTransform: 'none',
-                    '&:hover': {
-                      backgroundColor: colors.border,
-                      borderColor: colors.primary
-                    }
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500'
                   }}
                 >
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    backgroundColor: colors.border,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <SmartphoneIcon style={{ fontSize: '24px', color: colors.text }} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>Physical Device</div>
-                    <div style={{ fontSize: '14px', opacity: 0.8 }}>
-                      For installation on real iOS devices (arm64)
-                    </div>
-                  </div>
-                </Button>
+                  <SmartphoneIcon size={20} />
+                  Physical Device
+                </button>
               </div>
             </div>
           </motion.div>
