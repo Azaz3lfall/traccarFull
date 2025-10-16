@@ -437,6 +437,9 @@ const FloatingResellersPopover = ({
     const resellerId = reseller.appUrl; // Use appUrl as unique identifier
     
     try {
+      console.log(`🔍 checkBuildStatus called with buildType:`, buildType);
+      console.log(`🔍 reseller data:`, { appUrl: reseller.appUrl, parentUserId: reseller.parentUserId, currentDomain: reseller.currentDomain });
+      
       const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
         reseller.appUrl,
         reseller.parentUserId,
