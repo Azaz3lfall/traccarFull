@@ -3306,7 +3306,7 @@ const FloatingResellersPopover = ({
                     justifyContent: 'flex-start',
                     textTransform: 'none',
                     '&:hover': {
-                      backgroundColor: colors.primary + '20',
+                      backgroundColor: colors.border,
                       borderColor: colors.primary
                     }
                   }}
@@ -3315,13 +3315,13 @@ const FloatingResellersPopover = ({
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    backgroundColor: colors.primary + '20',
+                    backgroundColor: colors.border,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0
                   }}>
-                    <AppleIcon style={{ fontSize: '24px', color: colors.primary }} />
+                    <AppleIcon style={{ fontSize: '24px', color: colors.text }} />
                   </div>
                   <div>
                     <div style={{ fontWeight: '600', marginBottom: '4px' }}>iOS Simulator</div>
@@ -3350,7 +3350,7 @@ const FloatingResellersPopover = ({
                     justifyContent: 'flex-start',
                     textTransform: 'none',
                     '&:hover': {
-                      backgroundColor: colors.primary + '20',
+                      backgroundColor: colors.border,
                       borderColor: colors.primary
                     }
                   }}
@@ -3359,13 +3359,13 @@ const FloatingResellersPopover = ({
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    backgroundColor: colors.primary + '20',
+                    backgroundColor: colors.border,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0
                   }}>
-                    <SmartphoneIcon style={{ fontSize: '24px', color: colors.primary }} />
+                    <SmartphoneIcon style={{ fontSize: '24px', color: colors.text }} />
                   </div>
                   <div>
                     <div style={{ fontWeight: '600', marginBottom: '4px' }}>Physical Device</div>
