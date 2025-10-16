@@ -280,6 +280,39 @@ const FloatingResellersPopover = ({
     await startBuild(reseller, `ios_${iosBuildType}`);
   };
 
+  // Handle iOS button click - check for existing iOS builds first
+  const handleIosButtonClick = async (reseller) => {
+    const resellerId = reseller.appUrl;
+    const simulatorState = getBuildState(resellerId, 'ios_simulator');
+    const deviceState = getBuildState(resellerId, 'ios_device');
+    
+    // If either iOS build type is building, show status modal for the first one found
+    if (simulatorState === 'BUILDING' || simulatorState === 'BUILDED' || simulatorState === 'BUILD_ERROR') {
+      setBuildStatusModal({ open: true, reseller, buildType: 'ios_simulator' });
+    } else if (deviceState === 'BUILDING' || deviceState === 'BUILDED' || deviceState === 'BUILD_ERROR') {
+      setBuildStatusModal({ open: true, reseller, buildType: 'ios_device' });
+    } else {
+      // No existing iOS builds, show build type selection modal
+      setIosBuildTypeModal({ open: true, reseller });
+    }
+  };
+
+  // Get iOS button title based on build states
+  const getIosButtonTitle = (appUrl) => {
+    const simulatorState = getBuildState(appUrl, 'ios_simulator');
+    const deviceState = getBuildState(appUrl, 'ios_device');
+    
+    if (simulatorState === 'BUILDING' || deviceState === 'BUILDING') {
+      return 'Check Status';
+    } else if (simulatorState === 'BUILDED' || deviceState === 'BUILDED') {
+      return 'Download';
+    } else if (simulatorState === 'BUILD_ERROR' || deviceState === 'BUILD_ERROR') {
+      return 'Retry';
+    } else {
+      return 'Build';
+    }
+  };
+
   // Start a new build
   const startBuild = async (reseller, buildType) => {
     const resellerId = reseller.appUrl;
@@ -1658,14 +1691,14 @@ const FloatingResellersPopover = ({
                                     width: '28px',
                                     height: '28px',
                                     border: `1px solid ${colors.border}`,
-                                    color: buildLoading[`${reseller.appUrl}_ios`] ? colors.primary : colors.text,
+                                    color: (buildLoading[`${reseller.appUrl}_ios_simulator`] || buildLoading[`${reseller.appUrl}_ios_device`]) ? colors.primary : colors.text,
                                     padding: '4px'
                                   }}
-                                  onClick={() => handleBuildApp(reseller, 'ios')}
-                                  disabled={buildLoading[`${reseller.appUrl}_ios`]}
-                                  title={`iOS ${getBuildState(reseller.appUrl, 'ios') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'ios') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'ios') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                  onClick={() => handleIosButtonClick(reseller)}
+                                  disabled={buildLoading[`${reseller.appUrl}_ios_simulator`] || buildLoading[`${reseller.appUrl}_ios_device`]}
+                                  title={`iOS ${getIosButtonTitle(reseller.appUrl)}`}
                                 >
-                                  {buildLoading[`${reseller.appUrl}_ios`] ? (
+                                  {(buildLoading[`${reseller.appUrl}_ios_simulator`] || buildLoading[`${reseller.appUrl}_ios_device`]) ? (
                                     <CircularProgress size={12} />
                                   ) : (
                                     <AppleIcon style={{ fontSize: '16px' }} />
