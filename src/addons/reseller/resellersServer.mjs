@@ -2445,10 +2445,10 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
       });
     }
 
-    if (!['apk', 'aab', 'ios', 'both'].includes(cleanType)) {
+    if (!['apk', 'aab', 'ios', 'ios_simulator', 'ios_device', 'both'].includes(cleanType)) {
       return res.status(400).json({
         error: 'Bad request',
-        message: 'cleanType must be apk, aab, ios, or both',
+        message: 'cleanType must be apk, aab, ios, ios_simulator, ios_device, or both',
         timestamp: new Date().toISOString()
       });
     }
@@ -2489,7 +2489,7 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
     }
 
     // Clean iOS files
-    if (cleanType === 'ios' || cleanType === 'both') {
+    if (cleanType === 'ios' || cleanType === 'ios_simulator' || cleanType === 'ios_device' || cleanType === 'both') {
       const iosPath = path.join(DATA_DIR, `${appUrl}.app`);
       if (fs.existsSync(iosPath)) {
         try {

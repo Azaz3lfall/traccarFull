@@ -3151,29 +3151,55 @@ const FloatingResellersPopover = ({
                 </button>
                 
                 <button
-                  onClick={() => cleanApps(cleanAppsModal.reseller, 'ios')}
-                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios`]}
+                  onClick={() => cleanApps(cleanAppsModal.reseller, 'ios_simulator')}
+                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`]}
                   style={{ 
                     border: `1px solid ${colors.border}`, 
                     color: colors.text,
                     backgroundColor: 'transparent',
                     padding: '12px 16px',
                     borderRadius: '8px',
-                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios`] ? 'not-allowed' : 'pointer',
+                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     fontSize: '14px',
                     fontWeight: '500',
-                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios`] ? 0.6 : 1
+                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? 0.6 : 1
                   }}
                 >
-                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios`] ? (
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? (
                     <CircularProgress size={20} color="inherit" />
                   ) : (
-                    <AppleIcon />
+                    <AppleIcon size={20} />
                   )}
-                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios`] ? 'Cleaning iOS...' : 'Clean iOS Only'}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? 'Cleaning iOS Simulator...' : 'Clean iOS Simulator Only'}
+                </button>
+
+                <button
+                  onClick={() => cleanApps(cleanAppsModal.reseller, 'ios_device')}
+                  disabled={cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`]}
+                  style={{ 
+                    border: `1px solid ${colors.border}`, 
+                    color: colors.text,
+                    backgroundColor: 'transparent',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    cursor: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    opacity: cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? 0.6 : 1
+                  }}
+                >
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SmartphoneIcon size={20} />
+                  )}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? 'Cleaning iOS Device...' : 'Clean iOS Device Only'}
                 </button>
                 
                 <button
@@ -3199,7 +3225,7 @@ const FloatingResellersPopover = ({
                   ) : (
                     <RefreshIcon />
                   )}
-                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning All...' : 'Clean All (APK, AAB & iOS)'}
+                  {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning All...' : 'Clean All (APK, AAB, iOS Simulator & iOS Device)'}
                 </button>
           </div>
             </div>
