@@ -3002,7 +3002,6 @@ const FloatingResellersPopover = ({
       </Snackbar>
 
       {/* Build Status Modal */}
-      <AnimatePresence>
       {buildStatusModal.open && (
           <motion.div
             key="build-status-modal"
@@ -3085,13 +3084,9 @@ const FloatingResellersPopover = ({
             </motion.div>
           </motion.div>
       )}
-      </AnimatePresence>
 
-    </AnimatePresence>
-
-    {/* Clean Apps Modal */}
-    <AnimatePresence>
-    {cleanAppsModal.open && (
+      {/* Clean Apps Modal */}
+      {cleanAppsModal.open && (
         <motion.div
           key="clean-apps-modal"
           initial={{ opacity: 0 }}
@@ -3292,12 +3287,10 @@ const FloatingResellersPopover = ({
             </div>
           </motion.div>
         </motion.div>
-    )}
-    </AnimatePresence>
+      )}
 
-    {/* iOS Build Type Selection Modal */}
-    <AnimatePresence>
-    {iosBuildTypeModal.open && (
+      {/* iOS Build Type Selection Modal */}
+      {iosBuildTypeModal.open && (
         <motion.div
           key="ios-build-type-modal"
           initial={{ opacity: 0 }}
@@ -3419,7 +3412,8 @@ const FloatingResellersPopover = ({
             </div>
           </motion.div>
         </motion.div>
-    )}
+      )}
+
     </AnimatePresence>
     </>
   );
