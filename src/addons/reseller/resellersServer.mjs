@@ -1559,15 +1559,60 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       console.log('✅ AAB build completed');
     } else if (buildType === 'ios_simulator') {
       console.log('🍎 Building iOS for Simulator...');
+      
+      // Clean iOS build directory and pods
+      console.log('🧹 Cleaning iOS build directory...');
+      await execAsync(`cd "${resellerDirPath}" && rm -rf ios/build ios/Pods ios/Podfile.lock`, { timeout: 60000 });
+      
+      // Clean Flutter build cache
+      console.log('🧹 Cleaning Flutter build cache...');
+      await execAsync(`cd "${resellerDirPath}" && flutter clean`, { timeout: 60000 });
+      
+      // Get dependencies
+      console.log('📦 Getting Flutter dependencies...');
+      await execAsync(`cd "${resellerDirPath}" && flutter pub get`, { timeout: 60000 });
+      
+      // Build for iOS Simulator
+      console.log('🔨 Building for iOS Simulator...');
       await execAsync(`cd "${resellerDirPath}" && flutter build ios --debug --simulator`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ iOS Simulator build completed');
     } else if (buildType === 'ios_device') {
       console.log('🍎 Building iOS for Physical Device...');
+      
+      // Clean iOS build directory and pods
+      console.log('🧹 Cleaning iOS build directory...');
+      await execAsync(`cd "${resellerDirPath}" && rm -rf ios/build ios/Pods ios/Podfile.lock`, { timeout: 60000 });
+      
+      // Clean Flutter build cache
+      console.log('🧹 Cleaning Flutter build cache...');
+      await execAsync(`cd "${resellerDirPath}" && flutter clean`, { timeout: 60000 });
+      
+      // Get dependencies
+      console.log('📦 Getting Flutter dependencies...');
+      await execAsync(`cd "${resellerDirPath}" && flutter pub get`, { timeout: 60000 });
+      
+      // Build for Physical Device
+      console.log('🔨 Building for Physical Device...');
       await execAsync(`cd "${resellerDirPath}" && flutter build ios --release --no-codesign`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ iOS Device build completed');
     } else if (buildType === 'ios') {
       // Default to simulator for backward compatibility
       console.log('🍎 Building iOS for Simulator (default)...');
+      
+      // Clean iOS build directory and pods
+      console.log('🧹 Cleaning iOS build directory...');
+      await execAsync(`cd "${resellerDirPath}" && rm -rf ios/build ios/Pods ios/Podfile.lock`, { timeout: 60000 });
+      
+      // Clean Flutter build cache
+      console.log('🧹 Cleaning Flutter build cache...');
+      await execAsync(`cd "${resellerDirPath}" && flutter clean`, { timeout: 60000 });
+      
+      // Get dependencies
+      console.log('📦 Getting Flutter dependencies...');
+      await execAsync(`cd "${resellerDirPath}" && flutter pub get`, { timeout: 60000 });
+      
+      // Build for iOS Simulator
+      console.log('🔨 Building for iOS Simulator...');
       await execAsync(`cd "${resellerDirPath}" && flutter build ios --debug --simulator`, { timeout: 2400000 }); // 40 minutes
       console.log('✅ iOS build completed');
     } else {
