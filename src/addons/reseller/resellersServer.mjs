@@ -33,6 +33,39 @@ const generateUniqueFilename = (appUrl, parentUserId, resellerId, extension) => 
   return `${appUrl}_${parentUserId}_${resellerId}_${hash}.${extension}`;
 };
 
+// Helper function to calculate directory size recursively
+const getDirectorySize = (dirPath) => {
+  try {
+    if (!fs.existsSync(dirPath)) {
+      return 0;
+    }
+    
+    const stats = fs.statSync(dirPath);
+    if (!stats.isDirectory()) {
+      return stats.size;
+    }
+    
+    let totalSize = 0;
+    const files = fs.readdirSync(dirPath);
+    
+    for (const file of files) {
+      const filePath = path.join(dirPath, file);
+      const fileStats = fs.statSync(filePath);
+      
+      if (fileStats.isDirectory()) {
+        totalSize += getDirectorySize(filePath);
+      } else {
+        totalSize += fileStats.size;
+      }
+    }
+    
+    return totalSize;
+  } catch (error) {
+    console.error('❌ Error calculating directory size:', error);
+    return 0;
+  }
+};
+
 // Promisify exec for async/await usage
 const execAsync = promisify(exec);
 
@@ -1684,6 +1717,17 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       } else {
         console.log('❌ iOS app not found after build');
       }
+      
+      // Clean up old zip file if it exists
+      const zipPath = path.join(DATA_DIR, `${resellerData.appUrl}.app.zip`);
+      if (fs.existsSync(zipPath)) {
+        try {
+          fs.unlinkSync(zipPath);
+          console.log('🧹 Cleaned up old iOS zip file:', zipPath);
+        } catch (error) {
+          console.log('⚠️ Could not delete old zip file:', error.message);
+        }
+      }
     }
 
     // Clean up build directory to save space
@@ -2262,7 +2306,7 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     // Get file sizes if they exist
     const apkSize = apkExists ? fs.statSync(apkPath).size : 0;
     const aabSize = aabExists ? fs.statSync(aabPath).size : 0;
-    const iosSize = iosExists ? fs.statSync(iosPath).size : 0;
+    const iosSize = iosExists ? getDirectorySize(iosPath) : 0;
     
     res.json({
       success: true,
@@ -2345,8 +2389,23 @@ app.get('/api/resellers/download', async (req, res) => {
       const zipFilename = `${appUrl}.app.zip`;
       const zipPath = path.join(DATA_DIR, zipFilename);
       
-      // Check if zip already exists
-      if (!fs.existsSync(zipPath)) {
+      // Check if we need to recreate the zip (either doesn't exist or .app bundle is newer)
+      let shouldCreateZip = !fs.existsSync(zipPath);
+      
+      if (fs.existsSync(zipPath)) {
+        const appStats = fs.statSync(filePath);
+        const zipStats = fs.statSync(zipPath);
+        
+        // If .app bundle is newer than zip, recreate the zip
+        if (appStats.mtime > zipStats.mtime) {
+          console.log('🔄 .app bundle is newer than zip, recreating zip...');
+          shouldCreateZip = true;
+          // Remove old zip file
+          fs.unlinkSync(zipPath);
+        }
+      }
+      
+      if (shouldCreateZip) {
         console.log('📦 Creating zip for iOS app bundle...');
         try {
           await new Promise((resolve, reject) => {
@@ -2367,6 +2426,8 @@ app.get('/api/resellers/download', async (req, res) => {
             message: 'Could not create zip file for iOS app bundle'
           });
         }
+      } else {
+        console.log('✅ Using existing zip file (up to date)');
       }
       
       // Update file path and filename for zip
@@ -2529,6 +2590,19 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
         } catch (error) {
           errors.push(`Failed to delete iOS app: ${error.message}`);
           console.error(`❌ Error deleting iOS app:`, error);
+        }
+      }
+      
+      // Also clean up iOS zip file if it exists
+      const zipPath = path.join(DATA_DIR, `${appUrl}.app.zip`);
+      if (fs.existsSync(zipPath)) {
+        try {
+          fs.unlinkSync(zipPath);
+          cleanedFiles.push('iOS zip');
+          console.log(`✅ Deleted iOS zip: ${zipPath}`);
+        } catch (error) {
+          errors.push(`Failed to delete iOS zip: ${error.message}`);
+          console.error(`❌ Error deleting iOS zip:`, error);
         }
       }
     }
