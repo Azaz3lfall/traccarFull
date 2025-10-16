@@ -286,10 +286,23 @@ const FloatingResellersPopover = ({
     const simulatorState = getBuildState(resellerId, 'ios_simulator');
     const deviceState = getBuildState(resellerId, 'ios_device');
     
-    // If either iOS build type is building, show status modal for the first one found
-    if (simulatorState === 'BUILDING' || simulatorState === 'BUILDED' || simulatorState === 'BUILD_ERROR') {
+    // Check if any iOS build is active (building, built, or error)
+    const hasSimulatorBuild = simulatorState === 'BUILDING' || simulatorState === 'BUILDED' || simulatorState === 'BUILD_ERROR';
+    const hasDeviceBuild = deviceState === 'BUILDING' || deviceState === 'BUILDED' || deviceState === 'BUILD_ERROR';
+    
+    if (hasSimulatorBuild && hasDeviceBuild) {
+      // Both exist, prioritize the one that's currently building
+      if (simulatorState === 'BUILDING') {
+        setBuildStatusModal({ open: true, reseller, buildType: 'ios_simulator' });
+      } else if (deviceState === 'BUILDING') {
+        setBuildStatusModal({ open: true, reseller, buildType: 'ios_device' });
+      } else {
+        // Both are built or error, show simulator first
+        setBuildStatusModal({ open: true, reseller, buildType: 'ios_simulator' });
+      }
+    } else if (hasSimulatorBuild) {
       setBuildStatusModal({ open: true, reseller, buildType: 'ios_simulator' });
-    } else if (deviceState === 'BUILDING' || deviceState === 'BUILDED' || deviceState === 'BUILD_ERROR') {
+    } else if (hasDeviceBuild) {
       setBuildStatusModal({ open: true, reseller, buildType: 'ios_device' });
     } else {
       // No existing iOS builds, show build type selection modal
@@ -302,15 +315,22 @@ const FloatingResellersPopover = ({
     const simulatorState = getBuildState(appUrl, 'ios_simulator');
     const deviceState = getBuildState(appUrl, 'ios_device');
     
-    if (simulatorState === 'BUILDING' || deviceState === 'BUILDING') {
-      return 'Check Status';
-    } else if (simulatorState === 'BUILDED' || deviceState === 'BUILDED') {
-      return 'Download';
-    } else if (simulatorState === 'BUILD_ERROR' || deviceState === 'BUILD_ERROR') {
-      return 'Retry';
-    } else {
-      return 'Build';
+    // Check if any iOS build is active
+    const hasSimulatorBuild = simulatorState === 'BUILDING' || simulatorState === 'BUILDED' || simulatorState === 'BUILD_ERROR';
+    const hasDeviceBuild = deviceState === 'BUILDING' || deviceState === 'BUILDED' || deviceState === 'BUILD_ERROR';
+    
+    if (hasSimulatorBuild || hasDeviceBuild) {
+      // If both exist, prioritize the one that's building
+      if (simulatorState === 'BUILDING' || deviceState === 'BUILDING') {
+        return 'Check Status';
+      } else if (simulatorState === 'BUILDED' || deviceState === 'BUILDED') {
+        return 'Download';
+      } else if (simulatorState === 'BUILD_ERROR' || deviceState === 'BUILD_ERROR') {
+        return 'Retry';
+      }
     }
+    
+    return 'Build';
   };
 
   // Start a new build
