@@ -547,7 +547,7 @@ const FloatingResellersPopover = ({
 
       setSnackbar({
         open: true,
-        message: `${cleanType.toUpperCase()} apps cleaned successfully`,
+        message: `${cleanType === 'both' ? 'ALL' : cleanType.toUpperCase()} apps cleaned successfully`,
         severity: 'success'
       });
 
