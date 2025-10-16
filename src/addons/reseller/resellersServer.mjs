@@ -2163,6 +2163,8 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     const { appUrl } = req.params;
     const { parentUserId, buildType = 'apk' } = req.query;
     
+    console.log(`🔍 Build status API called:`, { appUrl, parentUserId, buildType, query: req.query });
+    
     if (!appUrl || !parentUserId) {
       return res.status(400).json({
         error: 'Missing required parameters',
