@@ -840,5 +840,15 @@
   "retry": "Покушај Поново",
   "build": "Гради",
   "downloadStarted": "преузимање почело!",
-  "downloadFailed": "Преузимање неуспешно"
+  "downloadFailed": "Преузимање неуспешно",
+  "appsCleanedSuccessfully": "апликације успешно очишћене",
+  "allAppsCleanedSuccessfully": "СВЕ апликације успешно очишћене",
+  "errorCleaning": "Грешка при чишћењу",
+  "pleaseSelectUserForResellerId": "Молимо изаберите корисника за ID Препродавца",
+  "companyLogoRequired": "Лого компаније је обавезан",
+  "faviconImageRequired": "Слика фавикона је обавезна",
+  "appImageRequired": "Слика апликације (1024x1024) је обавезна",
+  "notificationIconRequired": "Икона обавештења (192x192) је обавезна",
+  "changeAppImage": "Promeni sliku aplikacije",
+  "selectAppImage": "Odaberi sliku aplikacije"
 }

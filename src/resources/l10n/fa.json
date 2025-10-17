@@ -840,5 +840,15 @@
   "retry": "تلاش مجدد",
   "build": "ساخت",
   "downloadStarted": "دانلود شروع شد!",
-  "downloadFailed": "دانلود ناموفق"
+  "downloadFailed": "دانلود ناموفق",
+  "appsCleanedSuccessfully": "برنامه‌ها با موفقیت پاک شدند",
+  "allAppsCleanedSuccessfully": "همه برنامه‌ها با موفقیت پاک شدند",
+  "errorCleaning": "خطا در پاک کردن",
+  "pleaseSelectUserForResellerId": "لطفاً کاربری برای شناسه فروشنده انتخاب کنید",
+  "companyLogoRequired": "لوگوی شرکت الزامی است",
+  "faviconImageRequired": "تصویر فاویکون الزامی است",
+  "appImageRequired": "تصویر اپلیکیشن (1024x1024) الزامی است",
+  "notificationIconRequired": "آیکون اعلان (192x192) الزامی است",
+  "changeAppImage": "تغییر تصویر برنامه",
+  "selectAppImage": "انتخاب تصویر برنامه"
 }

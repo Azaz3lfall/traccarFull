@@ -840,5 +840,15 @@
   "retry": "Дахин Оролдох",
   "build": "Бүтээх",
   "downloadStarted": "татаж эхлэв!",
-  "downloadFailed": "Татах амжилтгүй"
+  "downloadFailed": "Татах амжилтгүй",
+  "appsCleanedSuccessfully": "апп амжилттай цэвэрлэгдлээ",
+  "allAppsCleanedSuccessfully": "БҮГД апп амжилттай цэвэрлэгдлээ",
+  "errorCleaning": "Цэвэрлэхэд алдаа",
+  "pleaseSelectUserForResellerId": "Дахин борлуулагчийн ID-д зориулж хэрэглэгч сонгоно уу",
+  "companyLogoRequired": "Компанийн лого шаардлагатай",
+  "faviconImageRequired": "Favicon зураг шаардлагатай",
+  "appImageRequired": "Апп зураг (1024x1024) шаардлагатай",
+  "notificationIconRequired": "Мэдэгдэл дүрс (192x192) шаардлагатай",
+  "changeAppImage": "Апп зураг солих",
+  "selectAppImage": "Апп зураг сонгох"
 }

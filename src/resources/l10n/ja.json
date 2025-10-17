@@ -843,5 +843,15 @@
   "retry": "再試行",
   "build": "ビルド",
   "downloadStarted": "ダウンロード開始！",
-  "downloadFailed": "ダウンロードに失敗"
+  "downloadFailed": "ダウンロードに失敗",
+  "appsCleanedSuccessfully": "アプリが正常にクリーンアップされました",
+  "allAppsCleanedSuccessfully": "すべてのアプリが正常にクリーンアップされました",
+  "errorCleaning": "クリーンアップエラー",
+  "pleaseSelectUserForResellerId": "リセラーIDのユーザーを選択してください",
+  "companyLogoRequired": "会社のロゴが必要です",
+  "faviconImageRequired": "ファビコン画像が必要です",
+  "appImageRequired": "アプリ画像（1024x1024）が必要です",
+  "notificationIconRequired": "通知アイコン（192x192）が必要です",
+  "changeAppImage": "アプリ画像を変更",
+  "selectAppImage": "アプリ画像を選択"
 }

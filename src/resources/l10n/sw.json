@@ -840,5 +840,15 @@
   "retry": "Jaribu Tena",
   "build": "Jenga",
   "downloadStarted": "upakuaji umeanza!",
-  "downloadFailed": "Upakuaji umeshindwa"
+  "downloadFailed": "Upakuaji umeshindwa",
+  "appsCleanedSuccessfully": "programu zimesafishwa kwa mafanikio",
+  "allAppsCleanedSuccessfully": "PROGRAMS ZOTE zimesafishwa kwa mafanikio",
+  "errorCleaning": "Hitilafu wakati wa kusafisha",
+  "pleaseSelectUserForResellerId": "Tafadhali chagua mtumiaji wa ID ya Mfanyabiashara",
+  "companyLogoRequired": "Logo ya kampuni inahitajika",
+  "faviconImageRequired": "Picha ya favicon inahitajika",
+  "appImageRequired": "Picha ya programu (1024x1024) inahitajika",
+  "notificationIconRequired": "Kikonyo cha arifa (192x192) kinahitajika",
+  "changeAppImage": "Badilisha picha ya programu",
+  "selectAppImage": "Chagua picha ya programu"
 }

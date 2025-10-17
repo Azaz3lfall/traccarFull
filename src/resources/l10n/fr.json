@@ -843,5 +843,15 @@
   "retry": "Réessayer",
   "build": "Construire",
   "downloadStarted": "téléchargement démarré!",
-  "downloadFailed": "Échec du téléchargement"
+  "downloadFailed": "Échec du téléchargement",
+  "appsCleanedSuccessfully": "applications nettoyées avec succès",
+  "allAppsCleanedSuccessfully": "TOUTES les applications nettoyées avec succès",
+  "errorCleaning": "Erreur lors du nettoyage",
+  "pleaseSelectUserForResellerId": "Veuillez sélectionner un utilisateur pour l'ID du revendeur",
+  "companyLogoRequired": "Le logo de l'entreprise est requis",
+  "faviconImageRequired": "L'image du favicon est requise",
+  "appImageRequired": "L'image de l'app (1024x1024) est requise",
+  "notificationIconRequired": "L'icône de notification (192x192) est requise",
+  "changeAppImage": "Changer l'image de l'app",
+  "selectAppImage": "Sélectionner l'image de l'app"
 }

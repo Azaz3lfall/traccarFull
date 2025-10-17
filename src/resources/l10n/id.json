@@ -844,5 +844,15 @@
   "retry": "Coba Lagi",
   "build": "Buat",
   "downloadStarted": "unduhan dimulai!",
-  "downloadFailed": "Gagal mengunduh"
+  "downloadFailed": "Gagal mengunduh",
+  "appsCleanedSuccessfully": "aplikasi berhasil dibersihkan",
+  "allAppsCleanedSuccessfully": "SEMUA aplikasi berhasil dibersihkan",
+  "errorCleaning": "Kesalahan membersihkan",
+  "pleaseSelectUserForResellerId": "Silakan pilih pengguna untuk ID Reseller",
+  "companyLogoRequired": "Logo perusahaan diperlukan",
+  "faviconImageRequired": "Gambar favicon diperlukan",
+  "appImageRequired": "Gambar aplikasi (1024x1024) diperlukan",
+  "notificationIconRequired": "Ikon notifikasi (192x192) diperlukan",
+  "changeAppImage": "Ubah gambar aplikasi",
+  "selectAppImage": "Pilih gambar aplikasi"
 }

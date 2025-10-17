@@ -840,5 +840,15 @@
   "retry": "Bandyti Dar Kartą",
   "build": "Kurti",
   "downloadStarted": "atsisiuntimas pradėtas!",
-  "downloadFailed": "Atsisiuntimas nepavyko"
+  "downloadFailed": "Atsisiuntimas nepavyko",
+  "appsCleanedSuccessfully": "programos sėkmingai išvalytos",
+  "allAppsCleanedSuccessfully": "VISOS programos sėkmingai išvalytos",
+  "errorCleaning": "Klaida valant",
+  "pleaseSelectUserForResellerId": "Prašome pasirinkti vartotoją pardavėjo ID",
+  "companyLogoRequired": "Įmonės logotipas yra privalomas",
+  "faviconImageRequired": "Favicon paveikslėlis yra privalomas",
+  "appImageRequired": "Programos paveikslėlis (1024x1024) yra privalomas",
+  "notificationIconRequired": "Pranešimo piktograma (192x192) yra privaloma",
+  "changeAppImage": "Keisti programos paveikslėlį",
+  "selectAppImage": "Pasirinkti programos paveikslėlį"
 }

@@ -840,5 +840,15 @@
   "retry": "Qayta Urinish",
   "build": "Qurish",
   "downloadStarted": "yuklab olish boshlandi!",
-  "downloadFailed": "Yuklab olish muvaffaqiyatsiz"
+  "downloadFailed": "Yuklab olish muvaffaqiyatsiz",
+  "appsCleanedSuccessfully": "ilovalar muvaffaqiyatli tozalandi",
+  "allAppsCleanedSuccessfully": "BARCHA ilovalar muvaffaqiyatli tozalandi",
+  "errorCleaning": "Tozalashda xatolik",
+  "pleaseSelectUserForResellerId": "Iltimos, sotuvchi ID uchun foydalanuvchini tanlang",
+  "companyLogoRequired": "Kompaniya logotipi talab qilinadi",
+  "faviconImageRequired": "Favicon rasmi talab qilinadi",
+  "appImageRequired": "Ilova rasmi (1024x1024) talab qilinadi",
+  "notificationIconRequired": "Bildirishnoma belgisi (192x192) talab qilinadi",
+  "changeAppImage": "Ilova rasmini o'zgartirish",
+  "selectAppImage": "Ilova rasmini tanlash"
 }

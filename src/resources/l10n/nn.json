@@ -840,5 +840,15 @@
   "retry": "Prøv Igjen",
   "build": "Bygg",
   "downloadStarted": "nedlasting starta!",
-  "downloadFailed": "Nedlasting mislukkast"
+  "downloadFailed": "Nedlasting mislukkast",
+  "appsCleanedSuccessfully": "appar rydda vellykka",
+  "allAppsCleanedSuccessfully": "ALLE appar rydda vellykka",
+  "errorCleaning": "Feil ved rydding",
+  "pleaseSelectUserForResellerId": "Ver venlegast vel ein brukar for Forhandlar ID",
+  "companyLogoRequired": "Firmalogo er påkravd",
+  "faviconImageRequired": "Favicon bilete er påkravd",
+  "appImageRequired": "App bilete (1024x1024) er påkravd",
+  "notificationIconRequired": "Varslingsikon (192x192) er påkravd",
+  "changeAppImage": "Endre app bilete",
+  "selectAppImage": "Vel app bilete"
 }

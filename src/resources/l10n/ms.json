@@ -840,5 +840,15 @@
   "retry": "Cuba Lagi",
   "build": "Bina",
   "downloadStarted": "muat turun bermula!",
-  "downloadFailed": "Muat turun gagal"
+  "downloadFailed": "Muat turun gagal",
+  "appsCleanedSuccessfully": "aplikasi berjaya dibersihkan",
+  "allAppsCleanedSuccessfully": "SEMUA aplikasi berjaya dibersihkan",
+  "errorCleaning": "Ralat membersihkan",
+  "pleaseSelectUserForResellerId": "Sila pilih pengguna untuk ID Penjual Semula",
+  "companyLogoRequired": "Logo syarikat diperlukan",
+  "faviconImageRequired": "Imej favicon diperlukan",
+  "appImageRequired": "Imej aplikasi (1024x1024) diperlukan",
+  "notificationIconRequired": "Ikon notifikasi (192x192) diperlukan",
+  "changeAppImage": "Tukar imej aplikasi",
+  "selectAppImage": "Pilih imej aplikasi"
 }

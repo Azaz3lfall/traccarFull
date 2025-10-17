@@ -840,5 +840,15 @@
   "retry": "Poskusi Znova",
   "build": "Gradi",
   "downloadStarted": "prenos se je začel!",
-  "downloadFailed": "Prenos ni uspel"
+  "downloadFailed": "Prenos ni uspel",
+  "appsCleanedSuccessfully": "aplikacije uspešno očiščene",
+  "allAppsCleanedSuccessfully": "VSE aplikacije uspešno očiščene",
+  "errorCleaning": "Napaka pri čiščenju",
+  "pleaseSelectUserForResellerId": "Prosimo, izberite uporabnika za ID Ponudnika",
+  "companyLogoRequired": "Logotip podjetja je obvezen",
+  "faviconImageRequired": "Slika favicon je obvezna",
+  "appImageRequired": "Slika aplikacije (1024x1024) je obvezna",
+  "notificationIconRequired": "Ikona obvestila (192x192) je obvezna",
+  "changeAppImage": "Spremeni sliko aplikacije",
+  "selectAppImage": "Izberi sliko aplikacije"
 }

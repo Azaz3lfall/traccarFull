@@ -840,5 +840,15 @@
   "retry": "Қайталау",
   "build": "Құру",
   "downloadStarted": "жүктеу басталды!",
-  "downloadFailed": "Жүктеу сәтсіз"
+  "downloadFailed": "Жүктеу сәтсіз",
+  "appsCleanedSuccessfully": "қосымшалар сәтті тазаланды",
+  "allAppsCleanedSuccessfully": "БАРЛЫҚ қосымшалар сәтті тазаланды",
+  "errorCleaning": "Тазалау қатесі",
+  "pleaseSelectUserForResellerId": "Қайта сатушы ID үшін пайдаланушыны таңдаңыз",
+  "companyLogoRequired": "Компания логотипі қажет",
+  "faviconImageRequired": "Favicon суреті қажет",
+  "appImageRequired": "Қосымша суреті (1024x1024) қажет",
+  "notificationIconRequired": "Хабарландыру белгішесі (192x192) қажет",
+  "changeAppImage": "Қосымша суретін өзгерту",
+  "selectAppImage": "Қосымша суретін таңдау"
 }

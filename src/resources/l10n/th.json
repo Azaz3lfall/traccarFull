@@ -844,5 +844,15 @@
   "retry": "ลองใหม่",
   "build": "สร้าง",
   "downloadStarted": "ดาวน์โหลดเริ่มแล้ว!",
-  "downloadFailed": "ดาวน์โหลดล้มเหลว"
+  "downloadFailed": "ดาวน์โหลดล้มเหลว",
+  "appsCleanedSuccessfully": "แอปทำความสะอาดสำเร็จ",
+  "allAppsCleanedSuccessfully": "แอปทั้งหมดทำความสะอาดสำเร็จ",
+  "errorCleaning": "ข้อผิดพลาดในการทำความสะอาด",
+  "pleaseSelectUserForResellerId": "กรุณาเลือกผู้ใช้สำหรับ ID ผู้จำหน่าย",
+  "companyLogoRequired": "โลโก้บริษัทจำเป็น",
+  "faviconImageRequired": "รูปภาพ Favicon จำเป็น",
+  "appImageRequired": "รูปภาพแอป (1024x1024) จำเป็น",
+  "notificationIconRequired": "ไอคอนการแจ้งเตือน (192x192) จำเป็น",
+  "changeAppImage": "เปลี่ยนรูปภาพแอป",
+  "selectAppImage": "เลือกรูปภาพแอป"
 }

@@ -840,5 +840,15 @@
   "retry": "Skúsiť Znovu",
   "build": "Sestaviť",
   "downloadStarted": "sťahovanie začalo!",
-  "downloadFailed": "Sťahovanie zlyhalo"
+  "downloadFailed": "Sťahovanie zlyhalo",
+  "appsCleanedSuccessfully": "aplikácie úspešne vyčistené",
+  "allAppsCleanedSuccessfully": "VŠETKY aplikácie úspešne vyčistené",
+  "errorCleaning": "Chyba pri čistení",
+  "pleaseSelectUserForResellerId": "Prosím, vyberte používateľa pre ID Predajcu",
+  "companyLogoRequired": "Logo spoločnosti je povinné",
+  "faviconImageRequired": "Obrázok faviconu je povinný",
+  "appImageRequired": "Obrázok aplikácie (1024x1024) je povinný",
+  "notificationIconRequired": "Ikona oznámenia (192x192) je povinná",
+  "changeAppImage": "Zmeniť obrázok aplikácie",
+  "selectAppImage": "Vybrať obrázok aplikácie"
 }

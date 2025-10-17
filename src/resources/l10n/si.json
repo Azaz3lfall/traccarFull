@@ -840,5 +840,15 @@
   "retry": "නැවත උත්සාහ කරන්න",
   "build": "ගොඩනගන්න",
   "downloadStarted": "බාගත කිරීම ආරම්භ විය!",
-  "downloadFailed": "බාගත කිරීම අසාර්ථක"
+  "downloadFailed": "බාගත කිරීම අසාර්ථක",
+  "appsCleanedSuccessfully": "යෙදුම් සාර්ථකව පිරිසිදු කරන ලදී",
+  "allAppsCleanedSuccessfully": "සියලුම යෙදුම් සාර්ථකව පිරිසිදු කරන ලදී",
+  "errorCleaning": "පිරිසිදු කිරීමේදී දෝෂය",
+  "pleaseSelectUserForResellerId": "කරුණාකර රිසෙලර් හැඳුනුම්පත සඳහා පරිශීලකයෙකු තෝරන්න",
+  "companyLogoRequired": "සමාගමේ ලෝගෝ අවශ්‍යයි",
+  "faviconImageRequired": "Favicon රූපය අවශ්‍යයි",
+  "appImageRequired": "යෙදුම් රූපය (1024x1024) අවශ්‍යයි",
+  "notificationIconRequired": "දැනුම්දීම් අයිකනය (192x192) අවශ්‍යයි",
+  "changeAppImage": "යෙදුම් රූපය වෙනස් කරන්න",
+  "selectAppImage": "යෙදුම් රූපය තෝරන්න"
 }

@@ -844,5 +844,15 @@
   "retry": "Probeer Weer",
   "build": "Bou",
   "downloadStarted": "aflaai begin!",
-  "downloadFailed": "Kon nie aflaai nie"
+  "downloadFailed": "Kon nie aflaai nie",
+  "appsCleanedSuccessfully": "programme suksesvol skoon gemaak",
+  "allAppsCleanedSuccessfully": "ALLE programme suksesvol skoon gemaak",
+  "errorCleaning": "Fout met skoonmaak",
+  "pleaseSelectUserForResellerId": "Kies asseblief 'n gebruiker vir Reseller ID",
+  "companyLogoRequired": "Maatskappy logo is vereis",
+  "faviconImageRequired": "Favicon beeld is vereis",
+  "appImageRequired": "App beeld (1024x1024) is vereis",
+  "notificationIconRequired": "Kennisgewing ikoon (192x192) is vereis",
+  "changeAppImage": "Verander App Beeld",
+  "selectAppImage": "Kies App Beeld"
 }

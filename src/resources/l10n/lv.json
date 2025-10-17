@@ -840,5 +840,15 @@
   "retry": "Mēģināt Vēlreiz",
   "build": "Būvēt",
   "downloadStarted": "lejupielāde sākta!",
-  "downloadFailed": "Lejupielāde neizdevās"
+  "downloadFailed": "Lejupielāde neizdevās",
+  "appsCleanedSuccessfully": "lietotnes veiksmīgi tīrītas",
+  "allAppsCleanedSuccessfully": "VISAS lietotnes veiksmīgi tīrītas",
+  "errorCleaning": "Kļūda tīrīšanas laikā",
+  "pleaseSelectUserForResellerId": "Lūdzu, izvēlieties lietotāju pārdevēja ID",
+  "companyLogoRequired": "Uzņēmuma logotips ir obligāts",
+  "faviconImageRequired": "Favicon attēls ir obligāts",
+  "appImageRequired": "Lietotnes attēls (1024x1024) ir obligāts",
+  "notificationIconRequired": "Paziņojuma ikona (192x192) ir obligāta",
+  "changeAppImage": "Mainīt lietotnes attēlu",
+  "selectAppImage": "Izvēlēties lietotnes attēlu"
 }

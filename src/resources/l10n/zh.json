@@ -843,5 +843,15 @@
   "retry": "重试",
   "build": "构建",
   "downloadStarted": "下载已开始！",
-  "downloadFailed": "下载失败"
+  "downloadFailed": "下载失败",
+  "appsCleanedSuccessfully": "应用清理成功",
+  "allAppsCleanedSuccessfully": "所有应用清理成功",
+  "errorCleaning": "清理错误",
+  "pleaseSelectUserForResellerId": "请为经销商ID选择用户",
+  "companyLogoRequired": "公司标志是必需的",
+  "faviconImageRequired": "网站图标是必需的",
+  "appImageRequired": "应用图片（1024x1024）是必需的",
+  "notificationIconRequired": "通知图标（192x192）是必需的",
+  "changeAppImage": "更改应用图片",
+  "selectAppImage": "选择应用图片"
 }

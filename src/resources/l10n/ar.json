@@ -843,5 +843,15 @@
   "retry": "إعادة المحاولة",
   "build": "بناء",
   "downloadStarted": "بدأ التحميل!",
-  "downloadFailed": "فشل في التحميل"
+  "downloadFailed": "فشل في التحميل",
+  "appsCleanedSuccessfully": "تم تنظيف التطبيقات بنجاح",
+  "allAppsCleanedSuccessfully": "تم تنظيف جميع التطبيقات بنجاح",
+  "errorCleaning": "خطأ في التنظيف",
+  "pleaseSelectUserForResellerId": "يرجى اختيار مستخدم لمعرف الموزع",
+  "companyLogoRequired": "شعار الشركة مطلوب",
+  "faviconImageRequired": "صورة الأيقونة المفضلة مطلوبة",
+  "appImageRequired": "صورة التطبيق (1024x1024) مطلوبة",
+  "notificationIconRequired": "أيقونة الإشعار (192x192) مطلوبة",
+  "changeAppImage": "تغيير صورة التطبيق",
+  "selectAppImage": "اختيار صورة التطبيق"
 }

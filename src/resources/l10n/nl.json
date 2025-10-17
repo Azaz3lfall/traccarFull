@@ -843,5 +843,15 @@
   "retry": "Opnieuw Proberen",
   "build": "Bouwen",
   "downloadStarted": "download gestart!",
-  "downloadFailed": "Download mislukt"
+  "downloadFailed": "Download mislukt",
+  "appsCleanedSuccessfully": "apps succesvol opgeschoond",
+  "allAppsCleanedSuccessfully": "ALLE apps succesvol opgeschoond",
+  "errorCleaning": "Fout bij opschonen",
+  "pleaseSelectUserForResellerId": "Selecteer een gebruiker voor Reseller ID",
+  "companyLogoRequired": "Bedrijfslogo is vereist",
+  "faviconImageRequired": "Favicon afbeelding is vereist",
+  "appImageRequired": "App afbeelding (1024x1024) is vereist",
+  "notificationIconRequired": "Melding icoon (192x192) is vereist",
+  "changeAppImage": "App afbeelding wijzigen",
+  "selectAppImage": "App afbeelding selecteren"
 }

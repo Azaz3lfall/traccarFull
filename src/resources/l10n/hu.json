@@ -844,5 +844,15 @@
   "retry": "Újra Próbálkozás",
   "build": "Építés",
   "downloadStarted": "letöltés elindult!",
-  "downloadFailed": "Letöltés sikertelen"
+  "downloadFailed": "Letöltés sikertelen",
+  "appsCleanedSuccessfully": "alkalmazások sikeresen tisztítva",
+  "allAppsCleanedSuccessfully": "MINDEN alkalmazás sikeresen tisztítva",
+  "errorCleaning": "Hiba tisztítás közben",
+  "pleaseSelectUserForResellerId": "Kérjük, válasszon felhasználót a továbbértékesítő azonosítóhoz",
+  "companyLogoRequired": "A vállalat logója kötelező",
+  "faviconImageRequired": "A favicon kép kötelező",
+  "appImageRequired": "Az alkalmazás kép (1024x1024) kötelező",
+  "notificationIconRequired": "Az értesítés ikon (192x192) kötelező",
+  "changeAppImage": "Alkalmazás kép módosítása",
+  "selectAppImage": "Alkalmazás kép kiválasztása"
 }

@@ -840,5 +840,15 @@
   "retry": "Նորից Փորձել",
   "build": "Կառուցել",
   "downloadStarted": "ներբեռնումը սկսվեց!",
-  "downloadFailed": "Ներբեռնումը ձախողվեց"
+  "downloadFailed": "Ներբեռնումը ձախողվեց",
+  "appsCleanedSuccessfully": "հավելվածները հաջողությամբ մաքրվեցին",
+  "allAppsCleanedSuccessfully": "ԲՈԼՈՐ հավելվածները հաջողությամբ մաքրվեցին",
+  "errorCleaning": "Սխալ մաքրման ժամանակ",
+  "pleaseSelectUserForResellerId": "Խնդրում ենք ընտրել օգտատիրոջ վերավաճառողի ID-ի համար",
+  "companyLogoRequired": "Ընկերության լոգոն պարտադիր է",
+  "faviconImageRequired": "Favicon պատկերը պարտադիր է",
+  "appImageRequired": "Հավելվածի պատկերը (1024x1024) պարտադիր է",
+  "notificationIconRequired": "Ծանուցման պատկերակը (192x192) պարտադիր է",
+  "changeAppImage": "Փոխել հավելվածի պատկերը",
+  "selectAppImage": "Ընտրել հավելվածի պատկերը"
 }

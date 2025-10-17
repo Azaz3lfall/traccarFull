@@ -840,5 +840,15 @@
   "retry": "ხელახალი მცდელობა",
   "build": "აშენება",
   "downloadStarted": "ჩამოტვირთვა დაიწყო!",
-  "downloadFailed": "ჩამოტვირთვა ვერ მოხერხდა"
+  "downloadFailed": "ჩამოტვირთვა ვერ მოხერხდა",
+  "appsCleanedSuccessfully": "აპლიკაციები წარმატებით გაწმენდილი",
+  "allAppsCleanedSuccessfully": "ყველა აპლიკაცია წარმატებით გაწმენდილი",
+  "errorCleaning": "შეცდომა გაწმენდისას",
+  "pleaseSelectUserForResellerId": "გთხოვთ აირჩიოთ მომხმარებელი გადამყიდველის ID-ისთვის",
+  "companyLogoRequired": "კომპანიის ლოგო აუცილებელია",
+  "faviconImageRequired": "Favicon სურათი აუცილებელია",
+  "appImageRequired": "აპლიკაციის სურათი (1024x1024) აუცილებელია",
+  "notificationIconRequired": "შეტყობინების ხატულა (192x192) აუცილებელია",
+  "changeAppImage": "აპლიკაციის სურათის შეცვლა",
+  "selectAppImage": "აპლიკაციის სურათის არჩევა"
 }

@@ -840,5 +840,15 @@
   "retry": "மீண்டும் முயற்சி",
   "build": "கட்டமை",
   "downloadStarted": "பதிவிறக்கம் தொடங்கியது!",
-  "downloadFailed": "பதிவிறக்கம் தோல்வி"
+  "downloadFailed": "பதிவிறக்கம் தோல்வி",
+  "appsCleanedSuccessfully": "ஆப்ஸ் வெற்றிகரமாக சுத்தம் செய்யப்பட்டன",
+  "allAppsCleanedSuccessfully": "அனைத்து ஆப்ஸ்களும் வெற்றிகரமாக சுத்தம் செய்யப்பட்டன",
+  "errorCleaning": "சுத்தம் செய்வதில் பிழை",
+  "pleaseSelectUserForResellerId": "ரீசெல்லர் ஐடிக்காக ஒரு பயனரைத் தேர்ந்தெடுக்கவும்",
+  "companyLogoRequired": "நிறுவன லோகோ தேவை",
+  "faviconImageRequired": "ஃபேவிகான் படம் தேவை",
+  "appImageRequired": "ஆப் படம் (1024x1024) தேவை",
+  "notificationIconRequired": "அறிவிப்பு ஐகான் (192x192) தேவை",
+  "changeAppImage": "ஆப் படத்தை மாற்றவும்",
+  "selectAppImage": "ஆப் படத்தைத் தேர்ந்தெடுக்கவும்"
 }

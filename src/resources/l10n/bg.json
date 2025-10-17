@@ -844,5 +844,15 @@
   "retry": "Опитай Отново",
   "build": "Строи",
   "downloadStarted": "изтегляне започна!",
-  "downloadFailed": "Неуспешно изтегляне"
+  "downloadFailed": "Неуспешно изтегляне",
+  "appsCleanedSuccessfully": "приложения са почистени успешно",
+  "allAppsCleanedSuccessfully": "ВСИЧКИ приложения са почистени успешно",
+  "errorCleaning": "Грешка при почистване",
+  "pleaseSelectUserForResellerId": "Моля, изберете потребител за ID на дистрибутор",
+  "companyLogoRequired": "Логото на компанията е задължително",
+  "faviconImageRequired": "Изображението на фавикона е задължително",
+  "appImageRequired": "Изображението на приложението (1024x1024) е задължително",
+  "notificationIconRequired": "Иконата за известия (192x192) е задължителна",
+  "changeAppImage": "Промени изображение на приложението",
+  "selectAppImage": "Избери изображение на приложението"
 }

@@ -844,5 +844,15 @@
   "retry": "Tornar a Intentar",
   "build": "Construir",
   "downloadStarted": "descarregament iniciat!",
-  "downloadFailed": "Error en la descàrrega"
+  "downloadFailed": "Error en la descàrrega",
+  "appsCleanedSuccessfully": "aplicacions netejades amb èxit",
+  "allAppsCleanedSuccessfully": "TOTES les aplicacions netejades amb èxit",
+  "errorCleaning": "Error netejant",
+  "pleaseSelectUserForResellerId": "Si us plau, seleccioneu un usuari per a l'ID del distribuïdor",
+  "companyLogoRequired": "El logotip de l'empresa és obligatori",
+  "faviconImageRequired": "La imatge del favicon és obligatòria",
+  "appImageRequired": "La imatge de l'app (1024x1024) és obligatòria",
+  "notificationIconRequired": "La icona de notificació (192x192) és obligatòria",
+  "changeAppImage": "Canviar imatge de l'app",
+  "selectAppImage": "Seleccionar imatge de l'app"
 }

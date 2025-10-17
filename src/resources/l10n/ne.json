@@ -840,5 +840,15 @@
   "retry": "पुनः प्रयास",
   "build": "निर्माण",
   "downloadStarted": "डाउनलोड सुरु भयो!",
-  "downloadFailed": "डाउनलोड असफल"
+  "downloadFailed": "डाउनलोड असफल",
+  "appsCleanedSuccessfully": "एपहरू सफलतापूर्वक सफा भयो",
+  "allAppsCleanedSuccessfully": "सबै एपहरू सफलतापूर्वक सफा भयो",
+  "errorCleaning": "सफा गर्दा त्रुटि",
+  "pleaseSelectUserForResellerId": "कृपया रिसेलर आईडीका लागि प्रयोगकर्ता छान्नुहोस्",
+  "companyLogoRequired": "कम्पनीको लोगो आवश्यक छ",
+  "faviconImageRequired": "फेभिकन छवि आवश्यक छ",
+  "appImageRequired": "एप छवि (1024x1024) आवश्यक छ",
+  "notificationIconRequired": "सूचना आइकन (192x192) आवश्यक छ",
+  "changeAppImage": "एप छवि परिवर्तन गर्नुहोस्",
+  "selectAppImage": "एप छवि छान्नुहोस्"
 }

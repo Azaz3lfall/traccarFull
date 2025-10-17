@@ -844,5 +844,15 @@
   "retry": "Prøv Igjen",
   "build": "Bygg",
   "downloadStarted": "nedlasting startet!",
-  "downloadFailed": "Nedlasting mislyktes"
+  "downloadFailed": "Nedlasting mislyktes",
+  "appsCleanedSuccessfully": "apper ryddet vellykket",
+  "allAppsCleanedSuccessfully": "ALLE apper ryddet vellykket",
+  "errorCleaning": "Feil ved rydding",
+  "pleaseSelectUserForResellerId": "Vennligst velg en bruker for Forhandler ID",
+  "companyLogoRequired": "Firmalogo er påkrevd",
+  "faviconImageRequired": "Favicon bilde er påkrevd",
+  "appImageRequired": "App bilde (1024x1024) er påkrevd",
+  "notificationIconRequired": "Varslingsikon (192x192) er påkrevd",
+  "changeAppImage": "Endre app bilde",
+  "selectAppImage": "Velg app bilde"
 }

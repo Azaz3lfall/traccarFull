@@ -840,5 +840,15 @@
   "retry": "Täzeden Syna",
   "build": "Gur",
   "downloadStarted": "göçürme başlandy!",
-  "downloadFailed": "Göçürme şowsuz"
+  "downloadFailed": "Göçürme şowsuz",
+  "appsCleanedSuccessfully": "programmalar üstünlikli arassalandy",
+  "allAppsCleanedSuccessfully": "HEMME programmalar üstünlikli arassalandy",
+  "errorCleaning": "Arassalama səwligi",
+  "pleaseSelectUserForResellerId": "Dükan ID üçin ulanyjy saýlaň",
+  "companyLogoRequired": "Kompaniýa logotipi zerur",
+  "faviconImageRequired": "Favicon surat zerur",
+  "appImageRequired": "Programma suraty (1024x1024) zerur",
+  "notificationIconRequired": "Duýduryş nyşany (192x192) zerur",
+  "changeAppImage": "Programma suratyny üýtget",
+  "selectAppImage": "Programma suratyny saýla"
 }

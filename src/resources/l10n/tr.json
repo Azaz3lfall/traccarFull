@@ -844,5 +844,15 @@
   "retry": "Tekrar Dene",
   "build": "Oluştur",
   "downloadStarted": "indirme başladı!",
-  "downloadFailed": "İndirme başarısız"
+  "downloadFailed": "İndirme başarısız",
+  "appsCleanedSuccessfully": "uygulamalar başarıyla temizlendi",
+  "allAppsCleanedSuccessfully": "TÜM uygulamalar başarıyla temizlendi",
+  "errorCleaning": "Temizleme hatası",
+  "pleaseSelectUserForResellerId": "Lütfen Bayi ID için bir kullanıcı seçin",
+  "companyLogoRequired": "Şirket logosu gerekli",
+  "faviconImageRequired": "Favicon resmi gerekli",
+  "appImageRequired": "Uygulama resmi (1024x1024) gerekli",
+  "notificationIconRequired": "Bildirim simgesi (192x192) gerekli",
+  "changeAppImage": "Uygulama resmini değiştir",
+  "selectAppImage": "Uygulama resmi seç"
 }

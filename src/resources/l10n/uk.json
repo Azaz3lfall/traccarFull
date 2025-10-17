@@ -844,5 +844,15 @@
   "retry": "Повторити",
   "build": "Зібрати",
   "downloadStarted": "завантаження розпочато!",
-  "downloadFailed": "Помилка завантаження"
+  "downloadFailed": "Помилка завантаження",
+  "appsCleanedSuccessfully": "додатки успішно очищено",
+  "allAppsCleanedSuccessfully": "ВСІ додатки успішно очищено",
+  "errorCleaning": "Помилка при очищенні",
+  "pleaseSelectUserForResellerId": "Будь ласка, виберіть користувача для ID Реселлера",
+  "companyLogoRequired": "Логотип компанії обов'язковий",
+  "faviconImageRequired": "Зображення фавікону обов'язкове",
+  "appImageRequired": "Зображення додатку (1024x1024) обов'язкове",
+  "notificationIconRequired": "Іконка сповіщення (192x192) обов'язкова",
+  "changeAppImage": "Змінити зображення додатку",
+  "selectAppImage": "Вибрати зображення додатку"
 }

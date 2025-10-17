@@ -844,5 +844,15 @@
   "retry": "Proovi Uuesti",
   "build": "Ehita",
   "downloadStarted": "allalaadimine alustatud!",
-  "downloadFailed": "Allalaadimine ebaõnnestus"
+  "downloadFailed": "Allalaadimine ebaõnnestus",
+  "appsCleanedSuccessfully": "rakendused puhastatud edukalt",
+  "allAppsCleanedSuccessfully": "KÕIK rakendused puhastatud edukalt",
+  "errorCleaning": "Viga puhastamisel",
+  "pleaseSelectUserForResellerId": "Palun valige kasutaja edasimüüja ID jaoks",
+  "companyLogoRequired": "Ettevõtte logo on nõutav",
+  "faviconImageRequired": "Favicon pilt on nõutav",
+  "appImageRequired": "Rakenduse pilt (1024x1024) on nõutav",
+  "notificationIconRequired": "Teate ikoon (192x192) on nõutav",
+  "changeAppImage": "Muuda rakenduse pilti",
+  "selectAppImage": "Vali rakenduse pilt"
 }

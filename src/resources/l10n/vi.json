@@ -844,5 +844,15 @@
   "retry": "Thử lại",
   "build": "Xây dựng",
   "downloadStarted": "tải xuống đã bắt đầu!",
-  "downloadFailed": "Tải xuống thất bại"
+  "downloadFailed": "Tải xuống thất bại",
+  "appsCleanedSuccessfully": "ứng dụng đã được dọn dẹp thành công",
+  "allAppsCleanedSuccessfully": "TẤT CẢ ứng dụng đã được dọn dẹp thành công",
+  "errorCleaning": "Lỗi khi dọn dẹp",
+  "pleaseSelectUserForResellerId": "Vui lòng chọn người dùng cho ID Nhà phân phối",
+  "companyLogoRequired": "Logo công ty là bắt buộc",
+  "faviconImageRequired": "Hình ảnh favicon là bắt buộc",
+  "appImageRequired": "Hình ảnh ứng dụng (1024x1024) là bắt buộc",
+  "notificationIconRequired": "Biểu tượng thông báo (192x192) là bắt buộc",
+  "changeAppImage": "Thay đổi hình ảnh ứng dụng",
+  "selectAppImage": "Chọn hình ảnh ứng dụng"
 }

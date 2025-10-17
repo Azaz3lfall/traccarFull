@@ -844,5 +844,15 @@
   "retry": "Prøv Igen",
   "build": "Byg",
   "downloadStarted": "download startet!",
-  "downloadFailed": "Download fejlede"
+  "downloadFailed": "Download fejlede",
+  "appsCleanedSuccessfully": "apps renset succesfuldt",
+  "allAppsCleanedSuccessfully": "ALLE apps renset succesfuldt",
+  "errorCleaning": "Fejl ved rensning",
+  "pleaseSelectUserForResellerId": "Vælg venligst en bruger til Forhandler ID",
+  "companyLogoRequired": "Firmalogo er påkrævet",
+  "faviconImageRequired": "Favicon billede er påkrævet",
+  "appImageRequired": "App billede (1024x1024) er påkrævet",
+  "notificationIconRequired": "Notifikations ikon (192x192) er påkrævet",
+  "changeAppImage": "Skift app billede",
+  "selectAppImage": "Vælg app billede"
 }

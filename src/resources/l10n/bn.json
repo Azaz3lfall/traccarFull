@@ -844,5 +844,15 @@
   "retry": "পুনরায় চেষ্টা করুন",
   "build": "বিল্ড",
   "downloadStarted": "ডাউনলোড শুরু হয়েছে!",
-  "downloadFailed": "ডাউনলোড ব্যর্থ"
+  "downloadFailed": "ডাউনলোড ব্যর্থ",
+  "appsCleanedSuccessfully": "অ্যাপস সফলভাবে পরিষ্কার হয়েছে",
+  "allAppsCleanedSuccessfully": "সব অ্যাপস সফলভাবে পরিষ্কার হয়েছে",
+  "errorCleaning": "পরিষ্কার করতে ত্রুটি",
+  "pleaseSelectUserForResellerId": "রিসেলার আইডির জন্য দয়া করে একজন ব্যবহারকারী নির্বাচন করুন",
+  "companyLogoRequired": "কোম্পানির লোগো প্রয়োজন",
+  "faviconImageRequired": "ফেভিকন ছবি প্রয়োজন",
+  "appImageRequired": "অ্যাপ ছবি (1024x1024) প্রয়োজন",
+  "notificationIconRequired": "বিজ্ঞপ্তি আইকন (192x192) প্রয়োজন",
+  "changeAppImage": "অ্যাপ ছবি পরিবর্তন করুন",
+  "selectAppImage": "অ্যাপ ছবি নির্বাচন করুন"
 }

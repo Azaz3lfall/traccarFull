@@ -844,5 +844,15 @@
   "retry": "נסה שוב",
   "build": "בנה",
   "downloadStarted": "הורדה התחילה!",
-  "downloadFailed": "הורדה נכשלה"
+  "downloadFailed": "הורדה נכשלה",
+  "appsCleanedSuccessfully": "אפליקציות נוקו בהצלחה",
+  "allAppsCleanedSuccessfully": "כל האפליקציות נוקו בהצלחה",
+  "errorCleaning": "שגיאה בניקוי",
+  "pleaseSelectUserForResellerId": "אנא בחר משתמש עבור מזהה המשווק",
+  "companyLogoRequired": "לוגו החברה נדרש",
+  "faviconImageRequired": "תמונת הפאביקון נדרשת",
+  "appImageRequired": "תמונת האפליקציה (1024x1024) נדרשת",
+  "notificationIconRequired": "אייקון ההתראה (192x192) נדרש",
+  "changeAppImage": "שנה תמונת אפליקציה",
+  "selectAppImage": "בחר תמונת אפליקציה"
 }

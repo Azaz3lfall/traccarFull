@@ -840,5 +840,15 @@
   "retry": "വീണ്ടും ശ്രമിക്കുക",
   "build": "നിർമ്മിക്കുക",
   "downloadStarted": "ഡൗൺലോഡ് ആരംഭിച്ചു!",
-  "downloadFailed": "ഡൗൺലോഡ് പരാജയപ്പെട്ടു"
+  "downloadFailed": "ഡൗൺലോഡ് പരാജയപ്പെട്ടു",
+  "appsCleanedSuccessfully": "ആപ്പുകൾ വൃത്തിയാക്കി",
+  "allAppsCleanedSuccessfully": "എല്ലാ ആപ്പുകളും വൃത്തിയാക്കി",
+  "errorCleaning": "വൃത്തിയാക്കുന്നതിൽ പിശക്",
+  "pleaseSelectUserForResellerId": "റീസെല്ലർ ഐഡിക്കായി ഒരു ഉപയോക്താവിനെ തിരഞ്ഞെടുക്കുക",
+  "companyLogoRequired": "കമ്പനി ലോഗോ ആവശ്യമാണ്",
+  "faviconImageRequired": "ഫാവിക്കോൺ ഇമേജ് ആവശ്യമാണ്",
+  "appImageRequired": "ആപ്പ് ഇമേജ് (1024x1024) ആവശ്യമാണ്",
+  "notificationIconRequired": "അറിയിപ്പ് ഐക്കൺ (192x192) ആവശ്യമാണ്",
+  "changeAppImage": "ആപ്പ് ഇമേജ് മാറ്റുക",
+  "selectAppImage": "ആപ്പ് ഇമേജ് തിരഞ്ഞെടുക്കുക"
 }

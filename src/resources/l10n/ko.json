@@ -843,5 +843,15 @@
   "retry": "다시 시도",
   "build": "빌드",
   "downloadStarted": "다운로드 시작!",
-  "downloadFailed": "다운로드 실패"
+  "downloadFailed": "다운로드 실패",
+  "appsCleanedSuccessfully": "앱이 성공적으로 정리되었습니다",
+  "allAppsCleanedSuccessfully": "모든 앱이 성공적으로 정리되었습니다",
+  "errorCleaning": "정리 중 오류",
+  "pleaseSelectUserForResellerId": "리셀러 ID에 대한 사용자를 선택해주세요",
+  "companyLogoRequired": "회사 로고가 필요합니다",
+  "faviconImageRequired": "파비콘 이미지가 필요합니다",
+  "appImageRequired": "앱 이미지 (1024x1024)가 필요합니다",
+  "notificationIconRequired": "알림 아이콘 (192x192)이 필요합니다",
+  "changeAppImage": "앱 이미지 변경",
+  "selectAppImage": "앱 이미지 선택"
 }

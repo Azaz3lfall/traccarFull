@@ -843,5 +843,15 @@
   "retry": "Повторить",
   "build": "Собрать",
   "downloadStarted": "загрузка началась!",
-  "downloadFailed": "Ошибка загрузки"
+  "downloadFailed": "Ошибка загрузки",
+  "appsCleanedSuccessfully": "приложения успешно очищены",
+  "allAppsCleanedSuccessfully": "ВСЕ приложения успешно очищены",
+  "errorCleaning": "Ошибка при очистке",
+  "pleaseSelectUserForResellerId": "Пожалуйста, выберите пользователя для ID Реселлера",
+  "companyLogoRequired": "Логотип компании обязателен",
+  "faviconImageRequired": "Изображение фавикона обязательно",
+  "appImageRequired": "Изображение приложения (1024x1024) обязательно",
+  "notificationIconRequired": "Иконка уведомления (192x192) обязательна",
+  "changeAppImage": "Изменить изображение приложения",
+  "selectAppImage": "Выбрать изображение приложения"
 }

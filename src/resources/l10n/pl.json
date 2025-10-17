@@ -844,5 +844,15 @@
   "retry": "Spróbuj Ponownie",
   "build": "Zbuduj",
   "downloadStarted": "pobieranie rozpoczęte!",
-  "downloadFailed": "Pobieranie nie powiodło się"
+  "downloadFailed": "Pobieranie nie powiodło się",
+  "appsCleanedSuccessfully": "aplikacje pomyślnie wyczyszczone",
+  "allAppsCleanedSuccessfully": "WSZYSTKIE aplikacje pomyślnie wyczyszczone",
+  "errorCleaning": "Błąd podczas czyszczenia",
+  "pleaseSelectUserForResellerId": "Proszę wybrać użytkownika dla ID Sprzedawcy",
+  "companyLogoRequired": "Logo firmy jest wymagane",
+  "faviconImageRequired": "Obraz favicon jest wymagany",
+  "appImageRequired": "Obraz aplikacji (1024x1024) jest wymagany",
+  "notificationIconRequired": "Ikona powiadomienia (192x192) jest wymagana",
+  "changeAppImage": "Zmień obraz aplikacji",
+  "selectAppImage": "Wybierz obraz aplikacji"
 }

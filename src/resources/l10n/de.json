@@ -843,5 +843,15 @@
   "retry": "Wiederholen",
   "build": "Erstellen",
   "downloadStarted": "Download gestartet!",
-  "downloadFailed": "Download fehlgeschlagen"
+  "downloadFailed": "Download fehlgeschlagen",
+  "appsCleanedSuccessfully": "Apps erfolgreich bereinigt",
+  "allAppsCleanedSuccessfully": "ALLE Apps erfolgreich bereinigt",
+  "errorCleaning": "Fehler beim Bereinigen",
+  "pleaseSelectUserForResellerId": "Bitte wählen Sie einen Benutzer für Händler-ID",
+  "companyLogoRequired": "Firmenlogo ist erforderlich",
+  "faviconImageRequired": "Favicon-Bild ist erforderlich",
+  "appImageRequired": "App-Bild (1024x1024) ist erforderlich",
+  "notificationIconRequired": "Benachrichtigungssymbol (192x192) ist erforderlich",
+  "changeAppImage": "App-Bild ändern",
+  "selectAppImage": "App-Bild auswählen"
 }

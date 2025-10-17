@@ -840,5 +840,15 @@
   "retry": "Provo Përsëri",
   "build": "Ndërto",
   "downloadStarted": "shkarkimi filloi!",
-  "downloadFailed": "Shkarkimi dështoi"
+  "downloadFailed": "Shkarkimi dështoi",
+  "appsCleanedSuccessfully": "aplikacionet pastruan me sukses",
+  "allAppsCleanedSuccessfully": "TË GJITHA aplikacionet pastruan me sukses",
+  "errorCleaning": "Gabim në pastrim",
+  "pleaseSelectUserForResellerId": "Ju lutemi zgjidhni një përdorues për ID-në e Rishitësit",
+  "companyLogoRequired": "Logo-ja e kompanisë është e detyrueshme",
+  "faviconImageRequired": "Imazhi i favicon është i detyrueshëm",
+  "appImageRequired": "Imazhi i aplikacionit (1024x1024) është i detyrueshëm",
+  "notificationIconRequired": "Ikona e njoftimit (192x192) është e detyrueshme",
+  "changeAppImage": "Ndrysho imazhin e aplikacionit",
+  "selectAppImage": "Zgjidh imazhin e aplikacionit"
 }

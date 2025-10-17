@@ -844,5 +844,15 @@
   "retry": "Yenidən Cəhd Et",
   "build": "Qur",
   "downloadStarted": "yükləmə başladı!",
-  "downloadFailed": "Yükləmə uğursuz oldu"
+  "downloadFailed": "Yükləmə uğursuz oldu",
+  "appsCleanedSuccessfully": "tətbiqlər uğurla təmizləndi",
+  "allAppsCleanedSuccessfully": "BÜTÜN tətbiqlər uğurla təmizləndi",
+  "errorCleaning": "Təmizləmə xətası",
+  "pleaseSelectUserForResellerId": "Satıcı ID üçün istifadəçi seçin",
+  "companyLogoRequired": "Şirkət loqosu tələb olunur",
+  "faviconImageRequired": "Favicon şəkli tələb olunur",
+  "appImageRequired": "Tətbiq şəkli (1024x1024) tələb olunur",
+  "notificationIconRequired": "Bildiriş ikonu (192x192) tələb olunur",
+  "changeAppImage": "Tətbiq Şəkli Dəyişdir",
+  "selectAppImage": "Tətbiq Şəkli Seç"
 }

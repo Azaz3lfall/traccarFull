@@ -844,5 +844,15 @@
   "retry": "Επανάληψη",
   "build": "Δημιουργία",
   "downloadStarted": "λήψη ξεκίνησε!",
-  "downloadFailed": "Αποτυχία λήψης"
+  "downloadFailed": "Αποτυχία λήψης",
+  "appsCleanedSuccessfully": "εφαρμογές καθαρίστηκαν επιτυχώς",
+  "allAppsCleanedSuccessfully": "ΟΛΕΣ οι εφαρμογές καθαρίστηκαν επιτυχώς",
+  "errorCleaning": "Σφάλμα καθαρισμού",
+  "pleaseSelectUserForResellerId": "Παρακαλώ επιλέξτε χρήστη για το ID του μεταπωλητή",
+  "companyLogoRequired": "Το λογότυπο της εταιρείας είναι απαραίτητο",
+  "faviconImageRequired": "Η εικόνα favicon είναι απαραίτητη",
+  "appImageRequired": "Η εικόνα εφαρμογής (1024x1024) είναι απαραίτητη",
+  "notificationIconRequired": "Το εικονίδιο ειδοποίησης (192x192) είναι απαραίτητο",
+  "changeAppImage": "Αλλαγή εικόνας εφαρμογής",
+  "selectAppImage": "Επιλογή εικόνας εφαρμογής"
 }

@@ -840,5 +840,15 @@
   "retry": "ລອງໃໝ່",
   "build": "ສ້າງ",
   "downloadStarted": "ການດາວໂຫຼດເລີ່ມຕົ້ນ!",
-  "downloadFailed": "ການດາວໂຫຼດລົ້ມເຫຼວ"
+  "downloadFailed": "ການດາວໂຫຼດລົ້ມເຫຼວ",
+  "appsCleanedSuccessfully": "ແອັບຖືກທຳຄວາມສະອາດສຳເລັດ",
+  "allAppsCleanedSuccessfully": "ແອັບທັງໝົດຖືກທຳຄວາມສະອາດສຳເລັດ",
+  "errorCleaning": "ຂໍ້ຜິດພາດໃນການທຳຄວາມສະອາດ",
+  "pleaseSelectUserForResellerId": "ກະລຸນາເລືອກຜູ້ໃຊ້ສຳລັບ ID ຜູ້ຂາຍປະຈຳ",
+  "companyLogoRequired": "ໂລໂກ້ບໍລິສັດຈຳເປັນ",
+  "faviconImageRequired": "ຮູບພາບ Favicon ຈຳເປັນ",
+  "appImageRequired": "ຮູບພາບແອັບ (1024x1024) ຈຳເປັນ",
+  "notificationIconRequired": "ໄອຄອນແຈ້ງເຕືອນ (192x192) ຈຳເປັນ",
+  "changeAppImage": "ປ່ຽນຮູບພາບແອັບ",
+  "selectAppImage": "ເລືອກຮູບພາບແອັບ"
 }

@@ -840,5 +840,15 @@
   "retry": "ព្យាយាមម្តងទៀត",
   "build": "បង្កើត",
   "downloadStarted": "ការទាញយកចាប់ផ្តើម!",
-  "downloadFailed": "ការទាញយកបរាជ័យ"
+  "downloadFailed": "ការទាញយកបរាជ័យ",
+  "appsCleanedSuccessfully": "កម្មវិធីត្រូវបានសម្អាតដោយជោគជ័យ",
+  "allAppsCleanedSuccessfully": "កម្មវិធីទាំងអស់ត្រូវបានសម្អាតដោយជោគជ័យ",
+  "errorCleaning": "កំហុសក្នុងការសម្អាត",
+  "pleaseSelectUserForResellerId": "សូមជ្រើសរើសអ្នកប្រើប្រាស់សម្រាប់ ID អ្នកលក់រាយ",
+  "companyLogoRequired": "ឡូហ្គូក្រុមហ៊ុនត្រូវបានទាមទារ",
+  "faviconImageRequired": "រូបភាព Favicon ត្រូវបានទាមទារ",
+  "appImageRequired": "រូបភាពកម្មវិធី (1024x1024) ត្រូវបានទាមទារ",
+  "notificationIconRequired": "រូបតំណាងការជូនដំណឹង (192x192) ត្រូវបានទាមទារ",
+  "changeAppImage": "ផ្លាស់ប្តូររូបភាពកម្មវិធី",
+  "selectAppImage": "ជ្រើសរើសរូបភាពកម្មវិធី"
 }

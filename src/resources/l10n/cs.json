@@ -844,5 +844,15 @@
   "retry": "Zkusit Znovu",
   "build": "Sestavit",
   "downloadStarted": "stahování zahájeno!",
-  "downloadFailed": "Stahování se nezdařilo"
+  "downloadFailed": "Stahování se nezdařilo",
+  "appsCleanedSuccessfully": "aplikace úspěšně vyčištěny",
+  "allAppsCleanedSuccessfully": "VŠECHNY aplikace úspěšně vyčištěny",
+  "errorCleaning": "Chyba při čištění",
+  "pleaseSelectUserForResellerId": "Prosím, vyberte uživatele pro ID prodejce",
+  "companyLogoRequired": "Logo společnosti je povinné",
+  "faviconImageRequired": "Obrázek faviconu je povinný",
+  "appImageRequired": "Obrázek aplikace (1024x1024) je povinný",
+  "notificationIconRequired": "Ikona oznámení (192x192) je povinná",
+  "changeAppImage": "Změnit obrázek aplikace",
+  "selectAppImage": "Vybrat obrázek aplikace"
 }

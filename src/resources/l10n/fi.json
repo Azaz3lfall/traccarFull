@@ -844,5 +844,15 @@
   "retry": "Yritä Uudelleen",
   "build": "Rakenna",
   "downloadStarted": "lataus aloitettu!",
-  "downloadFailed": "Lataus epäonnistui"
+  "downloadFailed": "Lataus epäonnistui",
+  "appsCleanedSuccessfully": "sovellukset puhdistettu onnistuneesti",
+  "allAppsCleanedSuccessfully": "KAIKKI sovellukset puhdistettu onnistuneesti",
+  "errorCleaning": "Virhe puhdistuksessa",
+  "pleaseSelectUserForResellerId": "Valitse käyttäjä jälleenmyyjä-tunnukselle",
+  "companyLogoRequired": "Yrityksen logo on pakollinen",
+  "faviconImageRequired": "Favicon-kuva on pakollinen",
+  "appImageRequired": "Sovelluksen kuva (1024x1024) on pakollinen",
+  "notificationIconRequired": "Ilmoitusikoni (192x192) on pakollinen",
+  "changeAppImage": "Vaihda sovelluksen kuva",
+  "selectAppImage": "Valitse sovelluksen kuva"
 }

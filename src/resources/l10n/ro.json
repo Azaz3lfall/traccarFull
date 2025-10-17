@@ -844,5 +844,15 @@
   "retry": "Încearcă Din Nou",
   "build": "Construiește",
   "downloadStarted": "descărcarea a început!",
-  "downloadFailed": "Descărcarea a eșuat"
+  "downloadFailed": "Descărcarea a eșuat",
+  "appsCleanedSuccessfully": "aplicații curățate cu succes",
+  "allAppsCleanedSuccessfully": "TOATE aplicațiile curățate cu succes",
+  "errorCleaning": "Eroare la curățare",
+  "pleaseSelectUserForResellerId": "Vă rugăm să selectați un utilizator pentru ID-ul Revânzătorului",
+  "companyLogoRequired": "Logo-ul companiei este obligatoriu",
+  "faviconImageRequired": "Imaginea favicon este obligatorie",
+  "appImageRequired": "Imaginea aplicației (1024x1024) este obligatorie",
+  "notificationIconRequired": "Iconița de notificare (192x192) este obligatorie",
+  "changeAppImage": "Schimbă imaginea aplicației",
+  "selectAppImage": "Selectează imaginea aplicației"
 }
