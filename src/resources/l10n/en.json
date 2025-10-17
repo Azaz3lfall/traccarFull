@@ -112,6 +112,7 @@
   "sharedShowAddress": "Show Address",
   "sharedShowDetails": "More Details",
   "sharedDisabled": "Disabled",
+  "sharedEnabled": "Enabled",
   "sharedMaintenance": "Maintenance",
   "sharedDeviceAccumulators": "Accumulators",
   "sharedAlarms": "Alarms",
