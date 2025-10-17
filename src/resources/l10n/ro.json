@@ -854,5 +854,10 @@
   "appImageRequired": "Imaginea aplicației (1024x1024) este obligatorie",
   "notificationIconRequired": "Iconița de notificare (192x192) este obligatorie",
   "changeAppImage": "Schimbă imaginea aplicației",
-  "selectAppImage": "Selectează imaginea aplicației"
+  "selectAppImage": "Selectează imaginea aplicației",
+  "failedToStartBuild": "Eșec la pornire",
+  "buildFailed": "Construcția a eșuat",
+  "failedToFetchResellers": "Eșec la preluarea revânzătorilor",
+  "failedToFetchUsers": "Eșec la preluarea utilizatorilor",
+  "failedToFetchLogs": "Eșec la preluarea jurnalelor"
 }

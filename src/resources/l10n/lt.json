@@ -850,5 +850,10 @@
   "appImageRequired": "Programos paveikslėlis (1024x1024) yra privalomas",
   "notificationIconRequired": "Pranešimo piktograma (192x192) yra privaloma",
   "changeAppImage": "Keisti programos paveikslėlį",
-  "selectAppImage": "Pasirinkti programos paveikslėlį"
+  "selectAppImage": "Pasirinkti programos paveikslėlį",
+  "failedToStartBuild": "Nepavyko paleisti",
+  "buildFailed": "Kompiliavimas nepavyko",
+  "failedToFetchResellers": "Nepavyko gauti pardavėjų",
+  "failedToFetchUsers": "Nepavyko gauti vartotojų",
+  "failedToFetchLogs": "Nepavyko gauti žurnalų"
 }

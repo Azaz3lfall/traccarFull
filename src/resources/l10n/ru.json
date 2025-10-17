@@ -853,5 +853,10 @@
   "appImageRequired": "Изображение приложения (1024x1024) обязательно",
   "notificationIconRequired": "Иконка уведомления (192x192) обязательна",
   "changeAppImage": "Изменить изображение приложения",
-  "selectAppImage": "Выбрать изображение приложения"
+  "selectAppImage": "Выбрать изображение приложения",
+  "failedToStartBuild": "Не удалось запустить",
+  "buildFailed": "Сборка не удалась",
+  "failedToFetchResellers": "Не удалось получить реселлеров",
+  "failedToFetchUsers": "Не удалось получить пользователей",
+  "failedToFetchLogs": "Не удалось получить логи"
 }

@@ -850,5 +850,10 @@
   "appImageRequired": "تصویر اپلیکیشن (1024x1024) الزامی است",
   "notificationIconRequired": "آیکون اعلان (192x192) الزامی است",
   "changeAppImage": "تغییر تصویر برنامه",
-  "selectAppImage": "انتخاب تصویر برنامه"
+  "selectAppImage": "انتخاب تصویر برنامه",
+  "failedToStartBuild": "شروع ناموفق",
+  "buildFailed": "ساخت ناموفق",
+  "failedToFetchResellers": "دریافت فروشندگان ناموفق",
+  "failedToFetchUsers": "دریافت کاربران ناموفق",
+  "failedToFetchLogs": "دریافت لاگ‌ها ناموفق"
 }

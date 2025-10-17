@@ -853,5 +853,10 @@
   "appImageRequired": "صورة التطبيق (1024x1024) مطلوبة",
   "notificationIconRequired": "أيقونة الإشعار (192x192) مطلوبة",
   "changeAppImage": "تغيير صورة التطبيق",
-  "selectAppImage": "اختيار صورة التطبيق"
+  "selectAppImage": "اختيار صورة التطبيق",
+  "failedToStartBuild": "فشل في البدء",
+  "buildFailed": "فشل البناء",
+  "failedToFetchResellers": "فشل في جلب الموزعين",
+  "failedToFetchUsers": "فشل في جلب المستخدمين",
+  "failedToFetchLogs": "فشل في جلب السجلات"
 }

@@ -854,5 +854,10 @@
   "appImageRequired": "Η εικόνα εφαρμογής (1024x1024) είναι απαραίτητη",
   "notificationIconRequired": "Το εικονίδιο ειδοποίησης (192x192) είναι απαραίτητο",
   "changeAppImage": "Αλλαγή εικόνας εφαρμογής",
-  "selectAppImage": "Επιλογή εικόνας εφαρμογής"
+  "selectAppImage": "Επιλογή εικόνας εφαρμογής",
+  "failedToStartBuild": "Αποτυχία εκκίνησης",
+  "buildFailed": "Η κατασκευή απέτυχε",
+  "failedToFetchResellers": "Αποτυχία λήψης μεταπωλητών",
+  "failedToFetchUsers": "Αποτυχία λήψης χρηστών",
+  "failedToFetchLogs": "Αποτυχία λήψης καταγραφών"
 }

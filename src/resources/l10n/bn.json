@@ -854,5 +854,10 @@
   "appImageRequired": "অ্যাপ ছবি (1024x1024) প্রয়োজন",
   "notificationIconRequired": "বিজ্ঞপ্তি আইকন (192x192) প্রয়োজন",
   "changeAppImage": "অ্যাপ ছবি পরিবর্তন করুন",
-  "selectAppImage": "অ্যাপ ছবি নির্বাচন করুন"
+  "selectAppImage": "অ্যাপ ছবি নির্বাচন করুন",
+  "failedToStartBuild": "শুরু করতে ব্যর্থ",
+  "buildFailed": "বিল্ড ব্যর্থ",
+  "failedToFetchResellers": "রিসেলার আনতে ব্যর্থ",
+  "failedToFetchUsers": "ব্যবহারকারী আনতে ব্যর্থ",
+  "failedToFetchLogs": "লগ আনতে ব্যর্থ"
 }

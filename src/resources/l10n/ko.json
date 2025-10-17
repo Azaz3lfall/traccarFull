@@ -853,5 +853,10 @@
   "appImageRequired": "앱 이미지 (1024x1024)가 필요합니다",
   "notificationIconRequired": "알림 아이콘 (192x192)이 필요합니다",
   "changeAppImage": "앱 이미지 변경",
-  "selectAppImage": "앱 이미지 선택"
+  "selectAppImage": "앱 이미지 선택",
+  "failedToStartBuild": "시작 실패",
+  "buildFailed": "빌드 실패",
+  "failedToFetchResellers": "리셀러 가져오기 실패",
+  "failedToFetchUsers": "사용자 가져오기 실패",
+  "failedToFetchLogs": "로그 가져오기 실패"
 }

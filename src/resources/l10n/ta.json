@@ -850,5 +850,10 @@
   "appImageRequired": "ஆப் படம் (1024x1024) தேவை",
   "notificationIconRequired": "அறிவிப்பு ஐகான் (192x192) தேவை",
   "changeAppImage": "ஆப் படத்தை மாற்றவும்",
-  "selectAppImage": "ஆப் படத்தைத் தேர்ந்தெடுக்கவும்"
+  "selectAppImage": "ஆப் படத்தைத் தேர்ந்தெடுக்கவும்",
+  "failedToStartBuild": "தொடங்க முடியவில்லை",
+  "buildFailed": "கட்டுமானம் தோல்வி",
+  "failedToFetchResellers": "மறுவிற்பனையாளர்களைப் பெற முடியவில்லை",
+  "failedToFetchUsers": "பயனர்களைப் பெற முடியவில்லை",
+  "failedToFetchLogs": "பதிவுகளைப் பெற முடியவில்லை"
 }

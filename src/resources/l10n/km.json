@@ -850,5 +850,10 @@
   "appImageRequired": "រូបភាពកម្មវិធី (1024x1024) ត្រូវបានទាមទារ",
   "notificationIconRequired": "រូបតំណាងការជូនដំណឹង (192x192) ត្រូវបានទាមទារ",
   "changeAppImage": "ផ្លាស់ប្តូររូបភាពកម្មវិធី",
-  "selectAppImage": "ជ្រើសរើសរូបភាពកម្មវិធី"
+  "selectAppImage": "ជ្រើសរើសរូបភាពកម្មវិធី",
+  "failedToStartBuild": "ចាប់ផ្តើមបរាជ័យ",
+  "buildFailed": "ការបង្កើតបរាជ័យ",
+  "failedToFetchResellers": "ការទាញយកអ្នកលក់រាយបរាជ័យ",
+  "failedToFetchUsers": "ការទាញយកអ្នកប្រើប្រាស់បរាជ័យ",
+  "failedToFetchLogs": "ការទាញយកកំណត់ហេតុបរាជ័យ"
 }

@@ -854,5 +854,10 @@
   "appImageRequired": "Зображення додатку (1024x1024) обов'язкове",
   "notificationIconRequired": "Іконка сповіщення (192x192) обов'язкова",
   "changeAppImage": "Змінити зображення додатку",
-  "selectAppImage": "Вибрати зображення додатку"
+  "selectAppImage": "Вибрати зображення додатку",
+  "failedToStartBuild": "Не вдалося запустити",
+  "buildFailed": "Збірка не вдалася",
+  "failedToFetchResellers": "Не вдалося отримати реселлерів",
+  "failedToFetchUsers": "Не вдалося отримати користувачів",
+  "failedToFetchLogs": "Не вдалося отримати логи"
 }

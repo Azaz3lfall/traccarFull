@@ -854,5 +854,10 @@
   "appImageRequired": "รูปภาพแอป (1024x1024) จำเป็น",
   "notificationIconRequired": "ไอคอนการแจ้งเตือน (192x192) จำเป็น",
   "changeAppImage": "เปลี่ยนรูปภาพแอป",
-  "selectAppImage": "เลือกรูปภาพแอป"
+  "selectAppImage": "เลือกรูปภาพแอป",
+  "failedToStartBuild": "เริ่มต้นล้มเหลว",
+  "buildFailed": "การสร้างล้มเหลว",
+  "failedToFetchResellers": "ดึงข้อมูลผู้จำหน่ายล้มเหลว",
+  "failedToFetchUsers": "ดึงข้อมูลผู้ใช้ล้มเหลว",
+  "failedToFetchLogs": "ดึงข้อมูลบันทึกล้มเหลว"
 }

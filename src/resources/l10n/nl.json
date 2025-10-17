@@ -853,5 +853,10 @@
   "appImageRequired": "App afbeelding (1024x1024) is vereist",
   "notificationIconRequired": "Melding icoon (192x192) is vereist",
   "changeAppImage": "App afbeelding wijzigen",
-  "selectAppImage": "App afbeelding selecteren"
+  "selectAppImage": "App afbeelding selecteren",
+  "failedToStartBuild": "Starten mislukt",
+  "buildFailed": "Bouwen mislukt",
+  "failedToFetchResellers": "Ophalen van wederverkopers mislukt",
+  "failedToFetchUsers": "Ophalen van gebruikers mislukt",
+  "failedToFetchLogs": "Ophalen van logs mislukt"
 }

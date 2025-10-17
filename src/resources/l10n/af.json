@@ -854,5 +854,10 @@
   "appImageRequired": "App beeld (1024x1024) is vereis",
   "notificationIconRequired": "Kennisgewing ikoon (192x192) is vereis",
   "changeAppImage": "Verander App Beeld",
-  "selectAppImage": "Kies App Beeld"
+  "selectAppImage": "Kies App Beeld",
+  "failedToStartBuild": "Kon nie begin nie",
+  "buildFailed": "Bou het misluk",
+  "failedToFetchResellers": "Kon nie herverkopers haal nie",
+  "failedToFetchUsers": "Kon nie gebruikers haal nie",
+  "failedToFetchLogs": "Kon nie logs haal nie"
 }

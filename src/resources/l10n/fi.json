@@ -854,5 +854,10 @@
   "appImageRequired": "Sovelluksen kuva (1024x1024) on pakollinen",
   "notificationIconRequired": "Ilmoitusikoni (192x192) on pakollinen",
   "changeAppImage": "Vaihda sovelluksen kuva",
-  "selectAppImage": "Valitse sovelluksen kuva"
+  "selectAppImage": "Valitse sovelluksen kuva",
+  "failedToStartBuild": "Käynnistys epäonnistui",
+  "buildFailed": "Kokoaminen epäonnistui",
+  "failedToFetchResellers": "Jälleenmyyjien haku epäonnistui",
+  "failedToFetchUsers": "Käyttäjien haku epäonnistui",
+  "failedToFetchLogs": "Lokien haku epäonnistui"
 }

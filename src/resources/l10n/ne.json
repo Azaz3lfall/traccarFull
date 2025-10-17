@@ -850,5 +850,10 @@
   "appImageRequired": "एप छवि (1024x1024) आवश्यक छ",
   "notificationIconRequired": "सूचना आइकन (192x192) आवश्यक छ",
   "changeAppImage": "एप छवि परिवर्तन गर्नुहोस्",
-  "selectAppImage": "एप छवि छान्नुहोस्"
+  "selectAppImage": "एप छवि छान्नुहोस्",
+  "failedToStartBuild": "सुरु गर्न असफल",
+  "buildFailed": "बिल्ड असफल",
+  "failedToFetchResellers": "रिसेलरहरू ल्याउन असफल",
+  "failedToFetchUsers": "प्रयोगकर्ताहरू ल्याउन असफल",
+  "failedToFetchLogs": "लगहरू ल्याउन असफल"
 }

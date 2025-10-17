@@ -854,5 +854,10 @@
   "appImageRequired": "Tətbiq şəkli (1024x1024) tələb olunur",
   "notificationIconRequired": "Bildiriş ikonu (192x192) tələb olunur",
   "changeAppImage": "Tətbiq Şəkli Dəyişdir",
-  "selectAppImage": "Tətbiq Şəkli Seç"
+  "selectAppImage": "Tətbiq Şəkli Seç",
+  "failedToStartBuild": "Başlamaq mümkün olmadı",
+  "buildFailed": "Qurulma uğursuz oldu",
+  "failedToFetchResellers": "Satıcıları gətirmək mümkün olmadı",
+  "failedToFetchUsers": "İstifadəçiləri gətirmək mümkün olmadı",
+  "failedToFetchLogs": "Logları gətirmək mümkün olmadı"
 }

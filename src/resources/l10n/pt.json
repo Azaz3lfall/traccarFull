@@ -854,5 +854,10 @@
   "appImageRequired": "A imagem da app (1024x1024) é obrigatória",
   "notificationIconRequired": "O ícone de notificação (192x192) é obrigatório",
   "changeAppImage": "Alterar imagem da app",
-  "selectAppImage": "Selecionar imagem da app"
+  "selectAppImage": "Selecionar imagem da app",
+  "failedToStartBuild": "Falha ao iniciar",
+  "buildFailed": "Construção falhada",
+  "failedToFetchResellers": "Falha ao buscar revendedores",
+  "failedToFetchUsers": "Falha ao buscar utilizadores",
+  "failedToFetchLogs": "Falha ao buscar registos"
 }

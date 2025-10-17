@@ -853,5 +853,10 @@
   "appImageRequired": "アプリ画像（1024x1024）が必要です",
   "notificationIconRequired": "通知アイコン（192x192）が必要です",
   "changeAppImage": "アプリ画像を変更",
-  "selectAppImage": "アプリ画像を選択"
+  "selectAppImage": "アプリ画像を選択",
+  "failedToStartBuild": "開始に失敗しました",
+  "buildFailed": "ビルドに失敗しました",
+  "failedToFetchResellers": "リセラーの取得に失敗しました",
+  "failedToFetchUsers": "ユーザーの取得に失敗しました",
+  "failedToFetchLogs": "ログの取得に失敗しました"
 }

@@ -854,5 +854,10 @@
   "appImageRequired": "Obrázek aplikace (1024x1024) je povinný",
   "notificationIconRequired": "Ikona oznámení (192x192) je povinná",
   "changeAppImage": "Změnit obrázek aplikace",
-  "selectAppImage": "Vybrat obrázek aplikace"
+  "selectAppImage": "Vybrat obrázek aplikace",
+  "failedToStartBuild": "Nepodařilo se spustit",
+  "buildFailed": "Sestavení se nezdařilo",
+  "failedToFetchResellers": "Nepodařilo se načíst prodejce",
+  "failedToFetchUsers": "Nepodařilo se načíst uživatele",
+  "failedToFetchLogs": "Nepodařilo se načíst protokoly"
 }

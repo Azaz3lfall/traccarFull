@@ -850,5 +850,10 @@
   "appImageRequired": "App bilete (1024x1024) er påkravd",
   "notificationIconRequired": "Varslingsikon (192x192) er påkravd",
   "changeAppImage": "Endre app bilete",
-  "selectAppImage": "Vel app bilete"
+  "selectAppImage": "Vel app bilete",
+  "failedToStartBuild": "Kunne ikkje starte",
+  "buildFailed": "Bygging mislukkast",
+  "failedToFetchResellers": "Kunne ikkje hente forhandlarar",
+  "failedToFetchUsers": "Kunne ikkje hente brukarar",
+  "failedToFetchLogs": "Kunne ikkje hente loggar"
 }

@@ -850,5 +850,10 @@
   "appImageRequired": "Picha ya programu (1024x1024) inahitajika",
   "notificationIconRequired": "Kikonyo cha arifa (192x192) kinahitajika",
   "changeAppImage": "Badilisha picha ya programu",
-  "selectAppImage": "Chagua picha ya programu"
+  "selectAppImage": "Chagua picha ya programu",
+  "failedToStartBuild": "Imeshindwa kuanza",
+  "buildFailed": "Ujenzi umeshindwa",
+  "failedToFetchResellers": "Imeshindwa kupata wafanyabiashara",
+  "failedToFetchUsers": "Imeshindwa kupata watumiaji",
+  "failedToFetchLogs": "Imeshindwa kupata logi"
 }

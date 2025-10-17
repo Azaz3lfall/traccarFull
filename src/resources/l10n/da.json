@@ -854,5 +854,10 @@
   "appImageRequired": "App billede (1024x1024) er påkrævet",
   "notificationIconRequired": "Notifikations ikon (192x192) er påkrævet",
   "changeAppImage": "Skift app billede",
-  "selectAppImage": "Vælg app billede"
+  "selectAppImage": "Vælg app billede",
+  "failedToStartBuild": "Kunne ikke starte",
+  "buildFailed": "Bygning mislykkedes",
+  "failedToFetchResellers": "Kunne ikke hente forhandlere",
+  "failedToFetchUsers": "Kunne ikke hente brugere",
+  "failedToFetchLogs": "Kunne ikke hente logs"
 }

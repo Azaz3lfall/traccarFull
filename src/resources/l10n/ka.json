@@ -850,5 +850,10 @@
   "appImageRequired": "აპლიკაციის სურათი (1024x1024) აუცილებელია",
   "notificationIconRequired": "შეტყობინების ხატულა (192x192) აუცილებელია",
   "changeAppImage": "აპლიკაციის სურათის შეცვლა",
-  "selectAppImage": "აპლიკაციის სურათის არჩევა"
+  "selectAppImage": "აპლიკაციის სურათის არჩევა",
+  "failedToStartBuild": "დაწყება ვერ მოხერხდა",
+  "buildFailed": "შექმნა ვერ მოხერხდა",
+  "failedToFetchResellers": "გადამყიდველების მიღება ვერ მოხერხდა",
+  "failedToFetchUsers": "მომხმარებლების მიღება ვერ მოხერხდა",
+  "failedToFetchLogs": "ლოგების მიღება ვერ მოხერხდა"
 }

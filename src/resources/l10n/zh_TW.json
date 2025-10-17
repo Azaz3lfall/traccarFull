@@ -854,5 +854,10 @@
   "appImageRequired": "應用程式圖片（1024x1024）是必需的",
   "notificationIconRequired": "通知圖標（192x192）是必需的",
   "changeAppImage": "更改應用程式圖片",
-  "selectAppImage": "選擇應用程式圖片"
+  "selectAppImage": "選擇應用程式圖片",
+  "failedToStartBuild": "啟動失敗",
+  "buildFailed": "建構失敗",
+  "failedToFetchResellers": "取得經銷商失敗",
+  "failedToFetchUsers": "取得使用者失敗",
+  "failedToFetchLogs": "取得日誌失敗"
 }

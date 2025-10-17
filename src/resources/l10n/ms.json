@@ -850,5 +850,10 @@
   "appImageRequired": "Imej aplikasi (1024x1024) diperlukan",
   "notificationIconRequired": "Ikon notifikasi (192x192) diperlukan",
   "changeAppImage": "Tukar imej aplikasi",
-  "selectAppImage": "Pilih imej aplikasi"
+  "selectAppImage": "Pilih imej aplikasi",
+  "failedToStartBuild": "Gagal memulakan",
+  "buildFailed": "Binaan gagal",
+  "failedToFetchResellers": "Gagal mengambil penjual semula",
+  "failedToFetchUsers": "Gagal mengambil pengguna",
+  "failedToFetchLogs": "Gagal mengambil log"
 }

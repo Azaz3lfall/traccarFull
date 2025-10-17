@@ -850,5 +850,10 @@
   "appImageRequired": "Հավելվածի պատկերը (1024x1024) պարտադիր է",
   "notificationIconRequired": "Ծանուցման պատկերակը (192x192) պարտադիր է",
   "changeAppImage": "Փոխել հավելվածի պատկերը",
-  "selectAppImage": "Ընտրել հավելվածի պատկերը"
+  "selectAppImage": "Ընտրել հավելվածի պատկերը",
+  "failedToStartBuild": "Սկսելը ձախողվեց",
+  "buildFailed": "Կառուցումը ձախողվեց",
+  "failedToFetchResellers": "Վերավաճառողների ստացումը ձախողվեց",
+  "failedToFetchUsers": "Օգտատերերի ստացումը ձախողվեց",
+  "failedToFetchLogs": "Գրանցումների ստացումը ձախողվեց"
 }

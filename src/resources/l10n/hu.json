@@ -854,5 +854,10 @@
   "appImageRequired": "Az alkalmazás kép (1024x1024) kötelező",
   "notificationIconRequired": "Az értesítés ikon (192x192) kötelező",
   "changeAppImage": "Alkalmazás kép módosítása",
-  "selectAppImage": "Alkalmazás kép kiválasztása"
+  "selectAppImage": "Alkalmazás kép kiválasztása",
+  "failedToStartBuild": "Indítás sikertelen",
+  "buildFailed": "Építés sikertelen",
+  "failedToFetchResellers": "Továbbértékesítők lekérése sikertelen",
+  "failedToFetchUsers": "Felhasználók lekérése sikertelen",
+  "failedToFetchLogs": "Naplók lekérése sikertelen"
 }

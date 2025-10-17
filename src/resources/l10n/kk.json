@@ -850,5 +850,10 @@
   "appImageRequired": "Қосымша суреті (1024x1024) қажет",
   "notificationIconRequired": "Хабарландыру белгішесі (192x192) қажет",
   "changeAppImage": "Қосымша суретін өзгерту",
-  "selectAppImage": "Қосымша суретін таңдау"
+  "selectAppImage": "Қосымша суретін таңдау",
+  "failedToStartBuild": "Бастау сәтсіз",
+  "buildFailed": "Құрастыру сәтсіз",
+  "failedToFetchResellers": "Қайта сатушыларды алу сәтсіз",
+  "failedToFetchUsers": "Пайдаланушыларды алу сәтсіз",
+  "failedToFetchLogs": "Журналдарды алу сәтсіз"
 }

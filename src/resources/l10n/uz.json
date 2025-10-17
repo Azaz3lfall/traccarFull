@@ -850,5 +850,10 @@
   "appImageRequired": "Ilova rasmi (1024x1024) talab qilinadi",
   "notificationIconRequired": "Bildirishnoma belgisi (192x192) talab qilinadi",
   "changeAppImage": "Ilova rasmini o'zgartirish",
-  "selectAppImage": "Ilova rasmini tanlash"
+  "selectAppImage": "Ilova rasmini tanlash",
+  "failedToStartBuild": "Boshlash muvaffaqiyatsiz",
+  "buildFailed": "Qurish muvaffaqiyatsiz",
+  "failedToFetchResellers": "Qayta sotuvchilarni olish muvaffaqiyatsiz",
+  "failedToFetchUsers": "Foydalanuvchilarni olish muvaffaqiyatsiz",
+  "failedToFetchLogs": "Jurnallarni olish muvaffaqiyatsiz"
 }

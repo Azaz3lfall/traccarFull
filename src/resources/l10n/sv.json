@@ -853,5 +853,10 @@
   "appImageRequired": "App bild (1024x1024) krävs",
   "notificationIconRequired": "Notifikationsikon (192x192) krävs",
   "changeAppImage": "Ändra app bild",
-  "selectAppImage": "Välj app bild"
+  "selectAppImage": "Välj app bild",
+  "failedToStartBuild": "Misslyckades att starta",
+  "buildFailed": "Bygge misslyckades",
+  "failedToFetchResellers": "Misslyckades att hämta återförsäljare",
+  "failedToFetchUsers": "Misslyckades att hämta användare",
+  "failedToFetchLogs": "Misslyckades att hämta loggar"
 }

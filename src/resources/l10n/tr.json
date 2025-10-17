@@ -854,5 +854,10 @@
   "appImageRequired": "Uygulama resmi (1024x1024) gerekli",
   "notificationIconRequired": "Bildirim simgesi (192x192) gerekli",
   "changeAppImage": "Uygulama resmini değiştir",
-  "selectAppImage": "Uygulama resmi seç"
+  "selectAppImage": "Uygulama resmi seç",
+  "failedToStartBuild": "Başlatılamadı",
+  "buildFailed": "Derleme başarısız",
+  "failedToFetchResellers": "Bayiler getirilemedi",
+  "failedToFetchUsers": "Kullanıcılar getirilemedi",
+  "failedToFetchLogs": "Günlükler getirilemedi"
 }

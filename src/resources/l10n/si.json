@@ -850,5 +850,10 @@
   "appImageRequired": "යෙදුම් රූපය (1024x1024) අවශ්‍යයි",
   "notificationIconRequired": "දැනුම්දීම් අයිකනය (192x192) අවශ්‍යයි",
   "changeAppImage": "යෙදුම් රූපය වෙනස් කරන්න",
-  "selectAppImage": "යෙදුම් රූපය තෝරන්න"
+  "selectAppImage": "යෙදුම් රූපය තෝරන්න",
+  "failedToStartBuild": "ආරම්භ කිරීමට අසමත්",
+  "buildFailed": "ගොඩනැගීම අසමත්",
+  "failedToFetchResellers": "අතරමැදි වෙළෙන්දන් ලබා ගැනීමට අසමත්",
+  "failedToFetchUsers": "පරිශීලකයන් ලබා ගැනීමට අසමත්",
+  "failedToFetchLogs": "ලොග් ලබා ගැනීමට අසමත්"
 }

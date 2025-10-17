@@ -850,5 +850,10 @@
   "appImageRequired": "ആപ്പ് ഇമേജ് (1024x1024) ആവശ്യമാണ്",
   "notificationIconRequired": "അറിയിപ്പ് ഐക്കൺ (192x192) ആവശ്യമാണ്",
   "changeAppImage": "ആപ്പ് ഇമേജ് മാറ്റുക",
-  "selectAppImage": "ആപ്പ് ഇമേജ് തിരഞ്ഞെടുക്കുക"
+  "selectAppImage": "ആപ്പ് ഇമേജ് തിരഞ്ഞെടുക്കുക",
+  "failedToStartBuild": "ആരംഭിക്കാൻ പരാജയപ്പെട്ടു",
+  "buildFailed": "ബിൽഡ് പരാജയപ്പെട്ടു",
+  "failedToFetchResellers": "റീസെല്ലറുകളെ എടുക്കാൻ പരാജയപ്പെട്ടു",
+  "failedToFetchUsers": "ഉപയോക്താക്കളെ എടുക്കാൻ പരാജയപ്പെട്ടു",
+  "failedToFetchLogs": "ലോഗുകൾ എടുക്കാൻ പരാജയപ്പെട്ടു"
 }

@@ -850,5 +850,10 @@
   "appImageRequired": "Lietotnes attēls (1024x1024) ir obligāts",
   "notificationIconRequired": "Paziņojuma ikona (192x192) ir obligāta",
   "changeAppImage": "Mainīt lietotnes attēlu",
-  "selectAppImage": "Izvēlēties lietotnes attēlu"
+  "selectAppImage": "Izvēlēties lietotnes attēlu",
+  "failedToStartBuild": "Neizdevās sākt",
+  "buildFailed": "Izveide neizdevās",
+  "failedToFetchResellers": "Neizdevās iegūt pārdevējus",
+  "failedToFetchUsers": "Neizdevās iegūt lietotājus",
+  "failedToFetchLogs": "Neizdevās iegūt žurnālus"
 }

@@ -850,5 +850,10 @@
   "appImageRequired": "Апп зураг (1024x1024) шаардлагатай",
   "notificationIconRequired": "Мэдэгдэл дүрс (192x192) шаардлагатай",
   "changeAppImage": "Апп зураг солих",
-  "selectAppImage": "Апп зураг сонгох"
+  "selectAppImage": "Апп зураг сонгох",
+  "failedToStartBuild": "Эхлүүлэх амжилтгүй",
+  "buildFailed": "Бүтээх амжилтгүй",
+  "failedToFetchResellers": "Дахин борлуулагч авах амжилтгүй",
+  "failedToFetchUsers": "Хэрэглэгч авах амжилтгүй",
+  "failedToFetchLogs": "Бүртгэл авах амжилтгүй"
 }

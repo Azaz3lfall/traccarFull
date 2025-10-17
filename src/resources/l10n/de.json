@@ -853,5 +853,10 @@
   "appImageRequired": "App-Bild (1024x1024) ist erforderlich",
   "notificationIconRequired": "Benachrichtigungssymbol (192x192) ist erforderlich",
   "changeAppImage": "App-Bild ändern",
-  "selectAppImage": "App-Bild auswählen"
+  "selectAppImage": "App-Bild auswählen",
+  "failedToStartBuild": "Starten fehlgeschlagen",
+  "buildFailed": "Build fehlgeschlagen",
+  "failedToFetchResellers": "Händler konnten nicht abgerufen werden",
+  "failedToFetchUsers": "Benutzer konnten nicht abgerufen werden",
+  "failedToFetchLogs": "Protokolle konnten nicht abgerufen werden"
 }

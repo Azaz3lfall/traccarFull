@@ -853,5 +853,10 @@
   "appImageRequired": "ऐप छवि (1024x1024) आवश्यक है",
   "notificationIconRequired": "सूचना आइकन (192x192) आवश्यक है",
   "changeAppImage": "ऐप छवि बदलें",
-  "selectAppImage": "ऐप छवि चुनें"
+  "selectAppImage": "ऐप छवि चुनें",
+  "failedToStartBuild": "शुरू करने में विफल",
+  "buildFailed": "बिल्ड विफल",
+  "failedToFetchResellers": "रिसेलर प्राप्त करने में विफल",
+  "failedToFetchUsers": "उपयोगकर्ता प्राप्त करने में विफल",
+  "failedToFetchLogs": "लॉग प्राप्त करने में विफल"
 }

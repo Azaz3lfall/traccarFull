@@ -850,5 +850,10 @@
   "appImageRequired": "Programma suraty (1024x1024) zerur",
   "notificationIconRequired": "Duýduryş nyşany (192x192) zerur",
   "changeAppImage": "Programma suratyny üýtget",
-  "selectAppImage": "Programma suratyny saýla"
+  "selectAppImage": "Programma suratyny saýla",
+  "failedToStartBuild": "Başlamak mümkin bolmady",
+  "buildFailed": "Gurmak mümkin bolmady",
+  "failedToFetchResellers": "Dükanlary almak mümkin bolmady",
+  "failedToFetchUsers": "Ulanyjylary almak mümkin bolmady",
+  "failedToFetchLogs": "Loglary almak mümkin bolmady"
 }

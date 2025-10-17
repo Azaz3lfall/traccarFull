@@ -854,5 +854,10 @@
   "appImageRequired": "Obraz aplikacji (1024x1024) jest wymagany",
   "notificationIconRequired": "Ikona powiadomienia (192x192) jest wymagana",
   "changeAppImage": "Zmień obraz aplikacji",
-  "selectAppImage": "Wybierz obraz aplikacji"
+  "selectAppImage": "Wybierz obraz aplikacji",
+  "failedToStartBuild": "Nie udało się uruchomić",
+  "buildFailed": "Budowanie nieudane",
+  "failedToFetchResellers": "Nie udało się pobrać sprzedawców",
+  "failedToFetchUsers": "Nie udało się pobrać użytkowników",
+  "failedToFetchLogs": "Nie udało się pobrać logów"
 }

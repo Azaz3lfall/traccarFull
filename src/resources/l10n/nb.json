@@ -854,5 +854,10 @@
   "appImageRequired": "App bilde (1024x1024) er påkrevd",
   "notificationIconRequired": "Varslingsikon (192x192) er påkrevd",
   "changeAppImage": "Endre app bilde",
-  "selectAppImage": "Velg app bilde"
+  "selectAppImage": "Velg app bilde",
+  "failedToStartBuild": "Kunne ikke starte",
+  "buildFailed": "Bygging mislyktes",
+  "failedToFetchResellers": "Kunne ikke hente forhandlere",
+  "failedToFetchUsers": "Kunne ikke hente brukere",
+  "failedToFetchLogs": "Kunne ikke hente logger"
 }

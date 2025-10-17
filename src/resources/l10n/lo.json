@@ -850,5 +850,10 @@
   "appImageRequired": "ຮູບພາບແອັບ (1024x1024) ຈຳເປັນ",
   "notificationIconRequired": "ໄອຄອນແຈ້ງເຕືອນ (192x192) ຈຳເປັນ",
   "changeAppImage": "ປ່ຽນຮູບພາບແອັບ",
-  "selectAppImage": "ເລືອກຮູບພາບແອັບ"
+  "selectAppImage": "ເລືອກຮູບພາບແອັບ",
+  "failedToStartBuild": "ລົ້ມເຫລວໃນການເລີ່ມ",
+  "buildFailed": "ການສ້າງລົ້ມເຫລວ",
+  "failedToFetchResellers": "ການດຶງຜູ້ຂາຍປະຈຳລົ້ມເຫລວ",
+  "failedToFetchUsers": "ການດຶງຜູ້ໃຊ້ລົ້ມເຫລວ",
+  "failedToFetchLogs": "ການດຶງບັນທຶກລົ້ມເຫລວ"
 }

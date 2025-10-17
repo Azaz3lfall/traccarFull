@@ -850,5 +850,10 @@
   "appImageRequired": "Слика апликације (1024x1024) је обавезна",
   "notificationIconRequired": "Икона обавештења (192x192) је обавезна",
   "changeAppImage": "Promeni sliku aplikacije",
-  "selectAppImage": "Odaberi sliku aplikacije"
+  "selectAppImage": "Odaberi sliku aplikacije",
+  "failedToStartBuild": "Неуспешно покретање",
+  "buildFailed": "Изградња неуспешна",
+  "failedToFetchResellers": "Неуспешно преузимање препродавача",
+  "failedToFetchUsers": "Неуспешно преузимање корисника",
+  "failedToFetchLogs": "Неуспешно преузимање логова"
 }

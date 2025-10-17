@@ -854,5 +854,10 @@
   "appImageRequired": "תמונת האפליקציה (1024x1024) נדרשת",
   "notificationIconRequired": "אייקון ההתראה (192x192) נדרש",
   "changeAppImage": "שנה תמונת אפליקציה",
-  "selectAppImage": "בחר תמונת אפליקציה"
+  "selectAppImage": "בחר תמונת אפליקציה",
+  "failedToStartBuild": "נכשל בהתחלה",
+  "buildFailed": "הבנייה נכשלה",
+  "failedToFetchResellers": "נכשל בקבלת משווקים",
+  "failedToFetchUsers": "נכשל בקבלת משתמשים",
+  "failedToFetchLogs": "נכשל בקבלת לוגים"
 }

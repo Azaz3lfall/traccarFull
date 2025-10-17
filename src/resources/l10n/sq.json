@@ -850,5 +850,10 @@
   "appImageRequired": "Imazhi i aplikacionit (1024x1024) është i detyrueshëm",
   "notificationIconRequired": "Ikona e njoftimit (192x192) është e detyrueshme",
   "changeAppImage": "Ndrysho imazhin e aplikacionit",
-  "selectAppImage": "Zgjidh imazhin e aplikacionit"
+  "selectAppImage": "Zgjidh imazhin e aplikacionit",
+  "failedToStartBuild": "Dështoi në fillim",
+  "buildFailed": "Ndërtimi dështoi",
+  "failedToFetchResellers": "Dështoi në marrjen e rishitësve",
+  "failedToFetchUsers": "Dështoi në marrjen e përdoruesve",
+  "failedToFetchLogs": "Dështoi në marrjen e regjistrave"
 }

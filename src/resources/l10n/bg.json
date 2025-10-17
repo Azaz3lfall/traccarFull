@@ -854,5 +854,10 @@
   "appImageRequired": "Изображението на приложението (1024x1024) е задължително",
   "notificationIconRequired": "Иконата за известия (192x192) е задължителна",
   "changeAppImage": "Промени изображение на приложението",
-  "selectAppImage": "Избери изображение на приложението"
+  "selectAppImage": "Избери изображение на приложението",
+  "failedToStartBuild": "Неуспешно стартиране",
+  "buildFailed": "Сборката неуспешна",
+  "failedToFetchResellers": "Неуспешно извличане на дистрибутори",
+  "failedToFetchUsers": "Неуспешно извличане на потребители",
+  "failedToFetchLogs": "Неуспешно извличане на логове"
 }

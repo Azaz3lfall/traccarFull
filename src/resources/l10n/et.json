@@ -854,5 +854,10 @@
   "appImageRequired": "Rakenduse pilt (1024x1024) on nõutav",
   "notificationIconRequired": "Teate ikoon (192x192) on nõutav",
   "changeAppImage": "Muuda rakenduse pilti",
-  "selectAppImage": "Vali rakenduse pilt"
+  "selectAppImage": "Vali rakenduse pilt",
+  "failedToStartBuild": "Käivitamine ebaõnnestus",
+  "buildFailed": "Koostamine ebaõnnestus",
+  "failedToFetchResellers": "Edasimüüjate laadimine ebaõnnestus",
+  "failedToFetchUsers": "Kasutajate laadimine ebaõnnestus",
+  "failedToFetchLogs": "Logide laadimine ebaõnnestus"
 }

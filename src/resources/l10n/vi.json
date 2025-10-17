@@ -854,5 +854,10 @@
   "appImageRequired": "Hình ảnh ứng dụng (1024x1024) là bắt buộc",
   "notificationIconRequired": "Biểu tượng thông báo (192x192) là bắt buộc",
   "changeAppImage": "Thay đổi hình ảnh ứng dụng",
-  "selectAppImage": "Chọn hình ảnh ứng dụng"
+  "selectAppImage": "Chọn hình ảnh ứng dụng",
+  "failedToStartBuild": "Không thể bắt đầu",
+  "buildFailed": "Xây dựng thất bại",
+  "failedToFetchResellers": "Không thể lấy nhà phân phối",
+  "failedToFetchUsers": "Không thể lấy người dùng",
+  "failedToFetchLogs": "Không thể lấy nhật ký"
 }
