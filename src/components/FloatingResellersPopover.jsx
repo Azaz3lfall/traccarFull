@@ -2650,8 +2650,8 @@ const FloatingResellersPopover = ({
                                                 src={imagePreview}
                                                 alt="Logo preview"
                                                 style={{
-                                                  width: '100px',
-                                                  height: '100px',
+                                                  width: '65px',
+                                                  height: '65px',
                                                   objectFit: 'contain',
                                                   borderRadius: '4px'
                                                 }}
@@ -2672,8 +2672,8 @@ const FloatingResellersPopover = ({
                                                 src={editingReseller.logo}
                                                 alt="Current logo"
                                                 style={{
-                                                  width: '100px',
-                                                  height: '100px',
+                                                  width: '65px',
+                                                  height: '65px',
                                                   objectFit: 'contain',
                                                   borderRadius: '4px'
                                                 }}
@@ -2763,8 +2763,8 @@ const FloatingResellersPopover = ({
                                                 src={faviconPreview}
                                                 alt="Favicon preview"
                                                 style={{
-                                                  width: '100px',
-                                                  height: '100px',
+                                                  width: '65px',
+                                                  height: '65px',
                                                   objectFit: 'contain',
                                                   borderRadius: '4px'
                                                 }}
@@ -2851,8 +2851,8 @@ const FloatingResellersPopover = ({
                                                 src={appImagePreview}
                                                 alt="App image preview"
                                                 style={{
-                                                  width: '100px',
-                                                  height: '100px',
+                                                  width: '65px',
+                                                  height: '65px',
                                                   objectFit: 'contain',
                                                   borderRadius: '4px'
                                                 }}
@@ -2936,8 +2936,8 @@ const FloatingResellersPopover = ({
                                                 src={notificationIconPreview}
                                                 alt="Notification icon preview"
                                                 style={{
-                                                  width: '100px',
-                                                  height: '100px',
+                                                  width: '65px',
+                                                  height: '65px',
                                                   objectFit: 'contain',
                                                   borderRadius: '4px'
                                                 }}
