@@ -136,6 +136,7 @@ const FloatingResellersPopover = ({
   const [buildStatusModal, setBuildStatusModal] = useState({ open: false, reseller: null, buildType: null });
   const [cleanAppsModal, setCleanAppsModal] = useState({ open: false, reseller: null });
   const [iosBuildTypeModal, setIosBuildTypeModal] = useState({ open: false, reseller: null });
+  const [massImporterModal, setMassImporterModal] = useState({ open: false, reseller: null });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
 
@@ -1441,6 +1442,16 @@ const FloatingResellersPopover = ({
       icon: <DeleteIcon fontSize="small" />,
       handler: (reseller) => {
         setCleanAppsModal({ open: true, reseller });
+        setAnchorEl(null); // Close the action menu
+      },
+      show: (reseller) => canEditReseller(reseller),
+    },
+    {
+      key: 'mass-importer',
+      title: t('massImporter'),
+      icon: <InventoryIcon fontSize="small" />,
+      handler: (reseller) => {
+        setMassImporterModal({ open: true, reseller });
         setAnchorEl(null); // Close the action menu
       },
       show: (reseller) => canEditReseller(reseller),
@@ -3414,6 +3425,141 @@ const FloatingResellersPopover = ({
         </motion.div>
       )}
 
+    </AnimatePresence>
+
+    {/* Mass Importer Modal */}
+    <AnimatePresence>
+      {massImporterModal.open && (
+        <motion.div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '20px'
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setMassImporterModal({ open: false, reseller: null })}
+        >
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '12px',
+              padding: '0',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+              border: `1px solid ${colors.border}`,
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <IconButton
+                  onClick={() => setMassImporterModal({ open: false, reseller: null })}
+                  size="small"
+                  style={{ color: colors.textSecondary }}
+                >
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                  {t('massImporterTitle')} - {massImporterModal.reseller?.companyName}
+                </Typography>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
+                {t('massImporterDescription')}
+              </Typography>
+              
+              <div style={{ marginBottom: '24px' }}>
+                <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
+                  {t('uploadCsvFile')}
+                </Typography>
+                <input
+                  type="file"
+                  accept=".csv"
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    backgroundColor: colors.surface,
+                    color: colors.text
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '24px' }}>
+                <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
+                  {t('enterDataManually')}
+                </Typography>
+                <TextField
+                  multiline
+                  rows={6}
+                  placeholder={t('csvPlaceholder')}
+                  fullWidth
+                  style={{
+                    '& .MuiInputBase-root': {
+                      backgroundColor: colors.surface,
+                      color: colors.text
+                    }
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setMassImporterModal({ open: false, reseller: null })}
+                  sx={{
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                >
+                  {t('sharedCancel')}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    // TODO: Implement mass import logic
+                    console.log('Mass import for reseller:', massImporterModal.reseller);
+                    setMassImporterModal({ open: false, reseller: null });
+                  }}
+                  sx={{
+                    backgroundColor: colors.primary,
+                    color: colors.primaryContrast
+                  }}
+                >
+                  {t('sharedImport')}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
     </>
   );
