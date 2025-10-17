@@ -3512,7 +3512,7 @@ const FloatingResellersPopover = ({
                       padding: '10px 16px',
                       border: `1px solid ${colors.border}`,
                       borderRadius: '8px',
-                      backgroundColor: 'transparent',
+                      backgroundColor: colors.secondary,
                       color: colors.text,
                       cursor: 'pointer',
                       fontSize: '14px',
@@ -3525,7 +3525,7 @@ const FloatingResellersPopover = ({
                       e.target.style.borderColor = colors.primary;
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.backgroundColor = colors.secondary;
                       e.target.style.borderColor = colors.border;
                     }}
                   >
@@ -3561,7 +3561,7 @@ const FloatingResellersPopover = ({
                     padding: '10px 20px',
                     border: `1px solid ${colors.primary}`,
                     borderRadius: '8px',
-                    backgroundColor: 'transparent',
+                    backgroundColor: colors.secondary,
                     color: colors.primary,
                     cursor: 'pointer',
                     fontSize: '14px',
@@ -3576,7 +3576,7 @@ const FloatingResellersPopover = ({
                     e.target.style.color = colors.primaryContrast;
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.backgroundColor = colors.secondary;
                     e.target.style.color = colors.primary;
                   }}
                 >
