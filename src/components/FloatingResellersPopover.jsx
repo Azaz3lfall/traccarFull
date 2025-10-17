@@ -635,6 +635,9 @@ const FloatingResellersPopover = ({
   const [isCheckingDomain, setIsCheckingDomain] = useState(false);
   const [domainValid, setDomainValid] = useState(false);
   const [isCompressingImage, setIsCompressingImage] = useState(false);
+  const [isCompressingFavicon, setIsCompressingFavicon] = useState(false);
+  const [isCompressingAppImage, setIsCompressingAppImage] = useState(false);
+  const [isCompressingNotificationIcon, setIsCompressingNotificationIcon] = useState(false);
 
   // Fetch resellers with TanStack Query
   const { data: resellersData, isLoading, error, refetch } = useQuery({
@@ -1283,6 +1286,7 @@ const FloatingResellersPopover = ({
       }
 
       // Image is square, compress and proceed
+      setIsCompressingFavicon(true);
       try {
         const compressedFile = await compressImage(file, {
           maxSizeKB: 20,
@@ -1299,9 +1303,15 @@ const FloatingResellersPopover = ({
           setFaviconPreview(e.target.result);
         };
         reader.readAsDataURL(compressedFile);
+        setIsCompressingFavicon(false);
       } catch (error) {
         console.error('Error compressing favicon:', error);
-        setFaviconError('Error compressing image');
+        setErrorModal({
+          open: true,
+          title: 'Favicon Upload Error',
+          message: 'Error compressing image'
+        });
+        setIsCompressingFavicon(false);
       }
     };
     img.src = URL.createObjectURL(file);
@@ -1340,6 +1350,7 @@ const FloatingResellersPopover = ({
       }
 
       // Image has correct dimensions, compress and proceed
+      setIsCompressingAppImage(true);
       try {
         const compressedFile = await compressImage(file, {
           maxSizeKB: 200,
@@ -1356,9 +1367,15 @@ const FloatingResellersPopover = ({
           setAppImagePreview(e.target.result);
         };
         reader.readAsDataURL(compressedFile);
+        setIsCompressingAppImage(false);
       } catch (error) {
         console.error('Error compressing app image:', error);
-        setAppImageError('Error compressing image');
+        setErrorModal({
+          open: true,
+          title: 'App Image Upload Error',
+          message: 'Error compressing image'
+        });
+        setIsCompressingAppImage(false);
       }
     };
     img.src = URL.createObjectURL(file);
@@ -1397,6 +1414,7 @@ const FloatingResellersPopover = ({
       }
 
       // Image has correct dimensions, compress and proceed
+      setIsCompressingNotificationIcon(true);
       try {
         const compressedFile = await compressImage(file, {
           maxSizeKB: 30,
@@ -2567,7 +2585,7 @@ const FloatingResellersPopover = ({
                                           style={{ display: 'none' }}
                                           id="logotype-upload"
                                         />
-                                        <label htmlFor="logotype-upload">
+                                        <label htmlFor="logotype-upload" style={{ display: 'none' }}>
                                           <Button
                                             variant="outlined"
                                             component="span"
@@ -2589,20 +2607,44 @@ const FloatingResellersPopover = ({
                                         </label>
 
                                         {/* Logo Preview Box */}
-                                        <div style={{
-                                          width: '130px',
-                                          height: '130px',
-                                          border: `1px solid ${colors.border}`,
-                                          borderRadius: '8px',
-                                          backgroundColor: colors.secondary,
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          gap: '8px',
-                                          padding: '12px'
-                                        }}>
-                                          {imagePreview ? (
+                                        <label htmlFor="logotype-upload" style={{ cursor: 'pointer' }}>
+                                          <div style={{
+                                            width: '130px',
+                                            height: '130px',
+                                            border: `1px solid ${colors.border}`,
+                                            borderRadius: '8px',
+                                            backgroundColor: colors.secondary,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            padding: '12px',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.backgroundColor = colors.hover;
+                                            e.target.style.borderColor = colors.primary;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.backgroundColor = colors.secondary;
+                                            e.target.style.borderColor = colors.border;
+                                          }}
+                                        >
+                                          {isCompressingImage ? (
+                                            <>
+                                              <CircularProgress size={32} style={{ color: colors.primary }} />
+                                              <div 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  fontSize: '12px'
+                                                }}
+                                              >
+                                                {t('resellerCompressingImage')}
+                                              </div>
+                                            </>
+                                          ) : imagePreview ? (
                                             <>
                                               <img
                                                 src={imagePreview}
@@ -2618,11 +2660,10 @@ const FloatingResellersPopover = ({
                                                 style={{ 
                                                   color: colors.textSecondary, 
                                                   textAlign: 'center',
-                                                  fontSize: '12px',
-                                                  wordBreak: 'break-word'
+                                                  fontSize: '12px'
                                                 }}
                                               >
-                                                {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
+                                                {(selectedImage?.size / 1024).toFixed(1)}KB
                                               </div>
                                             </>
                                           ) : editingReseller.logo ? (
@@ -2662,6 +2703,7 @@ const FloatingResellersPopover = ({
                                             </>
                                           )}
                                         </div>
+                                        </label>
 
                                       </div>
 
@@ -2674,7 +2716,7 @@ const FloatingResellersPopover = ({
                                           style={{ display: 'none' }}
                                           id="favicon-upload"
                                         />
-                                        <label htmlFor="favicon-upload">
+                                        <label htmlFor="favicon-upload" style={{ display: 'none' }}>
                                           <Button
                                             variant="outlined"
                                             component="span"
@@ -2691,19 +2733,30 @@ const FloatingResellersPopover = ({
                                         </label>
 
                                         {/* Favicon Preview Box */}
-                                        <div style={{
-                                          width: '130px',
-                                          height: '130px',
-                                          border: `1px solid ${colors.border}`,
-                                          borderRadius: '8px',
-                                          backgroundColor: colors.secondary,
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          gap: '8px',
-                                          padding: '12px'
-                                        }}>
+                                        <label htmlFor="favicon-upload" style={{ cursor: 'pointer' }}>
+                                          <div style={{
+                                            width: '130px',
+                                            height: '130px',
+                                            border: `1px solid ${colors.border}`,
+                                            borderRadius: '8px',
+                                            backgroundColor: colors.secondary,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            padding: '12px',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.backgroundColor = colors.hover;
+                                            e.target.style.borderColor = colors.primary;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.backgroundColor = colors.secondary;
+                                            e.target.style.borderColor = colors.border;
+                                          }}
+                                        >
                                           {faviconPreview ? (
                                             <>
                                               <img
@@ -2720,11 +2773,10 @@ const FloatingResellersPopover = ({
                                                 style={{ 
                                                   color: colors.textSecondary, 
                                                   textAlign: 'center',
-                                                  fontSize: '12px',
-                                                  wordBreak: 'break-word'
+                                                  fontSize: '12px'
                                                 }}
                                               >
-                                                {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
+                                                {(selectedFavicon?.size / 1024).toFixed(1)}KB
                                               </div>
                                             </>
                                           ) : (
@@ -2736,6 +2788,7 @@ const FloatingResellersPopover = ({
                                             </>
                                           )}
                                         </div>
+                                        </label>
 
                                       </div>
                                     </div>
@@ -2751,7 +2804,7 @@ const FloatingResellersPopover = ({
                                           style={{ display: 'none' }}
                                           id="app-image-upload"
                                         />
-                                        <label htmlFor="app-image-upload">
+                                        <label htmlFor="app-image-upload" style={{ display: 'none' }}>
                                           <Button
                                             variant="outlined"
                                             component="span"
@@ -2768,19 +2821,30 @@ const FloatingResellersPopover = ({
                                         </label>
 
                                         {/* App Image Preview Box */}
-                                        <div style={{
-                                          width: '130px',
-                                          height: '130px',
-                                          border: `1px solid ${colors.border}`,
-                                          borderRadius: '8px',
-                                          backgroundColor: colors.secondary,
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          gap: '8px',
-                                          padding: '12px'
-                                        }}>
+                                        <label htmlFor="app-image-upload" style={{ cursor: 'pointer' }}>
+                                          <div style={{
+                                            width: '130px',
+                                            height: '130px',
+                                            border: `1px solid ${colors.border}`,
+                                            borderRadius: '8px',
+                                            backgroundColor: colors.secondary,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            padding: '12px',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.backgroundColor = colors.hover;
+                                            e.target.style.borderColor = colors.primary;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.backgroundColor = colors.secondary;
+                                            e.target.style.borderColor = colors.border;
+                                          }}
+                                        >
                                           {appImagePreview ? (
                                             <>
                                               <img
@@ -2797,11 +2861,10 @@ const FloatingResellersPopover = ({
                                                 style={{ 
                                                   color: colors.textSecondary, 
                                                   textAlign: 'center',
-                                                  fontSize: '12px',
-                                                  wordBreak: 'break-word'
+                                                  fontSize: '12px'
                                                 }}
                                               >
-                                                {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
+                                                {(selectedAppImage?.size / 1024).toFixed(1)}KB
                                               </div>
                                             </>
                                           ) : (
@@ -2813,6 +2876,7 @@ const FloatingResellersPopover = ({
                                             </>
                                           )}
                                         </div>
+                                        </label>
 
                                       </div>
 
@@ -2825,7 +2889,7 @@ const FloatingResellersPopover = ({
                                           style={{ display: 'none' }}
                                           id="notification-icon-upload"
                                         />
-                                        <label htmlFor="notification-icon-upload">
+                                        <label htmlFor="notification-icon-upload" style={{ display: 'none' }}>
                                           <Button
                                             variant="outlined"
                                             component="span"
@@ -2842,19 +2906,30 @@ const FloatingResellersPopover = ({
                                         </label>
 
                                         {/* Notification Icon Preview Box */}
-                                        <div style={{
-                                          width: '130px',
-                                          height: '130px',
-                                          border: `1px solid ${colors.border}`,
-                                          borderRadius: '8px',
-                                          backgroundColor: colors.secondary,
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          gap: '8px',
-                                          padding: '12px'
-                                        }}>
+                                        <label htmlFor="notification-icon-upload" style={{ cursor: 'pointer' }}>
+                                          <div style={{
+                                            width: '130px',
+                                            height: '130px',
+                                            border: `1px solid ${colors.border}`,
+                                            borderRadius: '8px',
+                                            backgroundColor: colors.secondary,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            padding: '12px',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.backgroundColor = colors.hover;
+                                            e.target.style.borderColor = colors.primary;
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.backgroundColor = colors.secondary;
+                                            e.target.style.borderColor = colors.border;
+                                          }}
+                                        >
                                           {notificationIconPreview ? (
                                             <>
                                               <img
@@ -2871,11 +2946,10 @@ const FloatingResellersPopover = ({
                                                 style={{ 
                                                   color: colors.textSecondary, 
                                                   textAlign: 'center',
-                                                  fontSize: '12px',
-                                                  wordBreak: 'break-word'
+                                                  fontSize: '12px'
                                                 }}
                                               >
-                                                {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
+                                                {(selectedNotificationIcon?.size / 1024).toFixed(1)}KB
                                               </div>
                                             </>
                                           ) : (
@@ -2887,6 +2961,7 @@ const FloatingResellersPopover = ({
                                             </>
                                           )}
                                         </div>
+                                        </label>
 
                                       </div>
                                     </div>
