@@ -138,6 +138,7 @@ const FloatingResellersPopover = ({
   const [cleanAppsModal, setCleanAppsModal] = useState({ open: false, reseller: null });
   const [iosBuildTypeModal, setIosBuildTypeModal] = useState({ open: false, reseller: null });
   const [massImporterModal, setMassImporterModal] = useState({ open: false, reseller: null });
+  const [errorModal, setErrorModal] = useState({ open: false, message: '', title: '' });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
 
@@ -1175,7 +1176,11 @@ const FloatingResellersPopover = ({
     // Validate file type and size
     const validation = validateImageFile(file, 2048); // 2MB max input
     if (!validation.success) {
-      setImageError(t('resellerImageValidationError', { maxSize: 2048 }));
+      setErrorModal({
+        open: true,
+        title: 'Image Upload Error',
+        message: t('resellerImageValidationError', { maxSize: 2048 })
+      });
       setSelectedImage(null);
       setImagePreview(null);
       return;
@@ -1255,7 +1260,11 @@ const FloatingResellersPopover = ({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setFaviconError('Please select a valid image file');
+      setErrorModal({
+        open: true,
+        title: 'Favicon Upload Error',
+        message: 'Please select a valid image file'
+      });
       return;
     }
 
@@ -1263,7 +1272,11 @@ const FloatingResellersPopover = ({
     const img = new Image();
     img.onload = async () => {
       if (img.width !== img.height) {
-        setFaviconError('Favicon must be square (width = height)');
+        setErrorModal({
+          open: true,
+          title: 'Favicon Upload Error',
+          message: 'Favicon must be square (width = height)'
+        });
         setSelectedFavicon(null);
         setFaviconPreview(null);
         return;
@@ -1304,7 +1317,11 @@ const FloatingResellersPopover = ({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setAppImageError('Please select a valid image file');
+      setErrorModal({
+        open: true,
+        title: 'App Image Upload Error',
+        message: 'Please select a valid image file'
+      });
       return;
     }
 
@@ -1312,7 +1329,11 @@ const FloatingResellersPopover = ({
     const img = new Image();
     img.onload = async () => {
       if (img.width !== 1024 || img.height !== 1024) {
-        setAppImageError('App image must be exactly 1024x1024 pixels');
+        setErrorModal({
+          open: true,
+          title: 'App Image Upload Error',
+          message: 'App image must be exactly 1024x1024 pixels'
+        });
         setSelectedAppImage(null);
         setAppImagePreview(null);
         return;
@@ -1353,7 +1374,11 @@ const FloatingResellersPopover = ({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setNotificationIconError('Please select a valid image file');
+      setErrorModal({
+        open: true,
+        title: 'Notification Icon Upload Error',
+        message: 'Please select a valid image file'
+      });
       return;
     }
 
@@ -1361,7 +1386,11 @@ const FloatingResellersPopover = ({
     const img = new Image();
     img.onload = async () => {
       if (img.width !== 192 || img.height !== 192) {
-        setNotificationIconError('Notification icon must be exactly 192x192 pixels');
+        setErrorModal({
+          open: true,
+          title: 'Notification Icon Upload Error',
+          message: 'Notification icon must be exactly 192x192 pixels'
+        });
         setSelectedNotificationIcon(null);
         setNotificationIconPreview(null);
         return;
@@ -2530,7 +2559,7 @@ const FloatingResellersPopover = ({
                                     {/* Row 1: Logo and Favicon */}
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                       {/* Logo Upload Field */}
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, alignItems: 'center' }}>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2561,8 +2590,8 @@ const FloatingResellersPopover = ({
 
                                         {/* Logo Preview Box */}
                                         <div style={{
-                                          width: '140px',
-                                          height: '140px',
+                                          width: '130px',
+                                          height: '130px',
                                           border: `1px solid ${colors.border}`,
                                           borderRadius: '8px',
                                           backgroundColor: colors.secondary,
@@ -2585,9 +2614,16 @@ const FloatingResellersPopover = ({
                                                   borderRadius: '4px'
                                                 }}
                                               />
-                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                              <div 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  fontSize: '12px',
+                                                  wordBreak: 'break-word'
+                                                }}
+                                              >
                                                 {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
-                                              </Typography>
+                                              </div>
                                             </>
                                           ) : editingReseller.logo ? (
                                             <>
@@ -2601,7 +2637,19 @@ const FloatingResellersPopover = ({
                                                   borderRadius: '4px'
                                                 }}
                                               />
-                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                              <Typography 
+                                                variant="caption" 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  display: 'block',
+                                                  width: '100%',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis',
+                                                  whiteSpace: 'nowrap'
+                                                }}
+                                                title={`${selectedImage?.name} (${(selectedImage?.size / 1024).toFixed(1)}KB)`}
+                                              >
                                                 Current: {editingReseller.logo}
                                               </Typography>
                                             </>
@@ -2615,16 +2663,10 @@ const FloatingResellersPopover = ({
                                           )}
                                         </div>
 
-                                        {/* Logo Error Message */}
-                                        {imageError && (
-                                          <Typography variant="caption" style={{ color: '#f44336' }}>
-                                            {imageError}
-                                          </Typography>
-                                        )}
                                       </div>
 
                                       {/* Favicon Upload Field */}
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, alignItems: 'center' }}>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2650,8 +2692,8 @@ const FloatingResellersPopover = ({
 
                                         {/* Favicon Preview Box */}
                                         <div style={{
-                                          width: '140px',
-                                          height: '140px',
+                                          width: '130px',
+                                          height: '130px',
                                           border: `1px solid ${colors.border}`,
                                           borderRadius: '8px',
                                           backgroundColor: colors.secondary,
@@ -2674,9 +2716,16 @@ const FloatingResellersPopover = ({
                                                   borderRadius: '4px'
                                                 }}
                                               />
-                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                              <div 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  fontSize: '12px',
+                                                  wordBreak: 'break-word'
+                                                }}
+                                              >
                                                 {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
-                                              </Typography>
+                                              </div>
                                             </>
                                           ) : (
                                             <>
@@ -2688,19 +2737,13 @@ const FloatingResellersPopover = ({
                                           )}
                                         </div>
 
-                                        {/* Favicon Error Message */}
-                                        {faviconError && (
-                                          <Typography variant="caption" style={{ color: '#f44336' }}>
-                                            {faviconError}
-                                          </Typography>
-                                        )}
                                       </div>
                                     </div>
 
                                     {/* Row 2: App Image and Notification Icon */}
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                       {/* App Image Upload Field */}
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, alignItems: 'center' }}>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2726,8 +2769,8 @@ const FloatingResellersPopover = ({
 
                                         {/* App Image Preview Box */}
                                         <div style={{
-                                          width: '140px',
-                                          height: '140px',
+                                          width: '130px',
+                                          height: '130px',
                                           border: `1px solid ${colors.border}`,
                                           borderRadius: '8px',
                                           backgroundColor: colors.secondary,
@@ -2750,9 +2793,16 @@ const FloatingResellersPopover = ({
                                                   borderRadius: '4px'
                                                 }}
                                               />
-                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                              <div 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  fontSize: '12px',
+                                                  wordBreak: 'break-word'
+                                                }}
+                                              >
                                                 {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
-                                              </Typography>
+                                              </div>
                                             </>
                                           ) : (
                                             <>
@@ -2764,16 +2814,10 @@ const FloatingResellersPopover = ({
                                           )}
                                         </div>
 
-                                        {/* App Image Error Message */}
-                                        {appImageError && (
-                                          <Typography variant="caption" style={{ color: '#f44336' }}>
-                                            {appImageError}
-                                          </Typography>
-                                        )}
                                       </div>
 
                                       {/* Notification Icon Upload Field */}
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, alignItems: 'center' }}>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2799,8 +2843,8 @@ const FloatingResellersPopover = ({
 
                                         {/* Notification Icon Preview Box */}
                                         <div style={{
-                                          width: '140px',
-                                          height: '140px',
+                                          width: '130px',
+                                          height: '130px',
                                           border: `1px solid ${colors.border}`,
                                           borderRadius: '8px',
                                           backgroundColor: colors.secondary,
@@ -2823,9 +2867,16 @@ const FloatingResellersPopover = ({
                                                   borderRadius: '4px'
                                                 }}
                                               />
-                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                              <div 
+                                                style={{ 
+                                                  color: colors.textSecondary, 
+                                                  textAlign: 'center',
+                                                  fontSize: '12px',
+                                                  wordBreak: 'break-word'
+                                                }}
+                                              >
                                                 {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
-                                              </Typography>
+                                              </div>
                                             </>
                                           ) : (
                                             <>
@@ -2837,12 +2888,6 @@ const FloatingResellersPopover = ({
                                           )}
                                         </div>
 
-                                        {/* Notification Icon Error Message */}
-                                        {notificationIconError && (
-                                          <Typography variant="caption" style={{ color: '#f44336' }}>
-                                            {notificationIconError}
-                                          </Typography>
-                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -3629,6 +3674,101 @@ const FloatingResellersPopover = ({
                     }}
                   >
                     {t('sharedImport')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Error Modal */}
+      <AnimatePresence>
+        {errorModal.open && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '20px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setErrorModal({ open: false, message: '', title: '' })}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '12px',
+                padding: '0',
+                maxWidth: '400px',
+                width: '100%',
+                border: `1px solid ${colors.border}`,
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '20px 24px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                  {errorModal.title}
+                </Typography>
+                <IconButton
+                  onClick={() => setErrorModal({ open: false, message: '', title: '' })}
+                  size="small"
+                  style={{ color: colors.textSecondary }}
+                >
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '24px' }}>
+                <Typography variant="body1" style={{ color: colors.text, marginBottom: '24px' }}>
+                  {errorModal.message}
+                </Typography>
+                
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setErrorModal({ open: false, message: '', title: '' })}
+                    style={{
+                      padding: '10px 20px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.color = colors.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                      e.target.style.color = colors.text;
+                    }}
+                  >
+                    OK
                   </button>
                 </div>
               </div>
