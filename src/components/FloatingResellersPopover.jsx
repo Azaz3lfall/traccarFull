@@ -3501,15 +3501,25 @@ const FloatingResellersPopover = ({
                 <input
                   type="file"
                   accept=".csv"
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '4px',
-                    backgroundColor: colors.surface,
-                    color: colors.text
-                  }}
+                  style={{ display: 'none' }}
+                  id="csv-upload"
                 />
+                <label htmlFor="csv-upload">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    fullWidth
+                    style={{
+                      borderColor: colors.border,
+                      color: colors.text,
+                      textTransform: 'none',
+                      justifyContent: 'flex-start',
+                      padding: '8px 16px'
+                    }}
+                  >
+                    Choose CSV File
+                  </Button>
+                </label>
               </div>
 
               <div style={{ marginBottom: '24px' }}>
@@ -3522,10 +3532,8 @@ const FloatingResellersPopover = ({
                   placeholder={t('csvPlaceholder')}
                   fullWidth
                   style={{
-                    '& .MuiInputBase-root': {
-                      backgroundColor: colors.surface,
-                      color: colors.text
-                    }
+                    backgroundColor: colors.surface,
+                    color: colors.text
                   }}
                 />
               </div>
@@ -3534,7 +3542,7 @@ const FloatingResellersPopover = ({
                 <Button
                   variant="outlined"
                   onClick={() => setMassImporterModal({ open: false, reseller: null })}
-                  sx={{
+                  style={{
                     borderColor: colors.border,
                     color: colors.text
                   }}
@@ -3548,7 +3556,7 @@ const FloatingResellersPopover = ({
                     console.log('Mass import for reseller:', massImporterModal.reseller);
                     setMassImporterModal({ open: false, reseller: null });
                   }}
-                  sx={{
+                  style={{
                     backgroundColor: colors.primary,
                     color: colors.primaryContrast
                   }}
