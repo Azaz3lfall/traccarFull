@@ -57,6 +57,7 @@ import {
   Extension as ExtensionIcon,
 } from '@mui/icons-material';
 import { BsGooglePlay, BsAndroid } from "react-icons/bs";
+import { LuCameraOff } from "react-icons/lu";
 import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -2530,9 +2531,6 @@ const FloatingResellersPopover = ({
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                       {/* Logo Upload Field */}
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                                        <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                          Logo Image
-                                        </Typography>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2561,50 +2559,61 @@ const FloatingResellersPopover = ({
                                           </Button>
                                         </label>
 
-                                        {/* Logo Preview */}
-                                        {imagePreview && (
-                                          <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '12px',
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '8px',
-                                            backgroundColor: colors.secondary
-                                          }}>
-                                            <img
-                                              src={imagePreview}
-                                              alt="Logo preview"
-                                              style={{
-                                                width: '80px',
-                                                height: '80px',
-                                                objectFit: 'contain',
-                                                borderRadius: '4px'
-                                              }}
-                                            />
-                                            <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                              {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
-                                            </Typography>
-                                          </div>
-                                        )}
-
-                                        {/* Current Logo Display */}
-                                        {!imagePreview && editingReseller.logo && (
-                                          <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '8px',
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '8px',
-                                            backgroundColor: colors.secondary
-                                          }}>
-                                            <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                              Current: {editingReseller.logo}
-                                            </Typography>
-                                          </div>
-                                        )}
+                                        {/* Logo Preview Box */}
+                                        <div style={{
+                                          width: '140px',
+                                          height: '140px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary,
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '8px',
+                                          padding: '12px'
+                                        }}>
+                                          {imagePreview ? (
+                                            <>
+                                              <img
+                                                src={imagePreview}
+                                                alt="Logo preview"
+                                                style={{
+                                                  width: '100px',
+                                                  height: '100px',
+                                                  objectFit: 'contain',
+                                                  borderRadius: '4px'
+                                                }}
+                                              />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
+                                              </Typography>
+                                            </>
+                                          ) : editingReseller.logo ? (
+                                            <>
+                                              <img
+                                                src={editingReseller.logo}
+                                                alt="Current logo"
+                                                style={{
+                                                  width: '100px',
+                                                  height: '100px',
+                                                  objectFit: 'contain',
+                                                  borderRadius: '4px'
+                                                }}
+                                              />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                Current: {editingReseller.logo}
+                                              </Typography>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                Logotype
+                                              </Typography>
+                                            </>
+                                          )}
+                                        </div>
 
                                         {/* Logo Error Message */}
                                         {imageError && (
@@ -2616,9 +2625,6 @@ const FloatingResellersPopover = ({
 
                                       {/* Favicon Upload Field */}
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                                        <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                          Favicon (Square)
-                                        </Typography>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2642,33 +2648,45 @@ const FloatingResellersPopover = ({
                                           </Button>
                                         </label>
 
-                                        {/* Favicon Preview */}
-                                        {faviconPreview && (
-                                          <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '12px',
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '8px',
-                                            backgroundColor: colors.secondary
-                                          }}>
-                                            <img
-                                              src={faviconPreview}
-                                              alt="Favicon preview"
-                                              style={{
-                                                width: '64px',
-                                                height: '64px',
-                                                objectFit: 'contain',
-                                                borderRadius: '4px'
-                                              }}
-                                            />
-                                            <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                              {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
-                                            </Typography>
-                                          </div>
-                                        )}
+                                        {/* Favicon Preview Box */}
+                                        <div style={{
+                                          width: '140px',
+                                          height: '140px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary,
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '8px',
+                                          padding: '12px'
+                                        }}>
+                                          {faviconPreview ? (
+                                            <>
+                                              <img
+                                                src={faviconPreview}
+                                                alt="Favicon preview"
+                                                style={{
+                                                  width: '100px',
+                                                  height: '100px',
+                                                  objectFit: 'contain',
+                                                  borderRadius: '4px'
+                                                }}
+                                              />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
+                                              </Typography>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                Favicon (Square)
+                                              </Typography>
+                                            </>
+                                          )}
+                                        </div>
 
                                         {/* Favicon Error Message */}
                                         {faviconError && (
@@ -2683,9 +2701,6 @@ const FloatingResellersPopover = ({
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                       {/* App Image Upload Field */}
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                                        <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                          App Image (1024x1024)
-                                        </Typography>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2709,33 +2724,45 @@ const FloatingResellersPopover = ({
                                           </Button>
                                         </label>
 
-                                        {/* App Image Preview */}
-                                        {appImagePreview && (
-                                          <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '12px',
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '8px',
-                                            backgroundColor: colors.secondary
-                                          }}>
-                                            <img
-                                              src={appImagePreview}
-                                              alt="App image preview"
-                                              style={{
-                                                width: '80px',
-                                                height: '80px',
-                                                objectFit: 'contain',
-                                                borderRadius: '4px'
-                                              }}
-                                            />
-                                            <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                              {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
-                                            </Typography>
-                                          </div>
-                                        )}
+                                        {/* App Image Preview Box */}
+                                        <div style={{
+                                          width: '140px',
+                                          height: '140px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary,
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '8px',
+                                          padding: '12px'
+                                        }}>
+                                          {appImagePreview ? (
+                                            <>
+                                              <img
+                                                src={appImagePreview}
+                                                alt="App image preview"
+                                                style={{
+                                                  width: '100px',
+                                                  height: '100px',
+                                                  objectFit: 'contain',
+                                                  borderRadius: '4px'
+                                                }}
+                                              />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
+                                              </Typography>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                App Icon (1024x1024)
+                                              </Typography>
+                                            </>
+                                          )}
+                                        </div>
 
                                         {/* App Image Error Message */}
                                         {appImageError && (
@@ -2747,9 +2774,6 @@ const FloatingResellersPopover = ({
 
                                       {/* Notification Icon Upload Field */}
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                                        <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                          Notification Icon (192x192)
-                                        </Typography>
                                         <input
                                           type="file"
                                           accept=".png"
@@ -2773,33 +2797,45 @@ const FloatingResellersPopover = ({
                                           </Button>
                                         </label>
 
-                                        {/* Notification Icon Preview */}
-                                        {notificationIconPreview && (
-                                          <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '12px',
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '8px',
-                                            backgroundColor: colors.secondary
-                                          }}>
-                                            <img
-                                              src={notificationIconPreview}
-                                              alt="Notification icon preview"
-                                              style={{
-                                                width: '64px',
-                                                height: '64px',
-                                                objectFit: 'contain',
-                                                borderRadius: '4px'
-                                              }}
-                                            />
-                                            <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                              {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
-                                            </Typography>
-                                          </div>
-                                        )}
+                                        {/* Notification Icon Preview Box */}
+                                        <div style={{
+                                          width: '140px',
+                                          height: '140px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary,
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '8px',
+                                          padding: '12px'
+                                        }}>
+                                          {notificationIconPreview ? (
+                                            <>
+                                              <img
+                                                src={notificationIconPreview}
+                                                alt="Notification icon preview"
+                                                style={{
+                                                  width: '100px',
+                                                  height: '100px',
+                                                  objectFit: 'contain',
+                                                  borderRadius: '4px'
+                                                }}
+                                              />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
+                                              </Typography>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
+                                              <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
+                                                Notification Icon (192x192)
+                                              </Typography>
+                                            </>
+                                          )}
+                                        </div>
 
                                         {/* Notification Icon Error Message */}
                                         {notificationIconError && (
