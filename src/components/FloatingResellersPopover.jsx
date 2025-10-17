@@ -49,7 +49,6 @@ import {
   Android as AndroidIcon,
   Apple as AppleIcon,
   Download as DownloadIcon,
-  Inventory as InventoryIcon,
   Store as StoreIcon,
   PhoneIphone as PhoneIphoneIcon,
   ShoppingCart as ShoppingCartIcon,
@@ -58,6 +57,7 @@ import {
 } from '@mui/icons-material';
 import { BsGooglePlay, BsAndroid } from "react-icons/bs";
 import { LuCameraOff } from "react-icons/lu";
+import { GoArchive } from "react-icons/go";
 import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -1181,7 +1181,7 @@ const FloatingResellersPopover = ({
     if (!validation.success) {
       setErrorModal({
         open: true,
-        title: 'Image Upload Error',
+        title: t('imageUploadError'),
         message: t('resellerImageValidationError', { maxSize: 2048 })
       });
       setSelectedImage(null);
@@ -1265,8 +1265,8 @@ const FloatingResellersPopover = ({
     if (!file.type.startsWith('image/')) {
       setErrorModal({
         open: true,
-        title: 'Favicon Upload Error',
-        message: 'Please select a valid image file'
+        title: t('faviconUploadError'),
+        message: t('pleaseSelectValidImageFile')
       });
       return;
     }
@@ -1277,8 +1277,8 @@ const FloatingResellersPopover = ({
       if (img.width !== img.height) {
         setErrorModal({
           open: true,
-          title: 'Favicon Upload Error',
-          message: 'Favicon must be square (width = height)'
+          title: t('faviconUploadError'),
+          message: t('faviconMustBeSquare')
         });
         setSelectedFavicon(null);
         setFaviconPreview(null);
@@ -1308,8 +1308,8 @@ const FloatingResellersPopover = ({
         console.error('Error compressing favicon:', error);
         setErrorModal({
           open: true,
-          title: 'Favicon Upload Error',
-          message: 'Error compressing image'
+          title: t('faviconUploadError'),
+          message: t('errorCompressingImage')
         });
         setIsCompressingFavicon(false);
       }
@@ -1329,8 +1329,8 @@ const FloatingResellersPopover = ({
     if (!file.type.startsWith('image/')) {
       setErrorModal({
         open: true,
-        title: 'App Image Upload Error',
-        message: 'Please select a valid image file'
+        title: t('appImageUploadError'),
+        message: t('pleaseSelectValidImageFile')
       });
       return;
     }
@@ -1341,8 +1341,8 @@ const FloatingResellersPopover = ({
       if (img.width !== 1024 || img.height !== 1024) {
         setErrorModal({
           open: true,
-          title: 'App Image Upload Error',
-          message: 'App image must be exactly 1024x1024 pixels'
+          title: t('appImageUploadError'),
+          message: t('appImageMustBeExactSize')
         });
         setSelectedAppImage(null);
         setAppImagePreview(null);
@@ -1372,8 +1372,8 @@ const FloatingResellersPopover = ({
         console.error('Error compressing app image:', error);
         setErrorModal({
           open: true,
-          title: 'App Image Upload Error',
-          message: 'Error compressing image'
+          title: t('appImageUploadError'),
+          message: t('errorCompressingImage')
         });
         setIsCompressingAppImage(false);
       }
@@ -1393,8 +1393,8 @@ const FloatingResellersPopover = ({
     if (!file.type.startsWith('image/')) {
       setErrorModal({
         open: true,
-        title: 'Notification Icon Upload Error',
-        message: 'Please select a valid image file'
+        title: t('notificationIconUploadError'),
+        message: t('pleaseSelectValidImageFile')
       });
       return;
     }
@@ -1405,8 +1405,8 @@ const FloatingResellersPopover = ({
       if (img.width !== 192 || img.height !== 192) {
         setErrorModal({
           open: true,
-          title: 'Notification Icon Upload Error',
-          message: 'Notification icon must be exactly 192x192 pixels'
+          title: t('notificationIconUploadError'),
+          message: t('notificationIconMustBeExactSize')
         });
         setSelectedNotificationIcon(null);
         setNotificationIconPreview(null);
@@ -1433,7 +1433,7 @@ const FloatingResellersPopover = ({
         reader.readAsDataURL(compressedFile);
       } catch (error) {
         console.error('Error compressing notification icon:', error);
-        setNotificationIconError('Error compressing image');
+        setNotificationIconError(t('errorCompressingImage'));
       }
     };
     img.src = URL.createObjectURL(file);
@@ -1486,8 +1486,8 @@ const FloatingResellersPopover = ({
     },
     {
       key: 'clean-apps',
-      title: 'Clean Apps',
-      icon: <DeleteIcon fontSize="small" />,
+      title: t('cleanApps'),
+      icon: <RefreshIcon fontSize="small" />,
       handler: (reseller) => {
         setCleanAppsModal({ open: true, reseller });
         setAnchorEl(null); // Close the action menu
@@ -1497,7 +1497,7 @@ const FloatingResellersPopover = ({
     {
       key: 'mass-importer',
       title: t('massImporter'),
-      icon: <InventoryIcon fontSize="small" />,
+      icon: <GoArchive fontSize="small" />,
       handler: (reseller) => {
         setMassImporterModal({ open: true, reseller });
         setAnchorEl(null); // Close the action menu
@@ -1865,9 +1865,22 @@ const FloatingResellersPopover = ({
                     <MenuItem
                       key={action.key}
                       onClick={() => action.handler(selectedReseller)}
-                      style={{ color: colors.text, fontSize: '12px' }}
+                      style={{ 
+                        color: colors.text, 
+                        fontSize: '12px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
                     >
-                      {action.icon}
+                      <div style={{ 
+                        width: '24px', 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        flexShrink: 0
+                      }}>
+                        {action.icon}
+                      </div>
                       <span style={{ marginLeft: '6px' }}>{action.title}</span>
                     </MenuItem>
                   ))}
@@ -2623,8 +2636,8 @@ const FloatingResellersPopover = ({
                                         {/* Logo Preview Box */}
                                         <label htmlFor="logotype-upload" style={{ cursor: 'pointer' }}>
                                           <div style={{
-                                            width: '130px',
-                                            height: '130px',
+                                            width: '140px',
+                                            height: '140px',
                                             border: `1px solid ${colors.border}`,
                                             borderRadius: '8px',
                                             backgroundColor: colors.secondary,
@@ -2749,8 +2762,8 @@ const FloatingResellersPopover = ({
                                         {/* Favicon Preview Box */}
                                         <label htmlFor="favicon-upload" style={{ cursor: 'pointer' }}>
                                           <div style={{
-                                            width: '130px',
-                                            height: '130px',
+                                            width: '140px',
+                                            height: '140px',
                                             border: `1px solid ${colors.border}`,
                                             borderRadius: '8px',
                                             backgroundColor: colors.secondary,
@@ -2837,8 +2850,8 @@ const FloatingResellersPopover = ({
                                         {/* App Image Preview Box */}
                                         <label htmlFor="app-image-upload" style={{ cursor: 'pointer' }}>
                                           <div style={{
-                                            width: '130px',
-                                            height: '130px',
+                                            width: '140px',
+                                            height: '140px',
                                             border: `1px solid ${colors.border}`,
                                             borderRadius: '8px',
                                             backgroundColor: colors.secondary,
@@ -2922,8 +2935,8 @@ const FloatingResellersPopover = ({
                                         {/* Notification Icon Preview Box */}
                                         <label htmlFor="notification-icon-upload" style={{ cursor: 'pointer' }}>
                                           <div style={{
-                                            width: '130px',
-                                            height: '130px',
+                                            width: '140px',
+                                            height: '140px',
                                             border: `1px solid ${colors.border}`,
                                             borderRadius: '8px',
                                             backgroundColor: colors.secondary,
@@ -3338,7 +3351,7 @@ const FloatingResellersPopover = ({
                     <ChevronLeftIcon fontSize="small" />
                   </IconButton>
                   <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    Clean Apps - {cleanAppsModal.reseller?.companyName}
+{t('cleanApps')} - {cleanAppsModal.reseller?.companyName}
                   </Typography>
                 </div>
               </div>
@@ -3346,7 +3359,7 @@ const FloatingResellersPopover = ({
               {/* Content */}
               <div style={{ padding: '24px' }}>
                 <div style={{ marginBottom: '24px', color: colors.text, fontSize: '16px' }}>
-                  Select which apps you want to clean for this reseller:
+                  {t('selectAppsToClean')}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -3373,7 +3386,7 @@ const FloatingResellersPopover = ({
                     ) : (
                       <BsAndroid size={20} />
                     )}
-                    {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? 'Cleaning APK...' : 'Clean APK Only'}
+{t(cleanLoading[`${cleanAppsModal.reseller?.appUrl}_apk`] ? 'cleaningApk' : 'cleanApkOnly')}
                   </button>
 
                   <button
@@ -3399,7 +3412,7 @@ const FloatingResellersPopover = ({
                     ) : (
                       <BsGooglePlay size={20} />
                     )}
-                    {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? 'Cleaning AAB...' : 'Clean AAB Only'}
+{t(cleanLoading[`${cleanAppsModal.reseller?.appUrl}_aab`] ? 'cleaningAab' : 'cleanAabOnly')}
                   </button>
 
                   <button
@@ -3425,7 +3438,7 @@ const FloatingResellersPopover = ({
                     ) : (
                       <AppleIcon size={20} />
                     )}
-                    {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? 'Cleaning iOS Simulator...' : 'Clean iOS Simulator Only'}
+{t(cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_simulator`] ? 'cleaningIosSimulator' : 'cleanIosSimulatorOnly')}
                   </button>
 
                   <button
@@ -3451,7 +3464,7 @@ const FloatingResellersPopover = ({
                     ) : (
                       <SmartphoneIcon size={20} />
                     )}
-                    {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? 'Cleaning iOS Device...' : 'Clean iOS Device Only'}
+{t(cleanLoading[`${cleanAppsModal.reseller?.appUrl}_ios_device`] ? 'cleaningIosDevice' : 'cleanIosDeviceOnly')}
                   </button>
 
                   <button
@@ -3477,7 +3490,7 @@ const FloatingResellersPopover = ({
                     ) : (
                       <RefreshIcon />
                     )}
-                    {cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'Cleaning All...' : 'Clean All (APK, AAB, iOS Simulator & iOS Device)'}
+{t(cleanLoading[`${cleanAppsModal.reseller?.appUrl}_both`] ? 'cleaningAll' : 'cleanAll')}
                   </button>
                 </div>
               </div>
@@ -3551,7 +3564,7 @@ const FloatingResellersPopover = ({
                     <ChevronLeftIcon style={{ fontSize: '24px' }} />
                   </button>
                   <Typography variant="h6" style={{ color: colors.text, fontWeight: '600' }}>
-                    iOS Build Type
+                    {t('iosBuildType')}
                   </Typography>
                 </div>
               </div>
@@ -3559,7 +3572,7 @@ const FloatingResellersPopover = ({
               {/* Content */}
               <div style={{ padding: '24px' }}>
                 <Typography variant="body1" style={{ color: colors.text, marginBottom: '24px', textAlign: 'center' }}>
-                  Choose the iOS build type for <strong>{iosBuildTypeModal.reseller?.companyName}</strong>
+                  {t('chooseIosBuildType')} <strong>{iosBuildTypeModal.reseller?.companyName}</strong>
                 </Typography>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -3581,7 +3594,7 @@ const FloatingResellersPopover = ({
                     }}
                   >
                     <AppleIcon size={20} />
-                    iOS Simulator
+                    {t('iosSimulator')}
                   </button>
 
                   {/* Physical Device Build */}
@@ -3602,7 +3615,7 @@ const FloatingResellersPopover = ({
                     }}
                   >
                     <SmartphoneIcon size={20} />
-                    Physical Device
+                    {t('physicalDevice')}
                   </button>
                 </div>
               </div>
@@ -3714,7 +3727,7 @@ const FloatingResellersPopover = ({
                         e.target.style.color = colors.text;
                       }}
                     >
-                      Choose CSV File
+{t('chooseCsvFile')}
                     </button>
                   </label>
                 </div>
@@ -3816,50 +3829,25 @@ const FloatingResellersPopover = ({
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
-                  {errorModal.title}
-                </Typography>
-                <IconButton
-                  onClick={() => setErrorModal({ open: false, message: '', title: '' })}
-                  size="small"
-                  style={{ color: colors.textSecondary }}
-                >
-                  <ChevronLeftIcon fontSize="small" />
-                </IconButton>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => setErrorModal({ open: false, message: '', title: '' })}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0 }}>
+                    {errorModal.title}
+                  </Typography>
+                </div>
               </div>
 
               {/* Content */}
               <div style={{ padding: '24px' }}>
-                <Typography variant="body1" style={{ color: colors.text, marginBottom: '24px' }}>
+                <Typography variant="body1" style={{ color: colors.text }}>
                   {errorModal.message}
                 </Typography>
-                
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                  <button
-                    onClick={() => setErrorModal({ open: false, message: '', title: '' })}
-                    style={{
-                      padding: '10px 20px',
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: '8px',
-                      backgroundColor: colors.secondary,
-                      color: colors.text,
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = colors.hover;
-                      e.target.style.color = colors.text;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = colors.secondary;
-                      e.target.style.color = colors.text;
-                    }}
-                  >
-                    OK
-                  </button>
-                </div>
               </div>
             </motion.div>
           </motion.div>
