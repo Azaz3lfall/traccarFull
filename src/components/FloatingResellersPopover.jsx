@@ -427,7 +427,7 @@ const FloatingResellersPopover = ({
       updateBuildState(resellerId, buildType, 'BUILD_ERROR');
       setSnackbar({
         open: true,
-        message: `Failed to start ${buildType.toUpperCase()} build: ${error.message}`,
+        message: `${t('failedToStartBuild')} ${buildType.toUpperCase()} build: ${error.message}`,
         severity: 'error'
       });
       // Clear loading state on error too
@@ -659,7 +659,7 @@ const FloatingResellersPopover = ({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch resellers');
+        throw new Error(t('failedToFetchResellers'));
       }
 
       const data = await response.json();
@@ -708,7 +708,7 @@ const FloatingResellersPopover = ({
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch users');
+          throw new Error(t('failedToFetchUsers'));
         }
 
         const data = await response.json();
@@ -808,7 +808,7 @@ const FloatingResellersPopover = ({
         console.log('🔍 Logs count:', data.logs?.length || 0);
         setLogs(data.logs || []);
       } else {
-        console.error('❌ Failed to fetch logs, status:', response.status);
+        console.error(`❌ ${t('failedToFetchLogs')}, status:`, response.status);
         setLogs([]);
       }
     } catch (error) {
@@ -3990,7 +3990,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
         <div>
           <BlockIcon style={{ fontSize: 48, color: colors.error, marginBottom: '16px' }} />
           <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
-            Build failed
+            {t('buildFailed')}
           </Typography>
           {error && (
             <Typography variant="body2" style={{ color: colors.error, marginBottom: '16px' }}>
