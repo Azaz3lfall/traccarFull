@@ -325,15 +325,15 @@ const FloatingResellersPopover = ({
     if (hasSimulatorBuild || hasDeviceBuild) {
       // If both exist, prioritize the one that's building
       if (simulatorState === 'BUILDING' || deviceState === 'BUILDING') {
-        return 'Check Status';
+        return t('checkStatus');
       } else if (simulatorState === 'BUILDED' || deviceState === 'BUILDED') {
-        return 'Download';
+        return t('download');
       } else if (simulatorState === 'BUILD_ERROR' || deviceState === 'BUILD_ERROR') {
-        return 'Retry';
+        return t('retry');
       }
     }
 
-    return 'Build';
+    return t('build');
   };
 
   // Start a new build
@@ -509,14 +509,14 @@ const FloatingResellersPopover = ({
 
       setSnackbar({
         open: true,
-        message: `${buildType.toUpperCase()} download started!`,
+        message: `${buildType.toUpperCase()} ${t('downloadStarted')}`,
         severity: 'success'
       });
     } catch (error) {
       console.error(`❌ Error downloading ${buildType.toUpperCase()}:`, error);
       setSnackbar({
         open: true,
-        message: `Failed to download ${buildType.toUpperCase()}: ${error.message}`,
+        message: `${t('downloadFailed')} ${buildType.toUpperCase()}: ${error.message}`,
         severity: 'error'
       });
     }
@@ -611,7 +611,7 @@ const FloatingResellersPopover = ({
 
       setSnackbar({
         open: true,
-        message: `${cleanType === 'both' ? 'ALL' : cleanType.toUpperCase()} apps cleaned successfully`,
+        message: `${cleanType === 'both' ? t('allAppsCleanedSuccessfully') : cleanType.toUpperCase() + ' ' + t('appsCleanedSuccessfully')}`,
         severity: 'success'
       });
 
@@ -620,7 +620,7 @@ const FloatingResellersPopover = ({
       console.error(`❌ Error cleaning ${cleanType}:`, error);
       setSnackbar({
         open: true,
-        message: `Error cleaning ${cleanType}`,
+        message: `${t('errorCleaning')} ${cleanType}`,
         severity: 'error'
       });
     } finally {
@@ -1085,28 +1085,28 @@ const FloatingResellersPopover = ({
 
     // Validate that a user is selected
     if (!editingReseller.resellerId || editingReseller.resellerId === '') {
-      setSnackbar({ open: true, message: 'Please select a user for Reseller ID', severity: 'error' });
+      setSnackbar({ open: true, message: t('pleaseSelectUserForResellerId'), severity: 'error' });
       return;
     }
 
     // Validate that all required images are selected
     if (!selectedImage && !editingReseller.logotype && !editingReseller.logo) {
-      setSnackbar({ open: true, message: 'Company logo is required', severity: 'error' });
+      setSnackbar({ open: true, message: t('companyLogoRequired'), severity: 'error' });
       return;
     }
 
     if (!selectedFavicon) {
-      setSnackbar({ open: true, message: 'Favicon image is required', severity: 'error' });
+      setSnackbar({ open: true, message: t('faviconImageRequired'), severity: 'error' });
       return;
     }
 
     if (!selectedAppImage) {
-      setSnackbar({ open: true, message: 'App image (1024x1024) is required', severity: 'error' });
+      setSnackbar({ open: true, message: t('appImageRequired'), severity: 'error' });
       return;
     }
 
     if (!selectedNotificationIcon) {
-      setSnackbar({ open: true, message: 'Notification icon (192x192) is required', severity: 'error' });
+      setSnackbar({ open: true, message: t('notificationIconRequired'), severity: 'error' });
       return;
     }
 
@@ -1745,7 +1745,7 @@ const FloatingResellersPopover = ({
                                     }}
                                     onClick={() => handleBuildApp(reseller, 'aab')}
                                     disabled={buildLoading[`${reseller.appUrl}_aab`]}
-                                    title={`AAB ${getBuildState(reseller.appUrl, 'aab') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'aab') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'aab') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                    title={`AAB ${getBuildState(reseller.appUrl, 'aab') === 'NOT_BUILDED' ? t('build') : getBuildState(reseller.appUrl, 'aab') === 'BUILDING' ? t('checkStatus') : getBuildState(reseller.appUrl, 'aab') === 'BUILDED' ? t('download') : t('retry')}`}
                                   >
                                     {buildLoading[`${reseller.appUrl}_aab`] ? (
                                       <CircularProgress size={12} />
@@ -1764,7 +1764,7 @@ const FloatingResellersPopover = ({
                                     }}
                                     onClick={() => handleBuildApp(reseller, 'apk')}
                                     disabled={buildLoading[`${reseller.appUrl}_apk`]}
-                                    title={`APK ${getBuildState(reseller.appUrl, 'apk') === 'NOT_BUILDED' ? 'Build' : getBuildState(reseller.appUrl, 'apk') === 'BUILDING' ? 'Check Status' : getBuildState(reseller.appUrl, 'apk') === 'BUILDED' ? 'Download' : 'Retry'}`}
+                                    title={`APK ${getBuildState(reseller.appUrl, 'apk') === 'NOT_BUILDED' ? t('build') : getBuildState(reseller.appUrl, 'apk') === 'BUILDING' ? t('checkStatus') : getBuildState(reseller.appUrl, 'apk') === 'BUILDED' ? t('download') : t('retry')}`}
                                   >
                                     {buildLoading[`${reseller.appUrl}_apk`] ? (
                                       <CircularProgress size={12} />
@@ -2843,7 +2843,7 @@ const FloatingResellersPopover = ({
                                               borderStyle: 'dashed',
                                             }}
                                           >
-                                            {selectedAppImage ? 'Change App Image' : 'Select App Image'}
+                                            {selectedAppImage ? t('changeAppImage') : t('selectAppImage')}
                                           </Button>
                                         </label>
 
@@ -3267,7 +3267,7 @@ const FloatingResellersPopover = ({
                     <ChevronLeftIcon fontSize="small" />
                   </IconButton>
                   <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    Build Status - {buildStatusModal.reseller?.companyName}
+                    {t('buildStatusTitle')} - {buildStatusModal.reseller?.companyName}
                   </Typography>
                 </div>
               </div>
@@ -3287,6 +3287,7 @@ const FloatingResellersPopover = ({
                     }}
                     colors={colors}
                     resellersConfig={resellersConfig}
+                    t={t}
                   />
                 )}
               </div>
@@ -3858,7 +3859,7 @@ const FloatingResellersPopover = ({
 };
 
 // Build Status Modal Content Component
-const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry, colors, resellersConfig }) => {
+const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStatus, updateBuildState, onClose, onRetry, colors, resellersConfig, t }) => {
   const [statusData, setStatusData] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
@@ -3896,7 +3897,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
     <div style={{ textAlign: 'center' }}>
       <div style={{ marginBottom: '24px' }}>
         <Typography variant="h6" style={{ color: colors.text, marginBottom: '8px' }}>
-          {buildType.toUpperCase()} Build Status
+          {buildType === 'apk' ? t('apkBuildStatus') : buildType === 'aab' ? t('aabBuildStatus') : t('iosBuildStatus')}
         </Typography>
         <Typography variant="body2" style={{ color: colors.textSecondary }}>
           {reseller.companyName} - {reseller.appUrl}
@@ -3922,7 +3923,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
         <div>
           <CircularProgress size={48} color="inherit" style={{ marginBottom: '16px' }} />
           <Typography variant="body1" style={{ color: colors.text, marginBottom: '16px' }}>
-            Building {buildType.toUpperCase()}...
+{buildType === 'apk' ? t('buildingApk') : buildType === 'aab' ? t('buildingAab') : t('buildingIos')}
           </Typography>
           <Button
             variant="outlined"
@@ -3933,7 +3934,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
               color: isChecking ? colors.primary : colors.text
             }}
           >
-            {isChecking ? 'Checking...' : 'Check Status'}
+{t(isChecking ? 'checking' : 'checkStatus')}
           </Button>
         </div>
       )}
@@ -3980,7 +3981,7 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
               marginRight: '8px'
             }}
           >
-            Download
+{t('download')}
           </Button>
         </div>
       )}
