@@ -3522,11 +3522,11 @@ const FloatingResellersPopover = ({
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = colors.hover;
-                      e.target.style.borderColor = colors.primary;
+                      e.target.style.color = colors.text;
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.backgroundColor = colors.secondary;
-                      e.target.style.borderColor = colors.border;
+                      e.target.style.color = colors.text;
                     }}
                   >
                     Choose CSV File
@@ -3559,25 +3559,22 @@ const FloatingResellersPopover = ({
                   }}
                   style={{
                     padding: '10px 20px',
-                    border: `1px solid ${colors.primary}`,
+                    border: `1px solid ${colors.border}`,
                     borderRadius: '8px',
                     backgroundColor: colors.secondary,
-                    color: colors.primary,
+                    color: colors.text,
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
+                    transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.primary;
-                    e.target.style.color = colors.primaryContrast;
+                    e.target.style.backgroundColor = colors.hover;
+                    e.target.style.color = colors.text;
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = colors.secondary;
-                    e.target.style.color = colors.primary;
+                    e.target.style.color = colors.text;
                   }}
                 >
                   {t('sharedImport')}
