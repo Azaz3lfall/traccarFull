@@ -2428,279 +2428,292 @@ const FloatingResellersPopover = ({
                                   }}
                                 />
                                 
-                                {/* Image Upload Field */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <input
-                                    type="file"
-                                    accept=".png"
-                                    onChange={handleImageSelect}
-                                    style={{ display: 'none' }}
-                                    id="logotype-upload"
-                                  />
-                                  <label htmlFor="logotype-upload">
-                                    <Button
-                                      variant="outlined"
-                                      component="span"
-                                      fullWidth
-                                      style={{
-                                        borderColor: colors.border,
-                                        color: colors.text,
-                                        height: '56px',
-                                        borderStyle: 'dashed',
-                                      }}
-                                    >
-                                      {isCompressingImage ? (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                          <CircularProgress size={16} />
-                                          {t('resellerCompressingImage')}
-                                        </Box>
-                                      ) : selectedImage ? t('resellerChangeLogo') : t('resellerSelectLogo')}
-                                    </Button>
-                                  </label>
+                                {/* Image Upload Fields - Two per row layout */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                   
-                                  {/* Image Preview */}
-                                  {imagePreview && (
-                                    <div style={{ 
-                                      display: 'flex', 
-                                      flexDirection: 'column', 
-                                      alignItems: 'center', 
-                                      gap: '8px',
-                                      padding: '12px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '8px',
-                                      backgroundColor: colors.secondary
-                                    }}>
-                                      <img
-                                        src={imagePreview}
-                                        alt="Logo preview"
-                                        style={{
-                                          maxWidth: '120px',
-                                          maxHeight: '120px',
-                                          objectFit: 'contain',
-                                          borderRadius: '4px'
-                                        }}
+                                  {/* Row 1: Logo and Favicon */}
+                                  <div style={{ display: 'flex', gap: '16px' }}>
+                                    {/* Logo Upload Field */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                        Logo Image
+                                      </Typography>
+                                      <input
+                                        type="file"
+                                        accept=".png"
+                                        onChange={handleImageSelect}
+                                        style={{ display: 'none' }}
+                                        id="logotype-upload"
                                       />
-                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                        {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
-                                      </Typography>
+                                      <label htmlFor="logotype-upload">
+                                        <Button
+                                          variant="outlined"
+                                          component="span"
+                                          fullWidth
+                                          style={{
+                                            borderColor: colors.border,
+                                            color: colors.text,
+                                            height: '56px',
+                                            borderStyle: 'dashed',
+                                          }}
+                                        >
+                                          {isCompressingImage ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                              <CircularProgress size={16} />
+                                              {t('resellerCompressingImage')}
+                                            </Box>
+                                          ) : selectedImage ? t('resellerChangeLogo') : t('resellerSelectLogo')}
+                                        </Button>
+                                      </label>
+                                      
+                                      {/* Logo Preview */}
+                                      {imagePreview && (
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          flexDirection: 'column', 
+                                          alignItems: 'center', 
+                                          gap: '8px',
+                                          padding: '12px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary
+                                        }}>
+                                          <img
+                                            src={imagePreview}
+                                            alt="Logo preview"
+                                            style={{
+                                              width: '80px',
+                                              height: '80px',
+                                              objectFit: 'contain',
+                                              borderRadius: '4px'
+                                            }}
+                                          />
+                                          <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                            {selectedImage?.name} ({(selectedImage?.size / 1024).toFixed(1)}KB)
+                                          </Typography>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Current Logo Display */}
+                                      {!imagePreview && editingReseller.logo && (
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          gap: '8px',
+                                          padding: '8px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary
+                                        }}>
+                                          <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                            Current: {editingReseller.logo}
+                                          </Typography>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Logo Error Message */}
+                                      {imageError && (
+                                        <Typography variant="caption" style={{ color: '#f44336' }}>
+                                          {imageError}
+                                        </Typography>
+                                      )}
                                     </div>
-                                  )}
-                                  
-                                  {/* Error Message */}
-                                  {imageError && (
-                                    <Typography variant="caption" style={{ color: '#f44336' }}>
-                                      {imageError}
-                                    </Typography>
-                                  )}
-                                  
-                                  {/* Current Logo Display */}
-                                  {!imagePreview && editingReseller.logo && (
-                                    <div style={{ 
-                                      display: 'flex', 
-                                      alignItems: 'center', 
-                                      gap: '8px',
-                                      padding: '8px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '8px',
-                                      backgroundColor: colors.secondary
-                                    }}>
-                                      <Typography variant="body2" style={{ color: colors.textSecondary }}>
-                                        Current: {editingReseller.logo}
-                                      </Typography>
-                                    </div>
-                                  )}
-                                </div>
 
-                                {/* Favicon Upload Field */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                    Favicon Image (Square)
-                                  </Typography>
-                                  <input
-                                    type="file"
-                                    accept=".png"
-                                    onChange={handleFaviconSelect}
-                                    style={{ display: 'none' }}
-                                    id="favicon-upload"
-                                  />
-                                  <label htmlFor="favicon-upload">
-                                    <Button
-                                      variant="outlined"
-                                      component="span"
-                                      fullWidth
-                                      style={{
-                                        borderColor: colors.border,
-                                        color: colors.text,
-                                        height: '56px',
-                                        borderStyle: 'dashed',
-                                      }}
-                                    >
-                                      {selectedFavicon ? 'Change Favicon' : 'Select Favicon (Square)'}
-                                    </Button>
-                                  </label>
-                                  
-                                  {/* Favicon Preview */}
-                                  {faviconPreview && (
-                                    <div style={{ 
-                                      display: 'flex', 
-                                      flexDirection: 'column', 
-                                      alignItems: 'center', 
-                                      gap: '8px',
-                                      padding: '12px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '8px',
-                                      backgroundColor: colors.secondary
-                                    }}>
-                                      <img
-                                        src={faviconPreview}
-                                        alt="Favicon preview"
-                                        style={{
-                                          width: '64px',
-                                          height: '64px',
-                                          objectFit: 'contain',
-                                          borderRadius: '4px'
-                                        }}
-                                      />
-                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                        {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
+                                    {/* Favicon Upload Field */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                        Favicon (Square)
                                       </Typography>
+                                      <input
+                                        type="file"
+                                        accept=".png"
+                                        onChange={handleFaviconSelect}
+                                        style={{ display: 'none' }}
+                                        id="favicon-upload"
+                                      />
+                                      <label htmlFor="favicon-upload">
+                                        <Button
+                                          variant="outlined"
+                                          component="span"
+                                          fullWidth
+                                          style={{
+                                            borderColor: colors.border,
+                                            color: colors.text,
+                                            height: '56px',
+                                            borderStyle: 'dashed',
+                                          }}
+                                        >
+                                          {selectedFavicon ? 'Change Favicon' : 'Select Favicon'}
+                                        </Button>
+                                      </label>
+                                      
+                                      {/* Favicon Preview */}
+                                      {faviconPreview && (
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          flexDirection: 'column', 
+                                          alignItems: 'center', 
+                                          gap: '8px',
+                                          padding: '12px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary
+                                        }}>
+                                          <img
+                                            src={faviconPreview}
+                                            alt="Favicon preview"
+                                            style={{
+                                              width: '64px',
+                                              height: '64px',
+                                              objectFit: 'contain',
+                                              borderRadius: '4px'
+                                            }}
+                                          />
+                                          <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                            {selectedFavicon?.name} ({(selectedFavicon?.size / 1024).toFixed(1)}KB)
+                                          </Typography>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Favicon Error Message */}
+                                      {faviconError && (
+                                        <Typography variant="caption" style={{ color: '#f44336' }}>
+                                          {faviconError}
+                                        </Typography>
+                                      )}
                                     </div>
-                                  )}
-                                  
-                                  {/* Favicon Error Message */}
-                                  {faviconError && (
-                                    <Typography variant="caption" style={{ color: '#f44336' }}>
-                                      {faviconError}
-                                    </Typography>
-                                  )}
-                                </div>
+                                  </div>
 
-                                {/* App Image Upload Field */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                    App Image (1024x1024)
-                                  </Typography>
-                                  <input
-                                    type="file"
-                                    accept=".png"
-                                    onChange={handleAppImageSelect}
-                                    style={{ display: 'none' }}
-                                    id="app-image-upload"
-                                  />
-                                  <label htmlFor="app-image-upload">
-                                    <Button
-                                      variant="outlined"
-                                      component="span"
-                                      fullWidth
-                                      style={{
-                                        borderColor: colors.border,
-                                        color: colors.text,
-                                        height: '56px',
-                                        borderStyle: 'dashed',
-                                      }}
-                                    >
-                                      {selectedAppImage ? 'Change App Image' : 'Select App Image (1024x1024)'}
-                                    </Button>
-                                  </label>
-                                  
-                                  {/* App Image Preview */}
-                                  {appImagePreview && (
-                                    <div style={{ 
-                                      display: 'flex', 
-                                      flexDirection: 'column', 
-                                      alignItems: 'center', 
-                                      gap: '8px',
-                                      padding: '12px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '8px',
-                                      backgroundColor: colors.secondary
-                                    }}>
-                                      <img
-                                        src={appImagePreview}
-                                        alt="App image preview"
-                                        style={{
-                                          width: '120px',
-                                          height: '120px',
-                                          objectFit: 'contain',
-                                          borderRadius: '4px'
-                                        }}
-                                      />
-                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                        {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
+                                  {/* Row 2: App Image and Notification Icon */}
+                                  <div style={{ display: 'flex', gap: '16px' }}>
+                                    {/* App Image Upload Field */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                        App Image (1024x1024)
                                       </Typography>
+                                      <input
+                                        type="file"
+                                        accept=".png"
+                                        onChange={handleAppImageSelect}
+                                        style={{ display: 'none' }}
+                                        id="app-image-upload"
+                                      />
+                                      <label htmlFor="app-image-upload">
+                                        <Button
+                                          variant="outlined"
+                                          component="span"
+                                          fullWidth
+                                          style={{
+                                            borderColor: colors.border,
+                                            color: colors.text,
+                                            height: '56px',
+                                            borderStyle: 'dashed',
+                                          }}
+                                        >
+                                          {selectedAppImage ? 'Change App Image' : 'Select App Image'}
+                                        </Button>
+                                      </label>
+                                      
+                                      {/* App Image Preview */}
+                                      {appImagePreview && (
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          flexDirection: 'column', 
+                                          alignItems: 'center', 
+                                          gap: '8px',
+                                          padding: '12px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary
+                                        }}>
+                                          <img
+                                            src={appImagePreview}
+                                            alt="App image preview"
+                                            style={{
+                                              width: '80px',
+                                              height: '80px',
+                                              objectFit: 'contain',
+                                              borderRadius: '4px'
+                                            }}
+                                          />
+                                          <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                            {selectedAppImage?.name} ({(selectedAppImage?.size / 1024).toFixed(1)}KB)
+                                          </Typography>
+                                        </div>
+                                      )}
+                                      
+                                      {/* App Image Error Message */}
+                                      {appImageError && (
+                                        <Typography variant="caption" style={{ color: '#f44336' }}>
+                                          {appImageError}
+                                        </Typography>
+                                      )}
                                     </div>
-                                  )}
-                                  
-                                  {/* App Image Error Message */}
-                                  {appImageError && (
-                                    <Typography variant="caption" style={{ color: '#f44336' }}>
-                                      {appImageError}
-                                    </Typography>
-                                  )}
-                                </div>
 
-                                {/* Notification Icon Upload Field */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
-                                    Notification Icon (192x192)
-                                  </Typography>
-                                  <input
-                                    type="file"
-                                    accept=".png"
-                                    onChange={handleNotificationIconSelect}
-                                    style={{ display: 'none' }}
-                                    id="notification-icon-upload"
-                                  />
-                                  <label htmlFor="notification-icon-upload">
-                                    <Button
-                                      variant="outlined"
-                                      component="span"
-                                      fullWidth
-                                      style={{
-                                        borderColor: colors.border,
-                                        color: colors.text,
-                                        height: '56px',
-                                        borderStyle: 'dashed',
-                                      }}
-                                    >
-                                      {selectedNotificationIcon ? 'Change Notification Icon' : 'Select Notification Icon (192x192)'}
-                                    </Button>
-                                  </label>
-                                  
-                                  {/* Notification Icon Preview */}
-                                  {notificationIconPreview && (
-                                    <div style={{ 
-                                      display: 'flex', 
-                                      flexDirection: 'column', 
-                                      alignItems: 'center', 
-                                      gap: '8px',
-                                      padding: '12px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '8px',
-                                      backgroundColor: colors.secondary
-                                    }}>
-                                      <img
-                                        src={notificationIconPreview}
-                                        alt="Notification icon preview"
-                                        style={{
-                                          width: '80px',
-                                          height: '80px',
-                                          objectFit: 'contain',
-                                          borderRadius: '4px'
-                                        }}
-                                      />
-                                      <Typography variant="caption" style={{ color: colors.textSecondary }}>
-                                        {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
+                                    {/* Notification Icon Upload Field */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                                      <Typography variant="subtitle2" style={{ color: colors.text, fontWeight: '600' }}>
+                                        Notification Icon (192x192)
                                       </Typography>
+                                      <input
+                                        type="file"
+                                        accept=".png"
+                                        onChange={handleNotificationIconSelect}
+                                        style={{ display: 'none' }}
+                                        id="notification-icon-upload"
+                                      />
+                                      <label htmlFor="notification-icon-upload">
+                                        <Button
+                                          variant="outlined"
+                                          component="span"
+                                          fullWidth
+                                          style={{
+                                            borderColor: colors.border,
+                                            color: colors.text,
+                                            height: '56px',
+                                            borderStyle: 'dashed',
+                                          }}
+                                        >
+                                          {selectedNotificationIcon ? 'Change Icon' : 'Select Icon'}
+                                        </Button>
+                                      </label>
+                                      
+                                      {/* Notification Icon Preview */}
+                                      {notificationIconPreview && (
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          flexDirection: 'column', 
+                                          alignItems: 'center', 
+                                          gap: '8px',
+                                          padding: '12px',
+                                          border: `1px solid ${colors.border}`,
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.secondary
+                                        }}>
+                                          <img
+                                            src={notificationIconPreview}
+                                            alt="Notification icon preview"
+                                            style={{
+                                              width: '64px',
+                                              height: '64px',
+                                              objectFit: 'contain',
+                                              borderRadius: '4px'
+                                            }}
+                                          />
+                                          <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                            {selectedNotificationIcon?.name} ({(selectedNotificationIcon?.size / 1024).toFixed(1)}KB)
+                                          </Typography>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Notification Icon Error Message */}
+                                      {notificationIconError && (
+                                        <Typography variant="caption" style={{ color: '#f44336' }}>
+                                          {notificationIconError}
+                                        </Typography>
+                                      )}
                                     </div>
-                                  )}
-                                  
-                                  {/* Notification Icon Error Message */}
-                                  {notificationIconError && (
-                                    <Typography variant="caption" style={{ color: '#f44336' }}>
-                                      {notificationIconError}
-                                    </Typography>
-                                  )}
+                                  </div>
                                 </div>
                                 
                                 <TextField
