@@ -825,5 +825,20 @@
   "iosBuildType": "نوع Build iOS",
   "chooseIosBuildType": "نوع build iOS را برای انتخاب کنید",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "دستگاه فیزیکی"
+  "physicalDevice": "دستگاه فیزیکی",
+  "buildStatus": "وضعیت Build",
+  "buildStatusTitle": "وضعیت Build",
+  "apkBuildStatus": "وضعیت Build APK",
+  "aabBuildStatus": "وضعیت Build AAB",
+  "iosBuildStatus": "وضعیت Build iOS",
+  "buildingApk": "در حال ساخت APK...",
+  "buildingAab": "در حال ساخت AAB...",
+  "buildingIos": "در حال ساخت iOS...",
+  "checking": "در حال بررسی...",
+  "checkStatus": "بررسی وضعیت",
+  "download": "دانلود",
+  "retry": "تلاش مجدد",
+  "build": "ساخت",
+  "downloadStarted": "دانلود شروع شد!",
+  "downloadFailed": "دانلود ناموفق"
 }

@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Build Tyyppi",
   "chooseIosBuildType": "Valitse iOS build tyyppi",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fyysinen Laite"
+  "physicalDevice": "Fyysinen Laite",
+  "buildStatus": "Buildin Tila",
+  "buildStatusTitle": "Buildin Tila",
+  "apkBuildStatus": "APK Buildin Tila",
+  "aabBuildStatus": "AAB Buildin Tila",
+  "iosBuildStatus": "iOS Buildin Tila",
+  "buildingApk": "Rakennetaan APK...",
+  "buildingAab": "Rakennetaan AAB...",
+  "buildingIos": "Rakennetaan iOS...",
+  "checking": "Tarkistetaan...",
+  "checkStatus": "Tarkista Tila",
+  "download": "Lataa",
+  "retry": "Yritä Uudelleen",
+  "build": "Rakenna",
+  "downloadStarted": "lataus aloitettu!",
+  "downloadFailed": "Lataus epäonnistui"
 }

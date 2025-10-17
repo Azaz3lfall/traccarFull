@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Build Típus",
   "chooseIosBuildType": "Válassza ki az iOS build típust",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fizikai Eszköz"
+  "physicalDevice": "Fizikai Eszköz",
+  "buildStatus": "Build Állapot",
+  "buildStatusTitle": "Build Állapot",
+  "apkBuildStatus": "APK Build Állapot",
+  "aabBuildStatus": "AAB Build Állapot",
+  "iosBuildStatus": "iOS Build Állapot",
+  "buildingApk": "APK építése...",
+  "buildingAab": "AAB építése...",
+  "buildingIos": "iOS építése...",
+  "checking": "Ellenőrzés...",
+  "checkStatus": "Állapot Ellenőrzése",
+  "download": "Letöltés",
+  "retry": "Újra Próbálkozás",
+  "build": "Építés",
+  "downloadStarted": "letöltés elindult!",
+  "downloadFailed": "Letöltés sikertelen"
 }

@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Turi",
   "chooseIosBuildType": "uchun iOS build turini tanlang",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Jismoniy Qurilma"
+  "physicalDevice": "Jismoniy Qurilma",
+  "buildStatus": "Build Holati",
+  "buildStatusTitle": "Build Holati",
+  "apkBuildStatus": "APK Build Holati",
+  "aabBuildStatus": "AAB Build Holati",
+  "iosBuildStatus": "iOS Build Holati",
+  "buildingApk": "APK qurilmoqda...",
+  "buildingAab": "AAB qurilmoqda...",
+  "buildingIos": "iOS qurilmoqda...",
+  "checking": "Tekshirilmoqda...",
+  "checkStatus": "Holatni Tekshirish",
+  "download": "Yuklab Olish",
+  "retry": "Qayta Urinish",
+  "build": "Qurish",
+  "downloadStarted": "yuklab olish boshlandi!",
+  "downloadFailed": "Yuklab olish muvaffaqiyatsiz"
 }

@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build වර්ගය",
   "chooseIosBuildType": "සඳහා iOS build වර්ගය තෝරන්න",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "භෞතික උපකරණය"
+  "physicalDevice": "භෞතික උපකරණය",
+  "buildStatus": "බිල්ඩ් තත්වය",
+  "buildStatusTitle": "බිල්ඩ් තත්වය",
+  "apkBuildStatus": "APK බිල්ඩ් තත්වය",
+  "aabBuildStatus": "AAB බිල්ඩ් තත්වය",
+  "iosBuildStatus": "iOS බිල්ඩ් තත්වය",
+  "buildingApk": "APK ගොඩනගමින්...",
+  "buildingAab": "AAB ගොඩනගමින්...",
+  "buildingIos": "iOS ගොඩනගමින්...",
+  "checking": "පරීක්ෂා කරමින්...",
+  "checkStatus": "තත්වය පරීක්ෂා කරන්න",
+  "download": "බාගත කරන්න",
+  "retry": "නැවත උත්සාහ කරන්න",
+  "build": "ගොඩනගන්න",
+  "downloadStarted": "බාගත කිරීම ආරම්භ විය!",
+  "downloadFailed": "බාගත කිරීම අසාර්ථක"
 }

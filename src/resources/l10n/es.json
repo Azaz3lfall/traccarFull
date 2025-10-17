@@ -828,5 +828,20 @@
   "iosBuildType": "Tipo de Build iOS",
   "chooseIosBuildType": "Elige el tipo de build iOS para",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Dispositivo Físico"
+  "physicalDevice": "Dispositivo Físico",
+  "buildStatus": "Estado del Build",
+  "buildStatusTitle": "Estado del Build",
+  "apkBuildStatus": "Estado del Build APK",
+  "aabBuildStatus": "Estado del Build AAB",
+  "iosBuildStatus": "Estado del Build iOS",
+  "buildingApk": "Construyendo APK...",
+  "buildingAab": "Construyendo AAB...",
+  "buildingIos": "Construyendo iOS...",
+  "checking": "Verificando...",
+  "checkStatus": "Verificar Estado",
+  "download": "Descargar",
+  "retry": "Reintentar",
+  "build": "Construir",
+  "downloadStarted": "¡descarga iniciada!",
+  "downloadFailed": "Error en la descarga"
 }

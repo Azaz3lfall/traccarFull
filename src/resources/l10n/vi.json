@@ -829,5 +829,20 @@
   "iosBuildType": "Loại Build iOS",
   "chooseIosBuildType": "Chọn loại build iOS cho",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Thiết bị Vật lý"
+  "physicalDevice": "Thiết bị Vật lý",
+  "buildStatus": "Trạng thái Build",
+  "buildStatusTitle": "Trạng thái Build",
+  "apkBuildStatus": "Trạng thái Build APK",
+  "aabBuildStatus": "Trạng thái Build AAB",
+  "iosBuildStatus": "Trạng thái Build iOS",
+  "buildingApk": "Đang xây dựng APK...",
+  "buildingAab": "Đang xây dựng AAB...",
+  "buildingIos": "Đang xây dựng iOS...",
+  "checking": "Đang kiểm tra...",
+  "checkStatus": "Kiểm tra Trạng thái",
+  "download": "Tải xuống",
+  "retry": "Thử lại",
+  "build": "Xây dựng",
+  "downloadStarted": "tải xuống đã bắt đầu!",
+  "downloadFailed": "Tải xuống thất bại"
 }

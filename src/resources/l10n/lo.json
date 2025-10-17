@@ -825,5 +825,20 @@
   "iosBuildType": "ປະເພດ Build iOS",
   "chooseIosBuildType": "ເລືອກປະເພດ build iOS ສຳລັບ",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "ອຸປະກອນທາງກາຍະພາບ"
+  "physicalDevice": "ອຸປະກອນທາງກາຍະພາບ",
+  "buildStatus": "ສະຖານະ Build",
+  "buildStatusTitle": "ສະຖານະ Build",
+  "apkBuildStatus": "ສະຖານະ Build APK",
+  "aabBuildStatus": "ສະຖານະ Build AAB",
+  "iosBuildStatus": "ສະຖານະ Build iOS",
+  "buildingApk": "ກຳລັງສ້າງ APK...",
+  "buildingAab": "ກຳລັງສ້າງ AAB...",
+  "buildingIos": "ກຳລັງສ້າງ iOS...",
+  "checking": "ກຳລັງກວດສອບ...",
+  "checkStatus": "ກວດສອບສະຖານະ",
+  "download": "ດາວໂຫຼດ",
+  "retry": "ລອງໃໝ່",
+  "build": "ສ້າງ",
+  "downloadStarted": "ການດາວໂຫຼດເລີ່ມຕົ້ນ!",
+  "downloadFailed": "ການດາວໂຫຼດລົ້ມເຫຼວ"
 }

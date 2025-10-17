@@ -828,5 +828,20 @@
   "iosBuildType": "iOS Build Type",
   "chooseIosBuildType": "Kies het iOS build type voor",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fysiek Apparaat"
+  "physicalDevice": "Fysiek Apparaat",
+  "buildStatus": "Build Status",
+  "buildStatusTitle": "Build Status",
+  "apkBuildStatus": "APK Build Status",
+  "aabBuildStatus": "AAB Build Status",
+  "iosBuildStatus": "iOS Build Status",
+  "buildingApk": "APK bouwen...",
+  "buildingAab": "AAB bouwen...",
+  "buildingIos": "iOS bouwen...",
+  "checking": "Controleren...",
+  "checkStatus": "Status Controleren",
+  "download": "Downloaden",
+  "retry": "Opnieuw Proberen",
+  "build": "Bouwen",
+  "downloadStarted": "download gestart!",
+  "downloadFailed": "Download mislukt"
 }

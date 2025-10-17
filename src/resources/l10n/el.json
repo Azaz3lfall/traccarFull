@@ -829,5 +829,20 @@
   "iosBuildType": "Τύπος iOS Build",
   "chooseIosBuildType": "Επιλέξτε τον τύπο iOS build για",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Φυσική Συσκευή"
+  "physicalDevice": "Φυσική Συσκευή",
+  "buildStatus": "Κατάσταση Build",
+  "buildStatusTitle": "Κατάσταση Build",
+  "apkBuildStatus": "APK Build Κατάσταση",
+  "aabBuildStatus": "AAB Build Κατάσταση",
+  "iosBuildStatus": "iOS Build Κατάσταση",
+  "buildingApk": "Δημιουργία APK...",
+  "buildingAab": "Δημιουργία AAB...",
+  "buildingIos": "Δημιουργία iOS...",
+  "checking": "Ελέγχει...",
+  "checkStatus": "Έλεγχος Κατάστασης",
+  "download": "Λήψη",
+  "retry": "Επανάληψη",
+  "build": "Δημιουργία",
+  "downloadStarted": "λήψη ξεκίνησε!",
+  "downloadFailed": "Αποτυχία λήψης"
 }

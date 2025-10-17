@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build തരം",
   "chooseIosBuildType": "ഇതിനായി iOS build തരം തിരഞ്ഞെടുക്കുക",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "ഭൗതിക ഉപകരണം"
+  "physicalDevice": "ഭൗതിക ഉപകരണം",
+  "buildStatus": "ബിൽഡ് സ്റ്റാറ്റസ്",
+  "buildStatusTitle": "ബിൽഡ് സ്റ്റാറ്റസ്",
+  "apkBuildStatus": "APK ബിൽഡ് സ്റ്റാറ്റസ്",
+  "aabBuildStatus": "AAB ബിൽഡ് സ്റ്റാറ്റസ്",
+  "iosBuildStatus": "iOS ബിൽഡ് സ്റ്റാറ്റസ്",
+  "buildingApk": "APK നിർമ്മിക്കുന്നു...",
+  "buildingAab": "AAB നിർമ്മിക്കുന്നു...",
+  "buildingIos": "iOS നിർമ്മിക്കുന്നു...",
+  "checking": "പരിശോധിക്കുന്നു...",
+  "checkStatus": "സ്റ്റാറ്റസ് പരിശോധിക്കുക",
+  "download": "ഡൗൺലോഡ്",
+  "retry": "വീണ്ടും ശ്രമിക്കുക",
+  "build": "നിർമ്മിക്കുക",
+  "downloadStarted": "ഡൗൺലോഡ് ആരംഭിച്ചു!",
+  "downloadFailed": "ഡൗൺലോഡ് പരാജയപ്പെട്ടു"
 }

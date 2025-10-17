@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Görnüşi",
   "chooseIosBuildType": "iOS build görnüşini saýlaň",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fiziki Enjam"
+  "physicalDevice": "Fiziki Enjam",
+  "buildStatus": "Build Ýagdaýy",
+  "buildStatusTitle": "Build Ýagdaýy",
+  "apkBuildStatus": "APK Build Ýagdaýy",
+  "aabBuildStatus": "AAB Build Ýagdaýy",
+  "iosBuildStatus": "iOS Build Ýagdaýy",
+  "buildingApk": "APK gurulýar...",
+  "buildingAab": "AAB gurulýar...",
+  "buildingIos": "iOS gurulýar...",
+  "checking": "Barlanylýar...",
+  "checkStatus": "Ýagdaýy Barla",
+  "download": "Göçür",
+  "retry": "Täzeden Syna",
+  "build": "Gur",
+  "downloadStarted": "göçürme başlandy!",
+  "downloadFailed": "Göçürme şowsuz"
 }

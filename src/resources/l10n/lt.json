@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Tipas",
   "chooseIosBuildType": "Pasirinkite iOS build tipą",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fizinis Įrenginys"
+  "physicalDevice": "Fizinis Įrenginys",
+  "buildStatus": "Build Būsena",
+  "buildStatusTitle": "Build Būsena",
+  "apkBuildStatus": "APK Build Būsena",
+  "aabBuildStatus": "AAB Build Būsena",
+  "iosBuildStatus": "iOS Build Būsena",
+  "buildingApk": "Kuriamas APK...",
+  "buildingAab": "Kuriamas AAB...",
+  "buildingIos": "Kuriamas iOS...",
+  "checking": "Tikrinama...",
+  "checkStatus": "Tikrinti Būseną",
+  "download": "Atsisiųsti",
+  "retry": "Bandyti Dar Kartą",
+  "build": "Kurti",
+  "downloadStarted": "atsisiuntimas pradėtas!",
+  "downloadFailed": "Atsisiuntimas nepavyko"
 }

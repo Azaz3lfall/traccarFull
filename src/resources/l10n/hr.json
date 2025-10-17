@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Build Tip",
   "chooseIosBuildType": "Odaberite tip iOS builda za",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fizički Uređaj"
+  "physicalDevice": "Fizički Uređaj",
+  "buildStatus": "Status Builda",
+  "buildStatusTitle": "Status Builda",
+  "apkBuildStatus": "APK Build Status",
+  "aabBuildStatus": "AAB Build Status",
+  "iosBuildStatus": "iOS Build Status",
+  "buildingApk": "Gradnja APK...",
+  "buildingAab": "Gradnja AAB...",
+  "buildingIos": "Gradnja iOS...",
+  "checking": "Provjera...",
+  "checkStatus": "Provjeri Status",
+  "download": "Preuzmi",
+  "retry": "Pokušaj Ponovo",
+  "build": "Gradi",
+  "downloadStarted": "preuzimanje započelo!",
+  "downloadFailed": "Preuzimanje neuspješno"
 }

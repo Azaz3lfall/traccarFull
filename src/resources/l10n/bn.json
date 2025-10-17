@@ -829,5 +829,20 @@
   "iosBuildType": "iOS বিল্ড টাইপ",
   "chooseIosBuildType": "এর জন্য iOS বিল্ড টাইপ নির্বাচন করুন",
   "iosSimulator": "iOS সিমুলেটর",
-  "physicalDevice": "ফিজিক্যাল ডিভাইস"
+  "physicalDevice": "ফিজিক্যাল ডিভাইস",
+  "buildStatus": "বিল্ড স্ট্যাটাস",
+  "buildStatusTitle": "বিল্ড স্ট্যাটাস",
+  "apkBuildStatus": "APK বিল্ড স্ট্যাটাস",
+  "aabBuildStatus": "AAB বিল্ড স্ট্যাটাস",
+  "iosBuildStatus": "iOS বিল্ড স্ট্যাটাস",
+  "buildingApk": "APK বিল্ড করা হচ্ছে...",
+  "buildingAab": "AAB বিল্ড করা হচ্ছে...",
+  "buildingIos": "iOS বিল্ড করা হচ্ছে...",
+  "checking": "চেক করা হচ্ছে...",
+  "checkStatus": "স্ট্যাটাস চেক করুন",
+  "download": "ডাউনলোড",
+  "retry": "পুনরায় চেষ্টা করুন",
+  "build": "বিল্ড",
+  "downloadStarted": "ডাউনলোড শুরু হয়েছে!",
+  "downloadFailed": "ডাউনলোড ব্যর্থ"
 }

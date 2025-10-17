@@ -829,5 +829,20 @@
   "iosBuildType": "ประเภท iOS Build",
   "chooseIosBuildType": "เลือกประเภท iOS build สำหรับ",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "อุปกรณ์จริง"
+  "physicalDevice": "อุปกรณ์จริง",
+  "buildStatus": "สถานะ Build",
+  "buildStatusTitle": "สถานะ Build",
+  "apkBuildStatus": "สถานะ Build APK",
+  "aabBuildStatus": "สถานะ Build AAB",
+  "iosBuildStatus": "สถานะ Build iOS",
+  "buildingApk": "กำลังสร้าง APK...",
+  "buildingAab": "กำลังสร้าง AAB...",
+  "buildingIos": "กำลังสร้าง iOS...",
+  "checking": "กำลังตรวจสอบ...",
+  "checkStatus": "ตรวจสอบสถานะ",
+  "download": "ดาวน์โหลด",
+  "retry": "ลองใหม่",
+  "build": "สร้าง",
+  "downloadStarted": "ดาวน์โหลดเริ่มแล้ว!",
+  "downloadFailed": "ดาวน์โหลดล้มเหลว"
 }

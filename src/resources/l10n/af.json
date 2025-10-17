@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Bou Tipe",
   "chooseIosBuildType": "Kies die iOS bou tipe vir",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fisiese Toestel"
+  "physicalDevice": "Fisiese Toestel",
+  "buildStatus": "Bou Status",
+  "buildStatusTitle": "Bou Status",
+  "apkBuildStatus": "APK Bou Status",
+  "aabBuildStatus": "AAB Bou Status",
+  "iosBuildStatus": "iOS Bou Status",
+  "buildingApk": "Bou APK...",
+  "buildingAab": "Bou AAB...",
+  "buildingIos": "Bou iOS...",
+  "checking": "Kontroleer...",
+  "checkStatus": "Kontroleer Status",
+  "download": "Aflaai",
+  "retry": "Probeer Weer",
+  "build": "Bou",
+  "downloadStarted": "aflaai begin!",
+  "downloadFailed": "Kon nie aflaai nie"
 }

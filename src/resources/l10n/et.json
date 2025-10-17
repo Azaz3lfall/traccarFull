@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Build Tüüp",
   "chooseIosBuildType": "Valige iOS build tüüp",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Füüsiline Seade"
+  "physicalDevice": "Füüsiline Seade",
+  "buildStatus": "Buildi Olek",
+  "buildStatusTitle": "Buildi Olek",
+  "apkBuildStatus": "APK Buildi Olek",
+  "aabBuildStatus": "AAB Buildi Olek",
+  "iosBuildStatus": "iOS Buildi Olek",
+  "buildingApk": "APK ehitamine...",
+  "buildingAab": "AAB ehitamine...",
+  "buildingIos": "iOS ehitamine...",
+  "checking": "Kontrollin...",
+  "checkStatus": "Kontrolli Olekut",
+  "download": "Lae alla",
+  "retry": "Proovi Uuesti",
+  "build": "Ehita",
+  "downloadStarted": "allalaadimine alustatud!",
+  "downloadFailed": "Allalaadimine ebaõnnestus"
 }

@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Tips",
   "chooseIosBuildType": "Izvēlieties iOS build tipu",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fiziska Ierīce"
+  "physicalDevice": "Fiziska Ierīce",
+  "buildStatus": "Build Statuss",
+  "buildStatusTitle": "Build Statuss",
+  "apkBuildStatus": "APK Build Statuss",
+  "aabBuildStatus": "AAB Build Statuss",
+  "iosBuildStatus": "iOS Build Statuss",
+  "buildingApk": "Būvē APK...",
+  "buildingAab": "Būvē AAB...",
+  "buildingIos": "Būvē iOS...",
+  "checking": "Pārbauda...",
+  "checkStatus": "Pārbaudīt Statusu",
+  "download": "Lejupielādēt",
+  "retry": "Mēģināt Vēlreiz",
+  "build": "Būvēt",
+  "downloadStarted": "lejupielāde sākta!",
+  "downloadFailed": "Lejupielāde neizdevās"
 }

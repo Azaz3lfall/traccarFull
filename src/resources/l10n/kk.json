@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Түрі",
   "chooseIosBuildType": "iOS build түрін таңдаңыз",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Физикалық Құрылғы"
+  "physicalDevice": "Физикалық Құрылғы",
+  "buildStatus": "Build Статусы",
+  "buildStatusTitle": "Build Статусы",
+  "apkBuildStatus": "APK Build Статусы",
+  "aabBuildStatus": "AAB Build Статусы",
+  "iosBuildStatus": "iOS Build Статусы",
+  "buildingApk": "APK құрылуда...",
+  "buildingAab": "AAB құрылуда...",
+  "buildingIos": "iOS құрылуда...",
+  "checking": "Тексеруде...",
+  "checkStatus": "Статусты Тексеру",
+  "download": "Жүктеу",
+  "retry": "Қайталау",
+  "build": "Құру",
+  "downloadStarted": "жүктеу басталды!",
+  "downloadFailed": "Жүктеу сәтсіз"
 }

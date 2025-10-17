@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Төрөл",
   "chooseIosBuildType": "iOS build төрлийг сонгоно уу",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Физик Төхөөрөмж"
+  "physicalDevice": "Физик Төхөөрөмж",
+  "buildStatus": "Build-ийн Төлөв",
+  "buildStatusTitle": "Build-ийн Төлөв",
+  "apkBuildStatus": "APK Build-ийн Төлөв",
+  "aabBuildStatus": "AAB Build-ийн Төлөв",
+  "iosBuildStatus": "iOS Build-ийн Төлөв",
+  "buildingApk": "APK бүтээж байна...",
+  "buildingAab": "AAB бүтээж байна...",
+  "buildingIos": "iOS бүтээж байна...",
+  "checking": "Шалгаж байна...",
+  "checkStatus": "Төлөв Шалгах",
+  "download": "Татах",
+  "retry": "Дахин Оролдох",
+  "build": "Бүтээх",
+  "downloadStarted": "татаж эхлэв!",
+  "downloadFailed": "Татах амжилтгүй"
 }

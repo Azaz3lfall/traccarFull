@@ -828,5 +828,20 @@
   "iosBuildType": "iOS Build Typ",
   "chooseIosBuildType": "Välj iOS build typen för",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fysisk Enhet"
+  "physicalDevice": "Fysisk Enhet",
+  "buildStatus": "Build Status",
+  "buildStatusTitle": "Build Status",
+  "apkBuildStatus": "APK Build Status",
+  "aabBuildStatus": "AAB Build Status",
+  "iosBuildStatus": "iOS Build Status",
+  "buildingApk": "Bygger APK...",
+  "buildingAab": "Bygger AAB...",
+  "buildingIos": "Bygger iOS...",
+  "checking": "Kontrollerar...",
+  "checkStatus": "Kontrollera Status",
+  "download": "Ladda Ner",
+  "retry": "Försök Igen",
+  "build": "Bygg",
+  "downloadStarted": "nedladdning startad!",
+  "downloadFailed": "Nedladdning misslyckades"
 }

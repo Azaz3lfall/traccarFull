@@ -825,5 +825,20 @@
   "iosBuildType": "Aina ya iOS Build",
   "chooseIosBuildType": "Chagua aina ya iOS build kwa",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Kifaa cha Kimwili"
+  "physicalDevice": "Kifaa cha Kimwili",
+  "buildStatus": "Hali ya Build",
+  "buildStatusTitle": "Hali ya Build",
+  "apkBuildStatus": "Hali ya Build APK",
+  "aabBuildStatus": "Hali ya Build AAB",
+  "iosBuildStatus": "Hali ya Build iOS",
+  "buildingApk": "Inajenga APK...",
+  "buildingAab": "Inajenga AAB...",
+  "buildingIos": "Inajenga iOS...",
+  "checking": "Inaangalia...",
+  "checkStatus": "Angalia Hali",
+  "download": "Pakua",
+  "retry": "Jaribu Tena",
+  "build": "Jenga",
+  "downloadStarted": "upakuaji umeanza!",
+  "downloadFailed": "Upakuaji umeshindwa"
 }

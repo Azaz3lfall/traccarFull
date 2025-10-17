@@ -829,5 +829,20 @@
   "iosBuildType": "iOS Build Türü",
   "chooseIosBuildType": "için iOS build türünü seçin",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fiziksel Cihaz"
+  "physicalDevice": "Fiziksel Cihaz",
+  "buildStatus": "Build Durumu",
+  "buildStatusTitle": "Build Durumu",
+  "apkBuildStatus": "APK Build Durumu",
+  "aabBuildStatus": "AAB Build Durumu",
+  "iosBuildStatus": "iOS Build Durumu",
+  "buildingApk": "APK oluşturuluyor...",
+  "buildingAab": "AAB oluşturuluyor...",
+  "buildingIos": "iOS oluşturuluyor...",
+  "checking": "Kontrol ediliyor...",
+  "checkStatus": "Durumu Kontrol Et",
+  "download": "İndir",
+  "retry": "Tekrar Dene",
+  "build": "Oluştur",
+  "downloadStarted": "indirme başladı!",
+  "downloadFailed": "İndirme başarısız"
 }

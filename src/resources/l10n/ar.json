@@ -828,5 +828,20 @@
   "iosBuildType": "نوع بناء iOS",
   "chooseIosBuildType": "اختر نوع بناء iOS لـ",
   "iosSimulator": "محاكي iOS",
-  "physicalDevice": "جهاز فعلي"
+  "physicalDevice": "جهاز فعلي",
+  "buildStatus": "حالة البناء",
+  "buildStatusTitle": "حالة البناء",
+  "apkBuildStatus": "حالة بناء APK",
+  "aabBuildStatus": "حالة بناء AAB",
+  "iosBuildStatus": "حالة بناء iOS",
+  "buildingApk": "جاري بناء APK...",
+  "buildingAab": "جاري بناء AAB...",
+  "buildingIos": "جاري بناء iOS...",
+  "checking": "جاري التحقق...",
+  "checkStatus": "تحقق من الحالة",
+  "download": "تحميل",
+  "retry": "إعادة المحاولة",
+  "build": "بناء",
+  "downloadStarted": "بدأ التحميل!",
+  "downloadFailed": "فشل في التحميل"
 }

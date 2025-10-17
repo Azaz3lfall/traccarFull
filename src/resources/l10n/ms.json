@@ -825,5 +825,20 @@
   "iosBuildType": "Jenis Build iOS",
   "chooseIosBuildType": "Pilih jenis build iOS untuk",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Peranti Fizikal"
+  "physicalDevice": "Peranti Fizikal",
+  "buildStatus": "Status Build",
+  "buildStatusTitle": "Status Build",
+  "apkBuildStatus": "Status Build APK",
+  "aabBuildStatus": "Status Build AAB",
+  "iosBuildStatus": "Status Build iOS",
+  "buildingApk": "Membina APK...",
+  "buildingAab": "Membina AAB...",
+  "buildingIos": "Membina iOS...",
+  "checking": "Memeriksa...",
+  "checkStatus": "Periksa Status",
+  "download": "Muat Turun",
+  "retry": "Cuba Lagi",
+  "build": "Bina",
+  "downloadStarted": "muat turun bermula!",
+  "downloadFailed": "Muat turun gagal"
 }

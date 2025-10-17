@@ -825,5 +825,20 @@
   "iosBuildType": "Тип iOS Build",
   "chooseIosBuildType": "Изаберите тип iOS build за",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Физички Уређај"
+  "physicalDevice": "Физички Уређај",
+  "buildStatus": "Статус Build-а",
+  "buildStatusTitle": "Статус Build-а",
+  "apkBuildStatus": "APK Build Статус",
+  "aabBuildStatus": "AAB Build Статус",
+  "iosBuildStatus": "iOS Build Статус",
+  "buildingApk": "Гради APK...",
+  "buildingAab": "Гради AAB...",
+  "buildingIos": "Гради iOS...",
+  "checking": "Проверава...",
+  "checkStatus": "Провери Статус",
+  "download": "Преузми",
+  "retry": "Покушај Поново",
+  "build": "Гради",
+  "downloadStarted": "преузимање почело!",
+  "downloadFailed": "Преузимање неуспешно"
 }

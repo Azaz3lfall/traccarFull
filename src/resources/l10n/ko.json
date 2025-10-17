@@ -828,5 +828,20 @@
   "iosBuildType": "iOS 빌드 타입",
   "chooseIosBuildType": "의 iOS 빌드 타입을 선택하세요",
   "iosSimulator": "iOS 시뮬레이터",
-  "physicalDevice": "물리적 디바이스"
+  "physicalDevice": "물리적 디바이스",
+  "buildStatus": "빌드 상태",
+  "buildStatusTitle": "빌드 상태",
+  "apkBuildStatus": "APK 빌드 상태",
+  "aabBuildStatus": "AAB 빌드 상태",
+  "iosBuildStatus": "iOS 빌드 상태",
+  "buildingApk": "APK 빌드 중...",
+  "buildingAab": "AAB 빌드 중...",
+  "buildingIos": "iOS 빌드 중...",
+  "checking": "확인 중...",
+  "checkStatus": "상태 확인",
+  "download": "다운로드",
+  "retry": "다시 시도",
+  "build": "빌드",
+  "downloadStarted": "다운로드 시작!",
+  "downloadFailed": "다운로드 실패"
 }

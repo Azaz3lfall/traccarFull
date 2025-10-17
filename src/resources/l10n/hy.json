@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build Տեսակ",
   "chooseIosBuildType": "Ընտրեք iOS build տեսակը",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Ֆիզիկական Սարք"
+  "physicalDevice": "Ֆիզիկական Սարք",
+  "buildStatus": "Build-ի Կարգավիճակ",
+  "buildStatusTitle": "Build-ի Կարգավիճակ",
+  "apkBuildStatus": "APK Build-ի Կարգավիճակ",
+  "aabBuildStatus": "AAB Build-ի Կարգավիճակ",
+  "iosBuildStatus": "iOS Build-ի Կարգավիճակ",
+  "buildingApk": "APK-ն կառուցվում է...",
+  "buildingAab": "AAB-ն կառուցվում է...",
+  "buildingIos": "iOS-ը կառուցվում է...",
+  "checking": "Ստուգվում է...",
+  "checkStatus": "Ստուգել Կարգավիճակը",
+  "download": "Ներբեռնել",
+  "retry": "Նորից Փորձել",
+  "build": "Կառուցել",
+  "downloadStarted": "ներբեռնումը սկսվեց!",
+  "downloadFailed": "Ներբեռնումը ձախողվեց"
 }

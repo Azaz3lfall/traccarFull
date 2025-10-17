@@ -829,5 +829,20 @@
   "iosBuildType": "Tipus de Build iOS",
   "chooseIosBuildType": "Tria el tipus de build iOS per a",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Dispositiu Físic"
+  "physicalDevice": "Dispositiu Físic",
+  "buildStatus": "Estat del Build",
+  "buildStatusTitle": "Estat del Build",
+  "apkBuildStatus": "Estat del Build APK",
+  "aabBuildStatus": "Estat del Build AAB",
+  "iosBuildStatus": "Estat del Build iOS",
+  "buildingApk": "Construint APK...",
+  "buildingAab": "Construint AAB...",
+  "buildingIos": "Construint iOS...",
+  "checking": "Comprovant...",
+  "checkStatus": "Comprovar Estat",
+  "download": "Descarregar",
+  "retry": "Tornar a Intentar",
+  "build": "Construir",
+  "downloadStarted": "descarregament iniciat!",
+  "downloadFailed": "Error en la descàrrega"
 }

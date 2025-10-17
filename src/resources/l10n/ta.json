@@ -825,5 +825,20 @@
   "iosBuildType": "iOS பில்ட் வகை",
   "chooseIosBuildType": "இதற்கான iOS பில்ட் வகையைத் தேர்ந்தெடுக்கவும்",
   "iosSimulator": "iOS சிமுலேட்டர்",
-  "physicalDevice": "உடல் சாதனம்"
+  "physicalDevice": "உடல் சாதனம்",
+  "buildStatus": "பில்ட் நிலை",
+  "buildStatusTitle": "பில்ட் நிலை",
+  "apkBuildStatus": "APK பில்ட் நிலை",
+  "aabBuildStatus": "AAB பில்ட் நிலை",
+  "iosBuildStatus": "iOS பில்ட் நிலை",
+  "buildingApk": "APK கட்டமைக்கிறது...",
+  "buildingAab": "AAB கட்டமைக்கிறது...",
+  "buildingIos": "iOS கட்டமைக்கிறது...",
+  "checking": "சரிபார்க்கிறது...",
+  "checkStatus": "நிலையை சரிபார்",
+  "download": "பதிவிறக்கு",
+  "retry": "மீண்டும் முயற்சி",
+  "build": "கட்டமை",
+  "downloadStarted": "பதிவிறக்கம் தொடங்கியது!",
+  "downloadFailed": "பதிவிறக்கம் தோல்வி"
 }

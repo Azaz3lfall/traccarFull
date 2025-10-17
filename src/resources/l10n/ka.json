@@ -825,5 +825,20 @@
   "iosBuildType": "iOS Build ტიპი",
   "chooseIosBuildType": "აირჩიეთ iOS build ტიპი",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "ფიზიკური მოწყობილობა"
+  "physicalDevice": "ფიზიკური მოწყობილობა",
+  "buildStatus": "Build-ის სტატუსი",
+  "buildStatusTitle": "Build-ის სტატუსი",
+  "apkBuildStatus": "APK Build-ის სტატუსი",
+  "aabBuildStatus": "AAB Build-ის სტატუსი",
+  "iosBuildStatus": "iOS Build-ის სტატუსი",
+  "buildingApk": "APK-ს აშენება...",
+  "buildingAab": "AAB-ს აშენება...",
+  "buildingIos": "iOS-ის აშენება...",
+  "checking": "შემოწმება...",
+  "checkStatus": "სტატუსის შემოწმება",
+  "download": "ჩამოტვირთვა",
+  "retry": "ხელახალი მცდელობა",
+  "build": "აშენება",
+  "downloadStarted": "ჩამოტვირთვა დაიწყო!",
+  "downloadFailed": "ჩამოტვირთვა ვერ მოხერხდა"
 }

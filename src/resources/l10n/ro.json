@@ -829,5 +829,20 @@
   "iosBuildType": "Tip Build iOS",
   "chooseIosBuildType": "Alegeți tipul de build iOS pentru",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Dispozitiv Fizic"
+  "physicalDevice": "Dispozitiv Fizic",
+  "buildStatus": "Starea Build-ului",
+  "buildStatusTitle": "Starea Build-ului",
+  "apkBuildStatus": "Starea Build-ului APK",
+  "aabBuildStatus": "Starea Build-ului AAB",
+  "iosBuildStatus": "Starea Build-ului iOS",
+  "buildingApk": "Construire APK...",
+  "buildingAab": "Construire AAB...",
+  "buildingIos": "Construire iOS...",
+  "checking": "Verificare...",
+  "checkStatus": "Verifică Starea",
+  "download": "Descarcă",
+  "retry": "Încearcă Din Nou",
+  "build": "Construiește",
+  "downloadStarted": "descărcarea a început!",
+  "downloadFailed": "Descărcarea a eșuat"
 }

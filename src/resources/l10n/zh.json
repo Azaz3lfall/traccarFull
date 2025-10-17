@@ -828,5 +828,20 @@
   "iosBuildType": "iOS 构建类型",
   "chooseIosBuildType": "选择 iOS 构建类型",
   "iosSimulator": "iOS 模拟器",
-  "physicalDevice": "物理设备"
+  "physicalDevice": "物理设备",
+  "buildStatus": "构建状态",
+  "buildStatusTitle": "构建状态",
+  "apkBuildStatus": "APK 构建状态",
+  "aabBuildStatus": "AAB 构建状态",
+  "iosBuildStatus": "iOS 构建状态",
+  "buildingApk": "正在构建 APK...",
+  "buildingAab": "正在构建 AAB...",
+  "buildingIos": "正在构建 iOS...",
+  "checking": "正在检查...",
+  "checkStatus": "检查状态",
+  "download": "下载",
+  "retry": "重试",
+  "build": "构建",
+  "downloadStarted": "下载已开始！",
+  "downloadFailed": "下载失败"
 }

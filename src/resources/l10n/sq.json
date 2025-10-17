@@ -825,5 +825,20 @@
   "iosBuildType": "Lloji i iOS Build",
   "chooseIosBuildType": "Zgjidhni llojin e iOS build për",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Pajisje Fizike"
+  "physicalDevice": "Pajisje Fizike",
+  "buildStatus": "Statusi i Build-it",
+  "buildStatusTitle": "Statusi i Build-it",
+  "apkBuildStatus": "Statusi i Build-it APK",
+  "aabBuildStatus": "Statusi i Build-it AAB",
+  "iosBuildStatus": "Statusi i Build-it iOS",
+  "buildingApk": "Duke ndërtuar APK...",
+  "buildingAab": "Duke ndërtuar AAB...",
+  "buildingIos": "Duke ndërtuar iOS...",
+  "checking": "Duke kontrolluar...",
+  "checkStatus": "Kontrollo Statusin",
+  "download": "Shkarko",
+  "retry": "Provo Përsëri",
+  "build": "Ndërto",
+  "downloadStarted": "shkarkimi filloi!",
+  "downloadFailed": "Shkarkimi dështoi"
 }

@@ -829,5 +829,20 @@
   "iosBuildType": "iOS 建置類型",
   "chooseIosBuildType": "選擇 iOS 建置類型",
   "iosSimulator": "iOS 模擬器",
-  "physicalDevice": "實體裝置"
+  "physicalDevice": "實體裝置",
+  "buildStatus": "建置狀態",
+  "buildStatusTitle": "建置狀態",
+  "apkBuildStatus": "APK 建置狀態",
+  "aabBuildStatus": "AAB 建置狀態",
+  "iosBuildStatus": "iOS 建置狀態",
+  "buildingApk": "正在建置 APK...",
+  "buildingAab": "正在建置 AAB...",
+  "buildingIos": "正在建置 iOS...",
+  "checking": "正在檢查...",
+  "checkStatus": "檢查狀態",
+  "download": "下載",
+  "retry": "重試",
+  "build": "建置",
+  "downloadStarted": "下載已開始！",
+  "downloadFailed": "下載失敗"
 }

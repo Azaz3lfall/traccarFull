@@ -829,5 +829,20 @@
   "iosBuildType": "Typ iOS Buildu",
   "chooseIosBuildType": "Vyberte typ iOS buildu pro",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Fyzické Zařízení"
+  "physicalDevice": "Fyzické Zařízení",
+  "buildStatus": "Stav Buildu",
+  "buildStatusTitle": "Stav Buildu",
+  "apkBuildStatus": "APK Build Stav",
+  "aabBuildStatus": "AAB Build Stav",
+  "iosBuildStatus": "iOS Build Stav",
+  "buildingApk": "Sestavuje se APK...",
+  "buildingAab": "Sestavuje se AAB...",
+  "buildingIos": "Sestavuje se iOS...",
+  "checking": "Kontroluje se...",
+  "checkStatus": "Zkontrolovat Stav",
+  "download": "Stáhnout",
+  "retry": "Zkusit Znovu",
+  "build": "Sestavit",
+  "downloadStarted": "stahování zahájeno!",
+  "downloadFailed": "Stahování se nezdařilo"
 }

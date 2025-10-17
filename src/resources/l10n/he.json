@@ -829,5 +829,20 @@
   "iosBuildType": "סוג Build של iOS",
   "chooseIosBuildType": "בחר את סוג ה-build של iOS עבור",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "מכשיר פיזי"
+  "physicalDevice": "מכשיר פיזי",
+  "buildStatus": "סטטוס Build",
+  "buildStatusTitle": "סטטוס Build",
+  "apkBuildStatus": "סטטוס Build APK",
+  "aabBuildStatus": "סטטוס Build AAB",
+  "iosBuildStatus": "סטטוס Build iOS",
+  "buildingApk": "בונה APK...",
+  "buildingAab": "בונה AAB...",
+  "buildingIos": "בונה iOS...",
+  "checking": "בודק...",
+  "checkStatus": "בדוק סטטוס",
+  "download": "הורד",
+  "retry": "נסה שוב",
+  "build": "בנה",
+  "downloadStarted": "הורדה התחילה!",
+  "downloadFailed": "הורדה נכשלה"
 }

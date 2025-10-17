@@ -828,5 +828,20 @@
   "iosBuildType": "Тип iOS Build",
   "chooseIosBuildType": "Выберите тип iOS build для",
   "iosSimulator": "iOS Simulator",
-  "physicalDevice": "Физическое Устройство"
+  "physicalDevice": "Физическое Устройство",
+  "buildStatus": "Статус Сборки",
+  "buildStatusTitle": "Статус Сборки",
+  "apkBuildStatus": "Статус Сборки APK",
+  "aabBuildStatus": "Статус Сборки AAB",
+  "iosBuildStatus": "Статус Сборки iOS",
+  "buildingApk": "Сборка APK...",
+  "buildingAab": "Сборка AAB...",
+  "buildingIos": "Сборка iOS...",
+  "checking": "Проверка...",
+  "checkStatus": "Проверить Статус",
+  "download": "Скачать",
+  "retry": "Повторить",
+  "build": "Собрать",
+  "downloadStarted": "загрузка началась!",
+  "downloadFailed": "Ошибка загрузки"
 }

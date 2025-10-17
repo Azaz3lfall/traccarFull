@@ -828,5 +828,20 @@
   "iosBuildType": "iOSビルドタイプ",
   "chooseIosBuildType": "のiOSビルドタイプを選択",
   "iosSimulator": "iOSシミュレーター",
-  "physicalDevice": "物理デバイス"
+  "physicalDevice": "物理デバイス",
+  "buildStatus": "ビルドステータス",
+  "buildStatusTitle": "ビルドステータス",
+  "apkBuildStatus": "APKビルドステータス",
+  "aabBuildStatus": "AABビルドステータス",
+  "iosBuildStatus": "iOSビルドステータス",
+  "buildingApk": "APKをビルド中...",
+  "buildingAab": "AABをビルド中...",
+  "buildingIos": "iOSをビルド中...",
+  "checking": "チェック中...",
+  "checkStatus": "ステータスをチェック",
+  "download": "ダウンロード",
+  "retry": "再試行",
+  "build": "ビルド",
+  "downloadStarted": "ダウンロード開始！",
+  "downloadFailed": "ダウンロードに失敗"
 }
