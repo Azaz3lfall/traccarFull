@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Etkin bayiler için alan adı değiştirilemez.\nBu alan mevcut bayileri düzenlerken salt okunurdur.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Rota Planlayıcı",
   "routePlannerBasic": "Temel",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Görüntü sıkıştırılamadı. Lütfen tekrar deneyin.",
   "resellerCompressingImage": "Sıkıştırılıyor...",
   "resellerImageAlreadySmall": "Bayi logosu zaten optimize edilmiş! Boyut: {size}KB",
-  "sharedNoDescription": "Açıklama yok"
+  "sharedNoDescription": "Açıklama yok",
+  "resellerFavicon": "Favicon (Kare)",
+  "resellerAppIcon": "Uygulama İkonu (1024x1024)",
+  "resellerNotificationIcon": "Bildirim İkonu (192x192)"
 }

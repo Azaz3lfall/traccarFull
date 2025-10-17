@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domeeni ei saa muuta aktiivsete edasimüüjate jaoks.\nSee väli on ainult lugemiseks olemasolevate edasimüüjate redigeerimisel.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Marsruudi Planeerija",
   "routePlannerBasic": "Põhiline",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Pildi kokku surumine ebaõnnestus. Palun proovige uuesti.",
   "resellerCompressingImage": "Kokku surutakse...",
   "resellerImageAlreadySmall": "Edasimüüja logo on juba optimeeritud! Suurus: {size}KB",
-  "sharedNoDescription": "Pole kirjeldust"
+  "sharedNoDescription": "Pole kirjeldust",
+  "resellerFavicon": "Favicon (Ruut)",
+  "resellerAppIcon": "Rakenduse ikoon (1024x1024)",
+  "resellerNotificationIcon": "Teate ikoon (192x192)"
 }

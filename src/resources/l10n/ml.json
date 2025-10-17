@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ സജീവ റീസെല്ലർമാർക്ക് ഡൊമെയ്ൻ മാറ്റാൻ കഴിയില്ല.\nനിലവിലുള്ള റീസെല്ലർമാരെ എഡിറ്റ് ചെയ്യുമ്പോൾ ഈ ഫീൽഡ് വായനയ്ക്ക് മാത്രമാണ്.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "റൂട്ട് പ്ലാനർ",
   "routePlannerBasic": "അടിസ്ഥാന",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "ചിത്രം കംപ്രസ് ചെയ്യാൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
   "resellerCompressingImage": "കംപ്രസ് ചെയ്യുന്നു...",
   "resellerImageAlreadySmall": "റീസെലർ ലോഗോ ഇതിനകം ഒപ്റ്റിമൈസ് ചെയ്തിരിക്കുന്നു! വലിപ്പം: {size}KB",
-  "sharedNoDescription": "വിവരണമില്ല"
+  "sharedNoDescription": "വിവരണമില്ല",
+  "resellerFavicon": "Favicon (സ്ക്വയർ)",
+  "resellerAppIcon": "ആപ്പ് ഐക്കൺ (1024x1024)",
+  "resellerNotificationIcon": "അറിയിപ്പ് ഐക്കൺ (192x192)"
 }

@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Voer eerst een domein in",
   "domainCheckSuccessTitle": "Domein is geldig! Wijst naar: {ipAddress}",
   "domainCheckErrorTitle": "Domeincontrole mislukt: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domein kan niet worden gewijzigd voor actieve resellers.\nDit veld is alleen-lezen bij het bewerken van bestaande resellers.",
   "routePlanner": "Routeplanner",
   "routePlannerBasic": "Basis",
   "routePlannerEnterStartAddress": "Voer startadres in...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "Afbeelding comprimeren mislukt. Probeer opnieuw.",
   "resellerCompressingImage": "Comprimeren...",
   "resellerImageAlreadySmall": "Reseller-logo is al geoptimaliseerd! Grootte: {size}KB",
-  "sharedNoDescription": "Geen beschrijving"
+  "sharedNoDescription": "Geen beschrijving",
+  "resellerFavicon": "Favicon (Vierkant)",
+  "resellerAppIcon": "App-pictogram (1024x1024)",
+  "resellerNotificationIcon": "Meldingpictogram (192x192)"
 }

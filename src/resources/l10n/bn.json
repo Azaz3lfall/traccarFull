@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ সক্রিয় রিসেলারদের জন্য ডোমেইন পরিবর্তন করা যাবে না।\nবিদ্যমান রিসেলার সম্পাদনা করার সময় এই ক্ষেত্রটি কেবল পড়ার জন্য।",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "রুট প্ল্যানার",
   "routePlannerBasic": "বেসিক",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "ছবি কম্প্রেস করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "resellerCompressingImage": "কম্প্রেস করা হচ্ছে...",
   "resellerImageAlreadySmall": "রিসেলার লোগো ইতিমধ্যে অপ্টিমাইজড! আকার: {size}KB",
-  "sharedNoDescription": "কোন বর্ণনা নেই"
+  "sharedNoDescription": "কোন বর্ণনা নেই",
+  "resellerFavicon": "ফেভিকন (বর্গাকার)",
+  "resellerAppIcon": "অ্যাপ আইকন (1024x1024)",
+  "resellerNotificationIcon": "বিজ্ঞপ্তি আইকন (192x192)"
 }

@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domena nie może być zmieniona dla aktywnych sprzedawców.\nTo pole jest tylko do odczytu podczas edytowania istniejących sprzedawców.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Planista Tras",
   "routePlannerBasic": "Podstawowy",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Nie udało się skompresować obrazu. Spróbuj ponownie.",
   "resellerCompressingImage": "Kompresja...",
   "resellerImageAlreadySmall": "Logo sprzedawcy jest już zoptymalizowany! Rozmiar: {size}KB",
-  "sharedNoDescription": "Brak opisu"
+  "sharedNoDescription": "Brak opisu",
+  "resellerFavicon": "Favicon (Kwadrat)",
+  "resellerAppIcon": "Ikona aplikacji (1024x1024)",
+  "resellerNotificationIcon": "Ikona powiadomienia (192x192)"
 }

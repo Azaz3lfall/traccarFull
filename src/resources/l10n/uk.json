@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Домен не можна змінити для активних реселлерів.\nЦе поле тільки для читання при редагуванні існуючих реселлерів.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Планувальник Маршрутів",
   "routePlannerBasic": "Базовий",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Не вдалося стиснути зображення. Спробуйте ще раз.",
   "resellerCompressingImage": "Стискання...",
   "resellerImageAlreadySmall": "Логотип реселлера вже оптимізовано! Розмір: {size}KB",
-  "sharedNoDescription": "Немає опису"
+  "sharedNoDescription": "Немає опису",
+  "resellerFavicon": "Favicon (Квадрат)",
+  "resellerAppIcon": "Іконка додатку (1024x1024)",
+  "resellerNotificationIcon": "Іконка сповіщення (192x192)"
 }

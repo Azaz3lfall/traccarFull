@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Ange en domän först",
   "domainCheckSuccessTitle": "Domänen är giltig! Pekar på: {ipAddress}",
   "domainCheckErrorTitle": "Domänkontroll misslyckades: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domänen kan inte ändras för aktiva återförsäljare.\nDetta fält är endast läsbart när du redigerar befintliga återförsäljare.",
   "routePlanner": "Ruttplanerare",
   "routePlannerBasic": "Grundläggande",
   "routePlannerEnterStartAddress": "Ange startadress...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "Kunde inte komprimera bild. Försök igen.",
   "resellerCompressingImage": "Komprimerar...",
   "resellerImageAlreadySmall": "Återförsäljare-logo är redan optimerad! Storlek: {size}KB",
-  "sharedNoDescription": "Ingen beskrivning"
+  "sharedNoDescription": "Ingen beskrivning",
+  "resellerFavicon": "Favicon (Kvadrat)",
+  "resellerAppIcon": "App-ikon (1024x1024)",
+  "resellerNotificationIcon": "Avisningsikon (192x192)"
 }

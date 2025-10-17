@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domain tidak boleh diubah untuk penjual semula yang aktif.\nMedan ini adalah baca sahaja semasa mengedit penjual semula yang sedia ada.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Perancang Laluan",
   "routePlannerBasic": "Asas",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "Gagal memampatkan imej. Sila cuba lagi.",
   "resellerCompressingImage": "Memampatkan...",
   "resellerImageAlreadySmall": "Logo penjual semula sudah dioptimumkan! Saiz: {size}KB",
-  "sharedNoDescription": "Tiada keterangan"
+  "sharedNoDescription": "Tiada keterangan",
+  "resellerFavicon": "Favicon (Segi Empat)",
+  "resellerAppIcon": "Ikon Aplikasi (1024x1024)",
+  "resellerNotificationIcon": "Ikon Pemberitahuan (192x192)"
 }

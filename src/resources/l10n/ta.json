@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ செயலில் உள்ள மறுவிற்பனையாளர்களுக்கு டொமைன் மாற்ற முடியாது.\nஇருப்பிலுள்ள மறுவிற்பனையாளர்களைத் திருத்தும்போது இந்த புலம் வாசிப்புக்கு மட்டுமே.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "வழி திட்டமிடுநர்",
   "routePlannerBasic": "அடிப்படை",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "படத்தை சுருக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
   "resellerCompressingImage": "சுருக்குகிறது...",
   "resellerImageAlreadySmall": "ரீசெல்லர் லோகோ ஏற்கனவே மேம்படுத்தப்பட்டுள்ளது! அளவு: {size}KB",
-  "sharedNoDescription": "விளக்கம் இல்லை"
+  "sharedNoDescription": "விளக்கம் இல்லை",
+  "resellerFavicon": "Favicon (சதுரம்)",
+  "resellerAppIcon": "ஆப் ஐகான் (1024x1024)",
+  "resellerNotificationIcon": "அறிவிப்பு ஐகான் (192x192)"
 }

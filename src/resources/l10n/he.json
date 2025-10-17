@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ לא ניתן לשנות דומיין עבור משווקים פעילים.\nשדה זה הוא לקריאה בלבד בעת עריכת משווקים קיימים.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "מתכנן מסלולים",
   "routePlannerBasic": "בסיסי",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "נכשל בדחיסת התמונה. אנא נסה שוב.",
   "resellerCompressingImage": "דוחס...",
   "resellerImageAlreadySmall": "לוגו המשווק כבר מותאם! גודל: {size}KB",
-  "sharedNoDescription": "אין תיאור"
+  "sharedNoDescription": "אין תיאור",
+  "resellerFavicon": "Favicon (ריבוע)",
+  "resellerAppIcon": "סמל אפליקציה (1024x1024)",
+  "resellerNotificationIcon": "סמל התראה (192x192)"
 }

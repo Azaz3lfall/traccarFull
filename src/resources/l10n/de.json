@@ -713,6 +713,7 @@
   "domainCheckEmptyError": "Bitte geben Sie zuerst eine Domain ein",
   "domainCheckSuccessTitle": "Domain ist gültig! Zeigt auf: {ipAddress}",
   "domainCheckErrorTitle": "Domain-Prüfung fehlgeschlagen: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domain kann für aktive Reseller nicht geändert werden.\nDieses Feld ist schreibgeschützt beim Bearbeiten bestehender Reseller.",
   "routePlanner": "Routenplaner",
   "routePlannerBasic": "Grundlegend",
   "routePlannerEnterStartAddress": "Startadresse eingeben...",
@@ -792,5 +793,8 @@
   "resellerImageCompressedSuccess": "Wiederverkäufer-Logo komprimiert! Von {originalSize}KB auf {compressedSize}KB reduziert",
   "resellerImageCompressionError": "Bild konnte nicht komprimiert werden. Bitte versuchen Sie es erneut.",
   "resellerCompressingImage": "Komprimiere...",
-  "resellerImageAlreadySmall": "Wiederverkäufer-Logo ist bereits optimiert! Größe: {size}KB"
+  "resellerImageAlreadySmall": "Wiederverkäufer-Logo ist bereits optimiert! Größe: {size}KB",
+  "resellerFavicon": "Favicon (Quadratisch)",
+  "resellerAppIcon": "App-Symbol (1024x1024)",
+  "resellerNotificationIcon": "Benachrichtigungssymbol (192x192)"
 }

@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Сначала введите домен",
   "domainCheckSuccessTitle": "Домен действителен! Указывает на: {ipAddress}",
   "domainCheckErrorTitle": "Ошибка проверки домена: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Домен нельзя изменить для активных реселлеров.\nЭто поле только для чтения при редактировании существующих реселлеров.",
   "routePlanner": "Планировщик Маршрутов",
   "routePlannerBasic": "Базовый",
   "routePlannerEnterStartAddress": "Введите начальный адрес...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "Не удалось сжать изображение. Попробуйте еще раз.",
   "resellerCompressingImage": "Сжатие...",
   "resellerImageAlreadySmall": "Логотип реселлера уже оптимизирован! Размер: {size}KB",
-  "sharedNoDescription": "Нет описания"
+  "sharedNoDescription": "Нет описания",
+  "resellerFavicon": "Favicon (Квадрат)",
+  "resellerAppIcon": "Иконка приложения (1024x1024)",
+  "resellerNotificationIcon": "Иконка уведомления (192x192)"
 }

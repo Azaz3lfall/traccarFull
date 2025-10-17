@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Ο τομέας δεν μπορεί να αλλάξει για ενεργούς αναπωλητές.\nΑυτό το πεδίο είναι μόνο για ανάγνωση κατά την επεξεργασία υπαρχόντων αναπωλητών.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Σχεδιαστής Διαδρομών",
   "routePlannerBasic": "Βασικό",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Αποτυχία συμπίεσης εικόνας. Παρακαλώ δοκιμάστε ξανά.",
   "resellerCompressingImage": "Συμπιέζεται...",
   "resellerImageAlreadySmall": "Το λογότυπο αναπωλητή είναι ήδη βελτιστοποιημένο! Μέγεθος: {size}KB",
-  "sharedNoDescription": "Χωρίς περιγραφή"
+  "sharedNoDescription": "Χωρίς περιγραφή",
+  "resellerFavicon": "Favicon (Τετράγωνο)",
+  "resellerAppIcon": "Εικονίδιο Εφαρμογής (1024x1024)",
+  "resellerNotificationIcon": "Εικονίδιο Ειδοποίησης (192x192)"
 }

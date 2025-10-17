@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "请先输入域名",
   "domainCheckSuccessTitle": "域名有效！指向: {ipAddress}",
   "domainCheckErrorTitle": "域名检查失败: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ 活跃经销商的域名无法更改。\n编辑现有经销商时，此字段为只读。",
   "routePlanner": "路线规划器",
   "routePlannerBasic": "基础",
   "routePlannerEnterStartAddress": "输入起始地址...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "图像压缩失败。请重试。",
   "resellerCompressingImage": "压缩中...",
   "resellerImageAlreadySmall": "经销商标志已优化！大小：{size}KB",
-  "sharedNoDescription": "无描述"
+  "sharedNoDescription": "无描述",
+  "resellerFavicon": "网站图标 (正方形)",
+  "resellerAppIcon": "应用图标 (1024x1024)",
+  "resellerNotificationIcon": "通知图标 (192x192)"
 }

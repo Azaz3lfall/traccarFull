@@ -2558,6 +2558,20 @@ const FloatingResellersPopover = ({
                                       {t('domainCheckInstruction')}
                                     </Typography>
                                   )}
+                                  {isEditMode && (
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: colors.warning || colors.textSecondary,
+                                        fontSize: '0.75rem',
+                                        mt: 0.5,
+                                        fontStyle: 'italic',
+                                        whiteSpace: 'pre-line'
+                                      }}
+                                    >
+                                      {t('domainCannotChangeActiveReseller')}
+                                    </Typography>
+                                  )}
                                   {domainCheckResult && (
                                     <Alert
                                       severity={domainCheckResult.success ? 'success' : 'error'}
@@ -2698,7 +2712,7 @@ const FloatingResellersPopover = ({
                                             <>
                                               <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
                                               <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                                                Logotype
+                                                {t('resellerLogotype')}
                                               </Typography>
                                             </>
                                           )}
@@ -2783,7 +2797,7 @@ const FloatingResellersPopover = ({
                                             <>
                                               <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
                                               <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                                                Favicon (Square)
+                                                {t('resellerFavicon')}
                                               </Typography>
                                             </>
                                           )}
@@ -2871,7 +2885,7 @@ const FloatingResellersPopover = ({
                                             <>
                                               <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
                                               <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                                                App Icon (1024x1024)
+                                                {t('resellerAppIcon')}
                                               </Typography>
                                             </>
                                           )}
@@ -2956,7 +2970,7 @@ const FloatingResellersPopover = ({
                                             <>
                                               <LuCameraOff style={{ fontSize: '48px', color: colors.textSecondary }} />
                                               <Typography variant="caption" style={{ color: colors.textSecondary, textAlign: 'center' }}>
-                                                Notification Icon (192x192)
+                                                {t('resellerNotificationIcon')}
                                               </Typography>
                                             </>
                                           )}

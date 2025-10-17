@@ -711,6 +711,7 @@
   "domainCheckEmptyError": "먼저 도메인을 입력하세요",
   "domainCheckSuccessTitle": "도메인이 유효합니다! {ipAddress}를 가리킵니다",
   "domainCheckErrorTitle": "도메인 확인 실패: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ 활성 리셀러의 도메인은 변경할 수 없습니다.\n기존 리셀러를 편집할 때 이 필드는 읽기 전용입니다.",
   "routePlanner": "경로 계획기",
   "routePlannerBasic": "기본",
   "routePlannerEnterStartAddress": "시작 주소 입력...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "이미지 압축에 실패했습니다. 다시 시도해 주세요.",
   "resellerCompressingImage": "압축 중...",
   "resellerImageAlreadySmall": "리셀러 로고가 이미 최적화되었습니다! 크기: {size}KB",
-  "sharedNoDescription": "설명 없음"
+  "sharedNoDescription": "설명 없음",
+  "resellerFavicon": "파비콘 (정사각형)",
+  "resellerAppIcon": "앱 아이콘 (1024x1024)",
+  "resellerNotificationIcon": "알림 아이콘 (192x192)"
 }

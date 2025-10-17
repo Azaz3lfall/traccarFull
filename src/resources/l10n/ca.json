@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ El domini no es pot canviar per a distribuïdors actius.\nAquest camp és només de lectura quan s'editen distribuïdors existents.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Planificador de Rutes",
   "routePlannerBasic": "Bàsic",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Error en comprimir la imatge. Si us plau, torneu-ho a intentar.",
   "resellerCompressingImage": "Comprimint...",
   "resellerImageAlreadySmall": "Logo del distribuïdor ja està optimitzat! Mida: {size}KB",
-  "sharedNoDescription": "Sense descripció"
+  "sharedNoDescription": "Sense descripció",
+  "resellerFavicon": "Favicon (Quadrat)",
+  "resellerAppIcon": "Icona de l'App (1024x1024)",
+  "resellerNotificationIcon": "Icona de Notificació (192x192)"
 }

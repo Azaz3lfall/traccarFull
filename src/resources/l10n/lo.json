@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ ໂດເມນບໍ່ສາມາດປ່ຽນໄດ້ສຳລັບຜູ້ຂາຍທີ່ມີການເຄື່ອນໄຫວ.\nຊ່ອງນີ້ແມ່ນສຳລັບອ່ານເທົ່ານັ້ນເມື່ອແກ້ໄຂຜູ້ຂາຍທີ່ມີຢູ່ແລ້ວ.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "ຜູ້ວາງແຜນທາງ",
   "routePlannerBasic": "ພື້ນຖານ",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "ບໍ່ສາມາດບີບອັດຮູບພາບໄດ້. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ.",
   "resellerCompressingImage": "ກຳລັງບີບອັດ...",
   "resellerImageAlreadySmall": "ລ໋ອກໂອຂາຍຄືນໄດ້ຖືກປັບປຸງແລ້ວ! ຂະໜາດ: {size}KB",
-  "sharedNoDescription": "ບໍ່ມີຄຳອະທິບາຍ"
+  "sharedNoDescription": "ບໍ່ມີຄຳອະທິບາຍ",
+  "resellerFavicon": "Favicon (ຮູບສີ່ແຈ)",
+  "resellerAppIcon": "ໄອຄອນແອັບ (1024x1024)",
+  "resellerNotificationIcon": "ໄອຄອນການແຈ້ງເຕືອນ (192x192)"
 }

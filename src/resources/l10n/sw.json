@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Kikoa hakiwezi kubadilishwa kwa wauzaji hai.\nSehemu hii ni ya kusoma tu wakati wa kuhariri wauzaji waliopo.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Mpangaji wa Njia",
   "routePlannerBasic": "Msingi",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "Imeshindwa kukusanya picha. Tafadhali jaribu tena.",
   "resellerCompressingImage": "Inakusanya...",
   "resellerImageAlreadySmall": "Logo ya muuzaji tayari imeboreshwa! Ukubwa: {size}KB",
-  "sharedNoDescription": "Hakuna maelezo"
+  "sharedNoDescription": "Hakuna maelezo",
+  "resellerFavicon": "Favicon (Mraba)",
+  "resellerAppIcon": "Kikonyo cha Programu (1024x1024)",
+  "resellerNotificationIcon": "Kikonyo cha Arifa (192x192)"
 }

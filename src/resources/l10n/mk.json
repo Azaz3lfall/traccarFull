@@ -707,6 +707,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Доменот не може да се промени за активни дистрибутери.\nОва поле е само за читање при уредување на постоечки дистрибутери.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Планирач на Рути",
   "routePlannerBasic": "Основен",
@@ -789,5 +790,8 @@
   "resellerImageCompressionError": "Неуспешно компресирање на сликата. Ве молиме обидете се повторно.",
   "resellerCompressingImage": "Компресирање...",
   "resellerImageAlreadySmall": "Логото на препродавачот веќе е оптимизирано! Големина: {size}KB",
-  "sharedNoDescription": "Нема опис"
+  "sharedNoDescription": "Нема опис",
+  "resellerFavicon": "Favicon (Квадрат)",
+  "resellerAppIcon": "Икона на апликацијата (1024x1024)",
+  "resellerNotificationIcon": "Икона за известување (192x192)"
 }

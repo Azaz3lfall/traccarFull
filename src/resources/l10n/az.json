@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domen aktiv satıcılar üçün dəyişdirilə bilməz.\nBu sahə mövcud satıcıları redaktə edərkən yalnız oxumaq üçündür.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Marşrut Planlayıcı",
   "routePlannerBasic": "Əsas",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Şəkli sıxmaq mümkün olmadı. Zəhmət olmasa yenidən cəhd edin.",
   "resellerCompressingImage": "Sıxılır...",
   "resellerImageAlreadySmall": "Yenidən satıcı loqosu artıq optimallaşdırılıb! Ölçü: {size}KB",
-  "sharedNoDescription": "Təsvir yoxdur"
+  "sharedNoDescription": "Təsvir yoxdur",
+  "resellerFavicon": "Favicon (Kvadrat)",
+  "resellerAppIcon": "Tətbiq İkonu (1024x1024)",
+  "resellerNotificationIcon": "Bildiriş İkonu (192x192)"
 }

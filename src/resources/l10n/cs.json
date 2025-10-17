@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Doména nelze změnit pro aktivní prodejce.\nToto pole je pouze pro čtení při úpravě existujících prodejců.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Plánovač Tras",
   "routePlannerBasic": "Základní",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Nepodařilo se komprimovat obrázek. Zkuste to prosím znovu.",
   "resellerCompressingImage": "Komprimuje se...",
   "resellerImageAlreadySmall": "Logo prodejce je již optimalizováno! Velikost: {size}KB",
-  "sharedNoDescription": "Bez popisu"
+  "sharedNoDescription": "Bez popisu",
+  "resellerFavicon": "Favicon (Čtverec)",
+  "resellerAppIcon": "Ikona aplikace (1024x1024)",
+  "resellerNotificationIcon": "Ikona oznámení (192x192)"
 }

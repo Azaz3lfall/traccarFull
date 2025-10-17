@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domene kan ikke endres for aktive forhandlere.\nDette feltet er kun for lesing når du redigerer eksisterende forhandlere.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Ruteplanlegger",
   "routePlannerBasic": "Grunnleggende",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Kunne ikke komprimere bilde. Prøv igjen.",
   "resellerCompressingImage": "Komprimerer...",
   "resellerImageAlreadySmall": "Forhandler-logo er allerede optimalisert! Størrelse: {size}KB",
-  "sharedNoDescription": "Ingen beskrivelse"
+  "sharedNoDescription": "Ingen beskrivelse",
+  "resellerFavicon": "Favicon (Firkant)",
+  "resellerAppIcon": "App-ikon (1024x1024)",
+  "resellerNotificationIcon": "Varslingsikon (192x192)"
 }

@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ A domain nem módosítható aktív viszonteladók esetében.\nEz a mező csak olvasható a meglévő viszonteladók szerkesztésekor.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Útvonaltervező",
   "routePlannerBasic": "Alapvető",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "A kép tömörítése sikertelen. Kérjük, próbálja újra.",
   "resellerCompressingImage": "Tömörítés...",
   "resellerImageAlreadySmall": "Viszonteladó logó már optimalizált! Méret: {size}KB",
-  "sharedNoDescription": "Nincs leírás"
+  "sharedNoDescription": "Nincs leírás",
+  "resellerFavicon": "Favicon (Négyzet)",
+  "resellerAppIcon": "Alkalmazás ikon (1024x1024)",
+  "resellerNotificationIcon": "Értesítés ikon (192x192)"
 }

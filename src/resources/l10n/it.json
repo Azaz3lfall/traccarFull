@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Inserisci prima un dominio",
   "domainCheckSuccessTitle": "Il dominio è valido! Punta a: {ipAddress}",
   "domainCheckErrorTitle": "Verifica del dominio fallita: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Il dominio non può essere modificato per i rivenditori attivi.\nQuesto campo è di sola lettura durante la modifica di rivenditori esistenti.",
   "routePlanner": "Pianificatore di Percorsi",
   "routePlannerBasic": "Base",
   "routePlannerEnterStartAddress": "Inserisci indirizzo di partenza...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "Impossibile comprimere l'immagine. Riprova.",
   "resellerCompressingImage": "Compressione...",
   "resellerImageAlreadySmall": "Logo rivenditore già ottimizzato! Dimensione: {size}KB",
-  "sharedNoDescription": "Nessuna descrizione"
+  "sharedNoDescription": "Nessuna descrizione",
+  "resellerFavicon": "Favicon (Quadrato)",
+  "resellerAppIcon": "Icona App (1024x1024)",
+  "resellerNotificationIcon": "Icona Notifica (192x192)"
 }

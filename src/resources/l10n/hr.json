@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domena se ne može promijeniti za aktivne preprodavače.\nOvo polje je samo za čitanje prilikom uređivanja postojećih preprodavača.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Planer Ruta",
   "routePlannerBasic": "Osnovni",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Neuspješno komprimiranje slike. Molimo pokušajte ponovno.",
   "resellerCompressingImage": "Komprimiranje...",
   "resellerImageAlreadySmall": "Logo preprodavača već je optimiziran! Veličina: {size}KB",
-  "sharedNoDescription": "Nema opisa"
+  "sharedNoDescription": "Nema opisa",
+  "resellerFavicon": "Favicon (Kvadrat)",
+  "resellerAppIcon": "Ikona aplikacije (1024x1024)",
+  "resellerNotificationIcon": "Ikona obavještenja (192x192)"
 }

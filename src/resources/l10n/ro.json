@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domeniul nu poate fi modificat pentru distribuitorii activi.\nAcest câmp este doar pentru citire la editarea distribuitorilor existenți.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Planificator de Rute",
   "routePlannerBasic": "De bază",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Eșec la comprimarea imaginii. Vă rugăm să încercați din nou.",
   "resellerCompressingImage": "Se comprimă...",
   "resellerImageAlreadySmall": "Logo-ul revânzătorului este deja optimizat! Mărimea: {size}KB",
-  "sharedNoDescription": "Fără descriere"
+  "sharedNoDescription": "Fără descriere",
+  "resellerFavicon": "Favicon (Pătrat)",
+  "resellerAppIcon": "Pictograma aplicației (1024x1024)",
+  "resellerNotificationIcon": "Pictograma notificării (192x192)"
 }

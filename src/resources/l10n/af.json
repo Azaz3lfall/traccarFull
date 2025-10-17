@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Domein kan nie vir aktiewe herverkopers verander word nie.\nHierdie veld is slegs-lees wanneer bestaande herverkopers geredigeer word.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Roete Beplanner",
   "routePlannerBasic": "Basies",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Kon nie beeld saamper nie. Probeer asseblief weer.",
   "resellerCompressingImage": "Saamper...",
   "resellerImageAlreadySmall": "Herverkoper-logo is reeds geoptimaliseer! Grootte: {size}KB",
-  "sharedNoDescription": "Geen beskrywing"
+  "sharedNoDescription": "Geen beskrywing",
+  "resellerFavicon": "Favicon (Vierkantig)",
+  "resellerAppIcon": "App-ikoon (1024x1024)",
+  "resellerNotificationIcon": "Kennisgewing-ikoon (192x192)"
 }

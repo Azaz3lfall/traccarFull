@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Tên miền không thể thay đổi cho các nhà bán lẻ đang hoạt động.\nTrường này chỉ đọc khi chỉnh sửa các nhà bán lẻ hiện có.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Lập Kế Hoạch Tuyến Đường",
   "routePlannerBasic": "Cơ Bản",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Không thể nén hình ảnh. Vui lòng thử lại.",
   "resellerCompressingImage": "Đang nén...",
   "resellerImageAlreadySmall": "Logo đại lý đã được tối ưu hóa! Kích thước: {size}KB",
-  "sharedNoDescription": "Không có mô tả"
+  "sharedNoDescription": "Không có mô tả",
+  "resellerFavicon": "Favicon (Hình vuông)",
+  "resellerAppIcon": "Biểu tượng ứng dụng (1024x1024)",
+  "resellerNotificationIcon": "Biểu tượng thông báo (192x192)"
 }

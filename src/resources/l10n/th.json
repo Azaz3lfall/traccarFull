@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ โดเมนไม่สามารถเปลี่ยนแปลงได้สำหรับผู้ขายที่ใช้งานอยู่\nฟิลด์นี้เป็นแบบอ่านอย่างเดียวเมื่อแก้ไขผู้ขายที่มีอยู่",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "ตัววางแผนเส้นทาง",
   "routePlannerBasic": "พื้นฐาน",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "การบีบอัดภาพล้มเหลว กรุณาลองใหม่อีกครั้ง",
   "resellerCompressingImage": "กำลังบีบอัด...",
   "resellerImageAlreadySmall": "โลโก้ตัวแทนจำหน่ายได้รับการปรับปรุงแล้ว! ขนาด: {size}KB",
-  "sharedNoDescription": "ไม่มีคำอธิบาย"
+  "sharedNoDescription": "ไม่มีคำอธิบาย",
+  "resellerFavicon": "Favicon (สี่เหลี่ยม)",
+  "resellerAppIcon": "ไอคอนแอป (1024x1024)",
+  "resellerNotificationIcon": "ไอคอนการแจ้งเตือน (192x192)"
 }

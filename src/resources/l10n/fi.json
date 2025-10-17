@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "Please enter a domain first",
   "domainCheckSuccessTitle": "Domain is valid! Points to: {ipAddress}",
   "domainCheckErrorTitle": "Domain check failed: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ Verkkotunnusta ei voi muuttaa aktiivisille jälleenmyyjille.\nTämä kenttä on vain luku-tilassa olemassa olevia jälleenmyyjiä muokattaessa.",
   "resellerImageRequired": "Please select a logo image for the reseller",
   "routePlanner": "Reittisuunnittelija",
   "routePlannerBasic": "Perus",
@@ -793,5 +794,8 @@
   "resellerImageCompressionError": "Kuvan pakkaaminen epäonnistui. Yritä uudelleen.",
   "resellerCompressingImage": "Pakataan...",
   "resellerImageAlreadySmall": "Uudelleenmyyjän logo on jo optimoitu! Koko: {size}KB",
-  "sharedNoDescription": "Ei kuvausta"
+  "sharedNoDescription": "Ei kuvausta",
+  "resellerFavicon": "Favicon (Neliö)",
+  "resellerAppIcon": "Sovelluksen kuvake (1024x1024)",
+  "resellerNotificationIcon": "Ilmoituskuvake (192x192)"
 }

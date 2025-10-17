@@ -712,6 +712,7 @@
   "domainCheckEmptyError": "まずドメインを入力してください",
   "domainCheckSuccessTitle": "ドメインは有効です！{ipAddress}を指しています",
   "domainCheckErrorTitle": "ドメインチェックに失敗しました: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ アクティブなリセラーではドメインを変更できません。\n既存のリセラーを編集する際、このフィールドは読み取り専用です。",
   "routePlanner": "ルートプランナー",
   "routePlannerBasic": "基本",
   "routePlannerEnterStartAddress": "開始アドレスを入力...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "画像の圧縮に失敗しました。もう一度お試しください。",
   "resellerCompressingImage": "圧縮中...",
   "resellerImageAlreadySmall": "リセラーロゴは既に最適化されています！サイズ: {size}KB",
-  "sharedNoDescription": "説明なし"
+  "sharedNoDescription": "説明なし",
+  "resellerFavicon": "ファビコン (正方形)",
+  "resellerAppIcon": "アプリアイコン (1024x1024)",
+  "resellerNotificationIcon": "通知アイコン (192x192)"
 }

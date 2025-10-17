@@ -711,6 +711,7 @@
   "domainCheckEmptyError": "कृपया पहले एक डोमेन दर्ज करें",
   "domainCheckSuccessTitle": "डोमेन वैध है! इंगित करता है: {ipAddress}",
   "domainCheckErrorTitle": "डोमेन जांच विफल: {message}",
+  "domainCannotChangeActiveReseller": "⚠️ सक्रिय रीसेलर के लिए डोमेन नहीं बदला जा सकता।\nमौजूदा रीसेलर को संपादित करते समय यह फ़ील्ड केवल पढ़ने के लिए है।",
   "routePlanner": "रूट प्लानर",
   "routePlannerBasic": "बेसिक",
   "routePlannerEnterStartAddress": "प्रारंभिक पता दर्ज करें...",
@@ -792,5 +793,8 @@
   "resellerImageCompressionError": "छवि को संपीड़ित करने में विफल। कृपया पुनः प्रयास करें।",
   "resellerCompressingImage": "संपीड़ित कर रहे हैं...",
   "resellerImageAlreadySmall": "रीसेलर लोगो पहले से ही अनुकूलित है! आकार: {size}KB",
-  "sharedNoDescription": "कोई विवरण नहीं"
+  "sharedNoDescription": "कोई विवरण नहीं",
+  "resellerFavicon": "फेविकॉन (वर्ग)",
+  "resellerAppIcon": "ऐप आइकन (1024x1024)",
+  "resellerNotificationIcon": "सूचना आइकन (192x192)"
 }
