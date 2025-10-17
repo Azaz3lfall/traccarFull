@@ -3505,20 +3505,32 @@ const FloatingResellersPopover = ({
                   id="csv-upload"
                 />
                 <label htmlFor="csv-upload">
-                  <Button
-                    variant="outlined"
-                    component="span"
-                    fullWidth
+                  <button
+                    type="button"
                     style={{
-                      borderColor: colors.border,
+                      width: '100%',
+                      padding: '10px 16px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: 'transparent',
                       color: colors.text,
-                      textTransform: 'none',
-                      justifyContent: 'flex-start',
-                      padding: '8px 16px'
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.borderColor = colors.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.borderColor = colors.border;
                     }}
                   >
                     Choose CSV File
-                  </Button>
+                  </button>
                 </label>
               </div>
 
@@ -3539,30 +3551,37 @@ const FloatingResellersPopover = ({
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setMassImporterModal({ open: false, reseller: null })}
-                  style={{
-                    borderColor: colors.border,
-                    color: colors.text
-                  }}
-                >
-                  {t('sharedCancel')}
-                </Button>
-                <Button
-                  variant="contained"
+                <button
                   onClick={() => {
                     // TODO: Implement mass import logic
                     console.log('Mass import for reseller:', massImporterModal.reseller);
                     setMassImporterModal({ open: false, reseller: null });
                   }}
                   style={{
-                    backgroundColor: colors.primary,
-                    color: colors.primaryContrast
+                    padding: '10px 20px',
+                    border: `1px solid ${colors.primary}`,
+                    borderRadius: '8px',
+                    backgroundColor: 'transparent',
+                    color: colors.primary,
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.primary;
+                    e.target.style.color = colors.primaryContrast;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = colors.primary;
                   }}
                 >
                   {t('sharedImport')}
-                </Button>
+                </button>
               </div>
             </div>
           </motion.div>
