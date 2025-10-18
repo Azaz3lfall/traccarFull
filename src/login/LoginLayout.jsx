@@ -9,7 +9,7 @@ const LoginLayout = ({ children }) => {
     <main 
       className="min-h-screen flex flex-col relative" 
       style={{
-        backgroundImage: `linear-gradient(${colors.overlay || 'rgba(15, 23, 42, 0.85)'}, ${colors.overlay || 'rgba(15, 23, 42, 0.85)'}), url(/images/truck-fleet.jpg)`,
+        backgroundImage: `linear-gradient(${colors.overlay || 'rgba(15, 23, 42, 0.85)'}, ${colors.overlay || 'rgba(15, 23, 42, 0.85)'}), url(/images/mirrored-truck-fleet.webp)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
