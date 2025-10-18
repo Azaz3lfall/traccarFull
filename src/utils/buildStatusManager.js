@@ -20,7 +20,6 @@ class BuildStatusManager {
     if (this.isRunning) return;
     
     this.isRunning = true;
-    console.log('🚀 Starting global build status polling system');
     
     // Poll every 30 seconds
     this.globalInterval = setInterval(() => {
@@ -33,7 +32,6 @@ class BuildStatusManager {
     if (!this.isRunning) return;
     
     this.isRunning = false;
-    console.log('🛑 Stopping global build status polling system');
     
     if (this.globalInterval) {
       clearInterval(this.globalInterval);
@@ -54,11 +52,9 @@ class BuildStatusManager {
       const activeBuilds = this.getActiveBuilds(buildStates);
       
       if (activeBuilds.length === 0) {
-        console.log('📊 No active builds to poll');
         return;
       }
       
-      console.log(`🔄 Polling ${activeBuilds.length} active builds:`, activeBuilds);
       
       // Poll all active builds in parallel
       const pollPromises = activeBuilds.map(build => this.pollSingleBuild(build));
@@ -93,7 +89,6 @@ class BuildStatusManager {
       // Get reseller data from localStorage or make API call
       const resellerData = await this.getResellerData(resellerId);
       if (!resellerData) {
-        console.log(`⚠️ Reseller data not found for ${resellerId}, skipping poll`);
         return;
       }
       
@@ -102,14 +97,12 @@ class BuildStatusManager {
       
       if (status.success) {
         const serverStatus = status.data.buildStatus;
-        console.log(`📊 Build status for ${key}: ${serverStatus}`);
         
         // Update localStorage with server status
         this.updateBuildStateInStorage(key, serverStatus);
         
         // If build is complete, we don't need to poll this one anymore
         if (serverStatus === 'BUILDED' || serverStatus === 'BUILD_ERROR') {
-          console.log(`✅ Build ${key} completed with status: ${serverStatus}`);
         }
       } else {
         console.error(`❌ Failed to check status for ${key}:`, status.error);
@@ -133,7 +126,6 @@ class BuildStatusManager {
       
       // If not found in localStorage, you might need to fetch from API
       // This depends on your data structure
-      console.log(`⚠️ Reseller data not found in localStorage for ${resellerId}`);
       return null;
       
     } catch (error) {
@@ -178,7 +170,6 @@ class BuildStatusManager {
       const buildStates = this.getBuildStatesFromStorage();
       buildStates[key] = state;
       localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
-      console.log(`💾 Updated build state in storage: ${key} = ${state}`);
     } catch (error) {
       console.error(`❌ Error updating build state in storage:`, error);
     }
@@ -226,14 +217,12 @@ class BuildStatusManager {
     }
     
     if (completedBuilds.length > 0) {
-      console.log(`🧹 Cleaning up completed builds:`, completedBuilds);
     }
   }
 
   // Add a build to polling (called when starting a new build)
   addBuildToPolling(resellerId, buildType) {
     const key = `${resellerId}_${buildType}`;
-    console.log(`➕ Adding build to polling: ${key}`);
     
     // The build will be picked up by the next global poll cycle
     // No need to start individual polling
@@ -242,7 +231,6 @@ class BuildStatusManager {
   // Remove a build from polling (called when build completes)
   removeBuildFromPolling(resellerId, buildType) {
     const key = `${resellerId}_${buildType}`;
-    console.log(`➖ Removing build from polling: ${key}`);
     
     // The build will be automatically excluded from future polls
     // when its status is not BUILDING or PARTIAL_BUILDED
@@ -256,7 +244,6 @@ let buildStatusManager = null;
 const getBuildStatusManager = () => {
   if (!buildStatusManager) {
     buildStatusManager = new BuildStatusManager();
-    console.log('🚀 BuildStatusManager singleton created');
   }
   return buildStatusManager;
 };

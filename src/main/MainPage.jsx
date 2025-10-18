@@ -1027,8 +1027,6 @@ const MainPage = () => {
         }
       };
 
-      console.log('Updating user with profilePhoto:', uploadResult.url);
-      console.log('Updated user data:', updatedUserData);
 
       // Save updated user data
       const response = await fetchOrThrow(`/api/users/${user.id}`, {

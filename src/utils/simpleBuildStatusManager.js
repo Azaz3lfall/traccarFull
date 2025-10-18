@@ -8,30 +8,24 @@ class SimpleBuildStatusManager {
     this.globalTimer = null;
     this.isRunning = false;
     
-    console.log('🏗️ SimpleBuildStatusManager constructor called');
     
     // Only start if not already running
     if (!window.buildStatusManagerRunning) {
-      console.log('🚀 Starting build status manager for the first time');
       this.start();
       window.buildStatusManagerRunning = true;
     } else {
-      console.log('⚠️ Build status manager already running, skipping initialization');
     }
   }
 
   start() {
     if (this.isRunning) {
-      console.log('⚠️ Build status polling already running');
       return;
     }
     
     this.isRunning = true;
-    console.log('🚀 Starting simple build status polling');
     
     // Poll every 30 seconds
     this.globalTimer = setInterval(() => {
-      console.log('⏰ Polling timer triggered');
       this.pollActiveBuilds();
     }, this.pollInterval);
     
@@ -45,7 +39,6 @@ class SimpleBuildStatusManager {
     if (!this.isRunning) return;
     
     this.isRunning = false;
-    console.log('🛑 Stopping build status polling');
     
     if (this.globalTimer) {
       clearInterval(this.globalTimer);
@@ -58,17 +51,13 @@ class SimpleBuildStatusManager {
   async pollActiveBuilds() {
     try {
       const buildStates = this.getBuildStates();
-      console.log('🔍 Current build states in polling:', buildStates);
       
       const activeBuilds = this.getActiveBuilds(buildStates);
-      console.log('🔍 Active builds found:', activeBuilds);
       
       if (activeBuilds.length === 0) {
-        console.log('📊 No active builds to poll');
         return;
       }
       
-      console.log(`🔄 Polling ${activeBuilds.length} active builds:`, activeBuilds.map(b => b.key));
       
       // Poll all active builds in parallel
       const pollPromises = activeBuilds.map(build => this.pollSingleBuild(build));
@@ -111,7 +100,6 @@ class SimpleBuildStatusManager {
       // Get reseller data from localStorage
       const resellerData = await this.getResellerData(resellerId, buildType);
       if (!resellerData) {
-        console.log(`⚠️ Reseller data not found for ${resellerId}_${buildType}`);
         return;
       }
       
@@ -120,7 +108,6 @@ class SimpleBuildStatusManager {
       
       if (status.success) {
         const serverStatus = status.data.buildStatus;
-        console.log(`📊 Build status for ${key}: ${serverStatus}`);
         
         // Update localStorage with server status
         this.updateBuildState(key, serverStatus);
@@ -147,12 +134,10 @@ class SimpleBuildStatusManager {
         const key = `${resellerId}_${buildType}`;
         const buildData = data[key];
         if (buildData && buildData.resellerData) {
-          console.log(`✅ Found reseller data for ${key}:`, buildData.resellerData);
           return buildData.resellerData;
         }
       }
       
-      console.log(`⚠️ Reseller data not found for ${resellerId}_${buildType}`);
       return null;
     } catch (error) {
       console.error(`❌ Error getting reseller data:`, error);
@@ -205,7 +190,6 @@ class SimpleBuildStatusManager {
       }
       
       localStorage.setItem('resellerBuildStates', JSON.stringify(buildStates));
-      console.log(`💾 Updated build state: ${key} = ${state}`);
       
       // Also trigger React state update
       if (window.updateReactBuildState) {
@@ -228,17 +212,14 @@ class SimpleBuildStatusManager {
 
   addBuildToPolling(resellerId, buildType) {
     const key = `${resellerId}_${buildType}`;
-    console.log(`➕ Build ${key} will be polled automatically`);
     
     // Force an immediate poll to check this build
     setTimeout(() => {
-      console.log(`🔄 Force polling build ${key}`);
       this.pollActiveBuilds();
     }, 1000);
     
     // Also force another poll after 5 seconds to catch any state changes
     setTimeout(() => {
-      console.log(`🔄 Second force polling build ${key}`);
       this.pollActiveBuilds();
     }, 5000);
   }

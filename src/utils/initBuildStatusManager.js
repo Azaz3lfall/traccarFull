@@ -6,6 +6,5 @@ import getBuildStatusManager from './buildStatusManager';
 // Initialize the singleton instance
 const buildStatusManager = getBuildStatusManager();
 
-console.log('🚀 Build Status Manager initialized');
 
 export default buildStatusManager;

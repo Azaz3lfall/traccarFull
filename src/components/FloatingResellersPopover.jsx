@@ -150,7 +150,6 @@ const FloatingResellersPopover = ({
         if (savedStates) {
           const parsedStates = JSON.parse(savedStates);
           setBuildStates(parsedStates);
-          console.log('📱 Loaded build states from localStorage:', parsedStates);
         }
       } catch (error) {
         console.error('Error loading build states from localStorage:', error);
@@ -176,7 +175,6 @@ const FloatingResellersPopover = ({
   // Expose updateBuildState globally for polling system
   useEffect(() => {
     window.updateReactBuildState = (key, state) => {
-      console.log(`🌐 Global updateReactBuildState called: ${key} = ${state}`);
       const [resellerId, buildType] = key.split('_');
       if (resellerId && buildType) {
         setBuildStates(prev => ({
@@ -214,9 +212,6 @@ const FloatingResellersPopover = ({
   // Update build state for a specific reseller and build type
   const updateBuildState = (resellerId, buildType, state, resellerData = null) => {
     const key = `${resellerId}_${buildType}`;
-    console.log(`🔄 updateBuildState called: ${key} = ${state}`);
-    console.log(`🔄 Reseller data passed:`, resellerData);
-    console.log(`🔄 Current buildStates before update:`, buildStates);
 
     setBuildStates(prev => {
       const newState = {
@@ -227,8 +222,6 @@ const FloatingResellersPopover = ({
           timestamp: new Date().toISOString()
         }
       };
-      console.log(`🔄 New build states after update:`, newState);
-      console.log(`🔄 Specific key ${key} value:`, newState[key]);
       return newState;
     });
   };
@@ -351,7 +344,6 @@ const FloatingResellersPopover = ({
         buildType: buildType // Add build type to request
       };
 
-      console.log(`🏗️ Starting ${buildType.toUpperCase()} build for reseller:`, buildData);
 
       // Show loading while waiting for API response
       setBuildLoading(prev => ({ ...prev, [buildKey]: true }));
@@ -369,7 +361,6 @@ const FloatingResellersPopover = ({
       }
 
       const result = await response.json();
-      console.log(`✅ ${buildType.toUpperCase()} build started:`, result);
 
       // Store reseller data for polling system
       const resellerDataForPolling = {
@@ -379,23 +370,18 @@ const FloatingResellersPopover = ({
       };
 
       // Update state to BUILDING after successful API call with reseller data
-      console.log(`🔄 Setting state to BUILDING for ${resellerId}_${buildType}`);
-      console.log(`🔄 Reseller data for polling:`, resellerDataForPolling);
 
       updateBuildState(resellerId, buildType, 'BUILDING', resellerDataForPolling);
 
       // Verify the state was set immediately
       const immediateState = getBuildState(resellerId, buildType);
-      console.log(`🔍 Immediate state after setting BUILDING: ${resellerId}_${buildType} = ${immediateState}`);
 
       // Verify the state was set after a delay
       setTimeout(() => {
         const currentState = getBuildState(resellerId, buildType);
-        console.log(`🔍 Delayed state after setting BUILDING: ${resellerId}_${buildType} = ${currentState}`);
 
         // Also check localStorage directly
         const localStorageState = localStorage.getItem('resellerBuildStates');
-        console.log(`🔍 localStorage state:`, localStorageState);
       }, 100);
 
       setSnackbar({
@@ -412,10 +398,8 @@ const FloatingResellersPopover = ({
       });
 
       // Clear loading state immediately after API call
-      console.log(`🔄 Clearing loading state for ${buildKey}`);
       setBuildLoading(prev => {
         const newState = { ...prev, [buildKey]: false };
-        console.log(`🔄 New loading state:`, newState);
         return newState;
       });
 
@@ -440,8 +424,6 @@ const FloatingResellersPopover = ({
     const resellerId = reseller.appUrl; // Use appUrl as unique identifier
 
     try {
-      console.log(`🔍 checkBuildStatus called with buildType:`, buildType);
-      console.log(`🔍 reseller data:`, { appUrl: reseller.appUrl, parentUserId: reseller.parentUserId, currentDomain: reseller.currentDomain });
 
       const statusUrl = resellersConfig.ENDPOINTS.BUILD_STATUS(
         reseller.appUrl,
@@ -450,12 +432,10 @@ const FloatingResellersPopover = ({
         buildType
       );
 
-      console.log(`🔍 Checking build status:`, statusUrl);
 
       const response = await fetch(statusUrl);
       const status = await response.json();
 
-      console.log(`📊 Build status response:`, status);
 
       // Use the buildStatus from the server response
       const serverBuildStatus = status.data.buildStatus;
@@ -486,7 +466,6 @@ const FloatingResellersPopover = ({
   // Download build file
   const downloadBuild = async (reseller, buildType) => {
     try {
-      console.log(`📥 Downloading ${buildType.toUpperCase()} for reseller:`, reseller);
 
       // Construct download URL (simplified - only need appUrl and buildType)
       const downloadUrl = resellersConfig.ENDPOINTS.DOWNLOAD(
@@ -494,7 +473,6 @@ const FloatingResellersPopover = ({
         buildType
       );
 
-      console.log('🌐 Download URL:', downloadUrl);
 
       // Create a temporary link element to trigger download
       const link = document.createElement('a');
@@ -530,20 +508,12 @@ const FloatingResellersPopover = ({
       // Set loading state
       setCleanLoading(prev => ({ ...prev, [cleanKey]: true }));
 
-      console.log(`🧹 Cleaning ${cleanType} for reseller:`, reseller);
-      console.log('🔗 Clean apps endpoint:', resellersConfig.ENDPOINTS.CLEAN_APPS);
-      console.log('🔍 Reseller keys:', Object.keys(reseller));
-      console.log('🔍 Reseller appUrl:', reseller.appUrl);
-      console.log('🔍 Reseller id:', reseller.id);
-      console.log('🔍 Reseller resellerId:', reseller.resellerId);
-      console.log('🔍 Reseller parentUserId:', reseller.parentUserId);
 
       const requestBody = {
         appUrl: reseller.appUrl,
         resellerId: reseller.resellerId, // Use reseller.resellerId (not reseller.id)
         cleanType: cleanType
       };
-      console.log('📤 Request body:', requestBody);
 
       const response = await fetch(resellersConfig.ENDPOINTS.CLEAN_APPS, {
         method: 'POST',
@@ -553,8 +523,6 @@ const FloatingResellersPopover = ({
         body: JSON.stringify(requestBody)
       });
 
-      console.log('📡 Response status:', response.status);
-      console.log('📡 Response ok:', response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -563,13 +531,10 @@ const FloatingResellersPopover = ({
       }
 
       const result = await response.json();
-      console.log('✅ Clean apps result:', result);
 
       // Reset build states in localStorage
       // Now that reseller.id is properly set, we can use it for build keys
       const resellerId = reseller.id;
-      console.log('🔑 Using reseller ID for build keys:', resellerId);
-      console.log('🔍 Current localStorage before reset:', localStorage.getItem('resellerBuildStates'));
 
       const buildKeysToReset = [];
       if (cleanType === 'apk' || cleanType === 'both') {
@@ -587,7 +552,6 @@ const FloatingResellersPopover = ({
         buildKeysToReset.push(`${resellerId}_ios`);
       }
 
-      console.log('🔑 Build keys to reset:', buildKeysToReset);
 
       setBuildStates(prev => {
         const newStates = { ...prev };
@@ -605,8 +569,6 @@ const FloatingResellersPopover = ({
           delete states[key];
         });
         localStorage.setItem('resellerBuildStates', JSON.stringify(states));
-        console.log('✅ localStorage updated, removed keys:', buildKeysToReset);
-        console.log('🔍 localStorage after reset:', localStorage.getItem('resellerBuildStates'));
       }
 
       setSnackbar({
@@ -783,8 +745,6 @@ const FloatingResellersPopover = ({
   };
 
   const handleLogs = async (reseller) => {
-    console.log('🔍 Opening logs for reseller:', reseller);
-    console.log('🔍 Domain:', reseller.appUrl);
 
     setSelectedReseller(reseller);
     setLogsDialog(true);
@@ -792,20 +752,15 @@ const FloatingResellersPopover = ({
     setAnchorEl(null);
 
     try {
-      console.log('🔍 Making request to', resellersConfig.ENDPOINTS.LOGS);
       const response = await fetchOrThrow(resellersConfig.ENDPOINTS.LOGS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: reseller.appUrl }),
       });
 
-      console.log('🔍 Response status:', response.status);
-      console.log('🔍 Response ok:', response.ok);
 
       if (response.ok) {
         const data = await response.json();
-        console.log('🔍 Response data:', data);
-        console.log('🔍 Logs count:', data.logs?.length || 0);
         setLogs(data.logs || []);
       } else {
         console.error(`❌ ${t('failedToFetchLogs')}, status:`, response.status);
@@ -825,7 +780,6 @@ const FloatingResellersPopover = ({
     setLogsDeleting(true);
 
     try {
-      console.log('🗑️ Deleting logs for domain:', selectedReseller.appUrl);
       const response = await fetchOrThrow(resellersConfig.ENDPOINTS.LOGS_DELETE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -833,7 +787,6 @@ const FloatingResellersPopover = ({
       });
 
       if (response.ok) {
-        console.log('🗑️ Logs deleted successfully');
         setLogs([]); // Clear the logs in the UI
         // Optionally show a success message
       } else {
@@ -3753,7 +3706,6 @@ const FloatingResellersPopover = ({
                   <button
                     onClick={() => {
                       // TODO: Implement mass import logic
-                      console.log('Mass import for reseller:', massImporterModal.reseller);
                       setMassImporterModal({ open: false, reseller: null });
                     }}
                     style={{
@@ -3867,12 +3819,10 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
   const currentState = getBuildState(reseller.appUrl, buildType);
 
   const handleCheckStatus = async () => {
-    console.log(`🔍 BuildStatusContent: handleCheckStatus called for ${reseller.appUrl}_${buildType}`);
     setIsChecking(true);
     setError(null);
     try {
       const result = await checkBuildStatus(reseller, buildType);
-      console.log(`📊 BuildStatusContent: Status check result:`, result);
       setStatusData(result.data);
     } catch (err) {
       console.error(`❌ BuildStatusContent: Error checking status:`, err);
