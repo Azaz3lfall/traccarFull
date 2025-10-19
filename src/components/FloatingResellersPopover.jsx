@@ -54,8 +54,9 @@ import {
   ShoppingCart as ShoppingCartIcon,
   Apps as AppsIcon,
   Extension as ExtensionIcon,
+  TableChart as TableChartIcon,
 } from '@mui/icons-material';
-import { BsGooglePlay, BsAndroid } from "react-icons/bs";
+import { BsGooglePlay, BsAndroid, BsFiletypeXlsx } from "react-icons/bs";
 import { LuCameraOff } from "react-icons/lu";
 import { GoArchive } from "react-icons/go";
 import resellersConfig from '../config/resellersConfig';
@@ -3647,60 +3648,51 @@ const FloatingResellersPopover = ({
                 </Typography>
 
                 <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
-                    {t('uploadCsvFile')}
-                  </Typography>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    style={{ display: 'none' }}
-                    id="csv-upload"
-                  />
-                  <label htmlFor="csv-upload">
-                    <button
-                      type="button"
-                      style={{
-                        width: '100%',
-                        padding: '10px 16px',
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: '8px',
-                        backgroundColor: colors.secondary,
-                        color: colors.text,
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        textAlign: 'left',
-                        transition: 'all 0.2s'
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '8px' }}>
+                    <Typography variant="subtitle2" style={{ color: colors.text }}>
+                      {t('uploadXlsxFile')}
+                    </Typography>
+                    <input
+                      type="file"
+                      accept=".xlsx,.xls"
+                      style={{ display: 'none' }}
+                      id="xlsx-upload"
+                      onChange={(e) => {
+                        // Handle file selection here
+                        console.log('File selected:', e.target.files[0]);
                       }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = colors.hover;
-                        e.target.style.color = colors.text;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = colors.secondary;
-                        e.target.style.color = colors.text;
-                      }}
-                    >
-{t('chooseCsvFile')}
-                    </button>
-                  </label>
+                    />
+                    <label htmlFor="xlsx-upload" style={{ cursor: 'pointer' }}>
+                      <div
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          padding: '0',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: '8px',
+                          backgroundColor: colors.secondary,
+                          color: colors.text,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                          e.target.style.color = colors.text;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = colors.secondary;
+                          e.target.style.color = colors.text;
+                        }}
+                      >
+                        <BsFiletypeXlsx style={{ fontSize: '24px', color: colors.text }} />
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
-                  <Typography variant="subtitle2" style={{ color: colors.text, marginBottom: '8px' }}>
-                    {t('enterDataManually')}
-                  </Typography>
-                  <TextField
-                    multiline
-                    rows={6}
-                    placeholder={t('csvPlaceholder')}
-                    fullWidth
-                    style={{
-                      backgroundColor: colors.surface,
-                      color: colors.text
-                    }}
-                  />
-                </div>
 
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                   <button

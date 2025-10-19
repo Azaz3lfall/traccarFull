@@ -26,7 +26,6 @@ export const compressUserAvatar = async (file) => {
 
     // Get compression statistics
     const stats = getCompressionInfo(file, compressedFile);
-    console.log('Compression stats:', stats);
 
     return compressedFile;
   } catch (error) {
