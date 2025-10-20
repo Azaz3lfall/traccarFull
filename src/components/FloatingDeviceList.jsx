@@ -1354,7 +1354,7 @@ const FloatingDeviceList = ({
 
               {/* Right pane tabs header */}
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, height: '100%', minHeight: 0 }}>
-                <div style={{ display: 'flex', gap: 0, padding: '8px', border: `1px solid ${colors.border}`, borderRadius: '8px 8px 0 0', borderBottom: 'none', backgroundColor: colors.surface }}>
+                <div style={{ display: 'flex', gap: 0, padding: '0 8px', border: `1px solid ${colors.border}`, borderRadius: '8px 8px 0 0', borderBottom: 'none', backgroundColor: colors.surface, alignItems: 'flex-end', height: '48px' }}>
                   {[
                     { key: 'groups', label: t('settingsGroups') },
                     { key: 'geofences', label: t('sharedGeofences') },
@@ -1365,13 +1365,30 @@ const FloatingDeviceList = ({
                       key={tab.key}
                       onClick={() => setSmartLinkActiveTab(tab.key)}
                       style={{
-                        padding: '8px 14px',
+                        padding: '8px 16px',
                         border: 'none',
                         background: 'transparent',
-                        color: colors.text,
+                        color: smartLinkActiveTab === tab.key ? '#1976d2' : '#666666',
                         cursor: 'pointer',
-                        borderBottom: smartLinkActiveTab === tab.key ? `2px solid ${colors.text}` : '2px solid transparent',
-                        marginRight: '8px'
+                        borderBottom: smartLinkActiveTab === tab.key ? '2px solid #1976d2' : '2px solid transparent',
+                        marginRight: '8px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        textTransform: 'none',
+                        minHeight: '40px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (smartLinkActiveTab === tab.key) {
+                          e.currentTarget.style.color = '#1976d2';
+                          e.currentTarget.style.backgroundColor = 'rgba(25, 118, 210, 0.15)';
+                        } else {
+                          e.currentTarget.style.color = '#1976d2';
+                          e.currentTarget.style.backgroundColor = 'rgba(25, 118, 210, 0.08)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = smartLinkActiveTab === tab.key ? '#1976d2' : '#666666';
+                        e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
                       {tab.label}
