@@ -1545,6 +1545,20 @@ const FloatingDeviceList = ({
                                 <InputLabel sx={{ color: colors.text, '&.Mui-focused': { color: colors.primary } }}>{t('calendarRecurrence')}</InputLabel>
                                 <Select
                                   label={t('calendarRecurrence')}
+                                  MenuProps={{
+                                    PaperProps: {
+                                      sx: {
+                                        zIndex: 10010,
+                                        backgroundColor: colors.surface,
+                                        '& .MuiMenuItem-root': {
+                                          color: colors.text,
+                                          '&:hover': {
+                                            backgroundColor: colors.primary + '15'
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }}
                                   sx={{
                                     backgroundColor: colors.secondary,
                                     '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
