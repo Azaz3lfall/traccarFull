@@ -15,6 +15,7 @@ import { useAttributePreference, usePreference } from '../common/util/preference
 import { formatStatus, formatSpeed, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { prefixString } from '../common/util/stringUtils';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -1265,7 +1266,7 @@ const FloatingDeviceList = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+                gridTemplateColumns: 'repeat(5, minmax(220px, 1fr))',
                 gap: '12px',
                 marginBottom: '16px',
                 height: 'calc(70vh - 140px)',
@@ -1283,7 +1284,8 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
-                  minWidth: 0
+                  minWidth: 0,
+                  width: '100%'
                 }}
               >
                 <div style={{
@@ -1292,7 +1294,7 @@ const FloatingDeviceList = ({
                   color: colors.text,
                   marginBottom: '8px'
                 }}>
-                  Devices
+                  {t('deviceTitle')}
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {(filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
@@ -1353,7 +1355,8 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
-                  minWidth: 0
+                  minWidth: 0,
+                  width: '100%'
                 }}
               >
                 <div style={{
@@ -1362,7 +1365,7 @@ const FloatingDeviceList = ({
                   color: colors.text,
                   marginBottom: '8px'
                 }}>
-                  Groups
+                  {t('settingsGroups')}
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {Object.values(groups)
@@ -1423,7 +1426,8 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
-                  minWidth: 0
+                  minWidth: 0,
+                  width: '100%'
                 }}
               >
                 <div style={{
@@ -1432,7 +1436,7 @@ const FloatingDeviceList = ({
                   color: colors.text,
                   marginBottom: '8px'
                 }}>
-                  Geofences
+                  {t('sharedGeofences')}
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {Object.values(geofences)
@@ -1493,7 +1497,8 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
-                  minWidth: 0
+                  minWidth: 0,
+                  width: '100%'
                 }}
               >
                 <div style={{
@@ -1502,7 +1507,7 @@ const FloatingDeviceList = ({
                   color: colors.text,
                   marginBottom: '8px'
                 }}>
-                  Notifications
+                  {t('sharedNotifications')}
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {smartLinkNotificationsLoading ? (
@@ -1541,7 +1546,7 @@ const FloatingDeviceList = ({
                               style={{ width: '14px', height: '14px', margin: 0 }}
                             />
                             <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                              {notification.type || 'Notification'}
+                              {notification.type ? t(prefixString('event', notification.type)) : t('sharedNotifications')}
                             </span>
                           </label>
                         );
@@ -1567,7 +1572,8 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
-                  minWidth: 0
+                  minWidth: 0,
+                  width: '100%'
                 }}
               >
                 <div style={{
@@ -1576,7 +1582,7 @@ const FloatingDeviceList = ({
                   color: colors.text,
                   marginBottom: '8px'
                 }}>
-                  Calendars
+                  {t('sharedCalendars')}
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {smartLinkCalendarsLoading ? (
