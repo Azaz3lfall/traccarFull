@@ -38,23 +38,6 @@ import { Check as CheckIcon } from '@mui/icons-material';
 
 dayjs.extend(relativeTime);
 
-// Custom scrollbar styles
-const scrollbarStyles = `
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #e0e0e0;
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #1976d2;
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #1565c0;
-  }
-`;
 
 const FloatingDeviceList = ({ 
   filteredDevices, 
@@ -630,7 +613,6 @@ const FloatingDeviceList = ({
   
   return (
     <>
-    <style>{scrollbarStyles}</style>
     <AnimatePresence mode="wait">
       {!(!desktop && !showOnMobile) && isVisible && (
         <motion.div
@@ -1866,9 +1848,9 @@ const FloatingDeviceList = ({
                                         marginTop: '8px',
                                         maxHeight: '300px',
                                         overflowY: 'auto',
-                                        overflowX: 'hidden'
+                                        overflowX: 'hidden',
+                                        paddingRight: '8px'
                                       }}
-                                      className="custom-scrollbar"
                                     >
                                       {smartLinkTimeRanges.periods.map((period, index) => (
                                         <div key={`period-${index}-${period.name || 'unnamed'}`} style={{ 
