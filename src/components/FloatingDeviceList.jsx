@@ -71,6 +71,8 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
+  const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
+  const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -242,7 +244,7 @@ const FloatingDeviceList = ({
     }
   }, [desktop, selectedDeviceId]);
   
-  // Load notifications when SmartLink modal opens
+  // Load notifications and calendars when SmartLink modal opens
   React.useEffect(() => {
     const loadNotifications = async () => {
       try {
@@ -256,8 +258,21 @@ const FloatingDeviceList = ({
         setSmartLinkNotificationsLoading(false);
       }
     };
+    const loadCalendars = async () => {
+      try {
+        setSmartLinkCalendarsLoading(true);
+        const res = await fetchOrThrow('/api/calendars');
+        const data = await res.json();
+        setSmartLinkCalendars(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setSmartLinkCalendars([]);
+      } finally {
+        setSmartLinkCalendarsLoading(false);
+      }
+    };
     if (showWandModal) {
       loadNotifications();
+      loadCalendars();
     }
   }, [showWandModal]);
   
@@ -1285,7 +1300,7 @@ const FloatingDeviceList = ({
                     .map((device) => {
                       const isSelected = smartLinkSelectedDeviceIds.includes(device.id);
                       return (
-                        <label
+                          <label
                           key={device.id}
                           style={{
                             display: 'flex',
@@ -1294,7 +1309,7 @@ const FloatingDeviceList = ({
                             padding: '8px',
                             borderRadius: '6px',
                             cursor: 'pointer',
-                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                              backgroundColor: 'transparent',
                             width: '100%',
                             minWidth: 0
                           }}
@@ -1364,7 +1379,7 @@ const FloatingDeviceList = ({
                             padding: '8px',
                             borderRadius: '6px',
                             cursor: 'pointer',
-                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                            backgroundColor: 'transparent',
                             width: '100%',
                             minWidth: 0
                           }}
@@ -1434,7 +1449,7 @@ const FloatingDeviceList = ({
                             padding: '8px',
                             borderRadius: '6px',
                             cursor: 'pointer',
-                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                            backgroundColor: 'transparent',
                             width: '100%',
                             minWidth: 0
                           }}
@@ -1507,7 +1522,7 @@ const FloatingDeviceList = ({
                               padding: '8px',
                               borderRadius: '6px',
                               cursor: 'pointer',
-                              backgroundColor: isSelected ? colors.secondary : 'transparent',
+                              backgroundColor: 'transparent',
                               width: '100%',
                               minWidth: 0
                             }}
@@ -1563,7 +1578,57 @@ const FloatingDeviceList = ({
                 }}>
                   Calendars
                 </div>
-                <div style={{ flex: 1, color: colors.textSecondary, fontSize: '12px' }} />
+                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+                  {smartLinkCalendarsLoading ? (
+                    <div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>
+                  ) : (
+                    smartLinkCalendars
+                      .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                      .map((calendar) => {
+                        const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
+                        return (
+                          <label
+                            key={calendar.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              backgroundColor: 'transparent',
+                              width: '100%',
+                              minWidth: 0
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                setSmartLinkSelectedCalendarIds((prev) => {
+                                  if (e.target.checked) {
+                                    return prev.includes(calendar.id) ? prev : [...prev, calendar.id];
+                                  }
+                                  return prev.filter((id) => id !== calendar.id);
+                                });
+                              }}
+                              style={{ width: '14px', height: '14px', margin: 0 }}
+                            />
+                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                              {calendar.name || 'Unnamed'}
+                            </span>
+                          </label>
+                        );
+                      })
+                  )}
+                </div>
+                <div style={{
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Selected: {smartLinkSelectedCalendarIds.length}
+                </div>
               </div>
             </div>
 
