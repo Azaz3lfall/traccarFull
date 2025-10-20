@@ -60,6 +60,7 @@ const FloatingDeviceList = ({
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   
   const [showFilters, setShowFilters] = useState(false);
+  const [showWandModal, setShowWandModal] = useState(false);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -502,6 +503,7 @@ const FloatingDeviceList = ({
   // Debug logging removed for performance
   
   return (
+    <>
     <AnimatePresence mode="wait">
       {!(!desktop && !showOnMobile) && isVisible && (
         <motion.div
@@ -660,7 +662,7 @@ const FloatingDeviceList = ({
                 justifyContent: 'center',
                 zIndex: 2
               }}
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => setShowWandModal(true)}
             >
               <PiMagicWand style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
             </button>
@@ -1151,6 +1153,104 @@ const FloatingDeviceList = ({
     </motion.div>
       )}
     </AnimatePresence>
+    
+    {/* Wand Modal - same style and animation as logout confirmation */}
+    <AnimatePresence>
+      {showWandModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000
+          }}
+          onClick={() => setShowWandModal(false)}
+        >
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '8px',
+              padding: '20px',
+              maxWidth: '420px',
+              width: '90%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{
+              margin: '0 0 16px 0',
+              color: colors.text,
+              fontSize: '16px',
+              fontWeight: 600
+            }}>
+              {t('sharedFilters')}
+            </p>
+
+            <p style={{
+              margin: '0 0 16px 0',
+              color: colors.textSecondary,
+              fontSize: '14px'
+            }}>
+              {t('sharedApplyAdvancedFilters') || 'Apply advanced filters to your device list.'}
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                onClick={() => setShowWandModal(false)}
+                style={{
+                  padding: '8px 12px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '6px',
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                {t('sharedCancel')}
+              </button>
+              <button
+                onClick={() => setShowWandModal(false)}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: '6px',
+                  backgroundColor: '#EFF6FF',
+                  color: '#1D4ED8',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#DBEAFE';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#EFF6FF';
+                }}
+              >
+                {t('sharedApply')}
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 
