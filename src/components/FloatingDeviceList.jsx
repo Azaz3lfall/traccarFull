@@ -73,11 +73,13 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
   const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('');
   const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
-  const [smartLinkTimeRangesEnabled, setSmartLinkTimeRangesEnabled] = useState(false);
-  const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState([
-    { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
-    { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
-  ]);
+  const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
+    enabled: false,
+    periods: [
+      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+    ]
+  });
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
@@ -254,6 +256,39 @@ const FloatingDeviceList = ({
     }
   }, [desktop, selectedDeviceId]);
   
+  // Helper function to get period name
+  const getPeriodName = (index) => {
+    const periodName = t('calendarPeriod');
+    return periodName && periodName !== 'calendarPeriod' ? `${periodName} ${index}` : `Period ${index}`;
+  };
+
+  // Functions to manage time range periods
+  const addPeriod = () => {
+    const newPeriodIndex = smartLinkTimeRanges.periods.length + 1;
+    const newPeriod = {
+      enabled: true,
+      name: getPeriodName(newPeriodIndex),
+      startTime: '08:00',
+      endTime: '12:00'
+    };
+    
+    setSmartLinkTimeRanges({
+      ...smartLinkTimeRanges,
+      periods: [...smartLinkTimeRanges.periods, newPeriod]
+    });
+  };
+
+  const removePeriod = (index) => {
+    if (smartLinkTimeRanges.periods.length > 1) {
+      const newPeriods = [...smartLinkTimeRanges.periods];
+      newPeriods.splice(index, 1);
+      setSmartLinkTimeRanges({
+        ...smartLinkTimeRanges,
+        periods: newPeriods
+      });
+    }
+  };
+
   // Close recurrence dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -1638,114 +1673,173 @@ const FloatingDeviceList = ({
                                 )}
                               </div>
                               
-                              {/* Time Ranges Section - Only show for WEEKLY and MONTHLY */}
-                              {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
-                                <div style={{ marginTop: '16px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                              {/* Time Ranges for Weekly Recurrence */}
+                              {smartLinkRecurrence === 'WEEKLY' && (
+                                <div style={{ marginTop: '16px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                     <input
                                       type="checkbox"
-                                      checked={smartLinkTimeRangesEnabled}
-                                      onChange={(e) => setSmartLinkTimeRangesEnabled(e.target.checked)}
+                                      checked={smartLinkTimeRanges.enabled}
+                                      onChange={(e) => {
+                                        const newTimeRanges = { ...smartLinkTimeRanges, enabled: e.target.checked };
+                                        // Ensure first period is enabled when time ranges are enabled
+                                        if (e.target.checked && newTimeRanges.periods.length > 0) {
+                                          newTimeRanges.periods[0].enabled = true;
+                                        }
+                                        setSmartLinkTimeRanges(newTimeRanges);
+                                      }}
                                       style={{ width: '16px', height: '16px' }}
                                     />
                                     <span style={{ color: colors.text, fontSize: '14px', fontWeight: '500' }}>
-                                      {t('calendarTimeRanges')}
+                                      {t('calendarByTimeRange')}
                                     </span>
                                   </div>
                                   
-                                  {smartLinkTimeRangesEnabled && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                      {smartLinkTimeRanges.map((period, index) => (
-                                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', border: `1px solid ${colors.border}`, borderRadius: '4px', backgroundColor: colors.secondary }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={period.enabled}
-                                            onChange={(e) => {
-                                              const newPeriods = [...smartLinkTimeRanges];
-                                              newPeriods[index].enabled = e.target.checked;
-                                              setSmartLinkTimeRanges(newPeriods);
-                                            }}
-                                            style={{ width: '14px', height: '14px' }}
-                                          />
-                                          <input
-                                            type="text"
-                                            value={period.name}
-                                            onChange={(e) => {
-                                              const newPeriods = [...smartLinkTimeRanges];
-                                              newPeriods[index].name = e.target.value;
-                                              setSmartLinkTimeRanges(newPeriods);
-                                            }}
-                                            style={{
-                                              flex: 1,
-                                              padding: '4px 8px',
-                                              border: `1px solid ${colors.border}`,
-                                              borderRadius: '4px',
-                                              backgroundColor: colors.surface,
-                                              color: colors.text,
-                                              fontSize: '12px'
-                                            }}
-                                            placeholder="Period name"
-                                          />
-                                          <input
-                                            type="time"
-                                            value={period.startTime}
-                                            onChange={(e) => {
-                                              const newPeriods = [...smartLinkTimeRanges];
-                                              newPeriods[index].startTime = e.target.value;
-                                              setSmartLinkTimeRanges(newPeriods);
-                                            }}
-                                            style={{
-                                              padding: '4px 8px',
-                                              border: `1px solid ${colors.border}`,
-                                              borderRadius: '4px',
-                                              backgroundColor: colors.surface,
-                                              color: colors.text,
-                                              fontSize: '12px'
-                                            }}
-                                          />
-                                          <span style={{ color: colors.textSecondary }}>-</span>
-                                          <input
-                                            type="time"
-                                            value={period.endTime}
-                                            onChange={(e) => {
-                                              const newPeriods = [...smartLinkTimeRanges];
-                                              newPeriods[index].endTime = e.target.value;
-                                              setSmartLinkTimeRanges(newPeriods);
-                                            }}
-                                            style={{
-                                              padding: '4px 8px',
-                                              border: `1px solid ${colors.border}`,
-                                              borderRadius: '4px',
-                                              backgroundColor: colors.surface,
-                                              color: colors.text,
-                                              fontSize: '12px'
-                                            }}
-                                          />
+                                  {smartLinkTimeRanges.enabled && (
+                                    <div style={{ 
+                                      marginLeft: '16px', 
+                                      marginTop: '8px',
+                                      maxHeight: '300px',
+                                      overflowY: 'auto',
+                                      overflowX: 'hidden'
+                                    }}>
+                                      {smartLinkTimeRanges.periods.map((period, index) => (
+                                        <div key={`period-${index}-${period.name || 'unnamed'}`} style={{ 
+                                          marginBottom: '16px', 
+                                          padding: '16px', 
+                                          border: `1px solid ${colors.border}`, 
+                                          borderRadius: '8px',
+                                          backgroundColor: colors.surface
+                                        }}>
+                                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                              <input
+                                                type="checkbox"
+                                                checked={period.enabled}
+                                                disabled={index === 0 && smartLinkTimeRanges.enabled}
+                                                onChange={(e) => {
+                                                  const newPeriods = [...smartLinkTimeRanges.periods];
+                                                  newPeriods[index].enabled = e.target.checked;
+                                                  setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
+                                                }}
+                                                style={{ width: '16px', height: '16px' }}
+                                              />
+                                              <span style={{ color: colors.text, fontSize: '14px', fontWeight: '500' }}>
+                                                {period.name}
+                                              </span>
+                                              {index === 0 && smartLinkTimeRanges.enabled && (
+                                                <span style={{
+                                                  padding: '2px 6px',
+                                                  fontSize: '10px',
+                                                  backgroundColor: colors.primary + '20',
+                                                  color: colors.primary,
+                                                  border: `1px solid ${colors.primary}`,
+                                                  borderRadius: '4px'
+                                                }}>
+                                                  {t('sharedRequired')}
+                                                </span>
+                                              )}
+                                            </div>
+                                            {smartLinkTimeRanges.periods.length > 1 && index > 0 && (
+                                              <button
+                                                onClick={() => removePeriod(index)}
+                                                style={{
+                                                  padding: '4px',
+                                                  border: 'none',
+                                                  backgroundColor: 'transparent',
+                                                  color: colors.error,
+                                                  cursor: 'pointer',
+                                                  borderRadius: '4px'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                  e.currentTarget.style.backgroundColor = colors.error + '20';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                              >
+                                                ✕
+                                              </button>
+                                            )}
+                                          </div>
+                                          
+                                          {period.enabled && (
+                                            <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                                              <div style={{ flex: 1 }}>
+                                                <label style={{ display: 'block', color: colors.text, fontSize: '12px', marginBottom: '4px' }}>
+                                                  {t('calendarStartTime')}
+                                                </label>
+                                                <input
+                                                  type="time"
+                                                  value={period.startTime}
+                                                  onChange={(e) => {
+                                                    const newPeriods = [...smartLinkTimeRanges.periods];
+                                                    newPeriods[index].startTime = e.target.value;
+                                                    setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
+                                                  }}
+                                                  style={{
+                                                    width: '100%',
+                                                    padding: '8px',
+                                                    border: `1px solid ${colors.border}`,
+                                                    borderRadius: '4px',
+                                                    backgroundColor: colors.secondary,
+                                                    color: colors.text,
+                                                    fontSize: '12px'
+                                                  }}
+                                                />
+                                              </div>
+                                              <div style={{ flex: 1 }}>
+                                                <label style={{ display: 'block', color: colors.text, fontSize: '12px', marginBottom: '4px' }}>
+                                                  {t('calendarEndTime')}
+                                                </label>
+                                                <input
+                                                  type="time"
+                                                  value={period.endTime}
+                                                  onChange={(e) => {
+                                                    const newPeriods = [...smartLinkTimeRanges.periods];
+                                                    newPeriods[index].endTime = e.target.value;
+                                                    setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
+                                                  }}
+                                                  style={{
+                                                    width: '100%',
+                                                    padding: '8px',
+                                                    border: `1px solid ${colors.border}`,
+                                                    borderRadius: '4px',
+                                                    backgroundColor: colors.secondary,
+                                                    color: colors.text,
+                                                    fontSize: '12px'
+                                                  }}
+                                                />
+                                              </div>
+                                            </div>
+                                          )}
                                         </div>
                                       ))}
                                       
+                                      {/* Add Period Button */}
                                       <button
-                                        onClick={() => {
-                                          const newPeriodIndex = smartLinkTimeRanges.length + 1;
-                                          setSmartLinkTimeRanges([...smartLinkTimeRanges, {
-                                            enabled: true,
-                                            name: `Period ${newPeriodIndex}`,
-                                            startTime: '08:00',
-                                            endTime: '12:00'
-                                          }]);
-                                        }}
+                                        onClick={addPeriod}
                                         style={{
-                                          padding: '8px 12px',
-                                          border: `1px solid ${colors.primary}`,
+                                          width: '100%',
+                                          padding: '12px',
+                                          border: `1px solid ${colors.border}`,
                                           borderRadius: '4px',
                                           backgroundColor: 'transparent',
-                                          color: colors.primary,
+                                          color: colors.text,
                                           cursor: 'pointer',
                                           fontSize: '12px',
                                           fontWeight: '500'
                                         }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.borderColor = colors.primary;
+                                          e.currentTarget.style.backgroundColor = colors.primary + '10';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.borderColor = colors.border;
+                                          e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
                                       >
-                                        + {t('sharedAdd')} {t('calendarPeriod')}
+                                        + {t('calendarAddPeriod')}
                                       </button>
                                     </div>
                                   )}
