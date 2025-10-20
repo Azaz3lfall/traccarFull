@@ -1883,21 +1883,30 @@ const FloatingDeviceList = ({
                                               <button
                                                 onClick={() => removePeriod(index)}
                                                 style={{
-                                                  padding: '4px',
+                                                  padding: '6px',
                                                   border: 'none',
-                                                  backgroundColor: 'transparent',
-                                                  color: colors.error,
+                                                  backgroundColor: colors.surface,
+                                                  color: colors.textSecondary,
                                                   cursor: 'pointer',
-                                                  borderRadius: '4px'
+                                                  borderRadius: '4px',
+                                                  width: '24px',
+                                                  height: '24px',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  fontSize: '14px',
+                                                  fontWeight: 'bold'
                                                 }}
                                                 onMouseEnter={(e) => {
                                                   e.currentTarget.style.backgroundColor = colors.error + '20';
+                                                  e.currentTarget.style.color = colors.error;
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                                  e.currentTarget.style.backgroundColor = colors.surface;
+                                                  e.currentTarget.style.color = colors.textSecondary;
                                                 }}
                                               >
-                                                ✕
+                                                ×
                                               </button>
                                             )}
                                           </div>
