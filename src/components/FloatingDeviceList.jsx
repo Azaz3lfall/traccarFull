@@ -27,7 +27,7 @@ import {
   ChevronDown,
   Menu
 } from 'lucide-react';
-import { VscWand } from 'react-icons/vsc';
+import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 
@@ -608,11 +608,11 @@ const FloatingDeviceList = ({
               right: '64px',
               top: '50%',
               transform: 'translateY(-50%)',
-              fontSize: '9px',
+              fontSize: '11px',
               color: colors.textSecondary,
               backgroundColor: colors.surface,
-              padding: '0 4px',
-              borderRadius: '3px',
+              padding: '3px 5px',
+              borderRadius: '6px',
               border: `1px solid ${colors.border}`,
               zIndex: 1
             }}>
@@ -662,7 +662,7 @@ const FloatingDeviceList = ({
               }}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <VscWand style={{ width: '14px', height: '14px', color: colors.textSecondary }} />
+              <PiMagicWand style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
             </button>
           </div>
         </div>
