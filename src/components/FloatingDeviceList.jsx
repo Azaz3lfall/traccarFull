@@ -25,7 +25,8 @@ import {
   Gauge,
   Check,
   ChevronDown,
-  Menu
+  Menu,
+  ChevronLeft
 } from 'lucide-react';
 import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
@@ -57,10 +58,13 @@ const FloatingDeviceList = ({
   
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
+  const geofences = useSelector((state) => state.geofences?.items || {});
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   
   const [showFilters, setShowFilters] = useState(false);
   const [showWandModal, setShowWandModal] = useState(false);
+  const [smartLinkSelectedDeviceIds, setSmartLinkSelectedDeviceIds] = useState([]);
+  const [smartLinkSelectedGeofenceIds, setSmartLinkSelectedGeofenceIds] = useState([]);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -1185,67 +1189,235 @@ const FloatingDeviceList = ({
               backgroundColor: colors.surface,
               borderRadius: '8px',
               padding: '20px',
-              maxWidth: '420px',
-              width: '90%',
+              width: '70vw',
+              height: '70vh',
+              maxWidth: '98%',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p style={{
-              margin: '0 0 16px 0',
-              color: colors.text,
-              fontSize: '16px',
-              fontWeight: 600
-            }}>
-              {t('sharedFilters')}
-            </p>
-
-            <p style={{
-              margin: '0 0 16px 0',
-              color: colors.textSecondary,
-              fontSize: '14px'
-            }}>
-              {t('sharedApplyAdvancedFilters') || 'Apply advanced filters to your device list.'}
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
               <button
                 onClick={() => setShowWandModal(false)}
+                aria-label="Close"
                 style={{
-                  padding: '8px 12px',
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '6px',
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  fontSize: '14px',
+                  width: '34px',
+                  height: '34px',
+                  background: 'none',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   cursor: 'pointer'
                 }}
               >
-                {t('sharedCancel')}
+                <ChevronLeft size={18} color={colors.text} />
               </button>
-              <button
-                onClick={() => setShowWandModal(false)}
+              <div style={{ color: colors.text }}>
+                <span style={{ fontSize: '16px', fontWeight: 600 }}>SmartLink</span>
+                <sup style={{ marginLeft: '6px', fontStyle: 'italic', color: colors.textSecondary, fontSize: '12px' }}>beta</sup>
+              </div>
+            </div>
+
+            {/* Intro text removed per request */}
+
+            {/* Four sections grid */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '12px',
+                marginBottom: '16px',
+                height: 'calc(70vh - 140px)',
+                overflow: 'auto'
+              }}
+            >
+              {/* Devices */}
+              <div
                 style={{
-                  padding: '8px 16px',
-                  border: '1px solid #BFDBFE',
-                  borderRadius: '6px',
-                  backgroundColor: '#EFF6FF',
-                  color: '#1D4ED8',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#DBEAFE';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#EFF6FF';
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.surface,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0
                 }}
               >
-                {t('sharedApply')}
-              </button>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.text,
+                  marginBottom: '8px'
+                }}>
+                  Devices
+                </div>
+                <div style={{ flex: 1, overflow: 'auto' }}>
+                  {(filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    .map((device) => {
+                      const isSelected = smartLinkSelectedDeviceIds.includes(device.id);
+                      return (
+                        <label
+                          key={device.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                            width: '100%',
+                            minWidth: 0
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              setSmartLinkSelectedDeviceIds((prev) => {
+                                if (e.target.checked) {
+                                  return prev.includes(device.id) ? prev : [...prev, device.id];
+                                }
+                                return prev.filter((id) => id !== device.id);
+                              });
+                            }}
+                            style={{ width: '14px', height: '14px', margin: 0 }}
+                          />
+                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                            {device[devicePrimary] || device.name || 'Unnamed'}
+                          </span>
+                        </label>
+                      );
+                    })}
+                </div>
+                <div style={{
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Selected: {smartLinkSelectedDeviceIds.length}
+                </div>
+              </div>
+
+              {/* Geofences */}
+              <div
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.surface,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.text,
+                  marginBottom: '8px'
+                }}>
+                  Geofences
+                </div>
+                <div style={{ flex: 1, overflow: 'auto' }}>
+                  {Object.values(geofences)
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    .map((geofence) => {
+                      const isSelected = smartLinkSelectedGeofenceIds.includes(geofence.id);
+                      return (
+                        <label
+                          key={geofence.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                            width: '100%',
+                            minWidth: 0
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              setSmartLinkSelectedGeofenceIds((prev) => {
+                                if (e.target.checked) {
+                                  return prev.includes(geofence.id) ? prev : [...prev, geofence.id];
+                                }
+                                return prev.filter((id) => id !== geofence.id);
+                              });
+                            }}
+                            style={{ width: '14px', height: '14px', margin: 0 }}
+                          />
+                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                            {geofence.name || 'Unnamed'}
+                          </span>
+                        </label>
+                      );
+                    })}
+                </div>
+                <div style={{
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Selected: {smartLinkSelectedGeofenceIds.length}
+                </div>
+              </div>
+
+              {/* Notifications */}
+              <div
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.surface,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.text,
+                  marginBottom: '8px'
+                }}>
+                  Notifications
+                </div>
+                <div style={{ flex: 1, color: colors.textSecondary, fontSize: '12px' }} />
+              </div>
+
+              {/* Calendars */}
+              <div
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.surface,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.text,
+                  marginBottom: '8px'
+                }}>
+                  Calendars
+                </div>
+                <div style={{ flex: 1, color: colors.textSecondary, fontSize: '12px' }} />
+              </div>
             </div>
+
+            {/* Footer buttons removed per request */}
           </motion.div>
         </motion.div>
       )}
