@@ -65,6 +65,9 @@ const FloatingDeviceList = ({
   const [showWandModal, setShowWandModal] = useState(false);
   const [smartLinkSelectedDeviceIds, setSmartLinkSelectedDeviceIds] = useState([]);
   const [smartLinkSelectedGeofenceIds, setSmartLinkSelectedGeofenceIds] = useState([]);
+  const [smartLinkSelectedGroupIds, setSmartLinkSelectedGroupIds] = useState([]);
+  const [smartLinkSelectedNotificationIds, setSmartLinkSelectedNotificationIds] = useState([]);
+  const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -1221,11 +1224,11 @@ const FloatingDeviceList = ({
 
             {/* Intro text removed per request */}
 
-            {/* Four sections grid */}
+            {/* Sections grid */}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
                 gap: '12px',
                 marginBottom: '16px',
                 height: 'calc(70vh - 140px)',
@@ -1300,6 +1303,76 @@ const FloatingDeviceList = ({
                   color: colors.textSecondary
                 }}>
                   Selected: {smartLinkSelectedDeviceIds.length}
+                </div>
+              </div>
+
+              {/* Groups */}
+              <div
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '8px',
+                  padding: '12px',
+                  backgroundColor: colors.surface,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0,
+                  minWidth: 0
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.text,
+                  marginBottom: '8px'
+                }}>
+                  Groups
+                </div>
+                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+                  {Object.values(groups)
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    .map((group) => {
+                      const isSelected = smartLinkSelectedGroupIds.includes(group.id);
+                      return (
+                        <label
+                          key={group.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? colors.secondary : 'transparent',
+                            width: '100%',
+                            minWidth: 0
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              setSmartLinkSelectedGroupIds((prev) => {
+                                if (e.target.checked) {
+                                  return prev.includes(group.id) ? prev : [...prev, group.id];
+                                }
+                                return prev.filter((id) => id !== group.id);
+                              });
+                            }}
+                            style={{ width: '14px', height: '14px', margin: 0 }}
+                          />
+                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                            {group.name || 'Unnamed'}
+                          </span>
+                        </label>
+                      );
+                    })}
+                </div>
+                <div style={{
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Selected: {smartLinkSelectedGroupIds.length}
                 </div>
               </div>
 
