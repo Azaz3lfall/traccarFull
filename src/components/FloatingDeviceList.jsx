@@ -1531,13 +1531,12 @@ const FloatingDeviceList = ({
                                 })
                               )}
                             </div>
-                            <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedCalendarIds.length}</div>
                           </div>
                           
                           {/* Right Column - Add Calendar Form */}
                           <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
                             <div style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '8px' }}>{t('sharedAdd')} {t('sharedCalendar')}</div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface, minHeight: 0, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface, minHeight: 0, overflowY: 'auto', overflowX: 'hidden' }}>
                               {/* Name Field */}
                               <TextField
                                 label={t('sharedName')}
@@ -1821,7 +1820,7 @@ const FloatingDeviceList = ({
                               
                               {/* Time Ranges for Weekly and Monthly Recurrence */}
                               {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
-                                <div style={{ marginTop: '16px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ marginTop: '16px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                     <input
                                       type="checkbox"
@@ -1842,15 +1841,7 @@ const FloatingDeviceList = ({
                                   </div>
                                   
                                   {smartLinkTimeRanges.enabled && (
-                                    <div 
-                                      style={{ 
-                                        flex: 1,
-                                        minHeight: 0,
-                                        overflowY: 'auto',
-                                        overflowX: 'hidden',
-                                        paddingRight: '8px'
-                                      }}
-                                    >
+                                    <div>
                                       {smartLinkTimeRanges.periods.map((period, index) => (
                                         <div key={`period-${index}-${period.name || 'unnamed'}`} style={{ 
                                           marginBottom: '16px', 
