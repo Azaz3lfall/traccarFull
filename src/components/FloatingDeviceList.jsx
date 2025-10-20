@@ -1225,11 +1225,12 @@ const FloatingDeviceList = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
                 gap: '12px',
                 marginBottom: '16px',
                 height: 'calc(70vh - 140px)',
-                overflow: 'auto'
+                overflow: 'auto',
+                width: '100%'
               }}
             >
               {/* Devices */}
@@ -1241,7 +1242,8 @@ const FloatingDeviceList = ({
                   backgroundColor: colors.surface,
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 0
+                  minHeight: 0,
+                  minWidth: 0
                 }}
               >
                 <div style={{
@@ -1252,7 +1254,7 @@ const FloatingDeviceList = ({
                 }}>
                   Devices
                 </div>
-                <div style={{ flex: 1, overflow: 'auto' }}>
+                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {(filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
                     .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
                     .map((device) => {
@@ -1310,7 +1312,8 @@ const FloatingDeviceList = ({
                   backgroundColor: colors.surface,
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 0
+                  minHeight: 0,
+                  minWidth: 0
                 }}
               >
                 <div style={{
@@ -1321,7 +1324,7 @@ const FloatingDeviceList = ({
                 }}>
                   Geofences
                 </div>
-                <div style={{ flex: 1, overflow: 'auto' }}>
+                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {Object.values(geofences)
                     .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
                     .map((geofence) => {
@@ -1379,7 +1382,8 @@ const FloatingDeviceList = ({
                   backgroundColor: colors.surface,
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 0
+                  minHeight: 0,
+                  minWidth: 0
                 }}
               >
                 <div style={{
@@ -1402,7 +1406,8 @@ const FloatingDeviceList = ({
                   backgroundColor: colors.surface,
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 0
+                  minHeight: 0,
+                  minWidth: 0
                 }}
               >
                 <div style={{
