@@ -855,5 +855,7 @@
   "buildFailed": "Құрастыру сәтсіз",
   "failedToFetchResellers": "Қайта сатушыларды алу сәтсіз",
   "failedToFetchUsers": "Пайдаланушыларды алу сәтсіз",
-  "failedToFetchLogs": "Журналдарды алу сәтсіз"
+  "failedToFetchLogs": "Журналдарды алу сәтсіз",
+  "uploadXlsxFile": "XLSX файлын жүктеу",
+  "chooseXlsxFile": "XLSX файлын таңдау"
 }

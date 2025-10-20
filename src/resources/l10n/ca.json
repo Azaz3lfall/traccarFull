@@ -859,5 +859,7 @@
   "buildFailed": "Construcció fallida",
   "failedToFetchResellers": "Error al obtenir distribuïdors",
   "failedToFetchUsers": "Error al obtenir usuaris",
-  "failedToFetchLogs": "Error al obtenir registres"
+  "failedToFetchLogs": "Error al obtenir registres",
+  "uploadXlsxFile": "Pujar fitxer XLSX",
+  "chooseXlsxFile": "Tria fitxer XLSX"
 }

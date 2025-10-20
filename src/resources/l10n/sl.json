@@ -855,5 +855,7 @@
   "buildFailed": "Gradnja neuspešna",
   "failedToFetchResellers": "Pridobivanje ponudnikov neuspešno",
   "failedToFetchUsers": "Pridobivanje uporabnikov neuspešno",
-  "failedToFetchLogs": "Pridobivanje dnevnikov neuspešno"
+  "failedToFetchLogs": "Pridobivanje dnevnikov neuspešno",
+  "uploadXlsxFile": "Naloži XLSX datoteko",
+  "chooseXlsxFile": "Izberi XLSX datoteko"
 }

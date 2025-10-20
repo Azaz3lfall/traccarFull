@@ -855,5 +855,7 @@
   "buildFailed": "ගොඩනැගීම අසමත්",
   "failedToFetchResellers": "අතරමැදි වෙළෙන්දන් ලබා ගැනීමට අසමත්",
   "failedToFetchUsers": "පරිශීලකයන් ලබා ගැනීමට අසමත්",
-  "failedToFetchLogs": "ලොග් ලබා ගැනීමට අසමත්"
+  "failedToFetchLogs": "ලොග් ලබා ගැනීමට අසමත්",
+  "uploadXlsxFile": "XLSX ගොනුව උඩුගත කරන්න",
+  "chooseXlsxFile": "XLSX ගොනුව තෝරන්න"
 }

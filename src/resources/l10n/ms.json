@@ -855,5 +855,7 @@
   "buildFailed": "Binaan gagal",
   "failedToFetchResellers": "Gagal mengambil penjual semula",
   "failedToFetchUsers": "Gagal mengambil pengguna",
-  "failedToFetchLogs": "Gagal mengambil log"
+  "failedToFetchLogs": "Gagal mengambil log",
+  "uploadXlsxFile": "Muat naik fail XLSX",
+  "chooseXlsxFile": "Pilih fail XLSX"
 }

@@ -855,5 +855,7 @@
   "buildFailed": "Ujenzi umeshindwa",
   "failedToFetchResellers": "Imeshindwa kupata wafanyabiashara",
   "failedToFetchUsers": "Imeshindwa kupata watumiaji",
-  "failedToFetchLogs": "Imeshindwa kupata logi"
+  "failedToFetchLogs": "Imeshindwa kupata logi",
+  "uploadXlsxFile": "Pakia faili XLSX",
+  "chooseXlsxFile": "Chagua faili XLSX"
 }

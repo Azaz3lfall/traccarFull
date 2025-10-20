@@ -855,5 +855,7 @@
   "buildFailed": "Qurish muvaffaqiyatsiz",
   "failedToFetchResellers": "Qayta sotuvchilarni olish muvaffaqiyatsiz",
   "failedToFetchUsers": "Foydalanuvchilarni olish muvaffaqiyatsiz",
-  "failedToFetchLogs": "Jurnallarni olish muvaffaqiyatsiz"
+  "failedToFetchLogs": "Jurnallarni olish muvaffaqiyatsiz",
+  "uploadXlsxFile": "XLSX faylini yuklash",
+  "chooseXlsxFile": "XLSX faylini tanlash"
 }

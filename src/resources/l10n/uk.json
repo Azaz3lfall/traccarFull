@@ -859,5 +859,7 @@
   "buildFailed": "Збірка не вдалася",
   "failedToFetchResellers": "Не вдалося отримати реселлерів",
   "failedToFetchUsers": "Не вдалося отримати користувачів",
-  "failedToFetchLogs": "Не вдалося отримати логи"
+  "failedToFetchLogs": "Не вдалося отримати логи",
+  "uploadXlsxFile": "Завантажити файл XLSX",
+  "chooseXlsxFile": "Вибрати файл XLSX"
 }

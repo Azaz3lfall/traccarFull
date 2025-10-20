@@ -855,5 +855,7 @@
   "buildFailed": "Kompiliavimas nepavyko",
   "failedToFetchResellers": "Nepavyko gauti pardavėjų",
   "failedToFetchUsers": "Nepavyko gauti vartotojų",
-  "failedToFetchLogs": "Nepavyko gauti žurnalų"
+  "failedToFetchLogs": "Nepavyko gauti žurnalų",
+  "uploadXlsxFile": "Įkelti XLSX failą",
+  "chooseXlsxFile": "Pasirinkti XLSX failą"
 }

@@ -855,5 +855,7 @@
   "buildFailed": "Gurmak mümkin bolmady",
   "failedToFetchResellers": "Dükanlary almak mümkin bolmady",
   "failedToFetchUsers": "Ulanyjylary almak mümkin bolmady",
-  "failedToFetchLogs": "Loglary almak mümkin bolmady"
+  "failedToFetchLogs": "Loglary almak mümkin bolmady",
+  "uploadXlsxFile": "XLSX faýly ýükle",
+  "chooseXlsxFile": "XLSX faýly saýla"
 }

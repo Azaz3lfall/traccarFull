@@ -858,5 +858,7 @@
   "buildFailed": "Bygge misslyckades",
   "failedToFetchResellers": "Misslyckades att hämta återförsäljare",
   "failedToFetchUsers": "Misslyckades att hämta användare",
-  "failedToFetchLogs": "Misslyckades att hämta loggar"
+  "failedToFetchLogs": "Misslyckades att hämta loggar",
+  "uploadXlsxFile": "Ladda upp XLSX-fil",
+  "chooseXlsxFile": "Välj XLSX-fil"
 }

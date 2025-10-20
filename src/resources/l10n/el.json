@@ -859,5 +859,7 @@
   "buildFailed": "Η κατασκευή απέτυχε",
   "failedToFetchResellers": "Αποτυχία λήψης μεταπωλητών",
   "failedToFetchUsers": "Αποτυχία λήψης χρηστών",
-  "failedToFetchLogs": "Αποτυχία λήψης καταγραφών"
+  "failedToFetchLogs": "Αποτυχία λήψης καταγραφών",
+  "uploadXlsxFile": "Ανέβασμα αρχείου XLSX",
+  "chooseXlsxFile": "Επιλογή αρχείου XLSX"
 }

@@ -858,5 +858,7 @@
   "buildFailed": "فشل البناء",
   "failedToFetchResellers": "فشل في جلب الموزعين",
   "failedToFetchUsers": "فشل في جلب المستخدمين",
-  "failedToFetchLogs": "فشل في جلب السجلات"
+  "failedToFetchLogs": "فشل في جلب السجلات",
+  "uploadXlsxFile": "رفع ملف XLSX",
+  "chooseXlsxFile": "اختر ملف XLSX"
 }

@@ -858,5 +858,7 @@
   "buildFailed": "Build fallito",
   "failedToFetchResellers": "Recupero rivenditori fallito",
   "failedToFetchUsers": "Recupero utenti fallito",
-  "failedToFetchLogs": "Recupero log fallito"
+  "failedToFetchLogs": "Recupero log fallito",
+  "uploadXlsxFile": "Carica file XLSX",
+  "chooseXlsxFile": "Scegli file XLSX"
 }

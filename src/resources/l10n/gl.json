@@ -855,5 +855,7 @@
   "buildFailed": "Construción fallida",
   "failedToFetchResellers": "Erro ao obter revendedores",
   "failedToFetchUsers": "Erro ao obter usuarios",
-  "failedToFetchLogs": "Erro ao obter rexistros"
+  "failedToFetchLogs": "Erro ao obter rexistros",
+  "uploadXlsxFile": "Subir ficheiro XLSX",
+  "chooseXlsxFile": "Escoller ficheiro XLSX"
 }

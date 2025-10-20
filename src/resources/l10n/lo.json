@@ -855,5 +855,7 @@
   "buildFailed": "ການສ້າງລົ້ມເຫລວ",
   "failedToFetchResellers": "ການດຶງຜູ້ຂາຍປະຈຳລົ້ມເຫລວ",
   "failedToFetchUsers": "ການດຶງຜູ້ໃຊ້ລົ້ມເຫລວ",
-  "failedToFetchLogs": "ການດຶງບັນທຶກລົ້ມເຫລວ"
+  "failedToFetchLogs": "ການດຶງບັນທຶກລົ້ມເຫລວ",
+  "uploadXlsxFile": "ອັບໂລດໄຟລ໌ XLSX",
+  "chooseXlsxFile": "ເລືອກໄຟລ໌ XLSX"
 }

@@ -855,5 +855,7 @@
   "buildFailed": "Izveide neizdevās",
   "failedToFetchResellers": "Neizdevās iegūt pārdevējus",
   "failedToFetchUsers": "Neizdevās iegūt lietotājus",
-  "failedToFetchLogs": "Neizdevās iegūt žurnālus"
+  "failedToFetchLogs": "Neizdevās iegūt žurnālus",
+  "uploadXlsxFile": "Augšupielādēt XLSX failu",
+  "chooseXlsxFile": "Izvēlēties XLSX failu"
 }

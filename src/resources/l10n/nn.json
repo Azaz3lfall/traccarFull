@@ -855,5 +855,7 @@
   "buildFailed": "Bygging mislukkast",
   "failedToFetchResellers": "Kunne ikkje hente forhandlarar",
   "failedToFetchUsers": "Kunne ikkje hente brukarar",
-  "failedToFetchLogs": "Kunne ikkje hente loggar"
+  "failedToFetchLogs": "Kunne ikkje hente loggar",
+  "uploadXlsxFile": "Last opp XLSX-fil",
+  "chooseXlsxFile": "Vel XLSX-fil"
 }

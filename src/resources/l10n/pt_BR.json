@@ -861,5 +861,7 @@
   "buildFailed": "Build falhado",
   "failedToFetchResellers": "Falha ao buscar revendedores",
   "failedToFetchUsers": "Falha ao buscar usuários",
-  "failedToFetchLogs": "Falha ao buscar logs"
+  "failedToFetchLogs": "Falha ao buscar logs",
+  "uploadXlsxFile": "Fazer upload do arquivo XLSX",
+  "chooseXlsxFile": "Escolher arquivo XLSX"
 }

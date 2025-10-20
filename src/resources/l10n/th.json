@@ -859,5 +859,7 @@
   "buildFailed": "การสร้างล้มเหลว",
   "failedToFetchResellers": "ดึงข้อมูลผู้จำหน่ายล้มเหลว",
   "failedToFetchUsers": "ดึงข้อมูลผู้ใช้ล้มเหลว",
-  "failedToFetchLogs": "ดึงข้อมูลบันทึกล้มเหลว"
+  "failedToFetchLogs": "ดึงข้อมูลบันทึกล้มเหลว",
+  "uploadXlsxFile": "อัปโหลดไฟล์ XLSX",
+  "chooseXlsxFile": "เลือกไฟล์ XLSX"
 }

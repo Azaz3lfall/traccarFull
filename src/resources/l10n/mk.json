@@ -855,5 +855,7 @@
   "buildFailed": "Градбата неуспешна",
   "failedToFetchResellers": "Неуспешно преземање на препродавачи",
   "failedToFetchUsers": "Неуспешно преземање на корисници",
-  "failedToFetchLogs": "Неуспешно преземање на логови"
+  "failedToFetchLogs": "Неуспешно преземање на логови",
+  "uploadXlsxFile": "Прикачи XLSX датотека",
+  "chooseXlsxFile": "Избери XLSX датотека"
 }

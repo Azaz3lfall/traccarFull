@@ -859,5 +859,7 @@
   "buildFailed": "Koostamine ebaõnnestus",
   "failedToFetchResellers": "Edasimüüjate laadimine ebaõnnestus",
   "failedToFetchUsers": "Kasutajate laadimine ebaõnnestus",
-  "failedToFetchLogs": "Logide laadimine ebaõnnestus"
+  "failedToFetchLogs": "Logide laadimine ebaõnnestus",
+  "uploadXlsxFile": "Laadi üles XLSX fail",
+  "chooseXlsxFile": "Vali XLSX fail"
 }

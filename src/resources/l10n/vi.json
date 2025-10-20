@@ -859,5 +859,7 @@
   "buildFailed": "Xây dựng thất bại",
   "failedToFetchResellers": "Không thể lấy nhà phân phối",
   "failedToFetchUsers": "Không thể lấy người dùng",
-  "failedToFetchLogs": "Không thể lấy nhật ký"
+  "failedToFetchLogs": "Không thể lấy nhật ký",
+  "uploadXlsxFile": "Tải lên tệp XLSX",
+  "chooseXlsxFile": "Chọn tệp XLSX"
 }

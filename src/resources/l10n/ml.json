@@ -855,5 +855,7 @@
   "buildFailed": "ബിൽഡ് പരാജയപ്പെട്ടു",
   "failedToFetchResellers": "റീസെല്ലറുകളെ എടുക്കാൻ പരാജയപ്പെട്ടു",
   "failedToFetchUsers": "ഉപയോക്താക്കളെ എടുക്കാൻ പരാജയപ്പെട്ടു",
-  "failedToFetchLogs": "ലോഗുകൾ എടുക്കാൻ പരാജയപ്പെട്ടു"
+  "failedToFetchLogs": "ലോഗുകൾ എടുക്കാൻ പരാജയപ്പെട്ടു",
+  "uploadXlsxFile": "XLSX ഫയൽ അപ്‌ലോഡ് ചെയ്യുക",
+  "chooseXlsxFile": "XLSX ഫയൽ തിരഞ്ഞെടുക്കുക"
 }

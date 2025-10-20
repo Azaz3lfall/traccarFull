@@ -859,5 +859,7 @@
   "buildFailed": "הבנייה נכשלה",
   "failedToFetchResellers": "נכשל בקבלת משווקים",
   "failedToFetchUsers": "נכשל בקבלת משתמשים",
-  "failedToFetchLogs": "נכשל בקבלת לוגים"
+  "failedToFetchLogs": "נכשל בקבלת לוגים",
+  "uploadXlsxFile": "העלה קובץ XLSX",
+  "chooseXlsxFile": "בחר קובץ XLSX"
 }

@@ -858,5 +858,7 @@
   "buildFailed": "Bouwen mislukt",
   "failedToFetchResellers": "Ophalen van wederverkopers mislukt",
   "failedToFetchUsers": "Ophalen van gebruikers mislukt",
-  "failedToFetchLogs": "Ophalen van logs mislukt"
+  "failedToFetchLogs": "Ophalen van logs mislukt",
+  "uploadXlsxFile": "XLSX-bestand uploaden",
+  "chooseXlsxFile": "XLSX-bestand kiezen"
 }

@@ -859,5 +859,7 @@
   "buildFailed": "Izgradnja neuspješna",
   "failedToFetchResellers": "Neuspješno dohvaćanje preprodavača",
   "failedToFetchUsers": "Neuspješno dohvaćanje korisnika",
-  "failedToFetchLogs": "Neuspješno dohvaćanje zapisa"
+  "failedToFetchLogs": "Neuspješno dohvaćanje zapisa",
+  "uploadXlsxFile": "Učitaj XLSX datoteku",
+  "chooseXlsxFile": "Odaberi XLSX datoteku"
 }

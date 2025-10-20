@@ -859,5 +859,7 @@
   "buildFailed": "Bou het misluk",
   "failedToFetchResellers": "Kon nie herverkopers haal nie",
   "failedToFetchUsers": "Kon nie gebruikers haal nie",
-  "failedToFetchLogs": "Kon nie logs haal nie"
+  "failedToFetchLogs": "Kon nie logs haal nie",
+  "uploadXlsxFile": "Laai XLSX-lêer op",
+  "chooseXlsxFile": "Kies XLSX-lêer"
 }

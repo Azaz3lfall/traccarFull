@@ -858,5 +858,7 @@
   "buildFailed": "빌드 실패",
   "failedToFetchResellers": "리셀러 가져오기 실패",
   "failedToFetchUsers": "사용자 가져오기 실패",
-  "failedToFetchLogs": "로그 가져오기 실패"
+  "failedToFetchLogs": "로그 가져오기 실패",
+  "uploadXlsxFile": "XLSX 파일 업로드",
+  "chooseXlsxFile": "XLSX 파일 선택"
 }

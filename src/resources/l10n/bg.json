@@ -859,5 +859,7 @@
   "buildFailed": "Сборката неуспешна",
   "failedToFetchResellers": "Неуспешно извличане на дистрибутори",
   "failedToFetchUsers": "Неуспешно извличане на потребители",
-  "failedToFetchLogs": "Неуспешно извличане на логове"
+  "failedToFetchLogs": "Неуспешно извличане на логове",
+  "uploadXlsxFile": "Качване на XLSX файл",
+  "chooseXlsxFile": "Избор на XLSX файл"
 }

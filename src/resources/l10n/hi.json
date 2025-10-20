@@ -858,5 +858,7 @@
   "buildFailed": "बिल्ड विफल",
   "failedToFetchResellers": "रिसेलर प्राप्त करने में विफल",
   "failedToFetchUsers": "उपयोगकर्ता प्राप्त करने में विफल",
-  "failedToFetchLogs": "लॉग प्राप्त करने में विफल"
+  "failedToFetchLogs": "लॉग प्राप्त करने में विफल",
+  "uploadXlsxFile": "XLSX फ़ाइल अपलोड करें",
+  "chooseXlsxFile": "XLSX फ़ाइल चुनें"
 }

@@ -855,5 +855,7 @@
   "buildFailed": "Ndërtimi dështoi",
   "failedToFetchResellers": "Dështoi në marrjen e rishitësve",
   "failedToFetchUsers": "Dështoi në marrjen e përdoruesve",
-  "failedToFetchLogs": "Dështoi në marrjen e regjistrave"
+  "failedToFetchLogs": "Dështoi në marrjen e regjistrave",
+  "uploadXlsxFile": "Ngarko skedar XLSX",
+  "chooseXlsxFile": "Zgjidh skedar XLSX"
 }

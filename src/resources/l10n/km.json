@@ -855,5 +855,7 @@
   "buildFailed": "ការបង្កើតបរាជ័យ",
   "failedToFetchResellers": "ការទាញយកអ្នកលក់រាយបរាជ័យ",
   "failedToFetchUsers": "ការទាញយកអ្នកប្រើប្រាស់បរាជ័យ",
-  "failedToFetchLogs": "ការទាញយកកំណត់ហេតុបរាជ័យ"
+  "failedToFetchLogs": "ការទាញយកកំណត់ហេតុបរាជ័យ",
+  "uploadXlsxFile": "ផ្ទុកឡើងឯកសារ XLSX",
+  "chooseXlsxFile": "ជ្រើសរើសឯកសារ XLSX"
 }

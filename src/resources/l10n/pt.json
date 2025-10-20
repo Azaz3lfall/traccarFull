@@ -859,5 +859,7 @@
   "buildFailed": "Construção falhada",
   "failedToFetchResellers": "Falha ao buscar revendedores",
   "failedToFetchUsers": "Falha ao buscar utilizadores",
-  "failedToFetchLogs": "Falha ao buscar registos"
+  "failedToFetchLogs": "Falha ao buscar registos",
+  "uploadXlsxFile": "Carregar ficheiro XLSX",
+  "chooseXlsxFile": "Escolher ficheiro XLSX"
 }

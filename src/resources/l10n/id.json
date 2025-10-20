@@ -859,5 +859,7 @@
   "buildFailed": "Build gagal",
   "failedToFetchResellers": "Gagal mengambil reseller",
   "failedToFetchUsers": "Gagal mengambil pengguna",
-  "failedToFetchLogs": "Gagal mengambil log"
+  "failedToFetchLogs": "Gagal mengambil log",
+  "uploadXlsxFile": "Unggah file XLSX",
+  "chooseXlsxFile": "Pilih file XLSX"
 }

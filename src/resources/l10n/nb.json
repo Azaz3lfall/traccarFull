@@ -859,5 +859,7 @@
   "buildFailed": "Bygging mislyktes",
   "failedToFetchResellers": "Kunne ikke hente forhandlere",
   "failedToFetchUsers": "Kunne ikke hente brukere",
-  "failedToFetchLogs": "Kunne ikke hente logger"
+  "failedToFetchLogs": "Kunne ikke hente logger",
+  "uploadXlsxFile": "Last opp XLSX-fil",
+  "chooseXlsxFile": "Velg XLSX-fil"
 }

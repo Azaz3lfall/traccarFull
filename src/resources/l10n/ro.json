@@ -859,5 +859,7 @@
   "buildFailed": "Construcția a eșuat",
   "failedToFetchResellers": "Eșec la preluarea revânzătorilor",
   "failedToFetchUsers": "Eșec la preluarea utilizatorilor",
-  "failedToFetchLogs": "Eșec la preluarea jurnalelor"
+  "failedToFetchLogs": "Eșec la preluarea jurnalelor",
+  "uploadXlsxFile": "Încarcă fișier XLSX",
+  "chooseXlsxFile": "Alege fișier XLSX"
 }

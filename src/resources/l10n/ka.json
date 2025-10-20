@@ -855,5 +855,7 @@
   "buildFailed": "შექმნა ვერ მოხერხდა",
   "failedToFetchResellers": "გადამყიდველების მიღება ვერ მოხერხდა",
   "failedToFetchUsers": "მომხმარებლების მიღება ვერ მოხერხდა",
-  "failedToFetchLogs": "ლოგების მიღება ვერ მოხერხდა"
+  "failedToFetchLogs": "ლოგების მიღება ვერ მოხერხდა",
+  "uploadXlsxFile": "XLSX ფაილის ატვირთვა",
+  "chooseXlsxFile": "XLSX ფაილის არჩევა"
 }

@@ -859,5 +859,7 @@
   "buildFailed": "Derleme başarısız",
   "failedToFetchResellers": "Bayiler getirilemedi",
   "failedToFetchUsers": "Kullanıcılar getirilemedi",
-  "failedToFetchLogs": "Günlükler getirilemedi"
+  "failedToFetchLogs": "Günlükler getirilemedi",
+  "uploadXlsxFile": "XLSX dosyası yükle",
+  "chooseXlsxFile": "XLSX dosyası seç"
 }

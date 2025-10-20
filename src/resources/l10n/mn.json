@@ -855,5 +855,7 @@
   "buildFailed": "Бүтээх амжилтгүй",
   "failedToFetchResellers": "Дахин борлуулагч авах амжилтгүй",
   "failedToFetchUsers": "Хэрэглэгч авах амжилтгүй",
-  "failedToFetchLogs": "Бүртгэл авах амжилтгүй"
+  "failedToFetchLogs": "Бүртгэл авах амжилтгүй",
+  "uploadXlsxFile": "XLSX файл байршуулах",
+  "chooseXlsxFile": "XLSX файл сонгох"
 }

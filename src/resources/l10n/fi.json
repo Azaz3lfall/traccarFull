@@ -859,5 +859,7 @@
   "buildFailed": "Kokoaminen epäonnistui",
   "failedToFetchResellers": "Jälleenmyyjien haku epäonnistui",
   "failedToFetchUsers": "Käyttäjien haku epäonnistui",
-  "failedToFetchLogs": "Lokien haku epäonnistui"
+  "failedToFetchLogs": "Lokien haku epäonnistui",
+  "uploadXlsxFile": "Lataa XLSX-tiedosto",
+  "chooseXlsxFile": "Valitse XLSX-tiedosto"
 }

@@ -855,5 +855,7 @@
   "buildFailed": "Sestavenie sa nepodarilo",
   "failedToFetchResellers": "Nepodarilo sa načítať predajcov",
   "failedToFetchUsers": "Nepodarilo sa načítať používateľov",
-  "failedToFetchLogs": "Nepodarilo sa načítať protokoly"
+  "failedToFetchLogs": "Nepodarilo sa načítať protokoly",
+  "uploadXlsxFile": "Nahrať XLSX súbor",
+  "chooseXlsxFile": "Vybrať XLSX súbor"
 }

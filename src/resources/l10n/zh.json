@@ -858,5 +858,7 @@
   "buildFailed": "构建失败",
   "failedToFetchResellers": "获取经销商失败",
   "failedToFetchUsers": "获取用户失败",
-  "failedToFetchLogs": "获取日志失败"
+  "failedToFetchLogs": "获取日志失败",
+  "uploadXlsxFile": "上传 XLSX 文件",
+  "chooseXlsxFile": "选择 XLSX 文件"
 }

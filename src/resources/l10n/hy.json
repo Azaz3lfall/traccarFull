@@ -855,5 +855,7 @@
   "buildFailed": "Կառուցումը ձախողվեց",
   "failedToFetchResellers": "Վերավաճառողների ստացումը ձախողվեց",
   "failedToFetchUsers": "Օգտատերերի ստացումը ձախողվեց",
-  "failedToFetchLogs": "Գրանցումների ստացումը ձախողվեց"
+  "failedToFetchLogs": "Գրանցումների ստացումը ձախողվեց",
+  "uploadXlsxFile": "Վերբեռնել XLSX ֆայլ",
+  "chooseXlsxFile": "Ընտրել XLSX ֆայլ"
 }

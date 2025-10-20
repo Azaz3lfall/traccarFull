@@ -859,5 +859,7 @@
   "buildFailed": "Budowanie nieudane",
   "failedToFetchResellers": "Nie udało się pobrać sprzedawców",
   "failedToFetchUsers": "Nie udało się pobrać użytkowników",
-  "failedToFetchLogs": "Nie udało się pobrać logów"
+  "failedToFetchLogs": "Nie udało się pobrać logów",
+  "uploadXlsxFile": "Prześlij plik XLSX",
+  "chooseXlsxFile": "Wybierz plik XLSX"
 }

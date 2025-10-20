@@ -858,5 +858,7 @@
   "buildFailed": "ビルドに失敗しました",
   "failedToFetchResellers": "リセラーの取得に失敗しました",
   "failedToFetchUsers": "ユーザーの取得に失敗しました",
-  "failedToFetchLogs": "ログの取得に失敗しました"
+  "failedToFetchLogs": "ログの取得に失敗しました",
+  "uploadXlsxFile": "XLSXファイルをアップロード",
+  "chooseXlsxFile": "XLSXファイルを選択"
 }

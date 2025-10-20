@@ -855,5 +855,7 @@
   "buildFailed": "ساخت ناموفق",
   "failedToFetchResellers": "دریافت فروشندگان ناموفق",
   "failedToFetchUsers": "دریافت کاربران ناموفق",
-  "failedToFetchLogs": "دریافت لاگ‌ها ناموفق"
+  "failedToFetchLogs": "دریافت لاگ‌ها ناموفق",
+  "uploadXlsxFile": "آپلود فایل XLSX",
+  "chooseXlsxFile": "انتخاب فایل XLSX"
 }
