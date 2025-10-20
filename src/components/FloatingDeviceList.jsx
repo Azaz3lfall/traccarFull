@@ -14,6 +14,7 @@ import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { formatStatus, formatSpeed, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
+import fetchOrThrow from '../common/util/fetchOrThrow';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -68,6 +69,8 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedGroupIds, setSmartLinkSelectedGroupIds] = useState([]);
   const [smartLinkSelectedNotificationIds, setSmartLinkSelectedNotificationIds] = useState([]);
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
+  const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
+  const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -238,6 +241,25 @@ const FloatingDeviceList = ({
       setKeyword('');
     }
   }, [desktop, selectedDeviceId]);
+  
+  // Load notifications when SmartLink modal opens
+  React.useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        setSmartLinkNotificationsLoading(true);
+        const res = await fetchOrThrow('/api/notifications');
+        const data = await res.json();
+        setSmartLinkNotifications(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setSmartLinkNotifications([]);
+      } finally {
+        setSmartLinkNotificationsLoading(false);
+      }
+    };
+    if (showWandModal) {
+      loadNotifications();
+    }
+  }, [showWandModal]);
   
 
   // Optimized device row component for virtualized rendering
@@ -1467,7 +1489,57 @@ const FloatingDeviceList = ({
                 }}>
                   Notifications
                 </div>
-                <div style={{ flex: 1, color: colors.textSecondary, fontSize: '12px' }} />
+                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+                  {smartLinkNotificationsLoading ? (
+                    <div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>
+                  ) : (
+                    smartLinkNotifications
+                      .sort((a, b) => (a.type || '').localeCompare(b.type || ''))
+                      .map((notification) => {
+                        const isSelected = smartLinkSelectedNotificationIds.includes(notification.id);
+                        return (
+                          <label
+                            key={notification.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              backgroundColor: isSelected ? colors.secondary : 'transparent',
+                              width: '100%',
+                              minWidth: 0
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                setSmartLinkSelectedNotificationIds((prev) => {
+                                  if (e.target.checked) {
+                                    return prev.includes(notification.id) ? prev : [...prev, notification.id];
+                                  }
+                                  return prev.filter((id) => id !== notification.id);
+                                });
+                              }}
+                              style={{ width: '14px', height: '14px', margin: 0 }}
+                            />
+                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                              {notification.type || 'Notification'}
+                            </span>
+                          </label>
+                        );
+                      })
+                  )}
+                </div>
+                <div style={{
+                  marginTop: '8px',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Selected: {smartLinkSelectedNotificationIds.length}
+                </div>
               </div>
 
               {/* Calendars */}
