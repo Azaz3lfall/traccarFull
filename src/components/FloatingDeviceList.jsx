@@ -1548,7 +1548,7 @@ const FloatingDeviceList = ({
                                   MenuProps={{
                                     PaperProps: {
                                       sx: {
-                                        zIndex: 10010,
+                                        zIndex: 10020,
                                         backgroundColor: colors.surface,
                                         '& .MuiMenuItem-root': {
                                           color: colors.text,
@@ -1557,7 +1557,9 @@ const FloatingDeviceList = ({
                                           }
                                         }
                                       }
-                                    }
+                                    },
+                                    disablePortal: false,
+                                    container: document.body
                                   }}
                                   sx={{
                                     backgroundColor: colors.secondary,
