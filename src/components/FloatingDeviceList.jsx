@@ -27,6 +27,7 @@ import {
   ChevronDown,
   Menu
 } from 'lucide-react';
+import { VscWand } from 'react-icons/vsc';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 
@@ -533,7 +534,7 @@ const FloatingDeviceList = ({
         <div style={{
           padding: '16px 16px 8px 16px',
           display: 'flex',
-          gap: '8px',
+          gap: '6px',
           alignItems: 'center'
         }}>
           {/* Mobile Menu Button */}
@@ -585,7 +586,7 @@ const FloatingDeviceList = ({
               onChange={(e) => setKeyword(e.target.value)}
               style={{
                 paddingLeft: '40px',
-                paddingRight: '40px',
+                paddingRight: '92px',
                 height: '40px',
                 borderRadius: '8px',
                 backgroundColor: colors.secondary,
@@ -604,15 +605,16 @@ const FloatingDeviceList = ({
             {/* Device count */}
             <div style={{
               position: 'absolute',
-              right: '35px',
+              right: '64px',
               top: '50%',
               transform: 'translateY(-50%)',
-              fontSize: '10px',
+              fontSize: '9px',
               color: colors.textSecondary,
               backgroundColor: colors.surface,
-              padding: '1px 4px',
+              padding: '0 4px',
               borderRadius: '3px',
-              border: `1px solid ${colors.border}`
+              border: `1px solid ${colors.border}`,
+              zIndex: 1
             }}>
               {filteredDevices.length}
             </div>
@@ -621,22 +623,46 @@ const FloatingDeviceList = ({
               type="button"
               style={{
                 position: 'absolute',
-                right: '8px',
+                right: '32px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 padding: 0,
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                zIndex: 2
               }}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
+              <Filter style={{ width: '14px', height: '14px', color: colors.textSecondary }} />
+            </button>
+            <button
+              type="button"
+              aria-label="Open filters"
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '28px',
+                height: '28px',
+                padding: 0,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2
+              }}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <VscWand style={{ width: '14px', height: '14px', color: colors.textSecondary }} />
             </button>
           </div>
         </div>
