@@ -33,6 +33,7 @@ import {
 import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
+import { TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 dayjs.extend(relativeTime);
 
@@ -1449,20 +1450,119 @@ const FloatingDeviceList = ({
                     )}
                     {smartLinkActiveTab === 'calendars' && (
                       <>
-                        <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                          {smartLinkCalendarsLoading ? (<div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>) : (
-                            smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((calendar) => {
-                              const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
-                              return (
-                                <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
-                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedCalendarIds((prev) => e.target.checked ? (prev.includes(calendar.id) ? prev : [...prev, calendar.id]) : prev.filter((id) => id !== calendar.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{calendar.name || 'Unnamed'}</span>
-                                </label>
-                              );
-                            })
-                          )}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flex: 1, minHeight: 0 }}>
+                          {/* Left Column - Calendar List */}
+                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '8px' }}>{t('sharedCalendars')}</div>
+                            <div style={{ flex: 1, overflow: 'auto', minWidth: 0, border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface }}>
+                              {smartLinkCalendarsLoading ? (
+                                <div style={{ color: colors.textSecondary, fontSize: '12px', padding: '12px' }}>Loading...</div>
+                              ) : (
+                                smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((calendar) => {
+                                  const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
+                                  return (
+                                    <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
+                                      <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedCalendarIds((prev) => e.target.checked ? (prev.includes(calendar.id) ? prev : [...prev, calendar.id]) : prev.filter((id) => id !== calendar.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                                      <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{calendar.name || 'Unnamed'}</span>
+                                    </label>
+                                  );
+                                })
+                              )}
+                            </div>
+                            <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedCalendarIds.length}</div>
+                          </div>
+                          
+                          {/* Right Column - Add Calendar Form */}
+                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '8px' }}>{t('sharedAdd')} {t('sharedCalendar')}</div>
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface }}>
+                              {/* Name Field */}
+                              <TextField
+                                label={t('sharedName')}
+                                fullWidth
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                  '& .MuiOutlinedInputRoot': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { 
+                                    color: colors.text,
+                                    '&.Mui-focused': { color: colors.primary }
+                                  },
+                                }}
+                              />
+                              
+                              {/* From Field */}
+                              <TextField
+                                label={t('reportFrom')}
+                                type="datetime-local"
+                                fullWidth
+                                variant="outlined"
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                  '& .MuiOutlinedInputRoot': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { 
+                                    color: colors.text,
+                                    '&.Mui-focused': { color: colors.primary }
+                                  },
+                                }}
+                              />
+                              
+                              {/* To Field */}
+                              <TextField
+                                label={t('reportTo')}
+                                type="datetime-local"
+                                fullWidth
+                                variant="outlined"
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                  '& .MuiOutlinedInputRoot': {
+                                    backgroundColor: colors.secondary,
+                                    '& fieldset': { borderColor: colors.border },
+                                    '&:hover fieldset': { borderColor: colors.primary },
+                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                  },
+                                  '& .MuiInputLabel-root': { 
+                                    color: colors.text,
+                                    '&.Mui-focused': { color: colors.primary }
+                                  },
+                                }}
+                              />
+                              
+                              {/* Recurrency Field */}
+                              <FormControl fullWidth size="small">
+                                <InputLabel sx={{ color: colors.text, '&.Mui-focused': { color: colors.primary } }}>{t('calendarRecurrence')}</InputLabel>
+                                <Select
+                                  label={t('calendarRecurrence')}
+                                  sx={{
+                                    backgroundColor: colors.secondary,
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                                    '& .MuiSelect-icon': { color: colors.textSecondary }
+                                  }}
+                                >
+                                  {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
+                                    <MenuItem key={frequency} value={frequency}>
+                                      {t(prefixString('calendar', frequency.toLowerCase()))}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedCalendarIds.length}</div>
                       </>
                     )}
                   </div>
