@@ -1535,9 +1535,9 @@ const FloatingDeviceList = ({
                           </div>
                           
                           {/* Right Column - Add Calendar Form */}
-                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
                             <div style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '8px' }}>{t('sharedAdd')} {t('sharedCalendar')}</div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface }}>
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', backgroundColor: colors.surface, minHeight: 0, overflow: 'hidden' }}>
                               {/* Name Field */}
                               <TextField
                                 label={t('sharedName')}
@@ -1821,7 +1821,7 @@ const FloatingDeviceList = ({
                               
                               {/* Time Ranges for Weekly and Monthly Recurrence */}
                               {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
-                                <div style={{ marginTop: '16px' }}>
+                                <div style={{ marginTop: '16px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                     <input
                                       type="checkbox"
@@ -1844,9 +1844,8 @@ const FloatingDeviceList = ({
                                   {smartLinkTimeRanges.enabled && (
                                     <div 
                                       style={{ 
-                                        marginLeft: '16px', 
-                                        marginTop: '8px',
-                                        maxHeight: '300px',
+                                        flex: 1,
+                                        minHeight: 0,
                                         overflowY: 'auto',
                                         overflowX: 'hidden',
                                         paddingRight: '8px'
