@@ -1231,10 +1231,13 @@ const FloatingDeviceList = ({
               backgroundColor: colors.surface,
               borderRadius: '8px',
               padding: '20px',
-              width: '70vw',
+              width: desktop ? '70vw' : '98vw',
               height: '70vh',
               maxWidth: '98%',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflowX: desktop ? 'hidden' : 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -1267,12 +1270,14 @@ const FloatingDeviceList = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(220px, 1fr) 1fr',
+                gridTemplateColumns: '230px 1fr',
                 gap: '12px',
-                marginBottom: '16px',
-                height: 'calc(70vh - 140px)',
+                marginBottom: '0px',
+                flex: 1,
+                minHeight: 0,
                 overflow: 'hidden',
-                width: '100%'
+                width: '100%',
+                minWidth: desktop ? 'auto' : '900px'
               }}
             >
               {/* Devices */}
@@ -1286,7 +1291,8 @@ const FloatingDeviceList = ({
                   flexDirection: 'column',
                   minHeight: 0,
                   minWidth: 0,
-                  width: '100%'
+                  width: '100%',
+                  height: '100%'
                 }}
               >
                 <div style={{
@@ -1347,7 +1353,7 @@ const FloatingDeviceList = ({
               </div>
 
               {/* Right pane tabs header */}
-              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, height: '100%', minHeight: 0 }}>
                 <div style={{ display: 'flex', gap: 0, padding: '8px', border: `1px solid ${colors.border}`, borderRadius: '8px 8px 0 0', borderBottom: 'none', backgroundColor: colors.surface }}>
                   {[
                     { key: 'groups', label: t('settingsGroups') },
@@ -1372,7 +1378,7 @@ const FloatingDeviceList = ({
                     </button>
                   ))}
                 </div>
-                <div style={{ border: `1px solid ${colors.border}`, borderTop: 'none', borderRadius: '0 0 8px 8px', backgroundColor: colors.surface, minHeight: 0, height: '100%', overflow: 'hidden' }}>
+                <div style={{ border: `1px solid ${colors.border}`, borderTop: 'none', borderRadius: '0 0 8px 8px', backgroundColor: colors.surface, minHeight: 0, flex: 1, overflow: 'hidden' }}>
                   <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minWidth: 0, padding: '12px' }}>
                     {smartLinkActiveTab === 'groups' && (
                       <>
@@ -1445,299 +1451,7 @@ const FloatingDeviceList = ({
                   </div>
                 </div>
               </div>
-              <div
-                style={{
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  padding: '12px',
-                  backgroundColor: colors.surface,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  minHeight: 0,
-                  minWidth: 0,
-                  width: '100%'
-                }}
-              >
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: '8px'
-                }}>
-                  {t('settingsGroups')}
-                </div>
-                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                  {Object.values(groups)
-                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-                    .map((group) => {
-                      const isSelected = smartLinkSelectedGroupIds.includes(group.id);
-                      return (
-                        <label
-                          key={group.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '8px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            backgroundColor: 'transparent',
-                            width: '100%',
-                            minWidth: 0
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={(e) => {
-                              setSmartLinkSelectedGroupIds((prev) => {
-                                if (e.target.checked) {
-                                  return prev.includes(group.id) ? prev : [...prev, group.id];
-                                }
-                                return prev.filter((id) => id !== group.id);
-                              });
-                            }}
-                            style={{ width: '14px', height: '14px', margin: 0 }}
-                          />
-                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                            {group.name || 'Unnamed'}
-                          </span>
-                        </label>
-                      );
-                    })}
-                </div>
-                <div style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  color: colors.textSecondary
-                }}>
-                  Selected: {smartLinkSelectedGroupIds.length}
-                </div>
-              </div>
-
-              {/* Geofences */}
-              <div
-                style={{
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  padding: '12px',
-                  backgroundColor: colors.surface,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  minHeight: 0,
-                  minWidth: 0,
-                  width: '100%'
-                }}
-              >
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: '8px'
-                }}>
-                  {t('sharedGeofences')}
-                </div>
-                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                  {Object.values(geofences)
-                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-                    .map((geofence) => {
-                      const isSelected = smartLinkSelectedGeofenceIds.includes(geofence.id);
-                      return (
-                        <label
-                          key={geofence.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '8px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            backgroundColor: 'transparent',
-                            width: '100%',
-                            minWidth: 0
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={(e) => {
-                              setSmartLinkSelectedGeofenceIds((prev) => {
-                                if (e.target.checked) {
-                                  return prev.includes(geofence.id) ? prev : [...prev, geofence.id];
-                                }
-                                return prev.filter((id) => id !== geofence.id);
-                              });
-                            }}
-                            style={{ width: '14px', height: '14px', margin: 0 }}
-                          />
-                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                            {geofence.name || 'Unnamed'}
-                          </span>
-                        </label>
-                      );
-                    })}
-                </div>
-                <div style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  color: colors.textSecondary
-                }}>
-                  Selected: {smartLinkSelectedGeofenceIds.length}
-                </div>
-              </div>
-
-              {/* Notifications */}
-              <div
-                style={{
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  padding: '12px',
-                  backgroundColor: colors.surface,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  minHeight: 0,
-                  minWidth: 0,
-                  width: '100%'
-                }}
-              >
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: '8px'
-                }}>
-                  {t('sharedNotifications')}
-                </div>
-                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                  {smartLinkNotificationsLoading ? (
-                    <div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>
-                  ) : (
-                    smartLinkNotifications
-                      .sort((a, b) => (a.type || '').localeCompare(b.type || ''))
-                      .map((notification) => {
-                        const isSelected = smartLinkSelectedNotificationIds.includes(notification.id);
-                        return (
-                          <label
-                            key={notification.id}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              padding: '8px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              backgroundColor: 'transparent',
-                              width: '100%',
-                              minWidth: 0
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                setSmartLinkSelectedNotificationIds((prev) => {
-                                  if (e.target.checked) {
-                                    return prev.includes(notification.id) ? prev : [...prev, notification.id];
-                                  }
-                                  return prev.filter((id) => id !== notification.id);
-                                });
-                              }}
-                              style={{ width: '14px', height: '14px', margin: 0 }}
-                            />
-                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                              {notification.type ? t(prefixString('event', notification.type)) : t('sharedNotifications')}
-                            </span>
-                          </label>
-                        );
-                      })
-                  )}
-                </div>
-                <div style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  color: colors.textSecondary
-                }}>
-                  Selected: {smartLinkSelectedNotificationIds.length}
-                </div>
-              </div>
-
-              {/* Calendars */}
-              <div
-                style={{
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '8px',
-                  padding: '12px',
-                  backgroundColor: colors.surface,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  minHeight: 0,
-                  minWidth: 0,
-                  width: '100%'
-                }}
-              >
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: colors.text,
-                  marginBottom: '8px'
-                }}>
-                  {t('sharedCalendars')}
-                </div>
-                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                  {smartLinkCalendarsLoading ? (
-                    <div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>
-                  ) : (
-                    smartLinkCalendars
-                      .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-                      .map((calendar) => {
-                        const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
-                        return (
-                          <label
-                            key={calendar.id}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              padding: '8px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              backgroundColor: 'transparent',
-                              width: '100%',
-                              minWidth: 0
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                setSmartLinkSelectedCalendarIds((prev) => {
-                                  if (e.target.checked) {
-                                    return prev.includes(calendar.id) ? prev : [...prev, calendar.id];
-                                  }
-                                  return prev.filter((id) => id !== calendar.id);
-                                });
-                              }}
-                              style={{ width: '14px', height: '14px', margin: 0 }}
-                            />
-                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                              {calendar.name || 'Unnamed'}
-                            </span>
-                          </label>
-                        );
-                      })
-                  )}
-                </div>
-                <div style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  color: colors.textSecondary
-                }}>
-                  Selected: {smartLinkSelectedCalendarIds.length}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer buttons removed per request */}
+          </div>
           </motion.div>
         </motion.div>
       )}
