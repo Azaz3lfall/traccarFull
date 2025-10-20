@@ -34,8 +34,27 @@ import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Check as CheckIcon } from '@mui/icons-material';
 
 dayjs.extend(relativeTime);
+
+// Custom scrollbar styles
+const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #e0e0e0;
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #1976d2;
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #1565c0;
+  }
+`;
 
 const FloatingDeviceList = ({ 
   filteredDevices, 
@@ -611,6 +630,7 @@ const FloatingDeviceList = ({
   
   return (
     <>
+    <style>{scrollbarStyles}</style>
     <AnimatePresence mode="wait">
       {!(!desktop && !showOnMobile) && isVisible && (
         <motion.div
@@ -1770,7 +1790,7 @@ const FloatingDeviceList = ({
                                               }}
                                             >
                                               <span>{t(prefixString('calendar', day))}</span>
-                                              {isSelected && <span style={{ color: '#10B981', fontSize: '18px' }}>✓</span>}
+                                              {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
                                             </div>
                                           );
                                         }) : 
@@ -1807,7 +1827,7 @@ const FloatingDeviceList = ({
                                               }}
                                             >
                                               <span>{day}</span>
-                                              {isSelected && <span style={{ color: '#10B981', fontSize: '18px' }}>✓</span>}
+                                              {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
                                             </div>
                                           );
                                         })
@@ -1840,13 +1860,16 @@ const FloatingDeviceList = ({
                                   </div>
                                   
                                   {smartLinkTimeRanges.enabled && (
-                                    <div style={{ 
-                                      marginLeft: '16px', 
-                                      marginTop: '8px',
-                                      maxHeight: '300px',
-                                      overflowY: 'auto',
-                                      overflowX: 'hidden'
-                                    }}>
+                                    <div 
+                                      style={{ 
+                                        marginLeft: '16px', 
+                                        marginTop: '8px',
+                                        maxHeight: '300px',
+                                        overflowY: 'auto',
+                                        overflowX: 'hidden'
+                                      }}
+                                      className="custom-scrollbar"
+                                    >
                                       {smartLinkTimeRanges.periods.map((period, index) => (
                                         <div key={`period-${index}-${period.name || 'unnamed'}`} style={{ 
                                           marginBottom: '16px', 
