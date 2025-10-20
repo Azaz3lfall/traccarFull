@@ -73,6 +73,8 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
   const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('');
   const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
+  const [smartLinkDays, setSmartLinkDays] = useState([]);
+  const [smartLinkDaysDropdownOpen, setSmartLinkDaysDropdownOpen] = useState(false);
   const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
     enabled: false,
     periods: [
@@ -289,18 +291,21 @@ const FloatingDeviceList = ({
     }
   };
 
-  // Close recurrence dropdown when clicking outside
+  // Close dropdowns when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (smartLinkRecurrenceDropdownOpen) {
         setSmartLinkRecurrenceDropdownOpen(false);
+      }
+      if (smartLinkDaysDropdownOpen) {
+        setSmartLinkDaysDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [smartLinkRecurrenceDropdownOpen]);
+  }, [smartLinkRecurrenceDropdownOpen, smartLinkDaysDropdownOpen]);
 
   // Load notifications and calendars when SmartLink modal opens
   React.useEffect(() => {
@@ -1675,6 +1680,142 @@ const FloatingDeviceList = ({
                                   </div>
                                 )}
                               </div>
+                              
+                              {/* Days Selection for Weekly and Monthly Recurrence */}
+                              {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
+                                <div style={{ position: 'relative' }}>
+                                  <TextField
+                                    label={t('calendarDays')}
+                                    value={smartLinkDays.length > 0 ? 
+                                      (smartLinkRecurrence === 'WEEKLY' ? 
+                                        smartLinkDays.map(day => t(prefixString('calendar', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].indexOf(day)]))).join(', ') :
+                                        smartLinkDays.join(', ')
+                                      ) : ''
+                                    }
+                                    onClick={() => setSmartLinkDaysDropdownOpen(!smartLinkDaysDropdownOpen)}
+                                    InputProps={{
+                                      readOnly: true,
+                                      endAdornment: <ChevronDown style={{ color: colors.textSecondary, width: '16px', height: '16px' }} />
+                                    }}
+                                    fullWidth
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: colors.secondary,
+                                      '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
+                                      '& .MuiInputLabel-root': { 
+                                        color: colors.text,
+                                        '&.Mui-focused': { color: colors.primary }
+                                      }
+                                    }}
+                                  />
+                                  {smartLinkDaysDropdownOpen && (
+                                    <div 
+                                      ref={(el) => {
+                                        if (el) {
+                                          const rect = el.previousElementSibling?.getBoundingClientRect();
+                                          if (rect) {
+                                            el.style.top = `${rect.bottom + 4}px`;
+                                            el.style.left = `${rect.left}px`;
+                                            el.style.width = `${rect.width}px`;
+                                          }
+                                        }
+                                      }}
+                                      style={{
+                                        position: 'fixed',
+                                        zIndex: 999999,
+                                        maxHeight: '200px',
+                                        overflow: 'auto',
+                                        border: `1px solid ${colors.border}`,
+                                        borderRadius: '4px',
+                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                        backgroundColor: colors.surface
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      {smartLinkRecurrence === 'WEEKLY' ? 
+                                        ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day, index) => {
+                                          const dayCode = day.substring(0, 2).toUpperCase();
+                                          const isSelected = smartLinkDays.includes(dayCode);
+                                          return (
+                                            <div
+                                              key={day}
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const newDays = isSelected 
+                                                  ? smartLinkDays.filter(d => d !== dayCode)
+                                                  : [...smartLinkDays, dayCode];
+                                                setSmartLinkDays(newDays);
+                                              }}
+                                              style={{
+                                                padding: '12px 16px',
+                                                cursor: 'pointer',
+                                                color: colors.text,
+                                                backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
+                                                borderBottom: index < 6 ? `1px solid ${colors.border}` : 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.stopPropagation();
+                                                e.target.style.backgroundColor = colors.primary + '10';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.stopPropagation();
+                                                e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
+                                              }}
+                                            >
+                                              <span>{t(prefixString('calendar', day))}</span>
+                                              {isSelected && <span style={{ color: '#10B981', fontSize: '18px' }}>✓</span>}
+                                            </div>
+                                          );
+                                        }) : 
+                                        Array.from({ length: 31 }, (_, i) => i + 1).map((day, index) => {
+                                          const isSelected = smartLinkDays.includes(String(day));
+                                          return (
+                                            <div
+                                              key={day}
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const newDays = isSelected 
+                                                  ? smartLinkDays.filter(d => d !== String(day))
+                                                  : [...smartLinkDays, String(day)];
+                                                setSmartLinkDays(newDays);
+                                              }}
+                                              style={{
+                                                padding: '12px 16px',
+                                                cursor: 'pointer',
+                                                color: colors.text,
+                                                backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
+                                                borderBottom: index < 30 ? `1px solid ${colors.border}` : 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.stopPropagation();
+                                                e.target.style.backgroundColor = colors.primary + '10';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.stopPropagation();
+                                                e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
+                                              }}
+                                            >
+                                              <span>{day}</span>
+                                              {isSelected && <span style={{ color: '#10B981', fontSize: '18px' }}>✓</span>}
+                                            </div>
+                                          );
+                                        })
+                                      }
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                               
                               {/* Time Ranges for Weekly and Monthly Recurrence */}
                               {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
