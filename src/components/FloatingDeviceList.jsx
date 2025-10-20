@@ -1673,8 +1673,8 @@ const FloatingDeviceList = ({
                                 )}
                               </div>
                               
-                              {/* Time Ranges for Weekly Recurrence */}
-                              {smartLinkRecurrence === 'WEEKLY' && (
+                              {/* Time Ranges for Weekly and Monthly Recurrence */}
+                              {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
                                 <div style={{ marginTop: '16px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                     <input
