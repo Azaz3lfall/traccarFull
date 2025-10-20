@@ -71,6 +71,8 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedGroupIds, setSmartLinkSelectedGroupIds] = useState([]);
   const [smartLinkSelectedNotificationIds, setSmartLinkSelectedNotificationIds] = useState([]);
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
+  const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('');
+  const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
@@ -247,6 +249,19 @@ const FloatingDeviceList = ({
     }
   }, [desktop, selectedDeviceId]);
   
+  // Close recurrence dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (smartLinkRecurrenceDropdownOpen) {
+        setSmartLinkRecurrenceDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [smartLinkRecurrenceDropdownOpen]);
+
   // Load notifications and calendars when SmartLink modal opens
   React.useEffect(() => {
     const loadNotifications = async () => {
@@ -1541,47 +1556,76 @@ const FloatingDeviceList = ({
                               />
                               
                               {/* Recurrency Field */}
-                              <FormControl fullWidth size="small">
-                                <InputLabel sx={{ color: colors.text, '&.Mui-focused': { color: colors.primary } }}>{t('calendarRecurrence')}</InputLabel>
-                                <Select
+                              <div style={{ position: 'relative' }}>
+                                <TextField
                                   label={t('calendarRecurrence')}
-                                  MenuProps={{
-                                    PaperProps: {
-                                      sx: {
-                                        zIndex: 999999,
-                                        backgroundColor: colors.surface,
-                                        position: 'fixed',
-                                        '& .MuiMenuItem-root': {
-                                          color: colors.text,
-                                          '&:hover': {
-                                            backgroundColor: colors.primary + '15'
-                                          }
-                                        }
-                                      }
-                                    },
-                                    disablePortal: false,
-                                    container: document.body,
-                                    BackdropProps: {
-                                      sx: {
-                                        zIndex: 999998
-                                      }
-                                    }
+                                  value={smartLinkRecurrence || ''}
+                                  onClick={() => setSmartLinkRecurrenceDropdownOpen(!smartLinkRecurrenceDropdownOpen)}
+                                  InputProps={{
+                                    readOnly: true,
+                                    endAdornment: <ChevronDown style={{ color: colors.textSecondary, width: '16px', height: '16px' }} />
                                   }}
+                                  fullWidth
+                                  variant="outlined"
+                                  size="small"
                                   sx={{
                                     backgroundColor: colors.secondary,
                                     '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
                                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
                                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
-                                    '& .MuiSelect-icon': { color: colors.textSecondary }
+                                    '& .MuiInputLabel-root': { 
+                                      color: colors.text,
+                                      '&.Mui-focused': { color: colors.primary }
+                                    }
                                   }}
-                                >
-                                  {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
-                                    <MenuItem key={frequency} value={frequency}>
-                                      {t(prefixString('calendar', frequency.toLowerCase()))}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
+                                />
+                                {smartLinkRecurrenceDropdownOpen && (
+                                  <div 
+                                    style={{
+                                      position: 'fixed',
+                                      zIndex: 999999,
+                                      top: '50%',
+                                      left: '50%',
+                                      transform: 'translate(-50%, -50%)',
+                                      backgroundColor: colors.surface,
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '6px',
+                                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                                      minWidth: '200px',
+                                      maxHeight: '200px',
+                                      overflow: 'auto'
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
+                                      <div
+                                        key={frequency}
+                                        onClick={() => {
+                                          setSmartLinkRecurrence(frequency);
+                                          setSmartLinkRecurrenceDropdownOpen(false);
+                                        }}
+                                        style={{
+                                          padding: '12px 16px',
+                                          color: colors.text,
+                                          cursor: 'pointer',
+                                          borderBottom: `1px solid ${colors.border}`,
+                                          '&:hover': {
+                                            backgroundColor: colors.primary + '15'
+                                          }
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = colors.primary + '15';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
+                                      >
+                                        {t(prefixString('calendar', frequency.toLowerCase()))}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
