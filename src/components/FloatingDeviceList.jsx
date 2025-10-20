@@ -1599,7 +1599,7 @@ const FloatingDeviceList = ({
                               <div style={{ position: 'relative' }}>
                                 <TextField
                                   label={t('calendarRecurrence')}
-                                  value={smartLinkRecurrence || ''}
+                                  value={smartLinkRecurrence ? t(prefixString('calendar', smartLinkRecurrence.toLowerCase())) : ''}
                                   onClick={() => setSmartLinkRecurrenceDropdownOpen(!smartLinkRecurrenceDropdownOpen)}
                                   InputProps={{
                                     readOnly: true,
@@ -1646,7 +1646,10 @@ const FloatingDeviceList = ({
                                     {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((frequency) => (
                                       <div
                                         key={frequency}
-                                        onClick={() => {
+                                        onMouseDown={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          console.log('Setting recurrence to:', frequency);
                                           setSmartLinkRecurrence(frequency);
                                           setSmartLinkRecurrenceDropdownOpen(false);
                                         }}
