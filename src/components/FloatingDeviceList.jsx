@@ -88,6 +88,11 @@ const FloatingDeviceList = ({
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
+  const [smartLinkCalendarForm, setSmartLinkCalendarForm] = useState({
+    name: '',
+    from: dayjs().format('YYYY-MM-DDTHH:mm'),
+    to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
+  });
   const [smartLinkActiveTab, setSmartLinkActiveTab] = useState('groups');
   const [showOnMobile, setShowOnMobile] = useState(true);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -293,6 +298,141 @@ const FloatingDeviceList = ({
     }
   };
 
+  // Calendar helper functions
+  const formatCalendarTime = (time) => {
+    const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return `TZID=${tzid}:${time.locale('en').format('YYYYMMDDTHHmmss')}`;
+  };
+
+  const formatRule = (rule, endTime) => {
+    const by = rule.by && rule.by.join(',');
+    const untilDate = endTime ? endTime.format('YYYYMMDDTHHmmss') + 'Z' : dayjs().add(10, 'years').format('YYYYMMDDTHHmmss') + 'Z';
+    
+    switch (rule.frequency) {
+      case 'DAILY':
+        return `RRULE:FREQ=${rule.frequency};UNTIL=${untilDate}`;
+      case 'WEEKLY':
+        return `RRULE:FREQ=${rule.frequency};BYDAY=${by || 'SU'};UNTIL=${untilDate}`;
+      case 'MONTHLY':
+        return `RRULE:FREQ=${rule.frequency};BYMONTHDAY=${by || 1};UNTIL=${untilDate}`;
+      default:
+        return 'RRULE:FREQ=DAILY;COUNT=1';
+    }
+  };
+
+  const generateCalendarWithTimeRanges = (startTime, endTime, rule, timeRanges) => {
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Traccar//NONSGML Traccar//EN',
+    ];
+
+    if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
+      // Generate VEVENT blocks for each enabled time range
+      const enabledPeriods = timeRanges.periods.filter(period => period.enabled);
+      
+      if (enabledPeriods.length > 0) {
+        enabledPeriods.forEach((period, index) => {
+          if (period.startTime && period.endTime) {
+            // Use the base date from startTime and apply the period times
+            const baseDate = dayjs(startTime);
+            
+            // Parse time strings properly
+            const [startHour, startMinute] = period.startTime.split(':').map(Number);
+            const [endHour, endMinute] = period.endTime.split(':').map(Number);
+            
+            const periodStart = baseDate.clone().hour(startHour).minute(startMinute).second(0);
+            const periodEnd = baseDate.clone().hour(endHour).minute(endMinute).second(0);
+            
+            if (periodStart.isValid() && periodEnd.isValid()) {
+              lines.push(
+                'BEGIN:VEVENT',
+                `UID:00000000-0000-0000-0000-000000000${100 + index}`,
+                `DTSTART;${formatCalendarTime(periodStart)}`,
+                `DTEND;${formatCalendarTime(periodEnd)}`,
+                formatRule(rule, endTime),
+                `SUMMARY:${period.name || getPeriodName(index + 1)}`,
+                'END:VEVENT'
+              );
+            }
+          }
+        });
+      }
+    } else {
+      // Single VEVENT block for regular calendar
+      if (startTime.isValid() && endTime.isValid()) {
+        lines.push(
+          'BEGIN:VEVENT',
+          'UID:00000000-0000-0000-0000-000000000000',
+          `DTSTART;${formatCalendarTime(startTime)}`,
+          `DTEND;${formatCalendarTime(endTime)}`,
+          formatRule(rule, endTime),
+          'SUMMARY:Event',
+          'END:VEVENT'
+        );
+      }
+    }
+
+    lines.push('END:VCALENDAR');
+    const result = window.btoa(lines.join('\n'));
+    return result;
+  };
+
+  const createCalendar = async () => {
+    if (!smartLinkCalendarForm.name.trim()) {
+      alert(t('sharedName') + ' ' + t('sharedRequired'));
+      return;
+    }
+
+    try {
+      const startTime = dayjs(smartLinkCalendarForm.from);
+      const endTime = dayjs(smartLinkCalendarForm.to);
+      const rule = { frequency: smartLinkRecurrence || 'ONCE', by: smartLinkDays };
+      
+      const calendarData = {
+        name: smartLinkCalendarForm.name,
+        data: generateCalendarWithTimeRanges(startTime, endTime, rule, smartLinkTimeRanges),
+        attributes: {}
+      };
+
+      const response = await fetchOrThrow('/api/calendars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(calendarData),
+      });
+
+      if (response.ok) {
+        // Reset form
+        setSmartLinkCalendarForm({
+          name: '',
+          from: dayjs().format('YYYY-MM-DDTHH:mm'),
+          to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
+        });
+        setSmartLinkRecurrence('');
+        setSmartLinkDays([]);
+        setSmartLinkTimeRanges({
+          enabled: false,
+          periods: [
+            { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+            { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
+          ]
+        });
+        
+        // Reload calendars
+        const res = await fetchOrThrow('/api/calendars');
+        const data = await res.json();
+        setSmartLinkCalendars(Array.isArray(data) ? data : []);
+        
+        alert(t('sharedCalendar') + ' ' + t('sharedCreated'));
+      } else {
+        throw new Error('Failed to create calendar');
+      }
+    } catch (error) {
+      console.error('Error creating calendar:', error);
+      alert(t('sharedError') + ': ' + error.message);
+    }
+  };
+
   // Close dropdowns when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -338,6 +478,22 @@ const FloatingDeviceList = ({
     if (showWandModal) {
       loadNotifications();
       loadCalendars();
+      
+      // Reset calendar form to default values
+      setSmartLinkCalendarForm({
+        name: '',
+        from: dayjs().format('YYYY-MM-DDTHH:mm'),
+        to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
+      });
+      setSmartLinkRecurrence('');
+      setSmartLinkDays([]);
+      setSmartLinkTimeRanges({
+        enabled: false,
+        periods: [
+          { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+          { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
+        ]
+      });
     }
   }, [showWandModal]);
   
@@ -1540,6 +1696,8 @@ const FloatingDeviceList = ({
                               {/* Name Field */}
                               <TextField
                                 label={t('sharedName')}
+                                value={smartLinkCalendarForm.name}
+                                onChange={(e) => setSmartLinkCalendarForm({ ...smartLinkCalendarForm, name: e.target.value })}
                                 fullWidth
                                 variant="outlined"
                                 size="small"
@@ -1561,6 +1719,8 @@ const FloatingDeviceList = ({
                               <TextField
                                 label={t('reportFrom')}
                                 type="datetime-local"
+                                value={smartLinkCalendarForm.from}
+                                onChange={(e) => setSmartLinkCalendarForm({ ...smartLinkCalendarForm, from: e.target.value })}
                                 fullWidth
                                 variant="outlined"
                                 size="small"
@@ -1583,6 +1743,8 @@ const FloatingDeviceList = ({
                               <TextField
                                 label={t('reportTo')}
                                 type="datetime-local"
+                                value={smartLinkCalendarForm.to}
+                                onChange={(e) => setSmartLinkCalendarForm({ ...smartLinkCalendarForm, to: e.target.value })}
                                 fullWidth
                                 variant="outlined"
                                 size="small"
@@ -1993,6 +2155,31 @@ const FloatingDeviceList = ({
                                   )}
                                 </div>
                               )}
+                              
+                              {/* Create Calendar Button */}
+                              <button
+                                onClick={createCalendar}
+                                style={{
+                                  width: '100%',
+                                  padding: '12px',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  backgroundColor: colors.primary,
+                                  color: 'white',
+                                  cursor: 'pointer',
+                                  fontSize: '14px',
+                                  fontWeight: '600',
+                                  marginTop: '16px'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = colors.primary + 'CC';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = colors.primary;
+                                }}
+                              >
+                                {t('sharedCreate')} {t('sharedCalendar')}
+                              </button>
                             </div>
                           </div>
                         </div>
