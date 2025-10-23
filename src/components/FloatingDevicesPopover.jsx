@@ -189,7 +189,7 @@ const FloatingDevicesPopover = ({
 
   // Time filter options with green, orange, red gradient (avoiding yellow tones)
   const timeFilterOptions = [
-    { key: 'all', label: 'All', value: null, color: '#666666', borderColor: '#666666' },
+    { key: 'all', label: t('allItems'), value: null, color: '#666666', borderColor: '#666666' },
     { key: 'lt1h', label: '< 1hr', value: 1, color: '#4caf50', borderColor: '#66bb6a' }, // Green
     { key: 'gt1h', label: '> 1hr', value: 1, color: '#66bb6a', borderColor: '#81c784' }, // Light Green
     { key: 'gt3h', label: '> 3hr', value: 3, color: '#8bc34a', borderColor: '#aed581' }, // Lime Green
@@ -761,7 +761,7 @@ const FloatingDevicesPopover = ({
                           )}
                           {desktop && (
                             <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                              {t('sharedLastUpdate')}
+                              {t('deviceLastUpdate')}
                             </TableCell>
                           )}
                           <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
