@@ -181,7 +181,25 @@ const FloatingDevicesPopover = ({
   const [calendarInputRef, setCalendarInputRef] = useState(null);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
 
+  // Time filter options
+  const timeFilterOptions = [
+    { key: 'all', label: 'All', value: null },
+    { key: 'lt1h', label: '< 1hr', value: 1 },
+    { key: 'gt1h', label: '> 1hr', value: 1 },
+    { key: 'gt3h', label: '> 3hr', value: 3 },
+    { key: 'gt6h', label: '> 6hr', value: 6 },
+    { key: 'gt12h', label: '> 12hr', value: 12 },
+    { key: 'gt1d', label: '> 1d', value: 24 },
+    { key: 'gt3d', label: '> 3d', value: 72 },
+    { key: 'gt7d', label: '> 7d', value: 168 },
+  ];
+
+  // Handle time filter selection
+  const handleTimeFilterSelect = (filterKey) => {
+    setSelectedTimeFilter(filterKey);
+  };
 
   // Fetch devices with TanStack Query
   const { data: devices = [], isLoading, error } = useQuery({
@@ -540,6 +558,50 @@ const FloatingDevicesPopover = ({
                     }
                   }}
                 />
+              </div>
+              
+              {/* Time Filter Buttons */}
+              <div style={{ 
+                marginTop: '12px', 
+                display: 'flex', 
+                flexWrap: 'nowrap',
+                gap: '8px',
+                alignItems: 'center',
+                maxWidth: '100%',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                paddingBottom: '8px'
+              }}>
+                {timeFilterOptions.map((option) => {
+                  const isSelected = selectedTimeFilter === option.key;
+                  return (
+                    <div
+                      key={option.key}
+                      onClick={() => handleTimeFilterSelect(option.key)}
+                      style={{
+                        backgroundColor: isSelected ? '#1976d2' : 'transparent',
+                        color: isSelected ? '#ffffff' : '#666666',
+                        border: '1px solid',
+                        borderColor: isSelected ? '#1976d2' : '#666666',
+                        borderRadius: '16px',
+                        padding: '4px 12px',
+                        fontSize: '11px',
+                        height: '24px',
+                        fontWeight: isSelected ? '600' : '400',
+                        minWidth: 'fit-content',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        userSelect: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      {option.label}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
