@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import {
   TextField,
   Button,
@@ -46,6 +48,7 @@ import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle, formatTime } from '../common/util/formatter';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { BsFiletypeXlsx } from "react-icons/bs";
 
 dayjs.extend(relativeTime);
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -206,16 +209,85 @@ const FloatingDevicesPopover = ({
     setSelectedTimeFilter(filterKey);
   };
 
+  // Show snackbar notification
+  const showSnackbar = (message, severity = 'error') => {
+    // Simple console log for now - can be enhanced with proper notification system
+    console.log(`${severity.toUpperCase()}: ${message}`);
+  };
+
+  // Handle XLSX export
+  const handleExport = useCatch(async () => {
+    // Create groups lookup object
+    const groupsLookup = {};
+    groups.forEach(group => {
+      groupsLookup[group.id] = group;
+    });
+
+    const data = filteredDevices.map((device) => ({
+      [t('sharedName')]: device.name,
+      [t('deviceIdentifier')]: device.uniqueId,
+      [t('groupParent')]: device.groupId ? groupsLookup[device.groupId]?.name : null,
+      [t('sharedPhone')]: device.phone,
+      [t('deviceModel')]: device.model,
+      [t('deviceContact')]: device.contact,
+      [t('deviceStatus')]: formatStatus(device.status, t),
+      [t('deviceLastUpdate')]: device.lastUpdate ? formatTime(device.lastUpdate, 'minutes') : '-',
+    }));
+
+    if (data.length === 0) {
+      showSnackbar('No devices to export', 'warning');
+      return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(t('deviceTitle'));
+    const headers = Object.keys(data[0]);
+
+    const titleRow = worksheet.addRow([t('deviceTitle')]);
+    worksheet.mergeCells(1, 1, 1, headers.length);
+    titleRow.font = { bold: true };
+
+    const border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+    const headerRow = worksheet.addRow(headers);
+    headerRow.eachCell((cell) => {
+      cell.border = border;
+      cell.font = {};
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF1976D2' },
+      };
+    });
+    data.forEach((item) => {
+      const row = worksheet.addRow(headers.map((h) => item[h]));
+      row.eachCell({ includeEmpty: true }, (cell) => {
+        cell.border = border;
+        cell.font = {};
+      });
+    });
+
+    const blob = new Blob(
+      [await workbook.xlsx.writeBuffer()],
+      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+    );
+    saveAs(blob, 'devices.xlsx');
+  });
+
   // Format last update time (following Traccar patterns)
   const formatLastUpdate = (device) => {
-    if (!device.lastUpdate) {
-      return formatStatus(device.status, t);
+    if (!device.lastUpdate || !dayjs(device.lastUpdate).isValid()) {
+      return '-';
     }
-    
+
     const now = dayjs();
     const lastUpdate = dayjs(device.lastUpdate);
     const diffMinutes = now.diff(lastUpdate, 'minute');
-    
+
     // For online devices, show relative time if < 5 minutes, otherwise show formatted time
     if (device.status === 'online') {
       if (diffMinutes < 5) {
@@ -224,7 +296,7 @@ const FloatingDevicesPopover = ({
         return formatTime(device.lastUpdate, 'minutes');
       }
     }
-    
+
     // For offline/unknown devices, show relative time for recent updates, formatted time for older
     if (diffMinutes < 60) {
       return lastUpdate.fromNow();
@@ -278,12 +350,12 @@ const FloatingDevicesPopover = ({
   }, [isVisible]);
 
   // Time-based filtering function
-  const filterDevicesByTime = (device) => {
-    if (selectedTimeFilter === 'all') {
+  const filterDevicesByTime = (device, filterKey) => {
+    if (filterKey === 'all') {
       return true;
     }
 
-    if (selectedTimeFilter === 'nr') {
+    if (filterKey === 'nr') {
       // No Response - null or invalid lastUpdate
       return !device.lastUpdate || !dayjs(device.lastUpdate).isValid();
     }
@@ -298,7 +370,7 @@ const FloatingDevicesPopover = ({
     const diffHours = now.diff(lastUpdate, 'hour');
 
     // Filter from biggest time windows to smallest
-    switch (selectedTimeFilter) {
+    switch (filterKey) {
       case 'gt7d':
         return diffHours > 168; // > 7 days
       case 'gt3d':
@@ -320,11 +392,20 @@ const FloatingDevicesPopover = ({
     }
   };
 
+  // Count devices for each filter
+  const getFilterCounts = useMemo(() => {
+    const counts = {};
+    timeFilterOptions.forEach(option => {
+      counts[option.key] = devices.filter(device => filterDevicesByTime(device, option.key)).length;
+    });
+    return counts;
+  }, [devices, timeFilterOptions]);
+
   // Filter devices based on search keyword and time filter
   const filteredDevices = useMemo(() => {
     return devices.filter(device => {
       // First apply time filter
-      if (!filterDevicesByTime(device)) {
+      if (!filterDevicesByTime(device, selectedTimeFilter)) {
         return false;
       }
 
@@ -650,19 +731,25 @@ const FloatingDevicesPopover = ({
                 />
               </div>
               
-              {/* Time Filter Buttons */}
+              {/* Time Filter Buttons and Export */}
               <div style={{ 
                 marginTop: '12px', 
                 paddingTop: '4px',
                 display: 'flex', 
-                flexWrap: 'nowrap',
-                gap: '8px',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                maxWidth: '100%',
-                overflowX: 'auto',
-                overflowY: 'hidden',
                 paddingBottom: '8px'
               }}>
+                {/* Time Filter Buttons */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexWrap: 'nowrap',
+                  gap: '8px',
+                  alignItems: 'center',
+                  maxWidth: 'calc(100% - 40px)',
+                  overflowX: 'auto',
+                  overflowY: 'hidden'
+                }}>
                 {timeFilterOptions.map((option) => {
                   const isSelected = selectedTimeFilter === option.key;
                   
@@ -701,7 +788,7 @@ const FloatingDevicesPopover = ({
                           opacity: isSelected ? 0.9 : 0.8
                         }}
                       >
-                        {option.label}
+                        {option.label}: {getFilterCounts[option.key]}
                       </div>
                     );
                   }
@@ -745,10 +832,25 @@ const FloatingDevicesPopover = ({
                         opacity: isSelected ? 0.9 : 0.8
                       }}
                     >
-                      {option.label}
+                      {option.label}: {getFilterCounts[option.key]}
                     </div>
                   );
                 })}
+                </div>
+                
+                {/* XLSX Export Button */}
+                <IconButton
+                  onClick={handleExport}
+                  size="small"
+                  style={{
+                    color: colors.text,
+                    padding: '4px',
+                    marginLeft: '8px'
+                  }}
+                  title="Export to XLSX"
+                >
+                  <BsFiletypeXlsx size={16} />
+                </IconButton>
               </div>
             </div>
 
