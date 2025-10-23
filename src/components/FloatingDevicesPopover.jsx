@@ -183,17 +183,17 @@ const FloatingDevicesPopover = ({
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
 
-  // Time filter options
+  // Time filter options with subtle color gradient from green to red
   const timeFilterOptions = [
-    { key: 'all', label: 'All', value: null },
-    { key: 'lt1h', label: '< 1hr', value: 1 },
-    { key: 'gt1h', label: '> 1hr', value: 1 },
-    { key: 'gt3h', label: '> 3hr', value: 3 },
-    { key: 'gt6h', label: '> 6hr', value: 6 },
-    { key: 'gt12h', label: '> 12hr', value: 12 },
-    { key: 'gt1d', label: '> 1d', value: 24 },
-    { key: 'gt3d', label: '> 3d', value: 72 },
-    { key: 'gt7d', label: '> 7d', value: 168 },
+    { key: 'all', label: 'All', value: null, color: '#666666', borderColor: '#666666' },
+    { key: 'lt1h', label: '< 1hr', value: 1, color: '#81c784', borderColor: '#a5d6a7' }, // Light Green
+    { key: 'gt1h', label: '> 1hr', value: 1, color: '#aed581', borderColor: '#c8e6c9' }, // Light Green
+    { key: 'gt3h', label: '> 3hr', value: 3, color: '#dce775', borderColor: '#e8f5e8' }, // Light Lime
+    { key: 'gt6h', label: '> 6hr', value: 6, color: '#fff176', borderColor: '#fff9c4' }, // Light Yellow
+    { key: 'gt12h', label: '> 12hr', value: 12, color: '#ffcc02', borderColor: '#ffecb3' }, // Light Amber
+    { key: 'gt1d', label: '> 1d', value: 24, color: '#ffb74d', borderColor: '#ffe0b2' }, // Light Orange
+    { key: 'gt3d', label: '> 3d', value: 72, color: '#ff8a65', borderColor: '#ffccbc' }, // Light Deep Orange
+    { key: 'gt7d', label: '> 7d', value: 168, color: '#e57373', borderColor: '#ffcdd2' }, // Light Red
   ];
 
   // Handle time filter selection
@@ -237,6 +237,13 @@ const FloatingDevicesPopover = ({
   useEffect(() => {
     setPage(1);
   }, [searchKeyword]);
+
+  // Reset filter to "All" when popover opens
+  useEffect(() => {
+    if (isVisible) {
+      setSelectedTimeFilter('all');
+    }
+  }, [isVisible]);
 
   // Filter devices based on search keyword
   const filteredDevices = devices.filter(device =>
@@ -563,6 +570,7 @@ const FloatingDevicesPopover = ({
               {/* Time Filter Buttons */}
               <div style={{ 
                 marginTop: '12px', 
+                paddingTop: '4px',
                 display: 'flex', 
                 flexWrap: 'nowrap',
                 gap: '8px',
@@ -574,20 +582,24 @@ const FloatingDevicesPopover = ({
               }}>
                 {timeFilterOptions.map((option) => {
                   const isSelected = selectedTimeFilter === option.key;
+                  // Use dark text for yellow/light colored backgrounds for better readability
+                  const textColor = isSelected 
+                    ? (option.key === 'gt3h' || option.key === 'gt6h' ? '#333333' : '#ffffff')
+                    : option.color;
+                  const borderColor = isSelected ? option.color : option.color; // Same as text for inactive
                   return (
                     <div
                       key={option.key}
                       onClick={() => handleTimeFilterSelect(option.key)}
                       style={{
-                        backgroundColor: isSelected ? '#1976d2' : 'transparent',
-                        color: isSelected ? '#ffffff' : '#666666',
-                        border: '1px solid',
-                        borderColor: isSelected ? '#1976d2' : '#666666',
+                        backgroundColor: isSelected ? option.color : 'transparent',
+                        color: textColor,
+                        border: `1px solid ${borderColor}`,
                         borderRadius: '16px',
                         padding: '4px 12px',
                         fontSize: '11px',
                         height: '24px',
-                        fontWeight: isSelected ? '600' : '400',
+                        fontWeight: '500',
                         minWidth: 'fit-content',
                         whiteSpace: 'nowrap',
                         cursor: 'pointer',
@@ -595,7 +607,16 @@ const FloatingDevicesPopover = ({
                         alignItems: 'center',
                         justifyContent: 'center',
                         userSelect: 'none',
-                        boxSizing: 'border-box'
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                        position: 'relative',
+                        zIndex: 1,
+                        margin: '0',
+                        verticalAlign: 'top',
+                        WebkitBackfaceVisibility: 'hidden',
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(0)',
+                        willChange: 'auto'
                       }}
                     >
                       {option.label}
