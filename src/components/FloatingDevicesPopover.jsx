@@ -615,7 +615,7 @@ const FloatingDevicesPopover = ({
                 {timeFilterOptions.map((option) => {
                   const isSelected = selectedTimeFilter === option.key;
                   
-                  // Special styling for "All" tag - use pagination blue style
+                  // Special styling for "All" tag - use consistent pattern
                   if (option.key === 'all') {
                     return (
                       <div
@@ -624,7 +624,7 @@ const FloatingDevicesPopover = ({
                         style={{
                           backgroundColor: isSelected ? '#1976d2' : 'transparent',
                           color: isSelected ? '#ffffff' : '#1976d2',
-                          border: `1px solid ${isSelected ? '#1976d2' : '#1976d2'}`,
+                          border: `1px solid #1976d2`,
                           borderRadius: '16px',
                           padding: '4px 12px',
                           fontSize: '11px',
@@ -647,7 +647,7 @@ const FloatingDevicesPopover = ({
                           backfaceVisibility: 'hidden',
                           transform: 'translateZ(0)',
                           willChange: 'auto',
-                          opacity: 0.4
+                          opacity: isSelected ? 0.9 : 0.8
                         }}
                       >
                         {option.label}
@@ -691,7 +691,7 @@ const FloatingDevicesPopover = ({
                         backfaceVisibility: 'hidden',
                         transform: 'translateZ(0)',
                         willChange: 'auto',
-                        opacity: 0.6
+                        opacity: isSelected ? 0.9 : 0.8
                       }}
                     >
                       {option.label}
