@@ -43,7 +43,11 @@ import {
   Check as CheckIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
-import { formatStatus, formatNotificationTitle } from '../common/util/formatter';
+import { formatStatus, formatNotificationTitle, formatTime } from '../common/util/formatter';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
@@ -183,22 +187,50 @@ const FloatingDevicesPopover = ({
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
 
-  // Time filter options with subtle color gradient from green to red
+  // Time filter options with green, orange, red gradient (avoiding yellow tones)
   const timeFilterOptions = [
     { key: 'all', label: 'All', value: null, color: '#666666', borderColor: '#666666' },
-    { key: 'lt1h', label: '< 1hr', value: 1, color: '#81c784', borderColor: '#a5d6a7' }, // Light Green
-    { key: 'gt1h', label: '> 1hr', value: 1, color: '#aed581', borderColor: '#c8e6c9' }, // Light Green
-    { key: 'gt3h', label: '> 3hr', value: 3, color: '#dce775', borderColor: '#e8f5e8' }, // Light Lime
-    { key: 'gt6h', label: '> 6hr', value: 6, color: '#fff176', borderColor: '#fff9c4' }, // Light Yellow
-    { key: 'gt12h', label: '> 12hr', value: 12, color: '#ffcc02', borderColor: '#ffecb3' }, // Light Amber
-    { key: 'gt1d', label: '> 1d', value: 24, color: '#ffb74d', borderColor: '#ffe0b2' }, // Light Orange
-    { key: 'gt3d', label: '> 3d', value: 72, color: '#ff8a65', borderColor: '#ffccbc' }, // Light Deep Orange
-    { key: 'gt7d', label: '> 7d', value: 168, color: '#e57373', borderColor: '#ffcdd2' }, // Light Red
+    { key: 'lt1h', label: '< 1hr', value: 1, color: '#4caf50', borderColor: '#66bb6a' }, // Green
+    { key: 'gt1h', label: '> 1hr', value: 1, color: '#66bb6a', borderColor: '#81c784' }, // Light Green
+    { key: 'gt3h', label: '> 3hr', value: 3, color: '#8bc34a', borderColor: '#aed581' }, // Lime Green
+    { key: 'gt6h', label: '> 6hr', value: 6, color: '#ff9800', borderColor: '#ffb74d' }, // Orange
+    { key: 'gt12h', label: '> 12hr', value: 12, color: '#ff7043', borderColor: '#ff8a65' }, // Deep Orange
+    { key: 'gt1d', label: '> 1d', value: 24, color: '#ff5722', borderColor: '#ff8a65' }, // Red Orange
+    { key: 'gt3d', label: '> 3d', value: 72, color: '#f44336', borderColor: '#e57373' }, // Red
+    { key: 'gt7d', label: '> 7d', value: 168, color: '#d32f2f', borderColor: '#e57373' }, // Dark Red
+    { key: 'nr', label: 'NR', value: null, color: '#b71c1c', borderColor: '#d32f2f' }, // No Response - Darker Red
   ];
 
   // Handle time filter selection
   const handleTimeFilterSelect = (filterKey) => {
     setSelectedTimeFilter(filterKey);
+  };
+
+  // Format last update time (following Traccar patterns)
+  const formatLastUpdate = (device) => {
+    if (!device.lastUpdate) {
+      return formatStatus(device.status, t);
+    }
+    
+    const now = dayjs();
+    const lastUpdate = dayjs(device.lastUpdate);
+    const diffMinutes = now.diff(lastUpdate, 'minute');
+    
+    // For online devices, show relative time if < 5 minutes, otherwise show formatted time
+    if (device.status === 'online') {
+      if (diffMinutes < 5) {
+        return lastUpdate.fromNow();
+      } else {
+        return formatTime(device.lastUpdate, 'minutes');
+      }
+    }
+    
+    // For offline/unknown devices, show relative time for recent updates, formatted time for older
+    if (diffMinutes < 60) {
+      return lastUpdate.fromNow();
+    } else {
+      return formatTime(device.lastUpdate, 'minutes');
+    }
   };
 
   // Fetch devices with TanStack Query
@@ -582,11 +614,53 @@ const FloatingDevicesPopover = ({
               }}>
                 {timeFilterOptions.map((option) => {
                   const isSelected = selectedTimeFilter === option.key;
-                  // Use dark text for yellow/light colored backgrounds for better readability
+                  
+                  // Special styling for "All" tag - use pagination blue style
+                  if (option.key === 'all') {
+                    return (
+                      <div
+                        key={option.key}
+                        onClick={() => handleTimeFilterSelect(option.key)}
+                        style={{
+                          backgroundColor: isSelected ? '#1976d2' : 'transparent',
+                          color: isSelected ? '#ffffff' : '#1976d2',
+                          border: `1px solid ${isSelected ? '#1976d2' : '#1976d2'}`,
+                          borderRadius: '16px',
+                          padding: '4px 12px',
+                          fontSize: '11px',
+                          height: '24px',
+                          fontWeight: '500',
+                          minWidth: 'fit-content',
+                          whiteSpace: 'nowrap',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          userSelect: 'none',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                          position: 'relative',
+                          zIndex: 1,
+                          margin: '0',
+                          verticalAlign: 'top',
+                          WebkitBackfaceVisibility: 'hidden',
+                          backfaceVisibility: 'hidden',
+                          transform: 'translateZ(0)',
+                          willChange: 'auto',
+                          opacity: 0.4
+                        }}
+                      >
+                        {option.label}
+                      </div>
+                    );
+                  }
+                  
+                  // Regular styling for other tags
                   const textColor = isSelected 
                     ? (option.key === 'gt3h' || option.key === 'gt6h' ? '#333333' : '#ffffff')
                     : option.color;
-                  const borderColor = isSelected ? option.color : option.color; // Same as text for inactive
+                  const borderColor = isSelected ? option.color : option.color;
+                  
                   return (
                     <div
                       key={option.key}
@@ -616,7 +690,8 @@ const FloatingDevicesPopover = ({
                         WebkitBackfaceVisibility: 'hidden',
                         backfaceVisibility: 'hidden',
                         transform: 'translateZ(0)',
-                        willChange: 'auto'
+                        willChange: 'auto',
+                        opacity: 0.6
                       }}
                     >
                       {option.label}
@@ -684,6 +759,11 @@ const FloatingDevicesPopover = ({
                               {t('deviceStatus')}
                             </TableCell>
                           )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                              {t('sharedLastUpdate')}
+                            </TableCell>
+                          )}
                           <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                             {t('sharedActions')}
                           </TableCell>
@@ -729,6 +809,13 @@ const FloatingDevicesPopover = ({
                                     height: '16px',
                                   }}
                                 />
+                              </TableCell>
+                            )}
+                            {desktop && (
+                              <TableCell>
+                                <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {formatLastUpdate(device)}
+                                </Typography>
                               </TableCell>
                             )}
                             <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
