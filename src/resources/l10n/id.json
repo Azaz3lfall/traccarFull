@@ -518,7 +518,7 @@
   "sharedDescription": "Deskripsi",
   "sharedDevice": "Perangkat",
   "sharedDeviceAccumulators": "Accumulators",
-  "sharedDisabled": "Diaktifkan",
+  "sharedDisabled": "Dinonaktifkan",
   "sharedEnabled": "Diaktifkan",
   "sharedDistance": "Jarak",
   "sharedDriver": "Antarmuka",

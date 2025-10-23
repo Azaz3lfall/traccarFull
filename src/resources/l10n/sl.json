@@ -518,7 +518,7 @@
   "sharedDescription": "Opis",
   "sharedDevice": "Naprava",
   "sharedDeviceAccumulators": "Seštevki",
-  "sharedDisabled": "Omogočeno",
+  "sharedDisabled": "Onemogočeno",
   "sharedEnabled": "Omogočeno",
   "sharedDistance": "Razdalja",
   "sharedDriver": "Voznik",

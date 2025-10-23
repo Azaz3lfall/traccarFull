@@ -518,7 +518,7 @@
   "sharedDescription": "Kuvaus",
   "sharedDevice": "Laite",
   "sharedDeviceAccumulators": "Laskurit",
-  "sharedDisabled": "Käytössä",
+  "sharedDisabled": "Poistettu käytöstä",
   "sharedEnabled": "Käytössä",
   "sharedDistance": "Matka",
   "sharedDriver": "Kuljettaja",

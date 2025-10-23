@@ -518,7 +518,7 @@
   "sharedDescription": "Descripció",
   "sharedDevice": "Dispositiu",
   "sharedDeviceAccumulators": "Acumulador",
-  "sharedDisabled": "Habilitat",
+  "sharedDisabled": "Deshabilitat",
   "sharedEnabled": "Habilitat",
   "sharedDistance": "Distància",
   "sharedDriver": "Conductor",
