@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -277,14 +277,65 @@ const FloatingDevicesPopover = ({
     }
   }, [isVisible]);
 
-  // Filter devices based on search keyword
-  const filteredDevices = devices.filter(device =>
-    device.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    device.uniqueId?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    device.phone?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    device.model?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-    device.contact?.toLowerCase().includes(searchKeyword.toLowerCase())
-  );
+  // Time-based filtering function
+  const filterDevicesByTime = (device) => {
+    if (selectedTimeFilter === 'all') {
+      return true;
+    }
+
+    if (selectedTimeFilter === 'nr') {
+      // No Response - null or invalid lastUpdate
+      return !device.lastUpdate || !dayjs(device.lastUpdate).isValid();
+    }
+
+    // For time-based filters, check if lastUpdate exists and is valid
+    if (!device.lastUpdate || !dayjs(device.lastUpdate).isValid()) {
+      return false;
+    }
+
+    const now = dayjs();
+    const lastUpdate = dayjs(device.lastUpdate);
+    const diffHours = now.diff(lastUpdate, 'hour');
+
+    // Filter from biggest time windows to smallest
+    switch (selectedTimeFilter) {
+      case 'gt7d':
+        return diffHours > 168; // > 7 days
+      case 'gt3d':
+        return diffHours > 72 && diffHours <= 168; // > 3 days and <= 7 days
+      case 'gt1d':
+        return diffHours > 24 && diffHours <= 72; // > 1 day and <= 3 days
+      case 'gt12h':
+        return diffHours > 12 && diffHours <= 24; // > 12 hours and <= 1 day
+      case 'gt6h':
+        return diffHours > 6 && diffHours <= 12; // > 6 hours and <= 12 hours
+      case 'gt3h':
+        return diffHours > 3 && diffHours <= 6; // > 3 hours and <= 6 hours
+      case 'gt1h':
+        return diffHours > 1 && diffHours <= 3; // > 1 hour and <= 3 hours
+      case 'lt1h':
+        return diffHours <= 1; // <= 1 hour
+      default:
+        return true;
+    }
+  };
+
+  // Filter devices based on search keyword and time filter
+  const filteredDevices = useMemo(() => {
+    return devices.filter(device => {
+      // First apply time filter
+      if (!filterDevicesByTime(device)) {
+        return false;
+      }
+
+      // Then apply search filter
+      return device.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+             device.uniqueId?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+             device.phone?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+             device.model?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+             device.contact?.toLowerCase().includes(searchKeyword.toLowerCase());
+    });
+  }, [devices, searchKeyword, selectedTimeFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredDevices.length / pageSize);
@@ -854,6 +905,11 @@ const FloatingDevicesPopover = ({
                     }}>
                       <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
                         {page} / {totalPages} ({filteredDevices.length} {t('sharedDevices')})
+                        {selectedTimeFilter !== 'all' && (
+                          <span style={{ color: colors.textSecondary, opacity: 0.7 }}>
+                            {' '}• {timeFilterOptions.find(opt => opt.key === selectedTimeFilter)?.label}
+                          </span>
+                        )}
                       </Typography>
                       <CustomPagination
                         page={page}
