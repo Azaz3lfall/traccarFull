@@ -35,7 +35,7 @@ import {
 import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 
 dayjs.extend(relativeTime);
@@ -87,6 +87,17 @@ const FloatingDeviceList = ({
       { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
     ]
   });
+  
+  // Snackbar state for notifications
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  
+  const showSnackbar = (message, severity = 'error') => {
+    setSnackbar({ open: true, message, severity });
+  };
+  
+  const hideSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
@@ -392,12 +403,12 @@ const FloatingDeviceList = ({
 
   const createCalendar = async () => {
     if (!smartLinkCalendarForm.name.trim()) {
-      alert(t('sharedName') + ' ' + t('sharedRequired'));
+      showSnackbar(t('sharedName') + ' ' + t('sharedRequired'), 'error');
       return;
     }
 
     if (smartLinkDays.length === 0) {
-      alert(t('calendarDays') + ' ' + t('sharedRequired'));
+      showSnackbar(t('calendarDays') + ' ' + t('sharedRequired'), 'error');
       return;
     }
 
@@ -440,13 +451,13 @@ const FloatingDeviceList = ({
         const data = await res.json();
         setSmartLinkCalendars(Array.isArray(data) ? data : []);
         
-        alert(t('sharedCalendar') + ' ' + t('sharedCreated'));
+        showSnackbar(t('sharedCalendar') + ' ' + t('sharedCreated'), 'success');
       } else {
         throw new Error('Failed to create calendar');
       }
     } catch (error) {
       console.error('Error creating calendar:', error);
-      alert(t('sharedError') + ': ' + error.message);
+      showSnackbar(t('sharedError') + ': ' + error.message, 'error');
     }
   };
 
@@ -2271,6 +2282,21 @@ const FloatingDeviceList = ({
         </motion.div>
       )}
     </AnimatePresence>
+    
+    {/* Snackbar for notifications */}
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={hideSnackbar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert
+        severity={snackbar.severity}
+        sx={{ width: '100%' }}
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
     </>
   );
 };
