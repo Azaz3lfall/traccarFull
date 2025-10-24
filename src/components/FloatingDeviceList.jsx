@@ -2080,11 +2080,13 @@ const FloatingDeviceList = ({
                                       type="checkbox"
                                       checked={smartLinkTimeRanges.enabled}
                                       onChange={(e) => {
+                                        console.log('Time ranges checkbox changed:', e.target.checked);
                                         const newTimeRanges = { ...smartLinkTimeRanges, enabled: e.target.checked };
                                         // Ensure first period is enabled when time ranges are enabled
                                         if (e.target.checked && newTimeRanges.periods.length > 0) {
                                           newTimeRanges.periods[0].enabled = true;
                                         }
+                                        console.log('Setting time ranges to:', newTimeRanges);
                                         setSmartLinkTimeRanges(newTimeRanges);
                                       }}
                                       style={{ width: '16px', height: '16px' }}
