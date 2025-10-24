@@ -564,6 +564,9 @@ const FloatingDeviceList = ({
           { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
         ]
       });
+      
+      // Reset to first tab (groups)
+      setSmartLinkActiveTab('groups');
     }
   }, [showWandModal]);
   
