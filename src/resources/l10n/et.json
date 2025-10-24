@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Kasutajate laadimine ebaõnnestus",
   "failedToFetchLogs": "Logide laadimine ebaõnnestus",
   "uploadXlsxFile": "Laadi üles XLSX fail",
-  "chooseXlsxFile": "Vali XLSX fail"
+  "chooseXlsxFile": "Vali XLSX fail",
+  "sharedClearAll": "Tühjenda kõik"
 }

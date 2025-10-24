@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Neuspješno dohvaćanje korisnika",
   "failedToFetchLogs": "Neuspješno dohvaćanje zapisa",
   "uploadXlsxFile": "Učitaj XLSX datoteku",
-  "chooseXlsxFile": "Odaberi XLSX datoteku"
+  "chooseXlsxFile": "Odaberi XLSX datoteku",
+  "sharedClearAll": "Očisti sve"
 }

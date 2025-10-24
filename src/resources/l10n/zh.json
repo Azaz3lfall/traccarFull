@@ -860,5 +860,6 @@
   "failedToFetchUsers": "获取用户失败",
   "failedToFetchLogs": "获取日志失败",
   "uploadXlsxFile": "上传 XLSX 文件",
-  "chooseXlsxFile": "选择 XLSX 文件"
+  "chooseXlsxFile": "选择 XLSX 文件",
+  "sharedClearAll": "清除全部"
 }

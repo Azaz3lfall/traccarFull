@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Error al obtenir usuaris",
   "failedToFetchLogs": "Error al obtenir registres",
   "uploadXlsxFile": "Pujar fitxer XLSX",
-  "chooseXlsxFile": "Tria fitxer XLSX"
+  "chooseXlsxFile": "Tria fitxer XLSX",
+  "sharedClearAll": "Esborrar tot"
 }

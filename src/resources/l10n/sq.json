@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Dështoi në marrjen e përdoruesve",
   "failedToFetchLogs": "Dështoi në marrjen e regjistrave",
   "uploadXlsxFile": "Ngarko skedar XLSX",
-  "chooseXlsxFile": "Zgjidh skedar XLSX"
+  "chooseXlsxFile": "Zgjidh skedar XLSX",
+  "sharedClearAll": "Pastro gjithçka"
 }

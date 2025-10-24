@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Neizdevās iegūt lietotājus",
   "failedToFetchLogs": "Neizdevās iegūt žurnālus",
   "uploadXlsxFile": "Augšupielādēt XLSX failu",
-  "chooseXlsxFile": "Izvēlēties XLSX failu"
+  "chooseXlsxFile": "Izvēlēties XLSX failu",
+  "sharedClearAll": "Notīrīt visu"
 }

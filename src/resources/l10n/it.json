@@ -860,5 +860,6 @@
   "failedToFetchUsers": "Recupero utenti fallito",
   "failedToFetchLogs": "Recupero log fallito",
   "uploadXlsxFile": "Carica file XLSX",
-  "chooseXlsxFile": "Scegli file XLSX"
+  "chooseXlsxFile": "Scegli file XLSX",
+  "sharedClearAll": "Cancella tutto"
 }

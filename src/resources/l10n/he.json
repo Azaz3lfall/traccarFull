@@ -861,5 +861,6 @@
   "failedToFetchUsers": "נכשל בקבלת משתמשים",
   "failedToFetchLogs": "נכשל בקבלת לוגים",
   "uploadXlsxFile": "העלה קובץ XLSX",
-  "chooseXlsxFile": "בחר קובץ XLSX"
+  "chooseXlsxFile": "בחר קובץ XLSX",
+  "sharedClearAll": "נקה הכל"
 }

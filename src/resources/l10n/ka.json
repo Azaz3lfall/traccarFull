@@ -857,5 +857,6 @@
   "failedToFetchUsers": "მომხმარებლების მიღება ვერ მოხერხდა",
   "failedToFetchLogs": "ლოგების მიღება ვერ მოხერხდა",
   "uploadXlsxFile": "XLSX ფაილის ატვირთვა",
-  "chooseXlsxFile": "XLSX ფაილის არჩევა"
+  "chooseXlsxFile": "XLSX ფაილის არჩევა",
+  "sharedClearAll": "ყველას გასუფთავება"
 }

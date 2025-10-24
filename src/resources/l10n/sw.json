@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Imeshindwa kupata watumiaji",
   "failedToFetchLogs": "Imeshindwa kupata logi",
   "uploadXlsxFile": "Pakia faili XLSX",
-  "chooseXlsxFile": "Chagua faili XLSX"
+  "chooseXlsxFile": "Chagua faili XLSX",
+  "sharedClearAll": "Futa zote"
 }

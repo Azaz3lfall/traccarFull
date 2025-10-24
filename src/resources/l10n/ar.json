@@ -860,5 +860,6 @@
   "failedToFetchUsers": "فشل في جلب المستخدمين",
   "failedToFetchLogs": "فشل في جلب السجلات",
   "uploadXlsxFile": "رفع ملف XLSX",
-  "chooseXlsxFile": "اختر ملف XLSX"
+  "chooseXlsxFile": "اختر ملف XLSX",
+  "sharedClearAll": "مسح الكل"
 }

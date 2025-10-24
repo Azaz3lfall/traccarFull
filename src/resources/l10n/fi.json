@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Käyttäjien haku epäonnistui",
   "failedToFetchLogs": "Lokien haku epäonnistui",
   "uploadXlsxFile": "Lataa XLSX-tiedosto",
-  "chooseXlsxFile": "Valitse XLSX-tiedosto"
+  "chooseXlsxFile": "Valitse XLSX-tiedosto",
+  "sharedClearAll": "Tyhjennä kaikki"
 }

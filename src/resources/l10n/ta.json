@@ -857,5 +857,6 @@
   "failedToFetchUsers": "பயனர்களைப் பெற முடியவில்லை",
   "failedToFetchLogs": "பதிவுகளைப் பெற முடியவில்லை",
   "uploadXlsxFile": "XLSX கோப்பை பதிவேற்றவும்",
-  "chooseXlsxFile": "XLSX கோப்பை தேர்ந்தெடுக்கவும்"
+  "chooseXlsxFile": "XLSX கோப்பை தேர்ந்தெடுக்கவும்",
+  "sharedClearAll": "அனைத்தையும் அழி"
 }

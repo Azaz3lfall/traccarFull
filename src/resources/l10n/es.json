@@ -860,5 +860,6 @@
   "buildFailed": "Construcción fallida",
   "failedToFetchResellers": "Error al obtener revendedores",
   "failedToFetchUsers": "Error al obtener usuarios",
-  "failedToFetchLogs": "Error al obtener registros"
+  "failedToFetchLogs": "Error al obtener registros",
+  "sharedClearAll": "Limpiar todo"
 }

@@ -861,5 +861,6 @@
   "failedToFetchUsers": "ব্যবহারকারী আনতে ব্যর্থ",
   "failedToFetchLogs": "লগ আনতে ব্যর্থ",
   "uploadXlsxFile": "XLSX ফাইল আপলোড করুন",
-  "chooseXlsxFile": "XLSX ফাইল নির্বাচন করুন"
+  "chooseXlsxFile": "XLSX ফাইল নির্বাচন করুন",
+  "sharedClearAll": "সব সাফ করুন"
 }

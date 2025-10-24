@@ -860,5 +860,6 @@
   "failedToFetchUsers": "사용자 가져오기 실패",
   "failedToFetchLogs": "로그 가져오기 실패",
   "uploadXlsxFile": "XLSX 파일 업로드",
-  "chooseXlsxFile": "XLSX 파일 선택"
+  "chooseXlsxFile": "XLSX 파일 선택",
+  "sharedClearAll": "모두 지우기"
 }

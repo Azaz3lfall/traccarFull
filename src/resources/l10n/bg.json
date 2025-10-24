@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Неуспешно извличане на потребители",
   "failedToFetchLogs": "Неуспешно извличане на логове",
   "uploadXlsxFile": "Качване на XLSX файл",
-  "chooseXlsxFile": "Избор на XLSX файл"
+  "chooseXlsxFile": "Избор на XLSX файл",
+  "sharedClearAll": "Изчисти всички"
 }

@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Falha ao buscar utilizadores",
   "failedToFetchLogs": "Falha ao buscar registos",
   "uploadXlsxFile": "Carregar ficheiro XLSX",
-  "chooseXlsxFile": "Escolher ficheiro XLSX"
+  "chooseXlsxFile": "Escolher ficheiro XLSX",
+  "sharedClearAll": "Limpar tudo"
 }

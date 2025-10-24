@@ -269,6 +269,7 @@
   "confirmQuit": "Do you really want to logout?",
   "showHideDevices": "Show Device List",
   "allItems": "All",
+  "sharedClearAll": "Clear All",
   "loginTitle": "Login",
   "loginLanguage": "Language",
   "loginReset": "Reset Password",

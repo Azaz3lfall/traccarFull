@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Foydalanuvchilarni olish muvaffaqiyatsiz",
   "failedToFetchLogs": "Jurnallarni olish muvaffaqiyatsiz",
   "uploadXlsxFile": "XLSX faylini yuklash",
-  "chooseXlsxFile": "XLSX faylini tanlash"
+  "chooseXlsxFile": "XLSX faylini tanlash",
+  "sharedClearAll": "Barchasini tozalash"
 }

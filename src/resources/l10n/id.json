@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Gagal mengambil pengguna",
   "failedToFetchLogs": "Gagal mengambil log",
   "uploadXlsxFile": "Unggah file XLSX",
-  "chooseXlsxFile": "Pilih file XLSX"
+  "chooseXlsxFile": "Pilih file XLSX",
+  "sharedClearAll": "Hapus semua"
 }

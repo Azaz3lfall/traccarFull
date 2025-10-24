@@ -863,5 +863,6 @@
   "failedToFetchUsers": "Falha ao buscar usuários",
   "failedToFetchLogs": "Falha ao buscar logs",
   "uploadXlsxFile": "Fazer upload do arquivo XLSX",
-  "chooseXlsxFile": "Escolher arquivo XLSX"
+  "chooseXlsxFile": "Escolher arquivo XLSX",
+  "sharedClearAll": "Limpar tudo"
 }

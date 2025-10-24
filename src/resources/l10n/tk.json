@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Ulanyjylary almak mümkin bolmady",
   "failedToFetchLogs": "Loglary almak mümkin bolmady",
   "uploadXlsxFile": "XLSX faýly ýükle",
-  "chooseXlsxFile": "XLSX faýly saýla"
+  "chooseXlsxFile": "XLSX faýly saýla",
+  "sharedClearAll": "Hemmesini arassala"
 }

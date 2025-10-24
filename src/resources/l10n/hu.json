@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Felhasználók lekérése sikertelen",
   "failedToFetchLogs": "Naplók lekérése sikertelen",
   "uploadXlsxFile": "XLSX fájl feltöltése",
-  "chooseXlsxFile": "XLSX fájl kiválasztása"
+  "chooseXlsxFile": "XLSX fájl kiválasztása",
+  "sharedClearAll": "Összes törlése"
 }

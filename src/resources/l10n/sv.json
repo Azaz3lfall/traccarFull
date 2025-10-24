@@ -860,5 +860,6 @@
   "failedToFetchUsers": "Misslyckades att hämta användare",
   "failedToFetchLogs": "Misslyckades att hämta loggar",
   "uploadXlsxFile": "Ladda upp XLSX-fil",
-  "chooseXlsxFile": "Välj XLSX-fil"
+  "chooseXlsxFile": "Välj XLSX-fil",
+  "sharedClearAll": "Rensa allt"
 }

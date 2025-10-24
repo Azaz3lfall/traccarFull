@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Không thể lấy người dùng",
   "failedToFetchLogs": "Không thể lấy nhật ký",
   "uploadXlsxFile": "Tải lên tệp XLSX",
-  "chooseXlsxFile": "Chọn tệp XLSX"
+  "chooseXlsxFile": "Chọn tệp XLSX",
+  "sharedClearAll": "Xóa tất cả"
 }

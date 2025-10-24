@@ -860,5 +860,6 @@
   "buildFailed": "Build fehlgeschlagen",
   "failedToFetchResellers": "Händler konnten nicht abgerufen werden",
   "failedToFetchUsers": "Benutzer konnten nicht abgerufen werden",
-  "failedToFetchLogs": "Protokolle konnten nicht abgerufen werden"
+  "failedToFetchLogs": "Protokolle konnten nicht abgerufen werden",
+  "sharedClearAll": "Alle löschen"
 }

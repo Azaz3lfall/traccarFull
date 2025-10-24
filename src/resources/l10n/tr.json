@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Kullanıcılar getirilemedi",
   "failedToFetchLogs": "Günlükler getirilemedi",
   "uploadXlsxFile": "XLSX dosyası yükle",
-  "chooseXlsxFile": "XLSX dosyası seç"
+  "chooseXlsxFile": "XLSX dosyası seç",
+  "sharedClearAll": "Tümünü temizle"
 }

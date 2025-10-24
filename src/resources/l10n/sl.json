@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Pridobivanje uporabnikov neuspešno",
   "failedToFetchLogs": "Pridobivanje dnevnikov neuspešno",
   "uploadXlsxFile": "Naloži XLSX datoteko",
-  "chooseXlsxFile": "Izberi XLSX datoteko"
+  "chooseXlsxFile": "Izberi XLSX datoteko",
+  "sharedClearAll": "Počisti vse"
 }

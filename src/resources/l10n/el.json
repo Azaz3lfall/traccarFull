@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Αποτυχία λήψης χρηστών",
   "failedToFetchLogs": "Αποτυχία λήψης καταγραφών",
   "uploadXlsxFile": "Ανέβασμα αρχείου XLSX",
-  "chooseXlsxFile": "Επιλογή αρχείου XLSX"
+  "chooseXlsxFile": "Επιλογή αρχείου XLSX",
+  "sharedClearAll": "Εκκαθάριση όλων"
 }

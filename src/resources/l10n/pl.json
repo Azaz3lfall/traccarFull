@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Nie udało się pobrać użytkowników",
   "failedToFetchLogs": "Nie udało się pobrać logów",
   "uploadXlsxFile": "Prześlij plik XLSX",
-  "chooseXlsxFile": "Wybierz plik XLSX"
+  "chooseXlsxFile": "Wybierz plik XLSX",
+  "sharedClearAll": "Wyczyść wszystko"
 }

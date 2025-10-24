@@ -857,5 +857,6 @@
   "failedToFetchUsers": "دریافت کاربران ناموفق",
   "failedToFetchLogs": "دریافت لاگ‌ها ناموفق",
   "uploadXlsxFile": "آپلود فایل XLSX",
-  "chooseXlsxFile": "انتخاب فایل XLSX"
+  "chooseXlsxFile": "انتخاب فایل XLSX",
+  "sharedClearAll": "پاک کردن همه"
 }

@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Erro ao obter usuarios",
   "failedToFetchLogs": "Erro ao obter rexistros",
   "uploadXlsxFile": "Subir ficheiro XLSX",
-  "chooseXlsxFile": "Escoller ficheiro XLSX"
+  "chooseXlsxFile": "Escoller ficheiro XLSX",
+  "sharedClearAll": "Limpar todo"
 }

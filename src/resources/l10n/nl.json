@@ -860,5 +860,6 @@
   "failedToFetchUsers": "Ophalen van gebruikers mislukt",
   "failedToFetchLogs": "Ophalen van logs mislukt",
   "uploadXlsxFile": "XLSX-bestand uploaden",
-  "chooseXlsxFile": "XLSX-bestand kiezen"
+  "chooseXlsxFile": "XLSX-bestand kiezen",
+  "sharedClearAll": "Alles wissen"
 }

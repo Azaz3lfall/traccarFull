@@ -857,5 +857,6 @@
   "failedToFetchUsers": "प्रयोगकर्ताहरू ल्याउन असफल",
   "failedToFetchLogs": "लगहरू ल्याउन असफल",
   "uploadXlsxFile": "XLSX फाइल अपलोड गर्नुहोस्",
-  "chooseXlsxFile": "XLSX फाइल छान्नुहोस्"
+  "chooseXlsxFile": "XLSX फाइल छान्नुहोस्",
+  "sharedClearAll": "सबै खाली गर्नुहोस्"
 }

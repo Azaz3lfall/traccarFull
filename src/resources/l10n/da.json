@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Kunne ikke hente brugere",
   "failedToFetchLogs": "Kunne ikke hente logs",
   "uploadXlsxFile": "Upload XLSX-fil",
-  "chooseXlsxFile": "Vælg XLSX-fil"
+  "chooseXlsxFile": "Vælg XLSX-fil",
+  "sharedClearAll": "Ryd alt"
 }

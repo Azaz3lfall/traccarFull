@@ -857,5 +857,6 @@
   "failedToFetchUsers": "ການດຶງຜູ້ໃຊ້ລົ້ມເຫລວ",
   "failedToFetchLogs": "ການດຶງບັນທຶກລົ້ມເຫລວ",
   "uploadXlsxFile": "ອັບໂລດໄຟລ໌ XLSX",
-  "chooseXlsxFile": "ເລືອກໄຟລ໌ XLSX"
+  "chooseXlsxFile": "ເລືອກໄຟລ໌ XLSX",
+  "sharedClearAll": "ລຶບທັງໝົດ"
 }

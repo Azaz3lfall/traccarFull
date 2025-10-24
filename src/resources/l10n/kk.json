@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Пайдаланушыларды алу сәтсіз",
   "failedToFetchLogs": "Журналдарды алу сәтсіз",
   "uploadXlsxFile": "XLSX файлын жүктеу",
-  "chooseXlsxFile": "XLSX файлын таңдау"
+  "chooseXlsxFile": "XLSX файлын таңдау",
+  "sharedClearAll": "Барлығын тазалау"
 }

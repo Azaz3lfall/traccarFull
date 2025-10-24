@@ -860,5 +860,6 @@
   "buildFailed": "Construction échouée",
   "failedToFetchResellers": "Échec de récupération des revendeurs",
   "failedToFetchUsers": "Échec de récupération des utilisateurs",
-  "failedToFetchLogs": "Échec de récupération des journaux"
+  "failedToFetchLogs": "Échec de récupération des journaux",
+  "sharedClearAll": "Tout effacer"
 }

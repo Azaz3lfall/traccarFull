@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Неуспешно преузимање корисника",
   "failedToFetchLogs": "Неуспешно преузимање логова",
   "uploadXlsxFile": "Отпреми XLSX датотеку",
-  "chooseXlsxFile": "Изабери XLSX датотеку"
+  "chooseXlsxFile": "Изабери XLSX датотеку",
+  "sharedClearAll": "Очисти све"
 }

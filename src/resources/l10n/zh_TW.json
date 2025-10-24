@@ -861,5 +861,6 @@
   "failedToFetchUsers": "取得使用者失敗",
   "failedToFetchLogs": "取得日誌失敗",
   "uploadXlsxFile": "上傳 XLSX 檔案",
-  "chooseXlsxFile": "選擇 XLSX 檔案"
+  "chooseXlsxFile": "選擇 XLSX 檔案",
+  "sharedClearAll": "清除全部"
 }

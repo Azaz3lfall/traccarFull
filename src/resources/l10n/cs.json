@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Nepodařilo se načíst uživatele",
   "failedToFetchLogs": "Nepodařilo se načíst protokoly",
   "uploadXlsxFile": "Nahrát XLSX soubor",
-  "chooseXlsxFile": "Vybrat XLSX soubor"
+  "chooseXlsxFile": "Vybrat XLSX soubor",
+  "sharedClearAll": "Vymazat vše"
 }

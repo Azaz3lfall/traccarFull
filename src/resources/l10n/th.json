@@ -861,5 +861,6 @@
   "failedToFetchUsers": "ดึงข้อมูลผู้ใช้ล้มเหลว",
   "failedToFetchLogs": "ดึงข้อมูลบันทึกล้มเหลว",
   "uploadXlsxFile": "อัปโหลดไฟล์ XLSX",
-  "chooseXlsxFile": "เลือกไฟล์ XLSX"
+  "chooseXlsxFile": "เลือกไฟล์ XLSX",
+  "sharedClearAll": "ล้างทั้งหมด"
 }

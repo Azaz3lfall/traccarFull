@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Kunne ikkje hente brukarar",
   "failedToFetchLogs": "Kunne ikkje hente loggar",
   "uploadXlsxFile": "Last opp XLSX-fil",
-  "chooseXlsxFile": "Vel XLSX-fil"
+  "chooseXlsxFile": "Vel XLSX-fil",
+  "sharedClearAll": "Tøm alt"
 }

@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Хэрэглэгч авах амжилтгүй",
   "failedToFetchLogs": "Бүртгэл авах амжилтгүй",
   "uploadXlsxFile": "XLSX файл байршуулах",
-  "chooseXlsxFile": "XLSX файл сонгох"
+  "chooseXlsxFile": "XLSX файл сонгох",
+  "sharedClearAll": "Бүгдийг цэвэрлэх"
 }

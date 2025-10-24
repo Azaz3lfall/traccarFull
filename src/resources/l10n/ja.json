@@ -860,5 +860,6 @@
   "failedToFetchUsers": "ユーザーの取得に失敗しました",
   "failedToFetchLogs": "ログの取得に失敗しました",
   "uploadXlsxFile": "XLSXファイルをアップロード",
-  "chooseXlsxFile": "XLSXファイルを選択"
+  "chooseXlsxFile": "XLSXファイルを選択",
+  "sharedClearAll": "すべてクリア"
 }

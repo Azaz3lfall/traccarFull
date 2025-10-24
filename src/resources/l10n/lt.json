@@ -857,5 +857,6 @@
   "failedToFetchUsers": "Nepavyko gauti vartotojų",
   "failedToFetchLogs": "Nepavyko gauti žurnalų",
   "uploadXlsxFile": "Įkelti XLSX failą",
-  "chooseXlsxFile": "Pasirinkti XLSX failą"
+  "chooseXlsxFile": "Pasirinkti XLSX failą",
+  "sharedClearAll": "Išvalyti viską"
 }

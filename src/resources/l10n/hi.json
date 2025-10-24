@@ -860,5 +860,6 @@
   "failedToFetchUsers": "उपयोगकर्ता प्राप्त करने में विफल",
   "failedToFetchLogs": "लॉग प्राप्त करने में विफल",
   "uploadXlsxFile": "XLSX फ़ाइल अपलोड करें",
-  "chooseXlsxFile": "XLSX फ़ाइल चुनें"
+  "chooseXlsxFile": "XLSX फ़ाइल चुनें",
+  "sharedClearAll": "सभी साफ़ करें"
 }

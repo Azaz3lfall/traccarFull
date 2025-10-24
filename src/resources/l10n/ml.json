@@ -857,5 +857,6 @@
   "failedToFetchUsers": "ഉപയോക്താക്കളെ എടുക്കാൻ പരാജയപ്പെട്ടു",
   "failedToFetchLogs": "ലോഗുകൾ എടുക്കാൻ പരാജയപ്പെട്ടു",
   "uploadXlsxFile": "XLSX ഫയൽ അപ്‌ലോഡ് ചെയ്യുക",
-  "chooseXlsxFile": "XLSX ഫയൽ തിരഞ്ഞെടുക്കുക"
+  "chooseXlsxFile": "XLSX ഫയൽ തിരഞ്ഞെടുക്കുക",
+  "sharedClearAll": "എല്ലാം മായ്ക്കുക"
 }

@@ -861,5 +861,6 @@
   "failedToFetchUsers": "Eșec la preluarea utilizatorilor",
   "failedToFetchLogs": "Eșec la preluarea jurnalelor",
   "uploadXlsxFile": "Încarcă fișier XLSX",
-  "chooseXlsxFile": "Alege fișier XLSX"
+  "chooseXlsxFile": "Alege fișier XLSX",
+  "sharedClearAll": "Șterge tot"
 }
