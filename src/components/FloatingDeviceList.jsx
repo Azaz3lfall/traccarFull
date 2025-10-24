@@ -2050,7 +2050,7 @@ const FloatingDeviceList = ({
                                               {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
                                             </div>
                                           );
-                                        })
+                                        })}
                                     </div>
                                   )}
                                 </div>
