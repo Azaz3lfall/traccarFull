@@ -359,7 +359,16 @@ const FloatingDeviceList = ({
       condition: timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0
     });
 
+    console.log('Condition breakdown:', {
+      'timeRanges exists': !!timeRanges,
+      'timeRanges.enabled': timeRanges?.enabled,
+      'timeRanges.periods exists': !!timeRanges?.periods,
+      'periods.length > 0': timeRanges?.periods?.length > 0,
+      'FINAL CONDITION': timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0
+    });
+
     if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
+      console.log('ENTERING TIME RANGES BLOCK - THIS SHOULD NOT HAPPEN!');
       // Generate VEVENT blocks for each enabled time range
       const enabledPeriods = timeRanges.periods.filter(period => period.enabled);
       
@@ -391,6 +400,7 @@ const FloatingDeviceList = ({
         });
       }
     } else {
+      console.log('ENTERING ELSE BLOCK - Creating single VEVENT block');
       // Single VEVENT block for regular calendar
       if (startTime.isValid() && endTime.isValid()) {
         lines.push(
