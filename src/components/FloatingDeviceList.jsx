@@ -690,28 +690,31 @@ const FloatingDeviceList = ({
                       </div>
                     </div>
                   </div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    marginBottom: '2px'
-                  }}>
+                  {/* Status - Only visible to administrators and managers */}
+                  {manager && (
                     <div style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: getStatusColor(device.status || 'unknown')
-                    }} />
-                    <span style={{
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      color: colors.textSecondary,
-                      lineHeight: '1.2',
-                      textTransform: 'capitalize'
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      marginBottom: '2px'
                     }}>
-                      {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
-                    </span>
-                  </div>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: getStatusColor(device.status || 'unknown')
+                      }} />
+                      <span style={{
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        color: colors.textSecondary,
+                        lineHeight: '1.2',
+                        textTransform: 'capitalize'
+                      }}>
+                        {t(`deviceStatus${(device.status || 'unknown').charAt(0).toUpperCase() + (device.status || 'unknown').slice(1)}`)}
+                      </span>
+                    </div>
+                  )}
                   
                   {/* Last Update */}
                   <div style={{

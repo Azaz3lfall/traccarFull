@@ -48,7 +48,7 @@ import { BsFiletypeXlsx } from "react-icons/bs";
 dayjs.extend(relativeTime);
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
-import { useRestriction } from '../common/util/permissions';
+import { useRestriction, useManager } from '../common/util/permissions';
 import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import CustomPagination from './CustomPagination';
@@ -92,6 +92,7 @@ const FloatingDevicesPopover = ({
   const dispatch = useDispatch();
   
   const limitDevices = useRestriction('limitDevices');
+  const manager = useManager();
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const deviceAttributes = useDeviceAttributes(t);
 
@@ -195,16 +196,24 @@ const FloatingDevicesPopover = ({
       groupsLookup[group.id] = group;
     });
 
-    const data = filteredDevices.map((device) => ({
-      [t('sharedName')]: device.name,
-      [t('deviceIdentifier')]: device.uniqueId,
-      [t('groupParent')]: device.groupId ? groupsLookup[device.groupId]?.name : null,
-      [t('sharedPhone')]: device.phone,
-      [t('deviceModel')]: device.model,
-      [t('deviceContact')]: device.contact,
-      [t('deviceStatus')]: formatStatus(device.status, t),
-      [t('deviceLastUpdate')]: device.lastUpdate ? formatTime(device.lastUpdate, 'minutes') : '-',
-    }));
+    const data = filteredDevices.map((device) => {
+      const deviceData = {
+        [t('sharedName')]: device.name,
+        [t('deviceIdentifier')]: device.uniqueId,
+        [t('groupParent')]: device.groupId ? groupsLookup[device.groupId]?.name : null,
+        [t('sharedPhone')]: device.phone,
+        [t('deviceModel')]: device.model,
+        [t('deviceContact')]: device.contact,
+        [t('deviceLastUpdate')]: device.lastUpdate ? formatTime(device.lastUpdate, 'minutes') : '-',
+      };
+      
+      // Only include device status for administrators and managers
+      if (manager) {
+        deviceData[t('deviceStatus')] = formatStatus(device.status, t);
+      }
+      
+      return deviceData;
+    });
 
     if (data.length === 0) {
       showSnackbar('No devices to export', 'warning');
@@ -795,7 +804,7 @@ const FloatingDevicesPopover = ({
                               {t('deviceIdentifier')}
                             </TableCell>
                           )}
-                          {desktop && (
+                          {desktop && manager && (
                             <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                               {t('deviceStatus')}
                             </TableCell>
@@ -838,7 +847,7 @@ const FloatingDevicesPopover = ({
                                 </Typography>
                               </TableCell>
                             )}
-                            {desktop && (
+                            {desktop && manager && (
                               <TableCell>
                                 <Chip
                                   label={formatStatus(device.status, t)}
