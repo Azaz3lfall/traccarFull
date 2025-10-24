@@ -417,14 +417,6 @@ const FloatingDeviceList = ({
       const endTime = dayjs(smartLinkCalendarForm.to);
       const rule = { frequency: smartLinkRecurrence || 'ONCE', by: smartLinkDays };
       
-      // Debug: Log the values being sent
-      console.log('Creating calendar with:', {
-        recurrence: smartLinkRecurrence,
-        days: smartLinkDays,
-        timeRanges: smartLinkTimeRanges,
-        rule: rule
-      });
-      
       const calendarData = {
         name: smartLinkCalendarForm.name,
         data: generateCalendarWithTimeRanges(startTime, endTime, rule, smartLinkTimeRanges),
