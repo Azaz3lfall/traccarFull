@@ -396,6 +396,11 @@ const FloatingDeviceList = ({
       return;
     }
 
+    if (smartLinkDays.length === 0) {
+      alert(t('calendarDays') + ' ' + t('sharedRequired'));
+      return;
+    }
+
     try {
       const startTime = dayjs(smartLinkCalendarForm.from);
       const endTime = dayjs(smartLinkCalendarForm.to);
