@@ -12,6 +12,7 @@ import { devicesActions } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { useManager } from '../common/util/permissions';
 import { formatStatus, formatSpeed, formatCoordinate } from '../common/util/formatter';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import fetchOrThrow from '../common/util/fetchOrThrow';
@@ -61,6 +62,7 @@ const FloatingDeviceList = ({
   const dispatch = useDispatch();
   const t = useTranslation();
   const colors = useThemeColors();
+  const manager = useManager();
   
   const groups = useSelector((state) => state.groups.items || {});
   const devices = useSelector((state) => state.devices.items || {});
@@ -221,7 +223,7 @@ const FloatingDeviceList = ({
           setShowSortDropdown(false);
         }
         
-        if (showStatusDropdown && 
+        if (manager && showStatusDropdown && 
             statusDropdownRef.current &&
             !statusDropdownRef.current.contains(event.target)) {
           setShowStatusDropdown(false);
@@ -250,7 +252,7 @@ const FloatingDeviceList = ({
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown, showTimeWindowDropdown]);
+  }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown, showTimeWindowDropdown, manager]);
 
   // Close all dropdowns when filter popup is closed
   React.useEffect(() => {
@@ -1089,8 +1091,9 @@ const FloatingDeviceList = ({
                   </AnimatePresence>
                 </div>
                 
-                {/* Status Filter - Custom dropdown */}
-                <div ref={statusDropdownRef} style={{ position: 'relative' }}>
+                {/* Status Filter - Custom dropdown - Only visible to administrators and managers */}
+                {manager && (
+                  <div ref={statusDropdownRef} style={{ position: 'relative' }}>
                   <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -1203,7 +1206,8 @@ const FloatingDeviceList = ({
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                  </div>
+                )}
                 
                 {/* Groups Filter - Custom dropdown */}
                 <div ref={groupsDropdownRef} style={{ position: 'relative' }}>
