@@ -436,15 +436,10 @@ const FloatingDeviceList = ({
           from: dayjs().format('YYYY-MM-DDTHH:mm'),
           to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
         });
-        setSmartLinkRecurrence('');
-        setSmartLinkDays([]);
-        setSmartLinkTimeRanges({
-          enabled: false,
-          periods: [
-            { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
-            { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
-          ]
-        });
+        // Keep recurrence as WEEKLY, don't reset days and time ranges
+        // setSmartLinkRecurrence('WEEKLY'); // Already set to WEEKLY by default
+        // setSmartLinkDays([]); // Keep selected days
+        // setSmartLinkTimeRanges({...}); // Keep time ranges
         
         // Reload calendars
         const res = await fetchOrThrow('/api/calendars');
@@ -513,15 +508,10 @@ const FloatingDeviceList = ({
         from: dayjs().format('YYYY-MM-DDTHH:mm'),
         to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
       });
-      setSmartLinkRecurrence('');
-      setSmartLinkDays([]);
-      setSmartLinkTimeRanges({
-        enabled: false,
-        periods: [
-          { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
-          { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
-        ]
-      });
+      // Keep recurrence as WEEKLY, don't reset days and time ranges
+      // setSmartLinkRecurrence('WEEKLY'); // Already set to WEEKLY by default
+      // setSmartLinkDays([]); // Keep selected days
+      // setSmartLinkTimeRanges({...}); // Keep time ranges
     }
   }, [showWandModal]);
   
