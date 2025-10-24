@@ -76,7 +76,7 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedGroupIds, setSmartLinkSelectedGroupIds] = useState([]);
   const [smartLinkSelectedNotificationIds, setSmartLinkSelectedNotificationIds] = useState([]);
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
-  const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('');
+  const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('WEEKLY');
   const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
   const [smartLinkDays, setSmartLinkDays] = useState([]);
   const [smartLinkDaysDropdownOpen, setSmartLinkDaysDropdownOpen] = useState(false);
@@ -1881,8 +1881,8 @@ const FloatingDeviceList = ({
                                 }}
                               />
                               
-                              {/* Recurrency Field */}
-                              <div style={{ position: 'relative' }}>
+                              {/* Recurrency Field - Hidden, fixed to WEEKLY */}
+                              <div style={{ position: 'relative', display: 'none' }}>
                                 <TextField
                                   label={t('calendarRecurrence')}
                                   value={smartLinkRecurrence ? t(prefixString('calendar', smartLinkRecurrence.toLowerCase())) : ''}
@@ -1962,8 +1962,7 @@ const FloatingDeviceList = ({
                                 )}
                               </div>
                               
-                              {/* Days Selection for Weekly and Monthly Recurrence */}
-                              {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
+                              {/* Days Selection - Always visible since recurrence is fixed to WEEKLY */}
                                 <div style={{ position: 'relative' }}>
                                   <TextField
                                     label={t('calendarDays')}
@@ -2096,10 +2095,8 @@ const FloatingDeviceList = ({
                                     </div>
                                   )}
                                 </div>
-                              )}
                               
-                              {/* Time Ranges for Weekly and Monthly Recurrence */}
-                              {['WEEKLY', 'MONTHLY'].includes(smartLinkRecurrence) && (
+                              {/* Time Ranges - Always visible since recurrence is fixed to WEEKLY */}
                                 <div style={{ marginTop: '16px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                     <input
@@ -2272,7 +2269,6 @@ const FloatingDeviceList = ({
                                     </div>
                                   )}
                                 </div>
-                              )}
                               
                               {/* Create Calendar Button */}
                               <button
