@@ -85,7 +85,7 @@ const FloatingDeviceList = ({
   const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
       { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
     ]
   });
@@ -307,17 +307,16 @@ const FloatingDeviceList = ({
     };
     
     setSmartLinkTimeRanges({
-      ...smartLinkTimeRanges,
-      periods: [...smartLinkTimeRanges.periods, newPeriod]
+      enabled: smartLinkTimeRanges.enabled,
+      periods: [...smartLinkTimeRanges.periods.map(p => ({ ...p })), newPeriod]
     });
   };
 
   const removePeriod = (index) => {
     if (smartLinkTimeRanges.periods.length > 1) {
-      const newPeriods = [...smartLinkTimeRanges.periods];
-      newPeriods.splice(index, 1);
+      const newPeriods = smartLinkTimeRanges.periods.filter((_, i) => i !== index).map(p => ({ ...p }));
       setSmartLinkTimeRanges({
-        ...smartLinkTimeRanges,
+        enabled: smartLinkTimeRanges.enabled,
         periods: newPeriods
       });
     }
@@ -345,6 +344,22 @@ const FloatingDeviceList = ({
     }
   };
 
+  const generateSimpleCalendar = (startTime, endTime, rule) => {
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Traccar//NONSGML Traccar//EN',
+    ];
+
+    // Simple weekly calendar - NO VEVENT blocks, just RRULE
+    // This creates a weekly recurrence rule without specific events
+    lines.push(formatRule(rule, endTime));
+
+    lines.push('END:VCALENDAR');
+    const result = window.btoa(lines.join('\n'));
+    return result;
+  };
+
   const generateCalendarWithTimeRanges = (startTime, endTime, rule, timeRanges) => {
     const lines = [
       'BEGIN:VCALENDAR',
@@ -352,23 +367,8 @@ const FloatingDeviceList = ({
       'PRODID:-//Traccar//NONSGML Traccar//EN',
     ];
 
-    console.log('generateCalendarWithTimeRanges called with:', {
-      timeRanges,
-      enabled: timeRanges?.enabled,
-      periods: timeRanges?.periods,
-      condition: timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0
-    });
-
-    console.log('Condition breakdown:', {
-      'timeRanges exists': !!timeRanges,
-      'timeRanges.enabled': timeRanges?.enabled,
-      'timeRanges.periods exists': !!timeRanges?.periods,
-      'periods.length > 0': timeRanges?.periods?.length > 0,
-      'FINAL CONDITION': timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0
-    });
 
     if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
-      console.log('ENTERING TIME RANGES BLOCK - THIS SHOULD NOT HAPPEN!');
       // Generate VEVENT blocks for each enabled time range
       const enabledPeriods = timeRanges.periods.filter(period => period.enabled);
       
@@ -400,7 +400,6 @@ const FloatingDeviceList = ({
         });
       }
     } else {
-      console.log('ENTERING ELSE BLOCK - Creating single VEVENT block');
       // Single VEVENT block for regular calendar
       if (startTime.isValid() && endTime.isValid()) {
         lines.push(
@@ -436,11 +435,21 @@ const FloatingDeviceList = ({
       const endTime = dayjs(smartLinkCalendarForm.to);
       const rule = { frequency: smartLinkRecurrence || 'ONCE', by: smartLinkDays };
       
-      const calendarData = {
-        name: smartLinkCalendarForm.name,
-        data: generateCalendarWithTimeRanges(startTime, endTime, rule, smartLinkTimeRanges),
-        attributes: {}
-      };
+      
+      let calendarData;
+      if (smartLinkTimeRanges.enabled === true) {
+        calendarData = {
+          name: smartLinkCalendarForm.name,
+          data: generateCalendarWithTimeRanges(startTime, endTime, rule, smartLinkTimeRanges),
+          attributes: {}
+        };
+      } else {
+        calendarData = {
+          name: smartLinkCalendarForm.name,
+          data: generateSimpleCalendar(startTime, endTime, rule),
+          attributes: {}
+        };
+      }
 
       const response = await fetchOrThrow('/api/calendars', {
         method: 'POST',
@@ -455,10 +464,15 @@ const FloatingDeviceList = ({
           from: dayjs().format('YYYY-MM-DDTHH:mm'),
           to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
         });
-        // Keep recurrence as WEEKLY, don't reset days and time ranges
-        // setSmartLinkRecurrence('WEEKLY'); // Already set to WEEKLY by default
-        // setSmartLinkDays([]); // Keep selected days
-        // setSmartLinkTimeRanges({...}); // Keep time ranges
+        
+        // Reset timeranges to default state
+        setSmartLinkTimeRanges({
+          enabled: false,
+          periods: [
+            { enabled: false, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+            { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+          ]
+        });
         
         // Reload calendars
         const res = await fetchOrThrow('/api/calendars');
@@ -2090,13 +2104,24 @@ const FloatingDeviceList = ({
                                       type="checkbox"
                                       checked={smartLinkTimeRanges.enabled}
                                       onChange={(e) => {
-                                        console.log('Time ranges checkbox changed:', e.target.checked);
-                                        const newTimeRanges = { ...smartLinkTimeRanges, enabled: e.target.checked };
-                                        // Ensure first period is enabled when time ranges are enabled
-                                        if (e.target.checked && newTimeRanges.periods.length > 0) {
-                                          newTimeRanges.periods[0].enabled = true;
+                                        // Create a deep copy of periods to avoid mutation
+                                        const newPeriods = smartLinkTimeRanges.periods.map(period => ({ ...period }));
+                                        
+                                        const newTimeRanges = { 
+                                          enabled: e.target.checked,
+                                          periods: newPeriods
+                                        };
+                                        
+                                        if (e.target.checked) {
+                                          // Enable first period when time ranges are enabled
+                                          if (newPeriods.length > 0) {
+                                            newTimeRanges.periods[0].enabled = true;
+                                          }
+                                        } else {
+                                          // Disable all periods when time ranges are disabled
+                                          newTimeRanges.periods = newPeriods.map(period => ({ ...period, enabled: false }));
                                         }
-                                        console.log('Setting time ranges to:', newTimeRanges);
+                                        
                                         setSmartLinkTimeRanges(newTimeRanges);
                                       }}
                                       style={{ width: '16px', height: '16px' }}
@@ -2123,8 +2148,9 @@ const FloatingDeviceList = ({
                                                 checked={period.enabled}
                                                 disabled={index === 0 && smartLinkTimeRanges.enabled}
                                                 onChange={(e) => {
-                                                  const newPeriods = [...smartLinkTimeRanges.periods];
-                                                  newPeriods[index].enabled = e.target.checked;
+                                                  const newPeriods = smartLinkTimeRanges.periods.map((p, i) => 
+                                                    i === index ? { ...p, enabled: e.target.checked } : { ...p }
+                                                  );
                                                   setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
                                                 }}
                                                 style={{ width: '16px', height: '16px' }}
@@ -2187,8 +2213,9 @@ const FloatingDeviceList = ({
                                                   type="time"
                                                   value={period.startTime}
                                                   onChange={(e) => {
-                                                    const newPeriods = [...smartLinkTimeRanges.periods];
-                                                    newPeriods[index].startTime = e.target.value;
+                                                    const newPeriods = smartLinkTimeRanges.periods.map((p, i) => 
+                                                      i === index ? { ...p, startTime: e.target.value } : { ...p }
+                                                    );
                                                     setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
                                                   }}
                                                   style={{
@@ -2210,8 +2237,9 @@ const FloatingDeviceList = ({
                                                   type="time"
                                                   value={period.endTime}
                                                   onChange={(e) => {
-                                                    const newPeriods = [...smartLinkTimeRanges.periods];
-                                                    newPeriods[index].endTime = e.target.value;
+                                                    const newPeriods = smartLinkTimeRanges.periods.map((p, i) => 
+                                                      i === index ? { ...p, endTime: e.target.value } : { ...p }
+                                                    );
                                                     setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
                                                   }}
                                                   style={{

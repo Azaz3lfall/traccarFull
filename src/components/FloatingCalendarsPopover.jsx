@@ -65,7 +65,7 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
   const [timeRanges, setTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: true, name: `${t('calendarPeriod') || 'Period'} 1`, startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: `${t('calendarPeriod') || 'Period'} 1`, startTime: '08:00', endTime: '12:00' },
       { enabled: false, name: `${t('calendarPeriod') || 'Period'} 2`, startTime: '14:00', endTime: '18:00' }
     ]
   });
@@ -78,7 +78,13 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
       const rule = { frequency: editingCalendar.frequency, by: editingCalendar.by };
       
       if (startTime.isValid() && endTime.isValid()) {
-        const newData = generateCalendarWithTimeRanges(startTime, endTime, rule, timeRanges);
+        // Only use timerange logic if timeranges are enabled
+        let newData;
+        if (timeRanges.enabled === true) {
+          newData = generateCalendarWithTimeRanges(startTime, endTime, rule, timeRanges);
+        } else {
+          newData = generateSimpleCalendar(startTime, endTime, rule);
+        }
         setEditingCalendar({ ...editingCalendar, data: newData });
       }
     }
@@ -385,6 +391,22 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
     }
   };
 
+  const generateSimpleCalendar = (startTime, endTime, rule) => {
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Traccar//NONSGML Traccar//EN',
+    ];
+
+    // Simple weekly calendar - NO VEVENT blocks, just RRULE
+    // This creates a weekly recurrence rule without specific events
+    lines.push(formatRule(rule));
+
+    lines.push('END:VCALENDAR');
+    const result = window.btoa(lines.join('\n'));
+    return result;
+  };
+
   const generateCalendarWithTimeRanges = (startTime, endTime, rule, timeRanges) => {
     const lines = [
       'BEGIN:VCALENDAR',
@@ -478,19 +500,29 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
           }
         } else if (line.startsWith('SUMMARY:')) {
           currentEvent.name = line.substring(8);
+        } else if (line.startsWith('UID:')) {
+          currentEvent.uid = line.substring(4);
         }
       }
     }
     
+    // Detect timeranges by checking UID pattern and SUMMARY
+    // Simple calendars: UID=00000000-0000-0000-0000-000000000000, SUMMARY=Event
+    // Timerange calendars: UID=00000000-0000-0000-0000-000000000{100,200,etc}, SUMMARY=Period 1, etc.
+    const hasTimeRanges = events.some(event => {
+      return event.uid && event.uid !== '00000000-0000-0000-0000-000000000000' ||
+             event.name && event.name !== 'Event';
+    });
+    
     return {
-      enabled: events.length > 0,
-      periods: events.length > 0 ? events.map((event, index) => ({
+      enabled: hasTimeRanges,
+      periods: hasTimeRanges ? events.map((event, index) => ({
         enabled: true,
         name: event.name || getPeriodName(index + 1),
         startTime: event.startTime || '08:00',
         endTime: event.endTime || '12:00'
       })) : [
-        { enabled: true, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
+        { enabled: false, name: getPeriodName(1), startTime: '08:00', endTime: '12:00' },
         { enabled: false, name: getPeriodName(2), startTime: '14:00', endTime: '18:00' }
       ]
     };
@@ -1468,10 +1500,17 @@ const FloatingCalendarsPopover = ({ isVisible, onClose, desktop, isMenuExpanded 
                                     checked={timeRanges.enabled}
                                     onChange={(e) => {
                                       const newTimeRanges = { ...timeRanges, enabled: e.target.checked };
-                                      // Ensure first period is enabled when time ranges are enabled
-                                      if (e.target.checked && newTimeRanges.periods.length > 0) {
-                                        newTimeRanges.periods[0].enabled = true;
+                                      
+                                      if (e.target.checked) {
+                                        // Enable first period when time ranges are enabled
+                                        if (newTimeRanges.periods.length > 0) {
+                                          newTimeRanges.periods[0].enabled = true;
+                                        }
+                                      } else {
+                                        // Disable all periods when time ranges are disabled
+                                        newTimeRanges.periods = newTimeRanges.periods.map(period => ({ ...period, enabled: false }));
                                       }
+                                      
                                       setTimeRanges(newTimeRanges);
                                     }}
                                   />
