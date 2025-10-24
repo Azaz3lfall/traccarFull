@@ -6,6 +6,7 @@ import React, {
   useEffect
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { devicesActions } from '../store';
@@ -60,6 +61,7 @@ const FloatingDeviceList = ({
 }) => {
   
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const t = useTranslation();
   const colors = useThemeColors();
   const manager = useManager();
@@ -445,6 +447,9 @@ const FloatingDeviceList = ({
         const res = await fetchOrThrow('/api/calendars');
         const data = await res.json();
         setSmartLinkCalendars(Array.isArray(data) ? data : []);
+        
+        // Invalidate React Query cache for calendars to refresh main calendars popover
+        queryClient.invalidateQueries(['calendars']);
         
         showSnackbar(t('sharedCalendar') + ' ' + t('sharedCreated'), 'success');
       } else {
