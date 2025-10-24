@@ -1967,10 +1967,7 @@ const FloatingDeviceList = ({
                                   <TextField
                                     label={t('calendarDays')}
                                     value={smartLinkDays.length > 0 ? 
-                                      (smartLinkRecurrence === 'WEEKLY' ? 
-                                        smartLinkDays.map(day => t(prefixString('calendar', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].indexOf(day)]))).join(', ') :
-                                        smartLinkDays.join(', ')
-                                      ) : ''
+                                      smartLinkDays.map(day => t(prefixString('calendar', ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].indexOf(day)]))).join(', ') : ''
                                     }
                                     onClick={() => setSmartLinkDaysDropdownOpen(!smartLinkDaysDropdownOpen)}
                                     InputProps={{
@@ -2015,8 +2012,8 @@ const FloatingDeviceList = ({
                                       }}
                                       onClick={(e) => e.stopPropagation()}
                                     >
-                                      {smartLinkRecurrence === 'WEEKLY' ? 
-                                        ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day, index) => {
+                                      {/* Always show week days since recurrence is fixed to WEEKLY */}
+                                      {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day, index) => {
                                           const dayCode = day.substring(0, 2).toUpperCase();
                                           const isSelected = smartLinkDays.includes(dayCode);
                                           return (
@@ -2091,7 +2088,6 @@ const FloatingDeviceList = ({
                                             </div>
                                           );
                                         })
-                                      }
                                     </div>
                                   )}
                                 </div>
