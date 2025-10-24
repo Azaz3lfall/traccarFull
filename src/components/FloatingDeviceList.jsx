@@ -1851,7 +1851,7 @@ const FloatingDeviceList = ({
                                 }}
                               />
                               
-                              {/* From Field */}
+                              {/* From Field - Hidden but keep state */}
                               <TextField
                                 label={t('reportFrom')}
                                 type="datetime-local"
@@ -1862,20 +1862,11 @@ const FloatingDeviceList = ({
                                 size="small"
                                 InputLabelProps={{ shrink: true }}
                                 sx={{
-                                  '& .MuiOutlinedInputRoot': {
-                                    backgroundColor: colors.secondary,
-                                    '& fieldset': { borderColor: colors.border },
-                                    '&:hover fieldset': { borderColor: colors.primary },
-                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                  },
-                                  '& .MuiInputLabel-root': { 
-                                    color: colors.text,
-                                    '&.Mui-focused': { color: colors.primary }
-                                  },
+                                  display: 'none' // Hidden but keep state
                                 }}
                               />
                               
-                              {/* To Field */}
+                              {/* To Field - Hidden but keep state */}
                               <TextField
                                 label={t('reportTo')}
                                 type="datetime-local"
@@ -1886,16 +1877,7 @@ const FloatingDeviceList = ({
                                 size="small"
                                 InputLabelProps={{ shrink: true }}
                                 sx={{
-                                  '& .MuiOutlinedInputRoot': {
-                                    backgroundColor: colors.secondary,
-                                    '& fieldset': { borderColor: colors.border },
-                                    '&:hover fieldset': { borderColor: colors.primary },
-                                    '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                  },
-                                  '& .MuiInputLabel-root': { 
-                                    color: colors.text,
-                                    '&.Mui-focused': { color: colors.primary }
-                                  },
+                                  display: 'none' // Hidden but keep state
                                 }}
                               />
                               
