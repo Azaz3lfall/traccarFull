@@ -85,7 +85,7 @@ const FloatingDeviceList = ({
   const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+      { enabled: false, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
       { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
     ]
   });
