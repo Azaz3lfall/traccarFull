@@ -474,6 +474,9 @@ const FloatingDeviceList = ({
           ]
         });
         
+        // Reset weekdays selection
+        setSmartLinkDays([]);
+        
         // Reload calendars
         const res = await fetchOrThrow('/api/calendars');
         const data = await res.json();
