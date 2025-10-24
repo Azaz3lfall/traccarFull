@@ -2050,43 +2050,6 @@ const FloatingDeviceList = ({
                                               {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
                                             </div>
                                           );
-                                        }) : 
-                                        Array.from({ length: 31 }, (_, i) => i + 1).map((day, index) => {
-                                          const isSelected = smartLinkDays.includes(String(day));
-                                          return (
-                                            <div
-                                              key={day}
-                                              onMouseDown={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                const newDays = isSelected 
-                                                  ? smartLinkDays.filter(d => d !== String(day))
-                                                  : [...smartLinkDays, String(day)];
-                                                setSmartLinkDays(newDays);
-                                              }}
-                                              style={{
-                                                padding: '12px 16px',
-                                                cursor: 'pointer',
-                                                color: colors.text,
-                                                backgroundColor: isSelected ? colors.primary + '20' : colors.surface,
-                                                borderBottom: index < 30 ? `1px solid ${colors.border}` : 'none',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                              }}
-                                              onMouseEnter={(e) => {
-                                                e.stopPropagation();
-                                                e.target.style.backgroundColor = colors.primary + '10';
-                                              }}
-                                              onMouseLeave={(e) => {
-                                                e.stopPropagation();
-                                                e.target.style.backgroundColor = isSelected ? colors.primary + '20' : colors.surface;
-                                              }}
-                                            >
-                                              <span>{day}</span>
-                                              {isSelected && <CheckIcon style={{ color: '#10B981', fontSize: '18px' }} />}
-                                            </div>
-                                          );
                                         })
                                     </div>
                                   )}
