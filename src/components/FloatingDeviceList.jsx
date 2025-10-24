@@ -485,7 +485,7 @@ const FloatingDeviceList = ({
         // Invalidate React Query cache for calendars to refresh main calendars popover
         queryClient.invalidateQueries(['calendars']);
         
-        showSnackbar(t('sharedCalendar') + ' ' + t('sharedCreated'), 'success');
+        showSnackbar(t('sharedCalendar') + ' ' + t('sharedSaved'), 'success');
       } else {
         throw new Error('Failed to create calendar');
       }
@@ -2312,7 +2312,7 @@ const FloatingDeviceList = ({
                                   e.currentTarget.style.backgroundColor = colors.primary;
                                 }}
                               >
-                                {t('sharedCreate')} {t('sharedCalendar')}
+                                {t('sharedSave')} {t('sharedCalendar')}
                               </button>
                             </div>
                           </div>
