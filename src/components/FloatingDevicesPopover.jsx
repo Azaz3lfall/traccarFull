@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import {
   TextField,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -17,17 +15,12 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Dialog,
   Typography,
   Box,
   Chip,
   FormControlLabel,
-  Pagination,
   CircularProgress,
   Alert,
-  Select,
-  FormControl,
-  InputLabel,
   Checkbox,
   Tabs,
   Tab,
@@ -46,19 +39,20 @@ import {
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle, formatTime } from '../common/util/formatter';
+import { formatLastUpdate } from '../common/util/timeFilter';
+import useTimeFilter from '../hooks/useTimeFilter';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { BsFiletypeXlsx } from "react-icons/bs";
 
 dayjs.extend(relativeTime);
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
+import { useThemeColors } from '../common/components/ThemeProvider';
 import { useRestriction } from '../common/util/permissions';
 import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
-import { prefixString } from '../common/util/stringUtils';
 import CustomPagination from './CustomPagination';
-import { sessionActions, devicesActions, errorsActions } from '../store';
+import { devicesActions, errorsActions } from '../store';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
@@ -94,10 +88,8 @@ const FloatingDevicesPopover = ({
   
   const t = useTranslation();
   const colors = useThemeColors();
-  const { theme } = useTheme();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   
   const limitDevices = useRestriction('limitDevices');
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
@@ -169,7 +161,6 @@ const FloatingDevicesPopover = ({
   };
 
   // State management
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -188,26 +179,7 @@ const FloatingDevicesPopover = ({
   const [calendarInputRef, setCalendarInputRef] = useState(null);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
-  const [selectedTimeFilter, setSelectedTimeFilter] = useState('all');
 
-  // Time filter options with green, orange, red gradient (avoiding yellow tones)
-  const timeFilterOptions = [
-    { key: 'all', label: t('allItems'), value: null, color: '#666666', borderColor: '#666666' },
-    { key: 'lt1h', label: '< 1hr', value: 1, color: '#4caf50', borderColor: '#66bb6a' }, // Green
-    { key: 'gt1h', label: '> 1hr', value: 1, color: '#66bb6a', borderColor: '#81c784' }, // Light Green
-    { key: 'gt3h', label: '> 3hr', value: 3, color: '#8bc34a', borderColor: '#aed581' }, // Lime Green
-    { key: 'gt6h', label: '> 6hr', value: 6, color: '#ff9800', borderColor: '#ffb74d' }, // Orange
-    { key: 'gt12h', label: '> 12hr', value: 12, color: '#ff7043', borderColor: '#ff8a65' }, // Deep Orange
-    { key: 'gt1d', label: '> 1d', value: 24, color: '#ff5722', borderColor: '#ff8a65' }, // Red Orange
-    { key: 'gt3d', label: '> 3d', value: 72, color: '#f44336', borderColor: '#e57373' }, // Red
-    { key: 'gt7d', label: '> 7d', value: 168, color: '#d32f2f', borderColor: '#e57373' }, // Dark Red
-    { key: 'nr', label: 'NR', value: null, color: '#b71c1c', borderColor: '#d32f2f' }, // No Response - Darker Red
-  ];
-
-  // Handle time filter selection
-  const handleTimeFilterSelect = (filterKey) => {
-    setSelectedTimeFilter(filterKey);
-  };
 
   // Show snackbar notification
   const showSnackbar = (message, severity = 'error') => {
@@ -278,32 +250,6 @@ const FloatingDevicesPopover = ({
     saveAs(blob, 'devices.xlsx');
   });
 
-  // Format last update time (following Traccar patterns)
-  const formatLastUpdate = (device) => {
-    if (!device.lastUpdate || !dayjs(device.lastUpdate).isValid()) {
-      return '-';
-    }
-
-    const now = dayjs();
-    const lastUpdate = dayjs(device.lastUpdate);
-    const diffMinutes = now.diff(lastUpdate, 'minute');
-
-    // For online devices, show relative time if < 5 minutes, otherwise show formatted time
-    if (device.status === 'online') {
-      if (diffMinutes < 5) {
-        return lastUpdate.fromNow();
-      } else {
-        return formatTime(device.lastUpdate, 'minutes');
-      }
-    }
-
-    // For offline/unknown devices, show relative time for recent updates, formatted time for older
-    if (diffMinutes < 60) {
-      return lastUpdate.fromNow();
-    } else {
-      return formatTime(device.lastUpdate, 'minutes');
-    }
-  };
 
   // Fetch devices with TanStack Query
   const { data: devices = [], isLoading, error } = useQuery({
@@ -314,6 +260,22 @@ const FloatingDevicesPopover = ({
       return data;
     },
     enabled: isVisible,
+  });
+
+  // Use the reusable time filter hook
+  const {
+    searchKeyword,
+    selectedTimeFilter,
+    filteredItems: filteredDevices,
+    filterCounts,
+    timeFilterOptions,
+    handleTimeFilterSelect,
+    handleSearchChange,
+    getCurrentFilterInfo
+  } = useTimeFilter(devices, {
+    dateField: 'lastUpdate',
+    searchFields: ['name', 'uniqueId', 'phone', 'model', 'contact'],
+    isVisible
   });
 
   // Fetch groups for dropdown
@@ -342,81 +304,7 @@ const FloatingDevicesPopover = ({
     setPage(1);
   }, [searchKeyword]);
 
-  // Reset filter to "All" when popover opens
-  useEffect(() => {
-    if (isVisible) {
-      setSelectedTimeFilter('all');
-    }
-  }, [isVisible]);
 
-  // Time-based filtering function
-  const filterDevicesByTime = (device, filterKey) => {
-    if (filterKey === 'all') {
-      return true;
-    }
-
-    if (filterKey === 'nr') {
-      // No Response - null or invalid lastUpdate
-      return !device.lastUpdate || !dayjs(device.lastUpdate).isValid();
-    }
-
-    // For time-based filters, check if lastUpdate exists and is valid
-    if (!device.lastUpdate || !dayjs(device.lastUpdate).isValid()) {
-      return false;
-    }
-
-    const now = dayjs();
-    const lastUpdate = dayjs(device.lastUpdate);
-    const diffHours = now.diff(lastUpdate, 'hour');
-
-    // Filter from biggest time windows to smallest
-    switch (filterKey) {
-      case 'gt7d':
-        return diffHours > 168; // > 7 days
-      case 'gt3d':
-        return diffHours > 72 && diffHours <= 168; // > 3 days and <= 7 days
-      case 'gt1d':
-        return diffHours > 24 && diffHours <= 72; // > 1 day and <= 3 days
-      case 'gt12h':
-        return diffHours > 12 && diffHours <= 24; // > 12 hours and <= 1 day
-      case 'gt6h':
-        return diffHours > 6 && diffHours <= 12; // > 6 hours and <= 12 hours
-      case 'gt3h':
-        return diffHours > 3 && diffHours <= 6; // > 3 hours and <= 6 hours
-      case 'gt1h':
-        return diffHours > 1 && diffHours <= 3; // > 1 hour and <= 3 hours
-      case 'lt1h':
-        return diffHours <= 1; // <= 1 hour
-      default:
-        return true;
-    }
-  };
-
-  // Count devices for each filter
-  const getFilterCounts = useMemo(() => {
-    const counts = {};
-    timeFilterOptions.forEach(option => {
-      counts[option.key] = devices.filter(device => filterDevicesByTime(device, option.key)).length;
-    });
-    return counts;
-  }, [devices, timeFilterOptions]);
-
-  // Filter devices based on search keyword and time filter
-  const filteredDevices = useMemo(() => {
-    return devices.filter(device => {
-      // First apply time filter
-      if (!filterDevicesByTime(device, selectedTimeFilter)) {
-        return false;
-      }
-
-      // Then apply search filter
-      return device.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-             device.uniqueId?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-             device.phone?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-             device.model?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-             device.contact?.toLowerCase().includes(searchKeyword.toLowerCase());
-    });
-  }, [devices, searchKeyword, selectedTimeFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredDevices.length / pageSize);
@@ -715,7 +603,7 @@ const FloatingDevicesPopover = ({
                   size="small"
                   placeholder={t('sharedSearchDevices')}
                   value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   InputProps={{
                     startAdornment: <SearchIcon style={{ color: colors.textSecondary, marginRight: '8px' }} />,
                   }}
@@ -788,7 +676,7 @@ const FloatingDevicesPopover = ({
                           opacity: isSelected ? 0.9 : 0.8
                         }}
                       >
-                        {option.label}: {getFilterCounts[option.key]}
+                        {option.label}: {filterCounts[option.key]}
                       </div>
                     );
                   }
@@ -832,7 +720,7 @@ const FloatingDevicesPopover = ({
                         opacity: isSelected ? 0.9 : 0.8
                       }}
                     >
-                      {option.label}: {getFilterCounts[option.key]}
+                      {option.label}: {filterCounts[option.key]}
                     </div>
                   );
                 })}
@@ -967,7 +855,7 @@ const FloatingDevicesPopover = ({
                             {desktop && (
                               <TableCell>
                                 <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                                  {formatLastUpdate(device)}
+                                  {formatLastUpdate(device, 'lastUpdate', formatTime, device.status)}
                                 </Typography>
                               </TableCell>
                             )}
@@ -1009,7 +897,7 @@ const FloatingDevicesPopover = ({
                         {page} / {totalPages} ({filteredDevices.length} {t('sharedDevices')})
                         {selectedTimeFilter !== 'all' && (
                           <span style={{ color: colors.textSecondary, opacity: 0.7 }}>
-                            {' '}• {timeFilterOptions.find(opt => opt.key === selectedTimeFilter)?.label}
+                            {' '}• {getCurrentFilterInfo().label}
                           </span>
                         )}
                       </Typography>
