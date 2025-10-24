@@ -541,16 +541,29 @@ const FloatingDeviceList = ({
       loadNotifications();
       loadCalendars();
       
+      // Reset all selections to clean state
+      setSmartLinkSelectedDeviceIds([]);
+      setSmartLinkSelectedGeofenceIds([]);
+      setSmartLinkSelectedGroupIds([]);
+      setSmartLinkSelectedNotificationIds([]);
+      setSmartLinkSelectedCalendarIds([]);
+      
       // Reset calendar form to default values
       setSmartLinkCalendarForm({
         name: '',
         from: dayjs().format('YYYY-MM-DDTHH:mm'),
         to: dayjs().add(30, 'years').format('YYYY-MM-DDTHH:mm')
       });
-      // Keep recurrence as WEEKLY, don't reset days and time ranges
-      // setSmartLinkRecurrence('WEEKLY'); // Already set to WEEKLY by default
-      // setSmartLinkDays([]); // Keep selected days
-      // setSmartLinkTimeRanges({...}); // Keep time ranges
+      
+      // Reset weekdays and timeranges
+      setSmartLinkDays([]);
+      setSmartLinkTimeRanges({
+        enabled: false,
+        periods: [
+          { enabled: false, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+          { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
+        ]
+      });
     }
   }, [showWandModal]);
   
