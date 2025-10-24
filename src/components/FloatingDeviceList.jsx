@@ -85,7 +85,7 @@ const FloatingDeviceList = ({
   const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
     enabled: false,
     periods: [
-      { enabled: false, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
+      { enabled: true, name: 'Period 1', startTime: '08:00', endTime: '12:00' },
       { enabled: false, name: 'Period 2', startTime: '14:00', endTime: '18:00' }
     ]
   });
@@ -351,6 +351,13 @@ const FloatingDeviceList = ({
       'VERSION:2.0',
       'PRODID:-//Traccar//NONSGML Traccar//EN',
     ];
+
+    console.log('generateCalendarWithTimeRanges called with:', {
+      timeRanges,
+      enabled: timeRanges?.enabled,
+      periods: timeRanges?.periods,
+      condition: timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0
+    });
 
     if (timeRanges && timeRanges.enabled && timeRanges.periods && timeRanges.periods.length > 0) {
       // Generate VEVENT blocks for each enabled time range
