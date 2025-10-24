@@ -12,6 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
+import { defaultTimeFilterOptions, getTimeFilterCounts } from '../common/util/timeFilter';
 import DeviceRow from './DeviceRow';
 
 const useStyles = makeStyles()((theme) => ({
@@ -73,7 +74,7 @@ const MainToolbar = ({
         endAdornment={(
           <InputAdornment position="end">
             <IconButton size="small" edge="end" onClick={() => setFilterAnchorEl(inputRef.current)}>
-              <Badge color="info" variant="dot" invisible={!filter.statuses.length && !filter.groups.length}>
+              <Badge color="info" variant="dot" invisible={!filter.statuses.length && !filter.groups.length && (!filter.timeWindow || filter.timeWindow === 'all')}>
                 <TuneIcon fontSize="small" />
               </Badge>
             </IconButton>
@@ -122,6 +123,23 @@ const MainToolbar = ({
         }}
       >
         <div className={classes.filterPanel}>
+          <FormControl>
+            <InputLabel>{t('deviceLastUpdate')}</InputLabel>
+            <Select
+              label={t('deviceLastUpdate')}
+              value={filter.timeWindow || 'all'}
+              onChange={(e) => setFilter({ ...filter, timeWindow: e.target.value })}
+            >
+              {defaultTimeFilterOptions.map((option) => {
+                const count = getTimeFilterCounts(Object.values(devices), defaultTimeFilterOptions, 'lastUpdate')[option.key];
+                return (
+                  <MenuItem key={option.key} value={option.key}>
+                    {option.key === 'all' ? t('allItems') : option.label}: {count}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
           <FormControl>
             <InputLabel>{t('deviceStatus')}</InputLabel>
             <Select

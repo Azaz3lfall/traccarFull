@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
+import { filterItemByTime } from '../common/util/timeFilter';
 
 export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop = true) => {
   const groups = useSelector((state) => state.groups.items);
@@ -26,6 +27,13 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
     let filtered = Object.values(devices)
       .filter((device) => !filter.statuses.length || filter.statuses.includes(device.status))
       .filter((device) => !filter.groups.length || deviceGroups(device).some((id) => filter.groups.includes(id)))
+      .filter((device) => {
+        // Apply time window filter
+        if (filter.timeWindow && filter.timeWindow !== 'all') {
+          return filterItemByTime(device, filter.timeWindow, 'lastUpdate');
+        }
+        return true;
+      })
       .filter((device) => {
         if (!keyword) return true;
         const lowerCaseKeyword = keyword.toLowerCase();

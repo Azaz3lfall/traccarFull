@@ -1367,6 +1367,7 @@ const MainPage = () => {
   const [filter, setFilter] = usePersistedState('filter', {
     statuses: [],
     groups: [],
+    timeWindow: 'all',
   });
   const [filterSort, setFilterSort] = usePersistedState('filterSort', '');
   const [filterMap, setFilterMap] = usePersistedState('filterMap', false);

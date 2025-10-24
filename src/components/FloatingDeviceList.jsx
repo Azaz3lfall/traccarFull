@@ -16,6 +16,7 @@ import { formatStatus, formatSpeed, formatCoordinate } from '../common/util/form
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
+import { defaultTimeFilterOptions, getTimeFilterCounts } from '../common/util/timeFilter';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -98,6 +99,7 @@ const FloatingDeviceList = ({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
+  const [showTimeWindowDropdown, setShowTimeWindowDropdown] = useState(false);
   
   // Simplified key management - only change when showOnMobile changes
   const virtualizerContainerKey = useMemo(() => {
@@ -108,6 +110,7 @@ const FloatingDeviceList = ({
   const sortDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
   const groupsDropdownRef = useRef(null);
+  const timeWindowDropdownRef = useRef(null);
   const parentRef = useRef(null);
   
 
@@ -229,6 +232,12 @@ const FloatingDeviceList = ({
             !groupsDropdownRef.current.contains(event.target)) {
           setShowGroupsDropdown(false);
         }
+        
+        if (showTimeWindowDropdown && 
+            timeWindowDropdownRef.current &&
+            !timeWindowDropdownRef.current.contains(event.target)) {
+          setShowTimeWindowDropdown(false);
+        }
       }
     };
 
@@ -241,7 +250,7 @@ const FloatingDeviceList = ({
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown]);
+  }, [showFilters, showSortDropdown, showStatusDropdown, showGroupsDropdown, showTimeWindowDropdown]);
 
   // Close all dropdowns when filter popup is closed
   React.useEffect(() => {
@@ -249,6 +258,7 @@ const FloatingDeviceList = ({
       setShowSortDropdown(false);
       setShowStatusDropdown(false);
       setShowGroupsDropdown(false);
+      setShowTimeWindowDropdown(false);
     }
   }, [showFilters]);
 
@@ -960,6 +970,125 @@ const FloatingDeviceList = ({
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Time Window Filter - Custom dropdown */}
+                <div ref={timeWindowDropdownRef} style={{ position: 'relative' }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '8px'
+                  }}>
+                    <label style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.text
+                    }}>{t('deviceLastUpdate')}</label>
+                    {filter.timeWindow && filter.timeWindow !== 'all' && (
+                      <button
+                        type="button"
+                        onClick={() => setFilter({ ...filter, timeWindow: 'all' })}
+                        style={{
+                          fontSize: '12px',
+                          color: colors.textSecondary,
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        {t('sharedClearAll')}
+                      </button>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => setShowTimeWindowDropdown(!showTimeWindowDropdown)}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '6px',
+                      backgroundColor: colors.surface,
+                      fontSize: '14px',
+                      color: colors.text,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      outline: 'none'
+                    }}
+                  >
+                    <span>
+                      {filter.timeWindow === 'all' || !filter.timeWindow
+                        ? t('allItems')
+                        : defaultTimeFilterOptions.find(opt => opt.key === filter.timeWindow)?.label || t('allItems')
+                      }
+                    </span>
+                    <ChevronDown 
+                      size={16} 
+                      style={{ 
+                        transform: showTimeWindowDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                        color: colors.textSecondary
+                      }} 
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {showTimeWindowDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.1 }}
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          backgroundColor: colors.surface,
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: '6px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                          zIndex: 10001,
+                          marginTop: '4px'
+                        }}
+                      >
+                        {defaultTimeFilterOptions.map((option) => {
+                          const count = getTimeFilterCounts(Object.values(devices), defaultTimeFilterOptions, 'lastUpdate')[option.key];
+                          return (
+                            <button
+                              key={option.key}
+                              onClick={() => {
+                                setFilter({ ...filter, timeWindow: option.key });
+                                setShowTimeWindowDropdown(false);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                textAlign: 'left',
+                                fontSize: '14px',
+                                color: colors.text,
+                                backgroundColor: filter.timeWindow === option.key ? colors.hover : 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              <span>
+                                {option.key === 'all' ? t('allItems') : option.label}: {count}
+                              </span>
+                              {filter.timeWindow === option.key && <Check size={16} color="#10B981" />}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+                
                 {/* Status Filter - Custom dropdown */}
                 <div ref={statusDropdownRef} style={{ position: 'relative' }}>
                   <div style={{
