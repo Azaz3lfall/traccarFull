@@ -2277,11 +2277,25 @@ const FloatingDeviceList = ({
                                     return notification && notification.calendarId === calendar.id;
                                   });
                                   
-                                  // Check for conflicts - if there are selected notifications with different calendarId than this calendar
-                                  const hasConflict = smartLinkSelectedNotificationIds.some(notificationId => {
+                                  // Check for conflicts - gray background when there are notifications assigned to different calendars
+                                  // Check conflicts based on the actual user-selected calendars
+                                  const hasConflict = smartLinkSelectedCalendarIds.length > 1 || smartLinkSelectedNotificationIds.some(notificationId => {
                                     const notification = smartLinkNotifications.find(n => n.id === notificationId);
-                                    return notification && notification.calendarId && notification.calendarId !== calendar.id;
+                                    return notification && notification.calendarId && notification.calendarId !== 0 && notification.calendarId !== calendar.id;
                                   });
+                                  
+                                  // Debug logging
+                                  if (isSelected) {
+                                    console.log('=== CALENDAR DEBUG ===');
+                                    console.log('Calendar:', calendar.name, 'ID:', calendar.id);
+                                    console.log('Selected notifications:', smartLinkSelectedNotificationIds);
+                                    console.log('All notifications data:', smartLinkSelectedNotificationIds.map(id => {
+                                      const notif = smartLinkNotifications.find(n => n.id === id);
+                                      return { id, calendarId: notif?.calendarId, type: notif?.type };
+                                    }));
+                                    console.log('Has conflict:', hasConflict);
+                                    console.log('====================');
+                                  }
                                   
                                   return (
                                     <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
@@ -2293,7 +2307,7 @@ const FloatingDeviceList = ({
                                           width: '14px', 
                                           height: '14px', 
                                           margin: 0,
-                                          backgroundColor: hasConflict ? '#E0E0E0' : 'transparent',
+                                          backgroundColor: hasConflict ? '#E0E0E0' : '#1976d2',
                                           accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
                                         }} 
                                       />
