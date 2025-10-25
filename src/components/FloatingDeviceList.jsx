@@ -104,6 +104,16 @@ const FloatingDeviceList = ({
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
+  // Reset SmartLink selections
+  const resetSmartLinkSelections = () => {
+    setSmartLinkSelectedDeviceIds([]);
+    setSmartLinkSelectedGeofenceIds([]);
+    setSmartLinkSelectedGroupIds([]);
+    setSmartLinkSelectedNotificationIds([]);
+    setSmartLinkSelectedCalendarIds([]);
+    setSmartLinkUserSelectedCalendarIds([]);
+  };
+
   // SmartLink save validation
   const validateSmartLinkSave = () => {
     // Check if at least one device is selected
@@ -189,9 +199,30 @@ const FloatingDeviceList = ({
       }));
 
       // Close progress modal after a short delay
-      setTimeout(() => {
+      setTimeout(async () => {
         setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
         showSnackbar(t('sharedSaved') + '!', 'success');
+        
+        // Refresh devices from server to reflect new group assignments
+        try {
+          const devicesResponse = await fetchOrThrow('/api/devices');
+          const updatedDevices = await devicesResponse.json();
+          
+          // Convert devices object to array for Redux action
+          const devicesArray = Array.isArray(updatedDevices) ? updatedDevices : Object.values(updatedDevices);
+          
+          // Update Redux store with fresh device data
+          dispatch(devicesActions.update(devicesArray));
+          
+          console.log('Devices refreshed after save');
+          console.log('Updated devices:', devicesArray);
+          
+          // Also invalidate React Query cache for other components
+          queryClient.invalidateQueries(['devices']);
+          
+        } catch (error) {
+          console.error('Error refreshing devices:', error);
+        }
       }, 1000);
       
       console.log('All devices updated successfully');
@@ -1963,7 +1994,10 @@ const FloatingDeviceList = ({
             justifyContent: 'center',
             zIndex: 10000
           }}
-          onClick={() => setShowWandModal(false)}
+          onClick={() => {
+            resetSmartLinkSelections();
+            setShowWandModal(false);
+          }}
         >
           <motion.div
             initial={{ y: -50, opacity: 0 }}
@@ -1987,7 +2021,10 @@ const FloatingDeviceList = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button
-                  onClick={() => setShowWandModal(false)}
+                  onClick={() => {
+                    resetSmartLinkSelections();
+                    setShowWandModal(false);
+                  }}
                   aria-label="Close"
                   style={{
                     width: '34px',
