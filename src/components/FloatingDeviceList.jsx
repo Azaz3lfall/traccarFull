@@ -2024,9 +2024,37 @@ const FloatingDeviceList = ({
                           {Object.values(groups).sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((group) => {
                             const isSelected = smartLinkSelectedGroupIds.includes(group.id);
                             const hasPartial = hasPartialGroupSelection(group.id);
+                            
+                            // Check for conflicts - if any selected devices exist in other groups
+                            const hasConflict = isSelected && smartLinkSelectedDeviceIds.some(deviceId => {
+                              const deviceGroup = deviceGroups[deviceId];
+                              return deviceGroup && deviceGroup !== group.id;
+                            });
+                            
                             return (
-                              <label key={group.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
-                                <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGroupIds((prev) => e.target.checked ? (prev.includes(group.id) ? prev : [...prev, group.id]) : prev.filter((id) => id !== group.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                              <label key={group.id} style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '8px', 
+                                padding: '8px', 
+                                borderRadius: '6px', 
+                                cursor: 'pointer', 
+                                backgroundColor: 'transparent', 
+                                width: '100%', 
+                                minWidth: 0 
+                              }}>
+                                <input 
+                                  type="checkbox" 
+                                  checked={isSelected} 
+                                  onChange={(e) => { setSmartLinkSelectedGroupIds(e.target.checked ? [group.id] : []); }} 
+                                  style={{ 
+                                    width: '14px', 
+                                    height: '14px', 
+                                    margin: 0,
+                                    backgroundColor: hasConflict ? '#E0E0E0' : 'transparent',
+                                    accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
+                                  }} 
+                                />
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {group.name || 'Unnamed'}
