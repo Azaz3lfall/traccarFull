@@ -80,6 +80,7 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
   const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('WEEKLY');
   const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
+
   const [smartLinkDays, setSmartLinkDays] = useState([]);
   const [smartLinkDaysDropdownOpen, setSmartLinkDaysDropdownOpen] = useState(false);
   const [smartLinkTimeRanges, setSmartLinkTimeRanges] = useState({
@@ -106,6 +107,27 @@ const FloatingDeviceList = ({
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [smartLinkCommands, setSmartLinkCommands] = useState([]);
   const [smartLinkCommandsLoading, setSmartLinkCommandsLoading] = useState(false);
+
+  // Auto-select calendars based on selected notifications
+  useEffect(() => {
+    if (smartLinkSelectedNotificationIds.length > 0 && smartLinkNotifications.length > 0) {
+      const calendarIds = smartLinkSelectedNotificationIds
+        .map(notificationId => {
+          const notification = smartLinkNotifications.find(n => n.id === notificationId);
+          return notification?.calendarId;
+        })
+        .filter(Boolean);
+      
+      // Only update if there are calendar IDs and they're different from current selection
+      if (calendarIds.length > 0) {
+        const uniqueCalendarIds = [...new Set(calendarIds)];
+        setSmartLinkSelectedCalendarIds(uniqueCalendarIds);
+      }
+    } else {
+      // Clear calendar selection when no notifications are selected
+      setSmartLinkSelectedCalendarIds([]);
+    }
+  }, [smartLinkSelectedNotificationIds, smartLinkNotifications]);
   
   // Business rules state
   const [deviceGeofences, setDeviceGeofences] = useState({}); // deviceId -> geofenceIds
@@ -2248,9 +2270,33 @@ const FloatingDeviceList = ({
                               ) : (
                                 smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((calendar) => {
                                   const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
+                                  
+                                  // Check if this calendar should be selected based on notifications
+                                  const shouldBeSelected = smartLinkSelectedNotificationIds.some(notificationId => {
+                                    const notification = smartLinkNotifications.find(n => n.id === notificationId);
+                                    return notification && notification.calendarId === calendar.id;
+                                  });
+                                  
+                                  // Check for conflicts - if any selected notifications have a different calendarId than this calendar
+                                  const hasConflict = smartLinkSelectedNotificationIds.some(notificationId => {
+                                    const notification = smartLinkNotifications.find(n => n.id === notificationId);
+                                    return notification && notification.calendarId && notification.calendarId !== calendar.id;
+                                  });
+                                  
                                   return (
                                     <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
-                                      <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedCalendarIds((prev) => e.target.checked ? (prev.includes(calendar.id) ? prev : [...prev, calendar.id]) : prev.filter((id) => id !== calendar.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                                      <input 
+                                        type="checkbox" 
+                                        checked={isSelected} 
+                                        onChange={(e) => { setSmartLinkSelectedCalendarIds(e.target.checked ? [calendar.id] : []); }} 
+                                        style={{ 
+                                          width: '14px', 
+                                          height: '14px', 
+                                          margin: 0,
+                                          backgroundColor: hasConflict ? '#E0E0E0' : 'transparent',
+                                          accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
+                                        }} 
+                                      />
                                       <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{calendar.name || 'Unnamed'}</span>
                                     </label>
                                   );
