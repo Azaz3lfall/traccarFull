@@ -2297,7 +2297,90 @@ const FloatingDeviceList = ({
                                           accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
                                         }} 
                                       />
-                                      <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{calendar.name || 'Unnamed'}</span>
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                          {calendar.name || 'Unnamed'}
+                                        </div>
+                                        {isSelected && smartLinkSelectedNotificationIds.length > 0 && (
+                                          <div style={{ 
+                                            fontSize: '11px', 
+                                            marginTop: '2px',
+                                            wordWrap: 'break-word',
+                                            overflowWrap: 'break-word',
+                                            maxWidth: '100%'
+                                          }}>
+                                            {smartLinkSelectedNotificationIds
+                                              .filter(notificationId => {
+                                                const notification = smartLinkNotifications.find(n => n.id === notificationId);
+                                                return notification && notification.calendarId === calendar.id;
+                                              })
+                                              .map(notificationId => {
+                                                const notification = smartLinkNotifications.find(n => n.id === notificationId);
+                                                if (!notification) return null;
+                                                
+                                                // Format notificators (channels)
+                                                const formatList = (prefix, value) => {
+                                                  if (value) {
+                                                    return value
+                                                      .split(/[, ]+/)
+                                                      .filter(Boolean)
+                                                      .map((it) => t(prefixString(prefix, it)))
+                                                      .join(', ');
+                                                  }
+                                                  return '';
+                                                };
+                                                
+                                                const notificatorsText = formatList('notificator', notification.notificators);
+                                                const hasCommand = notification.notificators?.includes('command');
+                                                
+                                                // Build single line display
+                                                const displayParts = [];
+                                                
+                                                // Notification type
+                                                if (notification.type) {
+                                                  displayParts.push(t(prefixString('event', notification.type)));
+                                                }
+                                                
+                                                // Channels/Notificators
+                                                if (notificatorsText) {
+                                                  displayParts.push(notificatorsText);
+                                                }
+                                                
+                                                // Command description (if it's a command notification)
+                                                if (hasCommand && notification.commandId) {
+                                                  const command = smartLinkCommands?.find(cmd => cmd.id === notification.commandId);
+                                                  if (command?.description) {
+                                                    displayParts.push(command.description);
+                                                  } else {
+                                                    displayParts.push(`Command ${notification.commandId}`);
+                                                  }
+                                                }
+                                                
+                                                // Always flag
+                                                if (notification.always) {
+                                                  displayParts.push('Always active');
+                                                }
+                                                
+                                                const displayText = displayParts.join(' / ');
+                                                
+                                                return (
+                                                  <span
+                                                    key={notificationId}
+                                                    style={{
+                                                      color: '#10B981', // Green for partnered
+                                                      marginRight: '8px',
+                                                      fontSize: '10px'
+                                                    }}
+                                                  >
+                                                    {displayText}
+                                                  </span>
+                                                );
+                                              })
+                                              .filter(Boolean)
+                                            }
+                                          </div>
+                                        )}
+                                      </div>
                                     </label>
                                   );
                                 })
