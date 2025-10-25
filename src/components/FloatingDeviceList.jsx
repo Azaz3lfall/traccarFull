@@ -1948,7 +1948,7 @@ const FloatingDeviceList = ({
                           key={device.id}
                           style={{
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: 'flex-start',
                             gap: '8px',
                             padding: '8px',
                             borderRadius: '6px',
@@ -1964,7 +1964,7 @@ const FloatingDeviceList = ({
                             onChange={(e) => {
                               handleDeviceSelectionChange(device.id, e.target.checked);
                             }}
-                            style={{ width: '14px', height: '14px', margin: 0 }}
+                            style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }}
                           />
                           <div style={{
                             display: 'flex',
@@ -2058,7 +2058,7 @@ const FloatingDeviceList = ({
                             return (
                               <label key={group.id} style={{ 
                                 display: 'flex', 
-                                alignItems: 'center', 
+                                alignItems: 'flex-start', 
                                 gap: '8px', 
                                 padding: '8px', 
                                 borderRadius: '6px', 
@@ -2075,6 +2075,7 @@ const FloatingDeviceList = ({
                                     width: '14px', 
                                     height: '14px', 
                                     margin: 0,
+                                    marginTop: '2px',
                                     backgroundColor: hasConflict ? '#E0E0E0' : 'transparent',
                                     accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
                                   }} 
@@ -2125,8 +2126,8 @@ const FloatingDeviceList = ({
                             const isSelected = smartLinkSelectedGeofenceIds.includes(geofence.id);
                             const hasPartial = hasPartialGeofenceSelection(geofence.id);
                             return (
-                              <label key={geofence.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
-                                <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGeofenceIds((prev) => e.target.checked ? (prev.includes(geofence.id) ? prev : [...prev, geofence.id]) : prev.filter((id) => id !== geofence.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                              <label key={geofence.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
+                                <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGeofenceIds((prev) => e.target.checked ? (prev.includes(geofence.id) ? prev : [...prev, geofence.id]) : prev.filter((id) => id !== geofence.id)); }} style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }} />
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {geofence.name || 'Unnamed'}
@@ -2221,8 +2222,8 @@ const FloatingDeviceList = ({
                               const displayText = displayParts.join(' / ');
                               
                               return (
-                                <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
-                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                                <label key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
+                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }} />
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                       {displayText}
@@ -2296,7 +2297,7 @@ const FloatingDeviceList = ({
                                   const calendarHasConflict = hasConflict && isSelected;
                                   
                                   return (
-                                    <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
+                                    <label key={calendar.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                       <input 
                                         type="checkbox" 
                                         checked={isSelected} 
@@ -2315,6 +2316,7 @@ const FloatingDeviceList = ({
                                           width: '14px', 
                                           height: '14px', 
                                           margin: 0,
+                                          marginTop: '2px',
                                           backgroundColor: calendarHasConflict ? '#E0E0E0' : (isSelected ? '#1976d2' : 'transparent'),
                                           accentColor: calendarHasConflict ? '#E0E0E0' : '#1976d2'
                                         }} 
@@ -2636,10 +2638,11 @@ const FloatingDeviceList = ({
                               
                               {/* Time Ranges - Always visible since recurrence is fixed to WEEKLY */}
                                 <div style={{ marginTop: '16px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
                                     <input
                                       type="checkbox"
                                       checked={smartLinkTimeRanges.enabled}
+                                      style={{ marginTop: '2px', width: '16px', height: '16px' }}
                                       onChange={(e) => {
                                         // Create a deep copy of periods to avoid mutation
                                         const newPeriods = smartLinkTimeRanges.periods.map(period => ({ ...period }));
@@ -2661,7 +2664,6 @@ const FloatingDeviceList = ({
                                         
                                         setSmartLinkTimeRanges(newTimeRanges);
                                       }}
-                                      style={{ width: '16px', height: '16px' }}
                                     />
                                     <span style={{ color: colors.text, fontSize: '14px', fontWeight: '500' }}>
                                       {t('calendarByTimeRange')}
@@ -2679,11 +2681,12 @@ const FloatingDeviceList = ({
                                           backgroundColor: colors.surface
                                         }}>
                                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                                               <input
                                                 type="checkbox"
                                                 checked={period.enabled}
                                                 disabled={index === 0 && smartLinkTimeRanges.enabled}
+                                                style={{ marginTop: '2px' }}
                                                 onChange={(e) => {
                                                   const newPeriods = smartLinkTimeRanges.periods.map((p, i) => 
                                                     i === index ? { ...p, enabled: e.target.checked } : { ...p }
