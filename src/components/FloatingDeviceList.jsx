@@ -138,22 +138,12 @@ const FloatingDeviceList = ({
     return true;
   };
 
-  // Save SmartLink groups
-  const saveSmartLinkGroups = async () => {
+  // Save SmartLink geofences
+  const saveSmartLinkGeofences = async () => {
     try {
-      const groupId = smartLinkSelectedGroupIds.length > 0 ? smartLinkSelectedGroupIds[0] : 0;
-      const totalDevices = smartLinkSelectedDeviceIds.length;
+      const selectedGeofenceIds = smartLinkSelectedGeofenceIds;
       
-      // Open progress modal
-      setSmartLinkProgressModal({
-        open: true,
-        currentDevice: null,
-        currentOperation: 'Starting group assignment...',
-        totalDevices: totalDevices,
-        completedDevices: 0
-      });
-      
-      // Process each selected device sequentially to show progress
+      // Process each selected device
       for (let i = 0; i < smartLinkSelectedDeviceIds.length; i++) {
         const deviceId = smartLinkSelectedDeviceIds[i];
         const device = devices[deviceId];
@@ -164,37 +154,102 @@ const FloatingDeviceList = ({
         }
 
         // Update progress modal
+        const deviceName = device.name ? (device.name.length > 25 ? device.name.substring(0, 25) + '...' : device.name) : `Device ${deviceId}`;
         setSmartLinkProgressModal(prev => ({
           ...prev,
-          currentDevice: device.name || `Device ${deviceId}`,
-          currentOperation: `Updating group assignment...`,
+          currentDevice: deviceName,
+          currentOperation: `Processing geofence permissions...`,
           completedDevices: i
         }));
 
-        // Create updated device payload with new groupId
-        const updatedDevice = {
-          ...device,
-          groupId: groupId
-        };
+        // Get all geofences (both selected and unselected)
+        const allGeofences = Object.values(geofences);
+        
+        // Process each geofence for this device
+        for (const geofence of allGeofences) {
+          const isGeofenceSelected = selectedGeofenceIds.includes(geofence.id);
+          
+          // Update progress modal for geofence operation
+          const geofenceName = geofence.name ? (geofence.name.length > 20 ? geofence.name.substring(0, 20) + '...' : geofence.name) : 'Unnamed';
+          setSmartLinkProgressModal(prev => ({
+            ...prev,
+            currentOperation: isGeofenceSelected 
+              ? `Assigning geofence: ${geofenceName}` 
+              : `Removing geofence: ${geofenceName}`
+          }));
 
-        // PUT the updated device
-        const response = await fetchOrThrow(`/api/devices/${deviceId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedDevice)
-        });
+          const payload = {
+            deviceId: deviceId,
+            geofenceId: geofence.id
+          };
 
-        if (!response.ok) {
-          throw new Error(`Failed to update device ${deviceId}`);
+          try {
+            if (isGeofenceSelected) {
+              // POST to assign geofence permission
+              const response = await fetchOrThrow('/api/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              
+              if (response.status !== 204) {
+                throw new Error(`Failed to assign geofence ${geofence.id} to device ${deviceId}`);
+              }
+              
+              console.log(`Geofence ${geofence.id} assigned to device ${deviceId}`);
+            } else {
+              // DELETE to remove geofence permission
+              const response = await fetchOrThrow('/api/permissions', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              
+              if (response.status !== 204) {
+                throw new Error(`Failed to remove geofence ${geofence.id} from device ${deviceId}`);
+              }
+              
+              console.log(`Geofence ${geofence.id} removed from device ${deviceId}`);
+            }
+          } catch (error) {
+            console.error(`Error processing geofence ${geofence.id} for device ${deviceId}:`, error);
+            // Continue with other geofences even if one fails
+          }
         }
-
-        console.log(`Device ${deviceId} updated with groupId: ${groupId}`);
       }
+
+      console.log('All geofence permissions processed successfully');
+      
+    } catch (error) {
+      console.error('Error saving geofences:', error);
+      throw error; // Re-throw to be handled by the calling function
+    }
+  };
+
+  // Combined save function for groups and geofences
+  const saveSmartLinkData = async () => {
+    try {
+      const totalDevices = smartLinkSelectedDeviceIds.length;
+      
+      // Open progress modal
+      setSmartLinkProgressModal({
+        open: true,
+        currentDevice: null,
+        currentOperation: 'Starting SmartLink configuration...',
+        totalDevices: totalDevices,
+        completedDevices: 0
+      });
+
+      // Step 1: Save groups
+      await saveSmartLinkGroups();
+      
+      // Step 2: Save geofences
+      await saveSmartLinkGeofences();
 
       // Final progress update
       setSmartLinkProgressModal(prev => ({
         ...prev,
-        currentOperation: 'Group assignment completed!',
+        currentOperation: 'SmartLink configuration completed!',
         completedDevices: totalDevices
       }));
 
@@ -203,7 +258,7 @@ const FloatingDeviceList = ({
         setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
         showSnackbar(t('sharedSaved') + '!', 'success');
         
-        // Refresh devices from server to reflect new group assignments
+        // Refresh devices from server to reflect new assignments
         try {
           const devicesResponse = await fetchOrThrow('/api/devices');
           const updatedDevices = await devicesResponse.json();
@@ -230,7 +285,7 @@ const FloatingDeviceList = ({
           // Also invalidate React Query cache for other components
           queryClient.invalidateQueries(['devices']);
           
-          // Force re-render of SmartLink modal to update device group indicators
+          // Force re-render of SmartLink modal to update device indicators
           setSmartLinkRefreshTrigger(prev => prev + 1);
           
         } catch (error) {
@@ -238,12 +293,63 @@ const FloatingDeviceList = ({
         }
       }, 1000);
       
+    } catch (error) {
+      console.error('Error saving SmartLink data:', error);
+      setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
+      showSnackbar('Error saving SmartLink configuration: ' + error.message, 'error');
+    }
+  };
+
+  // Save SmartLink groups
+  const saveSmartLinkGroups = async () => {
+    try {
+      const groupId = smartLinkSelectedGroupIds.length > 0 ? smartLinkSelectedGroupIds[0] : 0;
+      const totalDevices = smartLinkSelectedDeviceIds.length;
+      
+      // Process each selected device sequentially to show progress
+      for (let i = 0; i < smartLinkSelectedDeviceIds.length; i++) {
+        const deviceId = smartLinkSelectedDeviceIds[i];
+        const device = devices[deviceId];
+        
+        if (!device) {
+          console.error('Device not found:', deviceId);
+          continue;
+        }
+
+        // Update progress modal
+        const deviceName = device.name ? (device.name.length > 25 ? device.name.substring(0, 25) + '...' : device.name) : `Device ${deviceId}`;
+        setSmartLinkProgressModal(prev => ({
+          ...prev,
+          currentDevice: deviceName,
+          currentOperation: `Updating group assignment...`,
+          completedDevices: i
+        }));
+
+        // Create updated device payload with new groupId
+        const updatedDevice = {
+          ...device,
+          groupId: groupId
+        };
+
+        // PUT the updated device
+        const response = await fetchOrThrow(`/api/devices/${deviceId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedDevice)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update device ${deviceId}`);
+        }
+
+        console.log(`Device ${deviceId} updated with groupId: ${groupId}`);
+      }
+
       console.log('All devices updated successfully');
       
     } catch (error) {
       console.error('Error saving groups:', error);
-      setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
-      showSnackbar('Error saving groups: ' + error.message, 'error');
+      throw error; // Re-throw to be handled by the calling function
     }
   };
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
@@ -2068,9 +2174,9 @@ const FloatingDeviceList = ({
                   console.log('SmartLink devices array on save click:', devicesArray);
                   
                   if (validateSmartLinkSave()) {
-                    // Validation passed - save groups
+                    // Validation passed - save groups and geofences
                     setSmartLinkSaveLoading(true);
-                    await saveSmartLinkGroups();
+                    await saveSmartLinkData();
                     setSmartLinkSaveLoading(false);
                   }
                 }}
@@ -3112,8 +3218,8 @@ const FloatingDeviceList = ({
             backgroundColor: colors.surface,
             borderRadius: '12px',
             padding: '24px',
-            minWidth: '400px',
-            maxWidth: '500px',
+            width: '450px',
+            maxWidth: '450px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             display: 'flex',
             flexDirection: 'column',
@@ -3129,11 +3235,11 @@ const FloatingDeviceList = ({
           </div>
           
           <div style={{ textAlign: 'center', width: '100%' }}>
-            <div style={{ fontSize: '14px', color: colors.text, marginBottom: '8px' }}>
+            <div style={{ fontSize: '14px', color: colors.text, marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {smartLinkProgressModal.currentOperation}
             </div>
             {smartLinkProgressModal.currentDevice && (
-              <div style={{ fontSize: '13px', color: colors.textSecondary, marginBottom: '12px' }}>
+              <div style={{ fontSize: '13px', color: colors.textSecondary, marginBottom: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 Device: {smartLinkProgressModal.currentDevice}
               </div>
             )}
