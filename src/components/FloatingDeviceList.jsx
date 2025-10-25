@@ -123,6 +123,8 @@ const FloatingDeviceList = ({
       if (calendarIds.length > 0) {
         const uniqueCalendarIds = [...new Set(calendarIds)];
         setSmartLinkSelectedCalendarIds(uniqueCalendarIds);
+        // Clear user selection when notifications change to reset conflict state
+        setSmartLinkUserSelectedCalendarIds([]);
       }
     } else {
       // Clear calendar selection when no notifications are selected
@@ -2275,30 +2277,23 @@ const FloatingDeviceList = ({
                                   const isSelected = smartLinkSelectedCalendarIds.includes(calendar.id);
                                   
                                   // Check if this calendar should be selected based on notifications
-                                  const shouldBeSelected = smartLinkSelectedNotificationIds.some(notificationId => {
-                                    const notification = smartLinkNotifications.find(n => n.id === notificationId);
-                                    return notification && notification.calendarId === calendar.id;
-                                  });
+                                  // (This logic is now handled in the useEffect above)
                                   
-                                  // Check for conflicts - gray background when there are notifications assigned to different calendars
-                                  // Check conflicts based on the actual user-selected calendars
-                                  const hasConflict = smartLinkUserSelectedCalendarIds.length > 1 || smartLinkSelectedNotificationIds.some(notificationId => {
-                                    const notification = smartLinkNotifications.find(n => n.id === notificationId);
-                                    return notification && notification.calendarId && notification.calendarId !== 0 && notification.calendarId !== calendar.id;
-                                  });
+                                  // Check for conflicts - there's a conflict if:
+                                  // 1. User has manually selected more than one calendar, OR
+                                  // 2. There are notifications assigned to different calendars (only if user hasn't made a selection yet)
+                                  const hasConflict = smartLinkUserSelectedCalendarIds.length > 1 || 
+                                    (smartLinkUserSelectedCalendarIds.length === 0 && 
+                                     smartLinkSelectedNotificationIds.length > 0 && 
+                                     smartLinkSelectedNotificationIds.some(notificationId => {
+                                       const notification = smartLinkNotifications.find(n => n.id === notificationId);
+                                       return notification && notification.calendarId && notification.calendarId !== 0 && 
+                                              notification.calendarId !== calendar.id;
+                                     }));
                                   
-                                  // Debug logging
-                                  if (isSelected) {
-                                    console.log('=== CALENDAR DEBUG ===');
-                                    console.log('Calendar:', calendar.name, 'ID:', calendar.id);
-                                    console.log('Selected notifications:', smartLinkSelectedNotificationIds);
-                                    console.log('All notifications data:', smartLinkSelectedNotificationIds.map(id => {
-                                      const notif = smartLinkNotifications.find(n => n.id === id);
-                                      return { id, calendarId: notif?.calendarId, type: notif?.type };
-                                    }));
-                                    console.log('Has conflict:', hasConflict);
-                                    console.log('====================');
-                                  }
+                                  // Determine if this specific calendar has a conflict
+                                  // A calendar has conflict if it's selected AND there's a conflict
+                                  const calendarHasConflict = hasConflict && isSelected;
                                   
                                   return (
                                     <label key={calendar.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
@@ -2306,15 +2301,22 @@ const FloatingDeviceList = ({
                                         type="checkbox" 
                                         checked={isSelected} 
                                         onChange={(e) => { 
-                                          setSmartLinkSelectedCalendarIds(e.target.checked ? [calendar.id] : []); 
-                                          setSmartLinkUserSelectedCalendarIds(e.target.checked ? [calendar.id] : []); 
+                                          if (e.target.checked) {
+                                            // When selecting a calendar, clear all others and set this as the only selected
+                                            setSmartLinkSelectedCalendarIds([calendar.id]); 
+                                            setSmartLinkUserSelectedCalendarIds([calendar.id]);
+                                          } else {
+                                            // When deselecting, clear all selections
+                                            setSmartLinkSelectedCalendarIds([]); 
+                                            setSmartLinkUserSelectedCalendarIds([]);
+                                          }
                                         }} 
                                         style={{ 
                                           width: '14px', 
                                           height: '14px', 
                                           margin: 0,
-                                          backgroundColor: hasConflict ? '#E0E0E0' : '#1976d2',
-                                          accentColor: hasConflict ? '#E0E0E0' : '#1976d2'
+                                          backgroundColor: calendarHasConflict ? '#E0E0E0' : (isSelected ? '#1976d2' : 'transparent'),
+                                          accentColor: calendarHasConflict ? '#E0E0E0' : '#1976d2'
                                         }} 
                                       />
                                       <div style={{ flex: 1, minWidth: 0 }}>
