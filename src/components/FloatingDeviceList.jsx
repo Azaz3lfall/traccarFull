@@ -341,6 +341,10 @@ const FloatingDeviceList = ({
       setDeviceGeofences({});
       setDeviceNotifications({});
       setDeviceGroups({});
+      // Clear all selections when no devices are selected
+      setSmartLinkSelectedGroupIds([]);
+      setSmartLinkSelectedGeofenceIds([]);
+      setSmartLinkSelectedNotificationIds([]);
       return;
     }
 
@@ -380,9 +384,32 @@ const FloatingDeviceList = ({
       setDeviceGeofences(newDeviceGeofences);
       setDeviceNotifications(newDeviceNotifications);
       setDeviceGroups(newDeviceGroups);
+
+      // Auto-select groups, geofences, and notifications based on device selection
+      updateRelatedSelections(results);
     } catch (error) {
       console.error('Error updating device business rules:', error);
     }
+  };
+
+  const updateRelatedSelections = (deviceResults) => {
+    // Collect all unique groups, geofences, and notifications from selected devices
+    const allGroupIds = new Set();
+    const allGeofenceIds = new Set();
+    const allNotificationIds = new Set();
+
+    deviceResults.forEach(({ groupId, geofenceIds, notificationIds }) => {
+      if (groupId) {
+        allGroupIds.add(groupId);
+      }
+      geofenceIds.forEach(id => allGeofenceIds.add(id));
+      notificationIds.forEach(id => allNotificationIds.add(id));
+    });
+
+    // Update selections
+    setSmartLinkSelectedGroupIds(Array.from(allGroupIds));
+    setSmartLinkSelectedGeofenceIds(Array.from(allGeofenceIds));
+    setSmartLinkSelectedNotificationIds(Array.from(allNotificationIds));
   };
 
   // Debounced device selection handler
