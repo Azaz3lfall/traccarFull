@@ -412,6 +412,35 @@ const FloatingDeviceList = ({
     setSmartLinkSelectedNotificationIds(Array.from(allNotificationIds));
   };
 
+  // Helper functions to check for partial selections
+  const hasPartialGroupSelection = (groupId) => {
+    const selectedDeviceIds = smartLinkSelectedDeviceIds;
+    if (selectedDeviceIds.length === 0) return false;
+    
+    const devicesInGroup = selectedDeviceIds.filter(deviceId => deviceGroups[deviceId] === groupId);
+    return devicesInGroup.length > 0 && devicesInGroup.length < selectedDeviceIds.length;
+  };
+
+  const hasPartialGeofenceSelection = (geofenceId) => {
+    const selectedDeviceIds = smartLinkSelectedDeviceIds;
+    if (selectedDeviceIds.length === 0) return false;
+    
+    const devicesInGeofence = selectedDeviceIds.filter(deviceId => 
+      deviceGeofences[deviceId]?.includes(geofenceId)
+    );
+    return devicesInGeofence.length > 0 && devicesInGeofence.length < selectedDeviceIds.length;
+  };
+
+  const hasPartialNotificationSelection = (notificationId) => {
+    const selectedDeviceIds = smartLinkSelectedDeviceIds;
+    if (selectedDeviceIds.length === 0) return false;
+    
+    const devicesInNotification = selectedDeviceIds.filter(deviceId => 
+      deviceNotifications[deviceId]?.includes(notificationId)
+    );
+    return devicesInNotification.length > 0 && devicesInNotification.length < selectedDeviceIds.length;
+  };
+
   // Debounced device selection handler
   const handleDeviceSelectionChange = (deviceId, isChecked) => {
     // Clear existing timeout
@@ -428,7 +457,7 @@ const FloatingDeviceList = ({
       // Set debounced timeout to update business rules
       const timeout = setTimeout(() => {
         updateDeviceBusinessRules(newSelection);
-      }, 800);
+      }, 500);
       
       setDebounceTimeout(timeout);
       
@@ -1966,10 +1995,13 @@ const FloatingDeviceList = ({
                         <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                           {Object.values(groups).sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((group) => {
                             const isSelected = smartLinkSelectedGroupIds.includes(group.id);
+                            const hasPartial = hasPartialGroupSelection(group.id);
                             return (
                               <label key={group.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGroupIds((prev) => e.target.checked ? (prev.includes(group.id) ? prev : [...prev, group.id]) : prev.filter((id) => id !== group.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{group.name || 'Unnamed'}</span>
+                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                                  {group.name || 'Unnamed'}{hasPartial && '*'}
+                                </span>
                               </label>
                             );
                           })}
@@ -1982,10 +2014,13 @@ const FloatingDeviceList = ({
                         <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                           {Object.values(geofences).sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((geofence) => {
                             const isSelected = smartLinkSelectedGeofenceIds.includes(geofence.id);
+                            const hasPartial = hasPartialGeofenceSelection(geofence.id);
                             return (
                               <label key={geofence.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGeofenceIds((prev) => e.target.checked ? (prev.includes(geofence.id) ? prev : [...prev, geofence.id]) : prev.filter((id) => id !== geofence.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{geofence.name || 'Unnamed'}</span>
+                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                                  {geofence.name || 'Unnamed'}{hasPartial && '*'}
+                                </span>
                               </label>
                             );
                           })}
@@ -1999,6 +2034,7 @@ const FloatingDeviceList = ({
                           {smartLinkNotificationsLoading ? (<div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>) : (
                             smartLinkNotifications.sort((a, b) => (a.type || '').localeCompare(b.type || '')).map((notification) => {
                               const isSelected = smartLinkSelectedNotificationIds.includes(notification.id);
+                              const hasPartial = hasPartialNotificationSelection(notification.id);
                               
                               // Format notificators (channels)
                               const formatList = (prefix, value) => {
@@ -2049,7 +2085,9 @@ const FloatingDeviceList = ({
                               return (
                                 <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
                                   <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{displayText}</span>
+                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                                    {displayText}{hasPartial && '*'}
+                                  </span>
                                 </label>
                               );
                             })
