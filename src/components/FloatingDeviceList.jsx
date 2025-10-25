@@ -78,6 +78,7 @@ const FloatingDeviceList = ({
   const [smartLinkSelectedGroupIds, setSmartLinkSelectedGroupIds] = useState([]);
   const [smartLinkSelectedNotificationIds, setSmartLinkSelectedNotificationIds] = useState([]);
   const [smartLinkSelectedCalendarIds, setSmartLinkSelectedCalendarIds] = useState([]);
+  const [smartLinkUserSelectedCalendarIds, setSmartLinkUserSelectedCalendarIds] = useState([]);
   const [smartLinkRecurrence, setSmartLinkRecurrence] = useState('WEEKLY');
   const [smartLinkRecurrenceDropdownOpen, setSmartLinkRecurrenceDropdownOpen] = useState(false);
 
@@ -126,6 +127,7 @@ const FloatingDeviceList = ({
     } else {
       // Clear calendar selection when no notifications are selected
       setSmartLinkSelectedCalendarIds([]);
+      setSmartLinkUserSelectedCalendarIds([]);
     }
   }, [smartLinkSelectedNotificationIds, smartLinkNotifications]);
   
@@ -761,6 +763,7 @@ const FloatingDeviceList = ({
       setSmartLinkSelectedGroupIds([]);
       setSmartLinkSelectedNotificationIds([]);
       setSmartLinkSelectedCalendarIds([]);
+      setSmartLinkUserSelectedCalendarIds([]);
       
       // Reset calendar form to default values
       setSmartLinkCalendarForm({
@@ -2279,7 +2282,7 @@ const FloatingDeviceList = ({
                                   
                                   // Check for conflicts - gray background when there are notifications assigned to different calendars
                                   // Check conflicts based on the actual user-selected calendars
-                                  const hasConflict = smartLinkSelectedCalendarIds.length > 1 || smartLinkSelectedNotificationIds.some(notificationId => {
+                                  const hasConflict = smartLinkUserSelectedCalendarIds.length > 1 || smartLinkSelectedNotificationIds.some(notificationId => {
                                     const notification = smartLinkNotifications.find(n => n.id === notificationId);
                                     return notification && notification.calendarId && notification.calendarId !== 0 && notification.calendarId !== calendar.id;
                                   });
@@ -2302,7 +2305,10 @@ const FloatingDeviceList = ({
                                       <input 
                                         type="checkbox" 
                                         checked={isSelected} 
-                                        onChange={(e) => { setSmartLinkSelectedCalendarIds(e.target.checked ? [calendar.id] : []); }} 
+                                        onChange={(e) => { 
+                                          setSmartLinkSelectedCalendarIds(e.target.checked ? [calendar.id] : []); 
+                                          setSmartLinkUserSelectedCalendarIds(e.target.checked ? [calendar.id] : []); 
+                                        }} 
                                         style={{ 
                                           width: '14px', 
                                           height: '14px', 
