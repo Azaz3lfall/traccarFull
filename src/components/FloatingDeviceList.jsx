@@ -2000,7 +2000,7 @@ const FloatingDeviceList = ({
                               <label key={group.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGroupIds((prev) => e.target.checked ? (prev.includes(group.id) ? prev : [...prev, group.id]) : prev.filter((id) => id !== group.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
                                 <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                  {group.name || 'Unnamed'}{hasPartial && '*'}
+                                  {group.name || 'Unnamed'}{hasPartial && ' ***'}
                                 </span>
                               </label>
                             );
@@ -2019,7 +2019,7 @@ const FloatingDeviceList = ({
                               <label key={geofence.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGeofenceIds((prev) => e.target.checked ? (prev.includes(geofence.id) ? prev : [...prev, geofence.id]) : prev.filter((id) => id !== geofence.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
                                 <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                  {geofence.name || 'Unnamed'}{hasPartial && '*'}
+                                  {geofence.name || 'Unnamed'}{hasPartial && ' ***'}
                                 </span>
                               </label>
                             );
@@ -2086,7 +2086,7 @@ const FloatingDeviceList = ({
                                 <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
                                   <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
                                   <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                    {displayText}{hasPartial && '*'}
+                                    {displayText}{hasPartial && ' ***'}
                                   </span>
                                 </label>
                               );
