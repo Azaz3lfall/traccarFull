@@ -2374,20 +2374,24 @@ const FloatingDeviceList = ({
                                 style={{
                                   width: '100%',
                                   padding: '12px',
-                                  border: 'none',
+                                  border: `1px solid ${colors.primary}`,
                                   borderRadius: '6px',
                                   backgroundColor: colors.primary,
-                                  color: 'white',
+                                  color: colors.text,
                                   cursor: 'pointer',
                                   fontSize: '14px',
                                   fontWeight: '600',
-                                  marginTop: '16px'
+                                  marginTop: '16px',
+                                  transition: 'all 0.2s ease',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor = colors.primary + 'CC';
+                                  e.currentTarget.style.borderColor = colors.primary;
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.backgroundColor = colors.primary;
+                                  e.currentTarget.style.borderColor = colors.primary;
                                 }}
                               >
                                 {t('sharedSave')} {t('sharedCalendar')}
