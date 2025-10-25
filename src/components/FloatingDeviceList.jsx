@@ -34,6 +34,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { PiMagicWand } from 'react-icons/pi';
+import { BsCloudArrowUp } from 'react-icons/bs';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress } from '@mui/material';
@@ -1876,10 +1877,32 @@ const FloatingDeviceList = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  onClick={() => setShowWandModal(false)}
+                  aria-label="Close"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    background: 'none',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <ChevronLeft size={18} color={colors.text} />
+                </button>
+                <div style={{ color: colors.text }}>
+                  <span style={{ fontSize: '16px', fontWeight: 600 }}>SmartLink</span>
+                  <sup style={{ marginLeft: '6px', fontStyle: 'italic', color: colors.textSecondary, fontSize: '12px' }}>beta</sup>
+                </div>
+              </div>
               <button
-                onClick={() => setShowWandModal(false)}
-                aria-label="Close"
+                onClick={() => alert('Save feature coming soon!')}
+                aria-label="Save"
                 style={{
                   width: '34px',
                   height: '34px',
@@ -1888,15 +1911,19 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  borderRadius: '6px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary + '20';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                <ChevronLeft size={18} color={colors.text} />
+                <BsCloudArrowUp size={18} color={colors.text} />
               </button>
-              <div style={{ color: colors.text }}>
-                <span style={{ fontSize: '16px', fontWeight: 600 }}>SmartLink</span>
-                <sup style={{ marginLeft: '6px', fontStyle: 'italic', color: colors.textSecondary, fontSize: '12px' }}>beta</sup>
-              </div>
             </div>
 
             {/* Intro text removed per request */}
@@ -2686,14 +2713,13 @@ const FloatingDeviceList = ({
                                                 type="checkbox"
                                                 checked={period.enabled}
                                                 disabled={index === 0 && smartLinkTimeRanges.enabled}
-                                                style={{ marginTop: '2px' }}
+                                                style={{ marginTop: '2px', width: '16px', height: '16px' }}
                                                 onChange={(e) => {
                                                   const newPeriods = smartLinkTimeRanges.periods.map((p, i) => 
                                                     i === index ? { ...p, enabled: e.target.checked } : { ...p }
                                                   );
                                                   setSmartLinkTimeRanges({ ...smartLinkTimeRanges, periods: newPeriods });
                                                 }}
-                                                style={{ width: '16px', height: '16px' }}
                                               />
                                               <span style={{ color: colors.text, fontSize: '14px', fontWeight: '500' }}>
                                                 {period.name}
