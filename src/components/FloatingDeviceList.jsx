@@ -1851,10 +1851,52 @@ const FloatingDeviceList = ({
                           {smartLinkNotificationsLoading ? (<div style={{ color: colors.textSecondary, fontSize: '12px' }}>Loading...</div>) : (
                             smartLinkNotifications.sort((a, b) => (a.type || '').localeCompare(b.type || '')).map((notification) => {
                               const isSelected = smartLinkSelectedNotificationIds.includes(notification.id);
+                              
+                              // Format notificators (channels)
+                              const formatList = (prefix, value) => {
+                                if (value) {
+                                  return value
+                                    .split(/[, ]+/)
+                                    .filter(Boolean)
+                                    .map((it) => t(prefixString(prefix, it)))
+                                    .join(', ');
+                                }
+                                return '';
+                              };
+                              
+                              const notificatorsText = formatList('notificator', notification.notificators);
+                              const hasCommand = notification.notificators?.includes('command');
+                              
                               return (
-                                <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
-                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{notification.type ? t(prefixString('event', notification.type)) : t('sharedNotifications')}</span>
+                                <label key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '12px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, border: isSelected ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`, marginBottom: '4px' }}>
+                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }} />
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    {/* Notification Type */}
+                                    <div style={{ color: colors.text, fontSize: '13px', fontWeight: '500', marginBottom: '4px' }}>
+                                      {notification.type ? t(prefixString('event', notification.type)) : t('sharedNotifications')}
+                                    </div>
+                                    
+                                    {/* Channels/Notificators */}
+                                    {notificatorsText && (
+                                      <div style={{ color: colors.textSecondary, fontSize: '11px', marginBottom: '2px' }}>
+                                        <span style={{ fontWeight: '500' }}>Channels:</span> {notificatorsText}
+                                      </div>
+                                    )}
+                                    
+                                    {/* Command Info */}
+                                    {hasCommand && notification.commandId && (
+                                      <div style={{ color: colors.textSecondary, fontSize: '11px' }}>
+                                        <span style={{ fontWeight: '500' }}>Command ID:</span> {notification.commandId}
+                                      </div>
+                                    )}
+                                    
+                                    {/* Always flag */}
+                                    {notification.always && (
+                                      <div style={{ color: colors.textSecondary, fontSize: '11px', fontStyle: 'italic' }}>
+                                        Always active
+                                      </div>
+                                    )}
+                                  </div>
                                 </label>
                               );
                             })
