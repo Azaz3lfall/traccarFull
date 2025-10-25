@@ -220,6 +220,9 @@ const FloatingDeviceList = ({
           // Also invalidate React Query cache for other components
           queryClient.invalidateQueries(['devices']);
           
+          // Force re-render of SmartLink modal to update device group indicators
+          setSmartLinkRefreshTrigger(prev => prev + 1);
+          
         } catch (error) {
           console.error('Error refreshing devices:', error);
         }
@@ -247,6 +250,7 @@ const FloatingDeviceList = ({
     totalDevices: 0,
     completedDevices: 0
   });
+  const [smartLinkRefreshTrigger, setSmartLinkRefreshTrigger] = useState(0);
 
   // Auto-select calendars based on selected notifications
   useEffect(() => {
@@ -2131,7 +2135,7 @@ const FloatingDeviceList = ({
                 }}>
                   {t('deviceTitle')}
                 </div>
-                <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+                <div key={`devices-${smartLinkRefreshTrigger}`} style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                   {(filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
                     .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
                     .map((device) => {
