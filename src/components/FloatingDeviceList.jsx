@@ -103,6 +103,30 @@ const FloatingDeviceList = ({
   const hideSnackbar = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
+
+  // SmartLink save validation
+  const validateSmartLinkSave = () => {
+    // Check if at least one device is selected
+    if (smartLinkSelectedDeviceIds.length === 0) {
+      showSnackbar('Please select at least one ' + t('sharedDevice').toLowerCase(), 'error');
+      return false;
+    }
+
+    // Check for conflicting groups (more than one group selected)
+    if (smartLinkSelectedGroupIds.length > 1) {
+      showSnackbar('Please select only one ' + t('settingsGroups').toLowerCase(), 'error');
+      return false;
+    }
+
+    // Check for conflicting calendars (more than one calendar selected)
+    if (smartLinkSelectedCalendarIds.length > 1) {
+      showSnackbar('Please select only one ' + t('sharedCalendars').toLowerCase(), 'error');
+      return false;
+    }
+
+    // All validations passed
+    return true;
+  };
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
@@ -1901,7 +1925,12 @@ const FloatingDeviceList = ({
                 </div>
               </div>
               <button
-                onClick={() => alert('Save feature coming soon!')}
+                onClick={() => {
+                  if (validateSmartLinkSave()) {
+                    // Validation passed - show success message for now
+                    showSnackbar(t('sharedSaved') + '!', 'success');
+                  }
+                }}
                 aria-label="Save"
                 style={{
                   width: '34px',
