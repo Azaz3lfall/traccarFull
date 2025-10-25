@@ -1968,9 +1968,9 @@ const FloatingDeviceList = ({
                             flex: 1,
                             minWidth: 0
                           }}>
-                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                              {device[devicePrimary] || device.name || 'Unnamed'}
-                            </span>
+                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                            {device[devicePrimary] || device.name || 'Unnamed'}
+                          </span>
                             {loadingDevices.has(device.id) && (
                               <CircularProgress 
                                 size={12} 
@@ -2098,7 +2098,7 @@ const FloatingDeviceList = ({
                                             }}
                                           >
                                             {deviceName}
-                                          </span>
+                                </span>
                                         );
                                       }).reduce((acc, curr, index) => {
                                         return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
@@ -2146,7 +2146,7 @@ const FloatingDeviceList = ({
                                             }}
                                           >
                                             {deviceName}
-                                          </span>
+                                </span>
                                         );
                                       }).reduce((acc, curr, index) => {
                                         return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
@@ -2242,7 +2242,7 @@ const FloatingDeviceList = ({
                                               }}
                                             >
                                               {deviceName}
-                                            </span>
+                                  </span>
                                           );
                                         }).reduce((acc, curr, index) => {
                                           return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
@@ -2277,7 +2277,7 @@ const FloatingDeviceList = ({
                                     return notification && notification.calendarId === calendar.id;
                                   });
                                   
-                                  // Check for conflicts - if any selected notifications have a different calendarId than this calendar
+                                  // Check for conflicts - if there are selected notifications with different calendarId than this calendar
                                   const hasConflict = smartLinkSelectedNotificationIds.some(notificationId => {
                                     const notification = smartLinkNotifications.find(n => n.id === notificationId);
                                     return notification && notification.calendarId && notification.calendarId !== calendar.id;
@@ -2354,10 +2354,6 @@ const FloatingDeviceList = ({
                                                   }
                                                 }
                                                 
-                                                // Always flag
-                                                if (notification.always) {
-                                                  displayParts.push('Always active');
-                                                }
                                                 
                                                 const displayText = displayParts.join(' / ');
                                                 
