@@ -214,8 +214,18 @@ const FloatingDeviceList = ({
           // Update Redux store with fresh device data
           dispatch(devicesActions.update(devicesArray));
           
+          // Update deviceGroups state with fresh group assignments
+          const newDeviceGroups = {};
+          devicesArray.forEach(device => {
+            if (device.groupId) {
+              newDeviceGroups[device.id] = device.groupId;
+            }
+          });
+          setDeviceGroups(newDeviceGroups);
+          
           console.log('Devices refreshed after save');
           console.log('Updated devices:', devicesArray);
+          console.log('Updated deviceGroups:', newDeviceGroups);
           
           // Also invalidate React Query cache for other components
           queryClient.invalidateQueries(['devices']);
