@@ -106,6 +106,12 @@ const FloatingDeviceList = ({
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [smartLinkCommands, setSmartLinkCommands] = useState([]);
   const [smartLinkCommandsLoading, setSmartLinkCommandsLoading] = useState(false);
+  
+  // Business rules state
+  const [deviceGeofences, setDeviceGeofences] = useState({}); // deviceId -> geofenceIds
+  const [deviceNotifications, setDeviceNotifications] = useState({}); // deviceId -> notificationIds
+  const [deviceGroups, setDeviceGroups] = useState({}); // deviceId -> groupId
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [smartLinkCalendarForm, setSmartLinkCalendarForm] = useState({
     name: '',
     from: dayjs().format('YYYY-MM-DDTHH:mm'),
@@ -279,6 +285,15 @@ const FloatingDeviceList = ({
     }
   }, [showFilters]);
 
+  // Cleanup debounce timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+    };
+  }, [debounceTimeout]);
+
   // Hide device list on mobile when device is selected
   React.useEffect(() => {
     if (!desktop && selectedDeviceId) {
@@ -296,6 +311,102 @@ const FloatingDeviceList = ({
   const getPeriodName = (index) => {
     const periodName = t('calendarPeriod');
     return periodName && periodName !== 'calendarPeriod' ? `${periodName} ${index}` : `Period ${index}`;
+  };
+
+  // Business rules functions
+  const fetchDeviceGeofences = async (deviceId) => {
+    try {
+      const response = await fetchOrThrow(`/api/geofences?deviceId=${deviceId}`);
+      const data = await response.json();
+      return Array.isArray(data) ? data.map(g => g.id) : [];
+    } catch (error) {
+      console.error(`Error fetching geofences for device ${deviceId}:`, error);
+      return [];
+    }
+  };
+
+  const fetchDeviceNotifications = async (deviceId) => {
+    try {
+      const response = await fetchOrThrow(`/api/notifications?deviceId=${deviceId}`);
+      const data = await response.json();
+      return Array.isArray(data) ? data.map(n => n.id) : [];
+    } catch (error) {
+      console.error(`Error fetching notifications for device ${deviceId}:`, error);
+      return [];
+    }
+  };
+
+  const updateDeviceBusinessRules = async (selectedDeviceIds) => {
+    if (selectedDeviceIds.length === 0) {
+      setDeviceGeofences({});
+      setDeviceNotifications({});
+      setDeviceGroups({});
+      return;
+    }
+
+    // Fetch geofences and notifications for all selected devices
+    const promises = selectedDeviceIds.map(async (deviceId) => {
+      const [geofenceIds, notificationIds] = await Promise.all([
+        fetchDeviceGeofences(deviceId),
+        fetchDeviceNotifications(deviceId)
+      ]);
+      
+      // Get groupId from device object
+      const device = devices[deviceId];
+      const groupId = device?.groupId || null;
+      
+      return {
+        deviceId,
+        geofenceIds,
+        notificationIds,
+        groupId
+      };
+    });
+
+    try {
+      const results = await Promise.all(promises);
+      
+      // Update state
+      const newDeviceGeofences = {};
+      const newDeviceNotifications = {};
+      const newDeviceGroups = {};
+      
+      results.forEach(({ deviceId, geofenceIds, notificationIds, groupId }) => {
+        newDeviceGeofences[deviceId] = geofenceIds;
+        newDeviceNotifications[deviceId] = notificationIds;
+        newDeviceGroups[deviceId] = groupId;
+      });
+      
+      setDeviceGeofences(newDeviceGeofences);
+      setDeviceNotifications(newDeviceNotifications);
+      setDeviceGroups(newDeviceGroups);
+    } catch (error) {
+      console.error('Error updating device business rules:', error);
+    }
+  };
+
+  // Debounced device selection handler
+  const handleDeviceSelectionChange = (deviceId, isChecked) => {
+    // Clear existing timeout
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Update selected devices immediately
+    setSmartLinkSelectedDeviceIds((prev) => {
+      const newSelection = isChecked 
+        ? (prev.includes(deviceId) ? prev : [...prev, deviceId])
+        : prev.filter((id) => id !== deviceId);
+      
+      // Set debounced timeout to update business rules
+      const timeout = setTimeout(() => {
+        updateDeviceBusinessRules(newSelection);
+      }, 800);
+      
+      setDebounceTimeout(timeout);
+      
+      return newSelection;
+    });
   };
 
   // Functions to manage time range periods
@@ -1758,12 +1869,7 @@ const FloatingDeviceList = ({
                             type="checkbox"
                             checked={isSelected}
                             onChange={(e) => {
-                              setSmartLinkSelectedDeviceIds((prev) => {
-                                if (e.target.checked) {
-                                  return prev.includes(device.id) ? prev : [...prev, device.id];
-                                }
-                                return prev.filter((id) => id !== device.id);
-                              });
+                              handleDeviceSelectionChange(device.id, e.target.checked);
                             }}
                             style={{ width: '14px', height: '14px', margin: 0 }}
                           />
