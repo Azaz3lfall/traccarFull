@@ -2309,14 +2309,12 @@ const FloatingDeviceList = ({
                                             overflowWrap: 'break-word',
                                             maxWidth: '100%'
                                           }}>
-                                            {smartLinkSelectedNotificationIds
-                                              .filter(notificationId => {
-                                                const notification = smartLinkNotifications.find(n => n.id === notificationId);
-                                                return notification && notification.calendarId === calendar.id;
-                                              })
-                                              .map(notificationId => {
+                                            {smartLinkSelectedNotificationIds.map(notificationId => {
                                                 const notification = smartLinkNotifications.find(n => n.id === notificationId);
                                                 if (!notification) return null;
+                                                
+                                                // Check if this notification is partnered with this calendar
+                                                const isPartnered = notification.calendarId === calendar.id;
                                                 
                                                 // Format notificators (channels)
                                                 const formatList = (prefix, value) => {
@@ -2367,7 +2365,7 @@ const FloatingDeviceList = ({
                                                   <span
                                                     key={notificationId}
                                                     style={{
-                                                      color: '#10B981', // Green for partnered
+                                                      color: isPartnered ? '#10B981' : '#EF4444', // Green for partnered, red for not partnered
                                                       marginRight: '8px',
                                                       fontSize: '10px'
                                                     }}
