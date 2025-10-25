@@ -104,6 +104,8 @@ const FloatingDeviceList = ({
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
+  const [smartLinkCommands, setSmartLinkCommands] = useState([]);
+  const [smartLinkCommandsLoading, setSmartLinkCommandsLoading] = useState(false);
   const [smartLinkCalendarForm, setSmartLinkCalendarForm] = useState({
     name: '',
     from: dayjs().format('YYYY-MM-DDTHH:mm'),
@@ -537,9 +539,22 @@ const FloatingDeviceList = ({
         setSmartLinkCalendarsLoading(false);
       }
     };
+    const loadCommands = async () => {
+      try {
+        setSmartLinkCommandsLoading(true);
+        const res = await fetchOrThrow('/api/commands');
+        const data = await res.json();
+        setSmartLinkCommands(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setSmartLinkCommands([]);
+      } finally {
+        setSmartLinkCommandsLoading(false);
+      }
+    };
     if (showWandModal) {
       loadNotifications();
       loadCalendars();
+      loadCommands();
       
       // Reset all selections to clean state
       setSmartLinkSelectedDeviceIds([]);
@@ -1867,36 +1882,41 @@ const FloatingDeviceList = ({
                               const notificatorsText = formatList('notificator', notification.notificators);
                               const hasCommand = notification.notificators?.includes('command');
                               
+                              // Build single line display
+                              const displayParts = [];
+                              
+                              // Notification type
+                              if (notification.type) {
+                                displayParts.push(t(prefixString('event', notification.type)));
+                              }
+                              
+                              // Channels/Notificators
+                              if (notificatorsText) {
+                                displayParts.push(notificatorsText);
+                              }
+                              
+                              // Command description (if it's a command notification)
+                              if (hasCommand && notification.commandId) {
+                                // Find command description from commands list
+                                const command = smartLinkCommands?.find(cmd => cmd.id === notification.commandId);
+                                if (command?.description) {
+                                  displayParts.push(command.description);
+                                } else {
+                                  displayParts.push(`Command ${notification.commandId}`);
+                                }
+                              }
+                              
+                              // Always flag
+                              if (notification.always) {
+                                displayParts.push('Always active');
+                              }
+                              
+                              const displayText = displayParts.join(' / ');
+                              
                               return (
-                                <label key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '12px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, border: isSelected ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`, marginBottom: '4px' }}>
-                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }} />
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    {/* Notification Type */}
-                                    <div style={{ color: colors.text, fontSize: '13px', fontWeight: '500', marginBottom: '4px' }}>
-                                      {notification.type ? t(prefixString('event', notification.type)) : t('sharedNotifications')}
-                                    </div>
-                                    
-                                    {/* Channels/Notificators */}
-                                    {notificatorsText && (
-                                      <div style={{ color: colors.textSecondary, fontSize: '11px', marginBottom: '2px' }}>
-                                        <span style={{ fontWeight: '500' }}>Channels:</span> {notificatorsText}
-                                      </div>
-                                    )}
-                                    
-                                    {/* Command Info */}
-                                    {hasCommand && notification.commandId && (
-                                      <div style={{ color: colors.textSecondary, fontSize: '11px' }}>
-                                        <span style={{ fontWeight: '500' }}>Command ID:</span> {notification.commandId}
-                                      </div>
-                                    )}
-                                    
-                                    {/* Always flag */}
-                                    {notification.always && (
-                                      <div style={{ color: colors.textSecondary, fontSize: '11px', fontStyle: 'italic' }}>
-                                        Always active
-                                      </div>
-                                    )}
-                                  </div>
+                                <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, border: isSelected ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`, marginBottom: '4px' }}>
+                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
+                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{displayText}</span>
                                 </label>
                               );
                             })
