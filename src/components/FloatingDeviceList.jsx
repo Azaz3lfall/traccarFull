@@ -1926,6 +1926,11 @@ const FloatingDeviceList = ({
               </div>
               <button
                 onClick={() => {
+                  // Console log the SmartLink devices array
+                  const devicesArray = (filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                  console.log('SmartLink devices array on save click:', devicesArray);
+                  
                   if (validateSmartLinkSave()) {
                     // Validation passed - show success message for now
                     showSnackbar(t('sharedSaved') + '!', 'success');
