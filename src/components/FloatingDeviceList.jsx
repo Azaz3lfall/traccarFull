@@ -449,7 +449,7 @@ const FloatingDeviceList = ({
       clearTimeout(debounceTimeout);
     }
 
-    // Show loading state immediately when device is selected
+    // Show loading state immediately for both select and deselect
     setLoadingDevices(prev => new Set([...prev, deviceId]));
 
     // Update selected devices immediately
@@ -458,10 +458,10 @@ const FloatingDeviceList = ({
         ? (prev.includes(deviceId) ? prev : [...prev, deviceId])
         : prev.filter((id) => id !== deviceId);
       
-      // Set debounced timeout to update business rules
-      const timeout = setTimeout(() => {
-        updateDeviceBusinessRules(newSelection);
-        // Remove device from loading state after data is fetched
+      // Set debounced timeout to update business rules for both select and deselect
+      const timeout = setTimeout(async () => {
+        await updateDeviceBusinessRules(newSelection);
+        // Remove device from loading state after ALL business rules are checked
         setLoadingDevices(prev => {
           const newSet = new Set(prev);
           newSet.delete(deviceId);
@@ -2027,9 +2027,38 @@ const FloatingDeviceList = ({
                             return (
                               <label key={group.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGroupIds((prev) => e.target.checked ? (prev.includes(group.id) ? prev : [...prev, group.id]) : prev.filter((id) => id !== group.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                  {group.name || 'Unnamed'}{hasPartial && ' ***'}
-                                </span>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {group.name || 'Unnamed'}
+                                  </div>
+                                  {isSelected && smartLinkSelectedDeviceIds.length > 0 && (
+                                    <div style={{ 
+                                      fontSize: '11px', 
+                                      marginTop: '2px',
+                                      wordWrap: 'break-word',
+                                      overflowWrap: 'break-word',
+                                      maxWidth: '100%'
+                                    }}>
+                                      {smartLinkSelectedDeviceIds.map(deviceId => {
+                                        const deviceGroup = deviceGroups[deviceId];
+                                        const isPartnered = deviceGroup === group.id;
+                                        const deviceName = devices[deviceId]?.name || 'Unknown';
+                                        return (
+                                          <span
+                                            key={deviceId}
+                                            style={{
+                                              color: isPartnered ? '#10B981' : '#EF4444' // Green for partnered, red for not partnered
+                                            }}
+                                          >
+                                            {deviceName}
+                                          </span>
+                                        );
+                                      }).reduce((acc, curr, index) => {
+                                        return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
+                                      }, null)}
+                                    </div>
+                                  )}
+                                </div>
                               </label>
                             );
                           })}
@@ -2046,9 +2075,38 @@ const FloatingDeviceList = ({
                             return (
                               <label key={geofence.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', width: '100%', minWidth: 0 }}>
                                 <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedGeofenceIds((prev) => e.target.checked ? (prev.includes(geofence.id) ? prev : [...prev, geofence.id]) : prev.filter((id) => id !== geofence.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                  {geofence.name || 'Unnamed'}{hasPartial && ' ***'}
-                                </span>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {geofence.name || 'Unnamed'}
+                                  </div>
+                                  {isSelected && smartLinkSelectedDeviceIds.length > 0 && (
+                                    <div style={{ 
+                                      fontSize: '11px', 
+                                      marginTop: '2px',
+                                      wordWrap: 'break-word',
+                                      overflowWrap: 'break-word',
+                                      maxWidth: '100%'
+                                    }}>
+                                      {smartLinkSelectedDeviceIds.map(deviceId => {
+                                        const deviceGeofenceList = deviceGeofences[deviceId] || [];
+                                        const isPartnered = deviceGeofenceList.includes(geofence.id);
+                                        const deviceName = devices[deviceId]?.name || 'Unknown';
+                                        return (
+                                          <span
+                                            key={deviceId}
+                                            style={{
+                                              color: isPartnered ? '#10B981' : '#EF4444' // Green for partnered, red for not partnered
+                                            }}
+                                          >
+                                            {deviceName}
+                                          </span>
+                                        );
+                                      }).reduce((acc, curr, index) => {
+                                        return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
+                                      }, null)}
+                                    </div>
+                                  )}
+                                </div>
                               </label>
                             );
                           })}
@@ -2113,9 +2171,38 @@ const FloatingDeviceList = ({
                               return (
                                 <label key={notification.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
                                   <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0 }} />
-                                  <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                                    {displayText}{hasPartial && ' ***'}
-                                  </span>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {displayText}
+                                    </div>
+                                    {isSelected && smartLinkSelectedDeviceIds.length > 0 && (
+                                      <div style={{ 
+                                        fontSize: '11px', 
+                                        marginTop: '2px',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        maxWidth: '100%'
+                                      }}>
+                                        {smartLinkSelectedDeviceIds.map(deviceId => {
+                                          const deviceNotificationList = deviceNotifications[deviceId] || [];
+                                          const isPartnered = deviceNotificationList.includes(notification.id);
+                                          const deviceName = devices[deviceId]?.name || 'Unknown';
+                                          return (
+                                            <span
+                                              key={deviceId}
+                                              style={{
+                                                color: isPartnered ? '#10B981' : '#EF4444' // Green for partnered, red for not partnered
+                                              }}
+                                            >
+                                              {deviceName}
+                                            </span>
+                                          );
+                                        }).reduce((acc, curr, index) => {
+                                          return acc === null ? [curr] : [...acc, <span key={`comma-${index}`} style={{ color: colors.textSecondary }}>, </span>, curr];
+                                        }, null)}
+                                      </div>
+                                    )}
+                                  </div>
                                 </label>
                               );
                             })
