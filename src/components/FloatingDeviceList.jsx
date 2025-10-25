@@ -36,7 +36,7 @@ import {
 import { PiMagicWand } from 'react-icons/pi';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 
 dayjs.extend(relativeTime);
@@ -112,6 +112,7 @@ const FloatingDeviceList = ({
   const [deviceNotifications, setDeviceNotifications] = useState({}); // deviceId -> notificationIds
   const [deviceGroups, setDeviceGroups] = useState({}); // deviceId -> groupId
   const [debounceTimeout, setDebounceTimeout] = useState(null);
+  const [loadingDevices, setLoadingDevices] = useState(new Set()); // Track devices currently loading data
   const [smartLinkCalendarForm, setSmartLinkCalendarForm] = useState({
     name: '',
     from: dayjs().format('YYYY-MM-DDTHH:mm'),
@@ -448,6 +449,9 @@ const FloatingDeviceList = ({
       clearTimeout(debounceTimeout);
     }
 
+    // Show loading state immediately when device is selected
+    setLoadingDevices(prev => new Set([...prev, deviceId]));
+
     // Update selected devices immediately
     setSmartLinkSelectedDeviceIds((prev) => {
       const newSelection = isChecked 
@@ -457,6 +461,12 @@ const FloatingDeviceList = ({
       // Set debounced timeout to update business rules
       const timeout = setTimeout(() => {
         updateDeviceBusinessRules(newSelection);
+        // Remove device from loading state after data is fetched
+        setLoadingDevices(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(deviceId);
+          return newSet;
+        });
       }, 500);
       
       setDebounceTimeout(timeout);
@@ -1929,9 +1939,27 @@ const FloatingDeviceList = ({
                             }}
                             style={{ width: '14px', height: '14px', margin: 0 }}
                           />
-                          <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
-                            {device[devicePrimary] || device.name || 'Unnamed'}
-                          </span>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            flex: 1,
+                            minWidth: 0
+                          }}>
+                            <span style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                              {device[devicePrimary] || device.name || 'Unnamed'}
+                            </span>
+                            {loadingDevices.has(device.id) && (
+                              <CircularProgress 
+                                size={12} 
+                                thickness={4}
+                                style={{ 
+                                  color: colors.text,
+                                  flexShrink: 0
+                                }} 
+                              />
+                            )}
+                          </div>
                         </label>
                       );
                     })}
