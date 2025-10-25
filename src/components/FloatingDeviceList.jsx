@@ -2025,11 +2025,8 @@ const FloatingDeviceList = ({
                             const isSelected = smartLinkSelectedGroupIds.includes(group.id);
                             const hasPartial = hasPartialGroupSelection(group.id);
                             
-                            // Check for conflicts - if any selected devices exist in other groups
-                            const hasConflict = isSelected && smartLinkSelectedDeviceIds.some(deviceId => {
-                              const deviceGroup = deviceGroups[deviceId];
-                              return deviceGroup && deviceGroup !== group.id;
-                            });
+                            // Check for conflicts - only show conflict if multiple groups are selected
+                            const hasConflict = isSelected && smartLinkSelectedGroupIds.length > 1;
                             
                             return (
                               <label key={group.id} style={{ 
