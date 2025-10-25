@@ -127,12 +127,95 @@ const FloatingDeviceList = ({
     // All validations passed
     return true;
   };
+
+  // Save SmartLink groups
+  const saveSmartLinkGroups = async () => {
+    try {
+      const groupId = smartLinkSelectedGroupIds.length > 0 ? smartLinkSelectedGroupIds[0] : 0;
+      const totalDevices = smartLinkSelectedDeviceIds.length;
+      
+      // Open progress modal
+      setSmartLinkProgressModal({
+        open: true,
+        currentDevice: null,
+        currentOperation: 'Starting group assignment...',
+        totalDevices: totalDevices,
+        completedDevices: 0
+      });
+      
+      // Process each selected device sequentially to show progress
+      for (let i = 0; i < smartLinkSelectedDeviceIds.length; i++) {
+        const deviceId = smartLinkSelectedDeviceIds[i];
+        const device = devices[deviceId];
+        
+        if (!device) {
+          console.error('Device not found:', deviceId);
+          continue;
+        }
+
+        // Update progress modal
+        setSmartLinkProgressModal(prev => ({
+          ...prev,
+          currentDevice: device.name || `Device ${deviceId}`,
+          currentOperation: `Updating group assignment...`,
+          completedDevices: i
+        }));
+
+        // Create updated device payload with new groupId
+        const updatedDevice = {
+          ...device,
+          groupId: groupId
+        };
+
+        // PUT the updated device
+        const response = await fetchOrThrow(`/api/devices/${deviceId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedDevice)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update device ${deviceId}`);
+        }
+
+        console.log(`Device ${deviceId} updated with groupId: ${groupId}`);
+      }
+
+      // Final progress update
+      setSmartLinkProgressModal(prev => ({
+        ...prev,
+        currentOperation: 'Group assignment completed!',
+        completedDevices: totalDevices
+      }));
+
+      // Close progress modal after a short delay
+      setTimeout(() => {
+        setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
+        showSnackbar(t('sharedSaved') + '!', 'success');
+      }, 1000);
+      
+      console.log('All devices updated successfully');
+      
+    } catch (error) {
+      console.error('Error saving groups:', error);
+      setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
+      showSnackbar('Error saving groups: ' + error.message, 'error');
+    }
+  };
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [smartLinkCommands, setSmartLinkCommands] = useState([]);
   const [smartLinkCommandsLoading, setSmartLinkCommandsLoading] = useState(false);
+  const [smartLinkSaveLoading, setSmartLinkSaveLoading] = useState(false);
+  const [smartLinkProgressModal, setSmartLinkProgressModal] = useState({
+    open: false,
+    currentDevice: null,
+    currentOperation: '',
+    totalDevices: 0,
+    completedDevices: 0
+  });
 
   // Auto-select calendars based on selected notifications
   useEffect(() => {
@@ -1925,17 +2008,22 @@ const FloatingDeviceList = ({
                 </div>
               </div>
               <button
-                onClick={() => {
+                onClick={async () => {
+                  if (smartLinkSaveLoading) return; // Prevent multiple clicks
+                  
                   // Console log the SmartLink devices array
                   const devicesArray = (filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
                     .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                   console.log('SmartLink devices array on save click:', devicesArray);
                   
                   if (validateSmartLinkSave()) {
-                    // Validation passed - show success message for now
-                    showSnackbar(t('sharedSaved') + '!', 'success');
+                    // Validation passed - save groups
+                    setSmartLinkSaveLoading(true);
+                    await saveSmartLinkGroups();
+                    setSmartLinkSaveLoading(false);
                   }
                 }}
+                disabled={smartLinkSaveLoading}
                 aria-label="Save"
                 style={{
                   width: '34px',
@@ -1945,18 +2033,25 @@ const FloatingDeviceList = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
+                  cursor: smartLinkSaveLoading ? 'not-allowed' : 'pointer',
                   borderRadius: '6px',
-                  transition: 'background-color 0.2s'
+                  transition: 'background-color 0.2s',
+                  opacity: smartLinkSaveLoading ? 0.6 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary + '20';
+                  if (!smartLinkSaveLoading) {
+                    e.currentTarget.style.backgroundColor = colors.primary + '20';
+                  }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                <BsCloudArrowUp size={18} color={colors.text} />
+                {smartLinkSaveLoading ? (
+                  <CircularProgress size={18} thickness={4} style={{ color: colors.text }} />
+                ) : (
+                  <BsCloudArrowUp size={18} color={colors.text} />
+                )}
               </button>
             </div>
 
@@ -2943,6 +3038,72 @@ const FloatingDeviceList = ({
         {snackbar.message}
       </Alert>
     </Snackbar>
+
+    {/* SmartLink Progress Modal */}
+    {smartLinkProgressModal.open && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            backgroundColor: colors.surface,
+            borderRadius: '12px',
+            padding: '24px',
+            minWidth: '400px',
+            maxWidth: '500px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <CircularProgress size={24} thickness={4} style={{ color: colors.primary }} />
+            <span style={{ fontSize: '18px', fontWeight: '600', color: colors.text }}>
+              Saving SmartLink Configuration
+            </span>
+          </div>
+          
+          <div style={{ textAlign: 'center', width: '100%' }}>
+            <div style={{ fontSize: '14px', color: colors.text, marginBottom: '8px' }}>
+              {smartLinkProgressModal.currentOperation}
+            </div>
+            {smartLinkProgressModal.currentDevice && (
+              <div style={{ fontSize: '13px', color: colors.textSecondary, marginBottom: '12px' }}>
+                Device: {smartLinkProgressModal.currentDevice}
+              </div>
+            )}
+            <div style={{ fontSize: '12px', color: colors.textSecondary }}>
+              Progress: {smartLinkProgressModal.completedDevices} / {smartLinkProgressModal.totalDevices} devices
+            </div>
+          </div>
+          
+          <div style={{ width: '100%', backgroundColor: colors.border, borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${(smartLinkProgressModal.completedDevices / smartLinkProgressModal.totalDevices) * 100}%`,
+                height: '100%',
+                backgroundColor: colors.primary,
+                transition: 'width 0.3s ease'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 };
