@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "กำลังประมวลผลสิทธิ์ geofence...",
   "smartLinkProcessingNotificationPermissions": "กำลังประมวลผลสิทธิ์การแจ้งเตือน...",
   "smartLinkUpdatingGroupAssignment": "กำลังอัปเดตการกำหนดกลุ่ม...",
-  "smartLinkConfigurationCompleted": "การตั้งค่า SmartLink เสร็จสมบูรณ์!"
+  "smartLinkConfigurationCompleted": "การตั้งค่า SmartLink เสร็จสมบูรณ์!",
+  "smartLinkSelectOnlyOneCalendar": "กรุณาเลือกเพียงหนึ่งปฏิทิน",
+  "smartLinkErrorSavingConfiguration": "ข้อผิดพลาดในการบันทึกการตั้งค่า SmartLink"
 }

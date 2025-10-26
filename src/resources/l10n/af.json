@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Verwerk geofence-toestemmings...",
   "smartLinkProcessingNotificationPermissions": "Verwerk kennisgewingtoestemmings...",
   "smartLinkUpdatingGroupAssignment": "Dateer groeptoekenning op...",
-  "smartLinkConfigurationCompleted": "SmartLink-konfigurasie voltooi!"
+  "smartLinkConfigurationCompleted": "SmartLink-konfigurasie voltooi!",
+  "smartLinkSelectOnlyOneCalendar": "Kies asseblief net een kalender",
+  "smartLinkErrorSavingConfiguration": "Fout met die stoor van SmartLink konfigurasie"
 }

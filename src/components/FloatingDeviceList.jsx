@@ -130,7 +130,7 @@ const FloatingDeviceList = ({
 
     // Check for conflicting calendars (more than one calendar selected)
     if (smartLinkSelectedCalendarIds.length > 1) {
-      showSnackbar('Please select only one ' + t('sharedCalendars').toLowerCase(), 'error');
+      showSnackbar(t('smartLinkSelectOnlyOneCalendar'), 'error');
       return false;
     }
 
@@ -460,7 +460,7 @@ const FloatingDeviceList = ({
     } catch (error) {
       console.error('Error saving SmartLink data:', error);
       setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
-      showSnackbar('Error saving SmartLink configuration: ' + error.message, 'error');
+      showSnackbar(t('smartLinkErrorSavingConfiguration') + ': ' + error.message, 'error');
     }
   };
 

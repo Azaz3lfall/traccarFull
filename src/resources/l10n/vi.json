@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Đang xử lý quyền geofence...",
   "smartLinkProcessingNotificationPermissions": "Đang xử lý quyền thông báo...",
   "smartLinkUpdatingGroupAssignment": "Đang cập nhật gán nhóm...",
-  "smartLinkConfigurationCompleted": "Cấu hình SmartLink đã hoàn tất!"
+  "smartLinkConfigurationCompleted": "Cấu hình SmartLink đã hoàn tất!",
+  "smartLinkSelectOnlyOneCalendar": "Vui lòng chọn chỉ một lịch",
+  "smartLinkErrorSavingConfiguration": "Lỗi khi lưu cấu hình SmartLink"
 }

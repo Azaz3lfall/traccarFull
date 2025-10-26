@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "გეოფერის უფლებების დამუშავება...",
   "smartLinkProcessingNotificationPermissions": "შეტყობინების უფლებების დამუშავება...",
   "smartLinkUpdatingGroupAssignment": "ჯგუფის მინიჭების განახლება...",
-  "smartLinkConfigurationCompleted": "SmartLink-ის კონფიგურაცია დასრულებულია!"
+  "smartLinkConfigurationCompleted": "SmartLink-ის კონფიგურაცია დასრულებულია!",
+  "smartLinkSelectOnlyOneCalendar": "გთხოვთ აირჩიოთ მხოლოდ ერთი კალენდარი",
+  "smartLinkErrorSavingConfiguration": "SmartLink-ის კონფიგურაციის შენახვის შეცდომა"
 }

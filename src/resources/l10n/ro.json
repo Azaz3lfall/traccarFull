@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Se procesează permisiunile geofence...",
   "smartLinkProcessingNotificationPermissions": "Se procesează permisiunile de notificare...",
   "smartLinkUpdatingGroupAssignment": "Se actualizează atribuirea grupurilor...",
-  "smartLinkConfigurationCompleted": "Configurația SmartLink este finalizată!"
+  "smartLinkConfigurationCompleted": "Configurația SmartLink este finalizată!",
+  "smartLinkSelectOnlyOneCalendar": "Vă rugăm să selectați doar un calendar",
+  "smartLinkErrorSavingConfiguration": "Eroare la salvarea configurației SmartLink"
 }

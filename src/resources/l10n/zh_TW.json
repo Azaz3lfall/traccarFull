@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "正在處理地理圍籬權限...",
   "smartLinkProcessingNotificationPermissions": "正在處理通知權限...",
   "smartLinkUpdatingGroupAssignment": "正在更新群組分配...",
-  "smartLinkConfigurationCompleted": "SmartLink 設定已完成！"
+  "smartLinkConfigurationCompleted": "SmartLink 設定已完成！",
+  "smartLinkSelectOnlyOneCalendar": "請只選擇一個日曆",
+  "smartLinkErrorSavingConfiguration": "儲存 SmartLink 設定時發生錯誤"
 }

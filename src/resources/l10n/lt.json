@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Apdorojamos geofence teisės...",
   "smartLinkProcessingNotificationPermissions": "Apdorojamos pranešimų teisės...",
   "smartLinkUpdatingGroupAssignment": "Atnaujinamas grupės priskyrimas...",
-  "smartLinkConfigurationCompleted": "SmartLink konfigūravimas baigtas!"
+  "smartLinkConfigurationCompleted": "SmartLink konfigūravimas baigtas!",
+  "smartLinkSelectOnlyOneCalendar": "Pasirinkite tik vieną kalendorių",
+  "smartLinkErrorSavingConfiguration": "Klaida išsaugant SmartLink konfigūraciją"
 }

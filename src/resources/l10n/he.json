@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "מעבדים הרשאות geofence...",
   "smartLinkProcessingNotificationPermissions": "מעבדים הרשאות הודעות...",
   "smartLinkUpdatingGroupAssignment": "מעדכנים הקצאת קבוצה...",
-  "smartLinkConfigurationCompleted": "תצורת SmartLink הושלמה!"
+  "smartLinkConfigurationCompleted": "תצורת SmartLink הושלמה!",
+  "smartLinkSelectOnlyOneCalendar": "אנא בחר לוח שנה אחד בלבד",
+  "smartLinkErrorSavingConfiguration": "שגיאה בשמירת תצורת SmartLink"
 }

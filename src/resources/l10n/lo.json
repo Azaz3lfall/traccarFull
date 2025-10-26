@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "ກຳລັງປະມວນຜົນສິດອະນຸຍາດ geofence...",
   "smartLinkProcessingNotificationPermissions": "ກຳລັງປະມວນຜົນສິດອະນຸຍາດແຈ້ງເຕືອນ...",
   "smartLinkUpdatingGroupAssignment": "ກຳລັງອັບເດດການກຳນົດກຸ່ມ...",
-  "smartLinkConfigurationCompleted": "ການຕັ້ງຄ່າ SmartLink ສຳເລັດແລ້ວ!"
+  "smartLinkConfigurationCompleted": "ການຕັ້ງຄ່າ SmartLink ສຳເລັດແລ້ວ!",
+  "smartLinkSelectOnlyOneCalendar": "ກະລຸນາເລືອກພຽງປະຕິທິນດຽວ",
+  "smartLinkErrorSavingConfiguration": "ຂໍ້ຜິດພາດໃນການບັນທຶກການຕັ້ງຄ່າ SmartLink"
 }

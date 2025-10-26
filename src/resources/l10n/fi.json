@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Käsitellään geofence-käyttöoikeuksia...",
   "smartLinkProcessingNotificationPermissions": "Käsitellään ilmoitusoikeuksia...",
   "smartLinkUpdatingGroupAssignment": "Päivitetään ryhmätehtävää...",
-  "smartLinkConfigurationCompleted": "SmartLink-konfiguraatio valmis!"
+  "smartLinkConfigurationCompleted": "SmartLink-konfiguraatio valmis!",
+  "smartLinkSelectOnlyOneCalendar": "Valitse vain yksi kalenteri",
+  "smartLinkErrorSavingConfiguration": "Virhe SmartLink-konfiguraation tallentamisessa"
 }

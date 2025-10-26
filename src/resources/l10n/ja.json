@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "ジオフェンス権限を処理中...",
   "smartLinkProcessingNotificationPermissions": "通知権限を処理中...",
   "smartLinkUpdatingGroupAssignment": "グループ割り当てを更新中...",
-  "smartLinkConfigurationCompleted": "SmartLink設定が完了しました！"
+  "smartLinkConfigurationCompleted": "SmartLink設定が完了しました！",
+  "smartLinkSelectOnlyOneCalendar": "1つのカレンダーのみ選択してください",
+  "smartLinkErrorSavingConfiguration": "SmartLink設定の保存エラー"
 }

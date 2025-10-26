@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Duke përpunuar lejet e geofence...",
   "smartLinkProcessingNotificationPermissions": "Duke përpunuar lejet e njoftimeve...",
   "smartLinkUpdatingGroupAssignment": "Duke përditësuar caktimin e grupit...",
-  "smartLinkConfigurationCompleted": "Konfigurimi i SmartLink u përfundua!"
+  "smartLinkConfigurationCompleted": "Konfigurimi i SmartLink u përfundua!",
+  "smartLinkSelectOnlyOneCalendar": "Ju lutem zgjidhni vetëm një kalendar",
+  "smartLinkErrorSavingConfiguration": "Gabim në ruajtjen e konfigurimit të SmartLink"
 }

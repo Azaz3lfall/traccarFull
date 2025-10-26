@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence ruxsatlari qayta ishlanmoqda...",
   "smartLinkProcessingNotificationPermissions": "Bildirishnomalar ruxsatlari qayta ishlanmoqda...",
   "smartLinkUpdatingGroupAssignment": "Guruh tayinlash yangilanmoqda...",
-  "smartLinkConfigurationCompleted": "SmartLink konfiguratsiyasi tugadi!"
+  "smartLinkConfigurationCompleted": "SmartLink konfiguratsiyasi tugadi!",
+  "smartLinkSelectOnlyOneCalendar": "Faqat bitta kalendarni tanlang",
+  "smartLinkErrorSavingConfiguration": "SmartLink konfiguratsiyasini saqlashda xatolik"
 }

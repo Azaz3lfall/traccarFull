@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Memproses izin geofence...",
   "smartLinkProcessingNotificationPermissions": "Memproses izin notifikasi...",
   "smartLinkUpdatingGroupAssignment": "Memperbarui penetapan grup...",
-  "smartLinkConfigurationCompleted": "Konfigurasi SmartLink selesai!"
+  "smartLinkConfigurationCompleted": "Konfigurasi SmartLink selesai!",
+  "smartLinkSelectOnlyOneCalendar": "Silakan pilih hanya satu kalender",
+  "smartLinkErrorSavingConfiguration": "Kesalahan saat menyimpan konfigurasi SmartLink"
 }

@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Apstrādā geofence atļaujas...",
   "smartLinkProcessingNotificationPermissions": "Apstrādā paziņojumu atļaujas...",
   "smartLinkUpdatingGroupAssignment": "Atjauno grupas piešķiršanu...",
-  "smartLinkConfigurationCompleted": "SmartLink konfigurācija pabeigta!"
+  "smartLinkConfigurationCompleted": "SmartLink konfigurācija pabeigta!",
+  "smartLinkSelectOnlyOneCalendar": "Lūdzu, atlasiet tikai vienu kalendāru",
+  "smartLinkErrorSavingConfiguration": "Kļūda saglabājot SmartLink konfigurāciju"
 }

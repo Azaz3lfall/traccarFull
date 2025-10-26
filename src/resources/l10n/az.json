@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence icazələri işlənir...",
   "smartLinkProcessingNotificationPermissions": "Bildiriş icazələri işlənir...",
   "smartLinkUpdatingGroupAssignment": "Qrup təyini yenilənir...",
-  "smartLinkConfigurationCompleted": "SmartLink konfiqurasiyası tamamlandı!"
+  "smartLinkConfigurationCompleted": "SmartLink konfiqurasiyası tamamlandı!",
+  "smartLinkSelectOnlyOneCalendar": "Zəhmət olmasa yalnız bir təqvim seçin",
+  "smartLinkErrorSavingConfiguration": "SmartLink konfiqurasiyasının saxlanmasında xəta"
 }

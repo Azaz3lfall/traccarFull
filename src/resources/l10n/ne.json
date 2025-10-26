@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence अनुमतिहरू प्रसाधन गर्दै...",
   "smartLinkProcessingNotificationPermissions": "सूचना अनुमतिहरू प्रसाधन गर्दै...",
   "smartLinkUpdatingGroupAssignment": "समूह निर्दिष्टीकरण अपडेट गर्दै...",
-  "smartLinkConfigurationCompleted": "SmartLink कन्फिगरेसन पूर्ण भयो!"
+  "smartLinkConfigurationCompleted": "SmartLink कन्फिगरेसन पूर्ण भयो!",
+  "smartLinkSelectOnlyOneCalendar": "कृपया केवल एउटा पात्रो छान्नुहोस्",
+  "smartLinkErrorSavingConfiguration": "SmartLink कन्फिगरेसन बचतमा त्रुटि"
 }

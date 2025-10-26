@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence рұқсаттарын өңдеу...",
   "smartLinkProcessingNotificationPermissions": "Хабарландыру рұқсаттарын өңдеу...",
   "smartLinkUpdatingGroupAssignment": "Топ тағайындауды жаңарту...",
-  "smartLinkConfigurationCompleted": "SmartLink конфигурациясы аяқталды!"
+  "smartLinkConfigurationCompleted": "SmartLink конфигурациясы аяқталды!",
+  "smartLinkSelectOnlyOneCalendar": "Тек бір күнтізбені таңдаңыз",
+  "smartLinkErrorSavingConfiguration": "SmartLink конфигурациясын сақтау кезіндегі қате"
 }

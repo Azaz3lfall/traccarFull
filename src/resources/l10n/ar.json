@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "معالجة أذونات الجيوفينس...",
   "smartLinkProcessingNotificationPermissions": "معالجة أذونات الإشعارات...",
   "smartLinkUpdatingGroupAssignment": "تحديث تعيين المجموعة...",
-  "smartLinkConfigurationCompleted": "اكتملت إعدادات SmartLink!"
+  "smartLinkConfigurationCompleted": "اكتملت إعدادات SmartLink!",
+  "smartLinkSelectOnlyOneCalendar": "يرجى تحديد تقويم واحد فقط",
+  "smartLinkErrorSavingConfiguration": "خطأ في حفظ إعدادات SmartLink"
 }

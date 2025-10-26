@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "Traitement des permissions de géocence...",
   "smartLinkProcessingNotificationPermissions": "Traitement des permissions de notification...",
   "smartLinkUpdatingGroupAssignment": "Mise à jour de l'attribution de groupe...",
-  "smartLinkConfigurationCompleted": "Configuration SmartLink terminée !"
+  "smartLinkConfigurationCompleted": "Configuration SmartLink terminée !",
+  "smartLinkSelectOnlyOneCalendar": "Veuillez sélectionner un seul calendrier",
+  "smartLinkErrorSavingConfiguration": "Erreur lors de l'enregistrement de la configuration SmartLink"
 }

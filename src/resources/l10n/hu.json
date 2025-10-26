@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence jogosultságok feldolgozása...",
   "smartLinkProcessingNotificationPermissions": "Értesítési jogosultságok feldolgozása...",
   "smartLinkUpdatingGroupAssignment": "Csoport hozzárendelés frissítése...",
-  "smartLinkConfigurationCompleted": "SmartLink beállítások befejezve!"
+  "smartLinkConfigurationCompleted": "SmartLink beállítások befejezve!",
+  "smartLinkSelectOnlyOneCalendar": "Kérjük, válasszon ki csak egy naptárat",
+  "smartLinkErrorSavingConfiguration": "Hiba a SmartLink beállítások mentésénél"
 }

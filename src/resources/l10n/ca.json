@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Processant permisos de geofence...",
   "smartLinkProcessingNotificationPermissions": "Processant permisos de notificació...",
   "smartLinkUpdatingGroupAssignment": "Actualitzant assignació de grup...",
-  "smartLinkConfigurationCompleted": "Configuració de SmartLink completada!"
+  "smartLinkConfigurationCompleted": "Configuració de SmartLink completada!",
+  "smartLinkSelectOnlyOneCalendar": "Seleccioneu només un calendari",
+  "smartLinkErrorSavingConfiguration": "Error en desar la configuració de SmartLink"
 }

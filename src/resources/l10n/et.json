@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence õiguste töötlemine...",
   "smartLinkProcessingNotificationPermissions": "Teate õiguste töötlemine...",
   "smartLinkUpdatingGroupAssignment": "Grupi määramise uuendamine...",
-  "smartLinkConfigurationCompleted": "SmartLink-konfiguratsioon lõpetatud!"
+  "smartLinkConfigurationCompleted": "SmartLink-konfiguratsioon lõpetatud!",
+  "smartLinkSelectOnlyOneCalendar": "Valige ainult üks kalender",
+  "smartLinkErrorSavingConfiguration": "Viga SmartLink-konfiguratsiooni salvestamisel"
 }

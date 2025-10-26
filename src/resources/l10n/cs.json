@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Zpracovávám oprávnění geofence...",
   "smartLinkProcessingNotificationPermissions": "Zpracovávám oprávnění notifikací...",
   "smartLinkUpdatingGroupAssignment": "Aktualizuji přiřazení skupiny...",
-  "smartLinkConfigurationCompleted": "Konfigurace SmartLink dokončena!"
+  "smartLinkConfigurationCompleted": "Konfigurace SmartLink dokončena!",
+  "smartLinkSelectOnlyOneCalendar": "Vyberte prosím pouze jeden kalendář",
+  "smartLinkErrorSavingConfiguration": "Chyba při ukládání konfigurace SmartLink"
 }

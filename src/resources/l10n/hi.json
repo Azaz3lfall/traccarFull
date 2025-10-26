@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "भौगोलिक सीमा अनुमतियां संसाधित की जा रही हैं...",
   "smartLinkProcessingNotificationPermissions": "सूचना अनुमतियां संसाधित की जा रही हैं...",
   "smartLinkUpdatingGroupAssignment": "समूह असाइनमेंट अपडेट किया जा रहा है...",
-  "smartLinkConfigurationCompleted": "SmartLink कॉन्फ़िगरेशन पूर्ण हो गया!"
+  "smartLinkConfigurationCompleted": "SmartLink कॉन्फ़िगरेशन पूर्ण हो गया!",
+  "smartLinkSelectOnlyOneCalendar": "कृपया केवल एक कैलेंडर चुनें",
+  "smartLinkErrorSavingConfiguration": "SmartLink कॉन्फ़िगरेशन सहेजने में त्रुटि"
 }

@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "지오펜스 권한 처리 중...",
   "smartLinkProcessingNotificationPermissions": "알림 권한 처리 중...",
   "smartLinkUpdatingGroupAssignment": "그룹 할당 업데이트 중...",
-  "smartLinkConfigurationCompleted": "SmartLink 구성 완료!"
+  "smartLinkConfigurationCompleted": "SmartLink 구성 완료!",
+  "smartLinkSelectOnlyOneCalendar": "하나의 캘린더만 선택하세요",
+  "smartLinkErrorSavingConfiguration": "SmartLink 구성 저장 오류"
 }

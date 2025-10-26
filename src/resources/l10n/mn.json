@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence эрхүүдийг боловсруулж байна...",
   "smartLinkProcessingNotificationPermissions": "Мэдэгдлүүдийг боловсруулж байна...",
   "smartLinkUpdatingGroupAssignment": "Бүлгийн томилголт шинэчилж байна...",
-  "smartLinkConfigurationCompleted": "SmartLink тохиргоо дууссан!"
+  "smartLinkConfigurationCompleted": "SmartLink тохиргоо дууссан!",
+  "smartLinkSelectOnlyOneCalendar": "Зөвхөн нэг хуанли сонгоно уу",
+  "smartLinkErrorSavingConfiguration": "SmartLink тохиргоог хадгалах үед алдаа гарлаа"
 }

@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Inachakata ruhusa za geofence...",
   "smartLinkProcessingNotificationPermissions": "Inachakata ruhusa za arifa...",
   "smartLinkUpdatingGroupAssignment": "Inasasisha mgawo wa kikundi...",
-  "smartLinkConfigurationCompleted": "Usanidi wa SmartLink umehitimu!"
+  "smartLinkConfigurationCompleted": "Usanidi wa SmartLink umehitimu!",
+  "smartLinkSelectOnlyOneCalendar": "Chagua kalenda moja tu",
+  "smartLinkErrorSavingConfiguration": "Hitilafu wakati wa kuhifadhi usanidi wa SmartLink"
 }

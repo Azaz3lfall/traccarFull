@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Επεξεργασία δικαιωμάτων γεωζώνης...",
   "smartLinkProcessingNotificationPermissions": "Επεξεργασία δικαιωμάτων ειδοποιήσεων...",
   "smartLinkUpdatingGroupAssignment": "Ενημέρωση ανάθεσης ομάδας...",
-  "smartLinkConfigurationCompleted": "Η διαμόρφωση SmartLink ολοκληρώθηκε!"
+  "smartLinkConfigurationCompleted": "Η διαμόρφωση SmartLink ολοκληρώθηκε!",
+  "smartLinkSelectOnlyOneCalendar": "Παρακαλώ επιλέξτε μόνο ένα ημερολόγιο",
+  "smartLinkErrorSavingConfiguration": "Σφάλμα κατά την αποθήκευση της διαμόρφωσης SmartLink"
 }

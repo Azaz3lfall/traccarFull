@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "پردازش مجوزهای geofence...",
   "smartLinkProcessingNotificationPermissions": "پردازش مجوزهای اعلان...",
   "smartLinkUpdatingGroupAssignment": "به‌روزرسانی اختصاص گروه...",
-  "smartLinkConfigurationCompleted": "تنظیمات SmartLink تکمیل شد!"
+  "smartLinkConfigurationCompleted": "تنظیمات SmartLink تکمیل شد!",
+  "smartLinkSelectOnlyOneCalendar": "لطفا فقط یک تقویم انتخاب کنید",
+  "smartLinkErrorSavingConfiguration": "خطا در ذخیره تنظیمات SmartLink"
 }

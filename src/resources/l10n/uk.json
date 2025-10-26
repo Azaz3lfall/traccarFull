@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Обробка дозволів геозони...",
   "smartLinkProcessingNotificationPermissions": "Обробка дозволів сповіщень...",
   "smartLinkUpdatingGroupAssignment": "Оновлення призначення групи...",
-  "smartLinkConfigurationCompleted": "Конфігурація SmartLink завершена!"
+  "smartLinkConfigurationCompleted": "Конфігурація SmartLink завершена!",
+  "smartLinkSelectOnlyOneCalendar": "Будь ласка, виберіть лише один календар",
+  "smartLinkErrorSavingConfiguration": "Помилка збереження конфігурації SmartLink"
 }

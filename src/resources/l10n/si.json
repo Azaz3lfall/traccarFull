@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence අවසර සැකසියි...",
   "smartLinkProcessingNotificationPermissions": "දැනුම්දීමේ අවසර සැකසියි...",
   "smartLinkUpdatingGroupAssignment": "කණ්ඩායම් පවරීම යාවත්කාල කරමින්...",
-  "smartLinkConfigurationCompleted": "SmartLink වින්‍යාසය සම්පූර්ණ!"
+  "smartLinkConfigurationCompleted": "SmartLink වින්‍යාසය සම්පූර්ණ!",
+  "smartLinkSelectOnlyOneCalendar": "කරුණාකර නැවත එක් දින දර්ශනයක් පමණක් තෝරන්න",
+  "smartLinkErrorSavingConfiguration": "SmartLink වින්‍යාසය සුරැකීමේදී දෝෂයක්"
 }

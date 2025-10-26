@@ -874,5 +874,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence-machtigingen verwerken...",
   "smartLinkProcessingNotificationPermissions": "Meldingsmachtigingen verwerken...",
   "smartLinkUpdatingGroupAssignment": "Groepstoewijzing bijwerken...",
-  "smartLinkConfigurationCompleted": "SmartLink-configuratie voltooid!"
+  "smartLinkConfigurationCompleted": "SmartLink-configuratie voltooid!",
+  "smartLinkSelectOnlyOneCalendar": "Selecteer slechts één kalender",
+  "smartLinkErrorSavingConfiguration": "Fout bij het opslaan van de SmartLink-configuratie"
 }

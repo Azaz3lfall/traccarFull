@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Obrada dozvola za geofence...",
   "smartLinkProcessingNotificationPermissions": "Obrada dozvola za obavijesti...",
   "smartLinkUpdatingGroupAssignment": "Ažuriranje dodjele grupe...",
-  "smartLinkConfigurationCompleted": "Konfiguracija SmartLink gotova!"
+  "smartLinkConfigurationCompleted": "Konfiguracija SmartLink gotova!",
+  "smartLinkSelectOnlyOneCalendar": "Odaberite samo jedan kalendar",
+  "smartLinkErrorSavingConfiguration": "Greška pri spremanju konfiguracije SmartLink"
 }

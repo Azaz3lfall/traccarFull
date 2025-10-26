@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence թույլտվությունների մշակում...",
   "smartLinkProcessingNotificationPermissions": "Ծանուցման թույլտվությունների մշակում...",
   "smartLinkUpdatingGroupAssignment": "Խմբի նշանակման թարմացում...",
-  "smartLinkConfigurationCompleted": "SmartLink կարգավորումը ավարտվել է!"
+  "smartLinkConfigurationCompleted": "SmartLink կարգավորումը ավարտվել է!",
+  "smartLinkSelectOnlyOneCalendar": "Խնդրում ենք ընտրել միայն մեկ օրացույց",
+  "smartLinkErrorSavingConfiguration": "Սխալ՝ SmartLink կարգավորման պահպանման ժամանակ"
 }

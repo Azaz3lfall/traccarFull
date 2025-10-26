@@ -875,5 +875,7 @@
   "smartLinkProcessingGeofencePermissions": "Behandler geofence-tillatelser...",
   "smartLinkProcessingNotificationPermissions": "Behandler varselst tillatelser...",
   "smartLinkUpdatingGroupAssignment": "Oppdaterer gruppetildeling...",
-  "smartLinkConfigurationCompleted": "SmartLink-konfigurasjon fullført!"
+  "smartLinkConfigurationCompleted": "SmartLink-konfigurasjon fullført!",
+  "smartLinkSelectOnlyOneCalendar": "Velg bare én kalender",
+  "smartLinkErrorSavingConfiguration": "Feil ved lagring av SmartLink-konfigurasjon"
 }

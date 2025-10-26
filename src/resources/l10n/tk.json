@@ -871,5 +871,7 @@
   "smartLinkProcessingGeofencePermissions": "Geofence rugsatlary işlenýär...",
   "smartLinkProcessingNotificationPermissions": "Bildiriş rugsatlary işlenýär...",
   "smartLinkUpdatingGroupAssignment": "Topar tabşyrmasy täzelenýär...",
-  "smartLinkConfigurationCompleted": "SmartLink konfigurasiýasy tamamlandy!"
+  "smartLinkConfigurationCompleted": "SmartLink konfigurasiýasy tamamlandy!",
+  "smartLinkSelectOnlyOneCalendar": "Diňe bir kalendary saýlaň",
+  "smartLinkErrorSavingConfiguration": "SmartLink konfigurasiýasyny ýatda saklamakda ýalňyşlyk"
 }
