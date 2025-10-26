@@ -141,6 +141,7 @@ const FloatingResellersPopover = ({
   const [iosBuildTypeModal, setIosBuildTypeModal] = useState({ open: false, reseller: null });
   const [massImporterModal, setMassImporterModal] = useState({ open: false, reseller: null });
   const [uploadedXlsxFile, setUploadedXlsxFile] = useState(null);
+  const [importProgress, setImportProgress] = useState({ open: false, current: 0, total: 0, status: '' });
   const [errorModal, setErrorModal] = useState({ open: false, message: '', title: '' });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
@@ -274,24 +275,200 @@ const FloatingResellersPopover = ({
     }
   };
 
-  const handleImport = () => {
-    if (uploadedXlsxFile) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          console.log('Parsed XLSX content:', jsonData);
-        } catch (error) {
-          console.error('Error parsing XLSX file:', error);
-        }
-      };
-      reader.readAsArrayBuffer(uploadedXlsxFile);
+  const handleImport = async () => {
+    if (!uploadedXlsxFile) {
+      setSnackbar({ open: true, message: 'Please select an XLSX file', severity: 'error' });
+      return;
     }
-    setMassImporterModal({ open: false, reseller: null });
+
+    try {
+      // Parse XLSX file
+      const parseFile = () => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+              const jsonData = XLSX.utils.sheet_to_json(worksheet);
+              
+              // Validate columns
+              const expectedColumns = ['userLogin', 'userFullName', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId', 'devicePhone', 'deviceModel'];
+              const headers = XLSX.utils.sheet_to_json(worksheet, { header: 1 })[0];
+              const missingColumns = expectedColumns.filter(col => !headers.includes(col));
+              
+              if (missingColumns.length > 0) {
+                reject(new Error(`Missing columns: ${missingColumns.join(', ')}`));
+                return;
+              }
+              
+              resolve(jsonData);
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(uploadedXlsxFile);
+        });
+      };
+
+      const data = await parseFile();
+      
+      // Open progress modal
+      setImportProgress({ open: true, current: 0, total: data.length, status: 'Starting import...' });
+      
+      // Fetch existing users
+      const usersResponse = await fetchOrThrow('/api/users');
+      const existingUsers = await usersResponse.json();
+      const userLookup = new Map();
+      existingUsers.forEach(user => {
+        if (user.login) userLookup.set(user.login.toLowerCase(), user);
+        if (user.email) userLookup.set(user.email.toLowerCase(), user);
+      });
+
+      // Statistics
+      let createdUsers = 0;
+      let createdDevices = 0;
+      let createdPermissions = 0;
+      let skippedUsers = 0;
+      const errors = [];
+
+      // Iterate through each row
+      for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        
+        setImportProgress({ 
+          open: true, 
+          current: i + 1, 
+          total: data.length, 
+          status: `Processing row ${i + 1} of ${data.length}...` 
+        });
+
+        try {
+          // Check if user exists
+          let userId = null;
+          const userKey = row.userLogin?.toLowerCase();
+          const emailKey = row.userEmail?.toLowerCase();
+          
+          if (userLookup.has(userKey) || userLookup.has(emailKey)) {
+            userId = userLookup.get(userKey)?.id || userLookup.get(emailKey)?.id;
+            skippedUsers++;
+          } else {
+            // Create new user
+            const userPayload = {
+              name: row.userFullName || row.userLogin,
+              login: row.userLogin,
+              email: row.userEmail,
+              password: row.userLogin,
+              readonly: false,
+              administrator: false,
+              map: "googleRoad",
+              latitude: 0,
+              longitude: 0,
+              zoom: 0,
+              coordinateFormat: null,
+              disabled: false,
+              expirationTime: null,
+              deviceLimit: parseInt(row.userDeviceLimit) || 0,
+              userLimit: parseInt(row.userUserLimit) || 0,
+              deviceReadonly: false,
+              limitCommands: false,
+              disableReports: false,
+              fixedEmail: false,
+              poiLayer: null,
+              totpKey: null,
+              temporary: false,
+              attributes: {
+                activeMapStyles: "locationIqStreets,locationIqDark,openFreeMap,osm,openTopoMap,carto,googleRoad,googleSatellite,googleHybrid",
+                positionItems: "fixTime,address,totalDistance,course,altitude,accuracy,protocol,deviceTime,serverTime,index,hdop,vdop,pdop,sat,satVisible,rssi,coolantTemp,engineTemp,gps,roaming,latitude,longitude,event,alarm,status,odometer,serviceOdometer,tripOdometer,hours,steps,heartRate,valid,blocked,speed,ignition",
+                mapLiveRoutes: "selected",
+                mapFollow: true,
+                speedUnit: "kmh",
+                mapOnSelect: false,
+                mapCluster: true,
+                accessLevel: "{\"mainMenu\":true,\"deviceList\":true,\"reports\":true,\"geofences\":true,\"settings\":true,\"notifications\":true,\"account\":true,\"devices\":true,\"groups\":true,\"drivers\":true,\"calendars\":true,\"computedAttributes\":true,\"maintenance\":true,\"savedCommands\":true,\"announcement\":true,\"server\":true,\"users\":true,\"resellerPanel\":true,\"editSensors\":true,\"stopEngine\":true,\"resumeEngine\":true,\"replay\":true,\"sendCommand\":true,\"shareDevice\":true,\"anchor\":true,\"totalDistance\":true,\"hours\":true,\"changePicture\":true,\"moreInfo\":true}",
+                mapGeofences: true,
+                timezone: "America/Sao_Paulo"
+              }
+            };
+
+            const userResponse = await fetchOrThrow('/api/users', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(userPayload)
+            });
+            
+            const newUser = await userResponse.json();
+            userId = newUser.id;
+            userLookup.set(userKey, newUser);
+            if (emailKey) userLookup.set(emailKey, newUser);
+            createdUsers++;
+          }
+
+          // Create device
+          const devicePayload = {
+            name: row.deviceName,
+            uniqueId: row.deviceUniqueId,
+            groupId: null,
+            phone: row.devicePhone || "",
+            model: row.deviceModel || "",
+            contact: "",
+            category: "default",
+            calendarId: null,
+            expirationTime: null,
+            disabled: false,
+            attributes: {}
+          };
+
+          const deviceResponse = await fetchOrThrow('/api/devices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(devicePayload)
+          });
+          
+          const newDevice = await deviceResponse.json();
+          createdDevices++;
+
+          // Create permission
+          await fetchOrThrow('/api/permissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userId,
+              deviceId: newDevice.id
+            })
+          });
+          
+          createdPermissions++;
+
+        } catch (error) {
+          console.error(`Error processing row ${i + 1}:`, error);
+          errors.push(`Row ${i + 1}: ${error.message}`);
+        }
+      }
+
+      // Close progress modal
+      setImportProgress({ open: false, current: 0, total: 0, status: '' });
+      
+      // Show results
+      const summary = `Import completed! Users created: ${createdUsers}, Skipped: ${skippedUsers}, Devices created: ${createdDevices}, Permissions created: ${createdPermissions}`;
+      console.log(summary);
+      setSnackbar({ 
+        open: true, 
+        message: summary, 
+        severity: errors.length > 0 ? 'warning' : 'success' 
+      });
+      
+      setMassImporterModal({ open: false, reseller: null });
+      setUploadedXlsxFile(null);
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      setImportProgress({ open: false, current: 0, total: 0, status: '' });
+      setSnackbar({ open: true, message: `Import failed: ${error.message}`, severity: 'error' });
+    }
   };
 
   // Build functions for mobile apps
@@ -3813,6 +3990,81 @@ const FloatingResellersPopover = ({
                   </button>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Import Progress Modal */}
+      <AnimatePresence>
+        {importProgress.open && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '12px',
+                padding: '24px',
+                width: '450px',
+                maxWidth: '450px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '16px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <CircularProgress size={24} thickness={4} style={{ color: colors.primary }} />
+                <span style={{ fontSize: '18px', fontWeight: '600', color: colors.text }}>
+                  Importing...
+                </span>
+              </div>
+              
+              <div style={{ textAlign: 'center', width: '100%' }}>
+                <div style={{ fontSize: '14px', color: colors.text, marginBottom: '8px' }}>
+                  {importProgress.status}
+                </div>
+                {importProgress.total > 0 && (
+                  <div style={{ fontSize: '12px', color: colors.textSecondary }}>
+                    Progress: {importProgress.current} / {importProgress.total} rows
+                  </div>
+                )}
+              </div>
+              
+              {importProgress.total > 0 && (
+                <div style={{ width: '100%', backgroundColor: colors.primary, borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${(importProgress.current / importProgress.total) * 100}%`,
+                      height: '100%',
+                      backgroundColor: colors.border,
+                      transition: 'width 0.3s ease'
+                    }}
+                  />
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
