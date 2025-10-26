@@ -232,9 +232,9 @@ const FloatingResellersPopover = ({
   // Mass Importer functions
   const handleDownloadTemplate = () => {
     const worksheet = XLSX.utils.aoa_to_sheet([
-      ['userLogin', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId'],
-      ['john.doe', 'john@example.com', '10', '50', 'Device 1', 'IMEI123456'],
-      ['jane.smith', 'jane@example.com', '5', '25', 'Device 2', 'IMEI789012']
+      ['userLogin', 'userFullName', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId'],
+      ['john.doe', 'John Doe', 'john@example.com', '10', '50', 'Device 1', 'IMEI123456'],
+      ['jane.smith', 'Jane Smith', 'jane@example.com', '5', '25', 'Device 2', 'IMEI789012']
     ]);
     
     const workbook = XLSX.utils.book_new();
