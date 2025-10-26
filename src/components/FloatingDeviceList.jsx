@@ -251,8 +251,53 @@ const FloatingDeviceList = ({
         for (const notification of allNotifications) {
           const isNotificationSelected = selectedNotificationIds.includes(notification.id);
           
-          // Update progress modal for notification operation
-          const notificationName = notification.description ? (notification.description.length > 20 ? notification.description.substring(0, 20) + '...' : notification.description) : 'Unnamed';
+          // Build notification display text (same as UI does)
+          const formatList = (prefix, value) => {
+            if (value) {
+              return value
+                .split(/[, ]+/)
+                .filter(Boolean)
+                .map((it) => t(prefixString(prefix, it)))
+                .join(', ');
+            }
+            return '';
+          };
+          
+          const notificatorsText = formatList('notificator', notification.notificators);
+          const hasCommand = notification.notificators?.includes('command');
+          
+          // Build single line display
+          const displayParts = [];
+          
+          // Notification type
+          if (notification.type) {
+            displayParts.push(t(prefixString('event', notification.type)));
+          }
+          
+          // Channels/Notificators
+          if (notificatorsText) {
+            displayParts.push(notificatorsText);
+          }
+          
+          // Command description (if it's a command notification)
+          if (hasCommand && notification.commandId) {
+            // Find command description from commands list
+            const command = smartLinkCommands?.find(cmd => cmd.id === notification.commandId);
+            if (command?.description) {
+              displayParts.push(command.description);
+            } else {
+              displayParts.push(`Command ${notification.commandId}`);
+            }
+          }
+          
+          // Always flag
+          if (notification.always) {
+            displayParts.push('Always active');
+          }
+          
+          const displayText = displayParts.join(' / ') || 'Unnamed';
+          const notificationName = displayText.length > 20 ? displayText.substring(0, 20) + '...' : displayText;
+          
           setSmartLinkProgressModal(prev => ({
             ...prev,
             currentOperation: isNotificationSelected 
