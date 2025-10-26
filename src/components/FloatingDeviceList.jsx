@@ -2684,7 +2684,8 @@ const FloatingDeviceList = ({
                             }
                             
                               const displayText = displayParts.join(' / ');
-                              const notificationCalendarId = notification.calendarId || 0;
+                              // Handle null, undefined, or 0 values - default to 0 (None)
+                              const notificationCalendarId = notification.calendarId != null ? notification.calendarId : 0;
                               
                               return (
                                 <div key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
