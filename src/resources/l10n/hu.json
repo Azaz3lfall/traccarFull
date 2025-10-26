@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Csoport hozzárendelés frissítése...",
   "smartLinkConfigurationCompleted": "SmartLink beállítások befejezve!",
   "smartLinkSelectOnlyOneCalendar": "Kérjük, válasszon ki csak egy naptárat",
-  "smartLinkErrorSavingConfiguration": "Hiba a SmartLink beállítások mentésénél"
+  "smartLinkErrorSavingConfiguration": "Hiba a SmartLink beállítások mentésénél",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

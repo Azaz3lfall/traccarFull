@@ -876,5 +876,9 @@
   "smartLinkUpdatingGroupAssignment": "Обновление назначения группы...",
   "smartLinkConfigurationCompleted": "Конфигурация SmartLink завершена!",
   "smartLinkSelectOnlyOneCalendar": "Пожалуйста, выберите только один календарь",
-  "smartLinkErrorSavingConfiguration": "Ошибка сохранения конфигурации SmartLink"
+  "smartLinkErrorSavingConfiguration": "Ошибка сохранения конфигурации SmartLink",
+  "smartLinkSavedSuccessfully": "Сохранено!",
+  "smartLinkErrorWithDetails": "Ошибка: {message}",
+  "smartLinkCalendarSaved": "Календарь сохранен",
+  "smartLinkError": "Ошибка: {message}"
 }

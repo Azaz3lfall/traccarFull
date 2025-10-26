@@ -876,5 +876,9 @@
   "smartLinkUpdatingGroupAssignment": "Mise à jour de l'attribution de groupe...",
   "smartLinkConfigurationCompleted": "Configuration SmartLink terminée !",
   "smartLinkSelectOnlyOneCalendar": "Veuillez sélectionner un seul calendrier",
-  "smartLinkErrorSavingConfiguration": "Erreur lors de l'enregistrement de la configuration SmartLink"
+  "smartLinkErrorSavingConfiguration": "Erreur lors de l'enregistrement de la configuration SmartLink",
+  "smartLinkSavedSuccessfully": "Enregistré !",
+  "smartLinkErrorWithDetails": "Erreur : {message}",
+  "smartLinkCalendarSaved": "Calendrier enregistré",
+  "smartLinkError": "Erreur : {message}"
 }

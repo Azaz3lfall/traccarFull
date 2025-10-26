@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Inasasisha mgawo wa kikundi...",
   "smartLinkConfigurationCompleted": "Usanidi wa SmartLink umehitimu!",
   "smartLinkSelectOnlyOneCalendar": "Chagua kalenda moja tu",
-  "smartLinkErrorSavingConfiguration": "Hitilafu wakati wa kuhifadhi usanidi wa SmartLink"
+  "smartLinkErrorSavingConfiguration": "Hitilafu wakati wa kuhifadhi usanidi wa SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

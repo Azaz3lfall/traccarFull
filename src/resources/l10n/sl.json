@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Posodabljanje dodelitve skupin...",
   "smartLinkConfigurationCompleted": "Konfiguracija SmartLink končana!",
   "smartLinkSelectOnlyOneCalendar": "Izbran samo en koledar",
-  "smartLinkErrorSavingConfiguration": "Napaka pri shranjevanju konfiguracije SmartLink"
+  "smartLinkErrorSavingConfiguration": "Napaka pri shranjevanju konfiguracije SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

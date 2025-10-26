@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "กำลังอัปเดตการกำหนดกลุ่ม...",
   "smartLinkConfigurationCompleted": "การตั้งค่า SmartLink เสร็จสมบูรณ์!",
   "smartLinkSelectOnlyOneCalendar": "กรุณาเลือกเพียงหนึ่งปฏิทิน",
-  "smartLinkErrorSavingConfiguration": "ข้อผิดพลาดในการบันทึกการตั้งค่า SmartLink"
+  "smartLinkErrorSavingConfiguration": "ข้อผิดพลาดในการบันทึกการตั้งค่า SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

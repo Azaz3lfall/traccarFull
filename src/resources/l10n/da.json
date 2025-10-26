@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Opdaterer gruppetildeling...",
   "smartLinkConfigurationCompleted": "SmartLink-konfiguration fuldført!",
   "smartLinkSelectOnlyOneCalendar": "Vælg venligst kun én kalender",
-  "smartLinkErrorSavingConfiguration": "Fejl ved gemning af SmartLink-konfiguration"
+  "smartLinkErrorSavingConfiguration": "Fejl ved gemning af SmartLink-konfiguration",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

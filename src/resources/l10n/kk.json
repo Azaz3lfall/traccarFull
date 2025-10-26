@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Топ тағайындауды жаңарту...",
   "smartLinkConfigurationCompleted": "SmartLink конфигурациясы аяқталды!",
   "smartLinkSelectOnlyOneCalendar": "Тек бір күнтізбені таңдаңыз",
-  "smartLinkErrorSavingConfiguration": "SmartLink конфигурациясын сақтау кезіндегі қате"
+  "smartLinkErrorSavingConfiguration": "SmartLink конфигурациясын сақтау кезіндегі қате",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

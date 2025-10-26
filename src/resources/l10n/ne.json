@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "समूह निर्दिष्टीकरण अपडेट गर्दै...",
   "smartLinkConfigurationCompleted": "SmartLink कन्फिगरेसन पूर्ण भयो!",
   "smartLinkSelectOnlyOneCalendar": "कृपया केवल एउटा पात्रो छान्नुहोस्",
-  "smartLinkErrorSavingConfiguration": "SmartLink कन्फिगरेसन बचतमा त्रुटि"
+  "smartLinkErrorSavingConfiguration": "SmartLink कन्फिगरेसन बचतमा त्रुटि",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

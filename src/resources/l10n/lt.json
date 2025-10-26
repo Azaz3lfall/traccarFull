@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Atnaujinamas grupės priskyrimas...",
   "smartLinkConfigurationCompleted": "SmartLink konfigūravimas baigtas!",
   "smartLinkSelectOnlyOneCalendar": "Pasirinkite tik vieną kalendorių",
-  "smartLinkErrorSavingConfiguration": "Klaida išsaugant SmartLink konfigūraciją"
+  "smartLinkErrorSavingConfiguration": "Klaida išsaugant SmartLink konfigūraciją",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

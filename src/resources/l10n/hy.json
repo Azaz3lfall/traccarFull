@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Խմբի նշանակման թարմացում...",
   "smartLinkConfigurationCompleted": "SmartLink կարգավորումը ավարտվել է!",
   "smartLinkSelectOnlyOneCalendar": "Խնդրում ենք ընտրել միայն մեկ օրացույց",
-  "smartLinkErrorSavingConfiguration": "Սխալ՝ SmartLink կարգավորման պահպանման ժամանակ"
+  "smartLinkErrorSavingConfiguration": "Սխալ՝ SmartLink կարգավորման պահպանման ժամանակ",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

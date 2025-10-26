@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Đang cập nhật gán nhóm...",
   "smartLinkConfigurationCompleted": "Cấu hình SmartLink đã hoàn tất!",
   "smartLinkSelectOnlyOneCalendar": "Vui lòng chọn chỉ một lịch",
-  "smartLinkErrorSavingConfiguration": "Lỗi khi lưu cấu hình SmartLink"
+  "smartLinkErrorSavingConfiguration": "Lỗi khi lưu cấu hình SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

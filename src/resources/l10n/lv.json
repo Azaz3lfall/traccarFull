@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Atjauno grupas piešķiršanu...",
   "smartLinkConfigurationCompleted": "SmartLink konfigurācija pabeigta!",
   "smartLinkSelectOnlyOneCalendar": "Lūdzu, atlasiet tikai vienu kalendāru",
-  "smartLinkErrorSavingConfiguration": "Kļūda saglabājot SmartLink konfigurāciju"
+  "smartLinkErrorSavingConfiguration": "Kļūda saglabājot SmartLink konfigurāciju",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

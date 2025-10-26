@@ -883,5 +883,9 @@
   "smartLinkUpdatingGroupAssignment": "Updating group assignment...",
   "smartLinkConfigurationCompleted": "SmartLink configuration completed!",
   "smartLinkSelectOnlyOneCalendar": "Please select only one calendar",
-  "smartLinkErrorSavingConfiguration": "Error saving SmartLink configuration"
+  "smartLinkErrorSavingConfiguration": "Error saving SmartLink configuration",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

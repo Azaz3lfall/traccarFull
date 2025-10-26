@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Grup ataması güncelleniyor...",
   "smartLinkConfigurationCompleted": "SmartLink yapılandırması tamamlandı!",
   "smartLinkSelectOnlyOneCalendar": "Lütfen yalnızca bir takvim seçin",
-  "smartLinkErrorSavingConfiguration": "SmartLink yapılandırmasını kaydederken hata"
+  "smartLinkErrorSavingConfiguration": "SmartLink yapılandırmasını kaydederken hata",
+  "smartLinkSavedSuccessfully": "Kaydedildi!",
+  "smartLinkErrorWithDetails": "Hata: {message}",
+  "smartLinkCalendarSaved": "Takvim kaydedildi",
+  "smartLinkError": "Hata: {message}"
 }

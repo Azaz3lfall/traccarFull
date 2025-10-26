@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Grupi määramise uuendamine...",
   "smartLinkConfigurationCompleted": "SmartLink-konfiguratsioon lõpetatud!",
   "smartLinkSelectOnlyOneCalendar": "Valige ainult üks kalender",
-  "smartLinkErrorSavingConfiguration": "Viga SmartLink-konfiguratsiooni salvestamisel"
+  "smartLinkErrorSavingConfiguration": "Viga SmartLink-konfiguratsiooni salvestamisel",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

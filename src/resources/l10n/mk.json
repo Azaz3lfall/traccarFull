@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Ажурирање на група доделба...",
   "smartLinkConfigurationCompleted": "SmartLink конфигурацијата е завршена!",
   "smartLinkSelectOnlyOneCalendar": "Изберете само еден календар",
-  "smartLinkErrorSavingConfiguration": "Грешка при зачувување на SmartLink конфигурација"
+  "smartLinkErrorSavingConfiguration": "Грешка при зачувување на SmartLink конфигурација",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

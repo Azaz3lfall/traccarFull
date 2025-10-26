@@ -876,5 +876,9 @@
   "smartLinkUpdatingGroupAssignment": "Groepstoewijzing bijwerken...",
   "smartLinkConfigurationCompleted": "SmartLink-configuratie voltooid!",
   "smartLinkSelectOnlyOneCalendar": "Selecteer slechts één kalender",
-  "smartLinkErrorSavingConfiguration": "Fout bij het opslaan van de SmartLink-configuratie"
+  "smartLinkErrorSavingConfiguration": "Fout bij het opslaan van de SmartLink-configuratie",
+  "smartLinkSavedSuccessfully": "Opgeslagen!",
+  "smartLinkErrorWithDetails": "Fout: {message}",
+  "smartLinkCalendarSaved": "Kalender opgeslagen",
+  "smartLinkError": "Fout: {message}"
 }

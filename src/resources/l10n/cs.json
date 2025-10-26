@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Aktualizuji přiřazení skupiny...",
   "smartLinkConfigurationCompleted": "Konfigurace SmartLink dokončena!",
   "smartLinkSelectOnlyOneCalendar": "Vyberte prosím pouze jeden kalendář",
-  "smartLinkErrorSavingConfiguration": "Chyba při ukládání konfigurace SmartLink"
+  "smartLinkErrorSavingConfiguration": "Chyba při ukládání konfigurace SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

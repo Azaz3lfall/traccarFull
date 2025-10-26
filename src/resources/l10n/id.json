@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Memperbarui penetapan grup...",
   "smartLinkConfigurationCompleted": "Konfigurasi SmartLink selesai!",
   "smartLinkSelectOnlyOneCalendar": "Silakan pilih hanya satu kalender",
-  "smartLinkErrorSavingConfiguration": "Kesalahan saat menyimpan konfigurasi SmartLink"
+  "smartLinkErrorSavingConfiguration": "Kesalahan saat menyimpan konfigurasi SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

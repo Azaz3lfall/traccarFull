@@ -454,13 +454,13 @@ const FloatingDeviceList = ({
       // Close progress modal after a short delay
       setTimeout(() => {
         setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
-        showSnackbar(t('sharedSaved') + '!', 'success');
+        showSnackbar(t('smartLinkSavedSuccessfully'), 'success');
       }, 300);
       
     } catch (error) {
       console.error('Error saving SmartLink data:', error);
       setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
-      showSnackbar(t('smartLinkErrorSavingConfiguration') + ': ' + error.message, 'error');
+      showSnackbar(t('smartLinkErrorWithDetails', { message: error.message }), 'error');
     }
   };
 
@@ -1098,13 +1098,13 @@ const FloatingDeviceList = ({
         queryClient.invalidateQueries(['calendars']);
         queryClient.invalidateQueries(['notifications']);
         
-        showSnackbar(t('sharedCalendar') + ' ' + t('sharedSaved'), 'success');
+        showSnackbar(t('smartLinkCalendarSaved'), 'success');
       } else {
         throw new Error('Failed to create calendar');
       }
     } catch (error) {
       console.error('Error creating calendar:', error);
-      showSnackbar(t('sharedError') + ': ' + error.message, 'error');
+      showSnackbar(t('smartLinkError', { message: error.message }), 'error');
     } finally {
       setSavingCalendar(false);
     }

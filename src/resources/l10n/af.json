@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Dateer groeptoekenning op...",
   "smartLinkConfigurationCompleted": "SmartLink-konfigurasie voltooi!",
   "smartLinkSelectOnlyOneCalendar": "Kies asseblief net een kalender",
-  "smartLinkErrorSavingConfiguration": "Fout met die stoor van SmartLink konfigurasie"
+  "smartLinkErrorSavingConfiguration": "Fout met die stoor van SmartLink konfigurasie",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

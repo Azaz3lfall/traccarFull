@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Ενημέρωση ανάθεσης ομάδας...",
   "smartLinkConfigurationCompleted": "Η διαμόρφωση SmartLink ολοκληρώθηκε!",
   "smartLinkSelectOnlyOneCalendar": "Παρακαλώ επιλέξτε μόνο ένα ημερολόγιο",
-  "smartLinkErrorSavingConfiguration": "Σφάλμα κατά την αποθήκευση της διαμόρφωσης SmartLink"
+  "smartLinkErrorSavingConfiguration": "Σφάλμα κατά την αποθήκευση της διαμόρφωσης SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

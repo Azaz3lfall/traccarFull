@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "குழு ஒதுக்கீட்டைப் புதுப்பிக்கிறது...",
   "smartLinkConfigurationCompleted": "SmartLink கட்டமைப்பு முடிந்தது!",
   "smartLinkSelectOnlyOneCalendar": "தயவுசெய்து ஒரு நாளடைவை மட்டும் தேர்ந்தெடுக்கவும்",
-  "smartLinkErrorSavingConfiguration": "SmartLink கட்டமைப்பை சேமிக்கும்போது பிழை"
+  "smartLinkErrorSavingConfiguration": "SmartLink கட்டமைப்பை சேமிக்கும்போது பிழை",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

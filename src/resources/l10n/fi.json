@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Päivitetään ryhmätehtävää...",
   "smartLinkConfigurationCompleted": "SmartLink-konfiguraatio valmis!",
   "smartLinkSelectOnlyOneCalendar": "Valitse vain yksi kalenteri",
-  "smartLinkErrorSavingConfiguration": "Virhe SmartLink-konfiguraation tallentamisessa"
+  "smartLinkErrorSavingConfiguration": "Virhe SmartLink-konfiguraation tallentamisessa",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

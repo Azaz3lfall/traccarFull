@@ -876,5 +876,9 @@
   "smartLinkUpdatingGroupAssignment": "グループ割り当てを更新中...",
   "smartLinkConfigurationCompleted": "SmartLink設定が完了しました！",
   "smartLinkSelectOnlyOneCalendar": "1つのカレンダーのみ選択してください",
-  "smartLinkErrorSavingConfiguration": "SmartLink設定の保存エラー"
+  "smartLinkErrorSavingConfiguration": "SmartLink設定の保存エラー",
+  "smartLinkSavedSuccessfully": "保存しました！",
+  "smartLinkErrorWithDetails": "エラー：{message}",
+  "smartLinkCalendarSaved": "カレンダーを保存しました",
+  "smartLinkError": "エラー：{message}"
 }

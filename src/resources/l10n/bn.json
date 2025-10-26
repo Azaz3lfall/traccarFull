@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "গ্রুপ বরাদ্দ আপডেট করা হচ্ছে...",
   "smartLinkConfigurationCompleted": "SmartLink কনফিগারেশন সম্পন্ন হয়েছে!",
   "smartLinkSelectOnlyOneCalendar": "অনুগ্রহ করে শুধুমাত্র একটি ক্যালেন্ডার নির্বাচন করুন",
-  "smartLinkErrorSavingConfiguration": "SmartLink কনফিগারেশন সংরক্ষণে ত্রুটি"
+  "smartLinkErrorSavingConfiguration": "SmartLink কনফিগারেশন সংরক্ষণে ত্রুটি",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

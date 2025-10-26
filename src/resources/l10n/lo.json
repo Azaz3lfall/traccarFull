@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "ກຳລັງອັບເດດການກຳນົດກຸ່ມ...",
   "smartLinkConfigurationCompleted": "ການຕັ້ງຄ່າ SmartLink ສຳເລັດແລ້ວ!",
   "smartLinkSelectOnlyOneCalendar": "ກະລຸນາເລືອກພຽງປະຕິທິນດຽວ",
-  "smartLinkErrorSavingConfiguration": "ຂໍ້ຜິດພາດໃນການບັນທຶກການຕັ້ງຄ່າ SmartLink"
+  "smartLinkErrorSavingConfiguration": "ຂໍ້ຜິດພາດໃນການບັນທຶກການຕັ້ງຄ່າ SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

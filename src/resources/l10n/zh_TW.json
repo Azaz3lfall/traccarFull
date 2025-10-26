@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "正在更新群組分配...",
   "smartLinkConfigurationCompleted": "SmartLink 設定已完成！",
   "smartLinkSelectOnlyOneCalendar": "請只選擇一個日曆",
-  "smartLinkErrorSavingConfiguration": "儲存 SmartLink 設定時發生錯誤"
+  "smartLinkErrorSavingConfiguration": "儲存 SmartLink 設定時發生錯誤",
+  "smartLinkSavedSuccessfully": "已儲存！",
+  "smartLinkErrorWithDetails": "錯誤：{message}",
+  "smartLinkCalendarSaved": "日曆已儲存",
+  "smartLinkError": "錯誤：{message}"
 }

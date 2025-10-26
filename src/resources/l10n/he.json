@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "מעדכנים הקצאת קבוצה...",
   "smartLinkConfigurationCompleted": "תצורת SmartLink הושלמה!",
   "smartLinkSelectOnlyOneCalendar": "אנא בחר לוח שנה אחד בלבד",
-  "smartLinkErrorSavingConfiguration": "שגיאה בשמירת תצורת SmartLink"
+  "smartLinkErrorSavingConfiguration": "שגיאה בשמירת תצורת SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

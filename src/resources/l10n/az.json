@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Qrup təyini yenilənir...",
   "smartLinkConfigurationCompleted": "SmartLink konfiqurasiyası tamamlandı!",
   "smartLinkSelectOnlyOneCalendar": "Zəhmət olmasa yalnız bir təqvim seçin",
-  "smartLinkErrorSavingConfiguration": "SmartLink konfiqurasiyasının saxlanmasında xəta"
+  "smartLinkErrorSavingConfiguration": "SmartLink konfiqurasiyasının saxlanmasında xəta",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

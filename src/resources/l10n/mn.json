@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "Бүлгийн томилголт шинэчилж байна...",
   "smartLinkConfigurationCompleted": "SmartLink тохиргоо дууссан!",
   "smartLinkSelectOnlyOneCalendar": "Зөвхөн нэг хуанли сонгоно уу",
-  "smartLinkErrorSavingConfiguration": "SmartLink тохиргоог хадгалах үед алдаа гарлаа"
+  "smartLinkErrorSavingConfiguration": "SmartLink тохиргоог хадгалах үед алдаа гарлаа",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

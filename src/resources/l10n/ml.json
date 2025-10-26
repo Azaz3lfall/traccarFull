@@ -873,5 +873,9 @@
   "smartLinkUpdatingGroupAssignment": "ഗ്രൂപ്പ് നിയോഗം അപ്ഡേറ്റ് ചെയ്യുന്നു...",
   "smartLinkConfigurationCompleted": "SmartLink കണ്ടുപിടുത്തം പൂർത്തിയായി!",
   "smartLinkSelectOnlyOneCalendar": "ദയവായി ഒരു കലണ്ടർ മാത്രം തിരഞ്ഞെടുക്കുക",
-  "smartLinkErrorSavingConfiguration": "SmartLink കണ്ടുപിടുത്തം സംരക്ഷിക്കുന്നതിൽ പിശക്"
+  "smartLinkErrorSavingConfiguration": "SmartLink കണ്ടുപിടുത്തം സംരക്ഷിക്കുന്നതിൽ പിശക്",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }

@@ -877,5 +877,9 @@
   "smartLinkUpdatingGroupAssignment": "Se actualizează atribuirea grupurilor...",
   "smartLinkConfigurationCompleted": "Configurația SmartLink este finalizată!",
   "smartLinkSelectOnlyOneCalendar": "Vă rugăm să selectați doar un calendar",
-  "smartLinkErrorSavingConfiguration": "Eroare la salvarea configurației SmartLink"
+  "smartLinkErrorSavingConfiguration": "Eroare la salvarea configurației SmartLink",
+  "smartLinkSavedSuccessfully": "Saved!",
+  "smartLinkErrorWithDetails": "Error: {message}",
+  "smartLinkCalendarSaved": "Calendar saved",
+  "smartLinkError": "Error: {message}"
 }
