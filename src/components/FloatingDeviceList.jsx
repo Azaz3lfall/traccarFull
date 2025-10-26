@@ -2683,11 +2683,19 @@ const FloatingDeviceList = ({
                               }
                             }
                             
-                            const displayText = displayParts.join(' / ');
+                              const displayText = displayParts.join(' / ');
+                              const notificationCalendarId = notification.calendarId || 0;
                               
                               return (
-                                <label key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
-                                  <input type="checkbox" checked={isSelected} onChange={(e) => { setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); }} style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px' }} />
+                                <div key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
+                                  <input 
+                                    type="checkbox" 
+                                    checked={isSelected} 
+                                    onChange={(e) => { 
+                                      setSmartLinkSelectedNotificationIds((prev) => e.target.checked ? (prev.includes(notification.id) ? prev : [...prev, notification.id]) : prev.filter((id) => id !== notification.id)); 
+                                    }} 
+                                    style={{ width: '14px', height: '14px', margin: 0, marginTop: '2px', cursor: 'pointer' }} 
+                                  />
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ color: colors.text, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                       {displayText}
@@ -2720,7 +2728,48 @@ const FloatingDeviceList = ({
                                       </div>
                                     )}
                                   </div>
-                                </label>
+                                  <select
+                                    value={notificationCalendarId}
+                                    onChange={async (e) => {
+                                      const newCalendarId = parseInt(e.target.value, 10);
+                                      try {
+                                        const updatedNotification = {
+                                          ...notification,
+                                          calendarId: newCalendarId
+                                        };
+                                        await fetchOrThrow(`/api/notifications/${notification.id}`, {
+                                          method: 'PUT',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify(updatedNotification)
+                                        });
+                                        // Update local state
+                                        setSmartLinkNotifications(prev => 
+                                          prev.map(n => n.id === notification.id ? updatedNotification : n)
+                                        );
+                                      } catch (error) {
+                                        console.error('Error updating notification calendar:', error);
+                                      }
+                                    }}
+                                    style={{
+                                      minWidth: '150px',
+                                      padding: '4px 8px',
+                                      fontSize: '12px',
+                                      border: `1px solid ${colors.border}`,
+                                      borderRadius: '4px',
+                                      backgroundColor: colors.surface,
+                                      color: colors.text,
+                                      cursor: 'pointer'
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <option value={0}>None</option>
+                                    {smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(calendar => (
+                                      <option key={calendar.id} value={calendar.id}>
+                                        {calendar.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
                               );
                             })
                           )}
