@@ -279,8 +279,9 @@ const FloatingDeviceList = ({
           try {
             console.log('Executing geofences refresh for devices:', smartLinkSelectedDeviceIds);
             const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
-              const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
-              const geofenceIds = await geofencesResponse.json();
+              const geofencesResponse = await fetchOrThrow(`/api/geofences?deviceId=${deviceId}`);
+              const geofences = await geofencesResponse.json();
+              const geofenceIds = Array.isArray(geofences) ? geofences.map(g => g.id) : [];
               return { deviceId, geofenceIds };
             });
             
