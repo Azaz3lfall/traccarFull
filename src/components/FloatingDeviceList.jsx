@@ -455,7 +455,7 @@ const FloatingDeviceList = ({
       setTimeout(() => {
         setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
         showSnackbar(t('sharedSaved') + '!', 'success');
-      }, 1000);
+      }, 300);
       
     } catch (error) {
       console.error('Error saving SmartLink data:', error);
@@ -3496,12 +3496,12 @@ const FloatingDeviceList = ({
             </div>
           </div>
           
-          <div style={{ width: '100%', backgroundColor: colors.border, borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', backgroundColor: colors.primary, borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${(smartLinkProgressModal.completedDevices / smartLinkProgressModal.totalDevices) * 100}%`,
                 height: '100%',
-                backgroundColor: colors.primary,
+                backgroundColor: colors.border,
                 transition: 'width 0.3s ease'
               }}
             />
