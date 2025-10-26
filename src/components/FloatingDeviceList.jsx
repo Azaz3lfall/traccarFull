@@ -2798,7 +2798,7 @@ const FloatingDeviceList = ({
                                       size={16} 
                                       style={{
                                         position: 'absolute',
-                                        right: '10px',
+                                        right: '6px',
                                         top: '50%',
                                         transform: 'translateY(-50%)',
                                         pointerEvents: 'none',
