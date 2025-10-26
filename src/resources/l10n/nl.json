@@ -880,5 +880,7 @@
   "smartLinkSavedSuccessfully": "Opgeslagen!",
   "smartLinkErrorWithDetails": "Fout: {message}",
   "smartLinkCalendarSaved": "Kalender opgeslagen",
-  "smartLinkError": "Fout: {message}"
+  "smartLinkError": "Fout: {message}",
+  "smartLinkNameRequired": "Naam is verplicht",
+  "smartLinkDaysRequired": "Dagen zijn verplicht"
 }

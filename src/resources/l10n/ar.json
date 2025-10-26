@@ -880,5 +880,7 @@
   "smartLinkSavedSuccessfully": "تم الحفظ!",
   "smartLinkErrorWithDetails": "خطأ: {message}",
   "smartLinkCalendarSaved": "تم حفظ التقويم",
-  "smartLinkError": "خطأ: {message}"
+  "smartLinkError": "خطأ: {message}",
+  "smartLinkNameRequired": "الاسم مطلوب",
+  "smartLinkDaysRequired": "الأيام مطلوبة"
 }

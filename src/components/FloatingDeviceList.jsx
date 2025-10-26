@@ -1023,12 +1023,12 @@ const FloatingDeviceList = ({
 
   const createCalendar = async () => {
     if (!smartLinkCalendarForm.name.trim()) {
-      showSnackbar(t('sharedName') + ' ' + t('sharedRequired'), 'error');
+      showSnackbar(t('smartLinkNameRequired'), 'error');
       return;
     }
 
     if (smartLinkDays.length === 0) {
-      showSnackbar(t('calendarDays') + ' ' + t('sharedRequired'), 'error');
+      showSnackbar(t('smartLinkDaysRequired'), 'error');
       return;
     }
 

@@ -880,5 +880,7 @@
   "smartLinkSavedSuccessfully": "Enregistré !",
   "smartLinkErrorWithDetails": "Erreur : {message}",
   "smartLinkCalendarSaved": "Calendrier enregistré",
-  "smartLinkError": "Erreur : {message}"
+  "smartLinkError": "Erreur : {message}",
+  "smartLinkNameRequired": "Le nom est requis",
+  "smartLinkDaysRequired": "Les jours sont requis"
 }

@@ -881,5 +881,7 @@
   "smartLinkSavedSuccessfully": "Збережено!",
   "smartLinkErrorWithDetails": "Помилка: {message}",
   "smartLinkCalendarSaved": "Календар збережено",
-  "smartLinkError": "Помилка: {message}"
+  "smartLinkError": "Помилка: {message}",
+  "smartLinkNameRequired": "Ім'я обов'язкове",
+  "smartLinkDaysRequired": "Дні обов'язкові"
 }

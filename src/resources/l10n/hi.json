@@ -880,5 +880,7 @@
   "smartLinkSavedSuccessfully": "सहेजा गया!",
   "smartLinkErrorWithDetails": "त्रुटि: {message}",
   "smartLinkCalendarSaved": "कैलेंडर सहेजा गया",
-  "smartLinkError": "त्रुटि: {message}"
+  "smartLinkError": "त्रुटि: {message}",
+  "smartLinkNameRequired": "नाम आवश्यक है",
+  "smartLinkDaysRequired": "दिन आवश्यक हैं"
 }

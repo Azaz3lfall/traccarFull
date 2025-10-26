@@ -881,5 +881,7 @@
   "smartLinkSavedSuccessfully": "Zapisano!",
   "smartLinkErrorWithDetails": "Błąd: {message}",
   "smartLinkCalendarSaved": "Kalendarz zapisany",
-  "smartLinkError": "Błąd: {message}"
+  "smartLinkError": "Błąd: {message}",
+  "smartLinkNameRequired": "Nazwa jest wymagana",
+  "smartLinkDaysRequired": "Dni są wymagane"
 }
