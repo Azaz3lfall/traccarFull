@@ -195,8 +195,6 @@ const FloatingDeviceList = ({
               if (response.status !== 204) {
                 throw new Error(`Failed to assign geofence ${geofence.id} to device ${deviceId}`);
               }
-              
-              console.log(`Geofence ${geofence.id} assigned to device ${deviceId}`);
             } else {
               // DELETE to remove geofence permission
               const response = await fetchOrThrow('/api/permissions', {
@@ -208,8 +206,6 @@ const FloatingDeviceList = ({
               if (response.status !== 204) {
                 throw new Error(`Failed to remove geofence ${geofence.id} from device ${deviceId}`);
               }
-              
-              console.log(`Geofence ${geofence.id} removed from device ${deviceId}`);
             }
           } catch (error) {
             console.error(`Error processing geofence ${geofence.id} for device ${deviceId}:`, error);
@@ -217,8 +213,6 @@ const FloatingDeviceList = ({
           }
         }
       }
-
-      console.log('All geofence permissions processed successfully');
       
     } catch (error) {
       console.error('Error saving geofences:', error);
@@ -274,10 +268,8 @@ const FloatingDeviceList = ({
         setDeviceGroups(newDeviceGroups);
         
         // Refresh geofences data for selected devices to update green/red indicators
-        console.log('smartLinkSelectedDeviceIds for geofences refresh:', smartLinkSelectedDeviceIds);
         if (smartLinkSelectedDeviceIds.length > 0) {
           try {
-            console.log('Executing geofences refresh for devices:', smartLinkSelectedDeviceIds);
             const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
               const geofencesResponse = await fetchOrThrow(`/api/geofences?deviceId=${deviceId}`);
               const geofences = await geofencesResponse.json();
@@ -295,17 +287,11 @@ const FloatingDeviceList = ({
               ...prev,
               ...newDeviceGeofences
             }));
-            
-            console.log('Geofences refreshed after save');
-            console.log('Updated deviceGeofences:', newDeviceGeofences);
           } catch (error) {
             console.error('Error refreshing geofences:', error);
           }
         }
         
-        console.log('Devices refreshed after save');
-        console.log('Updated devices:', devicesArray);
-        console.log('Updated deviceGroups:', newDeviceGroups);
         
         // Also invalidate React Query cache for other components
         queryClient.invalidateQueries(['devices']);
@@ -371,11 +357,7 @@ const FloatingDeviceList = ({
         if (!response.ok) {
           throw new Error(`Failed to update device ${deviceId}`);
         }
-
-        console.log(`Device ${deviceId} updated with groupId: ${groupId}`);
       }
-
-      console.log('All devices updated successfully');
       
     } catch (error) {
       console.error('Error saving groups:', error);
@@ -2197,11 +2179,6 @@ const FloatingDeviceList = ({
               <button
                 onClick={async () => {
                   if (smartLinkSaveLoading) return; // Prevent multiple clicks
-                  
-                  // Console log the SmartLink devices array
-                  const devicesArray = (filteredDevices && Array.isArray(filteredDevices) ? filteredDevices : Object.values(devices))
-                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                  console.log('SmartLink devices array on save click:', devicesArray);
                   
                   if (validateSmartLinkSave()) {
                     // Validation passed - save groups and geofences
