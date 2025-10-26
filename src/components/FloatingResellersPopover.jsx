@@ -245,6 +245,16 @@ const FloatingResellersPopover = ({
   const handleXlsxFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      console.log('Selected file:', file.name, file.type);
+      
+      // Check if file is valid XLSX/XLS
+      const fileName = file.name.toLowerCase();
+      if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        console.error('Invalid file type. Please select an .xlsx or .xls file.');
+        setSnackbar({ open: true, message: 'Invalid file type. Please select an .xlsx or .xls file.', severity: 'error' });
+        return;
+      }
+      
       setUploadedXlsxFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -257,6 +267,7 @@ const FloatingResellersPopover = ({
           console.log('Parsed XLSX content:', jsonData);
         } catch (error) {
           console.error('Error parsing XLSX file:', error);
+          setSnackbar({ open: true, message: 'Error parsing XLSX file. Please try again.', severity: 'error' });
         }
       };
       reader.readAsArrayBuffer(file);
@@ -3710,7 +3721,7 @@ const FloatingResellersPopover = ({
                     </Typography>
                     <input
                       type="file"
-                      accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                      accept=".xlsx,.xls"
                       style={{ display: 'none' }}
                       id="xlsx-upload"
                       onChange={handleXlsxFileChange}
