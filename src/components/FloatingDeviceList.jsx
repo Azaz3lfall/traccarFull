@@ -274,8 +274,10 @@ const FloatingDeviceList = ({
         setDeviceGroups(newDeviceGroups);
         
         // Refresh geofences data for selected devices to update green/red indicators
+        console.log('About to refresh geofences for devices:', smartLinkSelectedDeviceIds);
         if (smartLinkSelectedDeviceIds.length > 0) {
           try {
+            console.log('Starting geofences refresh for devices:', smartLinkSelectedDeviceIds);
             const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
               const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
               const geofenceIds = await geofencesResponse.json();
