@@ -1109,8 +1109,18 @@ const FloatingDeviceList = ({
         const data = await res.json();
         setSmartLinkCalendars(Array.isArray(data) ? data : []);
         
-        // Invalidate React Query cache for calendars to refresh main calendars popover
+        // Reload notifications to show updated calendar associations
+        try {
+          const notificationsRes = await fetchOrThrow('/api/notifications');
+          const notificationsData = await notificationsRes.json();
+          setSmartLinkNotifications(Array.isArray(notificationsData) ? notificationsData : []);
+        } catch (error) {
+          console.error('Error reloading notifications:', error);
+        }
+        
+        // Invalidate React Query cache for calendars and notifications
         queryClient.invalidateQueries(['calendars']);
+        queryClient.invalidateQueries(['notifications']);
         
         showSnackbar(t('sharedCalendar') + ' ' + t('sharedSaved'), 'success');
       } else {
