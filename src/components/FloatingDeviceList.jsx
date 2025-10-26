@@ -2774,6 +2774,8 @@ const FloatingDeviceList = ({
                                           setSmartLinkNotifications(prev => 
                                             prev.map(n => n.id === notification.id ? updatedNotification : n)
                                           );
+                                          // Invalidate notifications query to propagate changes across app
+                                          queryClient.invalidateQueries(['notifications']);
                                         } catch (error) {
                                           console.error('Error updating notification calendar:', error);
                                         } finally {
