@@ -2794,16 +2794,17 @@ const FloatingDeviceList = ({
                                         </option>
                                       ))}
                                     </select>
-                                    <div style={{
-                                      position: 'absolute',
-                                      right: '18px',
-                                      top: '50%',
-                                      transform: 'translateY(-50%)',
-                                      pointerEvents: 'none',
-                                      color: colors.text
-                                    }}>
-                                      ▼
-                                    </div>
+                                    <ChevronDown 
+                                      size={16} 
+                                      style={{
+                                        position: 'absolute',
+                                        right: '10px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        pointerEvents: 'none',
+                                        color: colors.text
+                                      }}
+                                    />
                                   </div>
                                 </div>
                               );
