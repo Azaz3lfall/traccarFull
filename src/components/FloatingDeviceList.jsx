@@ -220,6 +220,88 @@ const FloatingDeviceList = ({
     }
   };
 
+  // Save SmartLink notifications
+  const saveSmartLinkNotifications = async () => {
+    try {
+      const selectedNotificationIds = smartLinkSelectedNotificationIds;
+      
+      // Process each selected device
+      for (let i = 0; i < smartLinkSelectedDeviceIds.length; i++) {
+        const deviceId = smartLinkSelectedDeviceIds[i];
+        const device = devices[deviceId];
+        
+        if (!device) {
+          console.error('Device not found:', deviceId);
+          continue;
+        }
+
+        // Update progress modal
+        const deviceName = device.name ? (device.name.length > 25 ? device.name.substring(0, 25) + '...' : device.name) : `Device ${deviceId}`;
+        setSmartLinkProgressModal(prev => ({
+          ...prev,
+          currentDevice: deviceName,
+          currentOperation: `Processing notification permissions...`,
+          completedDevices: i
+        }));
+
+        // Get all notifications (both selected and unselected)
+        const allNotifications = Object.values(smartLinkNotifications);
+        
+        // Process each notification for this device
+        for (const notification of allNotifications) {
+          const isNotificationSelected = selectedNotificationIds.includes(notification.id);
+          
+          // Update progress modal for notification operation
+          const notificationName = notification.name ? (notification.name.length > 20 ? notification.name.substring(0, 20) + '...' : notification.name) : 'Unnamed';
+          setSmartLinkProgressModal(prev => ({
+            ...prev,
+            currentOperation: isNotificationSelected 
+              ? `Assigning notification: ${notificationName}` 
+              : `Removing notification: ${notificationName}`
+          }));
+
+          const payload = {
+            deviceId: deviceId,
+            notificationId: notification.id
+          };
+
+          try {
+            if (isNotificationSelected) {
+              // POST to assign notification permission
+              const response = await fetchOrThrow('/api/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              
+              if (response.status !== 204) {
+                throw new Error(`Failed to assign notification ${notification.id} to device ${deviceId}`);
+              }
+            } else {
+              // DELETE to remove notification permission
+              const response = await fetchOrThrow('/api/permissions', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              
+              if (response.status !== 204) {
+                throw new Error(`Failed to remove notification ${notification.id} from device ${deviceId}`);
+              }
+            }
+          } catch (error) {
+            console.error(`Error processing notification ${notification.id} for device ${deviceId}:`, error);
+            // Continue with other notifications even if one fails
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error saving notifications:', error);
+      throw error; // Re-throw to be handled by the calling function
+    }
+  };
+
   // Combined save function for groups and geofences
   const saveSmartLinkData = async () => {
     try {
@@ -239,6 +321,9 @@ const FloatingDeviceList = ({
       
       // Step 2: Save geofences
       await saveSmartLinkGeofences();
+
+      // Step 3: Save notifications
+      await saveSmartLinkNotifications();
 
       // Final progress update
       setSmartLinkProgressModal(prev => ({
@@ -289,6 +374,29 @@ const FloatingDeviceList = ({
             }));
           } catch (error) {
             console.error('Error refreshing geofences:', error);
+          }
+
+          // Refresh notifications data for selected devices to update green/red indicators
+          try {
+            const notificationsPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
+              const notificationsResponse = await fetchOrThrow(`/api/notifications?deviceId=${deviceId}`);
+              const notifications = await notificationsResponse.json();
+              const notificationIds = Array.isArray(notifications) ? notifications.map(n => n.id) : [];
+              return { deviceId, notificationIds };
+            });
+            
+            const notificationsResults = await Promise.all(notificationsPromises);
+            const newDeviceNotifications = {};
+            notificationsResults.forEach(({ deviceId, notificationIds }) => {
+              newDeviceNotifications[deviceId] = notificationIds;
+            });
+            
+            setDeviceNotifications(prev => ({
+              ...prev,
+              ...newDeviceNotifications
+            }));
+          } catch (error) {
+            console.error('Error refreshing notifications:', error);
           }
         }
         
