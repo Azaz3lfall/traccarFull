@@ -274,11 +274,8 @@ const FloatingDeviceList = ({
         setDeviceGroups(newDeviceGroups);
         
         // Refresh geofences data for selected devices to update green/red indicators
-        console.log('About to refresh geofences for devices:', smartLinkSelectedDeviceIds);
-        console.log('smartLinkSelectedDeviceIds.length:', smartLinkSelectedDeviceIds.length);
         if (smartLinkSelectedDeviceIds.length > 0) {
           try {
-            console.log('Starting geofences refresh for devices:', smartLinkSelectedDeviceIds);
             const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
               const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
               const geofenceIds = await geofencesResponse.json();
@@ -291,22 +288,16 @@ const FloatingDeviceList = ({
               newDeviceGeofences[deviceId] = geofenceIds;
             });
             
-            setDeviceGeofences(prev => {
-              const updated = {
-                ...prev,
-                ...newDeviceGeofences
-              };
-              console.log('Geofences refreshed after save');
-              console.log('Previous deviceGeofences:', prev);
-              console.log('New deviceGeofences:', newDeviceGeofences);
-              console.log('Updated deviceGeofences:', updated);
-              return updated;
-            });
+            setDeviceGeofences(prev => ({
+              ...prev,
+              ...newDeviceGeofences
+            }));
+            
+            console.log('Geofences refreshed after save');
+            console.log('Updated deviceGeofences:', newDeviceGeofences);
           } catch (error) {
             console.error('Error refreshing geofences:', error);
           }
-        } else {
-          console.log('No devices selected for geofences refresh');
         }
         
         console.log('Devices refreshed after save');
@@ -2493,12 +2484,6 @@ const FloatingDeviceList = ({
                                         const deviceGeofenceList = deviceGeofences[deviceId] || [];
                                         const isPartnered = deviceGeofenceList.includes(geofence.id);
                                         const deviceName = devices[deviceId]?.name || 'Unknown';
-                                        console.log(`Geofence ${geofence.id} rendering for device ${deviceId}:`, {
-                                          deviceGeofenceList,
-                                          isPartnered,
-                                          deviceName,
-                                          allDeviceGeofences: deviceGeofences
-                                        });
                                         return (
                                           <span
                                             key={deviceId}
