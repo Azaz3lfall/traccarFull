@@ -59,6 +59,7 @@ import {
 import { BsGooglePlay, BsAndroid, BsFiletypeXlsx } from "react-icons/bs";
 import { LuCameraOff } from "react-icons/lu";
 import { GoArchive } from "react-icons/go";
+import * as XLSX from 'xlsx';
 import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -139,6 +140,7 @@ const FloatingResellersPopover = ({
   const [cleanAppsModal, setCleanAppsModal] = useState({ open: false, reseller: null });
   const [iosBuildTypeModal, setIosBuildTypeModal] = useState({ open: false, reseller: null });
   const [massImporterModal, setMassImporterModal] = useState({ open: false, reseller: null });
+  const [uploadedXlsxFile, setUploadedXlsxFile] = useState(null);
   const [errorModal, setErrorModal] = useState({ open: false, message: '', title: '' });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
@@ -225,6 +227,60 @@ const FloatingResellersPopover = ({
       };
       return newState;
     });
+  };
+
+  // Mass Importer functions
+  const handleDownloadTemplate = () => {
+    const worksheet = XLSX.utils.aoa_to_sheet([
+      ['userLogin', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId'],
+      ['john.doe', 'john@example.com', '10', '50', 'Device 1', 'IMEI123456'],
+      ['jane.smith', 'jane@example.com', '5', '25', 'Device 2', 'IMEI789012']
+    ]);
+    
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    XLSX.writeFile(workbook, 'template.xlsx');
+  };
+
+  const handleXlsxFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setUploadedXlsxFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          console.log('Parsed XLSX content:', jsonData);
+        } catch (error) {
+          console.error('Error parsing XLSX file:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const handleImport = () => {
+    if (uploadedXlsxFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          console.log('Parsed XLSX content:', jsonData);
+        } catch (error) {
+          console.error('Error parsing XLSX file:', error);
+        }
+      };
+      reader.readAsArrayBuffer(uploadedXlsxFile);
+    }
+    setMassImporterModal({ open: false, reseller: null });
   };
 
   // Build functions for mobile apps
@@ -3657,10 +3713,7 @@ const FloatingResellersPopover = ({
                       accept=".xlsx,.xls"
                       style={{ display: 'none' }}
                       id="xlsx-upload"
-                      onChange={(e) => {
-                        // Handle file selection here
-                        console.log('File selected:', e.target.files[0]);
-                      }}
+                      onChange={handleXlsxFileChange}
                     />
                     <label htmlFor="xlsx-upload" style={{ cursor: 'pointer' }}>
                       <div
@@ -3696,10 +3749,35 @@ const FloatingResellersPopover = ({
 
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                   <button
-                    onClick={() => {
-                      // TODO: Implement mass import logic
-                      setMassImporterModal({ open: false, reseller: null });
+                    onClick={handleDownloadTemplate}
+                    style={{
+                      padding: '10px 20px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                      e.target.style.color = colors.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                      e.target.style.color = colors.text;
+                    }}
+                  >
+                    <DownloadIcon style={{ fontSize: '18px' }} />
+                    template.xlsx
+                  </button>
+                  <button
+                    onClick={handleImport}
                     style={{
                       padding: '10px 20px',
                       border: `1px solid ${colors.border}`,
