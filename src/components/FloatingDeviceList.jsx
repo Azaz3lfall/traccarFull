@@ -2772,7 +2772,7 @@ const FloatingDeviceList = ({
                                       }}
                                       style={{
                                         minWidth: '150px',
-                                        padding: '6px 24px 6px 8px', // More right padding for chevron
+                                        padding: '6px 28px 6px 8px', // Right padding for chevron
                                         fontSize: '13px', // Slightly increased font size
                                         border: `1px solid ${colors.border}`,
                                         borderRadius: '4px',
