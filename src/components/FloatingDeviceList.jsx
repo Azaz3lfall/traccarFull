@@ -514,6 +514,7 @@ const FloatingDeviceList = ({
   };
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
+  const [savingNotificationId, setSavingNotificationId] = useState(null); // Track which notification is being saved
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [smartLinkCommands, setSmartLinkCommands] = useState([]);
@@ -2729,47 +2730,63 @@ const FloatingDeviceList = ({
                                       </div>
                                     )}
                                   </div>
-                                  <select
-                                    value={notificationCalendarId}
-                                    onChange={async (e) => {
-                                      const newCalendarId = parseInt(e.target.value, 10);
-                                      try {
-                                        const updatedNotification = {
-                                          ...notification,
-                                          calendarId: newCalendarId
-                                        };
-                                        await fetchOrThrow(`/api/notifications/${notification.id}`, {
-                                          method: 'PUT',
-                                          headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify(updatedNotification)
-                                        });
-                                        // Update local state
-                                        setSmartLinkNotifications(prev => 
-                                          prev.map(n => n.id === notification.id ? updatedNotification : n)
-                                        );
-                                      } catch (error) {
-                                        console.error('Error updating notification calendar:', error);
-                                      }
-                                    }}
-                                    style={{
-                                      minWidth: '150px',
-                                      padding: '4px 8px',
-                                      fontSize: '12px',
-                                      border: `1px solid ${colors.border}`,
-                                      borderRadius: '4px',
-                                      backgroundColor: colors.surface,
-                                      color: colors.text,
-                                      cursor: 'pointer'
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <option value={0}>None</option>
-                                    {smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(calendar => (
-                                      <option key={calendar.id} value={calendar.id}>
-                                        {calendar.name}
-                                      </option>
-                                    ))}
-                                  </select>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {savingNotificationId === notification.id && (
+                                      <div style={{ 
+                                        width: '16px', 
+                                        height: '16px', 
+                                        border: `2px solid ${colors.border}`, 
+                                        borderTop: `2px solid ${colors.primary}`,
+                                        borderRadius: '50%',
+                                        animation: 'spin 0.8s linear infinite'
+                                      }} />
+                                    )}
+                                    <select
+                                      value={notificationCalendarId}
+                                      onChange={async (e) => {
+                                        const newCalendarId = parseInt(e.target.value, 10);
+                                        setSavingNotificationId(notification.id);
+                                        try {
+                                          const updatedNotification = {
+                                            ...notification,
+                                            calendarId: newCalendarId
+                                          };
+                                          await fetchOrThrow(`/api/notifications/${notification.id}`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(updatedNotification)
+                                          });
+                                          // Update local state
+                                          setSmartLinkNotifications(prev => 
+                                            prev.map(n => n.id === notification.id ? updatedNotification : n)
+                                          );
+                                        } catch (error) {
+                                          console.error('Error updating notification calendar:', error);
+                                        } finally {
+                                          setSavingNotificationId(null);
+                                        }
+                                      }}
+                                      style={{
+                                        minWidth: '150px',
+                                        padding: '4px 8px',
+                                        fontSize: '12px',
+                                        border: `1px solid ${colors.border}`,
+                                        borderRadius: '4px',
+                                        backgroundColor: colors.surface,
+                                        color: colors.text,
+                                        cursor: 'pointer',
+                                        outline: 'none'
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <option value={0}>None</option>
+                                      {smartLinkCalendars.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(calendar => (
+                                        <option key={calendar.id} value={calendar.id}>
+                                          {calendar.name}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
                                 </div>
                               );
                             })
@@ -3462,6 +3479,14 @@ const FloatingDeviceList = ({
         </div>
       </div>
     )}
+    <style>
+      {`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}
+    </style>
     </>
   );
 };
