@@ -2335,6 +2335,7 @@ const FloatingDeviceList = ({
                   
                   if (validateSmartLinkSave()) {
                     // Validation passed - save groups and geofences
+                    console.log('Calendars:', smartLinkCalendars);
                     setSmartLinkSaveLoading(true);
                     await saveSmartLinkData();
                     setSmartLinkSaveLoading(false);
