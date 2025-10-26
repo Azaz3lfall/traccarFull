@@ -2839,6 +2839,7 @@ const FloatingDeviceList = ({
                                       <input 
                                         type="checkbox" 
                                         checked={isSelected} 
+                                        disabled={true}
                                         onChange={(e) => { 
                                           if (e.target.checked) {
                                             // When selecting a calendar, clear all others and set this as the only selected
@@ -2855,8 +2856,10 @@ const FloatingDeviceList = ({
                                           height: '14px', 
                                           margin: 0,
                                           marginTop: '2px',
-                                          backgroundColor: calendarHasConflict ? '#E0E0E0' : (isSelected ? '#1976d2' : 'transparent'),
-                                          accentColor: calendarHasConflict ? '#E0E0E0' : '#1976d2'
+                                          backgroundColor: '#E0E0E0',
+                                          accentColor: '#E0E0E0',
+                                          cursor: 'not-allowed',
+                                          opacity: 0.5
                                         }} 
                                       />
                                       <div style={{ flex: 1, minWidth: 0 }}>
