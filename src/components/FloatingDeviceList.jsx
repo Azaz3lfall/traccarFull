@@ -2288,7 +2288,7 @@ const FloatingDeviceList = ({
               backgroundColor: colors.surface,
               borderRadius: '8px',
               padding: '20px',
-              width: desktop ? '70vw' : '98vw',
+              width: desktop ? '85vw' : '98vw',
               height: '70vh',
               maxWidth: '98%',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
