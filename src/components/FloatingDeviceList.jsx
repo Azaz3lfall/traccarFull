@@ -278,6 +278,33 @@ const FloatingDeviceList = ({
           });
           setDeviceGroups(newDeviceGroups);
           
+          // Refresh geofences data for selected devices to update green/red indicators
+          if (smartLinkSelectedDeviceIds.length > 0) {
+            try {
+              const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
+                const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
+                const geofenceIds = await geofencesResponse.json();
+                return { deviceId, geofenceIds };
+              });
+              
+              const geofencesResults = await Promise.all(geofencesPromises);
+              const newDeviceGeofences = {};
+              geofencesResults.forEach(({ deviceId, geofenceIds }) => {
+                newDeviceGeofences[deviceId] = geofenceIds;
+              });
+              
+              setDeviceGeofences(prev => ({
+                ...prev,
+                ...newDeviceGeofences
+              }));
+              
+              console.log('Geofences refreshed after save');
+              console.log('Updated deviceGeofences:', newDeviceGeofences);
+            } catch (error) {
+              console.error('Error refreshing geofences:', error);
+            }
+          }
+          
           console.log('Devices refreshed after save');
           console.log('Updated devices:', devicesArray);
           console.log('Updated deviceGroups:', newDeviceGroups);
