@@ -253,71 +253,71 @@ const FloatingDeviceList = ({
         completedDevices: totalDevices
       }));
 
+      // Refresh devices and geofences data immediately after save
+      try {
+        const devicesResponse = await fetchOrThrow('/api/devices');
+        const updatedDevices = await devicesResponse.json();
+        
+        // Convert devices object to array for Redux action
+        const devicesArray = Array.isArray(updatedDevices) ? updatedDevices : Object.values(updatedDevices);
+        
+        // Update Redux store with fresh device data
+        dispatch(devicesActions.update(devicesArray));
+        
+        // Update deviceGroups state with fresh group assignments
+        const newDeviceGroups = {};
+        devicesArray.forEach(device => {
+          if (device.groupId) {
+            newDeviceGroups[device.id] = device.groupId;
+          }
+        });
+        setDeviceGroups(newDeviceGroups);
+        
+        // Refresh geofences data for selected devices to update green/red indicators
+        if (smartLinkSelectedDeviceIds.length > 0) {
+          try {
+            const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
+              const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
+              const geofenceIds = await geofencesResponse.json();
+              return { deviceId, geofenceIds };
+            });
+            
+            const geofencesResults = await Promise.all(geofencesPromises);
+            const newDeviceGeofences = {};
+            geofencesResults.forEach(({ deviceId, geofenceIds }) => {
+              newDeviceGeofences[deviceId] = geofenceIds;
+            });
+            
+            setDeviceGeofences(prev => ({
+              ...prev,
+              ...newDeviceGeofences
+            }));
+            
+            console.log('Geofences refreshed after save');
+            console.log('Updated deviceGeofences:', newDeviceGeofences);
+          } catch (error) {
+            console.error('Error refreshing geofences:', error);
+          }
+        }
+        
+        console.log('Devices refreshed after save');
+        console.log('Updated devices:', devicesArray);
+        console.log('Updated deviceGroups:', newDeviceGroups);
+        
+        // Also invalidate React Query cache for other components
+        queryClient.invalidateQueries(['devices']);
+        
+        // Force re-render of SmartLink modal to update device indicators
+        setSmartLinkRefreshTrigger(prev => prev + 1);
+        
+      } catch (error) {
+        console.error('Error refreshing devices:', error);
+      }
+
       // Close progress modal after a short delay
-      setTimeout(async () => {
+      setTimeout(() => {
         setSmartLinkProgressModal(prev => ({ ...prev, open: false }));
         showSnackbar(t('sharedSaved') + '!', 'success');
-        
-        // Refresh devices from server to reflect new assignments
-        try {
-          const devicesResponse = await fetchOrThrow('/api/devices');
-          const updatedDevices = await devicesResponse.json();
-          
-          // Convert devices object to array for Redux action
-          const devicesArray = Array.isArray(updatedDevices) ? updatedDevices : Object.values(updatedDevices);
-          
-          // Update Redux store with fresh device data
-          dispatch(devicesActions.update(devicesArray));
-          
-          // Update deviceGroups state with fresh group assignments
-          const newDeviceGroups = {};
-          devicesArray.forEach(device => {
-            if (device.groupId) {
-              newDeviceGroups[device.id] = device.groupId;
-            }
-          });
-          setDeviceGroups(newDeviceGroups);
-          
-          // Refresh geofences data for selected devices to update green/red indicators
-          if (smartLinkSelectedDeviceIds.length > 0) {
-            try {
-              const geofencesPromises = smartLinkSelectedDeviceIds.map(async (deviceId) => {
-                const geofencesResponse = await fetchOrThrow(`/api/devices/${deviceId}/geofences`);
-                const geofenceIds = await geofencesResponse.json();
-                return { deviceId, geofenceIds };
-              });
-              
-              const geofencesResults = await Promise.all(geofencesPromises);
-              const newDeviceGeofences = {};
-              geofencesResults.forEach(({ deviceId, geofenceIds }) => {
-                newDeviceGeofences[deviceId] = geofenceIds;
-              });
-              
-              setDeviceGeofences(prev => ({
-                ...prev,
-                ...newDeviceGeofences
-              }));
-              
-              console.log('Geofences refreshed after save');
-              console.log('Updated deviceGeofences:', newDeviceGeofences);
-            } catch (error) {
-              console.error('Error refreshing geofences:', error);
-            }
-          }
-          
-          console.log('Devices refreshed after save');
-          console.log('Updated devices:', devicesArray);
-          console.log('Updated deviceGroups:', newDeviceGroups);
-          
-          // Also invalidate React Query cache for other components
-          queryClient.invalidateQueries(['devices']);
-          
-          // Force re-render of SmartLink modal to update device indicators
-          setSmartLinkRefreshTrigger(prev => prev + 1);
-          
-        } catch (error) {
-          console.error('Error refreshing devices:', error);
-        }
       }, 1000);
       
     } catch (error) {
@@ -2461,7 +2461,7 @@ const FloatingDeviceList = ({
                     )}
                     {smartLinkActiveTab === 'geofences' && (
                       <>
-                        <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+                        <div key={`geofences-${smartLinkRefreshTrigger}`} style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
                           {Object.values(geofences).sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((geofence) => {
                             const isSelected = smartLinkSelectedGeofenceIds.includes(geofence.id);
                             const hasPartial = hasPartialGeofenceSelection(geofence.id);
