@@ -290,11 +290,6 @@ const FloatingDeviceList = ({
             }
           }
           
-          // Always flag
-          if (notification.always) {
-            displayParts.push('Always active');
-          }
-          
           const displayText = displayParts.join(' / ') || 'Unnamed';
           const notificationName = displayText.length > 20 ? displayText.substring(0, 20) + '...' : displayText;
           
@@ -2683,17 +2678,12 @@ const FloatingDeviceList = ({
                                 const command = smartLinkCommands?.find(cmd => cmd.id === notification.commandId);
                                 if (command?.description) {
                                   displayParts.push(command.description);
-                                } else {
-                                  displayParts.push(`Command ${notification.commandId}`);
-                                }
+                              } else {
+                                displayParts.push(`Command ${notification.commandId}`);
                               }
-                              
-                              // Always flag
-                              if (notification.always) {
-                                displayParts.push('Always active');
-                              }
-                              
-                              const displayText = displayParts.join(' / ');
+                            }
+                            
+                            const displayText = displayParts.join(' / ');
                               
                               return (
                                 <label key={notification.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px', borderRadius: '6px', cursor: 'pointer', backgroundColor: isSelected ? colors.primary + '10' : 'transparent', width: '100%', minWidth: 0, marginBottom: '4px' }}>
