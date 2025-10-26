@@ -862,5 +862,18 @@
   "failedToFetchLogs": "Не вдалося отримати логи",
   "uploadXlsxFile": "Завантажити файл XLSX",
   "chooseXlsxFile": "Вибрати файл XLSX",
-  "sharedClearAll": "Очистити все"
+  "sharedClearAll": "Очистити все",
+  "smartLinkSelected": "Вибрано: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Будь ласка, виберіть принаймні один пристрій",
+  "smartLinkSelectOnlyOneGroup": "Будь ласка, виберіть лише одну групу",
+  "smartLinkSavingConfiguration": "Збереження конфігурації SmartLink",
+  "smartLinkRemovingGeofence": "Видалення геозони:",
+  "smartLinkAssigningGeofence": "Призначення геозони:",
+  "smartLinkDevice": "Пристрій:",
+  "smartLinkProgress": "Прогрес: {completed} / {total} пристроїв",
+  "smartLinkStartingConfiguration": "Запуск конфігурації SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "Обробка дозволів геозони...",
+  "smartLinkProcessingNotificationPermissions": "Обробка дозволів сповіщень...",
+  "smartLinkUpdatingGroupAssignment": "Оновлення призначення групи...",
+  "smartLinkConfigurationCompleted": "Конфігурація SmartLink завершена!"
 }

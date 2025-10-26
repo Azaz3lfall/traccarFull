@@ -861,5 +861,18 @@
   "failedToFetchLogs": "Ophalen van logs mislukt",
   "uploadXlsxFile": "XLSX-bestand uploaden",
   "chooseXlsxFile": "XLSX-bestand kiezen",
-  "sharedClearAll": "Alles wissen"
+  "sharedClearAll": "Alles wissen",
+  "smartLinkSelected": "Geselecteerd: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Selecteer ten minste één apparaat",
+  "smartLinkSelectOnlyOneGroup": "Selecteer slechts één groep",
+  "smartLinkSavingConfiguration": "SmartLink-configuratie opslaan",
+  "smartLinkRemovingGeofence": "Geofence verwijderen:",
+  "smartLinkAssigningGeofence": "Geofence toewijzen:",
+  "smartLinkDevice": "Apparaat:",
+  "smartLinkProgress": "Voortgang: {completed} / {total} apparaten",
+  "smartLinkStartingConfiguration": "SmartLink-configuratie starten...",
+  "smartLinkProcessingGeofencePermissions": "Geofence-machtigingen verwerken...",
+  "smartLinkProcessingNotificationPermissions": "Meldingsmachtigingen verwerken...",
+  "smartLinkUpdatingGroupAssignment": "Groepstoewijzing bijwerken...",
+  "smartLinkConfigurationCompleted": "SmartLink-configuratie voltooid!"
 }

@@ -861,5 +861,18 @@
   "failedToFetchResellers": "Händler konnten nicht abgerufen werden",
   "failedToFetchUsers": "Benutzer konnten nicht abgerufen werden",
   "failedToFetchLogs": "Protokolle konnten nicht abgerufen werden",
-  "sharedClearAll": "Alle löschen"
+  "sharedClearAll": "Alle löschen",
+  "smartLinkSelected": "Ausgewählt: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Bitte wählen Sie mindestens ein Gerät aus",
+  "smartLinkSelectOnlyOneGroup": "Bitte wählen Sie nur eine Gruppe aus",
+  "smartLinkSavingConfiguration": "Speichere SmartLink-Konfiguration",
+  "smartLinkRemovingGeofence": "Geofence entfernen:",
+  "smartLinkAssigningGeofence": "Geofence zuweisen:",
+  "smartLinkDevice": "Gerät:",
+  "smartLinkProgress": "Fortschritt: {completed} / {total} Geräte",
+  "smartLinkStartingConfiguration": "Starte SmartLink-Konfiguration...",
+  "smartLinkProcessingGeofencePermissions": "Verarbeite Geofence-Berechtigungen...",
+  "smartLinkProcessingNotificationPermissions": "Verarbeite Benachrichtigungsberechtigungen...",
+  "smartLinkUpdatingGroupAssignment": "Aktualisiere Gruppenzuweisung...",
+  "smartLinkConfigurationCompleted": "SmartLink-Konfiguration abgeschlossen!"
 }

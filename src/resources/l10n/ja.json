@@ -861,5 +861,18 @@
   "failedToFetchLogs": "ログの取得に失敗しました",
   "uploadXlsxFile": "XLSXファイルをアップロード",
   "chooseXlsxFile": "XLSXファイルを選択",
-  "sharedClearAll": "すべてクリア"
+  "sharedClearAll": "すべてクリア",
+  "smartLinkSelected": "選択済み: {count}",
+  "smartLinkSelectAtLeastOneDevice": "少なくとも1つのデバイスを選択してください",
+  "smartLinkSelectOnlyOneGroup": "1つのグループのみ選択してください",
+  "smartLinkSavingConfiguration": "SmartLink設定を保存中",
+  "smartLinkRemovingGeofence": "ジオフェンスを削除中:",
+  "smartLinkAssigningGeofence": "ジオフェンスを割り当て中:",
+  "smartLinkDevice": "デバイス:",
+  "smartLinkProgress": "進行状況: {completed} / {total} デバイス",
+  "smartLinkStartingConfiguration": "SmartLink設定を開始中...",
+  "smartLinkProcessingGeofencePermissions": "ジオフェンス権限を処理中...",
+  "smartLinkProcessingNotificationPermissions": "通知権限を処理中...",
+  "smartLinkUpdatingGroupAssignment": "グループ割り当てを更新中...",
+  "smartLinkConfigurationCompleted": "SmartLink設定が完了しました！"
 }

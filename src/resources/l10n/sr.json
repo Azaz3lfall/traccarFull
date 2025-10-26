@@ -858,5 +858,18 @@
   "failedToFetchLogs": "Неуспешно преузимање логова",
   "uploadXlsxFile": "Отпреми XLSX датотеку",
   "chooseXlsxFile": "Изабери XLSX датотеку",
-  "sharedClearAll": "Очисти све"
+  "sharedClearAll": "Очисти све",
+  "smartLinkSelected": "Selected: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Please select at least one device",
+  "smartLinkSelectOnlyOneGroup": "Please select only one group",
+  "smartLinkSavingConfiguration": "Saving SmartLink Configuration",
+  "smartLinkRemovingGeofence": "Removing geofence:",
+  "smartLinkAssigningGeofence": "Assigning geofence:",
+  "smartLinkDevice": "Device:",
+  "smartLinkProgress": "Progress: {completed} / {total} devices",
+  "smartLinkStartingConfiguration": "Starting SmartLink configuration...",
+  "smartLinkProcessingGeofencePermissions": "Processing geofence permissions...",
+  "smartLinkProcessingNotificationPermissions": "Processing notification permissions...",
+  "smartLinkUpdatingGroupAssignment": "Updating group assignment...",
+  "smartLinkConfigurationCompleted": "SmartLink configuration completed!"
 }

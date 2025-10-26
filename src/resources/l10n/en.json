@@ -868,5 +868,18 @@
   "resellerImageCompressedSuccess": "Reseller logo compressed! Reduced from {originalSize}KB to {compressedSize}KB",
   "resellerImageCompressionError": "Failed to compress image. Please try again.",
   "resellerCompressingImage": "Compressing...",
-  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB"
+  "resellerImageAlreadySmall": "Reseller logo is already optimized! Size: {size}KB",
+  "smartLinkSelected": "Selected: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Please select at least one device",
+  "smartLinkSelectOnlyOneGroup": "Please select only one group",
+  "smartLinkSavingConfiguration": "Saving SmartLink Configuration",
+  "smartLinkRemovingGeofence": "Removing geofence:",
+  "smartLinkAssigningGeofence": "Assigning geofence:",
+  "smartLinkDevice": "Device:",
+  "smartLinkProgress": "Progress: {completed} / {total} devices",
+  "smartLinkStartingConfiguration": "Starting SmartLink configuration...",
+  "smartLinkProcessingGeofencePermissions": "Processing geofence permissions...",
+  "smartLinkProcessingNotificationPermissions": "Processing notification permissions...",
+  "smartLinkUpdatingGroupAssignment": "Updating group assignment...",
+  "smartLinkConfigurationCompleted": "SmartLink configuration completed!"
 }

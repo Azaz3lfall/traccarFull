@@ -862,5 +862,18 @@
   "failedToFetchLogs": "Falha ao buscar registos",
   "uploadXlsxFile": "Carregar ficheiro XLSX",
   "chooseXlsxFile": "Escolher ficheiro XLSX",
-  "sharedClearAll": "Limpar tudo"
+  "sharedClearAll": "Limpar tudo",
+  "smartLinkSelected": "Selecionado: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Por favor selecione pelo menos um dispositivo",
+  "smartLinkSelectOnlyOneGroup": "Por favor selecione apenas um grupo",
+  "smartLinkSavingConfiguration": "A guardar configuração do SmartLink",
+  "smartLinkRemovingGeofence": "A remover geocerca:",
+  "smartLinkAssigningGeofence": "A atribuir geocerca:",
+  "smartLinkDevice": "Dispositivo:",
+  "smartLinkProgress": "Progresso: {completed} / {total} dispositivos",
+  "smartLinkStartingConfiguration": "A iniciar configuração do SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "A processar permissões de geocerca...",
+  "smartLinkProcessingNotificationPermissions": "A processar permissões de notificação...",
+  "smartLinkUpdatingGroupAssignment": "A atualizar atribuição de grupo...",
+  "smartLinkConfigurationCompleted": "Configuração do SmartLink concluída!"
 }

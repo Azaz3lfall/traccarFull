@@ -861,5 +861,18 @@
   "failedToFetchLogs": "فشل في جلب السجلات",
   "uploadXlsxFile": "رفع ملف XLSX",
   "chooseXlsxFile": "اختر ملف XLSX",
-  "sharedClearAll": "مسح الكل"
+  "sharedClearAll": "مسح الكل",
+  "smartLinkSelected": "المحدد: {count}",
+  "smartLinkSelectAtLeastOneDevice": "يرجى تحديد جهاز واحد على الأقل",
+  "smartLinkSelectOnlyOneGroup": "يرجى تحديد مجموعة واحدة فقط",
+  "smartLinkSavingConfiguration": "حفظ إعدادات SmartLink",
+  "smartLinkRemovingGeofence": "إزالة الجيوفينس:",
+  "smartLinkAssigningGeofence": "تعيين الجيوفينس:",
+  "smartLinkDevice": "الجهاز:",
+  "smartLinkProgress": "التقدم: {completed} / {total} جهاز",
+  "smartLinkStartingConfiguration": "بدء إعدادات SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "معالجة أذونات الجيوفينس...",
+  "smartLinkProcessingNotificationPermissions": "معالجة أذونات الإشعارات...",
+  "smartLinkUpdatingGroupAssignment": "تحديث تعيين المجموعة...",
+  "smartLinkConfigurationCompleted": "اكتملت إعدادات SmartLink!"
 }

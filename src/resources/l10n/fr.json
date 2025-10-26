@@ -861,5 +861,18 @@
   "failedToFetchResellers": "Échec de récupération des revendeurs",
   "failedToFetchUsers": "Échec de récupération des utilisateurs",
   "failedToFetchLogs": "Échec de récupération des journaux",
-  "sharedClearAll": "Tout effacer"
+  "sharedClearAll": "Tout effacer",
+  "smartLinkSelected": "Sélectionné : {count}",
+  "smartLinkSelectAtLeastOneDevice": "Veuillez sélectionner au moins un appareil",
+  "smartLinkSelectOnlyOneGroup": "Veuillez sélectionner un seul groupe",
+  "smartLinkSavingConfiguration": "Enregistrement de la configuration SmartLink",
+  "smartLinkRemovingGeofence": "Suppression de la géocence :",
+  "smartLinkAssigningGeofence": "Attribution de la géocence :",
+  "smartLinkDevice": "Appareil :",
+  "smartLinkProgress": "Progression : {completed} / {total} appareils",
+  "smartLinkStartingConfiguration": "Démarrage de la configuration SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "Traitement des permissions de géocence...",
+  "smartLinkProcessingNotificationPermissions": "Traitement des permissions de notification...",
+  "smartLinkUpdatingGroupAssignment": "Mise à jour de l'attribution de groupe...",
+  "smartLinkConfigurationCompleted": "Configuration SmartLink terminée !"
 }

@@ -118,13 +118,13 @@ const FloatingDeviceList = ({
   const validateSmartLinkSave = () => {
     // Check if at least one device is selected
     if (smartLinkSelectedDeviceIds.length === 0) {
-      showSnackbar('Please select at least one ' + t('sharedDevice').toLowerCase(), 'error');
+      showSnackbar(t('smartLinkSelectAtLeastOneDevice'), 'error');
       return false;
     }
 
     // Check for conflicting groups (more than one group selected)
     if (smartLinkSelectedGroupIds.length > 1) {
-      showSnackbar('Please select only one ' + t('settingsGroups').toLowerCase(), 'error');
+      showSnackbar(t('smartLinkSelectOnlyOneGroup'), 'error');
       return false;
     }
 
@@ -158,7 +158,7 @@ const FloatingDeviceList = ({
         setSmartLinkProgressModal(prev => ({
           ...prev,
           currentDevice: deviceName,
-          currentOperation: `Processing geofence permissions...`,
+          currentOperation: t('smartLinkProcessingGeofencePermissions'),
           completedDevices: i
         }));
 
@@ -174,8 +174,8 @@ const FloatingDeviceList = ({
           setSmartLinkProgressModal(prev => ({
             ...prev,
             currentOperation: isGeofenceSelected 
-              ? `Assigning geofence: ${geofenceName}` 
-              : `Removing geofence: ${geofenceName}`
+              ? `${t('smartLinkAssigningGeofence')} ${geofenceName}` 
+              : `${t('smartLinkRemovingGeofence')} ${geofenceName}`
           }));
 
           const payload = {
@@ -240,7 +240,7 @@ const FloatingDeviceList = ({
         setSmartLinkProgressModal(prev => ({
           ...prev,
           currentDevice: deviceName,
-          currentOperation: `Processing notification permissions...`,
+          currentOperation: t('smartLinkProcessingNotificationPermissions'),
           completedDevices: i
         }));
 
@@ -351,7 +351,7 @@ const FloatingDeviceList = ({
       setSmartLinkProgressModal({
         open: true,
         currentDevice: null,
-        currentOperation: 'Starting SmartLink configuration...',
+        currentOperation: t('smartLinkStartingConfiguration'),
         totalDevices: totalDevices,
         completedDevices: 0
       });
@@ -368,7 +368,7 @@ const FloatingDeviceList = ({
       // Final progress update
       setSmartLinkProgressModal(prev => ({
         ...prev,
-        currentOperation: 'SmartLink configuration completed!',
+        currentOperation: t('smartLinkConfigurationCompleted'),
         completedDevices: totalDevices
       }));
 
@@ -485,7 +485,7 @@ const FloatingDeviceList = ({
         setSmartLinkProgressModal(prev => ({
           ...prev,
           currentDevice: deviceName,
-          currentOperation: `Updating group assignment...`,
+          currentOperation: t('smartLinkUpdatingGroupAssignment'),
           completedDevices: i
         }));
 
@@ -2456,7 +2456,7 @@ const FloatingDeviceList = ({
                   fontSize: '12px',
                   color: colors.textSecondary
                 }}>
-                  Selected: {smartLinkSelectedDeviceIds.length}
+                  {t('smartLinkSelected', { count: smartLinkSelectedDeviceIds.length })}
                 </div>
               </div>
 
@@ -2576,7 +2576,7 @@ const FloatingDeviceList = ({
                             );
                           })}
                         </div>
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedGroupIds.length}</div>
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>{t('smartLinkSelected', { count: smartLinkSelectedGroupIds.length })}</div>
                       </>
                     )}
                     {smartLinkActiveTab === 'geofences' && (
@@ -2624,7 +2624,7 @@ const FloatingDeviceList = ({
                             );
                           })}
                         </div>
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedGeofenceIds.length}</div>
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>{t('smartLinkSelected', { count: smartLinkSelectedGeofenceIds.length })}</div>
                       </>
                     )}
                     {smartLinkActiveTab === 'notifications' && (
@@ -2799,7 +2799,7 @@ const FloatingDeviceList = ({
                             })
                           )}
                         </div>
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>Selected: {smartLinkSelectedNotificationIds.length}</div>
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: colors.textSecondary }}>{t('smartLinkSelected', { count: smartLinkSelectedNotificationIds.length })}</div>
                       </>
                     )}
                     {smartLinkActiveTab === 'calendars' && (
@@ -3478,7 +3478,7 @@ const FloatingDeviceList = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <CircularProgress size={24} thickness={4} style={{ color: colors.primary }} />
             <span style={{ fontSize: '18px', fontWeight: '600', color: colors.text }}>
-              Saving SmartLink Configuration
+              {t('smartLinkSavingConfiguration')}
             </span>
           </div>
           
@@ -3488,11 +3488,11 @@ const FloatingDeviceList = ({
             </div>
             {smartLinkProgressModal.currentDevice && (
               <div style={{ fontSize: '13px', color: colors.textSecondary, marginBottom: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                Device: {smartLinkProgressModal.currentDevice}
+                {t('smartLinkDevice')} {smartLinkProgressModal.currentDevice}
               </div>
             )}
             <div style={{ fontSize: '12px', color: colors.textSecondary }}>
-              Progress: {smartLinkProgressModal.completedDevices} / {smartLinkProgressModal.totalDevices} devices
+              {t('smartLinkProgress', { completed: smartLinkProgressModal.completedDevices, total: smartLinkProgressModal.totalDevices })}
             </div>
           </div>
           

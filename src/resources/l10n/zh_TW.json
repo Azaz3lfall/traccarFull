@@ -862,5 +862,18 @@
   "failedToFetchLogs": "取得日誌失敗",
   "uploadXlsxFile": "上傳 XLSX 檔案",
   "chooseXlsxFile": "選擇 XLSX 檔案",
-  "sharedClearAll": "清除全部"
+  "sharedClearAll": "清除全部",
+  "smartLinkSelected": "已選擇: {count}",
+  "smartLinkSelectAtLeastOneDevice": "請至少選擇一個設備",
+  "smartLinkSelectOnlyOneGroup": "請只選擇一個群組",
+  "smartLinkSavingConfiguration": "正在儲存 SmartLink 設定",
+  "smartLinkRemovingGeofence": "正在移除地理圍籬:",
+  "smartLinkAssigningGeofence": "正在分配地理圍籬:",
+  "smartLinkDevice": "設備:",
+  "smartLinkProgress": "進度: {completed} / {total} 個設備",
+  "smartLinkStartingConfiguration": "正在啟動 SmartLink 設定...",
+  "smartLinkProcessingGeofencePermissions": "正在處理地理圍籬權限...",
+  "smartLinkProcessingNotificationPermissions": "正在處理通知權限...",
+  "smartLinkUpdatingGroupAssignment": "正在更新群組分配...",
+  "smartLinkConfigurationCompleted": "SmartLink 設定已完成！"
 }

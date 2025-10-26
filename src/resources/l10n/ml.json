@@ -858,5 +858,18 @@
   "failedToFetchLogs": "ലോഗുകൾ എടുക്കാൻ പരാജയപ്പെട്ടു",
   "uploadXlsxFile": "XLSX ഫയൽ അപ്‌ലോഡ് ചെയ്യുക",
   "chooseXlsxFile": "XLSX ഫയൽ തിരഞ്ഞെടുക്കുക",
-  "sharedClearAll": "എല്ലാം മായ്ക്കുക"
+  "sharedClearAll": "എല്ലാം മായ്ക്കുക",
+  "smartLinkSelected": "Selected: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Please select at least one device",
+  "smartLinkSelectOnlyOneGroup": "Please select only one group",
+  "smartLinkSavingConfiguration": "Saving SmartLink Configuration",
+  "smartLinkRemovingGeofence": "Removing geofence:",
+  "smartLinkAssigningGeofence": "Assigning geofence:",
+  "smartLinkDevice": "Device:",
+  "smartLinkProgress": "Progress: {completed} / {total} devices",
+  "smartLinkStartingConfiguration": "Starting SmartLink configuration...",
+  "smartLinkProcessingGeofencePermissions": "Processing geofence permissions...",
+  "smartLinkProcessingNotificationPermissions": "Processing notification permissions...",
+  "smartLinkUpdatingGroupAssignment": "Updating group assignment...",
+  "smartLinkConfigurationCompleted": "SmartLink configuration completed!"
 }

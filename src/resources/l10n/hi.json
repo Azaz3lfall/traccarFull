@@ -861,5 +861,18 @@
   "failedToFetchLogs": "लॉग प्राप्त करने में विफल",
   "uploadXlsxFile": "XLSX फ़ाइल अपलोड करें",
   "chooseXlsxFile": "XLSX फ़ाइल चुनें",
-  "sharedClearAll": "सभी साफ़ करें"
+  "sharedClearAll": "सभी साफ़ करें",
+  "smartLinkSelected": "चयनित: {count}",
+  "smartLinkSelectAtLeastOneDevice": "कृपया कम से कम एक डिवाइस चुनें",
+  "smartLinkSelectOnlyOneGroup": "कृपया केवल एक समूह चुनें",
+  "smartLinkSavingConfiguration": "SmartLink कॉन्फ़िगरेशन सहेजा जा रहा है",
+  "smartLinkRemovingGeofence": "भौगोलिक सीमा हटाई जा रही है:",
+  "smartLinkAssigningGeofence": "भौगोलिक सीमा निर्दिष्ट की जा रही है:",
+  "smartLinkDevice": "डिवाइस:",
+  "smartLinkProgress": "प्रगति: {completed} / {total} डिवाइस",
+  "smartLinkStartingConfiguration": "SmartLink कॉन्फ़िगरेशन शुरू हो रहा है...",
+  "smartLinkProcessingGeofencePermissions": "भौगोलिक सीमा अनुमतियां संसाधित की जा रही हैं...",
+  "smartLinkProcessingNotificationPermissions": "सूचना अनुमतियां संसाधित की जा रही हैं...",
+  "smartLinkUpdatingGroupAssignment": "समूह असाइनमेंट अपडेट किया जा रहा है...",
+  "smartLinkConfigurationCompleted": "SmartLink कॉन्फ़िगरेशन पूर्ण हो गया!"
 }

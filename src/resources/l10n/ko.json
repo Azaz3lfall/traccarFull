@@ -861,5 +861,18 @@
   "failedToFetchLogs": "로그 가져오기 실패",
   "uploadXlsxFile": "XLSX 파일 업로드",
   "chooseXlsxFile": "XLSX 파일 선택",
-  "sharedClearAll": "모두 지우기"
+  "sharedClearAll": "모두 지우기",
+  "smartLinkSelected": "선택됨: {count}",
+  "smartLinkSelectAtLeastOneDevice": "최소 하나의 장치를 선택하세요",
+  "smartLinkSelectOnlyOneGroup": "하나의 그룹만 선택하세요",
+  "smartLinkSavingConfiguration": "SmartLink 구성 저장 중",
+  "smartLinkRemovingGeofence": "지오펜스 제거 중:",
+  "smartLinkAssigningGeofence": "지오펜스 할당 중:",
+  "smartLinkDevice": "장치:",
+  "smartLinkProgress": "진행: {completed} / {total} 장치",
+  "smartLinkStartingConfiguration": "SmartLink 구성 시작 중...",
+  "smartLinkProcessingGeofencePermissions": "지오펜스 권한 처리 중...",
+  "smartLinkProcessingNotificationPermissions": "알림 권한 처리 중...",
+  "smartLinkUpdatingGroupAssignment": "그룹 할당 업데이트 중...",
+  "smartLinkConfigurationCompleted": "SmartLink 구성 완료!"
 }

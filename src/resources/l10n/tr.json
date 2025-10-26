@@ -862,5 +862,18 @@
   "failedToFetchLogs": "Günlükler getirilemedi",
   "uploadXlsxFile": "XLSX dosyası yükle",
   "chooseXlsxFile": "XLSX dosyası seç",
-  "sharedClearAll": "Tümünü temizle"
+  "sharedClearAll": "Tümünü temizle",
+  "smartLinkSelected": "Seçildi: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Lütfen en az bir cihaz seçin",
+  "smartLinkSelectOnlyOneGroup": "Lütfen yalnızca bir grup seçin",
+  "smartLinkSavingConfiguration": "SmartLink yapılandırması kaydediliyor",
+  "smartLinkRemovingGeofence": "Geofence kaldırılıyor:",
+  "smartLinkAssigningGeofence": "Geofence atanıyor:",
+  "smartLinkDevice": "Cihaz:",
+  "smartLinkProgress": "İlerleme: {completed} / {total} cihaz",
+  "smartLinkStartingConfiguration": "SmartLink yapılandırması başlatılıyor...",
+  "smartLinkProcessingGeofencePermissions": "Geofence izinleri işleniyor...",
+  "smartLinkProcessingNotificationPermissions": "Bildirim izinleri işleniyor...",
+  "smartLinkUpdatingGroupAssignment": "Grup ataması güncelleniyor...",
+  "smartLinkConfigurationCompleted": "SmartLink yapılandırması tamamlandı!"
 }

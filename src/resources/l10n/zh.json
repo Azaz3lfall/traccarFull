@@ -861,5 +861,18 @@
   "failedToFetchLogs": "获取日志失败",
   "uploadXlsxFile": "上传 XLSX 文件",
   "chooseXlsxFile": "选择 XLSX 文件",
-  "sharedClearAll": "清除全部"
+  "sharedClearAll": "清除全部",
+  "smartLinkSelected": "已选择: {count}",
+  "smartLinkSelectAtLeastOneDevice": "请至少选择一个设备",
+  "smartLinkSelectOnlyOneGroup": "请只选择一个组",
+  "smartLinkSavingConfiguration": "正在保存 SmartLink 配置",
+  "smartLinkRemovingGeofence": "正在删除围栏:",
+  "smartLinkAssigningGeofence": "正在分配围栏:",
+  "smartLinkDevice": "设备:",
+  "smartLinkProgress": "进度: {completed} / {total} 个设备",
+  "smartLinkStartingConfiguration": "正在启动 SmartLink 配置...",
+  "smartLinkProcessingGeofencePermissions": "正在处理围栏权限...",
+  "smartLinkProcessingNotificationPermissions": "正在处理通知权限...",
+  "smartLinkUpdatingGroupAssignment": "正在更新组分配...",
+  "smartLinkConfigurationCompleted": "SmartLink 配置已完成！"
 }

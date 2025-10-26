@@ -858,5 +858,18 @@
   "failedToFetchLogs": "பதிவுகளைப் பெற முடியவில்லை",
   "uploadXlsxFile": "XLSX கோப்பை பதிவேற்றவும்",
   "chooseXlsxFile": "XLSX கோப்பை தேர்ந்தெடுக்கவும்",
-  "sharedClearAll": "அனைத்தையும் அழி"
+  "sharedClearAll": "அனைத்தையும் அழி",
+  "smartLinkSelected": "Selected: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Please select at least one device",
+  "smartLinkSelectOnlyOneGroup": "Please select only one group",
+  "smartLinkSavingConfiguration": "Saving SmartLink Configuration",
+  "smartLinkRemovingGeofence": "Removing geofence:",
+  "smartLinkAssigningGeofence": "Assigning geofence:",
+  "smartLinkDevice": "Device:",
+  "smartLinkProgress": "Progress: {completed} / {total} devices",
+  "smartLinkStartingConfiguration": "Starting SmartLink configuration...",
+  "smartLinkProcessingGeofencePermissions": "Processing geofence permissions...",
+  "smartLinkProcessingNotificationPermissions": "Processing notification permissions...",
+  "smartLinkUpdatingGroupAssignment": "Updating group assignment...",
+  "smartLinkConfigurationCompleted": "SmartLink configuration completed!"
 }

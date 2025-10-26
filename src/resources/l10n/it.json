@@ -861,5 +861,18 @@
   "failedToFetchLogs": "Recupero log fallito",
   "uploadXlsxFile": "Carica file XLSX",
   "chooseXlsxFile": "Scegli file XLSX",
-  "sharedClearAll": "Cancella tutto"
+  "sharedClearAll": "Cancella tutto",
+  "smartLinkSelected": "Selezionato: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Seleziona almeno un dispositivo",
+  "smartLinkSelectOnlyOneGroup": "Seleziona solo un gruppo",
+  "smartLinkSavingConfiguration": "Salvataggio configurazione SmartLink",
+  "smartLinkRemovingGeofence": "Rimozione geofence:",
+  "smartLinkAssigningGeofence": "Assegnazione geofence:",
+  "smartLinkDevice": "Dispositivo:",
+  "smartLinkProgress": "Avanzamento: {completed} / {total} dispositivi",
+  "smartLinkStartingConfiguration": "Avvio configurazione SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "Elaborazione permessi geofence...",
+  "smartLinkProcessingNotificationPermissions": "Elaborazione permessi notifiche...",
+  "smartLinkUpdatingGroupAssignment": "Aggiornamento assegnazione gruppo...",
+  "smartLinkConfigurationCompleted": "Configurazione SmartLink completata!"
 }

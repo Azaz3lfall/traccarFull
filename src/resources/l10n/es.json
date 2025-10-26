@@ -861,5 +861,18 @@
   "failedToFetchResellers": "Error al obtener revendedores",
   "failedToFetchUsers": "Error al obtener usuarios",
   "failedToFetchLogs": "Error al obtener registros",
-  "sharedClearAll": "Limpiar todo"
+  "sharedClearAll": "Limpiar todo",
+  "smartLinkSelected": "Seleccionado: {count}",
+  "smartLinkSelectAtLeastOneDevice": "Por favor selecciona al menos un dispositivo",
+  "smartLinkSelectOnlyOneGroup": "Por favor selecciona solo un grupo",
+  "smartLinkSavingConfiguration": "Guardando configuración de SmartLink",
+  "smartLinkRemovingGeofence": "Eliminando geocerca:",
+  "smartLinkAssigningGeofence": "Asignando geocerca:",
+  "smartLinkDevice": "Dispositivo:",
+  "smartLinkProgress": "Progreso: {completed} / {total} dispositivos",
+  "smartLinkStartingConfiguration": "Iniciando configuración de SmartLink...",
+  "smartLinkProcessingGeofencePermissions": "Procesando permisos de geocerca...",
+  "smartLinkProcessingNotificationPermissions": "Procesando permisos de notificación...",
+  "smartLinkUpdatingGroupAssignment": "Actualizando asignación de grupo...",
+  "smartLinkConfigurationCompleted": "¡Configuración de SmartLink completada!"
 }
