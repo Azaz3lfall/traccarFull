@@ -275,6 +275,7 @@ const FloatingDeviceList = ({
         
         // Refresh geofences data for selected devices to update green/red indicators
         console.log('About to refresh geofences for devices:', smartLinkSelectedDeviceIds);
+        console.log('smartLinkSelectedDeviceIds.length:', smartLinkSelectedDeviceIds.length);
         if (smartLinkSelectedDeviceIds.length > 0) {
           try {
             console.log('Starting geofences refresh for devices:', smartLinkSelectedDeviceIds);
@@ -304,6 +305,8 @@ const FloatingDeviceList = ({
           } catch (error) {
             console.error('Error refreshing geofences:', error);
           }
+        } else {
+          console.log('No devices selected for geofences refresh');
         }
         
         console.log('Devices refreshed after save');
