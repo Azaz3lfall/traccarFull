@@ -883,5 +883,7 @@
   "smartLinkCalendarSaved": "日曆已儲存",
   "smartLinkError": "錯誤：{message}",
   "smartLinkNameRequired": "名稱為必填項",
-  "smartLinkDaysRequired": "天數為必填項"
+  "smartLinkDaysRequired": "天數為必填項",
+  "smartLinkAssigningNotification": "正在分配通知:",
+  "smartLinkRemovingNotification": "正在移除通知:"
 }

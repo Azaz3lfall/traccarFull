@@ -296,8 +296,8 @@ const FloatingDeviceList = ({
           setSmartLinkProgressModal(prev => ({
             ...prev,
             currentOperation: isNotificationSelected 
-              ? `Assigning notification: ${notificationName}` 
-              : `Removing notification: ${notificationName}`
+              ? `${t('smartLinkAssigningNotification')} ${notificationName}` 
+              : `${t('smartLinkRemovingNotification')} ${notificationName}`
           }));
 
           const payload = {

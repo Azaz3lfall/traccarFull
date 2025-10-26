@@ -879,5 +879,7 @@
   "smartLinkCalendarSaved": "Calendar saved",
   "smartLinkError": "Error: {message}",
   "smartLinkNameRequired": "Name is required",
-  "smartLinkDaysRequired": "Days is required"
+  "smartLinkDaysRequired": "Days is required",
+  "smartLinkAssigningNotification": "അ thനുമതി നിയോഗിക്കുന്നു:",
+  "smartLinkRemovingNotification": "അ thനുമതി നീക്കം ചെയ്യുന്നു:"
 }

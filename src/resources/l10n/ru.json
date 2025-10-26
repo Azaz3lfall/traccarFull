@@ -882,5 +882,7 @@
   "smartLinkCalendarSaved": "Календарь сохранен",
   "smartLinkError": "Ошибка: {message}",
   "smartLinkNameRequired": "Имя обязательно",
-  "smartLinkDaysRequired": "Дни обязательны"
+  "smartLinkDaysRequired": "Дни обязательны",
+  "smartLinkAssigningNotification": "Назначение уведомления:",
+  "smartLinkRemovingNotification": "Удаление уведомления:"
 }

@@ -882,5 +882,7 @@
   "smartLinkCalendarSaved": "캘린더 저장됨",
   "smartLinkError": "오류: {message}",
   "smartLinkNameRequired": "이름은 필수입니다",
-  "smartLinkDaysRequired": "요일은 필수입니다"
+  "smartLinkDaysRequired": "요일은 필수입니다",
+  "smartLinkAssigningNotification": "알림 할당 중:",
+  "smartLinkRemovingNotification": "알림 제거 중:"
 }

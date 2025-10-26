@@ -882,5 +882,7 @@
   "smartLinkCalendarSaved": "تم حفظ التقويم",
   "smartLinkError": "خطأ: {message}",
   "smartLinkNameRequired": "الاسم مطلوب",
-  "smartLinkDaysRequired": "الأيام مطلوبة"
+  "smartLinkDaysRequired": "الأيام مطلوبة",
+  "smartLinkAssigningNotification": "تعيين الإشعار:",
+  "smartLinkRemovingNotification": "إزالة الإشعار:"
 }

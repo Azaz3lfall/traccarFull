@@ -883,5 +883,7 @@
   "smartLinkCalendarSaved": "Takvim kaydedildi",
   "smartLinkError": "Hata: {message}",
   "smartLinkNameRequired": "İsim gereklidir",
-  "smartLinkDaysRequired": "Günler gereklidir"
+  "smartLinkDaysRequired": "Günler gereklidir",
+  "smartLinkAssigningNotification": "Bildirim atanıyor:",
+  "smartLinkRemovingNotification": "Bildirim kaldırılıyor:"
 }

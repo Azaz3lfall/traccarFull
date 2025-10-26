@@ -882,5 +882,7 @@
   "smartLinkCalendarSaved": "कैलेंडर सहेजा गया",
   "smartLinkError": "त्रुटि: {message}",
   "smartLinkNameRequired": "नाम आवश्यक है",
-  "smartLinkDaysRequired": "दिन आवश्यक हैं"
+  "smartLinkDaysRequired": "दिन आवश्यक हैं",
+  "smartLinkAssigningNotification": "सूचना निर्दिष्ट कर रहे हैं:",
+  "smartLinkRemovingNotification": "सूचना हटा रहे हैं:"
 }

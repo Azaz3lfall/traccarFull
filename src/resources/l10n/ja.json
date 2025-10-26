@@ -882,5 +882,7 @@
   "smartLinkCalendarSaved": "カレンダーを保存しました",
   "smartLinkError": "エラー：{message}",
   "smartLinkNameRequired": "名前は必須です",
-  "smartLinkDaysRequired": "曜日は必須です"
+  "smartLinkDaysRequired": "曜日は必須です",
+  "smartLinkAssigningNotification": "通知を割り当て中:",
+  "smartLinkRemovingNotification": "通知を削除中:"
 }

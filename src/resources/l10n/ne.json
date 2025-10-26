@@ -879,5 +879,7 @@
   "smartLinkCalendarSaved": "Calendar saved",
   "smartLinkError": "Error: {message}",
   "smartLinkNameRequired": "Name is required",
-  "smartLinkDaysRequired": "Days is required"
+  "smartLinkDaysRequired": "Days is required",
+  "smartLinkAssigningNotification": "सूचना निर्दिष्ट गर्दै:",
+  "smartLinkRemovingNotification": "सूचना हटाउँदै:"
 }
