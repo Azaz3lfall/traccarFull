@@ -288,13 +288,17 @@ const FloatingDeviceList = ({
               newDeviceGeofences[deviceId] = geofenceIds;
             });
             
-            setDeviceGeofences(prev => ({
-              ...prev,
-              ...newDeviceGeofences
-            }));
-            
-            console.log('Geofences refreshed after save');
-            console.log('Updated deviceGeofences:', newDeviceGeofences);
+            setDeviceGeofences(prev => {
+              const updated = {
+                ...prev,
+                ...newDeviceGeofences
+              };
+              console.log('Geofences refreshed after save');
+              console.log('Previous deviceGeofences:', prev);
+              console.log('New deviceGeofences:', newDeviceGeofences);
+              console.log('Updated deviceGeofences:', updated);
+              return updated;
+            });
           } catch (error) {
             console.error('Error refreshing geofences:', error);
           }
@@ -2484,6 +2488,12 @@ const FloatingDeviceList = ({
                                         const deviceGeofenceList = deviceGeofences[deviceId] || [];
                                         const isPartnered = deviceGeofenceList.includes(geofence.id);
                                         const deviceName = devices[deviceId]?.name || 'Unknown';
+                                        console.log(`Geofence ${geofence.id} rendering for device ${deviceId}:`, {
+                                          deviceGeofenceList,
+                                          isPartnered,
+                                          deviceName,
+                                          allDeviceGeofences: deviceGeofences
+                                        });
                                         return (
                                           <span
                                             key={deviceId}
