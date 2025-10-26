@@ -252,7 +252,7 @@ const FloatingDeviceList = ({
           const isNotificationSelected = selectedNotificationIds.includes(notification.id);
           
           // Update progress modal for notification operation
-          const notificationName = notification.name ? (notification.name.length > 20 ? notification.name.substring(0, 20) + '...' : notification.name) : 'Unnamed';
+          const notificationName = notification.description ? (notification.description.length > 20 ? notification.description.substring(0, 20) + '...' : notification.description) : 'Unnamed';
           setSmartLinkProgressModal(prev => ({
             ...prev,
             currentOperation: isNotificationSelected 
