@@ -2734,7 +2734,7 @@ const FloatingDeviceList = ({
                                       </div>
                                     )}
                                   </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
                                     {savingNotificationId === notification.id && (
                                       <div style={{ 
                                         width: '16px', 
@@ -2772,14 +2772,18 @@ const FloatingDeviceList = ({
                                       }}
                                       style={{
                                         minWidth: '150px',
-                                        padding: '6px 40px 6px 8px', // Right padding for chevron
-                                        fontSize: '13px', // Slightly increased font size
+                                        padding: '6px 8px 6px 8px',
+                                        paddingRight: '30px',
+                                        fontSize: '13px',
                                         border: `1px solid ${colors.border}`,
                                         borderRadius: '4px',
                                         backgroundColor: colors.surface,
                                         color: colors.text,
                                         cursor: 'pointer',
-                                        outline: 'none'
+                                        outline: 'none',
+                                        appearance: 'none',
+                                        WebkitAppearance: 'none',
+                                        MozAppearance: 'none'
                                       }}
                                       onClick={(e) => e.stopPropagation()}
                                     >
@@ -2790,6 +2794,16 @@ const FloatingDeviceList = ({
                                         </option>
                                       ))}
                                     </select>
+                                    <div style={{
+                                      position: 'absolute',
+                                      right: '18px',
+                                      top: '50%',
+                                      transform: 'translateY(-50%)',
+                                      pointerEvents: 'none',
+                                      color: colors.text
+                                    }}>
+                                      ▼
+                                    </div>
                                   </div>
                                 </div>
                               );
