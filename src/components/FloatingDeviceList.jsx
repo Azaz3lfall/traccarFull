@@ -515,6 +515,7 @@ const FloatingDeviceList = ({
   const [smartLinkNotifications, setSmartLinkNotifications] = useState([]);
   const [smartLinkNotificationsLoading, setSmartLinkNotificationsLoading] = useState(false);
   const [savingNotificationId, setSavingNotificationId] = useState(null); // Track which notification is being saved
+  const [savingCalendar, setSavingCalendar] = useState(false); // Track if calendar is being saved
   const [smartLinkCalendars, setSmartLinkCalendars] = useState([]);
   const [smartLinkCalendarsLoading, setSmartLinkCalendarsLoading] = useState(false);
   const [smartLinkCommands, setSmartLinkCommands] = useState([]);
@@ -1055,6 +1056,7 @@ const FloatingDeviceList = ({
       return;
     }
 
+    setSavingCalendar(true);
     try {
       const startTime = dayjs(smartLinkCalendarForm.from);
       const endTime = dayjs(smartLinkCalendarForm.to);
@@ -1117,6 +1119,8 @@ const FloatingDeviceList = ({
     } catch (error) {
       console.error('Error creating calendar:', error);
       showSnackbar(t('sharedError') + ': ' + error.message, 'error');
+    } finally {
+      setSavingCalendar(false);
     }
   };
 
@@ -2679,11 +2683,11 @@ const FloatingDeviceList = ({
                                 const command = smartLinkCommands?.find(cmd => cmd.id === notification.commandId);
                                 if (command?.description) {
                                   displayParts.push(command.description);
-                              } else {
-                                displayParts.push(`Command ${notification.commandId}`);
+                                } else {
+                                  displayParts.push(`Command ${notification.commandId}`);
+                                }
                               }
-                            }
-                            
+                              
                               const displayText = displayParts.join(' / ');
                               // Handle null, undefined, or 0 values - default to 0 (None)
                               const notificationCalendarId = notification.calendarId != null ? notification.calendarId : 0;
@@ -3360,6 +3364,7 @@ const FloatingDeviceList = ({
                               {/* Create Calendar Button */}
                               <button
                                 onClick={createCalendar}
+                                disabled={savingCalendar}
                                 style={{
                                   width: '100%',
                                   padding: '12px',
@@ -3367,22 +3372,41 @@ const FloatingDeviceList = ({
                                   borderRadius: '6px',
                                   backgroundColor: colors.primary,
                                   color: colors.text,
-                                  cursor: 'pointer',
+                                  cursor: savingCalendar ? 'not-allowed' : 'pointer',
                                   fontSize: '14px',
                                   fontWeight: '600',
                                   marginTop: '16px',
                                   transition: 'all 0.2s ease',
-                                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                  opacity: savingCalendar ? 0.6 : 1,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '8px'
                                 }}
                                 onMouseEnter={(e) => {
+                                  if (!savingCalendar) {
                                   e.currentTarget.style.backgroundColor = colors.primary + 'CC';
                                   e.currentTarget.style.borderColor = colors.primary;
+                                  }
                                 }}
                                 onMouseLeave={(e) => {
+                                  if (!savingCalendar) {
                                   e.currentTarget.style.backgroundColor = colors.primary;
                                   e.currentTarget.style.borderColor = colors.primary;
+                                  }
                                 }}
                               >
+                                {savingCalendar && (
+                                  <div style={{ 
+                                    width: '16px', 
+                                    height: '16px', 
+                                    border: `2px solid ${colors.text}40`, 
+                                    borderTop: `2px solid ${colors.text}`,
+                                    borderRadius: '50%',
+                                    animation: 'spin 0.8s linear infinite'
+                                  }} />
+                                )}
                                 {t('sharedSave')} {t('sharedCalendar')}
                               </button>
                             </div>
