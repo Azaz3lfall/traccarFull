@@ -529,30 +529,6 @@ const FloatingDeviceList = ({
     completedDevices: 0
   });
   const [smartLinkRefreshTrigger, setSmartLinkRefreshTrigger] = useState(0);
-
-  // Auto-select calendars based on selected notifications
-  useEffect(() => {
-    if (smartLinkSelectedNotificationIds.length > 0 && smartLinkNotifications.length > 0) {
-      const calendarIds = smartLinkSelectedNotificationIds
-        .map(notificationId => {
-          const notification = smartLinkNotifications.find(n => n.id === notificationId);
-          return notification?.calendarId;
-        })
-        .filter(Boolean);
-      
-      // Only update if there are calendar IDs and they're different from current selection
-      if (calendarIds.length > 0) {
-        const uniqueCalendarIds = [...new Set(calendarIds)];
-        setSmartLinkSelectedCalendarIds(uniqueCalendarIds);
-        // Clear user selection when notifications change to reset conflict state
-        setSmartLinkUserSelectedCalendarIds([]);
-      }
-    } else {
-      // Clear calendar selection when no notifications are selected
-      setSmartLinkSelectedCalendarIds([]);
-      setSmartLinkUserSelectedCalendarIds([]);
-    }
-  }, [smartLinkSelectedNotificationIds, smartLinkNotifications]);
   
   // Business rules state
   const [deviceGeofences, setDeviceGeofences] = useState({}); // deviceId -> geofenceIds
