@@ -69,6 +69,7 @@ import fetchOrThrow from '../common/util/fetchOrThrow';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { resellersActions } from '../store';
 import { groupsActions } from '../store/groups';
+import { devicesActions } from '../store/devices';
 import { useSelector } from 'react-redux';
 import CustomPagination from './CustomPagination';
 
@@ -464,6 +465,10 @@ const FloatingResellersPopover = ({
           });
           
           const newDevice = await deviceResponse.json();
+          
+          // Update Redux store with new device
+          dispatch(devicesActions.update([newDevice]));
+          
           createdDevices++;
 
           // Create permission
