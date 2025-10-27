@@ -302,7 +302,7 @@ const FloatingResellersPopover = ({
               const missingColumns = expectedColumns.filter(col => !headers.includes(col));
               
               if (missingColumns.length > 0) {
-                reject(new Error(`Missing columns: ${missingColumns.join(', ')}`));
+                reject(new Error(t('massImporterMissingColumns', { columns: missingColumns.join(', ') })));
                 return;
               }
               
@@ -319,7 +319,7 @@ const FloatingResellersPopover = ({
       const data = await parseFile();
       
       // Open progress modal
-      setImportProgress({ open: true, current: 0, total: data.length, status: 'Starting import...' });
+      setImportProgress({ open: true, current: 0, total: data.length, status: t('massImporterStartingImport') });
       
       // Create group for the reseller
       const reseller = massImporterModal.reseller;
@@ -330,7 +330,7 @@ const FloatingResellersPopover = ({
           open: true, 
           current: 0, 
           total: data.length, 
-          status: 'Creating group for reseller...' 
+          status: t('massImporterCreatingGroup') 
         });
         
         const groupPayload = {
@@ -379,7 +379,7 @@ const FloatingResellersPopover = ({
           open: true, 
           current: i + 1, 
           total: data.length, 
-          status: `Processing row ${i + 1} of ${data.length}...` 
+          status: t('massImporterProcessingRow', { current: i + 1, total: data.length }) 
         });
 
         // Initialize row details
@@ -601,7 +601,13 @@ const FloatingResellersPopover = ({
       
       // Show results
       const errorCount = rowDetails.filter(r => r.userError || r.deviceError || r.permissions.userToDevice.error || r.permissions.resellerToDevice.error || r.permissions.resellerToGroup.error).length;
-      const summary = `Import completed! Users created: ${createdUsers}, Skipped: ${skippedUsers}, Devices created: ${createdDevices}, Permissions created: ${createdPermissions}, Errors: ${errorCount}`;
+      const summary = t('massImporterCompleted', {
+        createdUsers,
+        skippedUsers,
+        createdDevices,
+        createdPermissions,
+        errors: errorCount
+      });
       console.log(summary);
       setSnackbar({ 
         open: true, 
@@ -615,7 +621,7 @@ const FloatingResellersPopover = ({
     } catch (error) {
       console.error('Import error:', error);
       setImportProgress({ open: false, current: 0, total: 0, status: '' });
-      setSnackbar({ open: true, message: `Import failed: ${error.message}`, severity: 'error' });
+      setSnackbar({ open: true, message: t('massImporterImportFailed', { error: error.message }), severity: 'error' });
     }
   };
 
@@ -4307,7 +4313,7 @@ const FloatingResellersPopover = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <CircularProgress size={24} thickness={4} style={{ color: colors.primary }} />
                 <span style={{ fontSize: '18px', fontWeight: '600', color: colors.text }}>
-                  Importing...
+                  {t('massImporterImporting')}
                 </span>
               </div>
               
@@ -4317,7 +4323,7 @@ const FloatingResellersPopover = ({
                 </div>
                 {importProgress.total > 0 && (
                   <div style={{ fontSize: '12px', color: colors.textSecondary }}>
-                    Progress: {importProgress.current} / {importProgress.total} rows
+                    {t('massImporterProgress', { current: importProgress.current, total: importProgress.total })}
                   </div>
                 )}
               </div>
