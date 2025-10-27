@@ -68,6 +68,7 @@ import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { resellersActions } from '../store';
+import { groupsActions } from '../store/groups';
 import { useSelector } from 'react-redux';
 import CustomPagination from './CustomPagination';
 
@@ -319,6 +320,39 @@ const FloatingResellersPopover = ({
       // Open progress modal
       setImportProgress({ open: true, current: 0, total: data.length, status: 'Starting import...' });
       
+      // Create group for the reseller
+      const reseller = massImporterModal.reseller;
+      let groupId = null;
+      
+      if (reseller && reseller.companyName) {
+        setImportProgress({ 
+          open: true, 
+          current: 0, 
+          total: data.length, 
+          status: 'Creating group for reseller...' 
+        });
+        
+        const groupPayload = {
+          name: reseller.companyName,
+          groupId: null,
+          attributes: {}
+        };
+        
+        const groupResponse = await fetchOrThrow('/api/groups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(groupPayload)
+        });
+        
+        const newGroup = await groupResponse.json();
+        groupId = newGroup.id;
+        
+        // Update Redux store
+        dispatch(groupsActions.add(newGroup));
+        // Invalidate query cache
+        queryClient.invalidateQueries(['groups']);
+      }
+      
       // Fetch existing users
       const usersResponse = await fetchOrThrow('/api/users');
       const existingUsers = await usersResponse.json();
@@ -411,7 +445,7 @@ const FloatingResellersPopover = ({
           const devicePayload = {
             name: row.deviceName,
             uniqueId: row.deviceUniqueId,
-            groupId: null,
+            groupId: groupId,
             phone: row.devicePhone || "",
             model: row.deviceModel || "",
             contact: "",
@@ -437,7 +471,8 @@ const FloatingResellersPopover = ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: userId,
-              deviceId: newDevice.id
+              deviceId: newDevice.id,
+              groupId: groupId
             })
           });
           
