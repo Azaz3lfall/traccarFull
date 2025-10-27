@@ -551,21 +551,24 @@ const FloatingResellersPopover = ({
         } catch (error) {
           console.error(`Error processing row ${i + 1}:`, error);
           
+          // Extract first line of error message
+          const errorMessage = error.message.split('\n')[0];
+          
           // Try to capture which step failed based on error message and current state
           if (!rowDetail.userId) {
-            rowDetail.userError = error.message;
-            rowDetail.userStatus = `Failed: ${error.message}`;
+            rowDetail.userError = errorMessage;
+            rowDetail.userStatus = `Failed: ${errorMessage}`;
           } else if (!rowDetail.deviceId) {
-            rowDetail.deviceError = error.message;
-            rowDetail.deviceStatus = `Failed: ${error.message}`;
+            rowDetail.deviceError = errorMessage;
+            rowDetail.deviceStatus = `Failed: ${errorMessage}`;
           } else {
             // Permission error - determine which one
             if (!rowDetail.permissions.userToDevice.created) {
-              rowDetail.permissions.userToDevice.error = error.message;
+              rowDetail.permissions.userToDevice.error = errorMessage;
             } else if (reseller?.resellerId && !rowDetail.permissions.resellerToDevice.created) {
-              rowDetail.permissions.resellerToDevice.error = error.message;
+              rowDetail.permissions.resellerToDevice.error = errorMessage;
             } else if (reseller?.resellerId && groupId && !rowDetail.permissions.resellerToGroup.created) {
-              rowDetail.permissions.resellerToGroup.error = error.message;
+              rowDetail.permissions.resellerToGroup.error = errorMessage;
             }
           }
         } finally {
