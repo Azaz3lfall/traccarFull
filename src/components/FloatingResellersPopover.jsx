@@ -254,7 +254,7 @@ const FloatingResellersPopover = ({
       const fileName = file.name.toLowerCase();
       if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
         console.error('Invalid file type. Please select an .xlsx or .xls file.');
-        setSnackbar({ open: true, message: 'Invalid file type. Please select an .xlsx or .xls file.', severity: 'error' });
+        setSnackbar({ open: true, message: t('massImporterInvalidFileType'), severity: 'error' });
         return;
       }
       
@@ -270,7 +270,7 @@ const FloatingResellersPopover = ({
           console.log('Parsed XLSX content:', jsonData);
         } catch (error) {
           console.error('Error parsing XLSX file:', error);
-          setSnackbar({ open: true, message: 'Error parsing XLSX file. Please try again.', severity: 'error' });
+          setSnackbar({ open: true, message: t('massImporterParseError'), severity: 'error' });
         }
       };
       reader.readAsArrayBuffer(file);
@@ -279,7 +279,7 @@ const FloatingResellersPopover = ({
 
   const handleImport = async () => {
     if (!uploadedXlsxFile) {
-      setSnackbar({ open: true, message: 'Please select an XLSX file', severity: 'error' });
+      setSnackbar({ open: true, message: t('massImporterPleaseSelectFile'), severity: 'error' });
       return;
     }
 
