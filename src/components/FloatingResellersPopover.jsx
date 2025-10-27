@@ -477,8 +477,7 @@ const FloatingResellersPopover = ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: userId,
-              deviceId: newDevice.id,
-              groupId: groupId
+              deviceId: newDevice.id
             })
           });
           
