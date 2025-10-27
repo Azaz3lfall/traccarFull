@@ -369,7 +369,7 @@ const FloatingResellersPopover = ({
       let createdDevices = 0;
       let createdPermissions = 0;
       let skippedUsers = 0;
-      const errors = [];
+      const rowDetails = []; // Track detailed status of each row
 
       // Iterate through each row
       for (let i = 0; i < data.length; i++) {
@@ -382,8 +382,33 @@ const FloatingResellersPopover = ({
           status: `Processing row ${i + 1} of ${data.length}...` 
         });
 
+        // Initialize row details
+        const rowDetail = {
+          row: i + 1,
+          userLogin: row.userLogin,
+          userFullName: row.userFullName,
+          userEmail: row.userEmail,
+          deviceName: row.deviceName,
+          deviceUniqueId: row.deviceUniqueId,
+          devicePhone: row.devicePhone,
+          deviceModel: row.deviceModel,
+          userStatus: null,
+          userCreated: false,
+          userSkipped: false,
+          userError: null,
+          userId: null,
+          deviceStatus: null,
+          deviceId: null,
+          deviceError: null,
+          permissions: {
+            userToDevice: { created: false, error: null },
+            resellerToDevice: { created: false, error: null },
+            resellerToGroup: { created: false, error: null }
+          }
+        };
+
         try {
-          // Check if user exists
+          // STEP 1: Check if user exists or create
           let userId = null;
           const userKey = row.userLogin?.toLowerCase();
           const emailKey = row.userEmail?.toLowerCase();
@@ -391,6 +416,8 @@ const FloatingResellersPopover = ({
           if (userLookup.has(userKey) || userLookup.has(emailKey)) {
             userId = userLookup.get(userKey)?.id || userLookup.get(emailKey)?.id;
             skippedUsers++;
+            rowDetail.userSkipped = true;
+            rowDetail.userStatus = 'Skipped (already exists)';
           } else {
             // Create new user
             const userPayload = {
@@ -441,9 +468,14 @@ const FloatingResellersPopover = ({
             userLookup.set(userKey, newUser);
             if (emailKey) userLookup.set(emailKey, newUser);
             createdUsers++;
+            rowDetail.userCreated = true;
+            rowDetail.userStatus = 'Created';
           }
+          
+          rowDetail.userId = userId;
+          rowDetail.userStatus = rowDetail.userStatus || 'Created';
 
-          // Create device
+          // STEP 2: Create device
           const devicePayload = {
             name: row.deviceName,
             uniqueId: row.deviceUniqueId,
@@ -465,13 +497,15 @@ const FloatingResellersPopover = ({
           });
           
           const newDevice = await deviceResponse.json();
+          rowDetail.deviceId = newDevice.id;
+          rowDetail.deviceStatus = 'Created';
           
           // Update Redux store with new device
           dispatch(devicesActions.update([newDevice]));
           
           createdDevices++;
 
-          // Create permission: User to Device
+          // STEP 3: Create permissions (User to Device)
           await fetchOrThrow('/api/permissions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -482,6 +516,7 @@ const FloatingResellersPopover = ({
           });
           
           createdPermissions++;
+          rowDetail.permissions.userToDevice.created = true;
 
           // Create permission: Reseller (as userId) to Device
           if (reseller && reseller.resellerId) {
@@ -495,11 +530,47 @@ const FloatingResellersPopover = ({
             });
             
             createdPermissions++;
+            rowDetail.permissions.resellerToDevice.created = true;
+          }
+
+          // Create permission: Reseller (as userId) to Group
+          if (reseller && reseller.resellerId && groupId) {
+            await fetchOrThrow('/api/permissions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: reseller.resellerId,
+                groupId: groupId
+              })
+            });
+            
+            createdPermissions++;
+            rowDetail.permissions.resellerToGroup.created = true;
           }
 
         } catch (error) {
           console.error(`Error processing row ${i + 1}:`, error);
-          errors.push(`Row ${i + 1}: ${error.message}`);
+          
+          // Try to capture which step failed based on error message and current state
+          if (!rowDetail.userId) {
+            rowDetail.userError = error.message;
+            rowDetail.userStatus = `Failed: ${error.message}`;
+          } else if (!rowDetail.deviceId) {
+            rowDetail.deviceError = error.message;
+            rowDetail.deviceStatus = `Failed: ${error.message}`;
+          } else {
+            // Permission error - determine which one
+            if (!rowDetail.permissions.userToDevice.created) {
+              rowDetail.permissions.userToDevice.error = error.message;
+            } else if (reseller?.resellerId && !rowDetail.permissions.resellerToDevice.created) {
+              rowDetail.permissions.resellerToDevice.error = error.message;
+            } else if (reseller?.resellerId && groupId && !rowDetail.permissions.resellerToGroup.created) {
+              rowDetail.permissions.resellerToGroup.error = error.message;
+            }
+          }
+        } finally {
+          // Always push row details, whether success or error
+          rowDetails.push(rowDetail);
         }
       }
 
@@ -511,13 +582,28 @@ const FloatingResellersPopover = ({
       queryClient.invalidateQueries(['groups']);
       queryClient.invalidateQueries(['users']);
       
+      // Generate log file
+      const logContent = generateImportLog({
+        reseller,
+        totalRows: data.length,
+        createdUsers,
+        skippedUsers,
+        createdDevices,
+        createdPermissions,
+        rowDetails
+      });
+      
+      // Auto-download log file
+      downloadLogFile(logContent, reseller?.companyName || 'import');
+      
       // Show results
-      const summary = `Import completed! Users created: ${createdUsers}, Skipped: ${skippedUsers}, Devices created: ${createdDevices}, Permissions created: ${createdPermissions}`;
+      const errorCount = rowDetails.filter(r => r.userError || r.deviceError || r.permissions.userToDevice.error || r.permissions.resellerToDevice.error || r.permissions.resellerToGroup.error).length;
+      const summary = `Import completed! Users created: ${createdUsers}, Skipped: ${skippedUsers}, Devices created: ${createdDevices}, Permissions created: ${createdPermissions}, Errors: ${errorCount}`;
       console.log(summary);
       setSnackbar({ 
         open: true, 
         message: summary, 
-        severity: errors.length > 0 ? 'warning' : 'success' 
+        severity: errorCount > 0 ? 'warning' : 'success' 
       });
       
       setMassImporterModal({ open: false, reseller: null });
@@ -527,6 +613,127 @@ const FloatingResellersPopover = ({
       console.error('Import error:', error);
       setImportProgress({ open: false, current: 0, total: 0, status: '' });
       setSnackbar({ open: true, message: `Import failed: ${error.message}`, severity: 'error' });
+    }
+  };
+
+  // Helper function to generate import log content
+  const generateImportLog = ({ reseller, totalRows, createdUsers, skippedUsers, createdDevices, createdPermissions, rowDetails }) => {
+    const timestamp = new Date().toISOString();
+    const resellerName = reseller?.companyName || 'Unknown Reseller';
+    const resellerAppUrl = reseller?.appUrl || 'N/A';
+    
+    let log = `MASS IMPORTER LOG - ${resellerName}\n`;
+    log += `${'='.repeat(80)}\n\n`;
+    log += `Generated: ${timestamp}\n`;
+    log += `Reseller: ${resellerName}\n`;
+    log += `App URL: ${resellerAppUrl}\n`;
+    log += `Total Rows Processed: ${totalRows}\n`;
+    log += `${'='.repeat(80)}\n\n`;
+    
+    // Summary
+    log += `SUMMARY:\n`;
+    log += `${'-'.repeat(80)}\n`;
+    log += `Users Created: ${createdUsers}\n`;
+    log += `Users Skipped: ${skippedUsers}\n`;
+    log += `Devices Created: ${createdDevices}\n`;
+    log += `Permissions Created: ${createdPermissions}\n`;
+    
+    // Count permissions by type
+    const userToDeviceCount = rowDetails.filter(r => r.permissions.userToDevice.created).length;
+    const resellerToDeviceCount = rowDetails.filter(r => r.permissions.resellerToDevice.created).length;
+    const resellerToGroupCount = rowDetails.filter(r => r.permissions.resellerToGroup.created).length;
+    
+    log += `  - User → Device: ${userToDeviceCount}\n`;
+    log += `  - Reseller → Device: ${resellerToDeviceCount}\n`;
+    log += `  - Reseller → Group: ${resellerToGroupCount}\n`;
+    
+    const errorCount = rowDetails.filter(r => r.userError || r.deviceError || r.permissions.userToDevice.error || r.permissions.resellerToDevice.error || r.permissions.resellerToGroup.error).length;
+    log += `Rows with Errors: ${errorCount}\n`;
+    log += `${'='.repeat(80)}\n\n`;
+    
+    // Detailed Row-by-Row Report
+    log += `DETAILED ROW-BY-ROW REPORT:\n`;
+    log += `${'='.repeat(80)}\n\n`;
+    
+    rowDetails.forEach((detail) => {
+      log += `Row ${detail.row}: ${detail.userLogin || 'N/A'}\n`;
+      log += `${'-'.repeat(80)}\n`;
+      
+      // User Status
+      log += `  USER:\n`;
+      log += `    Status: ${detail.userStatus || 'Not processed'}\n`;
+      if (detail.userError) {
+        log += `    Error: ${detail.userError}\n`;
+      }
+      if (detail.userId) {
+        log += `    ID: ${detail.userId}\n`;
+      }
+      
+      // Device Status
+      log += `  DEVICE:\n`;
+      log += `    Name: ${detail.deviceName}\n`;
+      log += `    Unique ID: ${detail.deviceUniqueId}\n`;
+      log += `    Status: ${detail.deviceStatus || 'Not processed'}\n`;
+      if (detail.deviceError) {
+        log += `    Error: ${detail.deviceError}\n`;
+      }
+      if (detail.deviceId) {
+        log += `    ID: ${detail.deviceId}\n`;
+      }
+      
+      // Permissions Status
+      log += `  PERMISSIONS:\n`;
+      
+      // User → Device
+      if (detail.permissions.userToDevice.created) {
+        log += `    ✓ User → Device: Created\n`;
+      } else if (detail.permissions.userToDevice.error) {
+        log += `    ✗ User → Device: FAILED - ${detail.permissions.userToDevice.error}\n`;
+      } else {
+        log += `    - User → Device: Not created\n`;
+      }
+      
+      // Reseller → Device
+      if (detail.permissions.resellerToDevice.created) {
+        log += `    ✓ Reseller → Device: Created\n`;
+      } else if (detail.permissions.resellerToDevice.error) {
+        log += `    ✗ Reseller → Device: FAILED - ${detail.permissions.resellerToDevice.error}\n`;
+      } else if (detail.userId && detail.deviceId) {
+        log += `    - Reseller → Device: Not created (missing resellerId)\n`;
+      }
+      
+      // Reseller → Group
+      if (detail.permissions.resellerToGroup.created) {
+        log += `    ✓ Reseller → Group: Created\n`;
+      } else if (detail.permissions.resellerToGroup.error) {
+        log += `    ✗ Reseller → Group: FAILED - ${detail.permissions.resellerToGroup.error}\n`;
+      } else if (detail.userId && detail.deviceId && reseller?.resellerId) {
+        log += `    - Reseller → Group: Not created (missing groupId)\n`;
+      }
+      
+      log += `\n`;
+    });
+    
+    log += `END OF LOG\n`;
+    log += `${'='.repeat(80)}\n`;
+    
+    return log;
+  };
+
+  // Helper function to download log file
+  const downloadLogFile = (content, filename) => {
+    try {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `mass-import-log-${filename}-${Date.now()}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading log file:', error);
     }
   };
 
