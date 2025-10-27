@@ -471,7 +471,7 @@ const FloatingResellersPopover = ({
           
           createdDevices++;
 
-          // Create permission
+          // Create permission: User to Device
           await fetchOrThrow('/api/permissions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -482,6 +482,20 @@ const FloatingResellersPopover = ({
           });
           
           createdPermissions++;
+
+          // Create permission: Reseller (as userId) to Device
+          if (reseller && reseller.resellerId) {
+            await fetchOrThrow('/api/permissions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: reseller.resellerId,
+                deviceId: newDevice.id
+              })
+            });
+            
+            createdPermissions++;
+          }
 
         } catch (error) {
           console.error(`Error processing row ${i + 1}:`, error);
