@@ -349,8 +349,9 @@ const FloatingResellersPopover = ({
         
         // Update Redux store
         dispatch(groupsActions.add(newGroup));
-        // Invalidate query cache
+        // Invalidate query caches
         queryClient.invalidateQueries(['groups']);
+        queryClient.invalidateQueries(['devices']);
       }
       
       // Fetch existing users
@@ -486,6 +487,11 @@ const FloatingResellersPopover = ({
 
       // Close progress modal
       setImportProgress({ open: false, current: 0, total: 0, status: '' });
+      
+      // Revalidate devices and groups to propagate changes
+      queryClient.invalidateQueries(['devices']);
+      queryClient.invalidateQueries(['groups']);
+      queryClient.invalidateQueries(['users']);
       
       // Show results
       const summary = `Import completed! Users created: ${createdUsers}, Skipped: ${skippedUsers}, Devices created: ${createdDevices}, Permissions created: ${createdPermissions}`;
