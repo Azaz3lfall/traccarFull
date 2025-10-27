@@ -809,7 +809,7 @@
   "massImporter": "批量导入器",
   "massImporterTitle": "批量导入器",
   "massImporterDescription": "为选定的经销商批量导入用户和设备。",
-  "massImporterMissingColumns": "导入失败：缺少列：{columns}",
+  "massImporterMissingColumns": "缺少列：{columns}",
   "massImporterImporting": "导入中...",
   "massImporterProcessingRow": "正在处理第 {current} 行，共 {total} 行...",
   "massImporterProgress": "进度：{current} / {total} 行",

@@ -810,7 +810,7 @@
   "massImporter": "Importer Masowy",
   "massImporterTitle": "Importer Masowy",
   "massImporterDescription": "Importuj użytkowników i urządzenia masowo dla wybranego sprzedawcy.",
-  "massImporterMissingColumns": "Import nie powiódł się: Brakujące kolumny: {columns}",
+  "massImporterMissingColumns": "Brakujące kolumny: {columns}",
   "massImporterImporting": "Importowanie...",
   "massImporterProcessingRow": "Przetwarzanie wiersza {current} z {total}...",
   "massImporterProgress": "Postęp: {current} / {total} wierszy",

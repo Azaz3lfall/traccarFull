@@ -809,7 +809,7 @@
   "massImporter": "Importador Masivo",
   "massImporterTitle": "Importador Masivo",
   "massImporterDescription": "Importa usuarios y dispositivos en masa para el revendedor seleccionado.",
-  "massImporterMissingColumns": "Importación fallida: Faltan columnas: {columns}",
+  "massImporterMissingColumns": "Faltan columnas: {columns}",
   "massImporterImporting": "Importando...",
   "massImporterProcessingRow": "Procesando fila {current} de {total}...",
   "massImporterProgress": "Progreso: {current} / {total} filas",

@@ -809,7 +809,7 @@
   "massImporter": "Massa Importer",
   "massImporterTitle": "Massa Importer",
   "massImporterDescription": "Importeer gebruikers en apparaten in bulk voor de geselecteerde reseller.",
-  "massImporterMissingColumns": "Import mislukt: Ontbrekende kolommen: {columns}",
+  "massImporterMissingColumns": "Ontbrekende kolommen: {columns}",
   "massImporterImporting": "Importeren...",
   "massImporterProcessingRow": "Verwerken van rij {current} van {total}...",
   "massImporterProgress": "Voortgang: {current} / {total} rijen",

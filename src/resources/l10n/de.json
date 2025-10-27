@@ -809,7 +809,7 @@
   "massImporter": "Massen-Importeur",
   "massImporterTitle": "Massen-Importeur",
   "massImporterDescription": "Importieren Sie Benutzer und Geräte in großen Mengen für den ausgewählten Reseller.",
-  "massImporterMissingColumns": "Import fehlgeschlagen: Fehlende Spalten: {columns}",
+  "massImporterMissingColumns": "Fehlende Spalten: {columns}",
   "massImporterImporting": "Importiere...",
   "massImporterProcessingRow": "Verarbeite Zeile {current} von {total}...",
   "massImporterProgress": "Fortschritt: {current} / {total} Zeilen",

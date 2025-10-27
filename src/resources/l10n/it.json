@@ -809,7 +809,7 @@
   "massImporter": "Importatore di Massa",
   "massImporterTitle": "Importatore di Massa",
   "massImporterDescription": "Importa utenti e dispositivi in massa per il rivenditore selezionato.",
-  "massImporterMissingColumns": "Importazione non riuscita: Colonne mancanti: {columns}",
+  "massImporterMissingColumns": "Colonne mancanti: {columns}",
   "massImporterImporting": "Importazione...",
   "massImporterProcessingRow": "Elaborazione riga {current} di {total}...",
   "massImporterProgress": "Avanzamento: {current} / {total} righe",

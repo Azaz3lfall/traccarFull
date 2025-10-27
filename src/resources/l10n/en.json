@@ -116,7 +116,7 @@
   "massImporter": "Mass Importer",
   "massImporterTitle": "Mass Importer",
   "massImporterDescription": "Import users and devices in bulk for the selected reseller.",
-  "massImporterMissingColumns": "Import failed: Missing columns: {columns}",
+  "massImporterMissingColumns": "Missing columns: {columns}",
   "massImporterImporting": "Importing...",
   "massImporterProcessingRow": "Processing row {current} of {total}...",
   "massImporterProgress": "Progress: {current} / {total} rows",

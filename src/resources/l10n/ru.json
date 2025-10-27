@@ -809,7 +809,7 @@
   "massImporter": "Массовый Импортёр",
   "massImporterTitle": "Массовый Импортёр",
   "massImporterDescription": "Импортируйте пользователей и устройства оптом для выбранного реселлера.",
-  "massImporterMissingColumns": "Импорт не удался: Отсутствуют столбцы: {columns}",
+  "massImporterMissingColumns": "Отсутствуют столбцы: {columns}",
   "massImporterImporting": "Импорт...",
   "massImporterProcessingRow": "Обработка строки {current} из {total}...",
   "massImporterProgress": "Прогресс: {current} / {total} строк",
