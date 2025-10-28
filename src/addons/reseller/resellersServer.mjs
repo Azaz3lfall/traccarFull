@@ -2205,9 +2205,9 @@ app.post('/api/resellers/build', async (req, res) => {
 app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
   try {
     const { appUrl } = req.params;
-    const { parentUserId, buildType = 'apk' } = req.query;
+    const { parentUserId, currentDomain: queryCurrentDomain, buildType = 'apk' } = req.query;
     
-    console.log(`🔍 Build status API called:`, { appUrl, parentUserId, buildType, query: req.query });
+    console.log(`🔍 Build status API called:`, { appUrl, parentUserId, currentDomain: queryCurrentDomain, buildType, query: req.query });
     
     if (!appUrl || !parentUserId) {
       return res.status(400).json({
@@ -2250,8 +2250,11 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
       });
     }
 
+    // Use currentDomain from query if provided, otherwise fall back to resellerData.currentDomain
+    const currentDomain = queryCurrentDomain || resellerData.currentDomain || 'gps';
+
     // Create reseller directory name
-    const resellerDirName = `reseller_${resellerData.currentDomain || 'gps'}_${appUrl}_${parentUserId}_${resellerId}`;
+    const resellerDirName = `reseller_${currentDomain}_${appUrl}_${parentUserId}_${resellerId}`;
     const resellerDirPath = path.join(DATA_DIR, resellerDirName);
     
     // Check if build directory exists

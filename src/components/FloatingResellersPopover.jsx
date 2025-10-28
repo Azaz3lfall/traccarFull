@@ -960,22 +960,38 @@ const FloatingResellersPopover = ({
       // Use the buildStatus from the server response
       const serverBuildStatus = status.data.buildStatus;
 
-      if (serverBuildStatus === 'BUILDED') {
+      // Get current state before updating
+      const currentLocalState = getBuildState(resellerId, buildType);
+
+      // Only update state if it's different from current state
+      // and if the server returns a valid status
+      if (serverBuildStatus === 'BUILDED' && currentLocalState !== 'BUILDED') {
         updateBuildState(resellerId, buildType, 'BUILDED');
         return { status: 'BUILDED', data: status.data };
       } else if (serverBuildStatus === 'BUILDING') {
-        updateBuildState(resellerId, buildType, 'BUILDING');
+        // Always allow transitioning to BUILDING to show progress
+        if (currentLocalState !== 'BUILDING') {
+          updateBuildState(resellerId, buildType, 'BUILDING');
+        }
         return { status: 'BUILDING', data: status.data };
       } else if (serverBuildStatus === 'PARTIAL_BUILDED') {
         updateBuildState(resellerId, buildType, 'PARTIAL_BUILDED');
         return { status: 'PARTIAL_BUILDED', data: status.data };
-      } else {
-        updateBuildState(resellerId, buildType, 'NOT_BUILDED');
-        return { status: 'NOT_BUILDED', data: status.data };
+      } else if (serverBuildStatus === 'NOT_BUILDED') {
+        // Don't downgrade from BUILDING or BUILDED to NOT_BUILDED
+        // This prevents accidental restarts
+        if (currentLocalState === 'NOT_BUILDED' || currentLocalState === 'BUILD_ERROR') {
+          return { status: 'NOT_BUILDED', data: status.data };
+        }
+        // If we were building but server says not builded, keep BUILDING state
+        return { status: currentLocalState, data: status.data };
       }
     } catch (error) {
       console.error(`❌ Error checking build status:`, error);
-      updateBuildState(resellerId, buildType, 'BUILD_ERROR');
+      // Only update to ERROR if not already built
+      if (getBuildState(resellerId, buildType) !== 'BUILDED') {
+        updateBuildState(resellerId, buildType, 'BUILD_ERROR');
+      }
       return { status: 'BUILD_ERROR', error: error.message };
     }
   };
@@ -4449,7 +4465,8 @@ const BuildStatusContent = ({ reseller, buildType, getBuildState, checkBuildStat
     if (currentState === 'BUILDING') {
       handleCheckStatus();
     }
-  }, [currentState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div style={{ textAlign: 'center' }}>
