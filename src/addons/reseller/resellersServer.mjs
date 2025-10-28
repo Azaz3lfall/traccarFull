@@ -23,9 +23,9 @@ console.log('🔧 Checking build environment setup...');
 if (!process.env.FLUTTER_ROOT) {
     const homeDir = os.homedir();
     const possiblePaths = [
+        '/root/flutter',           // Standard production setup
         `${homeDir}/flutter`,
         '/opt/flutter',
-        '/root/flutter',
         '/usr/local/flutter'
     ];
     
@@ -43,6 +43,7 @@ if (!process.env.FLUTTER_ROOT) {
 if (!process.env.ANDROID_HOME) {
     const homeDir = os.homedir();
     const possiblePaths = [
+        '/root/Android',            // Standard production setup
         `${homeDir}/Android`,
         `${homeDir}/Android/Sdk`,
         '/opt/android-sdk',
