@@ -11,9 +11,112 @@ import { glob } from 'glob';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import dns from 'dns';
+import os from 'os';
 
 // Load environment variables
 dotenv.config();
+
+// Setup environment variables for Flutter, Android, and Java if not already set
+console.log('🔧 Checking build environment setup...');
+
+// Check and set FLUTTER_ROOT
+if (!process.env.FLUTTER_ROOT) {
+    const homeDir = os.homedir();
+    const possiblePaths = [
+        `${homeDir}/flutter`,
+        '/opt/flutter',
+        '/root/flutter',
+        '/usr/local/flutter'
+    ];
+    
+    for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            process.env.FLUTTER_ROOT = p;
+            process.env.PATH = `${p}/bin:${process.env.PATH}`;
+            console.log(`🦋 Set FLUTTER_ROOT to ${p}`);
+            break;
+        }
+    }
+}
+
+// Check and set ANDROID_HOME
+if (!process.env.ANDROID_HOME) {
+    const homeDir = os.homedir();
+    const possiblePaths = [
+        `${homeDir}/Android`,
+        `${homeDir}/Android/Sdk`,
+        '/opt/android-sdk',
+        '/usr/local/android-sdk'
+    ];
+    
+    for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            process.env.ANDROID_HOME = p;
+            const cmdlineTools = `${p}/cmdline-tools/latest/bin`;
+            const platformTools = `${p}/platform-tools`;
+            if (fs.existsSync(cmdlineTools) || fs.existsSync(`${p}/tools`)) {
+                process.env.PATH = `${cmdlineTools}:${platformTools}:${process.env.PATH}`;
+            }
+            console.log(`📱 Set ANDROID_HOME to ${p}`);
+            break;
+        }
+    }
+}
+
+// Check and set JAVA_HOME
+if (!process.env.JAVA_HOME) {
+    const possiblePaths = [
+        '/usr/lib/jvm/java-17-openjdk-amd64',
+        '/usr/lib/jvm/java-17-openjdk-arm64',
+        '/usr/lib/jvm/java-11-openjdk-amd64',
+        '/usr/lib/jvm/java-11-openjdk-arm64',
+        '/usr/lib/jvm/java-17-openjdk',
+        '/usr/lib/jvm/java-11-openjdk',
+        '/usr/lib/jvm/default-java',
+        '/opt/java'
+    ];
+    
+    for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            process.env.JAVA_HOME = p;
+            process.env.PATH = `${p}/bin:${process.env.PATH}`;
+            console.log(`☕ Set JAVA_HOME to ${p}`);
+            break;
+        }
+    }
+}
+
+// Also try to find Java by scanning /usr/lib/jvm
+if (!process.env.JAVA_HOME) {
+    try {
+        const jvmDir = '/usr/lib/jvm';
+        if (fs.existsSync(jvmDir)) {
+            const entries = fs.readdirSync(jvmDir);
+            const javaDirs = entries.filter(entry => 
+                entry.includes('openjdk') || entry.includes('java')
+            ).map(entry => path.join(jvmDir, entry));
+            
+            for (const javaDir of javaDirs) {
+                const javaBin = path.join(javaDir, 'bin', 'java');
+                if (fs.existsSync(javaBin)) {
+                    process.env.JAVA_HOME = javaDir;
+                    process.env.PATH = `${javaDir}/bin:${process.env.PATH}`;
+                    console.log(`☕ Set JAVA_HOME to ${javaDir} (auto-detected)`);
+                    break;
+                }
+            }
+        }
+    } catch (error) {
+        console.log('⚠️ Could not auto-detect JAVA_HOME:', error.message);
+    }
+}
+
+// Log current environment
+console.log(`📋 Environment check:`);
+console.log(`   FLUTTER_ROOT: ${process.env.FLUTTER_ROOT || 'NOT SET'}`);
+console.log(`   ANDROID_HOME: ${process.env.ANDROID_HOME || 'NOT SET'}`);
+console.log(`   JAVA_HOME: ${process.env.JAVA_HOME || 'NOT SET'}`);
+console.log('');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
