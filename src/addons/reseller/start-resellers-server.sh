@@ -33,18 +33,30 @@ for file in "${ENV_FILES[@]}"; do
 done
 
 # Set critical environment variables if not already set
-# Customize these paths to match your server installation
+# Default paths based on standard setup
 
-# Flutter path
-if [ -z "$FLUTTER_ROOT" ] && [ -d "/opt/flutter" ]; then
-    export FLUTTER_ROOT="/opt/flutter"
-    export PATH="$FLUTTER_ROOT/bin:$PATH"
-    echo "🦋 Set FLUTTER_ROOT to /opt/flutter"
+# Flutter path - check common locations
+if [ -z "$FLUTTER_ROOT" ]; then
+    if [ -d "$HOME/flutter" ]; then
+        export FLUTTER_ROOT="$HOME/flutter"
+    elif [ -d "/opt/flutter" ]; then
+        export FLUTTER_ROOT="/opt/flutter"
+    elif [ -d "/root/flutter" ]; then
+        export FLUTTER_ROOT="/root/flutter"
+    fi
+    
+    if [ -n "$FLUTTER_ROOT" ]; then
+        export PATH="$FLUTTER_ROOT/bin:$PATH"
+        echo "🦋 Set FLUTTER_ROOT to $FLUTTER_ROOT"
+    fi
 fi
 
 # Android SDK path
 if [ -z "$ANDROID_HOME" ]; then
-    if [ -d "$HOME/Android/Sdk" ]; then
+    # Try $HOME/Android first (standard setup)
+    if [ -d "$HOME/Android" ]; then
+        export ANDROID_HOME="$HOME/Android"
+    elif [ -d "$HOME/Android/Sdk" ]; then
         export ANDROID_HOME="$HOME/Android/Sdk"
     elif [ -d "/opt/android-sdk" ]; then
         export ANDROID_HOME="/opt/android-sdk"
@@ -53,19 +65,25 @@ if [ -z "$ANDROID_HOME" ]; then
     fi
     
     if [ -n "$ANDROID_HOME" ]; then
-        export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH"
+        # Add Android tools to PATH
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
         echo "📱 Set ANDROID_HOME to $ANDROID_HOME"
     fi
 fi
 
-# Java path
+# Java path - find openjdk installations
 if [ -z "$JAVA_HOME" ]; then
-    if [ -d "/usr/lib/jvm/java-11-openjdk-amd64" ]; then
-        export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
-    elif [ -d "/usr/lib/jvm/java-11-openjdk" ]; then
-        export JAVA_HOME="/usr/lib/jvm/java-11-openjdk"
-    elif [ -d "/opt/java" ]; then
-        export JAVA_HOME="/opt/java"
+    # Try to find java-17 first, then java-11, then any java
+    JAVA_17=$(ls -d /usr/lib/jvm/java-17-openjdk-* 2>/dev/null | head -n 1)
+    JAVA_11=$(ls -d /usr/lib/jvm/java-11-openjdk-* 2>/dev/null | head -n 1)
+    ANY_JAVA=$(ls -d /usr/lib/jvm/java-*-openjdk-* 2>/dev/null | head -n 1)
+    
+    if [ -n "$JAVA_17" ] && [ -d "$JAVA_17" ]; then
+        export JAVA_HOME="$JAVA_17"
+    elif [ -n "$JAVA_11" ] && [ -d "$JAVA_11" ]; then
+        export JAVA_HOME="$JAVA_11"
+    elif [ -n "$ANY_JAVA" ] && [ -d "$ANY_JAVA" ]; then
+        export JAVA_HOME="$ANY_JAVA"
     fi
     
     if [ -n "$JAVA_HOME" ]; then
