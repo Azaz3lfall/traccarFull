@@ -400,6 +400,9 @@ const FloatingResellersPopover = ({
         serverFormData.password
       );
       
+      // Collect data for export
+      const exportData = [];
+      
       // For each device, query users by deviceId
       if (devices && Array.isArray(devices)) {
         for (const device of devices) {
@@ -412,11 +415,56 @@ const FloatingResellersPopover = ({
                 device.id
               );
               console.log('Device name:', device.name || device.id, 'Users:', users);
+              
+              // Extract device data
+              const deviceName = device.name || '';
+              const deviceUniqueId = device.uniqueId || '';
+              const devicePhone = device.phone || '';
+              const deviceModel = device.model || '';
+              
+              // For each user, create a row
+              if (users && Array.isArray(users)) {
+                users.forEach(user => {
+                  const row = [
+                    user.login || '',           // userLogin
+                    user.name || '',           // userFullName
+                    user.email || '',          // userEmail
+                    user.userLimit || 0,       // userUserLimit
+                    user.deviceLimit || -1,    // userDeviceLimit
+                    deviceName,                // deviceName
+                    deviceUniqueId,            // deviceUniqueId
+                    devicePhone,               // devicePhone
+                    deviceModel                // deviceModel
+                  ];
+                  exportData.push(row);
+                });
+              }
             } catch (error) {
               console.error(`Failed to get users for device ${device.name || device.id}:`, error);
             }
           }
         }
+      }
+      
+      // Generate and download XLSX file if we have data
+      if (exportData.length > 0) {
+        const headers = ['userLogin', 'userFullName', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId', 'devicePhone', 'deviceModel'];
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData]);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        XLSX.writeFile(workbook, `server-import-${Date.now()}.xlsx`);
+        
+        setSnackbar({ 
+          open: true, 
+          message: t('serverImportFileGenerated', { count: exportData.length }), 
+          severity: 'success' 
+        });
+      } else {
+        setSnackbar({ 
+          open: true, 
+          message: t('serverImportNoData'), 
+          severity: 'warning' 
+        });
       }
     } catch (error) {
       console.error('Query failed:', error);

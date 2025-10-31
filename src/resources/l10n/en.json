@@ -130,6 +130,8 @@
   "allFieldsMandatory": "All fields are mandatory. Please fill in all fields.",
   "serverImportOnlyHttps": "Server URL must start with https://. This feature only works with HTTPS environment.",
   "serverImportQueryFailed": "Query failed. Please check the server URL, credentials, and CORS settings.",
+  "serverImportFileGenerated": "Import file generated successfully with {count} rows.",
+  "serverImportNoData": "No data found to export.",
   "uploadCsvFile": "Upload CSV File",
   "uploadXlsxFile": "Upload XLSX File",
   "enterDataManually": "Or enter data manually",
