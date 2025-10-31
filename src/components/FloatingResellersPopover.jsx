@@ -58,7 +58,7 @@ import {
 } from '@mui/icons-material';
 import { BsGooglePlay, BsAndroid, BsFiletypeXlsx } from "react-icons/bs";
 import { LuCameraOff } from "react-icons/lu";
-import { GoArchive } from "react-icons/go";
+import { GoArchive, GoServer } from "react-icons/go";
 import * as XLSX from 'xlsx';
 import resellersConfig from '../config/resellersConfig';
 import { useCatch } from '../reactHelper';
@@ -144,6 +144,9 @@ const FloatingResellersPopover = ({
   const [massImporterModal, setMassImporterModal] = useState({ open: false, reseller: null });
   const [uploadedXlsxFile, setUploadedXlsxFile] = useState(null);
   const [importProgress, setImportProgress] = useState({ open: false, current: 0, total: 0, status: '' });
+  const [serverModal, setServerModal] = useState({ open: false, reseller: null });
+  const [serverFormData, setServerFormData] = useState({ serverUrl: '', login: '', password: '' });
+  const [serverQueryLoading, setServerQueryLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ open: false, message: '', title: '' });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
@@ -243,6 +246,154 @@ const FloatingResellersPopover = ({
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
     XLSX.writeFile(workbook, 'template.xlsx');
+  };
+
+  const queryServerUsers = async (serverUrl, login, password) => {
+    try {
+      // Ensure serverUrl doesn't have trailing slash
+      const cleanServerUrl = serverUrl.trim().replace(/\/$/, '');
+      const apiUrl = `${cleanServerUrl}/api/users`;
+      
+      // Create Basic Auth header
+      const credentials = btoa(`${login}:${password}`);
+      const authHeader = `Basic ${credentials}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Server users query result:', data);
+      return data;
+    } catch (error) {
+      console.error('Error querying server users:', error);
+      throw error;
+    }
+  };
+
+  const queryServerDevices = async (serverUrl, login, password) => {
+    try {
+      // Ensure serverUrl doesn't have trailing slash
+      const cleanServerUrl = serverUrl.trim().replace(/\/$/, '');
+      const apiUrl = `${cleanServerUrl}/api/devices?all=true`;
+      
+      // Create Basic Auth header
+      const credentials = btoa(`${login}:${password}`);
+      const authHeader = `Basic ${credentials}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Server devices query result:', data);
+      return data;
+    } catch (error) {
+      console.error('Error querying server devices:', error);
+      throw error;
+    }
+  };
+
+  const queryUsersByDeviceId = async (serverUrl, login, password, deviceId) => {
+    try {
+      // Ensure serverUrl doesn't have trailing slash
+      const cleanServerUrl = serverUrl.trim().replace(/\/$/, '');
+      const apiUrl = `${cleanServerUrl}/api/users?deviceId=${deviceId}`;
+      
+      // Create Basic Auth header
+      const credentials = btoa(`${login}:${password}`);
+      const authHeader = `Basic ${credentials}`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error querying users for deviceId ${deviceId}:`, error);
+      throw error;
+    }
+  };
+
+  const handleQueryData = async () => {
+    // Validate all fields are mandatory
+    if (!serverFormData.serverUrl || !serverFormData.serverUrl.trim()) {
+      setSnackbar({ open: true, message: t('allFieldsMandatory'), severity: 'error' });
+      return;
+    }
+    if (!serverFormData.login || !serverFormData.login.trim()) {
+      setSnackbar({ open: true, message: t('allFieldsMandatory'), severity: 'error' });
+      return;
+    }
+    if (!serverFormData.password || !serverFormData.password.trim()) {
+      setSnackbar({ open: true, message: t('allFieldsMandatory'), severity: 'error' });
+      return;
+    }
+    
+    setServerQueryLoading(true);
+    try {
+      // Query users first
+      await queryServerUsers(
+        serverFormData.serverUrl,
+        serverFormData.login,
+        serverFormData.password
+      );
+      
+      // Then query devices
+      const devices = await queryServerDevices(
+        serverFormData.serverUrl,
+        serverFormData.login,
+        serverFormData.password
+      );
+      
+      // For each device, query users by deviceId
+      if (devices && Array.isArray(devices)) {
+        for (const device of devices) {
+          if (device.id) {
+            try {
+              const users = await queryUsersByDeviceId(
+                serverFormData.serverUrl,
+                serverFormData.login,
+                serverFormData.password,
+                device.id
+              );
+              console.log('Device name:', device.name || device.id, 'Users:', users);
+            } catch (error) {
+              console.error(`Failed to get users for device ${device.name || device.id}:`, error);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Query failed:', error);
+    } finally {
+      setServerQueryLoading(false);
+    }
   };
 
   const handleXlsxFileChange = (event) => {
@@ -4187,15 +4338,9 @@ const FloatingResellersPopover = ({
                     <Typography variant="subtitle2" style={{ color: colors.text }}>
                       {t('uploadXlsxFile')}
                     </Typography>
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls"
-                      style={{ display: 'none' }}
-                      id="xlsx-upload"
-                      onChange={handleXlsxFileChange}
-                    />
-                    <label htmlFor="xlsx-upload" style={{ cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <div
+                        onClick={() => setServerModal({ open: true, reseller: massImporterModal.reseller })}
                         style={{
                           width: '48px',
                           height: '48px',
@@ -4219,9 +4364,44 @@ const FloatingResellersPopover = ({
                           e.target.style.color = colors.text;
                         }}
                       >
-                        <BsFiletypeXlsx style={{ fontSize: '24px', color: colors.text }} />
+                        <GoServer style={{ fontSize: '24px', color: colors.text }} />
                       </div>
-                    </label>
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls"
+                        style={{ display: 'none' }}
+                        id="xlsx-upload"
+                        onChange={handleXlsxFileChange}
+                      />
+                      <label htmlFor="xlsx-upload" style={{ cursor: 'pointer' }}>
+                        <div
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            padding: '0',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '8px',
+                            backgroundColor: colors.secondary,
+                            color: colors.text,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = colors.hover;
+                            e.target.style.color = colors.text;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = colors.secondary;
+                            e.target.style.color = colors.text;
+                          }}
+                        >
+                          <BsFiletypeXlsx style={{ fontSize: '24px', color: colors.text }} />
+                        </div>
+                      </label>
+                    </div>
                   </div>
                 </div>
 
@@ -4425,6 +4605,207 @@ const FloatingResellersPopover = ({
                 <Typography variant="body1" style={{ color: colors.text }}>
                   {errorModal.message}
                 </Typography>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Server Modal */}
+      <AnimatePresence>
+        {serverModal.open && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '20px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => {
+              setServerModal({ open: false, reseller: null });
+              setServerFormData({ serverUrl: '', login: '', password: '' });
+            }}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '12px',
+                padding: '0',
+                maxWidth: '500px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'hidden',
+                border: `1px solid ${colors.border}`,
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '20px 24px',
+                borderBottom: `1px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <IconButton
+                    onClick={() => {
+                      setServerModal({ open: false, reseller: null });
+                      setServerFormData({ serverUrl: '', login: '', password: '' });
+                    }}
+                    size="small"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <ChevronLeftIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
+                    Server Import
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                  <TextField
+                    fullWidth
+                    label="Server URL"
+                    value={serverFormData.serverUrl}
+                    onChange={(e) => setServerFormData({ ...serverFormData, serverUrl: e.target.value })}
+                    required
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': {
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Login"
+                    value={serverFormData.login}
+                    onChange={(e) => setServerFormData({ ...serverFormData, login: e.target.value })}
+                    required
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': {
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    value={serverFormData.password}
+                    onChange={(e) => setServerFormData({ ...serverFormData, password: e.target.value })}
+                    required
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': {
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => {
+                      setServerModal({ open: false, reseller: null });
+                      setServerFormData({ serverUrl: '', login: '', password: '' });
+                    }}
+                    style={{
+                      padding: '10px 20px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = colors.hover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = colors.secondary;
+                    }}
+                  >
+                    {t('sharedCancel')}
+                  </button>
+                  <button
+                    onClick={handleQueryData}
+                    disabled={serverQueryLoading}
+                    style={{
+                      padding: '10px 20px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.secondary,
+                      color: colors.text,
+                      cursor: serverQueryLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      opacity: serverQueryLoading ? 0.7 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!serverQueryLoading) {
+                        e.target.style.backgroundColor = colors.hover;
+                        e.target.style.color = colors.text;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!serverQueryLoading) {
+                        e.target.style.backgroundColor = colors.secondary;
+                        e.target.style.color = colors.text;
+                      }
+                    }}
+                  >
+                    {serverQueryLoading && (
+                      <CircularProgress size={16} style={{ color: colors.text }} />
+                    )}
+                    Query Data
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
