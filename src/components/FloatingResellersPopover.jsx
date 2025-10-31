@@ -420,6 +420,11 @@ const FloatingResellersPopover = ({
       }
     } catch (error) {
       console.error('Query failed:', error);
+      setSnackbar({ 
+        open: true, 
+        message: error.message || t('serverImportQueryFailed'), 
+        severity: 'error' 
+      });
     } finally {
       const endTime = new Date();
       const executionTime = endTime - startTime;
@@ -4801,34 +4806,6 @@ const FloatingResellersPopover = ({
                 )}
 
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                  <button
-                    onClick={() => {
-                      setServerModal({ open: false, reseller: null });
-                      setServerFormData({ serverUrl: '', login: '', password: '' });
-                      setServerQueryStartTime(null);
-                      setServerQueryEndTime(null);
-                      setServerQueryExecutionTime(null);
-                    }}
-                    style={{
-                      padding: '10px 20px',
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: '8px',
-                      backgroundColor: colors.secondary,
-                      color: colors.text,
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = colors.hover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = colors.secondary;
-                    }}
-                  >
-                    {t('sharedCancel')}
-                  </button>
                   <button
                     onClick={handleQueryData}
                     disabled={serverQueryLoading}
