@@ -147,6 +147,9 @@ const FloatingResellersPopover = ({
   const [serverModal, setServerModal] = useState({ open: false, reseller: null });
   const [serverFormData, setServerFormData] = useState({ serverUrl: '', login: '', password: '' });
   const [serverQueryLoading, setServerQueryLoading] = useState(false);
+  const [serverQueryStartTime, setServerQueryStartTime] = useState(null);
+  const [serverQueryEndTime, setServerQueryEndTime] = useState(null);
+  const [serverQueryExecutionTime, setServerQueryExecutionTime] = useState(null);
   const [errorModal, setErrorModal] = useState({ open: false, message: '', title: '' });
   const [buildLoading, setBuildLoading] = useState({});
   const [cleanLoading, setCleanLoading] = useState({});
@@ -340,7 +343,21 @@ const FloatingResellersPopover = ({
     }
   };
 
+  const formatExecutionTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
   const handleQueryData = async () => {
+    // Prevent multiple concurrent queries
+    if (serverQueryLoading) {
+      return;
+    }
+    
     // Validate all fields are mandatory
     if (!serverFormData.serverUrl || !serverFormData.serverUrl.trim()) {
       setSnackbar({ open: true, message: t('allFieldsMandatory'), severity: 'error' });
@@ -355,6 +372,18 @@ const FloatingResellersPopover = ({
       return;
     }
     
+    // Validate HTTPS
+    const trimmedUrl = serverFormData.serverUrl.trim();
+    if (!trimmedUrl.startsWith('https://')) {
+      setSnackbar({ open: true, message: t('serverImportOnlyHttps'), severity: 'error' });
+      return;
+    }
+    
+    // Set start time and loading state together
+    const startTime = new Date();
+    setServerQueryStartTime(startTime);
+    setServerQueryEndTime(null);
+    setServerQueryExecutionTime(null);
     setServerQueryLoading(true);
     try {
       // Query users first
@@ -392,6 +421,10 @@ const FloatingResellersPopover = ({
     } catch (error) {
       console.error('Query failed:', error);
     } finally {
+      const endTime = new Date();
+      const executionTime = endTime - startTime;
+      setServerQueryEndTime(endTime);
+      setServerQueryExecutionTime(executionTime);
       setServerQueryLoading(false);
     }
   };
@@ -4634,6 +4667,9 @@ const FloatingResellersPopover = ({
             onClick={() => {
               setServerModal({ open: false, reseller: null });
               setServerFormData({ serverUrl: '', login: '', password: '' });
+              setServerQueryStartTime(null);
+              setServerQueryEndTime(null);
+              setServerQueryExecutionTime(null);
             }}
           >
             <motion.div
@@ -4666,6 +4702,9 @@ const FloatingResellersPopover = ({
                     onClick={() => {
                       setServerModal({ open: false, reseller: null });
                       setServerFormData({ serverUrl: '', login: '', password: '' });
+                      setServerQueryStartTime(null);
+                      setServerQueryEndTime(null);
+                      setServerQueryExecutionTime(null);
                     }}
                     size="small"
                     style={{ color: colors.textSecondary }}
@@ -4743,11 +4782,32 @@ const FloatingResellersPopover = ({
                   />
                 </div>
 
+                {/* Start Time Display */}
+                {serverQueryStartTime && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <Typography variant="body2" style={{ color: colors.textSecondary, fontSize: '14px' }}>
+                      Started at: {serverQueryStartTime.toLocaleString()}
+                      {serverQueryEndTime && serverQueryExecutionTime && (
+                        <>
+                          {' | '}
+                          Finished at: {serverQueryEndTime.toLocaleString()}
+                          <span style={{ fontSize: '12px', marginLeft: '8px' }}>
+                            ({formatExecutionTime(serverQueryExecutionTime)})
+                          </span>
+                        </>
+                      )}
+                    </Typography>
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                   <button
                     onClick={() => {
                       setServerModal({ open: false, reseller: null });
                       setServerFormData({ serverUrl: '', login: '', password: '' });
+                      setServerQueryStartTime(null);
+                      setServerQueryEndTime(null);
+                      setServerQueryExecutionTime(null);
                     }}
                     style={{
                       padding: '10px 20px',

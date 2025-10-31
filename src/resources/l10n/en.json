@@ -128,6 +128,7 @@
   "massImporterInvalidFileType": "Invalid file type. Please select an .xlsx or .xls file.",
   "massImporterParseError": "Error parsing XLSX file. Please try again.",
   "allFieldsMandatory": "All fields are mandatory. Please fill in all fields.",
+  "serverImportOnlyHttps": "Server URL must start with https://. This feature only works with HTTPS environment.",
   "uploadCsvFile": "Upload CSV File",
   "uploadXlsxFile": "Upload XLSX File",
   "enterDataManually": "Or enter data manually",
