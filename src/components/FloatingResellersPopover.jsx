@@ -393,21 +393,36 @@ const FloatingResellersPopover = ({
       let resellerUser = null;
       if (reseller && reseller.resellerId) {
         try {
+          console.log('=== RESELLER USER LOOKUP ===');
+          console.log('Reseller info:', { resellerId: reseller.resellerId, companyName: reseller.companyName });
+          
           const localUsersResponse = await fetchOrThrow('/api/users');
           const localUsers = await localUsersResponse.json();
+          console.log(`Total local users: ${localUsers.length}`);
+          
           resellerUser = localUsers.find(user => user.id === reseller.resellerId);
           if (resellerUser) {
-            console.log('Found reseller user from local server:', resellerUser.login || resellerUser.email || resellerUser.name);
+            console.log('✓ Found reseller user from local server:');
+            console.log('  - ID:', resellerUser.id);
+            console.log('  - Login:', resellerUser.login);
+            console.log('  - Email:', resellerUser.email);
+            console.log('  - Name:', resellerUser.name);
+            console.log('  - UserLimit:', resellerUser.userLimit);
+            console.log('  - DeviceLimit:', resellerUser.deviceLimit);
+            console.log('=== END RESELLER USER LOOKUP ===');
           } else {
-            console.warn(`Reseller user with ID ${reseller.resellerId} not found in local users list`);
+            console.warn(`✗ Reseller user with ID ${reseller.resellerId} not found in local users list`);
+            console.warn('Available user IDs:', localUsers.map(u => u.id).slice(0, 20));
           }
         } catch (error) {
           console.error('Error fetching local users for reseller:', error);
         }
+      } else {
+        console.warn('No reseller or resellerId provided:', reseller);
       }
       
-      // Query users from remote server (just for logging, not used for reseller lookup)
-      await queryServerUsers(
+      // Query ALL users from remote server
+      const allRemoteUsers = await queryServerUsers(
         serverFormData.serverUrl,
         serverFormData.login,
         serverFormData.password
@@ -427,14 +442,19 @@ const FloatingResellersPopover = ({
       let devicesWithoutUsers = 0;
       let devicesWithErrors = 0;
       let totalUsersFound = 0;
-      const processedUserIds = new Set();
+      const processedUserIds = new Set(); // Track users that have been included in export
+      const processedUserKeys = new Set(); // Track by login/email for uniqueness
       const processedDeviceIds = new Set();
       const errorDevices = [];
+      
+      // Map to track which users are associated with which devices
+      const userDeviceMap = new Map(); // userKey -> Set of deviceUniqueIds
       
       // For each device, query users by deviceId
       if (devices && Array.isArray(devices)) {
         console.log(`=== STARTING DEVICE PROCESSING ===`);
         console.log(`Total devices to process: ${devices.length}`);
+        console.log(`Total users from remote server: ${allRemoteUsers?.length || 0}`);
         
         for (let idx = 0; idx < devices.length; idx++) {
           const device = devices[idx];
@@ -462,8 +482,18 @@ const FloatingResellersPopover = ({
                 
                 users.forEach(user => {
                   // Track unique users
-                  const userKey = user.login || user.email || user.id;
-                  if (userKey) processedUserIds.add(String(userKey));
+                  const userKey = user.login || user.email || String(user.id);
+                  const userKeyLower = userKey.toLowerCase();
+                  if (userKey) {
+                    processedUserKeys.add(userKeyLower);
+                    processedUserIds.add(String(user.id));
+                    
+                    // Track user-device relationship
+                    if (!userDeviceMap.has(userKeyLower)) {
+                      userDeviceMap.set(userKeyLower, new Set());
+                    }
+                    userDeviceMap.get(userKeyLower).add(deviceUniqueId);
+                  }
                   
                   totalUsersFound++;
                   
@@ -486,8 +516,12 @@ const FloatingResellersPopover = ({
                 
                 // Device has no users - use reseller user data if available
                 if (resellerUser) {
-                  const userKey = resellerUser.login || resellerUser.email || resellerUser.id;
-                  if (userKey) processedUserIds.add(String(userKey));
+                  const userKey = resellerUser.login || resellerUser.email || String(resellerUser.id);
+                  const userKeyLower = userKey.toLowerCase();
+                  if (userKey) {
+                    processedUserKeys.add(userKeyLower);
+                    processedUserIds.add(String(resellerUser.id));
+                  }
                   
                   totalUsersFound++;
                   
@@ -524,6 +558,11 @@ const FloatingResellersPopover = ({
                   
                   if (idx < 10 || devicesWithoutUsers <= 10) {
                     console.warn(`Device ${idx + 1}/${devices.length}: ${device.name || device.id} (${deviceUniqueId}) has no users and reseller user not found - adding row with empty user data`);
+                    if (!reseller) {
+                      console.warn('Reseller object is missing:', reseller);
+                    } else if (!reseller.resellerId) {
+                      console.warn('Reseller resellerId is missing:', reseller);
+                    }
                   }
                 }
               }
@@ -549,16 +588,55 @@ const FloatingResellersPopover = ({
           }
         }
         
+        // Now add ALL users from remote server that weren't included yet (users without devices)
+        console.log('=== ADDING USERS WITHOUT DEVICES ===');
+        let usersWithoutDevicesAdded = 0;
+        if (allRemoteUsers && Array.isArray(allRemoteUsers)) {
+          allRemoteUsers.forEach(user => {
+            const userKey = user.login || user.email || String(user.id);
+            const userKeyLower = userKey.toLowerCase();
+            
+            // If user hasn't been included yet, add them with empty device data
+            if (userKey && !processedUserKeys.has(userKeyLower)) {
+              processedUserKeys.add(userKeyLower);
+              processedUserIds.add(String(user.id));
+              usersWithoutDevicesAdded++;
+              
+              const row = [
+                user.login || user.email || '', // userLogin (use login, fallback to email)
+                user.name || '',               // userFullName
+                user.email || '',              // userEmail
+                user.userLimit ?? 0,           // userUserLimit
+                user.deviceLimit ?? -1,        // userDeviceLimit
+                '',                            // deviceName (empty - no device)
+                '',                            // deviceUniqueId (empty - no device)
+                '',                            // devicePhone (empty - no device)
+                ''                             // deviceModel (empty - no device)
+              ];
+              exportData.push(row);
+            }
+          });
+        }
+        console.log(`Users without devices added: ${usersWithoutDevicesAdded}`);
+        console.log('=== END ADDING USERS WITHOUT DEVICES ===');
+        
         // Debug summary
         console.log('=== DEVICE PROCESSING SUMMARY ===');
         console.log(`Total devices from API: ${devices.length}`);
+        console.log(`Total users from remote API: ${allRemoteUsers?.length || 0}`);
         console.log(`Devices processed successfully: ${devicesProcessed}`);
         console.log(`Devices with users: ${devicesWithUsers}`);
         console.log(`Devices without users: ${devicesWithoutUsers}`);
         console.log(`Devices with errors: ${devicesWithErrors}`);
         console.log(`Unique devices in export (by uniqueId): ${processedDeviceIds.size}`);
         console.log(`Total user-device relationships: ${totalUsersFound}`);
+        console.log(`Users without devices added: ${usersWithoutDevicesAdded}`);
         console.log(`Unique users in export: ${processedUserIds.size}`);
+        console.log(`Reseller user included: ${resellerUser ? 'Yes' : 'No'}`);
+        if (!resellerUser) {
+          console.warn('⚠️ RESELLER USER NOT FOUND!');
+          console.warn('Reseller:', reseller);
+        }
         console.log(`Total rows in export file: ${exportData.length}`);
         
         if (errorDevices.length > 0 && errorDevices.length <= 20) {
