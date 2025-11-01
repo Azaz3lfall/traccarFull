@@ -386,12 +386,26 @@ const FloatingResellersPopover = ({
     setServerQueryExecutionTime(null);
     setServerQueryLoading(true);
     try {
+      // Get reseller info from serverModal
+      const reseller = serverModal.reseller;
+      
       // Query users first
-      await queryServerUsers(
+      const allUsers = await queryServerUsers(
         serverFormData.serverUrl,
         serverFormData.login,
         serverFormData.password
       );
+      
+      // Find reseller user from the users list
+      let resellerUser = null;
+      if (reseller && reseller.resellerId && allUsers && Array.isArray(allUsers)) {
+        resellerUser = allUsers.find(user => user.id === reseller.resellerId);
+        if (resellerUser) {
+          console.log('Found reseller user:', resellerUser.login || resellerUser.email || resellerUser.name);
+        } else {
+          console.warn(`Reseller user with ID ${reseller.resellerId} not found in users list`);
+        }
+      }
       
       // Then query devices
       const devices = await queryServerDevices(
@@ -464,23 +478,47 @@ const FloatingResellersPopover = ({
                 devicesWithoutUsers++;
                 processedDeviceIds.add(deviceUniqueId);
                 
-                // Device has no users, but we still need to include it with empty user data
-                // so it gets created and assigned to the group with reseller permissions
-                const row = [
-                  '',                              // userLogin (empty - no user)
-                  '',                              // userFullName (empty)
-                  '',                              // userEmail (empty)
-                  0,                               // userUserLimit (default)
-                  -1,                              // userDeviceLimit (default)
-                  deviceName || '',               // deviceName
-                  deviceUniqueId || '',           // deviceUniqueId
-                  devicePhone || '',              // devicePhone
-                  deviceModel || ''               // deviceModel
-                ];
-                exportData.push(row);
-                
-                if (idx < 10 || devicesWithoutUsers <= 10) {
-                  console.log(`Device ${idx + 1}/${devices.length}: ${device.name || device.id} (${deviceUniqueId}) has no users - adding row with empty user data`);
+                // Device has no users - use reseller user data if available
+                if (resellerUser) {
+                  const userKey = resellerUser.login || resellerUser.email || resellerUser.id;
+                  if (userKey) processedUserIds.add(String(userKey));
+                  
+                  totalUsersFound++;
+                  
+                  const row = [
+                    resellerUser.login || resellerUser.email || '', // userLogin (use login, fallback to email)
+                    resellerUser.name || '',                       // userFullName
+                    resellerUser.email || '',                       // userEmail
+                    resellerUser.userLimit ?? 0,                    // userUserLimit
+                    resellerUser.deviceLimit ?? -1,                 // userDeviceLimit
+                    deviceName || '',                              // deviceName
+                    deviceUniqueId || '',                          // deviceUniqueId
+                    devicePhone || '',                             // devicePhone
+                    deviceModel || ''                              // deviceModel
+                  ];
+                  exportData.push(row);
+                  
+                  if (idx < 10 || devicesWithoutUsers <= 10) {
+                    console.log(`Device ${idx + 1}/${devices.length}: ${device.name || device.id} (${deviceUniqueId}) has no users - using reseller user data`);
+                  }
+                } else {
+                  // Fallback: empty user data if reseller user not found
+                  const row = [
+                    '',                              // userLogin (empty - no user)
+                    '',                              // userFullName (empty)
+                    '',                              // userEmail (empty)
+                    0,                               // userUserLimit (default)
+                    -1,                              // userDeviceLimit (default)
+                    deviceName || '',               // deviceName
+                    deviceUniqueId || '',           // deviceUniqueId
+                    devicePhone || '',              // devicePhone
+                    deviceModel || ''               // deviceModel
+                  ];
+                  exportData.push(row);
+                  
+                  if (idx < 10 || devicesWithoutUsers <= 10) {
+                    console.warn(`Device ${idx + 1}/${devices.length}: ${device.name || device.id} (${deviceUniqueId}) has no users and reseller user not found - adding row with empty user data`);
+                  }
                 }
               }
             } catch (error) {
