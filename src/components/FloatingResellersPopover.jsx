@@ -389,23 +389,29 @@ const FloatingResellersPopover = ({
       // Get reseller info from serverModal
       const reseller = serverModal.reseller;
       
-      // Query users first
-      const allUsers = await queryServerUsers(
+      // Find reseller user from LOCAL server (not remote server)
+      let resellerUser = null;
+      if (reseller && reseller.resellerId) {
+        try {
+          const localUsersResponse = await fetchOrThrow('/api/users');
+          const localUsers = await localUsersResponse.json();
+          resellerUser = localUsers.find(user => user.id === reseller.resellerId);
+          if (resellerUser) {
+            console.log('Found reseller user from local server:', resellerUser.login || resellerUser.email || resellerUser.name);
+          } else {
+            console.warn(`Reseller user with ID ${reseller.resellerId} not found in local users list`);
+          }
+        } catch (error) {
+          console.error('Error fetching local users for reseller:', error);
+        }
+      }
+      
+      // Query users from remote server (just for logging, not used for reseller lookup)
+      await queryServerUsers(
         serverFormData.serverUrl,
         serverFormData.login,
         serverFormData.password
       );
-      
-      // Find reseller user from the users list
-      let resellerUser = null;
-      if (reseller && reseller.resellerId && allUsers && Array.isArray(allUsers)) {
-        resellerUser = allUsers.find(user => user.id === reseller.resellerId);
-        if (resellerUser) {
-          console.log('Found reseller user:', resellerUser.login || resellerUser.email || resellerUser.name);
-        } else {
-          console.warn(`Reseller user with ID ${reseller.resellerId} not found in users list`);
-        }
-      }
       
       // Then query devices
       const devices = await queryServerDevices(
