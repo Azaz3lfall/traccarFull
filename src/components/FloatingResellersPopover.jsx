@@ -426,15 +426,15 @@ const FloatingResellersPopover = ({
               if (users && Array.isArray(users)) {
                 users.forEach(user => {
                   const row = [
-                    user.login || '',           // userLogin
-                    user.name || '',           // userFullName
-                    user.email || '',          // userEmail
-                    user.userLimit || 0,       // userUserLimit
-                    user.deviceLimit || -1,    // userDeviceLimit
-                    deviceName,                // deviceName
-                    deviceUniqueId,            // deviceUniqueId
-                    devicePhone,               // devicePhone
-                    deviceModel                // deviceModel
+                    user.login || user.email || '', // userLogin (use login, fallback to email)
+                    user.name || '',               // userFullName
+                    user.email || '',              // userEmail
+                    user.userLimit ?? 0,           // userUserLimit
+                    user.deviceLimit ?? -1,        // userDeviceLimit
+                    deviceName || '',              // deviceName
+                    deviceUniqueId || '',         // deviceUniqueId
+                    devicePhone || '',             // devicePhone
+                    deviceModel || ''              // deviceModel
                   ];
                   exportData.push(row);
                 });
