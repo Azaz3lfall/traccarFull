@@ -402,10 +402,22 @@ const FloatingResellersPopover = ({
       
       // Collect data for export
       const exportData = [];
+      let devicesProcessed = 0;
+      let devicesWithUsers = 0;
+      let devicesWithoutUsers = 0;
+      let devicesWithErrors = 0;
+      let totalUsersFound = 0;
+      const processedUserIds = new Set();
+      const processedDeviceIds = new Set();
+      const errorDevices = [];
       
       // For each device, query users by deviceId
       if (devices && Array.isArray(devices)) {
-        for (const device of devices) {
+        console.log(`=== STARTING DEVICE PROCESSING ===`);
+        console.log(`Total devices to process: ${devices.length}`);
+        
+        for (let idx = 0; idx < devices.length; idx++) {
+          const device = devices[idx];
           if (device.id) {
             try {
               const users = await queryUsersByDeviceId(
@@ -414,7 +426,8 @@ const FloatingResellersPopover = ({
                 serverFormData.password,
                 device.id
               );
-              console.log('Device name:', device.name || device.id, 'Users:', users);
+              
+              devicesProcessed++;
               
               // Extract device data
               const deviceName = device.name || '';
@@ -423,8 +436,17 @@ const FloatingResellersPopover = ({
               const deviceModel = device.model || '';
               
               // For each user, create a row
-              if (users && Array.isArray(users)) {
+              if (users && Array.isArray(users) && users.length > 0) {
+                devicesWithUsers++;
+                processedDeviceIds.add(deviceUniqueId);
+                
                 users.forEach(user => {
+                  // Track unique users
+                  const userKey = user.login || user.email || user.id;
+                  if (userKey) processedUserIds.add(String(userKey));
+                  
+                  totalUsersFound++;
+                  
                   const row = [
                     user.login || user.email || '', // userLogin (use login, fallback to email)
                     user.name || '',               // userFullName
@@ -438,12 +460,67 @@ const FloatingResellersPopover = ({
                   ];
                   exportData.push(row);
                 });
+              } else {
+                devicesWithoutUsers++;
+                processedDeviceIds.add(deviceUniqueId);
+                
+                // Device has no users, but we still need to include it with empty user data
+                // so it gets created and assigned to the group with reseller permissions
+                const row = [
+                  '',                              // userLogin (empty - no user)
+                  '',                              // userFullName (empty)
+                  '',                              // userEmail (empty)
+                  0,                               // userUserLimit (default)
+                  -1,                              // userDeviceLimit (default)
+                  deviceName || '',               // deviceName
+                  deviceUniqueId || '',           // deviceUniqueId
+                  devicePhone || '',              // devicePhone
+                  deviceModel || ''               // deviceModel
+                ];
+                exportData.push(row);
+                
+                if (idx < 10 || devicesWithoutUsers <= 10) {
+                  console.log(`Device ${idx + 1}/${devices.length}: ${device.name || device.id} (${deviceUniqueId}) has no users - adding row with empty user data`);
+                }
               }
             } catch (error) {
-              console.error(`Failed to get users for device ${device.name || device.id}:`, error);
+              devicesWithErrors++;
+              errorDevices.push({
+                deviceId: device.id,
+                deviceName: device.name,
+                deviceUniqueId: device.uniqueId,
+                error: error.message
+              });
+              if (devicesWithErrors <= 10) {
+                console.error(`Failed to get users for device ${device.name || device.id} (${device.uniqueId}):`, error);
+              }
             }
+          } else {
+            console.warn(`Device at index ${idx} missing ID:`, device);
+          }
+          
+          // Progress update every 100 devices
+          if ((idx + 1) % 100 === 0) {
+            console.log(`Progress: ${idx + 1}/${devices.length} devices processed`);
           }
         }
+        
+        // Debug summary
+        console.log('=== DEVICE PROCESSING SUMMARY ===');
+        console.log(`Total devices from API: ${devices.length}`);
+        console.log(`Devices processed successfully: ${devicesProcessed}`);
+        console.log(`Devices with users: ${devicesWithUsers}`);
+        console.log(`Devices without users: ${devicesWithoutUsers}`);
+        console.log(`Devices with errors: ${devicesWithErrors}`);
+        console.log(`Unique devices in export (by uniqueId): ${processedDeviceIds.size}`);
+        console.log(`Total user-device relationships: ${totalUsersFound}`);
+        console.log(`Unique users in export: ${processedUserIds.size}`);
+        console.log(`Total rows in export file: ${exportData.length}`);
+        
+        if (errorDevices.length > 0 && errorDevices.length <= 20) {
+          console.log('Devices with errors (first 20):', errorDevices);
+        }
+        console.log('=== END SUMMARY ===');
       }
       
       // Generate and download XLSX file if we have data
@@ -504,6 +581,31 @@ const FloatingResellersPopover = ({
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          
+          // Debug: Log all lines
+          console.log('=== XLSX FILE DEBUG ===');
+          console.log('All lines:', jsonData);
+          console.log('Total count:', jsonData.length);
+          
+          // Get unique users based on userLogin (fallback to userEmail)
+          const uniqueUsers = new Set();
+          jsonData.forEach(row => {
+            const userKey = row.userLogin || row.userEmail || '';
+            if (userKey) uniqueUsers.add(userKey);
+          });
+          console.log('Unique users:', Array.from(uniqueUsers));
+          console.log('Unique users count:', uniqueUsers.size);
+          
+          // Get unique devices based on deviceUniqueId
+          const uniqueDevices = new Set();
+          jsonData.forEach(row => {
+            const deviceUniqueId = row.deviceUniqueId || '';
+            if (deviceUniqueId) uniqueDevices.add(deviceUniqueId);
+          });
+          console.log('Unique devices:', Array.from(uniqueDevices));
+          console.log('Unique devices count:', uniqueDevices.size);
+          console.log('=== END DEBUG ===');
+          
           console.log('Parsed XLSX content:', jsonData);
         } catch (error) {
           console.error('Error parsing XLSX file:', error);
@@ -601,6 +703,14 @@ const FloatingResellersPopover = ({
         if (user.email) userLookup.set(user.email.toLowerCase(), user);
       });
 
+      // Fetch existing devices
+      const devicesResponse = await fetchOrThrow('/api/devices?all=true');
+      const existingDevices = await devicesResponse.json();
+      const deviceLookup = new Map();
+      existingDevices.forEach(device => {
+        if (device.uniqueId) deviceLookup.set(device.uniqueId, device);
+      });
+
       // Statistics
       let createdUsers = 0;
       let createdDevices = 0;
@@ -645,19 +755,22 @@ const FloatingResellersPopover = ({
         };
 
         try {
-          // STEP 1: Check if user exists or create
+          // STEP 1: Check if user exists or create (skip if no user data)
           let userId = null;
-          const userKey = row.userLogin?.toLowerCase();
-          const emailKey = row.userEmail?.toLowerCase();
+          const hasUserData = row.userLogin || row.userEmail;
           
-          if (userLookup.has(userKey) || userLookup.has(emailKey)) {
-            userId = userLookup.get(userKey)?.id || userLookup.get(emailKey)?.id;
-            skippedUsers++;
-            rowDetail.userSkipped = true;
-            rowDetail.userStatus = 'Skipped (already exists)';
-          } else {
-            // Create new user
-            const userPayload = {
+          if (hasUserData) {
+            const userKey = row.userLogin?.toLowerCase();
+            const emailKey = row.userEmail?.toLowerCase();
+            
+            if (userLookup.has(userKey) || userLookup.has(emailKey)) {
+              userId = userLookup.get(userKey)?.id || userLookup.get(emailKey)?.id;
+              skippedUsers++;
+              rowDetail.userSkipped = true;
+              rowDetail.userStatus = 'Skipped (already exists)';
+            } else {
+              // Create new user
+              const userPayload = {
               name: row.userFullName || row.userLogin,
               login: row.userLogin,
               email: row.userEmail,
@@ -694,95 +807,174 @@ const FloatingResellersPopover = ({
               }
             };
 
-            const userResponse = await fetchOrThrow('/api/users', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(userPayload)
-            });
-            
-            const newUser = await userResponse.json();
-            userId = newUser.id;
-            userLookup.set(userKey, newUser);
-            if (emailKey) userLookup.set(emailKey, newUser);
-            createdUsers++;
-            rowDetail.userCreated = true;
-            rowDetail.userStatus = 'Created';
+              const userResponse = await fetchOrThrow('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userPayload)
+              });
+              
+              const newUser = await userResponse.json();
+              userId = newUser.id;
+              userLookup.set(userKey, newUser);
+              if (emailKey) userLookup.set(emailKey, newUser);
+              createdUsers++;
+              rowDetail.userCreated = true;
+              rowDetail.userStatus = 'Created';
+            }
+          } else {
+            // No user data in this row (device without user)
+            rowDetail.userStatus = 'Skipped (no user data)';
           }
           
           rowDetail.userId = userId;
           rowDetail.userStatus = rowDetail.userStatus || 'Created';
 
-          // STEP 2: Create device
-          const devicePayload = {
-            name: row.deviceName,
-            uniqueId: row.deviceUniqueId,
-            groupId: groupId,
-            phone: row.devicePhone || "",
-            model: row.deviceModel || "",
-            contact: "",
-            category: "default",
-            calendarId: null,
-            expirationTime: null,
-            disabled: false,
-            attributes: {}
-          };
+          // STEP 2: Check if device exists or create
+          let deviceId = null;
+          
+          if (row.deviceUniqueId && deviceLookup.has(row.deviceUniqueId)) {
+            const existingDevice = deviceLookup.get(row.deviceUniqueId);
+            deviceId = existingDevice.id;
+            rowDetail.deviceId = deviceId;
+            rowDetail.deviceStatus = 'Skipped (already exists)';
+          } else {
+            // Create new device
+            const devicePayload = {
+              name: row.deviceName,
+              uniqueId: row.deviceUniqueId,
+              groupId: groupId,
+              phone: row.devicePhone || "",
+              model: row.deviceModel || "",
+              contact: "",
+              category: "default",
+              calendarId: null,
+              expirationTime: null,
+              disabled: false,
+              attributes: {}
+            };
 
-          const deviceResponse = await fetchOrThrow('/api/devices', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(devicePayload)
-          });
+            try {
+              const deviceResponse = await fetchOrThrow('/api/devices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(devicePayload)
+              });
+              
+              const newDevice = await deviceResponse.json();
+              deviceId = newDevice.id;
+              rowDetail.deviceId = deviceId;
+              rowDetail.deviceStatus = 'Created';
+              
+              // Update lookup map
+              if (newDevice.uniqueId) deviceLookup.set(newDevice.uniqueId, newDevice);
+              
+              // Update Redux store with new device
+              dispatch(devicesActions.update([newDevice]));
+              
+              createdDevices++;
+            } catch (deviceError) {
+              // If device creation fails (duplicate), try to find existing device
+              const errorMessage = deviceError.message || '';
+              if (errorMessage.includes('Duplicate') || errorMessage.includes('uniqueid')) {
+                // Refresh device list to find the existing device
+                const refreshResponse = await fetchOrThrow('/api/devices?all=true');
+                const refreshedDevices = await refreshResponse.json();
+                const foundDevice = refreshedDevices.find(d => d.uniqueId === row.deviceUniqueId);
+                
+                if (foundDevice) {
+                  deviceId = foundDevice.id;
+                  rowDetail.deviceId = deviceId;
+                  rowDetail.deviceStatus = 'Found (already exists)';
+                  deviceLookup.set(foundDevice.uniqueId, foundDevice);
+                } else {
+                  throw deviceError;
+                }
+              } else {
+                throw deviceError;
+              }
+            }
+          }
           
-          const newDevice = await deviceResponse.json();
-          rowDetail.deviceId = newDevice.id;
-          rowDetail.deviceStatus = 'Created';
-          
-          // Update Redux store with new device
-          dispatch(devicesActions.update([newDevice]));
-          
-          createdDevices++;
-
-          // STEP 3: Create permissions (User to Device)
-          await fetchOrThrow('/api/permissions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: userId,
-              deviceId: newDevice.id
-            })
-          });
-          
-          createdPermissions++;
-          rowDetail.permissions.userToDevice.created = true;
-
-          // Create permission: Reseller (as userId) to Device
-          if (reseller && reseller.resellerId) {
-            await fetchOrThrow('/api/permissions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: reseller.resellerId,
-                deviceId: newDevice.id
-              })
-            });
-            
-            createdPermissions++;
-            rowDetail.permissions.resellerToDevice.created = true;
+          if (!deviceId) {
+            throw new Error('Device ID is required');
           }
 
-          // Create permission: Reseller (as userId) to Group
+          // STEP 3: Create permissions (User to Device) - only if user exists
+          if (userId) {
+            try {
+              await fetchOrThrow('/api/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: userId,
+                  deviceId: deviceId
+                })
+              });
+              
+              createdPermissions++;
+              rowDetail.permissions.userToDevice.created = true;
+            } catch (permError) {
+              // Permission might already exist
+              const permErrorMessage = permError.message || '';
+              if (permErrorMessage.includes('already exists') || permErrorMessage.includes('Duplicate')) {
+                rowDetail.permissions.userToDevice.created = true;
+              } else {
+                rowDetail.permissions.userToDevice.error = permErrorMessage;
+              }
+            }
+          } else {
+            rowDetail.permissions.userToDevice.created = false;
+            rowDetail.permissions.userToDevice.error = 'No user data';
+          }
+
+          // Create permission: Reseller (as userId) to Device - ALWAYS create (even if device already exists)
+          if (reseller && reseller.resellerId && deviceId) {
+            try {
+              await fetchOrThrow('/api/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: reseller.resellerId,
+                  deviceId: deviceId
+                })
+              });
+              
+              createdPermissions++;
+              rowDetail.permissions.resellerToDevice.created = true;
+            } catch (permError) {
+              // Permission might already exist - mark as created
+              const permErrorMessage = permError.message || '';
+              if (permErrorMessage.includes('already exists') || permErrorMessage.includes('Duplicate')) {
+                rowDetail.permissions.resellerToDevice.created = true;
+              } else {
+                rowDetail.permissions.resellerToDevice.error = permErrorMessage;
+              }
+            }
+          }
+
+          // Create permission: Reseller (as userId) to Group - ALWAYS create (once per group, but try each time)
           if (reseller && reseller.resellerId && groupId) {
-            await fetchOrThrow('/api/permissions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: reseller.resellerId,
-                groupId: groupId
-              })
-            });
-            
-            createdPermissions++;
-            rowDetail.permissions.resellerToGroup.created = true;
+            try {
+              await fetchOrThrow('/api/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: reseller.resellerId,
+                  groupId: groupId
+                })
+              });
+              
+              createdPermissions++;
+              rowDetail.permissions.resellerToGroup.created = true;
+            } catch (permError) {
+              // Permission might already exist - mark as created
+              const permErrorMessage = permError.message || '';
+              if (permErrorMessage.includes('already exists') || permErrorMessage.includes('Duplicate')) {
+                rowDetail.permissions.resellerToGroup.created = true;
+              } else {
+                rowDetail.permissions.resellerToGroup.error = permErrorMessage;
+              }
+            }
           }
 
         } catch (error) {
@@ -817,10 +1009,16 @@ const FloatingResellersPopover = ({
       // Close progress modal
       setImportProgress({ open: false, current: 0, total: 0, status: '' });
       
-      // Revalidate devices and groups to propagate changes
+      // Revalidate and refresh devices list to ensure we have the latest data
+      const refreshedDevicesResponse = await fetchOrThrow('/api/devices?all=true');
+      const refreshedDevices = await refreshedDevicesResponse.json();
+      dispatch(devicesActions.refresh(refreshedDevices));
+      
+      // Invalidate queries to propagate changes
       queryClient.invalidateQueries(['devices']);
       queryClient.invalidateQueries(['groups']);
       queryClient.invalidateQueries(['users']);
+      queryClient.invalidateQueries(['permissions']);
       
       // Generate log file
       const logContent = generateImportLog({
