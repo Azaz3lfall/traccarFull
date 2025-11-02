@@ -642,17 +642,36 @@ const FloatingResellersPopover = ({
         console.log('=== END SUMMARY ===');
       }
       
-      // Generate and download XLSX file if we have data
+      // Generate and download XLSX files if we have data (split into chunks of 500 rows)
       if (exportData.length > 0) {
         const headers = ['userLogin', 'userFullName', 'userEmail', 'userUserLimit', 'userDeviceLimit', 'deviceName', 'deviceUniqueId', 'devicePhone', 'deviceModel'];
-        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData]);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-        XLSX.writeFile(workbook, `server-import-${Date.now()}.xlsx`);
+        const maxRowsPerFile = 500;
+        const totalFiles = Math.ceil(exportData.length / maxRowsPerFile);
+        const timestamp = Date.now();
+        
+        // Helper function to delay downloads
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        
+        // Generate and download files sequentially
+        for (let fileIndex = 0; fileIndex < totalFiles; fileIndex++) {
+          const startIndex = fileIndex * maxRowsPerFile;
+          const endIndex = Math.min(startIndex + maxRowsPerFile, exportData.length);
+          const chunkData = exportData.slice(startIndex, endIndex);
+          
+          const worksheet = XLSX.utils.aoa_to_sheet([headers, ...chunkData]);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+          XLSX.writeFile(workbook, `server-import-${timestamp}-part${fileIndex + 1}-of-${totalFiles}.xlsx`);
+          
+          // Add a small delay between downloads to allow browser to handle them properly
+          if (fileIndex < totalFiles - 1) {
+            await delay(500); // 500ms delay between downloads
+          }
+        }
         
         setSnackbar({ 
           open: true, 
-          message: t('serverImportFileGenerated', { count: exportData.length }), 
+          message: t('serverImportFileGenerated', { count: exportData.length, files: totalFiles }), 
           severity: 'success' 
         });
       } else {
