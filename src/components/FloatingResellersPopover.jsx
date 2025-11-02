@@ -389,18 +389,17 @@ const FloatingResellersPopover = ({
       // Get reseller info from serverModal
       const reseller = serverModal.reseller;
       
-      // Find reseller user from LOCAL server (not remote server)
+      // Fetch reseller user from LOCAL server (only local API call needed - for fallback)
       let resellerUser = null;
       if (reseller && reseller.resellerId) {
         try {
           console.log('=== RESELLER USER LOOKUP ===');
           console.log('Reseller info:', { resellerId: reseller.resellerId, companyName: reseller.companyName });
           
-          const localUsersResponse = await fetchOrThrow('/api/users');
-          const localUsers = await localUsersResponse.json();
-          console.log(`Total local users: ${localUsers.length}`);
+          // Fetch reseller user directly by ID from local server
+          const resellerUserResponse = await fetchOrThrow(`/api/users/${reseller.resellerId}`);
+          resellerUser = await resellerUserResponse.json();
           
-          resellerUser = localUsers.find(user => user.id === reseller.resellerId);
           if (resellerUser) {
             console.log('✓ Found reseller user from local server:');
             console.log('  - ID:', resellerUser.id);
@@ -410,12 +409,10 @@ const FloatingResellersPopover = ({
             console.log('  - UserLimit:', resellerUser.userLimit);
             console.log('  - DeviceLimit:', resellerUser.deviceLimit);
             console.log('=== END RESELLER USER LOOKUP ===');
-          } else {
-            console.warn(`✗ Reseller user with ID ${reseller.resellerId} not found in local users list`);
-            console.warn('Available user IDs:', localUsers.map(u => u.id).slice(0, 20));
           }
         } catch (error) {
-          console.error('Error fetching local users for reseller:', error);
+          console.error(`Error fetching reseller user (ID: ${reseller.resellerId}) from local server:`, error);
+          console.warn('⚠️ Reseller user not available - devices without users will have empty user data');
         }
       } else {
         console.warn('No reseller or resellerId provided:', reseller);
