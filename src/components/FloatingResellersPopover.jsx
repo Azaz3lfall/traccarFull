@@ -798,7 +798,7 @@ const FloatingResellersPopover = ({
       // Open progress modal
       setImportProgress({ open: true, current: 0, total: data.length, status: t('massImporterStartingImport') });
       
-      // Create group for the reseller
+      // Create or find group for the reseller
       const reseller = massImporterModal.reseller;
       let groupId = null;
       
@@ -810,26 +810,43 @@ const FloatingResellersPopover = ({
           status: t('massImporterCreatingGroup') 
         });
         
-        const groupPayload = {
-          name: reseller.companyName,
-          groupId: null,
-          attributes: {}
-        };
+        // First, check if group already exists
+        const groupsResponse = await fetchOrThrow('/api/groups');
+        const existingGroups = await groupsResponse.json();
         
-        const groupResponse = await fetchOrThrow('/api/groups', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(groupPayload)
-        });
+        // Find group with matching name
+        const existingGroup = existingGroups.find(group => 
+          group.name === reseller.companyName
+        );
         
-        const newGroup = await groupResponse.json();
-        groupId = newGroup.id;
-        
-        // Update Redux store
-        dispatch(groupsActions.add(newGroup));
-        // Invalidate query caches
-        queryClient.invalidateQueries(['groups']);
-        queryClient.invalidateQueries(['devices']);
+        if (existingGroup) {
+          // Use existing group
+          groupId = existingGroup.id;
+          console.log(`Using existing group: ${existingGroup.name} (ID: ${groupId})`);
+        } else {
+          // Create new group
+          const groupPayload = {
+            name: reseller.companyName,
+            groupId: null,
+            attributes: {}
+          };
+          
+          const groupResponse = await fetchOrThrow('/api/groups', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(groupPayload)
+          });
+          
+          const newGroup = await groupResponse.json();
+          groupId = newGroup.id;
+          
+          // Update Redux store
+          dispatch(groupsActions.add(newGroup));
+          // Invalidate query caches
+          queryClient.invalidateQueries(['groups']);
+          queryClient.invalidateQueries(['devices']);
+          console.log(`Created new group: ${newGroup.name} (ID: ${groupId})`);
+        }
       }
       
       // Fetch existing users
