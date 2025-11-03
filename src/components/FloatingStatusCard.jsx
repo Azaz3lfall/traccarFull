@@ -8,7 +8,10 @@ import { createPortal } from 'react-dom';
 import {
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Tabs,
+  Tab,
+  Box
 } from '@mui/material';
 import {
   devicesActions,
@@ -57,6 +60,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
+import { HiOutlinePlay } from "react-icons/hi2";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -253,6 +257,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [sensorEditModalOpen, setSensorEditModalOpen] = useState(false);
   const [sensorNames, setSensorNames] = useState({});
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
+  const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
+  const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -324,6 +330,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Get current device and position
   // In replay mode, use replay device; otherwise use selected device
   const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
+
+  // Reset tab when modal opens to first enabled tab
+  useEffect(() => {
+    if (moreDetailsModalOpen && device) {
+      const hasIoTHub = !!device.attributes?.iothub;
+      const hasHikiVision = !!device.attributes?.hikivision;
+      
+      // Reset to first enabled tab
+      if (hasIoTHub) {
+        setMoreDetailsActiveTab(0);
+      } else if (hasHikiVision) {
+        setMoreDetailsActiveTab(1);
+      }
+    }
+  }, [moreDetailsModalOpen, device]);
 
   // Helper function to get sensor display name (custom name takes precedence)
   const getSensorDisplayName = useCallback((sensorKey) => {
@@ -1692,6 +1713,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           >
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
+
+          {/* More Details Button - Hidden in replay mode */}
+          {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (
+            <button
+              onClick={() => setMoreDetailsModalOpen(true)}
+              style={{
+                position: 'absolute',
+                top: !desktop ? '8px' : '12px',
+                right: !desktop ? '71px' : '76px',
+                zIndex: 10,
+                width: '28px',
+                height: '28px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="More Details"
+            >
+              <HiOutlinePlay style={{ fontSize: '18px', color: colors.textSecondary }} />
+            </button>
+          )}
 
           {/* Sensor Edit Button - Hidden in replay mode */}
           {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (
@@ -4439,6 +4485,161 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               >
                 {t('commandSend')}
               </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* More Details Modal */}
+    <AnimatePresence>
+      {moreDetailsModalOpen && (
+        <motion.div
+          key="more-details-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10004
+          }}
+          onClick={() => setMoreDetailsModalOpen(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: '8px',
+              width: '99vw',
+              height: '98vh',
+              maxWidth: '99vw',
+              maxHeight: '98vh',
+              overflow: 'hidden',
+              boxShadow: colors.shadow,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Tabs Navigation with Close Button */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <button
+                onClick={() => setMoreDetailsModalOpen(false)}
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s',
+                  padding: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.hover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                title="Close"
+              >
+                <ChevronLeft size={20} color={colors.textSecondary} />
+              </button>
+              <Tabs
+                value={moreDetailsActiveTab}
+                onChange={(e, newValue) => setMoreDetailsActiveTab(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+                style={{
+                  borderBottom: 'none',
+                  flex: 1,
+                }}
+                sx={{
+                  '& .MuiTab-root': {
+                    color: '#666666',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    textTransform: 'none',
+                    minHeight: '40px',
+                    padding: '8px 16px',
+                    '&.Mui-selected': {
+                      color: '#1976d2',
+                      fontWeight: '600',
+                      backgroundColor: 'transparent',
+                    },
+                    '&:hover': {
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                    },
+                    '&.Mui-selected:hover': {
+                      color: '#1976d2',
+                      backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                    },
+                    '&.Mui-disabled': {
+                      opacity: 0.5,
+                    },
+                  },
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: '#1976d2',
+                    height: '2px',
+                  },
+                }}
+              >
+                <Tab 
+                  label="IoTHub" 
+                  disabled={!device?.attributes?.iothub}
+                />
+                <Tab 
+                  label="HikiVision" 
+                  disabled={!device?.attributes?.hikivision}
+                />
+              </Tabs>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ 
+              flex: 1, 
+              overflow: 'hidden', 
+              padding: '0 24px 24px 24px', 
+              display: 'flex', 
+              flexDirection: 'column' 
+            }}>
+              {/* Tab Content */}
+              <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
+                {moreDetailsActiveTab === 0 && (
+                  <div style={{ color: colors.text }}>
+                    <h3 style={{ color: colors.text, marginBottom: '16px' }}>IoTHub</h3>
+                    <p style={{ color: colors.textSecondary }}>IoTHub content goes here...</p>
+                  </div>
+                )}
+                {moreDetailsActiveTab === 1 && (
+                  <div style={{ color: colors.text }}>
+                    <h3 style={{ color: colors.text, marginBottom: '16px' }}>HikiVision</h3>
+                    <p style={{ color: colors.textSecondary }}>HikiVision content goes here...</p>
+                  </div>
+                )}
+              </Box>
             </div>
           </motion.div>
         </motion.div>
