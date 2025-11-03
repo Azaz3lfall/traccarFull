@@ -410,12 +410,33 @@ const FloatingDevicesPopover = ({
       return;
     }
 
+    // Console log iothub state
+    console.log('iothub state:', editingDevice.iothub);
 
+    // Store iothub in attributes and remove from top level
+    // Ensure all fields are present, even if empty
+    const { iothub, ...deviceData } = editingDevice;
+    const iothubData = {
+      iothubServer: iothub?.iothubServer || '',
+      ftpServerIp: iothub?.ftpServerIp || '',
+      ftpPort: iothub?.ftpPort || '',
+      ftpUser: iothub?.ftpUser || '',
+      ftpPassword: iothub?.ftpPassword || '',
+      fileUploadPath: iothub?.fileUploadPath || '',
+    };
+    
+    const finalDeviceData = {
+      ...deviceData,
+      attributes: {
+        ...deviceData.attributes,
+        iothub: JSON.stringify(iothubData),
+      },
+    };
 
     if (editingDevice.id) {
-      updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: editingDevice });
+      updateDeviceMutation.mutate({ id: editingDevice.id, deviceData: finalDeviceData });
     } else {
-      createDeviceMutation.mutate(editingDevice);
+      createDeviceMutation.mutate(finalDeviceData);
     }
   };
 
@@ -453,7 +474,7 @@ const FloatingDevicesPopover = ({
       disabled: false,
       attributes: {},
       iothub: {
-        iothubIp: '',
+        iothubServer: '',
         ftpServerIp: '',
         ftpPort: '',
         ftpUser: '',
@@ -466,7 +487,28 @@ const FloatingDevicesPopover = ({
   };
 
   const handleEditDevice = (device) => {
-    setEditingDevice(device);
+    // Read iothub from attributes if it exists
+    let iothub = {
+      iothubServer: '',
+      ftpServerIp: '',
+      ftpPort: '',
+      ftpUser: '',
+      ftpPassword: '',
+      fileUploadPath: '',
+    };
+    
+    if (device.attributes?.iothub) {
+      try {
+        iothub = JSON.parse(device.attributes.iothub);
+      } catch (e) {
+        // If parsing fails, use default
+      }
+    }
+    
+    setEditingDevice({
+      ...device,
+      iothub,
+    });
     setEditDialog(true);
     setActiveTab(0);
   };
@@ -1535,13 +1577,13 @@ const FloatingDevicesPopover = ({
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <TextField
                           fullWidth
-                          label="IoTHub IP"
-                          value={editingDevice?.iothub?.iothubIp || ''}
+                          label="IoTHub Server"
+                          value={editingDevice?.iothub?.iothubServer || ''}
                           onChange={(e) => setEditingDevice({ 
                             ...editingDevice, 
                             iothub: { 
                               ...(editingDevice?.iothub || {}), 
-                              iothubIp: e.target.value 
+                              iothubServer: e.target.value 
                             } 
                           })}
                           size="small"
