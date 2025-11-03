@@ -452,6 +452,14 @@ const FloatingDevicesPopover = ({
       expirationTime: null,
       disabled: false,
       attributes: {},
+      iothub: {
+        iothubIp: '',
+        ftpServerIp: '',
+        ftpPort: '',
+        ftpUser: '',
+        ftpPassword: '',
+        fileUploadPath: '',
+      },
     });
     setEditDialog(true);
     setActiveTab(0);
@@ -1086,6 +1094,7 @@ const FloatingDevicesPopover = ({
                       <Tab label={t('sharedRequired')} />
                       <Tab label={t('sharedExtra')} />
                       <Tab label={t('sharedAttributes')} />
+                      <Tab label="Jimi IoT" />
                     </Tabs>
 
                     {/* Tab Content */}
@@ -1517,6 +1526,163 @@ const FloatingDevicesPopover = ({
                           definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
                           focusAttribute={null}
                           zIndex={10003}
+                        />
+                      </div>
+                    )}
+
+                    {/* Jimi IoT Tab */}
+                    {activeTab === 3 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <TextField
+                          fullWidth
+                          label="IoTHub IP"
+                          value={editingDevice?.iothub?.iothubIp || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              iothubIp: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="FTP Server IP"
+                          value={editingDevice?.iothub?.ftpServerIp || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              ftpServerIp: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="FTP Port"
+                          value={editingDevice?.iothub?.ftpPort || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              ftpPort: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="FTP User"
+                          value={editingDevice?.iothub?.ftpUser || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              ftpUser: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="FTP Password"
+                          type="password"
+                          value={editingDevice?.iothub?.ftpPassword || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              ftpPassword: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="File Upload Path"
+                          value={editingDevice?.iothub?.fileUploadPath || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              fileUploadPath: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
                         />
                       </div>
                     )}
