@@ -423,6 +423,8 @@ const FloatingDevicesPopover = ({
       ftpUser: iothub?.ftpUser || '',
       ftpPassword: iothub?.ftpPassword || '',
       fileUploadPath: iothub?.fileUploadPath || '',
+      deviceModel: iothub?.deviceModel || '',
+      channels: iothub?.channels || '',
     };
     
     const finalDeviceData = {
@@ -480,6 +482,8 @@ const FloatingDevicesPopover = ({
         ftpUser: '',
         ftpPassword: '',
         fileUploadPath: '',
+        deviceModel: '',
+        channels: '',
       },
     });
     setEditDialog(true);
@@ -494,7 +498,9 @@ const FloatingDevicesPopover = ({
       ftpPort: '',
       ftpUser: '',
       ftpPassword: '',
-      fileUploadPath: '',
+    fileUploadPath: '',
+    deviceModel: '',
+    channels: '',
     };
     
     if (device.attributes?.iothub) {
@@ -1602,6 +1608,31 @@ const FloatingDevicesPopover = ({
                         />
                         <TextField
                           fullWidth
+                          label="Device Model"
+                          value={editingDevice?.iothub?.deviceModel || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              deviceModel: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
                           label="FTP Server IP"
                           value={editingDevice?.iothub?.ftpServerIp || ''}
                           onChange={(e) => setEditingDevice({ 
@@ -1710,6 +1741,31 @@ const FloatingDevicesPopover = ({
                             iothub: { 
                               ...(editingDevice?.iothub || {}), 
                               fileUploadPath: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Channels"
+                          value={editingDevice?.iothub?.channels || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              channels: e.target.value 
                             } 
                           })}
                           size="small"
