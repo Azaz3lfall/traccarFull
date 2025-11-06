@@ -383,6 +383,83 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device]);
 
+  // Send instruct command to device to upload/transcode videos
+  const sendVideoListInstruct = useCallback(async () => {
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      throw new Error('Device iothub configuration not found');
+    }
+
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const iothubServer = iothub?.iothubServer || '';
+      const token = iothub?.token || '';
+
+      if (!iothubServer || !token) {
+        throw new Error('IoTHub Server or Token not configured');
+      }
+
+      // Format dates as YYMMDDHHmmss
+      const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return '';
+        const date = dayjs(dateTimeString);
+        return date.format('YYMMDDHHmmss');
+      };
+
+      const beginTime = formatDateTime(videoListStartDate);
+      const endTime = formatDateTime(videoListEndDate);
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("deviceImei", device.uniqueId);
+      urlencoded.append("cmdContent", JSON.stringify({
+        "channel": 0,
+        "beginTime": beginTime,
+        "endTime": endTime,
+        "alarmFlag": 0,
+        "resourceType": 0,
+        "codeType": 0,
+        "storageType": 0,
+        "instructionID": "123456789"
+      }));
+      urlencoded.append("serverFlagId", "0");
+      urlencoded.append("proNo", "37381");
+      urlencoded.append("platform", "web");
+      urlencoded.append("requestId", "6");
+      urlencoded.append("cmdType", "normallns");
+      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("token", token);
+
+      // Build URL from iothubServer - ensure it has protocol and path
+      const apiUrl = iothubServer.startsWith('http') 
+        ? `${iothubServer}/api/device/sendInstruct`
+        : `https://${iothubServer}/api/device/sendInstruct`;
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow"
+      };
+
+      console.log('=== Video List Instruct Request ===');
+      console.log('URL:', apiUrl);
+      console.log('beginTime:', beginTime);
+      console.log('endTime:', endTime);
+      console.log('====================================');
+
+      const response = await fetch(apiUrl, requestOptions);
+      const result = await response.text();
+      console.log('Video list instruct response:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('Error sending video list instruct:', error);
+      throw error;
+    }
+  }, [device, videoListStartDate, videoListEndDate]);
+
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
     if (!device?.uniqueId) {
@@ -5755,7 +5832,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               })}
                             </div>
                             <button
-                              onClick={() => {
+                              onClick={async () => {
                                 // Format dates as YYMMDDHHmmss
                                 const formatDateTime = (dateTimeString) => {
                                   if (!dateTimeString) return '';
@@ -5770,7 +5847,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 console.log('beginTime:', beginTime);
                                 console.log('endTime:', endTime);
                                 console.log('========================');
-                                fetchVideos();
+                                
+                                setVideosLoading(true);
+                                setVideosError(null);
+                                
+                                try {
+                                  // First, send instruct command to device
+                                  await sendVideoListInstruct();
+                                  
+                                  // Wait at least 20 seconds for device to process (upload/transcode)
+                                  // Then fetch videos from media server to get updated list
+                                  setTimeout(() => {
+                                    fetchVideos();
+                                  }, 20000); // 20 second delay
+                                } catch (error) {
+                                  console.error('Error in load from device:', error);
+                                  setVideosError(error.message || 'Failed to send command to device');
+                                  setVideosLoading(false);
+                                }
                               }}
                               disabled={videosLoading}
                               style={{
