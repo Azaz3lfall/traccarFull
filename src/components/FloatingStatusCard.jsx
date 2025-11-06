@@ -509,7 +509,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             parsed.data?._msg === "Command communication successful response") {
           return { success: true, data: parsed };
         } else {
-          return { success: false, data: parsed, error: 'Device is offline or command failed' };
+          // Show server message if available, otherwise show default message
+          const serverMessage = parsed.data?._msg || parsed.msg || 'Device is offline or command failed';
+          return { success: false, data: parsed, error: serverMessage };
         }
       } catch (e) {
         // If response is not JSON, treat as error
@@ -587,6 +589,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device, selectedChannel]);
 
+  // Refresh streaming for current channel
+  const handleRefreshStreaming = useCallback(async () => {
+    if (selectedChannel <= 0) {
+      return;
+    }
+
+    console.log(`Refreshing streaming for channel ${selectedChannel}`);
+    
+    // Clear previous streaming state
+    if (streamingRetryTimeoutRef.current) {
+      clearTimeout(streamingRetryTimeoutRef.current);
+      streamingRetryTimeoutRef.current = null;
+    }
+    
+    // Destroy existing player
+    if (flvPlayerRef.current) {
+      flvPlayerRef.current.destroy();
+      flvPlayerRef.current = null;
+    }
+    
+    // Clear streaming state
+    setStreamingVideoUrl(null);
+    setStreamingError(null);
+    setStreamingRetryCount(0);
+    setStreamingLoading(true);
+
+    try {
+      // Send streaming request
+      const response = await sendStreamingRequest(selectedChannel);
+      
+      // Check if response indicates success
+      if (response.success) {
+        // File is available immediately after activation - start loading right away
+        console.log('Streaming command sent successfully, loading video file...');
+        loadVideoStream(selectedChannel, 0, true);
+      } else {
+        // Device is offline or command failed
+        setStreamingError(response.error || 'Device is offline or command failed');
+        setStreamingLoading(false);
+      }
+    } catch (error) {
+      console.error('Error refreshing stream:', error);
+      setStreamingError(error.message || 'Failed to refresh streaming');
+      setStreamingLoading(false);
+    }
+  }, [selectedChannel, sendStreamingRequest, loadVideoStream]);
+
   // Handle channel tab change
   const handleChannelChange = useCallback(async (e, newValue) => {
     // Clear previous streaming state
@@ -594,14 +643,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       clearTimeout(streamingRetryTimeoutRef.current);
       streamingRetryTimeoutRef.current = null;
     }
-    // Destroy flv player if exists
-    if (flvPlayerRef.current) {
-      flvPlayerRef.current.destroy();
-      flvPlayerRef.current = null;
+    // Cleanup streaming when switching away from streaming tabs
+    if (newValue === 0 || newValue === 'playback') {
+      console.log('Cleaning up streaming - switching away from streaming tabs');
+      // Destroy flv player
+      if (flvPlayerRef.current) {
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
+      }
+      // Clear streaming state
+      setStreamingVideoUrl(null);
+      setStreamingLoading(false);
+      setStreamingError(null);
+      setStreamingRetryCount(0);
     }
-    setStreamingVideoUrl(null);
-    setStreamingError(null);
-    setStreamingRetryCount(0);
 
     setSelectedChannel(newValue);
 
@@ -633,6 +688,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Initialize flv.js player when video URL is set and video element is ready
   useEffect(() => {
     if (!streamingVideoUrl || selectedChannel <= 0) {
+      // Cleanup if URL is cleared or channel is not selected
+      if (flvPlayerRef.current) {
+        console.log('Cleaning up FLV player - URL cleared or channel not selected');
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
+      }
       return;
     }
 
@@ -762,8 +823,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       } else if (hasHikiVision) {
         setMoreDetailsActiveTab(1);
       }
+    } else if (!moreDetailsModalOpen) {
+      // Cleanup streaming when modal closes
+      console.log('Cleaning up streaming - modal closed');
+      if (streamingRetryTimeoutRef.current) {
+        clearTimeout(streamingRetryTimeoutRef.current);
+        streamingRetryTimeoutRef.current = null;
+      }
+      if (flvPlayerRef.current) {
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
+      }
+      setStreamingVideoUrl(null);
+      setStreamingLoading(false);
+      setStreamingError(null);
+      setStreamingRetryCount(0);
+      setSelectedChannel(0);
     }
-  }, [moreDetailsModalOpen, device, fetchVideos]);
+  }, [moreDetailsModalOpen, device, fetchVideos, getIoTHubChannels]);
 
   // Filter videos by selected channels and statuses
   const filteredVideos = useMemo(() => {
@@ -5211,51 +5288,71 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     height: desktop ? '100%' : 'auto',
                     minHeight: desktop ? 0 : 'auto'
                   }}>
-                    <Tabs
-                      value={selectedChannel}
-                      onChange={handleChannelChange}
-                      variant="scrollable"
-                      scrollButtons="auto"
-                      style={{
-                        borderBottom: `1px solid ${colors.border}`,
-                        marginBottom: '16px',
-                      }}
-                      sx={{
-                        '& .MuiTab-root': {
-                          color: '#666666',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          textTransform: 'none',
-                          minHeight: '40px',
-                          padding: '8px 16px',
-                          '&.Mui-selected': {
-                            color: '#1976d2',
-                            fontWeight: '600',
-                            backgroundColor: 'transparent',
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderBottom: `1px solid ${colors.border}`,
+                      marginBottom: '16px',
+                    }}>
+                      <Tabs
+                        value={selectedChannel}
+                        onChange={handleChannelChange}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        style={{
+                          flex: 1,
+                        }}
+                        sx={{
+                          '& .MuiTab-root': {
+                            color: '#666666',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            textTransform: 'none',
+                            minHeight: '40px',
+                            padding: '8px 16px',
+                            '&.Mui-selected': {
+                              color: '#1976d2',
+                              fontWeight: '600',
+                              backgroundColor: 'transparent',
+                            },
+                            '&:hover': {
+                              color: '#1976d2',
+                              backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                            },
+                            '&.Mui-selected:hover': {
+                              color: '#1976d2',
+                              backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                            },
                           },
-                          '&:hover': {
-                            color: '#1976d2',
-                            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                          '& .MuiTabs-indicator': {
+                            backgroundColor: '#1976d2',
+                            height: '2px',
                           },
-                          '&.Mui-selected:hover': {
-                            color: '#1976d2',
-                            backgroundColor: 'rgba(25, 118, 210, 0.15)',
-                          },
-                        },
-                        '& .MuiTabs-indicator': {
-                          backgroundColor: '#1976d2',
-                          height: '2px',
-                        },
-                      }}
-                    >
-                      <Tab label="Playback" />
-                      {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
-                        <Tab 
-                          key={channelNum}
-                          label={`Channel ${channelNum}`}
-                        />
-                      ))}
-                    </Tabs>
+                        }}
+                      >
+                        <Tab label="Playback" />
+                        {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
+                          <Tab 
+                            key={channelNum}
+                            label={`Channel ${channelNum}`}
+                          />
+                        ))}
+                      </Tabs>
+                      {selectedChannel > 0 && (
+                        <IconButton
+                          onClick={handleRefreshStreaming}
+                          disabled={streamingLoading}
+                          size="small"
+                          style={{
+                            marginRight: '8px',
+                            color: streamingLoading ? colors.textSecondary : '#1976d2',
+                          }}
+                          title="Refresh streaming"
+                        >
+                          <RefreshOutlinedIcon style={{ fontSize: '20px' }} />
+                        </IconButton>
+                      )}
+                    </div>
 
                     {/* Playback Tab Content */}
                     {selectedChannel === 0 && (() => {
@@ -5859,7 +5956,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   marginTop: '16px',
                                   fontSize: '14px'
                                 }}>
-                                  Loading stream... {streamingRetryCount > 0 && `(Retry ${streamingRetryCount}/10)`}
+                                  Connecting to device... {streamingRetryCount > 0 && `(Retry ${streamingRetryCount}/10)`}
                                 </Typography>
                               </div>
                             )}
