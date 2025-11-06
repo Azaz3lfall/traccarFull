@@ -271,6 +271,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
   const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState(0);
+  const [streamingLoading, setStreamingLoading] = useState(false);
+  const [streamingRetryCount, setStreamingRetryCount] = useState(0);
+  const [streamingVideoUrl, setStreamingVideoUrl] = useState(null);
+  const [streamingError, setStreamingError] = useState(null);
+  const streamingVideoRef = useRef(null);
+  const streamingRetryTimeoutRef = useRef(null);
   
   // Initialize dates with today 00:00:00 and 23:59:59
   const getTodayStart = () => dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
@@ -418,6 +424,149 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setVideosLoading(false);
     }
   }, [device]);
+
+  // Send streaming request to API
+  const sendStreamingRequest = useCallback(async (channelNum) => {
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      throw new Error('Device iothub configuration not found');
+    }
+
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const iothubServer = iothub?.iothubServer || '';
+      const ftpServerIp = iothub?.ftpServerIp || '';
+      const token = iothub?.token || '';
+
+      if (!iothubServer || !ftpServerIp || !token) {
+        throw new Error('IoTHub Server, FTP Server IP or Token not configured');
+      }
+
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("deviceImei", device.uniqueId);
+      urlencoded.append("cmdContent", JSON.stringify({
+        "dataType": "0",
+        "codeStreamType": "0",
+        "channel": String(channelNum),
+        "videoIP": ftpServerIp,
+        "videoTCPPort": "10002",
+        "videoUDPPort": "0"
+      }));
+      urlencoded.append("serverFlagId", "0");
+      urlencoded.append("proNo", "37121");
+      urlencoded.append("platform", "web");
+      urlencoded.append("requestId", "6");
+      urlencoded.append("cmdType", "normallns");
+      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("token", token);
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      // Build URL from iothubServer - ensure it has protocol and path
+      const apiUrl = iothubServer.startsWith('http') 
+        ? `${iothubServer}/api/device/sendInstruct`
+        : `https://${iothubServer}/api/device/sendInstruct`;
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow"
+      };
+      
+      const response = await fetch(apiUrl, requestOptions);
+      const result = await response.text();
+      console.log('Streaming request response:', result);
+      return result;
+    } catch (error) {
+      console.error('Error sending streaming request:', error);
+      throw error;
+    }
+  }, [device]);
+
+  // Load video stream with retry logic
+  const loadVideoStream = useCallback((channelNum, retryCount = 0) => {
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      setStreamingError('Device configuration not found');
+      setStreamingLoading(false);
+      return;
+    }
+
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const streamingServer = iothub?.streamingServer || '';
+
+      if (!streamingServer) {
+        setStreamingError('Streaming server not configured');
+        setStreamingLoading(false);
+        return;
+      }
+
+      const videoUrl = `${streamingServer}/${channelNum}/${device.uniqueId}.flv`;
+      setStreamingVideoUrl(videoUrl);
+      setStreamingError(null);
+      setStreamingRetryCount(retryCount);
+
+      // Wait a bit for the video element to be ready, then try to load
+      setTimeout(() => {
+        if (streamingVideoRef.current) {
+          const video = streamingVideoRef.current;
+          video.src = videoUrl;
+          video.load();
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error loading video stream:', error);
+      if (retryCount < 10) {
+        streamingRetryTimeoutRef.current = setTimeout(() => {
+          loadVideoStream(channelNum, retryCount + 1);
+        }, 30000);
+      } else {
+        setStreamingError(error.message || 'Failed to load video stream');
+        setStreamingLoading(false);
+      }
+    }
+  }, [device]);
+
+  // Handle channel tab change
+  const handleChannelChange = useCallback(async (e, newValue) => {
+    // Clear previous streaming state
+    if (streamingRetryTimeoutRef.current) {
+      clearTimeout(streamingRetryTimeoutRef.current);
+      streamingRetryTimeoutRef.current = null;
+    }
+    setStreamingVideoUrl(null);
+    setStreamingError(null);
+    setStreamingRetryCount(0);
+
+    setSelectedChannel(newValue);
+
+    // If switching to a channel tab (not playback)
+    if (newValue > 0) {
+      setStreamingLoading(true);
+      try {
+        // Send streaming request
+        await sendStreamingRequest(newValue);
+        // Start loading video stream after a short delay to allow the request to process
+        setTimeout(() => {
+          loadVideoStream(newValue, 0);
+        }, 2000);
+      } catch (error) {
+        console.error('Error starting stream:', error);
+        setStreamingError(error.message || 'Failed to start streaming');
+        setStreamingLoading(false);
+      }
+    }
+  }, [sendStreamingRequest, loadVideoStream]);
+
+  // Cleanup on unmount or when switching channels
+  useEffect(() => {
+    return () => {
+      if (streamingRetryTimeoutRef.current) {
+        clearTimeout(streamingRetryTimeoutRef.current);
+      }
+    };
+  }, [selectedChannel]);
 
   // Reset tab when modal opens to first enabled tab
   useEffect(() => {
@@ -4893,7 +5042,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   }}>
                     <Tabs
                       value={selectedChannel}
-                      onChange={(e, newValue) => setSelectedChannel(newValue)}
+                      onChange={handleChannelChange}
                       variant="scrollable"
                       scrollButtons="auto"
                       style={{
@@ -5519,13 +5668,99 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             overflow: 'hidden',
                             margin: '0 auto'
                           }}>
-                            {/* Real-time video player placeholder */}
-                            <Typography variant="body2" style={{ 
-                              color: colors.textSecondary,
-                              fontSize: '14px'
-                            }}>
-                              Real-time Video - Channel {selectedChannel}
-                            </Typography>
+                            {streamingLoading && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                zIndex: 10
+                              }}>
+                                <CircularProgress size={48} style={{ color: colors.primary }} />
+                                <Typography variant="body2" style={{ 
+                                  color: colors.text,
+                                  marginTop: '16px',
+                                  fontSize: '14px'
+                                }}>
+                                  Loading stream... {streamingRetryCount > 0 && `(Retry ${streamingRetryCount}/10)`}
+                                </Typography>
+                              </div>
+                            )}
+                            {streamingError && !streamingLoading && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                zIndex: 10,
+                                padding: '16px'
+                              }}>
+                                <Typography variant="body2" style={{ 
+                                  color: '#f44336',
+                                  fontSize: '14px',
+                                  textAlign: 'center'
+                                }}>
+                                  {streamingError}
+                                </Typography>
+                              </div>
+                            )}
+                            {streamingVideoUrl && (
+                              <video
+                                ref={streamingVideoRef}
+                                src={streamingVideoUrl}
+                                autoPlay
+                                controls
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'contain',
+                                  backgroundColor: '#000'
+                                }}
+                                onLoadedData={() => {
+                                  setStreamingLoading(false);
+                                  setStreamingRetryCount(0);
+                                }}
+                                onError={(e) => {
+                                  console.error('Video load error:', e);
+                                  if (streamingRetryCount < 10) {
+                                    const newRetryCount = streamingRetryCount + 1;
+                                    setStreamingRetryCount(newRetryCount);
+                                    streamingRetryTimeoutRef.current = setTimeout(() => {
+                                      if (streamingVideoRef.current && selectedChannel > 0) {
+                                        streamingVideoRef.current.load();
+                                      }
+                                    }, 30000);
+                                  } else {
+                                    setStreamingError('Failed to load video stream after multiple attempts');
+                                    setStreamingLoading(false);
+                                  }
+                                }}
+                                onCanPlay={() => {
+                                  setStreamingLoading(false);
+                                  setStreamingRetryCount(0);
+                                }}
+                              />
+                            )}
+                            {!streamingVideoUrl && !streamingLoading && !streamingError && (
+                              <Typography variant="body2" style={{ 
+                                color: colors.textSecondary,
+                                fontSize: '14px'
+                              }}>
+                                Real-time Video - Channel {selectedChannel}
+                              </Typography>
+                            )}
                           </div>
                         )}
                       </div>

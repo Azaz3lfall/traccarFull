@@ -425,6 +425,8 @@ const FloatingDevicesPopover = ({
       fileUploadPath: iothub?.fileUploadPath || '',
       deviceModel: iothub?.deviceModel || '',
       channels: iothub?.channels || '',
+      token: iothub?.token || '',
+      streamingServer: iothub?.streamingServer || '',
     };
     
     const finalDeviceData = {
@@ -484,6 +486,8 @@ const FloatingDevicesPopover = ({
         fileUploadPath: '',
         deviceModel: '',
         channels: '',
+        token: '',
+        streamingServer: '',
       },
     });
     setEditDialog(true);
@@ -501,6 +505,8 @@ const FloatingDevicesPopover = ({
     fileUploadPath: '',
     deviceModel: '',
     channels: '',
+    token: '',
+    streamingServer: '',
     };
     
     if (device.attributes?.iothub) {
@@ -1766,6 +1772,56 @@ const FloatingDevicesPopover = ({
                             iothub: { 
                               ...(editingDevice?.iothub || {}), 
                               channels: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Token"
+                          value={editingDevice?.iothub?.token || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              token: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Streaming Server"
+                          value={editingDevice?.iothub?.streamingServer || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              streamingServer: e.target.value 
                             } 
                           })}
                           size="small"
