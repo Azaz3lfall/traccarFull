@@ -295,6 +295,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videosCurrentPage, setVideosCurrentPage] = useState(1);
   const videosPerPage = 20;
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [uploadingVideoId, setUploadingVideoId] = useState(null);
+  const uploadCheckIntervalRef = useRef(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -459,6 +461,194 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       throw error;
     }
   }, [device, videoListStartDate, videoListEndDate]);
+
+  // Upload video command to device
+  const uploadVideo = useCallback(async (video) => {
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      throw new Error('Device iothub configuration not found');
+    }
+
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const iothubServer = iothub?.iothubServer || '';
+      const token = iothub?.token || '';
+      const ftpServerIp = iothub?.ftpServerIp || '';
+      const ftpPort = iothub?.ftpPort || '';
+      const ftpUser = iothub?.ftpUser || '';
+      const ftpPassword = iothub?.ftpPassword || '';
+      const fileUploadPath = iothub?.fileUploadPath || '';
+
+      if (!iothubServer || !token || !ftpServerIp) {
+        throw new Error('IoTHub Server, Token or FTP Server IP not configured');
+      }
+
+      // Extract numeric channel from video
+      const channel = parseInt(video.channel) || 0;
+      
+      // Format beginTime and endTime as YYMMDDHHmmss
+      const formatDateTime = (timeStr) => {
+        if (!timeStr) return '';
+        try {
+          // Parse from 'YYYY-MM-DD HH:mm:ss' format
+          const date = dayjs(timeStr, 'YYYY-MM-DD HH:mm:ss');
+          return date.format('YYMMDDHHmmss');
+        } catch {
+          return timeStr;
+        }
+      };
+
+      const beginTime = formatDateTime(video.beginTime);
+      const endTime = formatDateTime(video.endTime);
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("deviceImei", device.uniqueId);
+      urlencoded.append("cmdContent", JSON.stringify({
+        "serverAddress": ftpServerIp,
+        "ftpPort": parseInt(ftpPort) || 21,
+        "userName": ftpUser,
+        "password": ftpPassword,
+        "fileUploadPath": fileUploadPath,
+        "channel": channel,
+        "beginTime": beginTime,
+        "endTime": endTime,
+        "alarmFlag": 0,
+        "resourceType": 0,
+        "codeType": 0,
+        "storageType": 0,
+        "condition": 1,
+        "instructionID": "123456789"
+      }));
+      urlencoded.append("serverFlagId", "0");
+      urlencoded.append("proNo", "37382");
+      urlencoded.append("platform", "web");
+      urlencoded.append("requestId", "6");
+      urlencoded.append("cmdType", "normallns");
+      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("token", token);
+
+      // Build URL from iothubServer - ensure it has protocol and path
+      const apiUrl = iothubServer.startsWith('http') 
+        ? `${iothubServer}/api/device/sendInstruct`
+        : `https://${iothubServer}/api/device/sendInstruct`;
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow"
+      };
+
+      console.log('=== Upload Video Request ===');
+      console.log('URL:', apiUrl);
+      console.log('Video:', video);
+      console.log('Channel:', channel);
+      console.log('beginTime:', beginTime);
+      console.log('endTime:', endTime);
+      console.log('==========================');
+
+      const response = await fetch(apiUrl, requestOptions);
+      const result = await response.text();
+      console.log('Upload video response:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      throw error;
+    }
+  }, [device]);
+
+  // Check if video is uploaded and poll until it's uploaded_ok
+  const checkVideoUploadStatus = useCallback(async (video) => {
+    const videoId = `${video.channel}-${video.beginTime}`;
+    const channel = video.channel;
+    const beginTime = video.beginTime;
+    
+    // Clear any existing interval
+    if (uploadCheckIntervalRef.current) {
+      clearInterval(uploadCheckIntervalRef.current);
+      uploadCheckIntervalRef.current = null;
+    }
+
+    // Check if video is now uploaded_ok
+    const checkStatus = async () => {
+      try {
+        // Fetch latest videos
+        const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+        if (!mediaServerUrl) {
+          console.error('Media server URL not configured');
+          return;
+        }
+
+        const response = await fetch(`${mediaServerUrl}/getFileList`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            deviceImei: device.uniqueId
+          })
+        });
+
+        if (!response.ok) {
+          console.error(`Failed to fetch videos: ${response.statusText}`);
+          return;
+        }
+
+        const data = await response.json();
+        const currentVideos = data.videos || [];
+        
+        // Find the video we're checking
+        const currentVideo = currentVideos.find(v => 
+          String(v.channel) === String(channel) && 
+          v.beginTime === beginTime
+        );
+        
+        if (currentVideo && currentVideo.status === 'uploaded_ok') {
+          // Video is uploaded, stop checking and update state
+          setUploadingVideoId(null);
+          setVideos(currentVideos);
+          setVideosTotalCount(data.resource_count || 0);
+          if (uploadCheckIntervalRef.current) {
+            clearInterval(uploadCheckIntervalRef.current);
+            uploadCheckIntervalRef.current = null;
+          }
+          console.log('Video uploaded successfully:', videoId);
+        } else {
+          // Update videos list even if not uploaded yet
+          setVideos(currentVideos);
+          setVideosTotalCount(data.resource_count || 0);
+        }
+      } catch (error) {
+        console.error('Error checking video upload status:', error);
+      }
+    };
+
+    // Check immediately
+    await checkStatus();
+    
+    // Poll every 30 seconds
+    uploadCheckIntervalRef.current = setInterval(checkStatus, 30000);
+  }, [device]);
+
+  // Handle upload button click
+  const handleUploadVideo = useCallback(async (video, e) => {
+    e.stopPropagation(); // Prevent video click
+    
+    const videoId = `${video.channel}-${video.beginTime}`;
+    setUploadingVideoId(videoId);
+    
+    try {
+      await uploadVideo(video);
+      // Start checking upload status
+      await checkVideoUploadStatus(video);
+    } catch (error) {
+      console.error('Error in upload process:', error);
+      setUploadingVideoId(null);
+    }
+  }, [uploadVideo, checkVideoUploadStatus]);
 
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
@@ -873,6 +1063,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (flvPlayerRef.current) {
         flvPlayerRef.current.destroy();
         flvPlayerRef.current = null;
+      }
+      if (uploadCheckIntervalRef.current) {
+        clearInterval(uploadCheckIntervalRef.current);
+        uploadCheckIntervalRef.current = null;
       }
     };
   }, [selectedChannel]);
@@ -5599,6 +5793,42 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 </Typography>
                               </div>
                             </div>
+
+                            {/* Upload/Share button for not_uploaded videos - Apple style */}
+                            {video.status === 'not_uploaded' && (
+                              <IconButton
+                                onClick={(e) => handleUploadVideo(video, e)}
+                                disabled={uploadingVideoId === `${video.channel}-${video.beginTime}`}
+                                size="small"
+                                style={{
+                                  position: 'absolute',
+                                  top: '8px',
+                                  right: '8px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                  backdropFilter: 'blur(10px)',
+                                  color: '#fff',
+                                  width: '32px',
+                                  height: '32px',
+                                  padding: '6px',
+                                  zIndex: 10,
+                                }}
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                  },
+                                  '&.Mui-disabled': {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                                  }
+                                }}
+                                title="Upload video"
+                              >
+                                {uploadingVideoId === `${video.channel}-${video.beginTime}` ? (
+                                  <CircularProgress size={16} style={{ color: '#fff' }} />
+                                ) : (
+                                  <ShareIcon style={{ fontSize: '18px' }} />
+                                )}
+                              </IconButton>
+                            )}
 
                             {/* Play button overlay for videos with URL */}
                             {video.video_url && (
