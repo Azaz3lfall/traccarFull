@@ -54,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
     await _initialized.future;
     _appLinks = AppLinks();
     _appLinksSubscription = _appLinks.uriLinkStream.listen((uri) {
-      if (uri.scheme == 'org.traccar.manager') {
+      if (uri.scheme == 'br.com.absmultipla.gps') {
         final baseUri = Uri.parse(_getUrl());
         final updatedQueryParameters = Map<String, String>.from(uri.queryParameters)
           ..['redirect_uri'] = uri.toString().split('?').first;
@@ -75,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
     try {
       final originalRedirect = Uri.parse(uri.queryParameters['redirect_uri']!);
       final updatedRedirect = Uri(
-        scheme: 'org.traccar.manager',
+        scheme: 'br.com.absmultipla.gps',
         path: originalRedirect.path,
         queryParameters: originalRedirect.queryParameters.isEmpty ? null : originalRedirect.queryParameters,
       );

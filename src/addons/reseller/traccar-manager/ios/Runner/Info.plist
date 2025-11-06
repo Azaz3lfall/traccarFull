@@ -61,7 +61,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>org.traccar.manager</string>
+				<string>br.com.absmultipla.gps</string>
 			</array>
 		</dict>
 	</array>

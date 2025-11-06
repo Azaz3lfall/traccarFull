@@ -1,35 +1,45 @@
 {
   "project_info": {
-    "project_number": "847296525014",
-    "firebase_url": "https://traccar-manager-app.firebaseio.com",
-    "project_id": "traccar-manager-app",
-    "storage_bucket": "traccar-manager-app.appspot.com"
+    "project_number": "366024970424",
+    "project_id": "absmult-rastreamento",
+    "storage_bucket": "absmult-rastreamento.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:847296525014:android:ddfd572332cea794",
+        "mobilesdk_app_id": "1:366024970424:android:6ae3642d88c91a3eb4644d",
         "android_client_info": {
-          "package_name": "org.traccar.manager"
+          "package_name": "br.com.absmultipla.gps"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAAg2esrXqGG-_6TkPvpIfc3RlC2xFOysA"
+          "current_key": "AIzaSyBFvFNk9_NRKOGc5YBc98B9UOxz2pR1-Co"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "847296525014-8d6vg8a08lfk1mp8j6mbgv96gq3n7cob.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "org.traccar.TraccarManager"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366024970424:android:5527030d4f437f20b4644d",
+        "android_client_info": {
+          "package_name": "com.absmultirastreamento.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFvFNk9_NRKOGc5YBc98B9UOxz2pR1-Co"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
         }
       }
     }

@@ -50,12 +50,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAAg2esrXqGG-_6TkPvpIfc3RlC2xFOysA',
-    appId: '1:847296525014:android:ddfd572332cea794',
-    messagingSenderId: '847296525014',
-    projectId: 'traccar-manager-app',
-    databaseURL: 'https://traccar-manager-app.firebaseio.com',
-    storageBucket: 'traccar-manager-app.appspot.com',
+    apiKey: 'AIzaSyBFvFNk9_NRKOGc5YBc98B9UOxz2pR1-Co',
+    appId: '1:366024970424:android:6ae3642d88c91a3eb4644d',
+    messagingSenderId: '366024970424',
+    projectId: 'absmult-rastreamento',
+    storageBucket: 'absmult-rastreamento.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
