@@ -77,6 +77,8 @@ import {
   Settings
 } from 'lucide-react';
 import { Card } from './ui/card';
+import { useResellerBranding } from '../common/hooks/useResellerBranding';
+import fallbackLogo from '../resources/images/image170.png?inline';
 
 dayjs.extend(relativeTime);
 
@@ -91,6 +93,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const positions = useSelector((state) => state.session.positions);
   const replayPositions = useSelector((state) => state.session.replayPositions);
   const user = useSelector((state) => state.session.user);
+  const logo = useSelector((state) => state.session.server?.attributes?.logo);
+  const logoInverted = useSelector((state) => state.session.server?.attributes?.logoInverted);
+  const { getLogoUrl } = useResellerBranding();
   
   // Check if user has edit sensors permission
   const hasEditSensorsPermission = useMemo(() => {
@@ -283,6 +288,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const videosPerPage = 20;
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const videoRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -479,8 +486,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && showVideoPlayer) {
-        setShowVideoPlayer(false);
-        setSelectedVideo(null);
+        if (isFullscreen) {
+          // Exit fullscreen first
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        } else {
+          setShowVideoPlayer(false);
+          setSelectedVideo(null);
+        }
       }
     };
     
@@ -488,6 +508,81 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       document.addEventListener('keydown', handleEscape);
       return () => {
         document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [showVideoPlayer, isFullscreen]);
+
+  // Disable fullscreen button on video
+  useEffect(() => {
+    if (videoRef.current && showVideoPlayer) {
+      const video = videoRef.current;
+      
+      // Prevent fullscreen via CSS (for browsers that don't support controlsList)
+      const style = document.createElement('style');
+      style.id = 'disable-video-fullscreen';
+      style.textContent = `
+        video::-webkit-media-controls-fullscreen-button {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Prevent fullscreen via JavaScript
+      const handleFullscreenRequest = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
+      
+      video.addEventListener('webkitbeginfullscreen', handleFullscreenRequest);
+      
+      const handleFullscreenChange = () => {
+        if (document.fullscreenElement === video || 
+            document.webkitFullscreenElement === video ||
+            document.mozFullScreenElement === video ||
+            document.msFullscreenElement === video) {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      };
+      
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+      
+      // Override fullscreen methods
+      const originalRequestFullscreen = video.requestFullscreen;
+      const originalWebkitRequestFullscreen = video.webkitRequestFullscreen;
+      const originalMozRequestFullscreen = video.mozRequestFullScreen;
+      const originalMsRequestFullscreen = video.msRequestFullscreen;
+      
+      video.requestFullscreen = () => {};
+      if (video.webkitRequestFullscreen) video.webkitRequestFullscreen = () => {};
+      if (video.mozRequestFullScreen) video.mozRequestFullScreen = () => {};
+      if (video.msRequestFullscreen) video.msRequestFullscreen = () => {};
+      
+      return () => {
+        const existingStyle = document.getElementById('disable-video-fullscreen');
+        if (existingStyle) {
+          document.head.removeChild(existingStyle);
+        }
+        video.removeEventListener('webkitbeginfullscreen', handleFullscreenRequest);
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+        video.requestFullscreen = originalRequestFullscreen;
+        if (originalWebkitRequestFullscreen) video.webkitRequestFullscreen = originalWebkitRequestFullscreen;
+        if (originalMozRequestFullscreen) video.mozRequestFullScreen = originalMozRequestFullscreen;
+        if (originalMsRequestFullscreen) video.msRequestFullscreen = originalMsRequestFullscreen;
       };
     }
   }, [showVideoPlayer]);
@@ -5250,26 +5345,41 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               }}
                               disabled={videosLoading}
                               style={{
-                                width: '40px',
-                                height: '40px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                border: `1px solid #1976d2`,
+                                backgroundColor: '#1976d220',
+                                color: '#1976d2',
+                                fontSize: '11px',
+                                fontWeight: '600',
                                 cursor: videosLoading ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.2s ease',
-                                padding: 0,
-                                flexShrink: 0,
-                                opacity: videosLoading ? 0.5 : 1
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                whiteSpace: 'nowrap',
+                                opacity: videosLoading ? 0.6 : 1
                               }}
-                              title="Refresh Videos"
+                              onMouseEnter={(e) => {
+                                if (!videosLoading) {
+                                  e.currentTarget.style.backgroundColor = '#1976d230';
+                                  e.currentTarget.style.borderColor = '#1565c0';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!videosLoading) {
+                                  e.currentTarget.style.backgroundColor = '#1976d220';
+                                  e.currentTarget.style.borderColor = '#1976d2';
+                                }
+                              }}
+                              title="Load videos from device"
                             >
                               {videosLoading ? (
-                                <CircularProgress size={20} style={{ color: colors.textSecondary }} />
+                                <CircularProgress size={12} style={{ color: '#1976d2' }} />
                               ) : (
-                                <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                                <RefreshOutlinedIcon style={{ fontSize: '14px', color: '#1976d2' }} />
                               )}
+                              Load from Device
                             </button>
                           </div>
                         </div>
@@ -5497,7 +5607,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   fontSize: '14px',
                   fontWeight: '600'
                 }}>
-                  Channel {selectedVideo.channel} • {dayjs(selectedVideo.beginTime, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm')}
+                  Channel {selectedVideo.channel} • {dayjs(selectedVideo.beginTime, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm')}{user?.name && user?.email ? ` - ${user.name} - ${user.email}` : ''}
                 </Typography>
                 {selectedVideo.expected_file && (
                   <Typography variant="caption" style={{ 
@@ -5544,20 +5654,82 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               minHeight: '400px'
             }}>
               <video
+                ref={videoRef}
                 src={selectedVideo.video_url}
                 controls
+                controlsList="nodownload nofullscreen"
                 autoPlay
                 style={{
                   width: '100%',
                   height: '100%',
                   maxHeight: 'calc(95vh - 120px)',
-                  outline: 'none'
+                  outline: 'none',
+                  opacity: 1.0
                 }}
                 onError={(e) => {
                   console.error('Video playback error:', e);
                   showSnackbar('Failed to load video', 'error');
                 }}
               />
+              {/* Logo Overlay */}
+              {(() => {
+                const logoUrl = getLogoUrl() || logo || logoInverted;
+                if (!logoUrl) return null;
+                
+                return (
+                  <>
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%) rotate(-30deg)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 10,
+                      pointerEvents: 'none',
+                      width: '60%',
+                      height: '60%'
+                    }}>
+                      <img 
+                        src={logoUrl} 
+                        alt="Logo" 
+                        style={{ 
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          opacity: 0.3
+                        }}
+                        onError={(e) => {
+                          const fallbackUrl = logo || logoInverted || fallbackLogo;
+                          e.target.src = fallbackUrl;
+                        }}
+                      />
+                    </div>
+                    {user?.name && user?.email && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 'calc(50% + 15%)',
+                        left: '55%',
+                        transform: 'translate(-50%, -50%) rotate(-30deg)',
+                        zIndex: 10,
+                        pointerEvents: 'none',
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        <Typography style={{
+                          color: 'rgba(255, 255, 255, 0.6)',
+                          fontSize: '18px',
+                          fontWeight: '500',
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.8)'
+                        }}>
+                          {user.name} {user.email}
+                        </Typography>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </motion.div>
         </motion.div>
