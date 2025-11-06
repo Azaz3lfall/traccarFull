@@ -18,6 +18,7 @@ import {
   FormControlLabel,
   IconButton
 } from '@mui/material';
+import CustomPagination from './CustomPagination';
 import {
   devicesActions,
   geofencesActions,
@@ -272,11 +273,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   
   const [videoListStartDate, setVideoListStartDate] = useState(getTodayStart());
   const [videoListEndDate, setVideoListEndDate] = useState(getTodayEnd());
-  const [videoListSelectedChannels, setVideoListSelectedChannels] = useState(['1']);
+  const [videoListSelectedChannels, setVideoListSelectedChannels] = useState([]);
   const [videoListSelectedStatuses, setVideoListSelectedStatuses] = useState(['uploaded_ok', 'not_uploaded', 'upload_errored']);
   const [videos, setVideos] = useState([]);
+  const [videosTotalCount, setVideosTotalCount] = useState(0);
   const [videosLoading, setVideosLoading] = useState(false);
   const [videosError, setVideosError] = useState(null);
+  const [videosCurrentPage, setVideosCurrentPage] = useState(1);
+  const videosPerPage = 20;
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -394,10 +398,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
       const data = await response.json();
       setVideos(data.videos || []);
+      setVideosTotalCount(data.resource_count || 0);
+      setVideosCurrentPage(1); // Reset to first page when new data is fetched
     } catch (error) {
       console.error('Error fetching videos:', error);
       setVideosError(error.message);
       setVideos([]);
+      setVideosTotalCount(0);
     } finally {
       setVideosLoading(false);
     }
@@ -416,8 +423,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         // Reset video list dates to today
         setVideoListStartDate(dayjs().startOf('day').format('YYYY-MM-DDTHH:mm'));
         setVideoListEndDate(dayjs().endOf('day').format('YYYY-MM-DDTHH:mm'));
-        setVideoListSelectedChannels(['1']);
+        // Set all channels as selected by default
+        const allChannels = Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
+        setVideoListSelectedChannels(allChannels.length > 0 ? allChannels : ['1']);
         setVideoListSelectedStatuses(['uploaded_ok', 'not_uploaded', 'upload_errored']);
+        setVideosCurrentPage(1); // Reset to first page
         // Fetch videos when modal opens
         fetchVideos();
       } else if (hasHikiVision) {
@@ -429,11 +439,47 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Filter videos by selected channels and statuses
   const filteredVideos = useMemo(() => {
     if (!videos || videos.length === 0) return [];
-    return videos.filter(video => 
-      videoListSelectedChannels.includes(video.channel?.toString()) &&
-      videoListSelectedStatuses.includes(video.status)
-    );
+    // If no filters selected, show all videos
+    if (videoListSelectedChannels.length === 0 && videoListSelectedStatuses.length === 0) {
+      return videos;
+    }
+    const filtered = videos.filter(video => {
+      const channelMatch = videoListSelectedChannels.length === 0 || 
+        videoListSelectedChannels.includes(String(video.channel)) ||
+        videoListSelectedChannels.includes(video.channel?.toString());
+      const statusMatch = videoListSelectedStatuses.length === 0 || 
+        videoListSelectedStatuses.includes(video.status);
+      return channelMatch && statusMatch;
+    });
+    return filtered;
   }, [videos, videoListSelectedChannels, videoListSelectedStatuses]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setVideosCurrentPage(1);
+  }, [videoListSelectedChannels, videoListSelectedStatuses]);
+
+  // Initialize all channels as selected when device is available
+  useEffect(() => {
+    if (device && getIoTHubChannels > 0) {
+      // Get unique channels from videos to ensure we include all channels
+      const videoChannels = [...new Set(videos.map(v => String(v.channel)).filter(Boolean))];
+      if (videoChannels.length > 0 && videoListSelectedChannels.length === 0) {
+        // Use channels from videos, or fallback to configured channels
+        const channelsToSelect = videoChannels.length > 0 ? videoChannels : 
+          Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
+        setVideoListSelectedChannels(channelsToSelect);
+      }
+    }
+  }, [device, getIoTHubChannels, videos]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+  const paginatedVideos = useMemo(() => {
+    const startIndex = (videosCurrentPage - 1) * videosPerPage;
+    const endIndex = startIndex + videosPerPage;
+    return filteredVideos.slice(startIndex, endIndex);
+  }, [filteredVideos, videosCurrentPage, videosPerPage]);
 
   // Helper function to get sensor display name (custom name takes precedence)
   const getSensorDisplayName = useCallback((sensorKey) => {
@@ -4966,7 +5012,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           flexDirection: 'column',
                           height: desktop ? '100%' : 'auto',
                           overflow: desktop ? 'hidden' : 'visible',
-                          boxSizing: 'border-box'
+                          boxSizing: 'border-box',
+                          minHeight: desktop ? 0 : 'auto'
                         }}>
                           <Typography variant="subtitle2" style={{ 
                             color: colors.text, 
@@ -5226,26 +5273,79 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             padding: '40px',
                             textAlign: 'center'
                           }}>
-                            No videos found for selected channels
+                            No videos found for selected channels and status
                           </Typography>
                         ) : (
-                          <Box style={{
-                            display: 'grid',
-                            gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
-                            gap: '16px',
-                            overflowY: desktop ? 'auto' : 'visible',
-                            overflowX: 'hidden',
-                            paddingRight: '4px',
-                            flex: desktop ? 1 : 'none',
-                            minHeight: desktop ? 0 : 'auto',
-                            width: '100%',
-                            maxWidth: '100%',
-                            boxSizing: 'border-box'
-                          }}>
-                            {filteredVideos.map((video, index) => (
-                              <VideoItem key={`${video.channel}-${video.beginTime}-${index}`} video={video} index={index} />
-                            ))}
-                          </Box>
+                          <>
+                            <Box style={{
+                              display: 'grid',
+                              gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+                              gap: '16px',
+                              overflowY: desktop ? 'auto' : 'visible',
+                              overflowX: 'hidden',
+                              paddingRight: '4px',
+                              flex: desktop ? '1 1 auto' : 'none',
+                              minHeight: desktop ? 0 : 'auto',
+                              width: '100%',
+                              maxWidth: '100%',
+                              boxSizing: 'border-box'
+                            }}>
+                              {paginatedVideos.map((video, index) => (
+                                <VideoItem key={`${video.channel}-${video.beginTime}-${index}`} video={video} index={index} />
+                              ))}
+                            </Box>
+                            
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                              <Box style={{
+                                display: 'flex',
+                                flexDirection: desktop ? 'row' : 'column',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '8px',
+                                padding: '4px 0',
+                                borderTop: `1px solid ${colors.border}`,
+                                marginTop: '4px',
+                                marginBottom: '0'
+                              }}>
+                                {desktop && (
+                                  <Typography variant="body2" style={{ 
+                                    color: colors.textSecondary,
+                                    fontSize: '12px'
+                                  }}>
+                                    Showing {((videosCurrentPage - 1) * videosPerPage) + 1} - {Math.min(videosCurrentPage * videosPerPage, filteredVideos.length)} of {filteredVideos.length} videos
+                                    {videosTotalCount > 0 && ` (Total: ${videosTotalCount})`}
+                                  </Typography>
+                                )}
+                                <CustomPagination
+                                  page={videosCurrentPage}
+                                  totalPages={totalPages}
+                                  onPageChange={setVideosCurrentPage}
+                                  colors={colors}
+                                  size="small"
+                                  showFirstLastButtons={true}
+                                />
+                              </Box>
+                            )}
+                            {totalPages === 1 && filteredVideos.length > 0 && (
+                              <Box style={{
+                                padding: '4px 0',
+                                borderTop: `1px solid ${colors.border}`,
+                                marginTop: '4px',
+                                marginBottom: '0',
+                                display: desktop ? 'flex' : 'none',
+                                justifyContent: 'flex-start'
+                              }}>
+                                <Typography variant="body2" style={{ 
+                                  color: colors.textSecondary,
+                                  fontSize: '12px'
+                                }}>
+                                  Showing {filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''}
+                                  {videosTotalCount > 0 && ` (Total: ${videosTotalCount})`}
+                                </Typography>
+                              </Box>
+                            )}
+                          </>
                         )}
                         </div>
                       );
