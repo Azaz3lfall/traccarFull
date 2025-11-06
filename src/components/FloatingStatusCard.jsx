@@ -5586,7 +5586,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               value={videoListStartDate}
                               onChange={(e) => setVideoListStartDate(e.target.value)}
                               size="small"
-                              disabled={true}
                               InputLabelProps={{
                                 shrink: true,
                               }}
@@ -5615,7 +5614,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               value={videoListEndDate}
                               onChange={(e) => setVideoListEndDate(e.target.value)}
                               size="small"
-                              disabled={true}
                               InputLabelProps={{
                                 shrink: true,
                               }}
@@ -5758,6 +5756,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             </div>
                             <button
                               onClick={() => {
+                                // Format dates as YYMMDDHHmmss
+                                const formatDateTime = (dateTimeString) => {
+                                  if (!dateTimeString) return '';
+                                  const date = dayjs(dateTimeString);
+                                  return date.format('YYMMDDHHmmss');
+                                };
+                                
+                                const beginTime = formatDateTime(videoListStartDate);
+                                const endTime = formatDateTime(videoListEndDate);
+                                
+                                console.log('=== Load from Device ===');
+                                console.log('beginTime:', beginTime);
+                                console.log('endTime:', endTime);
+                                console.log('========================');
                                 fetchVideos();
                               }}
                               disabled={videosLoading}
