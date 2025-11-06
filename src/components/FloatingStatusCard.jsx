@@ -264,7 +264,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
   const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
   const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
-  const [selectedChannel, setSelectedChannel] = useState(1);
+  const [selectedChannel, setSelectedChannel] = useState(0);
   
   // Initialize dates with today 00:00:00 and 23:59:59
   const getTodayStart = () => dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
@@ -272,7 +272,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   
   const [videoListStartDate, setVideoListStartDate] = useState(getTodayStart());
   const [videoListEndDate, setVideoListEndDate] = useState(getTodayEnd());
-  const [videoListSelectedChannel, setVideoListSelectedChannel] = useState('1');
+  const [videoListSelectedChannels, setVideoListSelectedChannels] = useState(['1']);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -367,11 +367,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Reset to first enabled tab
       if (hasIoTHub) {
         setMoreDetailsActiveTab(0);
-        setSelectedChannel(1); // Reset to Channel 1
+        setSelectedChannel(0); // Reset to Playback tab
         // Reset video list dates to today
         setVideoListStartDate(dayjs().startOf('day').format('YYYY-MM-DDTHH:mm'));
         setVideoListEndDate(dayjs().endOf('day').format('YYYY-MM-DDTHH:mm'));
-        setVideoListSelectedChannel('1');
+        setVideoListSelectedChannels(['1']);
       } else if (hasHikiVision) {
         setMoreDetailsActiveTab(1);
       }
@@ -4660,319 +4660,326 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               {/* Tab Content */}
               <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
                 {moreDetailsActiveTab === 0 && (
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: desktop ? 'row' : 'column',
-                    gap: '16px',
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
                     height: desktop ? '100%' : 'auto',
                     minHeight: desktop ? 0 : 'auto'
                   }}>
-                    {/* Left Column - Real-time Video Tabs */}
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      width: desktop ? '50%' : '100%',
-                      flexShrink: 0,
-                      height: desktop ? '100%' : 'auto'
-                    }}>
-                      <Tabs
-                        value={selectedChannel - 1}
-                        onChange={(e, newValue) => setSelectedChannel(newValue + 1)}
-                        variant="scrollable"
-                        scrollButtons="auto"
-                        style={{
-                          borderBottom: `1px solid ${colors.border}`,
-                          marginBottom: '16px',
-                        }}
-                        sx={{
-                          '& .MuiTab-root': {
-                            color: '#666666',
-                            fontSize: '12px',
-                            fontWeight: '500',
-                            textTransform: 'none',
-                            minHeight: '40px',
-                            padding: '8px 16px',
-                            '&.Mui-selected': {
-                              color: '#1976d2',
-                              fontWeight: '600',
-                              backgroundColor: 'transparent',
-                            },
-                            '&:hover': {
-                              color: '#1976d2',
-                              backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                            },
-                            '&.Mui-selected:hover': {
-                              color: '#1976d2',
-                              backgroundColor: 'rgba(25, 118, 210, 0.15)',
-                            },
-                          },
-                          '& .MuiTabs-indicator': {
-                            backgroundColor: '#1976d2',
-                            height: '2px',
-                          },
-                        }}
-                      >
-                        {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
-                          <Tab 
-                            key={channelNum}
-                            label={`Channel ${channelNum}`}
-                          />
-                        ))}
-                      </Tabs>
-                      {getIoTHubChannels === 0 ? (
-                        <Typography variant="body2" style={{ 
-                          color: colors.textSecondary,
-                          padding: '12px 16px',
-                          fontStyle: 'italic'
-                        }}>
-                          No channels configured
-                        </Typography>
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          maxWidth: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: colors.secondary,
-                          borderRadius: '8px',
-                          border: `1px solid ${colors.border}`,
-                          aspectRatio: '16/9',
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}>
-                          {/* Real-time video player placeholder */}
-                          <Typography variant="body2" style={{ 
-                            color: colors.textSecondary,
-                            fontSize: '14px'
-                          }}>
-                            Real-time Video - Channel {selectedChannel}
-                          </Typography>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right Column - Video List */}
-                    <div style={{
-                      width: desktop ? '50%' : '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      minWidth: 0,
-                      height: desktop ? '100%' : 'auto',
-                      overflow: desktop ? 'hidden' : 'visible',
-                      boxSizing: 'border-box'
-                    }}>
-                      <Typography variant="subtitle2" style={{ 
-                        color: colors.text, 
+                    <Tabs
+                      value={selectedChannel}
+                      onChange={(e, newValue) => setSelectedChannel(newValue)}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      style={{
+                        borderBottom: `1px solid ${colors.border}`,
                         marginBottom: '16px',
-                        fontWeight: '600'
-                      }}>
-                        Videos
-                      </Typography>
-                      
-                      {/* Date pickers and channel selection */}
+                      }}
+                      sx={{
+                        '& .MuiTab-root': {
+                          color: '#666666',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          textTransform: 'none',
+                          minHeight: '40px',
+                          padding: '8px 16px',
+                          '&.Mui-selected': {
+                            color: '#1976d2',
+                            fontWeight: '600',
+                            backgroundColor: 'transparent',
+                          },
+                          '&:hover': {
+                            color: '#1976d2',
+                            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                          },
+                          '&.Mui-selected:hover': {
+                            color: '#1976d2',
+                            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+                          },
+                        },
+                        '& .MuiTabs-indicator': {
+                          backgroundColor: '#1976d2',
+                          height: '2px',
+                        },
+                      }}
+                    >
+                      <Tab label="Playback" />
+                      {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
+                        <Tab 
+                          key={channelNum}
+                          label={`Channel ${channelNum}`}
+                        />
+                      ))}
+                    </Tabs>
+
+                    {/* Playback Tab Content */}
+                    {selectedChannel === 0 && (
                       <div style={{
                         display: 'flex',
-                        flexDirection: desktop ? 'row' : 'column',
-                        gap: '12px',
-                        alignItems: desktop ? 'center' : 'stretch',
-                        marginBottom: '16px'
+                        flexDirection: 'column',
+                        height: desktop ? '100%' : 'auto',
+                        overflow: desktop ? 'hidden' : 'visible',
+                        boxSizing: 'border-box'
                       }}>
-                        {/* Date pickers row */}
-                        <div style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          gap: '12px',
-                          alignItems: 'center',
-                          flex: desktop ? '0 1 auto' : 'none',
-                          width: desktop ? 'auto' : '100%'
+                        <Typography variant="subtitle2" style={{ 
+                          color: colors.text, 
+                          marginBottom: '16px',
+                          fontWeight: '600'
                         }}>
-                          <TextField
-                            label="Start Date"
-                            type="datetime-local"
-                            value={videoListStartDate}
-                            onChange={(e) => setVideoListStartDate(e.target.value)}
-                            size="small"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            sx={{
-                              flex: desktop ? '0 1 auto' : '1 1 auto',
-                              minWidth: '130px',
-                              maxWidth: desktop ? '200px' : 'none',
-                              '& .MuiOutlinedInputRoot': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabelRoot': { 
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                              '& .MuiInputBase-input': {
-                                color: colors.text,
-                              },
-                            }}
-                          />
-                          <TextField
-                            label="End Date"
-                            type="datetime-local"
-                            value={videoListEndDate}
-                            onChange={(e) => setVideoListEndDate(e.target.value)}
-                            size="small"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            sx={{
-                              flex: desktop ? '0 1 auto' : '1 1 auto',
-                              minWidth: '130px',
-                              maxWidth: desktop ? '200px' : 'none',
-                              '& .MuiOutlinedInputRoot': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabelRoot': { 
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                              '& .MuiInputBase-input': {
-                                color: colors.text,
-                              },
-                            }}
-                          />
-                        </div>
+                          Videos
+                        </Typography>
                         
-                        {/* Channels and refresh button row */}
+                        {/* Date pickers and channel selection */}
                         <div style={{
                           display: 'flex',
-                          flexDirection: 'row',
-                          gap: '8px',
-                          alignItems: 'center',
-                          flex: desktop ? '1 1 auto' : 'none',
-                          flexWrap: desktop ? 'wrap' : 'nowrap',
-                          justifyContent: 'space-between',
-                          minWidth: desktop ? '200px' : 'auto',
-                          width: desktop ? 'auto' : '100%'
+                          flexDirection: desktop ? 'row' : 'column',
+                          gap: '12px',
+                          alignItems: desktop ? 'center' : 'stretch',
+                          marginBottom: '16px'
                         }}>
+                          {/* Date pickers row */}
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '12px',
+                            alignItems: 'center',
+                            flex: desktop ? '0 1 auto' : 'none',
+                            width: desktop ? 'auto' : '100%'
+                          }}>
+                            <TextField
+                              label="Start Date"
+                              type="datetime-local"
+                              value={videoListStartDate}
+                              onChange={(e) => setVideoListStartDate(e.target.value)}
+                              size="small"
+                              InputLabelProps={{
+                                shrink: true,
+                              }}
+                              sx={{
+                                flex: desktop ? '0 1 auto' : '1 1 auto',
+                                minWidth: '130px',
+                                maxWidth: desktop ? '200px' : 'none',
+                                '& .MuiOutlinedInputRoot': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabelRoot': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                                '& .MuiInputBase-input': {
+                                  color: colors.text,
+                                },
+                              }}
+                            />
+                            <TextField
+                              label="End Date"
+                              type="datetime-local"
+                              value={videoListEndDate}
+                              onChange={(e) => setVideoListEndDate(e.target.value)}
+                              size="small"
+                              InputLabelProps={{
+                                shrink: true,
+                              }}
+                              sx={{
+                                flex: desktop ? '0 1 auto' : '1 1 auto',
+                                minWidth: '130px',
+                                maxWidth: desktop ? '200px' : 'none',
+                                '& .MuiOutlinedInputRoot': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabelRoot': { 
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary }
+                                },
+                                '& .MuiInputBase-input': {
+                                  color: colors.text,
+                                },
+                              }}
+                            />
+                          </div>
+                          
+                          {/* Channels and refresh button row */}
                           <div style={{
                             display: 'flex',
                             flexDirection: 'row',
                             gap: '8px',
                             alignItems: 'center',
-                            flexWrap: 'wrap'
+                            flex: desktop ? '1 1 auto' : 'none',
+                            flexWrap: desktop ? 'wrap' : 'nowrap',
+                            justifyContent: 'space-between',
+                            minWidth: desktop ? '200px' : 'auto',
+                            width: desktop ? 'auto' : '100%'
                           }}>
-                            {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
-                              <FormControlLabel
-                                key={channelNum}
-                                control={
-                                  <Checkbox
-                                    checked={videoListSelectedChannel === channelNum.toString()}
-                                    onChange={(e) => {
-                                      if (e.target.checked) {
-                                        setVideoListSelectedChannel(channelNum.toString());
-                                      }
-                                    }}
-                                    sx={{
-                                      color: colors.text,
-                                      '&.Mui-checked': {
-                                        color: colors.text,
-                                      },
-                                      '&.MuiCheckbox-root': {
-                                        color: colors.text,
-                                      },
-                                    }}
-                                  />
-                                }
-                                label={`Ch ${channelNum}`}
-                                sx={{ 
-                                  color: colors.text,
-                                  margin: 0,
-                                }}
-                              />
-                            ))}
-                          </div>
-                          <button
-                            onClick={() => {
-                              // Handle video request
-                              console.log('Request videos:', {
-                                startDate: videoListStartDate,
-                                endDate: videoListEndDate,
-                                channel: videoListSelectedChannel
-                              });
-                            }}
-                            style={{
-                              width: '40px',
-                              height: '40px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              padding: 0,
-                              flexShrink: 0
-                            }}
-                            title="Request Videos"
-                          >
-                            <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Video grid - only y-scrollable */}
-                      <Box style={{
-                        display: 'grid',
-                        gridTemplateColumns: desktop ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr)',
-                        gap: '16px',
-                        overflowY: desktop ? 'auto' : 'visible',
-                        overflowX: 'hidden',
-                        paddingRight: '4px',
-                        flex: desktop ? 1 : 'none',
-                        minHeight: desktop ? 0 : 'auto',
-                        width: '100%',
-                        maxWidth: '100%',
-                        boxSizing: 'border-box'
-                      }}>
-                        {/* Placeholder video items - replace with actual video data */}
-                        {Array.from({ length: 30 }, (_, i) => i + 1).map((videoNum) => (
-                          <div
-                            key={videoNum}
-                            style={{
-                              width: '100%',
-                              paddingBottom: '56.25%', // 16:9 aspect ratio
-                              position: 'relative',
-                              backgroundColor: colors.secondary,
-                              borderRadius: '8px',
-                              border: `1px solid ${colors.border}`,
-                              overflow: 'hidden',
-                              boxSizing: 'border-box'
-                            }}
-                          >
                             <div style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
                               display: 'flex',
+                              flexDirection: 'row',
+                              gap: '8px',
                               alignItems: 'center',
-                              justifyContent: 'center'
+                              flexWrap: 'wrap'
                             }}>
-                              <Typography variant="body2" style={{ 
-                                color: colors.textSecondary,
-                                fontSize: '12px'
-                              }}>
-                                Video {videoNum}
-                              </Typography>
+                              {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
+                                <FormControlLabel
+                                  key={channelNum}
+                                  control={
+                                    <Checkbox
+                                      checked={videoListSelectedChannels.includes(channelNum.toString())}
+                                      onChange={(e) => {
+                                        const channelStr = channelNum.toString();
+                                        if (e.target.checked) {
+                                          setVideoListSelectedChannels(prev => 
+                                            prev.includes(channelStr) ? prev : [...prev, channelStr]
+                                          );
+                                        } else {
+                                          setVideoListSelectedChannels(prev => prev.filter(ch => ch !== channelStr));
+                                        }
+                                      }}
+                                      sx={{
+                                        color: colors.text,
+                                        '&.Mui-checked': {
+                                          color: colors.text,
+                                        },
+                                        '&.MuiCheckbox-root': {
+                                          color: colors.text,
+                                        },
+                                      }}
+                                    />
+                                  }
+                                  label={`Ch ${channelNum}`}
+                                  sx={{ 
+                                    color: colors.text,
+                                    margin: 0,
+                                  }}
+                                />
+                              ))}
                             </div>
+                            <button
+                              onClick={() => {
+                                // Handle video request
+                                console.log('Request videos:', {
+                                  startDate: videoListStartDate,
+                                  endDate: videoListEndDate,
+                                  channels: videoListSelectedChannels
+                                });
+                              }}
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                padding: 0,
+                                flexShrink: 0
+                              }}
+                              title="Request Videos"
+                            >
+                              <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                            </button>
                           </div>
-                        ))}
-                      </Box>
-                    </div>
+                        </div>
+
+                        {/* Video grid - only y-scrollable */}
+                        <Box style={{
+                          display: 'grid',
+                          gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+                          gap: '16px',
+                          overflowY: desktop ? 'auto' : 'visible',
+                          overflowX: 'hidden',
+                          paddingRight: '4px',
+                          flex: desktop ? 1 : 'none',
+                          minHeight: desktop ? 0 : 'auto',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
+                        }}>
+                          {/* Placeholder video items - replace with actual video data */}
+                          {Array.from({ length: 30 }, (_, i) => i + 1).map((videoNum) => (
+                            <div
+                              key={videoNum}
+                              style={{
+                                width: '100%',
+                                paddingBottom: '56.25%', // 16:9 aspect ratio
+                                position: 'relative',
+                                backgroundColor: colors.secondary,
+                                borderRadius: '8px',
+                                border: `1px solid ${colors.border}`,
+                                overflow: 'hidden',
+                                boxSizing: 'border-box'
+                              }}
+                            >
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                <Typography variant="body2" style={{ 
+                                  color: colors.textSecondary,
+                                  fontSize: '12px'
+                                }}>
+                                  Video {videoNum}
+                                </Typography>
+                              </div>
+                            </div>
+                          ))}
+                        </Box>
+                      </div>
+                    )}
+
+                    {/* Channel Tabs Content - Real-time Video */}
+                    {selectedChannel > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: desktop ? '100%' : 'auto'
+                      }}>
+                        {getIoTHubChannels === 0 ? (
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary,
+                            padding: '12px 16px',
+                            fontStyle: 'italic'
+                          }}>
+                            No channels configured
+                          </Typography>
+                        ) : (
+                          <div style={{
+                            width: '100%',
+                            maxWidth: '1024px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: colors.secondary,
+                            borderRadius: '8px',
+                            border: `1px solid ${colors.border}`,
+                            aspectRatio: '16/9',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            margin: '0 auto'
+                          }}>
+                            {/* Real-time video player placeholder */}
+                            <Typography variant="body2" style={{ 
+                              color: colors.textSecondary,
+                              fontSize: '14px'
+                            }}>
+                              Real-time Video - Channel {selectedChannel}
+                            </Typography>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
                 {moreDetailsActiveTab === 1 && (
