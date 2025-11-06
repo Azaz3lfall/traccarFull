@@ -281,6 +281,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videosError, setVideosError] = useState(null);
   const [videosCurrentPage, setVideosCurrentPage] = useState(1);
   const videosPerPage = 20;
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -472,6 +474,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
     }
   }, [device, getIoTHubChannels, videos]);
+
+  // Handle Escape key to close video player
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && showVideoPlayer) {
+        setShowVideoPlayer(false);
+        setSelectedVideo(null);
+      }
+    };
+    
+    if (showVideoPlayer) {
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [showVideoPlayer]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
@@ -4897,7 +4916,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             }}
                             onClick={() => {
                               if (video.video_url) {
-                                window.open(video.video_url, '_blank');
+                                setSelectedVideo(video);
+                                setShowVideoPlayer(true);
                               }
                             }}
                           >
@@ -5401,6 +5421,135 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </div>
                 )}
               </Box>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* Video Player Overlay */}
+    <AnimatePresence>
+      {showVideoPlayer && selectedVideo && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            zIndex: 10005,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowVideoPlayer(false);
+              setSelectedVideo(null);
+            }
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              width: '100%',
+              maxWidth: '95vw',
+              maxHeight: '95vh',
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: '#000',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Video Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{ flex: 1 }}>
+                <Typography variant="body2" style={{ 
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  Channel {selectedVideo.channel} • {dayjs(selectedVideo.beginTime, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm')}
+                </Typography>
+                {selectedVideo.expected_file && (
+                  <Typography variant="caption" style={{ 
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '11px',
+                    display: 'block',
+                    marginTop: '2px'
+                  }}>
+                    {selectedVideo.expected_file}
+                  </Typography>
+                )}
+              </div>
+              <IconButton
+                onClick={() => {
+                  setShowVideoPlayer(false);
+                  setSelectedVideo(null);
+                }}
+                size="small"
+                style={{
+                  color: '#fff',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  marginLeft: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+              >
+                <X size={20} />
+              </IconButton>
+            </div>
+
+            {/* Video Player */}
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              backgroundColor: '#000',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              minHeight: '400px'
+            }}>
+              <video
+                src={selectedVideo.video_url}
+                controls
+                autoPlay
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  maxHeight: 'calc(95vh - 120px)',
+                  outline: 'none'
+                }}
+                onError={(e) => {
+                  console.error('Video playback error:', e);
+                  showSnackbar('Failed to load video', 'error');
+                }}
+              />
             </div>
           </motion.div>
         </motion.div>
