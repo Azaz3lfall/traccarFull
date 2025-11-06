@@ -427,6 +427,7 @@ const FloatingDevicesPopover = ({
       channels: iothub?.channels || '',
       token: iothub?.token || '',
       streamingServer: iothub?.streamingServer || '',
+      midiaServer: iothub?.midiaServer || '',
     };
     
     const finalDeviceData = {
@@ -488,6 +489,7 @@ const FloatingDevicesPopover = ({
         channels: '',
         token: '',
         streamingServer: '',
+        midiaServer: '',
       },
     });
     setEditDialog(true);
@@ -507,6 +509,7 @@ const FloatingDevicesPopover = ({
     channels: '',
     token: '',
     streamingServer: '',
+    midiaServer: '',
     };
     
     if (device.attributes?.iothub) {
@@ -1822,6 +1825,31 @@ const FloatingDevicesPopover = ({
                             iothub: { 
                               ...(editingDevice?.iothub || {}), 
                               streamingServer: e.target.value 
+                            } 
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': { 
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Midia Server"
+                          value={editingDevice?.iothub?.midiaServer || ''}
+                          onChange={(e) => setEditingDevice({ 
+                            ...editingDevice, 
+                            iothub: { 
+                              ...(editingDevice?.iothub || {}), 
+                              midiaServer: e.target.value 
                             } 
                           })}
                           size="small"
