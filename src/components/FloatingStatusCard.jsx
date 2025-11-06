@@ -79,6 +79,7 @@ import {
 import { Card } from './ui/card';
 import { useResellerBranding } from '../common/hooks/useResellerBranding';
 import fallbackLogo from '../resources/images/image170.png?inline';
+import flvjs from 'flv.js';
 
 dayjs.extend(relativeTime);
 
@@ -277,6 +278,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [streamingError, setStreamingError] = useState(null);
   const streamingVideoRef = useRef(null);
   const streamingRetryTimeoutRef = useRef(null);
+  const flvPlayerRef = useRef(null);
   
   // Initialize dates with today 00:00:00 and 23:59:59
   const getTodayStart = () => dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
@@ -443,14 +445,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
       const urlencoded = new URLSearchParams();
       urlencoded.append("deviceImei", device.uniqueId);
-      urlencoded.append("cmdContent", JSON.stringify({
+      const cmdContent = {
         "dataType": "0",
         "codeStreamType": "0",
         "channel": String(channelNum),
         "videoIP": ftpServerIp,
         "videoTCPPort": "10002",
         "videoUDPPort": "0"
-      }));
+      };
+      urlencoded.append("cmdContent", JSON.stringify(cmdContent));
       urlencoded.append("serverFlagId", "0");
       urlencoded.append("proNo", "37121");
       urlencoded.append("platform", "web");
@@ -473,19 +476,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         body: urlencoded,
         redirect: "follow"
       };
+
+      // Log full request details
+      console.log('=== Streaming Activation Request ===');
+      console.log('URL:', apiUrl);
+      console.log('Method:', requestOptions.method);
+      console.log('Headers:', Object.fromEntries(myHeaders.entries()));
+      console.log('Body Parameters:');
+      console.log('  - deviceImei:', device.uniqueId);
+      console.log('  - cmdContent:', JSON.stringify(cmdContent, null, 2));
+      console.log('  - serverFlagId: 0');
+      console.log('  - proNo: 37121');
+      console.log('  - platform: web');
+      console.log('  - requestId: 6');
+      console.log('  - cmdType: normallns');
+      console.log('  - offLineFlag: 1');
+      console.log('  - token:', token ? `${token.substring(0, 10)}...` : '(empty)');
+      console.log('Full URL-encoded body:', urlencoded.toString());
+      console.log('====================================');
       
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Streaming request response:', result);
-      return result;
+      
+      // Parse and validate response
+      try {
+        const parsed = JSON.parse(result);
+        // Check if response matches expected success format
+        if (parsed.code === 0 && 
+            parsed.msg === "success" && 
+            parsed.data?._code === "100" &&
+            parsed.data?._msg === "Command communication successful response") {
+          return { success: true, data: parsed };
+        } else {
+          return { success: false, data: parsed, error: 'Device is offline or command failed' };
+        }
+      } catch (e) {
+        // If response is not JSON, treat as error
+        return { success: false, error: 'Invalid response from device', raw: result };
+      }
     } catch (error) {
       console.error('Error sending streaming request:', error);
       throw error;
     }
   }, [device]);
 
-  // Load video stream with retry logic
-  const loadVideoStream = useCallback((channelNum, retryCount = 0) => {
+  // Load video stream with retry logic using flv.js
+  const loadVideoStream = useCallback((channelNum, retryCount = 0, isInitialLoad = false) => {
     if (!device?.attributes?.iothub || !device?.uniqueId) {
       setStreamingError('Device configuration not found');
       setStreamingLoading(false);
@@ -502,31 +539,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         return;
       }
 
-      const videoUrl = `${streamingServer}/${channelNum}/${device.uniqueId}.flv`;
+      // Check if flv.js is supported
+      if (!flvjs.isSupported()) {
+        setStreamingError('FLV playback is not supported in this browser');
+        setStreamingLoading(false);
+        return;
+      }
+
+      // Build streaming URL - ensure proper format
+      let videoUrl;
+      if (streamingServer.startsWith('http://') || streamingServer.startsWith('https://')) {
+        // Remove trailing slash if present
+        const cleanServer = streamingServer.replace(/\/$/, '');
+        videoUrl = `${cleanServer}/${channelNum}/${device.uniqueId}.flv`;
+      } else {
+        // Default to http if no protocol specified
+        videoUrl = `http://${streamingServer}/${channelNum}/${device.uniqueId}.flv`;
+      }
+      
+      console.log('=== Streaming URL Details ===');
+      console.log('Streaming URL:', videoUrl);
+      console.log('Streaming server (raw):', streamingServer);
+      console.log('Channel:', channelNum);
+      console.log('Device uniqueId:', device.uniqueId);
+      console.log('URL Format: {streamingServer}/{channel}/{deviceId}.flv');
+      console.log('================================');
+      
       setStreamingVideoUrl(videoUrl);
       setStreamingError(null);
       setStreamingRetryCount(retryCount);
-
-      // Wait a bit for the video element to be ready, then try to load
-      setTimeout(() => {
-        if (streamingVideoRef.current) {
-          const video = streamingVideoRef.current;
-          video.src = videoUrl;
-          video.load();
-        }
-      }, 100);
+      
+      // Player initialization will happen in useEffect when streamingVideoUrl is set
     } catch (error) {
       console.error('Error loading video stream:', error);
       if (retryCount < 10) {
+        const newRetryCount = retryCount + 1;
+        setStreamingRetryCount(newRetryCount);
+        setStreamingLoading(true);
+        console.log(`Retrying to load stream (attempt ${newRetryCount}/10) in 3 seconds...`);
         streamingRetryTimeoutRef.current = setTimeout(() => {
-          loadVideoStream(channelNum, retryCount + 1);
-        }, 30000);
+          loadVideoStream(channelNum, newRetryCount, false);
+        }, 3000);
       } else {
-        setStreamingError(error.message || 'Failed to load video stream');
+        setStreamingError(error.message || 'Failed to load video file after multiple attempts');
         setStreamingLoading(false);
       }
     }
-  }, [device]);
+  }, [device, selectedChannel]);
 
   // Handle channel tab change
   const handleChannelChange = useCallback(async (e, newValue) => {
@@ -534,6 +593,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     if (streamingRetryTimeoutRef.current) {
       clearTimeout(streamingRetryTimeoutRef.current);
       streamingRetryTimeoutRef.current = null;
+    }
+    // Destroy flv player if exists
+    if (flvPlayerRef.current) {
+      flvPlayerRef.current.destroy();
+      flvPlayerRef.current = null;
     }
     setStreamingVideoUrl(null);
     setStreamingError(null);
@@ -546,11 +610,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setStreamingLoading(true);
       try {
         // Send streaming request
-        await sendStreamingRequest(newValue);
-        // Start loading video stream after a short delay to allow the request to process
-        setTimeout(() => {
-          loadVideoStream(newValue, 0);
-        }, 2000);
+        const response = await sendStreamingRequest(newValue);
+        
+        // Check if response indicates success
+        if (response.success) {
+          // File is available immediately after activation - start loading right away
+          console.log('Streaming command sent successfully, loading video file...');
+          loadVideoStream(newValue, 0, true);
+        } else {
+          // Device is offline or command failed
+          setStreamingError(response.error || 'Device is offline or command failed');
+          setStreamingLoading(false);
+        }
       } catch (error) {
         console.error('Error starting stream:', error);
         setStreamingError(error.message || 'Failed to start streaming');
@@ -559,11 +630,111 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [sendStreamingRequest, loadVideoStream]);
 
+  // Initialize flv.js player when video URL is set and video element is ready
+  useEffect(() => {
+    if (!streamingVideoUrl || selectedChannel <= 0) {
+      return;
+    }
+
+    // Small delay to ensure video element is fully in DOM
+    const timer = setTimeout(() => {
+      if (!streamingVideoRef.current) {
+        console.warn('Video element not ready yet');
+        return;
+      }
+
+      // Destroy existing player if any
+      if (flvPlayerRef.current) {
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
+      }
+
+      const videoElement = streamingVideoRef.current;
+      console.log('Initializing FLV player with URL:', streamingVideoUrl);
+      console.log('Video element:', videoElement);
+
+      // Create flv.js player
+      const flvPlayer = flvjs.createPlayer({
+        type: 'flv',
+        url: streamingVideoUrl,
+        isLive: false,
+        hasAudio: true,
+        hasVideo: true,
+        enableWorker: false,
+        enableStashBuffer: true,
+        stashInitialSize: 128,
+        autoCleanupSourceBuffer: true
+      });
+
+      // Set up event handlers
+      flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+        console.error('FLV player error:', errorType, errorDetail, errorInfo);
+        if (flvPlayerRef.current) {
+          flvPlayerRef.current.destroy();
+          flvPlayerRef.current = null;
+        }
+        
+        if (streamingRetryCount < 10) {
+          const newRetryCount = streamingRetryCount + 1;
+          setStreamingRetryCount(newRetryCount);
+          setStreamingLoading(true);
+          console.log(`Retrying to load stream (attempt ${newRetryCount}/10) in 3 seconds...`);
+          streamingRetryTimeoutRef.current = setTimeout(() => {
+            if (selectedChannel > 0) {
+              loadVideoStream(selectedChannel, newRetryCount, false);
+            }
+          }, 3000);
+        } else {
+          setStreamingError('Failed to load video file after multiple attempts');
+          setStreamingLoading(false);
+        }
+      });
+
+      flvPlayer.on(flvjs.Events.LOADING_COMPLETE, () => {
+        console.log('FLV stream loaded successfully');
+        setStreamingLoading(false);
+        setStreamingRetryCount(0);
+      });
+
+      flvPlayer.on(flvjs.Events.MEDIA_INFO, (mediaInfo) => {
+        console.log('FLV media info received:', mediaInfo);
+        setStreamingLoading(false);
+        setStreamingRetryCount(0);
+      });
+
+      flvPlayer.on(flvjs.Events.STATISTICS_INFO, () => {
+        if (streamingLoading) {
+          setStreamingLoading(false);
+          setStreamingRetryCount(0);
+        }
+      });
+
+      flvPlayer.attachMediaElement(videoElement);
+      flvPlayerRef.current = flvPlayer;
+      
+      console.log('FLV player attached, calling load()...');
+      try {
+        flvPlayer.load();
+        console.log('flvPlayer.load() called - network request should appear in browser network tab');
+      } catch (loadError) {
+        console.error('Error calling flvPlayer.load():', loadError);
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, streamingLoading, loadVideoStream]);
+
   // Cleanup on unmount or when switching channels
   useEffect(() => {
     return () => {
       if (streamingRetryTimeoutRef.current) {
         clearTimeout(streamingRetryTimeoutRef.current);
+      }
+      if (flvPlayerRef.current) {
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
       }
     };
   }, [selectedChannel]);
@@ -5719,37 +5890,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             {streamingVideoUrl && (
                               <video
                                 ref={streamingVideoRef}
-                                src={streamingVideoUrl}
                                 autoPlay
                                 controls
+                                muted
+                                playsInline
                                 style={{
                                   width: '100%',
                                   height: '100%',
                                   objectFit: 'contain',
                                   backgroundColor: '#000'
                                 }}
-                                onLoadedData={() => {
-                                  setStreamingLoading(false);
-                                  setStreamingRetryCount(0);
-                                }}
                                 onError={(e) => {
-                                  console.error('Video load error:', e);
-                                  if (streamingRetryCount < 10) {
-                                    const newRetryCount = streamingRetryCount + 1;
-                                    setStreamingRetryCount(newRetryCount);
-                                    streamingRetryTimeoutRef.current = setTimeout(() => {
-                                      if (streamingVideoRef.current && selectedChannel > 0) {
-                                        streamingVideoRef.current.load();
-                                      }
-                                    }, 30000);
-                                  } else {
-                                    setStreamingError('Failed to load video stream after multiple attempts');
-                                    setStreamingLoading(false);
+                                  // Ignore native video errors - flv.js handles FLV playback
+                                  // Only log if flv.js is not handling it
+                                  if (!flvPlayerRef.current) {
+                                    console.error('Video element error (no flv player):', e);
                                   }
-                                }}
-                                onCanPlay={() => {
-                                  setStreamingLoading(false);
-                                  setStreamingRetryCount(0);
                                 }}
                               />
                             )}
