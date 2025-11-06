@@ -4720,6 +4720,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               >
                 <ChevronLeft size={20} color={colors.textSecondary} />
               </button>
+              <Typography variant="h6" style={{
+                color: colors.text,
+                fontSize: '16px',
+                fontWeight: '600',
+                margin: 0,
+                flex: 1
+              }}>
+                RouteGuardian <span style={{ fontStyle: 'italic', fontSize: '0.7em', verticalAlign: 'super' }}>beta</span>
+              </Typography>
               <Tabs
                 value={moreDetailsActiveTab}
                 onChange={(e, newValue) => setMoreDetailsActiveTab(newValue)}
@@ -4727,7 +4736,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 scrollButtons="auto"
                 style={{
                   borderBottom: 'none',
-                  flex: 1,
                 }}
                 sx={{
                   '& .MuiTab-root': {
