@@ -273,6 +273,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videoListStartDate, setVideoListStartDate] = useState(getTodayStart());
   const [videoListEndDate, setVideoListEndDate] = useState(getTodayEnd());
   const [videoListSelectedChannels, setVideoListSelectedChannels] = useState(['1']);
+  const [videoListSelectedStatuses, setVideoListSelectedStatuses] = useState(['uploaded_ok', 'not_uploaded', 'upload_errored']);
+  const [videos, setVideos] = useState([]);
+  const [videosLoading, setVideosLoading] = useState(false);
+  const [videosError, setVideosError] = useState(null);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
   const [sensorSearchTerm, setSensorSearchTerm] = useState('');
@@ -358,6 +362,47 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device]);
 
+  // Fetch videos from media server
+  const fetchVideos = useCallback(async () => {
+    if (!device?.uniqueId) {
+      setVideos([]);
+      return;
+    }
+
+    setVideosLoading(true);
+    setVideosError(null);
+
+    try {
+      const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+      if (!mediaServerUrl) {
+        throw new Error('Media server URL not configured');
+      }
+
+      const response = await fetch(`${mediaServerUrl}/getFileList`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          deviceImei: device.uniqueId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch videos: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setVideos(data.videos || []);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      setVideosError(error.message);
+      setVideos([]);
+    } finally {
+      setVideosLoading(false);
+    }
+  }, [device]);
+
   // Reset tab when modal opens to first enabled tab
   useEffect(() => {
     if (moreDetailsModalOpen && device) {
@@ -372,11 +417,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setVideoListStartDate(dayjs().startOf('day').format('YYYY-MM-DDTHH:mm'));
         setVideoListEndDate(dayjs().endOf('day').format('YYYY-MM-DDTHH:mm'));
         setVideoListSelectedChannels(['1']);
+        setVideoListSelectedStatuses(['uploaded_ok', 'not_uploaded', 'upload_errored']);
+        // Fetch videos when modal opens
+        fetchVideos();
       } else if (hasHikiVision) {
         setMoreDetailsActiveTab(1);
       }
     }
-  }, [moreDetailsModalOpen, device]);
+  }, [moreDetailsModalOpen, device, fetchVideos]);
+
+  // Filter videos by selected channels and statuses
+  const filteredVideos = useMemo(() => {
+    if (!videos || videos.length === 0) return [];
+    return videos.filter(video => 
+      videoListSelectedChannels.includes(video.channel?.toString()) &&
+      videoListSelectedStatuses.includes(video.status)
+    );
+  }, [videos, videoListSelectedChannels, videoListSelectedStatuses]);
 
   // Helper function to get sensor display name (custom name takes precedence)
   const getSensorDisplayName = useCallback((sensorKey) => {
@@ -4713,21 +4770,211 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     </Tabs>
 
                     {/* Playback Tab Content */}
-                    {selectedChannel === 0 && (
-                      <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: desktop ? '100%' : 'auto',
-                        overflow: desktop ? 'hidden' : 'visible',
-                        boxSizing: 'border-box'
-                      }}>
-                        <Typography variant="subtitle2" style={{ 
-                          color: colors.text, 
-                          marginBottom: '16px',
-                          fontWeight: '600'
+                    {selectedChannel === 0 && (() => {
+                      // VideoItem component with lazy loading
+                      const VideoItem = ({ video, index }) => {
+                        const [imageLoaded, setImageLoaded] = useState(false);
+                        const [imageError, setImageError] = useState(false);
+                        const imgRef = useRef(null);
+
+                        // Lazy load thumbnail when in viewport
+                        useEffect(() => {
+                          if (!imgRef.current) return;
+
+                          const observer = new IntersectionObserver(
+                            (entries) => {
+                              entries.forEach((entry) => {
+                                if (entry.isIntersecting && !imageLoaded && !imageError) {
+                                  setImageLoaded(true);
+                                }
+                              });
+                            },
+                            { rootMargin: '50px' }
+                          );
+
+                          observer.observe(imgRef.current);
+
+                          return () => {
+                            if (imgRef.current) {
+                              observer.unobserve(imgRef.current);
+                            }
+                          };
+                        }, [imageLoaded, imageError]);
+
+                        const formatVideoTime = (timeStr) => {
+                          if (!timeStr) return '';
+                          try {
+                            return dayjs(timeStr, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm');
+                          } catch {
+                            return timeStr;
+                          }
+                        };
+
+                        const getStatusColor = (status) => {
+                          switch (status) {
+                            case 'uploaded_ok':
+                              return '#4caf50';
+                            case 'upload_errored':
+                              return '#f44336';
+                            case 'not_uploaded':
+                              return '#ff9800';
+                            default:
+                              return colors.textSecondary;
+                          }
+                        };
+
+                        return (
+                          <div
+                            ref={imgRef}
+                            key={`${video.channel}-${video.beginTime}-${index}`}
+                            style={{
+                              width: '100%',
+                              paddingBottom: '56.25%', // 16:9 aspect ratio
+                              position: 'relative',
+                              backgroundColor: colors.secondary,
+                              borderRadius: '8px',
+                              border: `1px solid ${colors.border}`,
+                              overflow: 'hidden',
+                              boxSizing: 'border-box',
+                              cursor: video.video_url ? 'pointer' : 'default',
+                              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (video.video_url) {
+                                e.currentTarget.style.transform = 'scale(1.02)';
+                                e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                            onClick={() => {
+                              if (video.video_url) {
+                                window.open(video.video_url, '_blank');
+                              }
+                            }}
+                          >
+                            {/* Thumbnail */}
+                            <div style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                            }}>
+                              {imageLoaded && video.thumbnail_url ? (
+                                <img
+                                  src={video.thumbnail_url}
+                                  alt={`Channel ${video.channel} - ${video.beginTime}`}
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                  }}
+                                  onError={() => setImageError(true)}
+                                />
+                              ) : (
+                                <div style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  backgroundColor: colors.secondary,
+                                }}>
+                                  {!imageLoaded && !imageError && (
+                                    <CircularProgress size={24} />
+                                  )}
+                                  {imageError && (
+                                    <Typography variant="body2" style={{ 
+                                      color: colors.textSecondary,
+                                      fontSize: '12px'
+                                    }}>
+                                      No thumbnail
+                                    </Typography>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Overlay with info */}
+                            <div style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                              padding: '8px',
+                              color: '#fff'
+                            }}>
+                              <Typography variant="caption" style={{ 
+                                display: 'block',
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                marginBottom: '2px'
+                              }}>
+                                Ch {video.channel} • {formatVideoTime(video.beginTime)}
+                              </Typography>
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                marginTop: '2px'
+                              }}>
+                                <div style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
+                                  backgroundColor: getStatusColor(video.status)
+                                }} />
+                                <Typography variant="caption" style={{ 
+                                  fontSize: '9px',
+                                  textTransform: 'capitalize'
+                                }}>
+                                  {video.status?.replace('_', ' ')}
+                                </Typography>
+                              </div>
+                            </div>
+
+                            {/* Play button overlay for videos with URL */}
+                            {video.video_url && (
+                              <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '50%',
+                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                pointerEvents: 'none'
+                              }}>
+                                <PlayArrowIcon style={{ fontSize: '28px', color: '#fff' }} />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      };
+
+                      return (
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: desktop ? '100%' : 'auto',
+                          overflow: desktop ? 'hidden' : 'visible',
+                          boxSizing: 'border-box'
                         }}>
-                          Videos
-                        </Typography>
+                          <Typography variant="subtitle2" style={{ 
+                            color: colors.text, 
+                            marginBottom: '16px',
+                            fontWeight: '600'
+                          }}>
+                            Videos
+                          </Typography>
                         
                         {/* Date pickers and channel selection */}
                         <div style={{
@@ -4752,6 +4999,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               value={videoListStartDate}
                               onChange={(e) => setVideoListStartDate(e.target.value)}
                               size="small"
+                              disabled={true}
                               InputLabelProps={{
                                 shrink: true,
                               }}
@@ -4780,6 +5028,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               value={videoListEndDate}
                               onChange={(e) => setVideoListEndDate(e.target.value)}
                               size="small"
+                              disabled={true}
                               InputLabelProps={{
                                 shrink: true,
                               }}
@@ -4858,15 +5107,73 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 />
                               ))}
                             </div>
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              gap: '6px',
+                              alignItems: 'center',
+                              flexWrap: 'wrap'
+                            }}>
+                              {[
+                                { status: 'uploaded_ok', label: 'Upload Ok', color: '#4caf50' },
+                                { status: 'not_uploaded', label: 'Not Uploaded', color: '#ff9800' },
+                                { status: 'upload_errored', label: 'Upload Error', color: '#f44336' }
+                              ].map(({ status, label, color }) => {
+                                const isSelected = videoListSelectedStatuses.includes(status);
+                                return (
+                                  <button
+                                    key={status}
+                                    onClick={() => {
+                                      if (isSelected) {
+                                        setVideoListSelectedStatuses(prev => prev.filter(s => s !== status));
+                                      } else {
+                                        setVideoListSelectedStatuses(prev => [...prev, status]);
+                                      }
+                                    }}
+                                    style={{
+                                      padding: '4px 10px',
+                                      borderRadius: '12px',
+                                      border: `1px solid ${isSelected ? color : colors.border}`,
+                                      backgroundColor: isSelected ? `${color}20` : colors.secondary,
+                                      color: isSelected ? color : colors.text,
+                                      fontSize: '11px',
+                                      fontWeight: isSelected ? '600' : '500',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s ease',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                      whiteSpace: 'nowrap'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (!isSelected) {
+                                        e.currentTarget.style.borderColor = color;
+                                        e.currentTarget.style.backgroundColor = `${color}15`;
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (!isSelected) {
+                                        e.currentTarget.style.borderColor = colors.border;
+                                        e.currentTarget.style.backgroundColor = colors.secondary;
+                                      }
+                                    }}
+                                  >
+                                    <div style={{
+                                      width: '6px',
+                                      height: '6px',
+                                      borderRadius: '50%',
+                                      backgroundColor: color
+                                    }} />
+                                    {label}
+                                  </button>
+                                );
+                              })}
+                            </div>
                             <button
                               onClick={() => {
-                                // Handle video request
-                                console.log('Request videos:', {
-                                  startDate: videoListStartDate,
-                                  endDate: videoListEndDate,
-                                  channels: videoListSelectedChannels
-                                });
+                                fetchVideos();
                               }}
+                              disabled={videosLoading}
                               style={{
                                 width: '40px',
                                 height: '40px',
@@ -4875,69 +5182,74 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                cursor: 'pointer',
+                                cursor: videosLoading ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.2s ease',
                                 padding: 0,
-                                flexShrink: 0
+                                flexShrink: 0,
+                                opacity: videosLoading ? 0.5 : 1
                               }}
-                              title="Request Videos"
+                              title="Refresh Videos"
                             >
-                              <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                              {videosLoading ? (
+                                <CircularProgress size={20} style={{ color: colors.textSecondary }} />
+                              ) : (
+                                <RefreshOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                              )}
                             </button>
                           </div>
                         </div>
 
                         {/* Video grid - only y-scrollable */}
-                        <Box style={{
-                          display: 'grid',
-                          gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
-                          gap: '16px',
-                          overflowY: desktop ? 'auto' : 'visible',
-                          overflowX: 'hidden',
-                          paddingRight: '4px',
-                          flex: desktop ? 1 : 'none',
-                          minHeight: desktop ? 0 : 'auto',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
-                        }}>
-                          {/* Placeholder video items - replace with actual video data */}
-                          {Array.from({ length: 30 }, (_, i) => i + 1).map((videoNum) => (
-                            <div
-                              key={videoNum}
-                              style={{
-                                width: '100%',
-                                paddingBottom: '56.25%', // 16:9 aspect ratio
-                                position: 'relative',
-                                backgroundColor: colors.secondary,
-                                borderRadius: '8px',
-                                border: `1px solid ${colors.border}`,
-                                overflow: 'hidden',
-                                boxSizing: 'border-box'
-                              }}
-                            >
-                              <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}>
-                                <Typography variant="body2" style={{ 
-                                  color: colors.textSecondary,
-                                  fontSize: '12px'
-                                }}>
-                                  Video {videoNum}
-                                </Typography>
-                              </div>
-                            </div>
-                          ))}
-                        </Box>
-                      </div>
-                    )}
+                        {videosError && (
+                          <Typography variant="body2" style={{ 
+                            color: colors.error || '#f44336',
+                            marginBottom: '16px',
+                            padding: '12px',
+                            backgroundColor: colors.secondary,
+                            borderRadius: '8px'
+                          }}>
+                            Error loading videos: {videosError}
+                          </Typography>
+                        )}
+                        {videosLoading && filteredVideos.length === 0 ? (
+                          <Box style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '40px'
+                          }}>
+                            <CircularProgress />
+                          </Box>
+                        ) : filteredVideos.length === 0 ? (
+                          <Typography variant="body2" style={{ 
+                            color: colors.textSecondary,
+                            padding: '40px',
+                            textAlign: 'center'
+                          }}>
+                            No videos found for selected channels
+                          </Typography>
+                        ) : (
+                          <Box style={{
+                            display: 'grid',
+                            gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
+                            gap: '16px',
+                            overflowY: desktop ? 'auto' : 'visible',
+                            overflowX: 'hidden',
+                            paddingRight: '4px',
+                            flex: desktop ? 1 : 'none',
+                            minHeight: desktop ? 0 : 'auto',
+                            width: '100%',
+                            maxWidth: '100%',
+                            boxSizing: 'border-box'
+                          }}>
+                            {filteredVideos.map((video, index) => (
+                              <VideoItem key={`${video.channel}-${video.beginTime}-${index}`} video={video} index={index} />
+                            ))}
+                          </Box>
+                        )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Channel Tabs Content - Real-time Video */}
                     {selectedChannel > 0 && (
