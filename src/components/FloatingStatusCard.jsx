@@ -575,7 +575,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Check if video is now uploaded_ok
     const checkStatus = async () => {
       try {
-        // Fetch latest videos
+        // First, simulate "Load from Device" - send instruct command
+        try {
+          await sendVideoListInstruct();
+          // Wait 20 seconds for device to process (upload/transcode)
+          await new Promise(resolve => setTimeout(resolve, 20000));
+        } catch (instructError) {
+          console.error('Error sending instruct command during status check:', instructError);
+          // Continue anyway to try fetching videos
+        }
+
+        // Then fetch latest videos from media server
         const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
         if (!mediaServerUrl) {
           console.error('Media server URL not configured');
@@ -617,9 +627,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           }
           console.log('Video uploaded successfully:', videoId);
         } else {
-          // Update videos list even if not uploaded yet
-          setVideos(currentVideos);
-          setVideosTotalCount(data.resource_count || 0);
+          // Only update if videos list actually changed to prevent blinking
+          setVideos(prevVideos => {
+            // Check if the list actually changed
+            const prevVideoIds = new Set(prevVideos.map(v => `${v.channel}-${v.beginTime}-${v.status}`));
+            const newVideoIds = new Set(currentVideos.map(v => `${v.channel}-${v.beginTime}-${v.status}`));
+            
+            // If sets are different, update
+            if (prevVideoIds.size !== newVideoIds.size || 
+                [...prevVideoIds].some(id => !newVideoIds.has(id))) {
+              return currentVideos;
+            }
+            return prevVideos; // No change, return previous to prevent re-render
+          });
+          // Only update count if it changed
+          setVideosTotalCount(prevCount => {
+            const newCount = data.resource_count || 0;
+            return prevCount !== newCount ? newCount : prevCount;
+          });
         }
       } catch (error) {
         console.error('Error checking video upload status:', error);
@@ -631,7 +656,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     
     // Poll every 30 seconds
     uploadCheckIntervalRef.current = setInterval(checkStatus, 30000);
-  }, [device]);
+  }, [device, sendVideoListInstruct]);
 
   // Handle upload button click
   const handleUploadVideo = useCallback(async (video, e) => {
@@ -1113,21 +1138,37 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [moreDetailsModalOpen, device, fetchVideos, getIoTHubChannels]);
 
-  // Filter videos by selected channels and statuses
+  // Filter and sort videos by selected channels and statuses
   const filteredVideos = useMemo(() => {
     if (!videos || videos.length === 0) return [];
-    // If no filters selected, show all videos
-    if (videoListSelectedChannels.length === 0 && videoListSelectedStatuses.length === 0) {
-      return videos;
+    
+    // Filter videos
+    let filtered = videos;
+    if (videoListSelectedChannels.length > 0 || videoListSelectedStatuses.length > 0) {
+      filtered = videos.filter(video => {
+        const channelMatch = videoListSelectedChannels.length === 0 || 
+          videoListSelectedChannels.includes(String(video.channel)) ||
+          videoListSelectedChannels.includes(video.channel?.toString());
+        const statusMatch = videoListSelectedStatuses.length === 0 || 
+          videoListSelectedStatuses.includes(video.status);
+        return channelMatch && statusMatch;
+      });
     }
-    const filtered = videos.filter(video => {
-      const channelMatch = videoListSelectedChannels.length === 0 || 
-        videoListSelectedChannels.includes(String(video.channel)) ||
-        videoListSelectedChannels.includes(video.channel?.toString());
-      const statusMatch = videoListSelectedStatuses.length === 0 || 
-        videoListSelectedStatuses.includes(video.status);
-      return channelMatch && statusMatch;
+    
+    // Sort by beginTime ascending
+    filtered = [...filtered].sort((a, b) => {
+      if (!a.beginTime && !b.beginTime) return 0;
+      if (!a.beginTime) return 1;
+      if (!b.beginTime) return -1;
+      try {
+        const timeA = dayjs(a.beginTime, 'YYYY-MM-DD HH:mm:ss').valueOf();
+        const timeB = dayjs(b.beginTime, 'YYYY-MM-DD HH:mm:ss').valueOf();
+        return timeA - timeB;
+      } catch {
+        return a.beginTime.localeCompare(b.beginTime);
+      }
     });
+    
     return filtered;
   }, [videos, videoListSelectedChannels, videoListSelectedStatuses]);
 
