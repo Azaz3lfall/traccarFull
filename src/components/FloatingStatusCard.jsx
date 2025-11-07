@@ -565,6 +565,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     const videoId = `${video.channel}-${video.beginTime}`;
     const channel = video.channel;
     const beginTime = video.beginTime;
+    const originalStatus = video.status; // Store original status to compare
     
     // Clear any existing interval
     if (uploadCheckIntervalRef.current) {
@@ -616,36 +617,58 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           v.beginTime === beginTime
         );
         
-        if (currentVideo && currentVideo.status === 'uploaded_ok') {
-          // Video is uploaded, stop checking and update state
-          setUploadingVideoId(null);
-          setVideos(currentVideos);
-          setVideosTotalCount(data.resource_count || 0);
-          if (uploadCheckIntervalRef.current) {
-            clearInterval(uploadCheckIntervalRef.current);
-            uploadCheckIntervalRef.current = null;
-          }
-          console.log('Video uploaded successfully:', videoId);
-        } else {
-          // Only update if videos list actually changed to prevent blinking
-          setVideos(prevVideos => {
-            // Check if the list actually changed
-            const prevVideoIds = new Set(prevVideos.map(v => `${v.channel}-${v.beginTime}-${v.status}`));
-            const newVideoIds = new Set(currentVideos.map(v => `${v.channel}-${v.beginTime}-${v.status}`));
+        if (currentVideo) {
+          const isUploaded = currentVideo.status === 'uploaded_ok';
+          const isErrored = currentVideo.status === 'upload_errored';
+          const statusChanged = originalStatus !== currentVideo.status;
+          
+          if (isUploaded || isErrored) {
+            // Video is uploaded or errored, stop checking
+            setUploadingVideoId(null);
             
-            // If sets are different, update
-            if (prevVideoIds.size !== newVideoIds.size || 
-                [...prevVideoIds].some(id => !newVideoIds.has(id))) {
-              return currentVideos;
+            if (uploadCheckIntervalRef.current) {
+              clearInterval(uploadCheckIntervalRef.current);
+              uploadCheckIntervalRef.current = null;
             }
-            return prevVideos; // No change, return previous to prevent re-render
-          });
-          // Only update count if it changed
-          setVideosTotalCount(prevCount => {
-            const newCount = data.resource_count || 0;
-            return prevCount !== newCount ? newCount : prevCount;
-          });
+            
+            // Update videos list
+            setVideos(currentVideos);
+            setVideosTotalCount(data.resource_count || 0);
+            
+            // Ensure the status is in the selected statuses filter
+            if (isUploaded) {
+              setVideoListSelectedStatuses(prev => {
+                if (!prev.includes('uploaded_ok')) {
+                  return [...prev, 'uploaded_ok'];
+                }
+                return prev;
+              });
+              console.log('Video uploaded successfully:', videoId);
+            } else if (isErrored) {
+              setVideoListSelectedStatuses(prev => {
+                if (!prev.includes('upload_errored')) {
+                  return [...prev, 'upload_errored'];
+                }
+                return prev;
+              });
+              console.log('Video upload errored:', videoId);
+            }
+            
+            // Try to play the video if it has a video_url (even if errored)
+            if (currentVideo.video_url) {
+              setTimeout(() => {
+                setSelectedVideo(currentVideo);
+                setShowVideoPlayer(true);
+              }, 100);
+            }
+          } else if (statusChanged) {
+            // Status changed but not to uploaded/errored, update list
+            setVideos(currentVideos);
+            setVideosTotalCount(data.resource_count || 0);
+          }
+          // If status hasn't changed, don't update to prevent blinking
         }
+        // If video not found, don't update to prevent blinking
       } catch (error) {
         console.error('Error checking video upload status:', error);
       }
