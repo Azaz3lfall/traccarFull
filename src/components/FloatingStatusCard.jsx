@@ -67,6 +67,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
+import { IoShareOutline, IoRefreshOutline } from "react-icons/io5";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -464,6 +465,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   // Upload video command to device
   const uploadVideo = useCallback(async (video) => {
+    // Log video details
+    console.log('=== FTP Upload Video Details (Playback Tab - Play Button Modal) ===');
+    console.log('Full video object:', video);
+    console.log('Video channel:', video.channel);
+    console.log('Video beginTime:', video.beginTime);
+    console.log('Video endTime:', video.endTime);
+    console.log('Video status:', video.status);
+    console.log('Video thumbnail_url:', video.thumbnail_url);
+    console.log('Video video_url:', video.video_url);
+    console.log('Device uniqueId:', device?.uniqueId);
+    console.log('============================================');
+    
     if (!device?.attributes?.iothub || !device?.uniqueId) {
       throw new Error('Device iothub configuration not found');
     }
@@ -685,18 +698,123 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleUploadVideo = useCallback(async (video, e) => {
     e.stopPropagation(); // Prevent video click
     
+    console.log('=== Upload Button Clicked (Playback Tab - Play Button Modal) ===');
+    console.log('Video data:', video);
+    
     const videoId = `${video.channel}-${video.beginTime}`;
     setUploadingVideoId(videoId);
     
     try {
+      // Step 1: Call upload endpoint once
+      console.log('Step 1: Sending upload command...');
       await uploadVideo(video);
-      // Start checking upload status
-      await checkVideoUploadStatus(video);
+      
+      // Step 2: Wait 90 seconds
+      console.log('Step 2: Waiting 90 seconds...');
+      await new Promise(resolve => setTimeout(resolve, 90000));
+      
+      // Step 3: Check for updates (send instruct command and fetch videos)
+      console.log('Step 3: Checking for updates...');
+      try {
+        await sendVideoListInstruct();
+      } catch (instructError) {
+        console.error('Error sending instruct command:', instructError);
+      }
+      
+      // Fetch latest videos from media server
+      const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+      if (mediaServerUrl) {
+        try {
+          const response = await fetch(`${mediaServerUrl}/getFileList`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              deviceImei: device.uniqueId
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const currentVideos = data.videos || [];
+            setVideos(currentVideos);
+            setVideosTotalCount(data.resource_count || 0);
+            console.log('Video list updated after first check');
+          }
+        } catch (fetchError) {
+          console.error('Error fetching videos:', fetchError);
+        }
+      }
+      
+      // Step 4: Wait 90 seconds
+      console.log('Step 4: Waiting 90 seconds...');
+      await new Promise(resolve => setTimeout(resolve, 90000));
+      
+      // Step 5: Finally update video list
+      console.log('Step 5: Final video list update...');
+      if (mediaServerUrl) {
+        try {
+          const response = await fetch(`${mediaServerUrl}/getFileList`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              deviceImei: device.uniqueId
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const currentVideos = data.videos || [];
+            
+            // Find the video we're checking
+            const currentVideo = currentVideos.find(v => 
+              String(v.channel) === String(video.channel) && 
+              v.beginTime === video.beginTime
+            );
+            
+            setVideos(currentVideos);
+            setVideosTotalCount(data.resource_count || 0);
+            
+            // Update status filters if needed
+            if (currentVideo) {
+              if (currentVideo.status === 'uploaded_ok') {
+                setVideoListSelectedStatuses(prev => {
+                  if (!prev.includes('uploaded_ok')) {
+                    return [...prev, 'uploaded_ok'];
+                  }
+                  return prev;
+                });
+                console.log('Video uploaded successfully:', videoId);
+              } else if (currentVideo.status === 'upload_errored') {
+                setVideoListSelectedStatuses(prev => {
+                  if (!prev.includes('upload_errored')) {
+                    return [...prev, 'upload_errored'];
+                  }
+                  return prev;
+                });
+                console.log('Video upload errored:', videoId);
+              }
+            }
+            
+            console.log('Final video list updated');
+          }
+        } catch (fetchError) {
+          console.error('Error fetching videos in final update:', fetchError);
+        }
+      }
+      
+      // Clear uploading state
+      setUploadingVideoId(null);
+      console.log('Upload process completed');
+      
     } catch (error) {
       console.error('Error in upload process:', error);
       setUploadingVideoId(null);
     }
-  }, [uploadVideo, checkVideoUploadStatus]);
+  }, [uploadVideo, sendVideoListInstruct, device]);
 
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
@@ -5858,8 +5976,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               </div>
                             </div>
 
-                            {/* Upload/Share button for not_uploaded videos - Apple style */}
-                            {video.status === 'not_uploaded' && (
+                            {/* Upload/Share button for not_uploaded and upload_errored videos - Apple style */}
+                            {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
                               <IconButton
                                 onClick={(e) => handleUploadVideo(video, e)}
                                 disabled={uploadingVideoId === `${video.channel}-${video.beginTime}`}
@@ -5884,12 +6002,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                     backgroundColor: 'rgba(0, 0, 0, 0.4)',
                                   }
                                 }}
-                                title="Upload video"
+                                title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
                               >
                                 {uploadingVideoId === `${video.channel}-${video.beginTime}` ? (
                                   <CircularProgress size={16} style={{ color: '#fff' }} />
+                                ) : video.status === 'upload_errored' ? (
+                                  <IoRefreshOutline style={{ fontSize: '18px', color: '#fff' }} />
                                 ) : (
-                                  <ShareIcon style={{ fontSize: '18px' }} />
+                                  <IoShareOutline style={{ fontSize: '18px', color: '#fff' }} />
                                 )}
                               </IconButton>
                             )}

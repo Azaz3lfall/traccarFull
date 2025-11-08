@@ -4,7 +4,7 @@
 // Use environment variable or default to the resellers server domain
 // In development, set VITE_RESELLERS_SERVER_URL=http://localhost:3333
 // In production, uses the separate resellers domain
-const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://revenda.absmultipla.com.br';
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://revendas.rastreadorautoram.com.br';
 // const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
 
 export default {
