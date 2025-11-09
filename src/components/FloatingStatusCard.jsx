@@ -85,7 +85,7 @@ import flvjs from 'flv.js';
 dayjs.extend(relativeTime);
 
 // VideoItem component with lazy loading - moved outside to prevent re-creation on every render
-const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVideo, setShowVideoPlayer, uploadingVideoId }) => {
+const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVideo, setShowVideoPlayer }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef(null);
@@ -254,7 +254,6 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
       {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
         <IconButton
           onClick={(e) => handleUploadVideo(video, e)}
-          disabled={uploadingVideoId === `${video.channel}-${video.beginTime}`}
           size="small"
           style={{
             position: 'absolute',
@@ -271,16 +270,11 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
           sx={{
             '&:hover': {
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            },
-            '&.Mui-disabled': {
-              backgroundColor: 'rgba(0, 0, 0, 0.4)',
             }
           }}
           title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
         >
-          {uploadingVideoId === `${video.channel}-${video.beginTime}` ? (
-            <CircularProgress size={16} style={{ color: '#fff' }} />
-          ) : video.status === 'upload_errored' ? (
+          {video.status === 'upload_errored' ? (
             <IoRefreshOutline style={{ fontSize: '18px', color: '#fff' }} />
           ) : (
             <IoShareOutline style={{ fontSize: '18px', color: '#fff' }} />
@@ -521,8 +515,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const streamingVideoRef = useRef(null);
   const streamingRetryTimeoutRef = useRef(null);
   const flvPlayerRef = useRef(null);
-  const uploadCheckIntervalRef = useRef(null);
-  const isUploadingRef = useRef(false); // Guard to prevent duplicate upload calls
   
   // Initialize dates with today 00:00:00 and 23:59:59
   const getTodayStart = () => dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
@@ -539,7 +531,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videosCurrentPage, setVideosCurrentPage] = useState(1);
   const videosPerPage = 20;
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [uploadingVideoId, setUploadingVideoId] = useState(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef(null);
   const [deviceMessages, setDeviceMessages] = useState([]);
@@ -800,446 +791,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device, videoListStartDate, videoListEndDate, logDeviceMessage]);
 
-  // Upload video command to device
-  const uploadVideo = useCallback(async (video, videoInfoForLogging = null) => {
-    // Log video details
-    console.log('=== FTP Upload Video Details (Playback Tab - Play Button Modal) ===');
-    console.log('Full video object:', video);
-    console.log('Video channel:', video.channel);
-    console.log('Video beginTime:', video.beginTime);
-    console.log('Video endTime:', video.endTime);
-    console.log('Video status:', video.status);
-    console.log('Video thumbnail_url:', video.thumbnail_url);
-    console.log('Video video_url:', video.video_url);
-    console.log('Device uniqueId:', device?.uniqueId);
-    console.log('============================================');
+  // Handle upload button click - just logs video details
+  const handleUploadVideo = useCallback((video, e) => {
+    e.stopPropagation();
+    e.preventDefault();
     
-    if (!device?.attributes?.iothub || !device?.uniqueId) {
-      throw new Error('Device iothub configuration not found');
-    }
-
-    try {
-      const iothub = JSON.parse(device.attributes.iothub);
-      const iothubServer = iothub?.iothubServer || '';
-      const token = iothub?.token || '';
-      const ftpServerIp = iothub?.ftpServerIp || '';
-      const ftpPort = iothub?.ftpPort || '';
-      const ftpUser = iothub?.ftpUser || '';
-      const ftpPassword = iothub?.ftpPassword || '';
-      const fileUploadPath = iothub?.fileUploadPath || '';
-
-      if (!iothubServer || !token || !ftpServerIp) {
-        throw new Error('IoTHub Server, Token or FTP Server IP not configured');
-      }
-
-      // Extract numeric channel from video
-      const channel = parseInt(video.channel) || 0;
-      
-      // Format beginTime and endTime as YYMMDDHHmmss
-      const formatDateTime = (timeStr) => {
-        if (!timeStr) return '';
-        try {
-          // Parse from 'YYYY-MM-DD HH:mm:ss' format
-          const date = dayjs(timeStr, 'YYYY-MM-DD HH:mm:ss');
-          return date.format('YYMMDDHHmmss');
-        } catch {
-          return timeStr;
-        }
-      };
-
-      const beginTime = formatDateTime(video.beginTime);
-      const endTime = formatDateTime(video.endTime);
-
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-      const urlencoded = new URLSearchParams();
-      urlencoded.append("deviceImei", device.uniqueId);
-      urlencoded.append("cmdContent", JSON.stringify({
-        "serverAddress": ftpServerIp,
-        "ftpPort": parseInt(ftpPort) || 21,
-        "userName": ftpUser,
-        "password": ftpPassword,
-        "fileUploadPath": fileUploadPath,
-        "channel": channel,
-        "beginTime": beginTime,
-        "endTime": endTime,
-        "alarmFlag": 0,
-        "resourceType": 0,
-        "codeType": 0,
-        "storageType": 0,
-        "condition": 1,
-        "instructionID": "123456789"
-      }));
-      urlencoded.append("serverFlagId", "0");
-      urlencoded.append("proNo", "37382");
-      urlencoded.append("platform", "web");
-      urlencoded.append("requestId", "6");
-      urlencoded.append("cmdType", "normallns");
-      urlencoded.append("offLineFlag", "1");
-      urlencoded.append("token", token);
-
-      // Build URL from iothubServer - ensure it has protocol and path
-      const apiUrl = iothubServer.startsWith('http') 
-        ? `${iothubServer}/api/device/sendInstruct`
-        : `https://${iothubServer}/api/device/sendInstruct`;
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow"
-      };
-
-      console.log('=== Upload Video Request ===');
-      console.log('URL:', apiUrl);
-      console.log('Video:', video);
-      console.log('Channel:', channel);
-      console.log('beginTime:', beginTime);
-      console.log('endTime:', endTime);
-      console.log('==========================');
-
-      const requestData = {
-        deviceImei: device.uniqueId,
-        channel: video.channel,
-        beginTime: formatDateTime(video.beginTime),
-        endTime: formatDateTime(video.endTime),
-        cmdContent: JSON.parse(urlencoded.get("cmdContent"))
-      };
-
-      const response = await fetch(apiUrl, requestOptions);
-      const result = await response.text();
-      console.log('Upload video response:', result);
-      
-      try {
-        const parsed = JSON.parse(result);
-        const isSuccess = parsed.code === 0 && parsed.data?._code === '100';
-        const errorMsg = !isSuccess ? (parsed.data?._msg || parsed.msg || 'Upload command failed') : null;
-        
-        logDeviceMessage('upload', 'upload_video', requestData, parsed, isSuccess, errorMsg, videoInfoForLogging || video);
-        
-        // Return structured result for checking
-        return {
-          success: isSuccess,
-          data: parsed,
-          error: errorMsg
-        };
-      } catch (e) {
-        logDeviceMessage('upload', 'upload_video', requestData, result, false, 'Invalid JSON response', videoInfoForLogging || video);
-        return {
-          success: false,
-          error: 'Invalid JSON response',
-          raw: result
-        };
-      }
-    } catch (error) {
-      console.error('Error uploading video:', error);
-      throw error;
-    }
-  }, [device, logDeviceMessage]);
-
-  // Poll video status after upload - only called after FTP upload succeeds
-  const pollVideoUploadStatus = useCallback(async (video) => {
-    const videoId = `${video.channel}-${video.beginTime}`;
-    const channel = video.channel;
-    const beginTime = video.beginTime;
-    
-    // Clear any existing interval first
-    if (uploadCheckIntervalRef.current) {
-      clearInterval(uploadCheckIntervalRef.current);
-      uploadCheckIntervalRef.current = null;
-    }
-
-    const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
-    if (!mediaServerUrl) {
-      console.error('Media server URL not configured');
-      setUploadingVideoId(null);
-      return;
-    }
-
-    // Check video status function
-    const checkStatus = async () => {
-      // Stop immediately if interval was cleared (upload finished)
-      if (!uploadCheckIntervalRef.current) {
-        return;
-      }
-
-      try {
-        // Send instruct command to refresh video list from device
-        try {
-          const instructResult = await sendVideoListInstruct();
-          
-          // Parse and check API response to determine device online status
-          let parsed;
-          try {
-            parsed = typeof instructResult === 'string' ? JSON.parse(instructResult) : instructResult;
-          } catch (parseError) {
-            console.warn('Could not parse instruct response:', parseError);
-            // If response is not JSON, stop polling
-            logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, null, false, 'Invalid JSON response');
-            if (uploadCheckIntervalRef.current) {
-              clearInterval(uploadCheckIntervalRef.current);
-              uploadCheckIntervalRef.current = null;
-            }
-            setUploadingVideoId(null);
-            return;
-          }
-          
-          // Check API response codes and messages for offline indicators
-          const responseCode = parsed.data?._code;
-          const responseMsg = (parsed.data?._msg || parsed.msg || '').toLowerCase();
-          const offlineCodes = ['300', '302', '600']; // 300=offline, 302=busy, 600=timeout
-          const offlineMessages = ['offline', 'not online', 'busy', 'timeout', 'previous command'];
-          const isSuccess = parsed.code === 0 && responseCode === '100';
-          const isOffline = offlineCodes.includes(responseCode) || 
-                           offlineMessages.some(msg => responseMsg.includes(msg));
-          
-          if (!isSuccess || isOffline) {
-            const errorMsg = parsed.data?._msg || parsed.msg || 'Instruct command failed';
-            console.error('Device is offline/busy based on API response:', errorMsg, 'Code:', responseCode);
-            logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, parsed, false, errorMsg);
-            
-            // STOP polling if device is offline/busy - don't proceed
-            if (uploadCheckIntervalRef.current) {
-              clearInterval(uploadCheckIntervalRef.current);
-              uploadCheckIntervalRef.current = null;
-            }
-            setUploadingVideoId(null);
-            return; // STOP - don't proceed
-          }
-          
-          // Only proceed if API response indicates success (Code 100)
-          // Wait a bit for device to process
-          await new Promise(resolve => setTimeout(resolve, 5000));
-        } catch (instructError) {
-          console.error('Error sending instruct command during status check:', instructError);
-          logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, null, false, instructError.message || 'Instruct command failed');
-          
-          // Stop polling on error - don't proceed
-          if (uploadCheckIntervalRef.current) {
-            clearInterval(uploadCheckIntervalRef.current);
-            uploadCheckIntervalRef.current = null;
-          }
-          setUploadingVideoId(null);
-          return; // STOP - don't proceed
-        }
-
-        // Fetch latest videos from media server
-        const response = await fetch(`${mediaServerUrl}/getFileList`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            deviceImei: device.uniqueId
-          })
-        });
-
-        if (!response.ok) {
-          console.error(`Failed to fetch videos: ${response.statusText}`);
-          return;
-        }
-
-        const data = await response.json();
-        const currentVideos = data.videos || [];
-        
-        // Find the video we're checking
-        const currentVideo = currentVideos.find(v => 
-          String(v.channel) === String(channel) && 
-          v.beginTime === beginTime
-        );
-        
-        if (currentVideo) {
-          const isUploaded = currentVideo.status === 'uploaded_ok';
-          const isErrored = currentVideo.status === 'upload_errored';
-          
-          if (isUploaded || isErrored) {
-            // STOP POLLING IMMEDIATELY - before any updates
-            if (uploadCheckIntervalRef.current) {
-              clearInterval(uploadCheckIntervalRef.current);
-              uploadCheckIntervalRef.current = null;
-            }
-            
-            // Clear uploading state
-            isUploadingRef.current = false;
-            setUploadingVideoId(null);
-            
-            // Update videos list ONLY ONCE when upload finishes - prevent blinking
-            setVideos(prevVideos => {
-              // Deep comparison to prevent unnecessary updates
-              const prevVideosStr = JSON.stringify(prevVideos);
-              const currentVideosStr = JSON.stringify(currentVideos);
-              
-              // Only update if data actually changed
-              if (prevVideosStr !== currentVideosStr) {
-                return currentVideos;
-              }
-              return prevVideos; // Return same reference to prevent re-render
-            });
-            
-            setVideosTotalCount(data.resource_count || 0);
-            
-            // Ensure the status is in the selected statuses filter
-            if (isUploaded) {
-              setVideoListSelectedStatuses(prev => {
-                if (!prev.includes('uploaded_ok')) {
-                  return [...prev, 'uploaded_ok'];
-                }
-                return prev;
-              });
-              console.log('Video uploaded successfully:', videoId);
-              
-              // AUTO-PLAY VIDEO IMMEDIATELY when upload finishes
-              // Use video_url from API response, or generate from expected_file if available
-              const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
-              const videoToPlay = currentVideo.video_url || 
-                (currentVideo.expected_file && device?.uniqueId && mediaServerUrl
-                  ? `${mediaServerUrl.replace(/\/$/, '')}/${device.uniqueId}/${currentVideo.expected_file}`
-                  : null);
-              
-              if (videoToPlay) {
-                console.log('Auto-playing uploaded video:', currentVideo);
-                // Create video object with URL for playback
-                const videoForPlayback = {
-                  ...currentVideo,
-                  video_url: videoToPlay
-                };
-                // Use setTimeout to ensure state updates are complete before playing
-                setTimeout(() => {
-                  setSelectedVideo(videoForPlayback);
-                  setShowVideoPlayer(true);
-                }, 100);
-              }
-            } else if (isErrored) {
-              setVideoListSelectedStatuses(prev => {
-                if (!prev.includes('upload_errored')) {
-                  return [...prev, 'upload_errored'];
-                }
-                return prev;
-              });
-              console.log('Video upload errored:', videoId);
-            }
-            
-            // Exit early - no more polling needed
-            return;
-          } else {
-            // Status hasn't changed to uploaded/errored yet
-            // Only update list if data changed, and do it silently to prevent blinking
-            setVideos(prevVideos => {
-              const prevVideosStr = JSON.stringify(prevVideos);
-              const currentVideosStr = JSON.stringify(currentVideos);
-              
-              // Only update if data actually changed
-              if (prevVideosStr !== currentVideosStr) {
-                return currentVideos;
-              }
-              return prevVideos; // Return same reference to prevent re-render
-            });
-            setVideosTotalCount(data.resource_count || 0);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking video upload status:', error);
-      }
-    };
-
-    // Start polling every 15 seconds (more frequent than before for faster detection)
-    // Only poll after upload command succeeds
-    await checkStatus(); // Check immediately first
-    uploadCheckIntervalRef.current = setInterval(checkStatus, 15000); // Poll every 15 seconds
-  }, [device, sendVideoListInstruct, logDeviceMessage]);
-
-  // Handle upload button click
-  const handleUploadVideo = useCallback(async (video, e) => {
-    e.stopPropagation(); // Prevent video click
-    e.preventDefault(); // Prevent default behavior
-    
-    const videoId = `${video.channel}-${video.beginTime}`;
-    
-    console.log('=== Upload Button Clicked (Playback Tab - Play Button Modal) ===');
-    console.log('Video data:', video);
-    
-    // Clear any existing polling interval if restarting
-    if (uploadCheckIntervalRef.current) {
-      console.log('Clearing existing polling interval to restart upload process');
-      clearInterval(uploadCheckIntervalRef.current);
-      uploadCheckIntervalRef.current = null;
-    }
-    
-    // Set ref and state to indicate upload is starting/restarting
-    isUploadingRef.current = true;
-    setUploadingVideoId(videoId);
-    
-    let uploadResult = null;
-    try {
-      // Step 1: Call upload endpoint - check API response to determine if device is online
-      console.log('Step 1: Sending FTP upload command...');
-      uploadResult = await uploadVideo(video, video); // Pass video info for logging - this will log with download URL
-      
-      // Check API response to determine device online status
-      if (!uploadResult || !uploadResult.success) {
-        const errorMsg = uploadResult?.error || 'Upload command failed';
-        const responseData = uploadResult?.data;
-        
-        // Check for offline indicators in API response
-        const offlineCodes = ['300', '302', '600']; // 300=offline, 302=busy, 600=timeout
-        const offlineMessages = ['offline', 'not online', 'busy', 'timeout'];
-        const responseCode = responseData?.data?._code;
-        const responseMsg = (responseData?.data?._msg || responseData?.msg || '').toLowerCase();
-        
-        const isOffline = offlineCodes.includes(responseCode) || 
-                         offlineMessages.some(msg => responseMsg.includes(msg));
-        
-        if (isOffline) {
-          const offlineMsg = responseData?.data?._msg || responseData?.msg || errorMsg;
-          console.error('Device is offline based on API response:', offlineMsg, 'Code:', responseCode);
-          // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
-          isUploadingRef.current = false;
-          setUploadingVideoId(null);
-          return; // STOP - don't proceed
-        }
-        
-        console.error('Upload command failed:', errorMsg);
-        // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
-        isUploadingRef.current = false;
-        setUploadingVideoId(null);
-        return; // STOP - don't proceed
-      }
-      
-      // Only proceed if API response indicates success (Code 100)
-      if (uploadResult.data?.data?._code !== '100') {
-        const errorMsg = uploadResult.data?.data?._msg || uploadResult.data?.msg || 'Upload command did not succeed';
-        console.error('Upload command did not succeed:', errorMsg);
-        // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
-        isUploadingRef.current = false;
-        setUploadingVideoId(null);
-        return; // STOP - don't proceed
-      }
-      
-      console.log('FTP upload command sent successfully. Device is online. Starting status polling...');
-      
-      // Step 2: Start polling for upload status - ONLY after upload command succeeds with Code 100
-      // This will poll every 15 seconds until video is uploaded_ok or errored
-      // Video will auto-play when upload finishes
-      await pollVideoUploadStatus(video);
-      
-    } catch (error) {
-      console.error('Error in upload process:', error);
-      // Only log if uploadVideo wasn't called (network error, etc.)
-      // If uploadVideo was called, it already logged the message
-      if (!uploadResult) {
-        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, null, false, error.message || 'Upload process failed', video);
-      }
-      isUploadingRef.current = false;
-      setUploadingVideoId(null);
-      
-      // Clear any polling interval on error
-      if (uploadCheckIntervalRef.current) {
-        clearInterval(uploadCheckIntervalRef.current);
-        uploadCheckIntervalRef.current = null;
-      }
-    }
-  }, [uploadVideo, pollVideoUploadStatus, device, logDeviceMessage]);
+    console.log('Video Details:', {
+      channel: video.channel,
+      beginTime: video.beginTime,
+      endTime: video.endTime,
+      status: video.status,
+      expected_file: video.expected_file,
+      video_url: video.video_url,
+      thumbnail_url: video.thumbnail_url,
+      deviceImei: device?.uniqueId
+    });
+  }, [device]);
 
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
