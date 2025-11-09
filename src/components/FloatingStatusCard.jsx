@@ -521,6 +521,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const streamingVideoRef = useRef(null);
   const streamingRetryTimeoutRef = useRef(null);
   const flvPlayerRef = useRef(null);
+  const uploadCheckIntervalRef = useRef(null);
+  const isUploadingRef = useRef(false); // Guard to prevent duplicate upload calls
   
   // Initialize dates with today 00:00:00 and 23:59:59
   const getTodayStart = () => dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
@@ -538,7 +540,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const videosPerPage = 20;
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploadingVideoId, setUploadingVideoId] = useState(null);
-  const uploadCheckIntervalRef = useRef(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef(null);
   const [deviceMessages, setDeviceMessages] = useState([]);
@@ -615,22 +616,54 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // In replay mode, use replay device; otherwise use selected device
   const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
 
+  // Helper function to generate video download URL from expected_file
+  const generateVideoDownloadUrl = useCallback((expectedFile, deviceImei) => {
+    if (!expectedFile || !deviceImei) return null;
+    
+    const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+    if (!mediaServerUrl) return null;
+    
+    // Remove trailing slash from media server URL
+    const cleanServer = mediaServerUrl.replace(/\/$/, '');
+    // Generate download URL: mediaServerUrl/deviceImei/expected_file
+    return `${cleanServer}/${deviceImei}/${expectedFile}`;
+  }, []);
+
   // Helper function to log device messages - defined early so it can be used in other callbacks
   const logDeviceMessage = useCallback((type, action, request, response, success, error = null, videoInfo = null) => {
     // Extract video information from request or videoInfo
     let videoName = null;
+    let videoFileName = null;
+    let videoUrl = null;
+    let videoDownloadUrl = null;
+    
     if (videoInfo) {
       if (typeof videoInfo === 'string') {
         videoName = videoInfo;
       } else if (videoInfo.channel && videoInfo.beginTime) {
         videoName = `Ch ${videoInfo.channel} - ${videoInfo.beginTime}`;
+        // Extract filename and URL from video object
+        videoFileName = videoInfo.expected_file || null;
+        videoUrl = videoInfo.video_url || null;
+        // Generate download URL if we have expected_file
+        if (videoFileName && device?.uniqueId) {
+          videoDownloadUrl = generateVideoDownloadUrl(videoFileName, device.uniqueId);
+        }
       }
     }
     if (!videoName && request) {
       if (request.channel && request.beginTime) {
         videoName = `Ch ${request.channel} - ${request.beginTime}`;
-      } else if (request.video?.channel && request.video?.beginTime) {
-        videoName = `Ch ${request.video.channel} - ${request.video.beginTime}`;
+      } else if (request.video) {
+        if (request.video.channel && request.video.beginTime) {
+          videoName = `Ch ${request.video.channel} - ${request.video.beginTime}`;
+        }
+        videoFileName = request.video.expected_file || null;
+        videoUrl = request.video.video_url || null;
+        // Generate download URL if we have expected_file
+        if (videoFileName && (request.deviceImei || device?.uniqueId)) {
+          videoDownloadUrl = generateVideoDownloadUrl(videoFileName, request.deviceImei || device.uniqueId);
+        }
       }
     }
     
@@ -650,7 +683,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       code: response?.code,
       _code: response?.data?._code,
       _msg: response?.data?._msg,
-      videoName: videoName // Include video name/info
+      videoName: videoName, // Include video name/info
+      videoFileName: videoFileName, // Include real filename (e.g., CH2_251109_000859_000000.mp4)
+      videoUrl: videoUrl, // Include video URL for playback (from API response)
+      videoDownloadUrl: videoDownloadUrl // Include generated download URL (available immediately)
     };
     
     setDeviceMessages(prev => {
@@ -658,7 +694,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Keep only last 200 messages
       return updated.slice(0, 200);
     });
-  }, []);
+  }, [device, generateVideoDownloadUrl]);
 
   // Parse iothub channels from device attributes
   const getIoTHubChannels = useMemo(() => {
@@ -1025,6 +1061,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             }
             
             // Clear uploading state
+            isUploadingRef.current = false;
             setUploadingVideoId(null);
             
             // Update videos list ONLY ONCE when upload finishes - prevent blinking
@@ -1053,11 +1090,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               console.log('Video uploaded successfully:', videoId);
               
               // AUTO-PLAY VIDEO IMMEDIATELY when upload finishes
-              if (currentVideo.video_url) {
+              // Use video_url from API response, or generate from expected_file if available
+              const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+              const videoToPlay = currentVideo.video_url || 
+                (currentVideo.expected_file && device?.uniqueId && mediaServerUrl
+                  ? `${mediaServerUrl.replace(/\/$/, '')}/${device.uniqueId}/${currentVideo.expected_file}`
+                  : null);
+              
+              if (videoToPlay) {
                 console.log('Auto-playing uploaded video:', currentVideo);
+                // Create video object with URL for playback
+                const videoForPlayback = {
+                  ...currentVideo,
+                  video_url: videoToPlay
+                };
                 // Use setTimeout to ensure state updates are complete before playing
                 setTimeout(() => {
-                  setSelectedVideo(currentVideo);
+                  setSelectedVideo(videoForPlayback);
                   setShowVideoPlayer(true);
                 }, 100);
               }
@@ -1103,17 +1152,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Handle upload button click
   const handleUploadVideo = useCallback(async (video, e) => {
     e.stopPropagation(); // Prevent video click
+    e.preventDefault(); // Prevent default behavior
+    
+    const videoId = `${video.channel}-${video.beginTime}`;
     
     console.log('=== Upload Button Clicked (Playback Tab - Play Button Modal) ===');
     console.log('Video data:', video);
     
-    const videoId = `${video.channel}-${video.beginTime}`;
+    // Clear any existing polling interval if restarting
+    if (uploadCheckIntervalRef.current) {
+      console.log('Clearing existing polling interval to restart upload process');
+      clearInterval(uploadCheckIntervalRef.current);
+      uploadCheckIntervalRef.current = null;
+    }
+    
+    // Set ref and state to indicate upload is starting/restarting
+    isUploadingRef.current = true;
     setUploadingVideoId(videoId);
     
+    let uploadResult = null;
     try {
       // Step 1: Call upload endpoint - check API response to determine if device is online
       console.log('Step 1: Sending FTP upload command...');
-      const uploadResult = await uploadVideo(video, video); // Pass video info for logging
+      uploadResult = await uploadVideo(video, video); // Pass video info for logging - this will log with download URL
       
       // Check API response to determine device online status
       if (!uploadResult || !uploadResult.success) {
@@ -1132,13 +1193,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         if (isOffline) {
           const offlineMsg = responseData?.data?._msg || responseData?.msg || errorMsg;
           console.error('Device is offline based on API response:', offlineMsg, 'Code:', responseCode);
-          logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, responseData, false, offlineMsg, video);
+          // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
+          isUploadingRef.current = false;
           setUploadingVideoId(null);
           return; // STOP - don't proceed
         }
         
         console.error('Upload command failed:', errorMsg);
-        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, responseData, false, errorMsg, video);
+        // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
+        isUploadingRef.current = false;
         setUploadingVideoId(null);
         return; // STOP - don't proceed
       }
@@ -1147,7 +1210,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (uploadResult.data?.data?._code !== '100') {
         const errorMsg = uploadResult.data?.data?._msg || uploadResult.data?.msg || 'Upload command did not succeed';
         console.error('Upload command did not succeed:', errorMsg);
-        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, uploadResult.data, false, errorMsg, video);
+        // Note: logDeviceMessage already called in uploadVideo function, no need to duplicate
+        isUploadingRef.current = false;
         setUploadingVideoId(null);
         return; // STOP - don't proceed
       }
@@ -1161,7 +1225,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
     } catch (error) {
       console.error('Error in upload process:', error);
-      logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, null, false, error.message || 'Upload process failed', video);
+      // Only log if uploadVideo wasn't called (network error, etc.)
+      // If uploadVideo was called, it already logged the message
+      if (!uploadResult) {
+        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, null, false, error.message || 'Upload process failed', video);
+      }
+      isUploadingRef.current = false;
       setUploadingVideoId(null);
       
       // Clear any polling interval on error
@@ -1289,7 +1358,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         channel: channelNum,
         cmdContent: cmdContent
       };
-
+      
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Streaming request response:', result);
@@ -6179,7 +6248,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
                     {/* Playback Tab Content */}
                     {selectedChannel === 0 && (() => {
-                      return (
+                        return (
                         <div style={{
                           display: 'flex',
                           flexDirection: 'column',
@@ -6852,6 +6921,76 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                     fontWeight: '500'
                                   }}>
                                     <strong style={{ color: colors.text, fontWeight: '600' }}>Video:</strong> <span style={{ color: colors.textSecondary }}>{msg.videoName}</span>
+                                  </div>
+                                )}
+                                
+                                {msg.videoFileName && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
+                                    fontWeight: '500'
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Filename:</strong> <span style={{ color: colors.textSecondary, fontFamily: 'monospace' }}>{msg.videoFileName}</span>
+                                  </div>
+                                )}
+                                
+                                {msg.videoDownloadUrl && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
+                                    fontWeight: '500'
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Download URL:</strong>{' '}
+                                    <a 
+                                      href={msg.videoDownloadUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      download
+                                      style={{
+                                        color: isDarkMode ? '#93c5fd' : '#2563eb',
+                                        textDecoration: 'none',
+                                        fontFamily: 'monospace',
+                                        fontSize: '10px',
+                                        wordBreak: 'break-all',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                      onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                    >
+                                      <DownloadIcon style={{ fontSize: '12px' }} />
+                                      {msg.videoDownloadUrl}
+                                    </a>
+                                  </div>
+                                )}
+                                
+                                {msg.videoUrl && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
+                                    fontWeight: '500'
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Playback URL:</strong>{' '}
+                                    <a 
+                                      href={msg.videoUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      style={{
+                                        color: isDarkMode ? '#93c5fd' : '#2563eb',
+                                        textDecoration: 'none',
+                                        fontFamily: 'monospace',
+                                        fontSize: '10px',
+                                        wordBreak: 'break-all'
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                      onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                    >
+                                      {msg.videoUrl}
+                                    </a>
                                   </div>
                                 )}
                                 
