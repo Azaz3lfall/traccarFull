@@ -311,7 +311,6 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
     prevProps.video.status === nextProps.video.status &&
     prevProps.video.video_url === nextProps.video.video_url &&
     prevProps.video.thumbnail_url === nextProps.video.thumbnail_url &&
-    prevProps.uploadingVideoId === nextProps.uploadingVideoId &&
     prevProps.index === nextProps.index
   );
 });
@@ -1232,10 +1231,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (flvPlayerRef.current) {
         flvPlayerRef.current.destroy();
         flvPlayerRef.current = null;
-      }
-      if (uploadCheckIntervalRef.current) {
-        clearInterval(uploadCheckIntervalRef.current);
-        uploadCheckIntervalRef.current = null;
       }
     };
   }, [selectedChannel]);
@@ -6152,7 +6147,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   handleUploadVideo={handleUploadVideo}
                                   setSelectedVideo={setSelectedVideo}
                                   setShowVideoPlayer={setShowVideoPlayer}
-                                  uploadingVideoId={uploadingVideoId}
                                 />
                               ))}
                             </Box>
