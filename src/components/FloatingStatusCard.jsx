@@ -26,7 +26,7 @@ import {
   sessionActions
 } from '../store';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors } from '../common/components/ThemeProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { map } from '../map/core/MapView';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useDeviceReadonly } from '../common/util/permissions';
@@ -329,6 +329,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const queryClient = useQueryClient();
   const t = useTranslation();
   const colors = useThemeColors();
+  const { theme } = useTheme();
   
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const devices = useSelector((state) => state.devices.items);
@@ -615,7 +616,28 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
 
   // Helper function to log device messages - defined early so it can be used in other callbacks
-  const logDeviceMessage = useCallback((type, action, request, response, success, error = null) => {
+  const logDeviceMessage = useCallback((type, action, request, response, success, error = null, videoInfo = null) => {
+    // Extract video information from request or videoInfo
+    let videoName = null;
+    if (videoInfo) {
+      if (typeof videoInfo === 'string') {
+        videoName = videoInfo;
+      } else if (videoInfo.channel && videoInfo.beginTime) {
+        videoName = `Ch ${videoInfo.channel} - ${videoInfo.beginTime}`;
+      }
+    }
+    if (!videoName && request) {
+      if (request.channel && request.beginTime) {
+        videoName = `Ch ${request.channel} - ${request.beginTime}`;
+      } else if (request.video?.channel && request.video?.beginTime) {
+        videoName = `Ch ${request.video.channel} - ${request.video.beginTime}`;
+      }
+    }
+    
+    // Get message from response or error
+    const responseMsg = response?.data?._msg || response?.msg || null;
+    const messageText = error || responseMsg || null;
+    
     const message = {
       id: Date.now() + Math.random(),
       timestamp: new Date().toISOString(),
@@ -624,10 +646,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       request: request ? JSON.stringify(request, null, 2) : null,
       response: response ? (typeof response === 'string' ? response : JSON.stringify(response, null, 2)) : null,
       success,
-      error: error || (response?.data?._msg) || (response?.msg) || null,
+      error: messageText, // This will be displayed as "Message" in UI
       code: response?.code,
       _code: response?.data?._code,
-      _msg: response?.data?._msg
+      _msg: response?.data?._msg,
+      videoName: videoName // Include video name/info
     };
     
     setDeviceMessages(prev => {
@@ -742,7 +765,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [device, videoListStartDate, videoListEndDate, logDeviceMessage]);
 
   // Upload video command to device
-  const uploadVideo = useCallback(async (video) => {
+  const uploadVideo = useCallback(async (video, videoInfoForLogging = null) => {
     // Log video details
     console.log('=== FTP Upload Video Details (Playback Tab - Play Button Modal) ===');
     console.log('Full video object:', video);
@@ -854,12 +877,25 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       try {
         const parsed = JSON.parse(result);
-        logDeviceMessage('upload', 'upload_video', requestData, parsed, parsed.code === 0, parsed.code !== 0 ? parsed.msg : null);
+        const isSuccess = parsed.code === 0 && parsed.data?._code === '100';
+        const errorMsg = !isSuccess ? (parsed.data?._msg || parsed.msg || 'Upload command failed') : null;
+        
+        logDeviceMessage('upload', 'upload_video', requestData, parsed, isSuccess, errorMsg, videoInfoForLogging || video);
+        
+        // Return structured result for checking
+        return {
+          success: isSuccess,
+          data: parsed,
+          error: errorMsg
+        };
       } catch (e) {
-        logDeviceMessage('upload', 'upload_video', requestData, result, false, 'Invalid JSON response');
+        logDeviceMessage('upload', 'upload_video', requestData, result, false, 'Invalid JSON response', videoInfoForLogging || video);
+        return {
+          success: false,
+          error: 'Invalid JSON response',
+          raw: result
+        };
       }
-      
-      return result;
     } catch (error) {
       console.error('Error uploading video:', error);
       throw error;
@@ -895,12 +931,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       try {
         // Send instruct command to refresh video list from device
         try {
-          await sendVideoListInstruct();
+          const instructResult = await sendVideoListInstruct();
+          
+          // Parse and check API response to determine device online status
+          let parsed;
+          try {
+            parsed = typeof instructResult === 'string' ? JSON.parse(instructResult) : instructResult;
+          } catch (parseError) {
+            console.warn('Could not parse instruct response:', parseError);
+            // If response is not JSON, stop polling
+            logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, null, false, 'Invalid JSON response');
+            if (uploadCheckIntervalRef.current) {
+              clearInterval(uploadCheckIntervalRef.current);
+              uploadCheckIntervalRef.current = null;
+            }
+            setUploadingVideoId(null);
+            return;
+          }
+          
+          // Check API response codes and messages for offline indicators
+          const responseCode = parsed.data?._code;
+          const responseMsg = (parsed.data?._msg || parsed.msg || '').toLowerCase();
+          const offlineCodes = ['300', '302', '600']; // 300=offline, 302=busy, 600=timeout
+          const offlineMessages = ['offline', 'not online', 'busy', 'timeout', 'previous command'];
+          const isSuccess = parsed.code === 0 && responseCode === '100';
+          const isOffline = offlineCodes.includes(responseCode) || 
+                           offlineMessages.some(msg => responseMsg.includes(msg));
+          
+          if (!isSuccess || isOffline) {
+            const errorMsg = parsed.data?._msg || parsed.msg || 'Instruct command failed';
+            console.error('Device is offline/busy based on API response:', errorMsg, 'Code:', responseCode);
+            logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, parsed, false, errorMsg);
+            
+            // STOP polling if device is offline/busy - don't proceed
+            if (uploadCheckIntervalRef.current) {
+              clearInterval(uploadCheckIntervalRef.current);
+              uploadCheckIntervalRef.current = null;
+            }
+            setUploadingVideoId(null);
+            return; // STOP - don't proceed
+          }
+          
+          // Only proceed if API response indicates success (Code 100)
           // Wait a bit for device to process
           await new Promise(resolve => setTimeout(resolve, 5000));
         } catch (instructError) {
           console.error('Error sending instruct command during status check:', instructError);
-          // Continue anyway to try fetching videos
+          logDeviceMessage('instruct', 'get_video_list', { deviceImei: device?.uniqueId }, null, false, instructError.message || 'Instruct command failed');
+          
+          // Stop polling on error - don't proceed
+          if (uploadCheckIntervalRef.current) {
+            clearInterval(uploadCheckIntervalRef.current);
+            uploadCheckIntervalRef.current = null;
+          }
+          setUploadingVideoId(null);
+          return; // STOP - don't proceed
         }
 
         // Fetch latest videos from media server
@@ -1013,7 +1098,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Only poll after upload command succeeds
     await checkStatus(); // Check immediately first
     uploadCheckIntervalRef.current = setInterval(checkStatus, 15000); // Poll every 15 seconds
-  }, [device, sendVideoListInstruct]);
+  }, [device, sendVideoListInstruct, logDeviceMessage]);
 
   // Handle upload button click
   const handleUploadVideo = useCallback(async (video, e) => {
@@ -1026,19 +1111,57 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setUploadingVideoId(videoId);
     
     try {
-      // Step 1: Call upload endpoint - ONLY start polling after this succeeds
+      // Step 1: Call upload endpoint - check API response to determine if device is online
       console.log('Step 1: Sending FTP upload command...');
-      await uploadVideo(video);
+      const uploadResult = await uploadVideo(video, video); // Pass video info for logging
       
-      console.log('FTP upload command sent successfully. Starting status polling...');
+      // Check API response to determine device online status
+      if (!uploadResult || !uploadResult.success) {
+        const errorMsg = uploadResult?.error || 'Upload command failed';
+        const responseData = uploadResult?.data;
+        
+        // Check for offline indicators in API response
+        const offlineCodes = ['300', '302', '600']; // 300=offline, 302=busy, 600=timeout
+        const offlineMessages = ['offline', 'not online', 'busy', 'timeout'];
+        const responseCode = responseData?.data?._code;
+        const responseMsg = (responseData?.data?._msg || responseData?.msg || '').toLowerCase();
+        
+        const isOffline = offlineCodes.includes(responseCode) || 
+                         offlineMessages.some(msg => responseMsg.includes(msg));
+        
+        if (isOffline) {
+          const offlineMsg = responseData?.data?._msg || responseData?.msg || errorMsg;
+          console.error('Device is offline based on API response:', offlineMsg, 'Code:', responseCode);
+          logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, responseData, false, offlineMsg, video);
+          setUploadingVideoId(null);
+          return; // STOP - don't proceed
+        }
+        
+        console.error('Upload command failed:', errorMsg);
+        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, responseData, false, errorMsg, video);
+        setUploadingVideoId(null);
+        return; // STOP - don't proceed
+      }
       
-      // Step 2: Start polling for upload status - ONLY after upload command succeeds
+      // Only proceed if API response indicates success (Code 100)
+      if (uploadResult.data?.data?._code !== '100') {
+        const errorMsg = uploadResult.data?.data?._msg || uploadResult.data?.msg || 'Upload command did not succeed';
+        console.error('Upload command did not succeed:', errorMsg);
+        logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, uploadResult.data, false, errorMsg, video);
+        setUploadingVideoId(null);
+        return; // STOP - don't proceed
+      }
+      
+      console.log('FTP upload command sent successfully. Device is online. Starting status polling...');
+      
+      // Step 2: Start polling for upload status - ONLY after upload command succeeds with Code 100
       // This will poll every 15 seconds until video is uploaded_ok or errored
       // Video will auto-play when upload finishes
       await pollVideoUploadStatus(video);
       
     } catch (error) {
       console.error('Error in upload process:', error);
+      logDeviceMessage('upload', 'upload_video', { deviceImei: device?.uniqueId, channel: video.channel, video: video }, null, false, error.message || 'Upload process failed', video);
       setUploadingVideoId(null);
       
       // Clear any polling interval on error
@@ -1047,7 +1170,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         uploadCheckIntervalRef.current = null;
       }
     }
-  }, [uploadVideo, pollVideoUploadStatus]);
+  }, [uploadVideo, pollVideoUploadStatus, device, logDeviceMessage]);
 
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
@@ -6623,151 +6746,196 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         </Typography>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                          {deviceMessages.map((msg) => (
-                            <div
-                              key={msg.id}
-                              style={{
-                                backgroundColor: msg.success ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                                border: `1px solid ${msg.success ? 'rgba(76, 175, 80, 0.3)' : 'rgba(244, 67, 54, 0.3)'}`,
-                                borderRadius: '6px',
-                                padding: '12px',
-                                fontFamily: 'monospace',
-                                fontSize: '12px'
-                              }}
-                            >
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: '8px',
-                                flexWrap: 'wrap',
-                                gap: '8px'
-                              }}>
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          {deviceMessages.map((msg) => {
+                            // Theme-aware colors for better contrast
+                            const isDarkMode = theme === 'dark';
+                            const successBg = isDarkMode ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)';
+                            const successBorder = isDarkMode ? 'rgba(34, 197, 94, 0.5)' : 'rgba(34, 197, 94, 0.4)';
+                            const successBadge = isDarkMode ? '#22c55e' : '#16a34a';
+                            const errorBg = isDarkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.15)';
+                            const errorBorder = isDarkMode ? 'rgba(239, 68, 68, 0.5)' : 'rgba(239, 68, 68, 0.4)';
+                            const errorBadge = isDarkMode ? '#ef4444' : '#dc2626';
+                            const errorText = isDarkMode ? '#fca5a5' : '#dc2626';
+                            const codeBg = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+                            const preBg = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
+                            
+                            return (
+                              <div
+                                key={msg.id}
+                                style={{
+                                  backgroundColor: msg.success ? successBg : errorBg,
+                                  border: `1px solid ${msg.success ? successBorder : errorBorder}`,
+                                  borderRadius: '6px',
+                                  padding: '12px',
+                                  fontFamily: 'monospace',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  marginBottom: '8px',
+                                  flexWrap: 'wrap',
+                                  gap: '8px'
+                                }}>
+                                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <span style={{
+                                      padding: '3px 10px',
+                                      borderRadius: '4px',
+                                      backgroundColor: msg.success ? successBadge : errorBadge,
+                                      color: '#ffffff',
+                                      fontSize: '10px',
+                                      fontWeight: '700',
+                                      letterSpacing: '0.5px'
+                                    }}>
+                                      {msg.success ? 'SUCCESS' : 'ERROR'}
+                                    </span>
+                                    <span style={{
+                                      padding: '3px 10px',
+                                      borderRadius: '4px',
+                                      backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.25)' : 'rgba(59, 130, 246, 0.15)',
+                                      color: isDarkMode ? '#93c5fd' : '#2563eb',
+                                      fontSize: '10px',
+                                      fontWeight: '600',
+                                      border: `1px solid ${isDarkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'}`
+                                    }}>
+                                      {msg.type}
+                                    </span>
+                                    <span style={{
+                                      color: colors.text,
+                                      fontWeight: '600',
+                                      fontSize: '11px'
+                                    }}>
+                                      {msg.action}
+                                    </span>
+                                  </div>
                                   <span style={{
-                                    padding: '2px 8px',
-                                    borderRadius: '4px',
-                                    backgroundColor: msg.success ? '#4caf50' : '#f44336',
-                                    color: '#fff',
-                                    fontSize: '10px',
-                                    fontWeight: '600'
-                                  }}>
-                                    {msg.success ? 'SUCCESS' : 'ERROR'}
-                                  </span>
-                                  <span style={{
-                                    padding: '2px 8px',
-                                    borderRadius: '4px',
-                                    backgroundColor: colors.primary + '20',
-                                    color: colors.primary,
-                                    fontSize: '10px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
                                     fontWeight: '500'
                                   }}>
-                                    {msg.type}
-                                  </span>
-                                  <span style={{
-                                    color: colors.text,
-                                    fontWeight: '500'
-                                  }}>
-                                    {msg.action}
+                                    {dayjs(msg.timestamp).format('HH:mm:ss.SSS')}
                                   </span>
                                 </div>
-                                <span style={{
-                                  color: colors.textSecondary,
-                                  fontSize: '11px'
-                                }}>
-                                  {dayjs(msg.timestamp).format('HH:mm:ss.SSS')}
-                                </span>
+                                
+                                {msg._msg && (
+                                  <div style={{
+                                    marginTop: '8px',
+                                    padding: '10px',
+                                    backgroundColor: codeBg,
+                                    borderRadius: '4px',
+                                    color: colors.text,
+                                    fontWeight: '500',
+                                    border: `1px solid ${colors.border}`
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Message:</strong> <span style={{ color: colors.text }}>{msg._msg}</span>
+                                  </div>
+                                )}
+                                
+                                {msg._code && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
+                                    fontWeight: '500'
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Code:</strong> <span style={{ color: colors.textSecondary }}>{msg._code}</span>
+                                  </div>
+                                )}
+                                
+                                {msg.videoName && (
+                                  <div style={{
+                                    marginTop: '6px',
+                                    color: colors.textSecondary,
+                                    fontSize: '11px',
+                                    fontWeight: '500'
+                                  }}>
+                                    <strong style={{ color: colors.text, fontWeight: '600' }}>Video:</strong> <span style={{ color: colors.textSecondary }}>{msg.videoName}</span>
+                                  </div>
+                                )}
+                                
+                                {msg.error && (
+                                  <div style={{
+                                    marginTop: '8px',
+                                    padding: '10px',
+                                    backgroundColor: errorBg,
+                                    borderRadius: '4px',
+                                    color: errorText,
+                                    fontSize: '11px',
+                                    fontWeight: '500',
+                                    border: `1px solid ${errorBorder}`
+                                  }}>
+                                    <strong style={{ color: errorText, fontWeight: '700' }}>Message:</strong> <span style={{ color: errorText }}>{msg.error}</span>
+                                  </div>
+                                )}
+                                
+                                {msg.request && (
+                                  <details style={{ marginTop: '8px' }}>
+                                    <summary style={{
+                                      cursor: 'pointer',
+                                      color: isDarkMode ? '#93c5fd' : '#2563eb',
+                                      fontSize: '11px',
+                                      fontWeight: '600',
+                                      userSelect: 'none',
+                                      padding: '4px 0'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                    onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                    >
+                                      Request Details
+                                    </summary>
+                                    <pre style={{
+                                      marginTop: '8px',
+                                      padding: '12px',
+                                      backgroundColor: preBg,
+                                      borderRadius: '4px',
+                                      overflow: 'auto',
+                                      fontSize: '10px',
+                                      color: colors.text,
+                                      maxHeight: '200px',
+                                      border: `1px solid ${colors.border}`,
+                                      lineHeight: '1.5'
+                                    }}>
+                                      {msg.request}
+                                    </pre>
+                                  </details>
+                                )}
+                                
+                                {msg.response && (
+                                  <details style={{ marginTop: '8px' }}>
+                                    <summary style={{
+                                      cursor: 'pointer',
+                                      color: isDarkMode ? '#93c5fd' : '#2563eb',
+                                      fontSize: '11px',
+                                      fontWeight: '600',
+                                      userSelect: 'none',
+                                      padding: '4px 0'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                    onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                    >
+                                      Response Details
+                                    </summary>
+                                    <pre style={{
+                                      marginTop: '8px',
+                                      padding: '12px',
+                                      backgroundColor: preBg,
+                                      borderRadius: '4px',
+                                      overflow: 'auto',
+                                      fontSize: '10px',
+                                      color: colors.text,
+                                      maxHeight: '200px',
+                                      border: `1px solid ${colors.border}`,
+                                      lineHeight: '1.5'
+                                    }}>
+                                      {msg.response}
+                                    </pre>
+                                  </details>
+                                )}
                               </div>
-                              
-                              {msg._msg && (
-                                <div style={{
-                                  marginTop: '8px',
-                                  padding: '8px',
-                                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                                  borderRadius: '4px',
-                                  color: colors.text,
-                                  fontWeight: '500'
-                                }}>
-                                  <strong>Message:</strong> {msg._msg}
-                                </div>
-                              )}
-                              
-                              {msg._code && (
-                                <div style={{
-                                  marginTop: '4px',
-                                  color: colors.textSecondary,
-                                  fontSize: '11px'
-                                }}>
-                                  <strong>Code:</strong> {msg._code}
-                                </div>
-                              )}
-                              
-                              {msg.error && (
-                                <div style={{
-                                  marginTop: '8px',
-                                  padding: '8px',
-                                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                                  borderRadius: '4px',
-                                  color: '#f44336',
-                                  fontSize: '11px'
-                                }}>
-                                  <strong>Error:</strong> {msg.error}
-                                </div>
-                              )}
-                              
-                              {msg.request && (
-                                <details style={{ marginTop: '8px' }}>
-                                  <summary style={{
-                                    cursor: 'pointer',
-                                    color: colors.primary,
-                                    fontSize: '11px',
-                                    fontWeight: '500',
-                                    userSelect: 'none'
-                                  }}>
-                                    Request Details
-                                  </summary>
-                                  <pre style={{
-                                    marginTop: '8px',
-                                    padding: '8px',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                                    borderRadius: '4px',
-                                    overflow: 'auto',
-                                    fontSize: '10px',
-                                    color: colors.text,
-                                    maxHeight: '200px'
-                                  }}>
-                                    {msg.request}
-                                  </pre>
-                                </details>
-                              )}
-                              
-                              {msg.response && (
-                                <details style={{ marginTop: '8px' }}>
-                                  <summary style={{
-                                    cursor: 'pointer',
-                                    color: colors.primary,
-                                    fontSize: '11px',
-                                    fontWeight: '500',
-                                    userSelect: 'none'
-                                  }}>
-                                    Response Details
-                                  </summary>
-                                  <pre style={{
-                                    marginTop: '8px',
-                                    padding: '8px',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                                    borderRadius: '4px',
-                                    overflow: 'auto',
-                                    fontSize: '10px',
-                                    color: colors.text,
-                                    maxHeight: '200px'
-                                  }}>
-                                    {msg.response}
-                                  </pre>
-                                </details>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </Box>
