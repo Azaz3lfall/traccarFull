@@ -1,5 +1,5 @@
 import {
-  useState, useEffect, useCallback, useRef, useMemo
+  useState, useEffect, useCallback, useRef, useMemo, memo
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,6 +83,246 @@ import fallbackLogo from '../resources/images/image170.png?inline';
 import flvjs from 'flv.js';
 
 dayjs.extend(relativeTime);
+
+// VideoItem component with lazy loading - moved outside to prevent re-creation on every render
+const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVideo, setShowVideoPlayer, uploadingVideoId }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const imgRef = useRef(null);
+
+  // Lazy load thumbnail when in viewport
+  useEffect(() => {
+    if (!imgRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !imageLoaded && !imageError) {
+            setImageLoaded(true);
+          }
+        });
+      },
+      { rootMargin: '50px' }
+    );
+
+    observer.observe(imgRef.current);
+
+    return () => {
+      if (imgRef.current) {
+        observer.unobserve(imgRef.current);
+      }
+    };
+  }, [imageLoaded, imageError]);
+
+  const formatVideoTime = (timeStr) => {
+    if (!timeStr) return '';
+    try {
+      return dayjs(timeStr, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm');
+    } catch {
+      return timeStr;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'uploaded_ok':
+        return '#4caf50';
+      case 'upload_errored':
+        return '#f44336';
+      case 'not_uploaded':
+        return '#ff9800';
+      default:
+        return colors.textSecondary;
+    }
+  };
+
+  return (
+    <div
+      ref={imgRef}
+      style={{
+        width: '100%',
+        paddingBottom: '56.25%', // 16:9 aspect ratio
+        position: 'relative',
+        backgroundColor: colors.secondary,
+        borderRadius: '8px',
+        border: `1px solid ${colors.border}`,
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        cursor: video.video_url ? 'pointer' : 'default',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        if (video.video_url) {
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
+      onClick={() => {
+        if (video.video_url) {
+          setSelectedVideo(video);
+          setShowVideoPlayer(true);
+        }
+      }}
+    >
+      {/* Thumbnail */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}>
+        {imageLoaded && video.thumbnail_url ? (
+          <img
+            src={video.thumbnail_url}
+            alt={`Channel ${video.channel} - ${video.beginTime}`}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.secondary,
+          }}>
+            {!imageLoaded && !imageError && (
+              <CircularProgress size={24} />
+            )}
+            {imageError && (
+              <Typography variant="body2" style={{ 
+                color: colors.textSecondary,
+                fontSize: '12px'
+              }}>
+                No thumbnail
+              </Typography>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Overlay with info */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+        padding: '8px',
+        color: '#fff'
+      }}>
+        <Typography variant="caption" style={{ 
+          display: 'block',
+          fontSize: '10px',
+          fontWeight: '600',
+          marginBottom: '2px'
+        }}>
+          Ch {video.channel} • {formatVideoTime(video.beginTime)}
+        </Typography>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          marginTop: '2px'
+        }}>
+          <div style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: getStatusColor(video.status)
+          }} />
+          <Typography variant="caption" style={{ 
+            fontSize: '9px',
+            textTransform: 'capitalize'
+          }}>
+            {video.status?.replace('_', ' ')}
+          </Typography>
+        </div>
+      </div>
+
+      {/* Upload/Share button for not_uploaded and upload_errored videos - Apple style */}
+      {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
+        <IconButton
+          onClick={(e) => handleUploadVideo(video, e)}
+          disabled={uploadingVideoId === `${video.channel}-${video.beginTime}`}
+          size="small"
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(10px)',
+            color: '#fff',
+            width: '32px',
+            height: '32px',
+            padding: '6px',
+            zIndex: 10,
+          }}
+          sx={{
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            },
+            '&.Mui-disabled': {
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            }
+          }}
+          title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
+        >
+          {uploadingVideoId === `${video.channel}-${video.beginTime}` ? (
+            <CircularProgress size={16} style={{ color: '#fff' }} />
+          ) : video.status === 'upload_errored' ? (
+            <IoRefreshOutline style={{ fontSize: '18px', color: '#fff' }} />
+          ) : (
+            <IoShareOutline style={{ fontSize: '18px', color: '#fff' }} />
+          )}
+        </IconButton>
+      )}
+
+      {/* Play button overlay for videos with URL */}
+      {video.video_url && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none'
+        }}>
+          <PlayArrowIcon style={{ fontSize: '28px', color: '#fff' }} />
+        </div>
+      )}
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison function for memo - only re-render if video data or relevant props change
+  return (
+    prevProps.video.channel === nextProps.video.channel &&
+    prevProps.video.beginTime === nextProps.video.beginTime &&
+    prevProps.video.status === nextProps.video.status &&
+    prevProps.video.video_url === nextProps.video.video_url &&
+    prevProps.video.thumbnail_url === nextProps.video.thumbnail_url &&
+    prevProps.uploadingVideoId === nextProps.uploadingVideoId &&
+    prevProps.index === nextProps.index
+  );
+});
+
+VideoItem.displayName = 'VideoItem';
 
 const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList }) => {
   const dispatch = useDispatch();
@@ -300,6 +540,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const uploadCheckIntervalRef = useRef(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef(null);
+  const [deviceMessages, setDeviceMessages] = useState([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedNewSensor, setSelectedNewSensor] = useState('');
   const [newSensorName, setNewSensorName] = useState('');
@@ -372,6 +613,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Get current device and position
   // In replay mode, use replay device; otherwise use selected device
   const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
+
+  // Helper function to log device messages - defined early so it can be used in other callbacks
+  const logDeviceMessage = useCallback((type, action, request, response, success, error = null) => {
+    const message = {
+      id: Date.now() + Math.random(),
+      timestamp: new Date().toISOString(),
+      type, // 'streaming', 'upload', 'instruct', etc.
+      action, // 'start_stream', 'upload_video', 'get_video_list', etc.
+      request: request ? JSON.stringify(request, null, 2) : null,
+      response: response ? (typeof response === 'string' ? response : JSON.stringify(response, null, 2)) : null,
+      success,
+      error: error || (response?.data?._msg) || (response?.msg) || null,
+      code: response?.code,
+      _code: response?.data?._code,
+      _msg: response?.data?._msg
+    };
+    
+    setDeviceMessages(prev => {
+      const updated = [message, ...prev];
+      // Keep only last 200 messages
+      return updated.slice(0, 200);
+    });
+  }, []);
 
   // Parse iothub channels from device attributes
   const getIoTHubChannels = useMemo(() => {
@@ -452,16 +716,30 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('endTime:', endTime);
       console.log('====================================');
 
+      const requestData = {
+        deviceImei: device.uniqueId,
+        cmdContent: JSON.parse(urlencoded.get("cmdContent")),
+        beginTime: formatDateTime(videoListStartDate),
+        endTime: formatDateTime(videoListEndDate)
+      };
+
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Video list instruct response:', result);
+      
+      try {
+        const parsed = JSON.parse(result);
+        logDeviceMessage('instruct', 'get_video_list', requestData, parsed, parsed.code === 0, parsed.code !== 0 ? parsed.msg : null);
+      } catch (e) {
+        logDeviceMessage('instruct', 'get_video_list', requestData, result, false, 'Invalid JSON response');
+      }
       
       return result;
     } catch (error) {
       console.error('Error sending video list instruct:', error);
       throw error;
     }
-  }, [device, videoListStartDate, videoListEndDate]);
+  }, [device, videoListStartDate, videoListEndDate, logDeviceMessage]);
 
   // Upload video command to device
   const uploadVideo = useCallback(async (video) => {
@@ -562,50 +840,70 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('endTime:', endTime);
       console.log('==========================');
 
+      const requestData = {
+        deviceImei: device.uniqueId,
+        channel: video.channel,
+        beginTime: formatDateTime(video.beginTime),
+        endTime: formatDateTime(video.endTime),
+        cmdContent: JSON.parse(urlencoded.get("cmdContent"))
+      };
+
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Upload video response:', result);
+      
+      try {
+        const parsed = JSON.parse(result);
+        logDeviceMessage('upload', 'upload_video', requestData, parsed, parsed.code === 0, parsed.code !== 0 ? parsed.msg : null);
+      } catch (e) {
+        logDeviceMessage('upload', 'upload_video', requestData, result, false, 'Invalid JSON response');
+      }
       
       return result;
     } catch (error) {
       console.error('Error uploading video:', error);
       throw error;
     }
-  }, [device]);
+  }, [device, logDeviceMessage]);
 
-  // Check if video is uploaded and poll until it's uploaded_ok
-  const checkVideoUploadStatus = useCallback(async (video) => {
+  // Poll video status after upload - only called after FTP upload succeeds
+  const pollVideoUploadStatus = useCallback(async (video) => {
     const videoId = `${video.channel}-${video.beginTime}`;
     const channel = video.channel;
     const beginTime = video.beginTime;
-    const originalStatus = video.status; // Store original status to compare
     
-    // Clear any existing interval
+    // Clear any existing interval first
     if (uploadCheckIntervalRef.current) {
       clearInterval(uploadCheckIntervalRef.current);
       uploadCheckIntervalRef.current = null;
     }
 
-    // Check if video is now uploaded_ok
+    const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+    if (!mediaServerUrl) {
+      console.error('Media server URL not configured');
+      setUploadingVideoId(null);
+      return;
+    }
+
+    // Check video status function
     const checkStatus = async () => {
+      // Stop immediately if interval was cleared (upload finished)
+      if (!uploadCheckIntervalRef.current) {
+        return;
+      }
+
       try {
-        // First, simulate "Load from Device" - send instruct command
+        // Send instruct command to refresh video list from device
         try {
           await sendVideoListInstruct();
-          // Wait 20 seconds for device to process (upload/transcode)
-          await new Promise(resolve => setTimeout(resolve, 20000));
+          // Wait a bit for device to process
+          await new Promise(resolve => setTimeout(resolve, 5000));
         } catch (instructError) {
           console.error('Error sending instruct command during status check:', instructError);
           // Continue anyway to try fetching videos
         }
 
-        // Then fetch latest videos from media server
-        const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
-        if (!mediaServerUrl) {
-          console.error('Media server URL not configured');
-          return;
-        }
-
+        // Fetch latest videos from media server
         const response = await fetch(`${mediaServerUrl}/getFileList`, {
           method: 'POST',
           headers: {
@@ -633,19 +931,30 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         if (currentVideo) {
           const isUploaded = currentVideo.status === 'uploaded_ok';
           const isErrored = currentVideo.status === 'upload_errored';
-          const statusChanged = originalStatus !== currentVideo.status;
           
           if (isUploaded || isErrored) {
-            // Video is uploaded or errored, stop checking
-            setUploadingVideoId(null);
-            
+            // STOP POLLING IMMEDIATELY - before any updates
             if (uploadCheckIntervalRef.current) {
               clearInterval(uploadCheckIntervalRef.current);
               uploadCheckIntervalRef.current = null;
             }
             
-            // Update videos list
-            setVideos(currentVideos);
+            // Clear uploading state
+            setUploadingVideoId(null);
+            
+            // Update videos list ONLY ONCE when upload finishes - prevent blinking
+            setVideos(prevVideos => {
+              // Deep comparison to prevent unnecessary updates
+              const prevVideosStr = JSON.stringify(prevVideos);
+              const currentVideosStr = JSON.stringify(currentVideos);
+              
+              // Only update if data actually changed
+              if (prevVideosStr !== currentVideosStr) {
+                return currentVideos;
+              }
+              return prevVideos; // Return same reference to prevent re-render
+            });
+            
             setVideosTotalCount(data.resource_count || 0);
             
             // Ensure the status is in the selected statuses filter
@@ -657,6 +966,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 return prev;
               });
               console.log('Video uploaded successfully:', videoId);
+              
+              // AUTO-PLAY VIDEO IMMEDIATELY when upload finishes
+              if (currentVideo.video_url) {
+                console.log('Auto-playing uploaded video:', currentVideo);
+                // Use setTimeout to ensure state updates are complete before playing
+                setTimeout(() => {
+                  setSelectedVideo(currentVideo);
+                  setShowVideoPlayer(true);
+                }, 100);
+              }
             } else if (isErrored) {
               setVideoListSelectedStatuses(prev => {
                 if (!prev.includes('upload_errored')) {
@@ -667,31 +986,33 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               console.log('Video upload errored:', videoId);
             }
             
-            // Try to play the video if it has a video_url (even if errored)
-            if (currentVideo.video_url) {
-              setTimeout(() => {
-                setSelectedVideo(currentVideo);
-                setShowVideoPlayer(true);
-              }, 100);
-            }
-          } else if (statusChanged) {
-            // Status changed but not to uploaded/errored, update list
-            setVideos(currentVideos);
+            // Exit early - no more polling needed
+            return;
+          } else {
+            // Status hasn't changed to uploaded/errored yet
+            // Only update list if data changed, and do it silently to prevent blinking
+            setVideos(prevVideos => {
+              const prevVideosStr = JSON.stringify(prevVideos);
+              const currentVideosStr = JSON.stringify(currentVideos);
+              
+              // Only update if data actually changed
+              if (prevVideosStr !== currentVideosStr) {
+                return currentVideos;
+              }
+              return prevVideos; // Return same reference to prevent re-render
+            });
             setVideosTotalCount(data.resource_count || 0);
           }
-          // If status hasn't changed, don't update to prevent blinking
         }
-        // If video not found, don't update to prevent blinking
       } catch (error) {
         console.error('Error checking video upload status:', error);
       }
     };
 
-    // Check immediately
-    await checkStatus();
-    
-    // Poll every 30 seconds
-    uploadCheckIntervalRef.current = setInterval(checkStatus, 30000);
+    // Start polling every 15 seconds (more frequent than before for faster detection)
+    // Only poll after upload command succeeds
+    await checkStatus(); // Check immediately first
+    uploadCheckIntervalRef.current = setInterval(checkStatus, 15000); // Poll every 15 seconds
   }, [device, sendVideoListInstruct]);
 
   // Handle upload button click
@@ -705,116 +1026,28 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setUploadingVideoId(videoId);
     
     try {
-      // Step 1: Call upload endpoint once
-      console.log('Step 1: Sending upload command...');
+      // Step 1: Call upload endpoint - ONLY start polling after this succeeds
+      console.log('Step 1: Sending FTP upload command...');
       await uploadVideo(video);
       
-      // Step 2: Wait 90 seconds
-      console.log('Step 2: Waiting 90 seconds...');
-      await new Promise(resolve => setTimeout(resolve, 90000));
+      console.log('FTP upload command sent successfully. Starting status polling...');
       
-      // Step 3: Check for updates (send instruct command and fetch videos)
-      console.log('Step 3: Checking for updates...');
-      try {
-        await sendVideoListInstruct();
-      } catch (instructError) {
-        console.error('Error sending instruct command:', instructError);
-      }
-      
-      // Fetch latest videos from media server
-      const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
-      if (mediaServerUrl) {
-        try {
-          const response = await fetch(`${mediaServerUrl}/getFileList`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              deviceImei: device.uniqueId
-            })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const currentVideos = data.videos || [];
-            setVideos(currentVideos);
-            setVideosTotalCount(data.resource_count || 0);
-            console.log('Video list updated after first check');
-          }
-        } catch (fetchError) {
-          console.error('Error fetching videos:', fetchError);
-        }
-      }
-      
-      // Step 4: Wait 90 seconds
-      console.log('Step 4: Waiting 90 seconds...');
-      await new Promise(resolve => setTimeout(resolve, 90000));
-      
-      // Step 5: Finally update video list
-      console.log('Step 5: Final video list update...');
-      if (mediaServerUrl) {
-        try {
-          const response = await fetch(`${mediaServerUrl}/getFileList`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              deviceImei: device.uniqueId
-            })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const currentVideos = data.videos || [];
-            
-            // Find the video we're checking
-            const currentVideo = currentVideos.find(v => 
-              String(v.channel) === String(video.channel) && 
-              v.beginTime === video.beginTime
-            );
-            
-            setVideos(currentVideos);
-            setVideosTotalCount(data.resource_count || 0);
-            
-            // Update status filters if needed
-            if (currentVideo) {
-              if (currentVideo.status === 'uploaded_ok') {
-                setVideoListSelectedStatuses(prev => {
-                  if (!prev.includes('uploaded_ok')) {
-                    return [...prev, 'uploaded_ok'];
-                  }
-                  return prev;
-                });
-                console.log('Video uploaded successfully:', videoId);
-              } else if (currentVideo.status === 'upload_errored') {
-                setVideoListSelectedStatuses(prev => {
-                  if (!prev.includes('upload_errored')) {
-                    return [...prev, 'upload_errored'];
-                  }
-                  return prev;
-                });
-                console.log('Video upload errored:', videoId);
-              }
-            }
-            
-            console.log('Final video list updated');
-          }
-        } catch (fetchError) {
-          console.error('Error fetching videos in final update:', fetchError);
-        }
-      }
-      
-      // Clear uploading state
-      setUploadingVideoId(null);
-      console.log('Upload process completed');
+      // Step 2: Start polling for upload status - ONLY after upload command succeeds
+      // This will poll every 15 seconds until video is uploaded_ok or errored
+      // Video will auto-play when upload finishes
+      await pollVideoUploadStatus(video);
       
     } catch (error) {
       console.error('Error in upload process:', error);
       setUploadingVideoId(null);
+      
+      // Clear any polling interval on error
+      if (uploadCheckIntervalRef.current) {
+        clearInterval(uploadCheckIntervalRef.current);
+        uploadCheckIntervalRef.current = null;
+      }
     }
-  }, [uploadVideo, sendVideoListInstruct, device]);
+  }, [uploadVideo, pollVideoUploadStatus]);
 
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
@@ -858,7 +1091,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } finally {
       setVideosLoading(false);
     }
-  }, [device]);
+  }, [device, logDeviceMessage]);
 
   // Send streaming request to API
   const sendStreamingRequest = useCallback(async (channelNum) => {
@@ -928,6 +1161,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Full URL-encoded body:', urlencoded.toString());
       console.log('====================================');
       
+      const requestData = {
+        deviceImei: device.uniqueId,
+        channel: channelNum,
+        cmdContent: cmdContent
+      };
+
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Streaming request response:', result);
@@ -935,11 +1174,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       // Parse and validate response
       try {
         const parsed = JSON.parse(result);
-        // Check if response matches expected success format
-        if (parsed.code === 0 && 
+        const isSuccess = parsed.code === 0 && 
             parsed.msg === "success" && 
             parsed.data?._code === "100" &&
-            parsed.data?._msg === "Command communication successful response") {
+            parsed.data?._msg === "Command communication successful response";
+        
+        // Log the message
+        logDeviceMessage('streaming', `start_stream_channel_${channelNum}`, requestData, parsed, isSuccess, isSuccess ? null : (parsed.data?._msg || parsed.msg || 'Device is offline or command failed'));
+        
+        if (isSuccess) {
           return { success: true, data: parsed };
         } else {
           // Show server message if available, otherwise show default message
@@ -948,13 +1191,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         }
       } catch (e) {
         // If response is not JSON, treat as error
+        logDeviceMessage('streaming', `start_stream_channel_${channelNum}`, requestData, result, false, 'Invalid JSON response');
         return { success: false, error: 'Invalid response from device', raw: result };
       }
     } catch (error) {
       console.error('Error sending streaming request:', error);
       throw error;
     }
-  }, [device]);
+  }, [device, logDeviceMessage]);
 
   // Load video stream with retry logic using flv.js
   const loadVideoStream = useCallback((channelNum, retryCount = 0, isInitialLoad = false) => {
@@ -5721,6 +5965,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   label="HikiVision" 
                   disabled={!device?.attributes?.hikivision}
                 />
+                <Tab 
+                  label="Device Responses" 
+                />
               </Tabs>
             </div>
 
@@ -5809,234 +6056,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
                     {/* Playback Tab Content */}
                     {selectedChannel === 0 && (() => {
-                      // VideoItem component with lazy loading
-                      const VideoItem = ({ video, index }) => {
-                        const [imageLoaded, setImageLoaded] = useState(false);
-                        const [imageError, setImageError] = useState(false);
-                        const imgRef = useRef(null);
-
-                        // Lazy load thumbnail when in viewport
-                        useEffect(() => {
-                          if (!imgRef.current) return;
-
-                          const observer = new IntersectionObserver(
-                            (entries) => {
-                              entries.forEach((entry) => {
-                                if (entry.isIntersecting && !imageLoaded && !imageError) {
-                                  setImageLoaded(true);
-                                }
-                              });
-                            },
-                            { rootMargin: '50px' }
-                          );
-
-                          observer.observe(imgRef.current);
-
-                          return () => {
-                            if (imgRef.current) {
-                              observer.unobserve(imgRef.current);
-                            }
-                          };
-                        }, [imageLoaded, imageError]);
-
-                        const formatVideoTime = (timeStr) => {
-                          if (!timeStr) return '';
-                          try {
-                            return dayjs(timeStr, 'YYYY-MM-DD HH:mm:ss').format('MMM DD, YYYY HH:mm');
-                          } catch {
-                            return timeStr;
-                          }
-                        };
-
-                        const getStatusColor = (status) => {
-                          switch (status) {
-                            case 'uploaded_ok':
-                              return '#4caf50';
-                            case 'upload_errored':
-                              return '#f44336';
-                            case 'not_uploaded':
-                              return '#ff9800';
-                            default:
-                              return colors.textSecondary;
-                          }
-                        };
-
-                        return (
-                          <div
-                            ref={imgRef}
-                            key={`${video.channel}-${video.beginTime}-${index}`}
-                            style={{
-                              width: '100%',
-                              paddingBottom: '56.25%', // 16:9 aspect ratio
-                              position: 'relative',
-                              backgroundColor: colors.secondary,
-                              borderRadius: '8px',
-                              border: `1px solid ${colors.border}`,
-                              overflow: 'hidden',
-                              boxSizing: 'border-box',
-                              cursor: video.video_url ? 'pointer' : 'default',
-                              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (video.video_url) {
-                                e.currentTarget.style.transform = 'scale(1.02)';
-                                e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
-                            }}
-                            onClick={() => {
-                              if (video.video_url) {
-                                setSelectedVideo(video);
-                                setShowVideoPlayer(true);
-                              }
-                            }}
-                          >
-                            {/* Thumbnail */}
-                            <div style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                            }}>
-                              {imageLoaded && video.thumbnail_url ? (
-                                <img
-                                  src={video.thumbnail_url}
-                                  alt={`Channel ${video.channel} - ${video.beginTime}`}
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                  }}
-                                  onError={() => setImageError(true)}
-                                />
-                              ) : (
-                                <div style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  backgroundColor: colors.secondary,
-                                }}>
-                                  {!imageLoaded && !imageError && (
-                                    <CircularProgress size={24} />
-                                  )}
-                                  {imageError && (
-                                    <Typography variant="body2" style={{ 
-                                      color: colors.textSecondary,
-                                      fontSize: '12px'
-                                    }}>
-                                      No thumbnail
-                                    </Typography>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Overlay with info */}
-                            <div style={{
-                              position: 'absolute',
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-                              padding: '8px',
-                              color: '#fff'
-                            }}>
-                              <Typography variant="caption" style={{ 
-                                display: 'block',
-                                fontSize: '10px',
-                                fontWeight: '600',
-                                marginBottom: '2px'
-                              }}>
-                                Ch {video.channel} • {formatVideoTime(video.beginTime)}
-                              </Typography>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                marginTop: '2px'
-                              }}>
-                                <div style={{
-                                  width: '6px',
-                                  height: '6px',
-                                  borderRadius: '50%',
-                                  backgroundColor: getStatusColor(video.status)
-                                }} />
-                                <Typography variant="caption" style={{ 
-                                  fontSize: '9px',
-                                  textTransform: 'capitalize'
-                                }}>
-                                  {video.status?.replace('_', ' ')}
-                                </Typography>
-                              </div>
-                            </div>
-
-                            {/* Upload/Share button for not_uploaded and upload_errored videos - Apple style */}
-                            {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
-                              <IconButton
-                                onClick={(e) => handleUploadVideo(video, e)}
-                                disabled={uploadingVideoId === `${video.channel}-${video.beginTime}`}
-                                size="small"
-                                style={{
-                                  position: 'absolute',
-                                  top: '8px',
-                                  right: '8px',
-                                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                  backdropFilter: 'blur(10px)',
-                                  color: '#fff',
-                                  width: '32px',
-                                  height: '32px',
-                                  padding: '6px',
-                                  zIndex: 10,
-                                }}
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                  },
-                                  '&.Mui-disabled': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                                  }
-                                }}
-                                title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
-                              >
-                                {uploadingVideoId === `${video.channel}-${video.beginTime}` ? (
-                                  <CircularProgress size={16} style={{ color: '#fff' }} />
-                                ) : video.status === 'upload_errored' ? (
-                                  <IoRefreshOutline style={{ fontSize: '18px', color: '#fff' }} />
-                                ) : (
-                                  <IoShareOutline style={{ fontSize: '18px', color: '#fff' }} />
-                                )}
-                              </IconButton>
-                            )}
-
-                            {/* Play button overlay for videos with URL */}
-                            {video.video_url && (
-                              <div style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '50%',
-                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                pointerEvents: 'none'
-                              }}>
-                                <PlayArrowIcon style={{ fontSize: '28px', color: '#fff' }} />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      };
-
                       return (
                         <div style={{
                           display: 'flex',
@@ -6366,7 +6385,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               boxSizing: 'border-box'
                             }}>
                               {paginatedVideos.map((video, index) => (
-                                <VideoItem key={`${video.channel}-${video.beginTime}-${index}`} video={video} index={index} />
+                                <VideoItem 
+                                  key={`${video.channel}-${video.beginTime}-${index}`} 
+                                  video={video} 
+                                  index={index}
+                                  colors={colors}
+                                  handleUploadVideo={handleUploadVideo}
+                                  setSelectedVideo={setSelectedVideo}
+                                  setShowVideoPlayer={setShowVideoPlayer}
+                                  uploadingVideoId={uploadingVideoId}
+                                />
                               ))}
                             </Box>
                             
@@ -6544,6 +6572,205 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   <div style={{ color: colors.text }}>
                     <h3 style={{ color: colors.text, marginBottom: '16px' }}>HikiVision</h3>
                     <p style={{ color: colors.textSecondary }}>HikiVision content goes here...</p>
+                  </div>
+                )}
+                {moreDetailsActiveTab === 2 && (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    height: '100%',
+                    color: colors.text 
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '16px'
+                    }}>
+                      <Typography variant="h6" style={{ 
+                        color: colors.text, 
+                        fontWeight: '600' 
+                      }}>
+                        Device Responses
+                      </Typography>
+                      <IconButton
+                        onClick={() => setDeviceMessages([])}
+                        size="small"
+                        style={{
+                          color: colors.textSecondary
+                        }}
+                        title="Clear logs"
+                      >
+                        <RefreshOutlinedIcon />
+                      </IconButton>
+                    </div>
+                    
+                    <Box style={{
+                      flex: 1,
+                      overflow: 'auto',
+                      backgroundColor: colors.secondary,
+                      borderRadius: '8px',
+                      padding: '12px',
+                      border: `1px solid ${colors.border}`
+                    }}>
+                      {deviceMessages.length === 0 ? (
+                        <Typography variant="body2" style={{ 
+                          color: colors.textSecondary,
+                          textAlign: 'center',
+                          padding: '40px'
+                        }}>
+                          No device responses yet. Responses will appear here when you interact with the device.
+                        </Typography>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {deviceMessages.map((msg) => (
+                            <div
+                              key={msg.id}
+                              style={{
+                                backgroundColor: msg.success ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                                border: `1px solid ${msg.success ? 'rgba(76, 175, 80, 0.3)' : 'rgba(244, 67, 54, 0.3)'}`,
+                                borderRadius: '6px',
+                                padding: '12px',
+                                fontFamily: 'monospace',
+                                fontSize: '12px'
+                              }}
+                            >
+                              <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: '8px',
+                                flexWrap: 'wrap',
+                                gap: '8px'
+                              }}>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  <span style={{
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    backgroundColor: msg.success ? '#4caf50' : '#f44336',
+                                    color: '#fff',
+                                    fontSize: '10px',
+                                    fontWeight: '600'
+                                  }}>
+                                    {msg.success ? 'SUCCESS' : 'ERROR'}
+                                  </span>
+                                  <span style={{
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    backgroundColor: colors.primary + '20',
+                                    color: colors.primary,
+                                    fontSize: '10px',
+                                    fontWeight: '500'
+                                  }}>
+                                    {msg.type}
+                                  </span>
+                                  <span style={{
+                                    color: colors.text,
+                                    fontWeight: '500'
+                                  }}>
+                                    {msg.action}
+                                  </span>
+                                </div>
+                                <span style={{
+                                  color: colors.textSecondary,
+                                  fontSize: '11px'
+                                }}>
+                                  {dayjs(msg.timestamp).format('HH:mm:ss.SSS')}
+                                </span>
+                              </div>
+                              
+                              {msg._msg && (
+                                <div style={{
+                                  marginTop: '8px',
+                                  padding: '8px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                  borderRadius: '4px',
+                                  color: colors.text,
+                                  fontWeight: '500'
+                                }}>
+                                  <strong>Message:</strong> {msg._msg}
+                                </div>
+                              )}
+                              
+                              {msg._code && (
+                                <div style={{
+                                  marginTop: '4px',
+                                  color: colors.textSecondary,
+                                  fontSize: '11px'
+                                }}>
+                                  <strong>Code:</strong> {msg._code}
+                                </div>
+                              )}
+                              
+                              {msg.error && (
+                                <div style={{
+                                  marginTop: '8px',
+                                  padding: '8px',
+                                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                  borderRadius: '4px',
+                                  color: '#f44336',
+                                  fontSize: '11px'
+                                }}>
+                                  <strong>Error:</strong> {msg.error}
+                                </div>
+                              )}
+                              
+                              {msg.request && (
+                                <details style={{ marginTop: '8px' }}>
+                                  <summary style={{
+                                    cursor: 'pointer',
+                                    color: colors.primary,
+                                    fontSize: '11px',
+                                    fontWeight: '500',
+                                    userSelect: 'none'
+                                  }}>
+                                    Request Details
+                                  </summary>
+                                  <pre style={{
+                                    marginTop: '8px',
+                                    padding: '8px',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                    borderRadius: '4px',
+                                    overflow: 'auto',
+                                    fontSize: '10px',
+                                    color: colors.text,
+                                    maxHeight: '200px'
+                                  }}>
+                                    {msg.request}
+                                  </pre>
+                                </details>
+                              )}
+                              
+                              {msg.response && (
+                                <details style={{ marginTop: '8px' }}>
+                                  <summary style={{
+                                    cursor: 'pointer',
+                                    color: colors.primary,
+                                    fontSize: '11px',
+                                    fontWeight: '500',
+                                    userSelect: 'none'
+                                  }}>
+                                    Response Details
+                                  </summary>
+                                  <pre style={{
+                                    marginTop: '8px',
+                                    padding: '8px',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                    borderRadius: '4px',
+                                    overflow: 'auto',
+                                    fontSize: '10px',
+                                    color: colors.text,
+                                    maxHeight: '200px'
+                                  }}>
+                                    {msg.response}
+                                  </pre>
+                                </details>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </Box>
                   </div>
                 )}
               </Box>
