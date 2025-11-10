@@ -64,7 +64,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
-import BarChartIcon from '@mui/icons-material/BarChart';
+import { PieChart } from 'lucide-react';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
@@ -2833,7 +2833,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               }}
               title={t('sharedReports') || 'Reports'}
             >
-              <BarChartIcon style={{ fontSize: '18px', color: colors.textSecondary }} />
+              <PieChart size={18} color={colors.textSecondary} />
             </button>
           )}
 
