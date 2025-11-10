@@ -37,7 +37,7 @@ import { PiMagicWand, PiStarFourThin } from 'react-icons/pi';
 import { BsCloudArrowUp } from 'react-icons/bs';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress, Tooltip } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 
 dayjs.extend(relativeTime);
@@ -1636,34 +1636,36 @@ const FloatingDeviceList = ({
               <PiMagicWand style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
             </button>
             {/* Filter on Map Toggle Button - Last button (rightmost) */}
-            <button
-              type="button"
-              aria-label="Toggle filter on map"
-              onClick={() => setFilterMap(!filterMap)}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '28px',
-                height: '28px',
-                padding: 0,
-                margin: 0,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 2
-              }}
-            >
-              <PiStarFourThin style={{ 
-                width: '16px', 
-                height: '16px', 
-                color: filterMap ? '#10B981' : colors.textSecondary 
-              }} />
-            </button>
+            <Tooltip title="Smart Filter" placement="top" arrow>
+              <button
+                type="button"
+                aria-label="Toggle filter on map"
+                onClick={() => setFilterMap(!filterMap)}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '28px',
+                  height: '28px',
+                  padding: 0,
+                  margin: 0,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 2
+                }}
+              >
+                <PiStarFourThin style={{ 
+                  width: '16px', 
+                  height: '16px', 
+                  color: filterMap ? '#10B981' : colors.textSecondary 
+                }} />
+              </button>
+            </Tooltip>
           </div>
         </div>
         
