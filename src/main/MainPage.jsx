@@ -1407,6 +1407,26 @@ const MainPage = () => {
   // Always call useFilter (required by Rules of Hooks)
   useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop);
 
+  // Track previous selectedDeviceId to detect when user goes back from selected device
+  const prevSelectedDeviceIdRef = useRef(selectedDeviceId);
+
+  // When device is selected, set search to device uniqueId and enable filter on map
+  // Works on both mobile and desktop
+  useEffect(() => {
+    if (selectedDeviceId && devices[selectedDeviceId]) {
+      const selectedDevice = devices[selectedDeviceId];
+      if (selectedDevice.uniqueId) {
+        setKeyword(selectedDevice.uniqueId);
+        setFilterMap(true);
+      }
+      prevSelectedDeviceIdRef.current = selectedDeviceId;
+    } else if (!selectedDeviceId && prevSelectedDeviceIdRef.current) {
+      // Only clear when transitioning from selected to not selected (user went back)
+      setKeyword('');
+      setFilterMap(false);
+      prevSelectedDeviceIdRef.current = null;
+    }
+  }, [selectedDeviceId, devices, setKeyword, setFilterMap]);
 
   // Old desktop-only refresh - now handled by universal refresh below
 

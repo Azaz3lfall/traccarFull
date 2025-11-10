@@ -1,19 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { devicesActions } from '../store';
 import DeviceCard from './DeviceCard';
 import { Input } from './ui/input';
-import { Search, Filter, Grid, List, Menu } from 'lucide-react';
+import { Search, Filter, Grid, List, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { useMediaQuery } from '../common/util/hooks';
+import { useTranslation } from '../common/components/LocalizationProvider';
 
-const ModernDeviceList = ({ devices, positions }) => {
+const ModernDeviceList = ({ devices, positions, keyword, setKeyword, filterMap, setFilterMap }) => {
   const dispatch = useDispatch();
+  const t = useTranslation();
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState(keyword || '');
   const [viewMode, setViewMode] = React.useState('grid'); // 'grid' or 'list'
+  const [showFilters, setShowFilters] = useState(false);
   const desktop = useMediaQuery('(min-width: 1024px)');
+
+  // Sync searchTerm with keyword prop
+  useEffect(() => {
+    setSearchTerm(keyword || '');
+  }, [keyword]);
+
+  // Update keyword when searchTerm changes (user typing)
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    if (setKeyword) {
+      setKeyword(value);
+    }
+  };
 
   const filteredDevices = devices.filter(device =>
     device.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,15 +68,60 @@ const ModernDeviceList = ({ devices, positions }) => {
         </div>
         
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Search devices..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="relative flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Search devices..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className={showFilters ? 'bg-primary text-primary-foreground' : ''}
+          >
+            <Filter className="w-4 h-4" />
+          </Button>
         </div>
+        
+        {/* Filter Popover */}
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-4 p-4 border-t bg-card"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold">Filters</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Filter on Map Checkbox */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="filterMap"
+                checked={filterMap || false}
+                onChange={(e) => setFilterMap && setFilterMap(e.target.checked)}
+                className="w-4 h-4 accent-primary"
+              />
+              <label htmlFor="filterMap" className="text-sm cursor-pointer">
+                {t('sharedFilterMap') || 'Filter on Map'}
+              </label>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Device List */}

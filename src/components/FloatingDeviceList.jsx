@@ -33,7 +33,7 @@ import {
   Menu,
   ChevronLeft
 } from 'lucide-react';
-import { PiMagicWand } from 'react-icons/pi';
+import { PiMagicWand, PiStarFourThin } from 'react-icons/pi';
 import { BsCloudArrowUp } from 'react-icons/bs';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
@@ -722,12 +722,9 @@ const FloatingDeviceList = ({
   React.useEffect(() => {
     if (!desktop && selectedDeviceId) {
       setShowOnMobile(false);
-      // Inject dummy text to trigger search and reload
-      setKeyword(' ');
     } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
-      // Clear dummy text to trigger reload
-      setKeyword('');
+      // Note: keyword clearing is handled in MainPage.jsx to avoid conflicts
     }
   }, [desktop, selectedDeviceId]);
   
@@ -1558,7 +1555,7 @@ const FloatingDeviceList = ({
               onChange={(e) => setKeyword(e.target.value)}
               style={{
                 paddingLeft: '40px',
-                paddingRight: '92px',
+                paddingRight: '100px',
                 height: '40px',
                 borderRadius: '8px',
                 backgroundColor: colors.secondary,
@@ -1574,10 +1571,10 @@ const FloatingDeviceList = ({
                 e.target.style.borderColor = colors.border;
               }}
             />
-            {/* Device count */}
+            {/* Device count - First button (leftmost) */}
             <div style={{
               position: 'absolute',
-              right: '64px',
+              right: '88px',
               top: '50%',
               transform: 'translateY(-50%)',
               fontSize: '11px',
@@ -1590,12 +1587,13 @@ const FloatingDeviceList = ({
             }}>
               {filteredDevices.length}
             </div>
+            {/* Filter button - Second button */}
             <button
               ref={filterButtonRef}
               type="button"
               style={{
                 position: 'absolute',
-                right: '32px',
+                right: '56px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 width: '28px',
@@ -1613,12 +1611,13 @@ const FloatingDeviceList = ({
             >
               <Filter style={{ width: '14px', height: '14px', color: colors.textSecondary }} />
             </button>
+            {/* Smart link button - Third button */}
             <button
               type="button"
-              aria-label="Open filters"
+              aria-label="Open smart link"
               style={{
                 position: 'absolute',
-                right: '8px',
+                right: '32px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 width: '28px',
@@ -1635,6 +1634,35 @@ const FloatingDeviceList = ({
               onClick={() => setShowWandModal(true)}
             >
               <PiMagicWand style={{ width: '16px', height: '16px', color: colors.textSecondary }} />
+            </button>
+            {/* Filter on Map Toggle Button - Last button (rightmost) */}
+            <button
+              type="button"
+              aria-label="Toggle filter on map"
+              onClick={() => setFilterMap(!filterMap)}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '28px',
+                height: '28px',
+                padding: 0,
+                margin: 0,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2
+              }}
+            >
+              <PiStarFourThin style={{ 
+                width: '16px', 
+                height: '16px', 
+                color: filterMap ? '#10B981' : colors.textSecondary 
+              }} />
             </button>
           </div>
         </div>

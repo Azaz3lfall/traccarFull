@@ -22,9 +22,9 @@ const ModernMainPage = () => {
 
   const mapOnSelect = useAttributePreference('mapOnSelect', true);
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
+  const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const user = useSelector((state) => state.session.user);
-  const { companyName } = useResellerBranding();
   
   // Check if user has mainMenu permission
   const hasMainMenuPermission = useMemo(() => {
@@ -69,6 +69,25 @@ const ModernMainPage = () => {
     }
   }, [desktop, mapOnSelect, selectedDeviceId]);
 
+  // When device is selected on mobile, set search to device uniqueId and enable filter on map
+  // Only do this when sidebar is closed (list is not visible)
+  useEffect(() => {
+    if (!desktop && selectedDeviceId && devices[selectedDeviceId] && !sidebarOpen) {
+      const selectedDevice = devices[selectedDeviceId];
+      if (selectedDevice.uniqueId) {
+        setKeyword(selectedDevice.uniqueId);
+        setFilterMap(true);
+      }
+    }
+  }, [desktop, selectedDeviceId, devices, sidebarOpen]);
+
+  // When user goes back to list on mobile, clear search so all devices appear
+  useEffect(() => {
+    if (!desktop && sidebarOpen) {
+      setKeyword('');
+    }
+  }, [desktop, sidebarOpen]);
+
   useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions);
 
   const sidebarVariants = {
@@ -108,6 +127,10 @@ const ModernMainPage = () => {
         <ModernDeviceList 
           devices={filteredDevices} 
           positions={filteredPositions}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          filterMap={filterMap}
+          setFilterMap={setFilterMap}
         />
       </motion.div>
 
