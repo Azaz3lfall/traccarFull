@@ -6,7 +6,7 @@ import { useThemeColors } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { sessionActions } from '../store';
 import { Card } from './ui/card';
-import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, IconButton, Tabs, Tab, Box, Table, TableBody, TableCell, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem, Button, TextField, CircularProgress, Portal, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, Chip } from '@mui/material';
 import { ChevronLeft as CloseIcon } from 'lucide-react';
 import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatTime, formatSpeed, formatDistance, formatVolume, formatNumericHours } from '../common/util/formatter';
@@ -1505,7 +1505,7 @@ const FloatingReportsPopover = ({
             left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
             width: !desktop ? '100vw' : `calc(100vw - ${isMenuExpanded ? '200px' : '63px'} - 10px)`,
             height: !desktop ? '100vh' : 'calc(100vh - 16px)',
-            zIndex: 10001,
+            zIndex: 10002,
             pointerEvents: 'auto',
             transition: 'left 0.3s ease'
           }}
@@ -1621,18 +1621,50 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
+                      <Autocomplete
                         multiple
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
+                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        onChange={(event, newValue) => {
+                          setDeviceIds(newValue.map(device => device.id));
                         }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={t('deviceTitle')}
+                            placeholder={t('sharedSearchDevices') || 'Search devices...'}
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.id}
+                              label={option.name}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          ))
+                        }
+                        fullWidth
+                        size="small"
+                        disablePortal={false}
+                        ListboxProps={{
+                          style: {
+                            zIndex: 10003,
+                          },
+                        }}
+                        componentsProps={{
+                          popper: {
+                            style: {
+                              zIndex: 10003,
+                            },
+                          },
+                        }}
+                        PaperComponent={(props) => (
+                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                        )}
                       />
                     </div>
                     
@@ -1768,18 +1800,50 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
+                      <Autocomplete
                         multiple
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
+                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        onChange={(event, newValue) => {
+                          setDeviceIds(newValue.map(device => device.id));
                         }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={t('deviceTitle')}
+                            placeholder={t('sharedSearchDevices') || 'Search devices...'}
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.id}
+                              label={option.name}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          ))
+                        }
+                        fullWidth
+                        size="small"
+                        disablePortal={false}
+                        ListboxProps={{
+                          style: {
+                            zIndex: 10003,
+                          },
+                        }}
+                        componentsProps={{
+                          popper: {
+                            style: {
+                              zIndex: 10003,
+                            },
+                          },
+                        }}
+                        PaperComponent={(props) => (
+                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                        )}
                       />
                     </div>
                     
@@ -1980,18 +2044,50 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
+                      <Autocomplete
                         multiple
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
+                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        onChange={(event, newValue) => {
+                          setDeviceIds(newValue.map(device => device.id));
                         }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={t('deviceTitle')}
+                            placeholder={t('sharedSearchDevices') || 'Search devices...'}
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.id}
+                              label={option.name}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          ))
+                        }
+                        fullWidth
+                        size="small"
+                        disablePortal={false}
+                        ListboxProps={{
+                          style: {
+                            zIndex: 10003,
+                          },
+                        }}
+                        componentsProps={{
+                          popper: {
+                            style: {
+                              zIndex: 10003,
+                            },
+                          },
+                        }}
+                        PaperComponent={(props) => (
+                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                        )}
                       />
                     </div>
                     
@@ -2200,18 +2296,50 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
+                      <Autocomplete
                         multiple
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
+                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        onChange={(event, newValue) => {
+                          setDeviceIds(newValue.map(device => device.id));
                         }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={t('deviceTitle')}
+                            placeholder={t('sharedSearchDevices') || 'Search devices...'}
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.id}
+                              label={option.name}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          ))
+                        }
+                        fullWidth
+                        size="small"
+                        disablePortal={false}
+                        ListboxProps={{
+                          style: {
+                            zIndex: 10003,
+                          },
+                        }}
+                        componentsProps={{
+                          popper: {
+                            style: {
+                              zIndex: 10003,
+                            },
+                          },
+                        }}
+                        PaperComponent={(props) => (
+                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                        )}
                       />
                     </div>
                     
@@ -2420,18 +2548,50 @@ const FloatingReportsPopover = ({
                   }}>
                     {/* Device Selection */}
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
-                      <SelectField
-                        label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
-                        value={deviceIds}
-                        onChange={(e) => setDeviceIds(e.target.value)}
+                      <Autocomplete
                         multiple
-                        fullWidth
-                        zIndex={10002}
-                        MenuProps={{
-                          disablePortal: false,
-                          style: { zIndex: 10002 }
+                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        onChange={(event, newValue) => {
+                          setDeviceIds(newValue.map(device => device.id));
                         }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={t('deviceTitle')}
+                            placeholder={t('sharedSearchDevices') || 'Search devices...'}
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.id}
+                              label={option.name}
+                              {...getTagProps({ index })}
+                              size="small"
+                            />
+                          ))
+                        }
+                        fullWidth
+                        size="small"
+                        disablePortal={false}
+                        ListboxProps={{
+                          style: {
+                            zIndex: 10003,
+                          },
+                        }}
+                        componentsProps={{
+                          popper: {
+                            style: {
+                              zIndex: 10003,
+                            },
+                          },
+                        }}
+                        PaperComponent={(props) => (
+                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                        )}
                       />
                     </div>
                     
