@@ -1663,8 +1663,23 @@ const FloatingReportsPopover = ({
                           },
                         }}
                         PaperComponent={(props) => (
-                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                          <div 
+                            {...props} 
+                            style={{ 
+                              ...props.style, 
+                              zIndex: 10003,
+                              border: `1px solid ${colors.border}`,
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              backgroundColor: colors.surface
+                            }} 
+                          />
                         )}
+                        sx={{
+                          '& .MuiAutocomplete-popper': {
+                            zIndex: '10003 !important',
+                          },
+                        }}
                       />
                     </div>
                     
@@ -1842,8 +1857,23 @@ const FloatingReportsPopover = ({
                           },
                         }}
                         PaperComponent={(props) => (
-                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                          <div 
+                            {...props} 
+                            style={{ 
+                              ...props.style, 
+                              zIndex: 10003,
+                              border: `1px solid ${colors.border}`,
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              backgroundColor: colors.surface
+                            }} 
+                          />
                         )}
+                        sx={{
+                          '& .MuiAutocomplete-popper': {
+                            zIndex: '10003 !important',
+                          },
+                        }}
                       />
                     </div>
                     
@@ -2086,8 +2116,23 @@ const FloatingReportsPopover = ({
                           },
                         }}
                         PaperComponent={(props) => (
-                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                          <div 
+                            {...props} 
+                            style={{ 
+                              ...props.style, 
+                              zIndex: 10003,
+                              border: `1px solid ${colors.border}`,
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              backgroundColor: colors.surface
+                            }} 
+                          />
                         )}
+                        sx={{
+                          '& .MuiAutocomplete-popper': {
+                            zIndex: '10003 !important',
+                          },
+                        }}
                       />
                     </div>
                     
@@ -2338,8 +2383,23 @@ const FloatingReportsPopover = ({
                           },
                         }}
                         PaperComponent={(props) => (
-                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                          <div 
+                            {...props} 
+                            style={{ 
+                              ...props.style, 
+                              zIndex: 10003,
+                              border: `1px solid ${colors.border}`,
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              backgroundColor: colors.surface
+                            }} 
+                          />
                         )}
+                        sx={{
+                          '& .MuiAutocomplete-popper': {
+                            zIndex: '10003 !important',
+                          },
+                        }}
                       />
                     </div>
                     
@@ -2590,8 +2650,23 @@ const FloatingReportsPopover = ({
                           },
                         }}
                         PaperComponent={(props) => (
-                          <div {...props} style={{ ...props.style, zIndex: 10003 }} />
+                          <div 
+                            {...props} 
+                            style={{ 
+                              ...props.style, 
+                              zIndex: 10003,
+                              border: `1px solid ${colors.border}`,
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '8px',
+                              backgroundColor: colors.surface
+                            }} 
+                          />
                         )}
+                        sx={{
+                          '& .MuiAutocomplete-popper': {
+                            zIndex: '10003 !important',
+                          },
+                        }}
                       />
                     </div>
                     
