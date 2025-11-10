@@ -3002,6 +3002,7 @@ const MainPage = () => {
         showReplayPopover={showReplayPopover}
         setShowReplayPopover={setShowReplayPopover}
         onHideDeviceList={() => setIsDeviceListVisible(false)}
+        onShowDeviceList={() => setIsDeviceListVisible(true)}
         onOpenReports={() => setReportsPopoverVisible(true)}
       />
       

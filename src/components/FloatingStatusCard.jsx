@@ -318,7 +318,7 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
 
 VideoItem.displayName = 'VideoItem';
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList, onOpenReports }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList, onShowDeviceList, onOpenReports }) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const t = useTranslation();
@@ -2676,7 +2676,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, [dispatch]);
+    
+    // Reopen device list when closing replay popover
+    if (onShowDeviceList) {
+      onShowDeviceList();
+    }
+  }, [dispatch, onShowDeviceList]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -2781,7 +2786,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           <button
             onClick={(e) => {
               e.stopPropagation();
-              dispatch(devicesActions.selectId(null));
+              
+              // If in replay mode, close replay popover (which will also show device list)
+              if (showReplayPopover) {
+                handleCloseReplayPopover();
+              } else {
+                // Normal mode: just deselect device
+                dispatch(devicesActions.selectId(null));
+              }
             }}
             style={{
               position: !desktop ? 'fixed' : 'absolute',
