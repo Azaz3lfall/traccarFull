@@ -159,6 +159,7 @@ const FloatingReportsPopover = ({
 
   const dispatch = useDispatch();
   const devices = useSelector((state) => state.devices.items);
+  const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const groups = useSelector((state) => state.groups.items);
   const geofences = useSelector((state) => state.geofences.items);
   const calendars = useSelector((state) => state.calendars.items);
@@ -170,6 +171,18 @@ const FloatingReportsPopover = ({
 
   // Position attributes for chart
   const positionAttributes = usePositionAttributes(t);
+
+  // Automatically select device in reports when device is selected in device list
+  useEffect(() => {
+    if (isVisible && selectedDeviceId && devices[selectedDeviceId]) {
+      // Automatically select the device in reports popover
+      // Replace existing selection with the newly selected device
+      setDeviceIds([selectedDeviceId]);
+    } else if (isVisible && !selectedDeviceId && deviceIds.length > 0) {
+      // Clear selection when device is deselected in device list
+      setDeviceIds([]);
+    }
+  }, [isVisible, selectedDeviceId, devices]);
 
   // Events columns configuration
   const eventsColumnsArray = [

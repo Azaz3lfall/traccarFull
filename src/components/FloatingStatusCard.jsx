@@ -64,6 +64,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
@@ -317,7 +318,7 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
 
 VideoItem.displayName = 'VideoItem';
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList, onOpenReports }) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const t = useTranslation();
@@ -2810,6 +2811,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           >
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
+
+          {/* Reports Button - Hidden in replay mode */}
+          {!showReplayPopover && onOpenReports && (
+            <button
+              onClick={onOpenReports}
+              style={{
+                position: 'absolute',
+                top: !desktop ? '8px' : '12px',
+                right: !desktop ? '103px' : '108px',
+                zIndex: 10,
+                width: '28px',
+                height: '28px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title={t('sharedReports') || 'Reports'}
+            >
+              <BarChartIcon style={{ fontSize: '18px', color: colors.textSecondary }} />
+            </button>
+          )}
 
           {/* More Details Button - Hidden in replay mode */}
           {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (

@@ -3002,6 +3002,7 @@ const MainPage = () => {
         showReplayPopover={showReplayPopover}
         setShowReplayPopover={setShowReplayPopover}
         onHideDeviceList={() => setIsDeviceListVisible(false)}
+        onOpenReports={() => setReportsPopoverVisible(true)}
       />
       
       {/* Vertical Control Bar - Left of Device List */}
