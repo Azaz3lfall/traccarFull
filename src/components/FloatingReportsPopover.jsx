@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -172,17 +172,28 @@ const FloatingReportsPopover = ({
   // Position attributes for chart
   const positionAttributes = usePositionAttributes(t);
 
-  // Automatically select device in reports when device is selected in device list
+  // Track if we've already pre-selected the device when popover opened
+  const prevIsVisibleRef = useRef(isVisible);
+  
+  // Create a static snapshot of devices list that only updates when popover opens
+  // This prevents Autocomplete from resetting when positions arrive via websocket
+  const [staticDevicesList, setStaticDevicesList] = useState([]);
+
+  // Update static devices list and pre-select device ONLY when popover first opens
   useEffect(() => {
-    if (isVisible && selectedDeviceId && devices[selectedDeviceId]) {
-      // Automatically select the device in reports popover
-      // Replace existing selection with the newly selected device
-      setDeviceIds([selectedDeviceId]);
-    } else if (isVisible && !selectedDeviceId && deviceIds.length > 0) {
-      // Clear selection when device is deselected in device list
-      setDeviceIds([]);
+    if (isVisible && !prevIsVisibleRef.current) {
+      // Create a snapshot of devices as an array - this won't change until popover reopens
+      const devicesSnapshot = Object.values(devices).map(device => ({ ...device }));
+      setStaticDevicesList(devicesSnapshot);
+      
+      // Pre-select the device if one is selected
+      if (selectedDeviceId && devices[selectedDeviceId]) {
+        setDeviceIds([selectedDeviceId]);
+      }
     }
-  }, [isVisible, selectedDeviceId, devices]);
+    
+    prevIsVisibleRef.current = isVisible;
+  }, [isVisible]); // Only depend on isVisible, not devices or selectedDeviceId
 
   // Events columns configuration
   const eventsColumnsArray = [
@@ -1623,10 +1634,10 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <Autocomplete
                         multiple
-                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        options={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         getOptionLabel={(option) => option.name || ''}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        value={staticDevicesList.filter(device => deviceIds.includes(device.id))}
                         onChange={(event, newValue) => {
                           setDeviceIds(newValue.map(device => device.id));
                         }}
@@ -1817,10 +1828,10 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <Autocomplete
                         multiple
-                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        options={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         getOptionLabel={(option) => option.name || ''}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        value={staticDevicesList.filter(device => deviceIds.includes(device.id))}
                         onChange={(event, newValue) => {
                           setDeviceIds(newValue.map(device => device.id));
                         }}
@@ -2076,10 +2087,10 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <Autocomplete
                         multiple
-                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        options={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         getOptionLabel={(option) => option.name || ''}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        value={staticDevicesList.filter(device => deviceIds.includes(device.id))}
                         onChange={(event, newValue) => {
                           setDeviceIds(newValue.map(device => device.id));
                         }}
@@ -2343,10 +2354,10 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <Autocomplete
                         multiple
-                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        options={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         getOptionLabel={(option) => option.name || ''}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        value={staticDevicesList.filter(device => deviceIds.includes(device.id))}
                         onChange={(event, newValue) => {
                           setDeviceIds(newValue.map(device => device.id));
                         }}
@@ -2610,10 +2621,10 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <Autocomplete
                         multiple
-                        options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        options={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         getOptionLabel={(option) => option.name || ''}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
-                        value={Object.values(devices).filter(device => deviceIds.includes(device.id))}
+                        value={staticDevicesList.filter(device => deviceIds.includes(device.id))}
                         onChange={(event, newValue) => {
                           setDeviceIds(newValue.map(device => device.id));
                         }}
@@ -2884,7 +2895,7 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <SelectField
                         label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        data={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         value={deviceIds}
                         onChange={(e) => setDeviceIds(e.target.value)}
                         multiple
@@ -3085,7 +3096,7 @@ const FloatingReportsPopover = ({
                     <div style={{ flex: desktop ? '1 1 200px' : '1 1 auto', minWidth: 0 }}>
                       <SelectField
                         label={t('deviceTitle')}
-                        data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+                        data={staticDevicesList.sort((a, b) => a.name.localeCompare(b.name))}
                         value={deviceIds}
                         onChange={(e) => setDeviceIds(e.target.value)}
                         multiple
