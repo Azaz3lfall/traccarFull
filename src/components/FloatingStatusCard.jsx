@@ -974,16 +974,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         };
         cmdContentString = JSON.stringify(cmdContent);
       } else {
-        // jc400 format: String cmdContent (RTMP,ON,IN for channel 1, RTMP,ON,OUT for channel 2)
-        // Channel mapping: Channel 1 → index 0 → "RTMP,ON,IN", Channel 2 → index 1 → "RTMP,ON,OUT"
+        // jc400 format: String cmdContent
+        // Channel mapping: Channel 1 (index 0) → "RTMP,ON,OUT", Channel 2 (index 1) → "RTMP,ON,IN"
         const channelIndex = apiTemplate.streaming.channelsStartAtZero ? channelNum - 1 : channelNum;
         console.log(`📡 Channel mapping for cmdContent: UI Channel ${channelNum} → index ${channelIndex}`);
         if (channelIndex === 0) {
-          cmdContentString = "RTMP,ON,IN";
-          console.log(`✅ Channel 1 → index 0 → cmdContent: "RTMP,ON,IN"`);
-        } else if (channelIndex === 1) {
           cmdContentString = "RTMP,ON,OUT";
-          console.log(`✅ Channel 2 → index 1 → cmdContent: "RTMP,ON,OUT"`);
+          console.log(`✅ Channel 1 → index 0 → cmdContent: "RTMP,ON,OUT"`);
+        } else if (channelIndex === 1) {
+          cmdContentString = "RTMP,ON,IN";
+          console.log(`✅ Channel 2 → index 1 → cmdContent: "RTMP,ON,IN"`);
         } else {
           throw new Error(`Channel ${channelNum} is not supported for jc400. Only channels 1 and 2 are supported.`);
         }
@@ -1219,18 +1219,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Check if response indicates success
       if (response.success) {
-        // For jc400, wait a bit for the stream to be ready
-        const deviceModel = getDeviceModel;
-        if (deviceModel === 'jc400') {
-          console.log('Streaming command sent successfully for jc400, waiting 2 seconds before loading...');
-          setTimeout(() => {
-            loadVideoStream(selectedChannel, 0, true);
-          }, 2000); // 2 second delay for jc400
-        } else {
-          // File is available immediately after activation for jc181 - start loading right away
-          console.log('Streaming command sent successfully, loading video file...');
-          loadVideoStream(selectedChannel, 0, true);
-        }
+        // Load stream immediately after receiving OK from API
+        console.log('✅ Streaming request successful, loading stream immediately...');
+        loadVideoStream(selectedChannel, 0, true);
       } else {
         // Device is offline or command failed
         setStreamingError(response.error || 'Device is offline or command failed');
@@ -1277,20 +1268,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         // Check if response indicates success
         console.log('Streaming response:', response);
         if (response.success) {
-          console.log('✅ Streaming request successful, preparing to load stream...');
-          // For jc400, wait a bit for the stream to be ready
-          const deviceModel = getDeviceModel;
-          if (deviceModel === 'jc400') {
-            console.log('⏳ jc400 detected, waiting 2 seconds before loading stream...');
-            setTimeout(() => {
-              console.log('🚀 Loading jc400 stream now...');
-              loadVideoStream(newValue, 0, true);
-            }, 2000); // 2 second delay for jc400
-          } else {
-            // File is available immediately after activation for jc181 - start loading right away
-            console.log('🚀 Loading jc181 stream immediately...');
-            loadVideoStream(newValue, 0, true);
-          }
+          console.log('✅ Streaming request successful, loading stream immediately...');
+          // Load stream immediately after receiving OK from API
+          loadVideoStream(newValue, 0, true);
         } else {
           console.error('❌ Streaming request failed:', response.error);
           // Device is offline or command failed
