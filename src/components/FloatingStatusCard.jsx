@@ -733,7 +733,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           serverFlagId: '0',
           platform: 'web',
           requestId: '6',
-          offLineFlag: '1'
+          offLineFlag: '1',
+          useJsonCmdContent: true,
+          channelsStartAtZero: false
+        }
+      };
+    }
+    
+    // jc400 template
+    if (normalizedModel === 'jc400') {
+      return {
+        videoList: null, // jc400 doesn't support video list requests yet
+        streaming: {
+          proNo: '128',
+          useJsonCmdContent: false,
+          channelsStartAtZero: true,
+          urlFormat: 'live' // Uses /live/{channelIndex}/ format
         }
       };
     }
@@ -756,8 +771,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
 
       const apiTemplate = getApiTemplate(deviceModel);
-      if (!apiTemplate) {
-        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" is supported.`);
+      if (!apiTemplate || !apiTemplate.videoList) {
+        throw new Error(`Device model "${deviceModel}" does not support video list requests. Currently only "jc181" supports video list requests.`);
       }
 
       const iothub = JSON.parse(device.attributes.iothub);
@@ -919,36 +934,71 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
 
       const apiTemplate = getApiTemplate(deviceModel);
-      if (!apiTemplate) {
-        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" is supported.`);
+      if (!apiTemplate || !apiTemplate.streaming) {
+        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" and "jc400" are supported.`);
       }
 
       const iothub = JSON.parse(device.attributes.iothub);
       const iothubServer = iothub?.iothubServer || '';
-      const ftpServerIp = iothub?.ftpServerIp || '';
       const token = iothub?.token || '';
 
-      if (!iothubServer || !ftpServerIp || !token) {
-        throw new Error('IoTHub Server, FTP Server IP or Token not configured');
+      if (!iothubServer || !token) {
+        throw new Error('IoTHub Server or Token not configured');
+      }
+
+      // For jc400, we don't need ftpServerIp
+      if (deviceModel === 'jc181') {
+        const ftpServerIp = iothub?.ftpServerIp || '';
+        if (!ftpServerIp) {
+          throw new Error('FTP Server IP not configured');
+        }
       }
 
       const urlencoded = new URLSearchParams();
       urlencoded.append("deviceImei", device.uniqueId);
-      const cmdContent = {
-        "dataType": "0",
-        "codeStreamType": "0",
-        "channel": String(channelNum),
-        "videoIP": ftpServerIp,
-        "videoTCPPort": "10002",
-        "videoUDPPort": "0"
-      };
-      urlencoded.append("cmdContent", JSON.stringify(cmdContent));
-      urlencoded.append("serverFlagId", apiTemplate.streaming.serverFlagId);
+      
+      // Handle different cmdContent formats based on model
+      let cmdContent;
+      let cmdContentString;
+      
+      if (apiTemplate.streaming.useJsonCmdContent) {
+        // jc181 format: JSON cmdContent
+        const ftpServerIp = iothub?.ftpServerIp || '';
+        cmdContent = {
+          "dataType": "0",
+          "codeStreamType": "0",
+          "channel": String(channelNum),
+          "videoIP": ftpServerIp,
+          "videoTCPPort": "10002",
+          "videoUDPPort": "0"
+        };
+        cmdContentString = JSON.stringify(cmdContent);
+      } else {
+        // jc400 format: String cmdContent (RTMP,ON,IN for channel 1, RTMP,ON,OUT for channel 2)
+        // Channels start at 0 for jc400, so channel 1 = index 0, channel 2 = index 1
+        const channelIndex = apiTemplate.streaming.channelsStartAtZero ? channelNum - 1 : channelNum;
+        if (channelIndex === 0) {
+          cmdContentString = "RTMP,ON,IN";
+        } else if (channelIndex === 1) {
+          cmdContentString = "RTMP,ON,OUT";
+        } else {
+          throw new Error(`Channel ${channelNum} is not supported for jc400. Only channels 1 and 2 are supported.`);
+        }
+        cmdContent = cmdContentString;
+      }
+      
+      urlencoded.append("cmdContent", cmdContentString);
       urlencoded.append("proNo", apiTemplate.streaming.proNo);
-      urlencoded.append("platform", apiTemplate.streaming.platform);
-      urlencoded.append("requestId", apiTemplate.streaming.requestId);
-      urlencoded.append("cmdType", apiTemplate.streaming.cmdType);
-      urlencoded.append("offLineFlag", apiTemplate.streaming.offLineFlag);
+      
+      // Only add these fields for jc181
+      if (apiTemplate.streaming.useJsonCmdContent) {
+        urlencoded.append("serverFlagId", apiTemplate.streaming.serverFlagId);
+        urlencoded.append("platform", apiTemplate.streaming.platform);
+        urlencoded.append("requestId", apiTemplate.streaming.requestId);
+        urlencoded.append("cmdType", apiTemplate.streaming.cmdType);
+        urlencoded.append("offLineFlag", apiTemplate.streaming.offLineFlag);
+      }
+      
       urlencoded.append("token", token);
 
       const myHeaders = new Headers();
@@ -973,13 +1023,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Headers:', Object.fromEntries(myHeaders.entries()));
       console.log('Body Parameters:');
       console.log('  - deviceImei:', device.uniqueId);
-      console.log('  - cmdContent:', JSON.stringify(cmdContent, null, 2));
-      console.log('  - serverFlagId:', apiTemplate.streaming.serverFlagId);
+      console.log('  - cmdContent:', typeof cmdContent === 'string' ? cmdContent : JSON.stringify(cmdContent, null, 2));
       console.log('  - proNo:', apiTemplate.streaming.proNo);
-      console.log('  - platform:', apiTemplate.streaming.platform);
-      console.log('  - requestId:', apiTemplate.streaming.requestId);
-      console.log('  - cmdType:', apiTemplate.streaming.cmdType);
-      console.log('  - offLineFlag:', apiTemplate.streaming.offLineFlag);
+      if (apiTemplate.streaming.useJsonCmdContent) {
+        console.log('  - serverFlagId:', apiTemplate.streaming.serverFlagId);
+        console.log('  - platform:', apiTemplate.streaming.platform);
+        console.log('  - requestId:', apiTemplate.streaming.requestId);
+        console.log('  - cmdType:', apiTemplate.streaming.cmdType);
+        console.log('  - offLineFlag:', apiTemplate.streaming.offLineFlag);
+      }
       console.log('  - token:', token ? `${token.substring(0, 10)}...` : '(empty)');
       console.log('Full URL-encoded body:', urlencoded.toString());
       console.log('====================================');
@@ -1032,6 +1084,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
 
     try {
+      // Get device model to determine URL format
+      const deviceModel = getDeviceModel;
+      const apiTemplate = deviceModel ? getApiTemplate(deviceModel) : null;
+      
       const iothub = JSON.parse(device.attributes.iothub);
       const streamingServer = iothub?.streamingServer || '';
 
@@ -1048,15 +1104,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         return;
       }
 
-      // Build streaming URL - ensure proper format
+      // Build streaming URL based on device model
       let videoUrl;
-      if (streamingServer.startsWith('http://') || streamingServer.startsWith('https://')) {
-        // Remove trailing slash if present
-        const cleanServer = streamingServer.replace(/\/$/, '');
-        videoUrl = `${cleanServer}/${channelNum}/${device.uniqueId}.flv`;
+      const cleanServer = streamingServer.replace(/\/$/, '');
+      
+      if (apiTemplate?.streaming?.urlFormat === 'live') {
+        // jc400 format: https://{streamingServer}/live/{channelIndex}/{deviceId}.flv
+        // Channels start at 0, so channel 1 = index 0, channel 2 = index 1
+        const channelIndex = channelNum - 1;
+        if (cleanServer.startsWith('http://') || cleanServer.startsWith('https://')) {
+          videoUrl = `${cleanServer}/live/${channelIndex}/${device.uniqueId}.flv`;
+        } else {
+          videoUrl = `https://${cleanServer}/live/${channelIndex}/${device.uniqueId}.flv`;
+        }
       } else {
-        // Default to http if no protocol specified
-        videoUrl = `http://${streamingServer}/${channelNum}/${device.uniqueId}.flv`;
+        // jc181 format: {streamingServer}/{channelNum}/{deviceId}.flv
+        if (cleanServer.startsWith('http://') || cleanServer.startsWith('https://')) {
+          videoUrl = `${cleanServer}/${channelNum}/${device.uniqueId}.flv`;
+        } else {
+          videoUrl = `http://${cleanServer}/${channelNum}/${device.uniqueId}.flv`;
+        }
       }
       
       console.log('=== Streaming URL Details ===');
@@ -1064,7 +1131,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Streaming server (raw):', streamingServer);
       console.log('Channel:', channelNum);
       console.log('Device uniqueId:', device.uniqueId);
-      console.log('URL Format: {streamingServer}/{channel}/{deviceId}.flv');
+      console.log('Device Model:', deviceModel);
+      console.log('URL Format:', apiTemplate?.streaming?.urlFormat === 'live' 
+        ? `{streamingServer}/live/{channelIndex}/{deviceId}.flv` 
+        : `{streamingServer}/{channel}/{deviceId}.flv`);
       console.log('================================');
       
       setStreamingVideoUrl(videoUrl);
@@ -1087,7 +1157,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setStreamingLoading(false);
       }
     }
-  }, [device, selectedChannel]);
+  }, [device, selectedChannel, getDeviceModel, getApiTemplate]);
 
   // Refresh streaming for current channel
   const handleRefreshStreaming = useCallback(async () => {
@@ -5863,7 +5933,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               Device Model Not Supported
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: '13px' }}>
-                              Device model "{deviceModel}" is not currently supported. Only "jc181" is supported at this time. 
+                              Device model "{deviceModel}" is not currently supported. Currently "jc181" and "jc400" are supported. 
                               Video playback and streaming features will not work for this device.
                             </Typography>
                           </Alert>
