@@ -975,12 +975,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         cmdContentString = JSON.stringify(cmdContent);
       } else {
         // jc400 format: String cmdContent (RTMP,ON,IN for channel 1, RTMP,ON,OUT for channel 2)
-        // Channels start at 0 for jc400, so channel 1 = index 0, channel 2 = index 1
+        // Channel mapping: Channel 1 → index 0 → "RTMP,ON,IN", Channel 2 → index 1 → "RTMP,ON,OUT"
         const channelIndex = apiTemplate.streaming.channelsStartAtZero ? channelNum - 1 : channelNum;
+        console.log(`📡 Channel mapping for cmdContent: UI Channel ${channelNum} → index ${channelIndex}`);
         if (channelIndex === 0) {
           cmdContentString = "RTMP,ON,IN";
+          console.log(`✅ Channel 1 → index 0 → cmdContent: "RTMP,ON,IN"`);
         } else if (channelIndex === 1) {
           cmdContentString = "RTMP,ON,OUT";
+          console.log(`✅ Channel 2 → index 1 → cmdContent: "RTMP,ON,OUT"`);
         } else {
           throw new Error(`Channel ${channelNum} is not supported for jc400. Only channels 1 and 2 are supported.`);
         }
@@ -1045,14 +1048,32 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       const response = await fetch(apiUrl, requestOptions);
       const result = await response.text();
       console.log('Streaming request response:', result);
+      console.log('Device model:', deviceModel);
       
       // Parse and validate response
       try {
         const parsed = JSON.parse(result);
-        const isSuccess = parsed.code === 0 && 
-            parsed.msg === "success" && 
-            parsed.data?._code === "100" &&
-            parsed.data?._msg === "Command communication successful response";
+        
+        // Different response validation based on device model
+        let isSuccess = false;
+        
+        if (deviceModel === 'jc400') {
+          // jc400 response format: code 0, msg "success", data._code "100" (data._msg can be null)
+          isSuccess = parsed.code === 0 && 
+                     parsed.msg === "success" && 
+                     parsed.data?._code === "100";
+          
+          // Also accept if code is 0 and msg is success (even if _code is missing)
+          if (!isSuccess && parsed.code === 0 && parsed.msg === "success") {
+            isSuccess = true;
+          }
+        } else {
+          // jc181 format: specific response structure
+          isSuccess = parsed.code === 0 && 
+              parsed.msg === "success" && 
+              parsed.data?._code === "100" &&
+              parsed.data?._msg === "Command communication successful response";
+        }
         
         // Log the message
         logDeviceMessage('streaming', `start_stream_channel_${channelNum}`, requestData, parsed, isSuccess, isSuccess ? null : (parsed.data?._msg || parsed.msg || 'Device is offline or command failed'));
@@ -1061,11 +1082,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           return { success: true, data: parsed };
         } else {
           // Show server message if available, otherwise show default message
-          const serverMessage = parsed.data?._msg || parsed.msg || 'Device is offline or command failed';
+          const serverMessage = parsed.data?._msg || parsed.msg || parsed.error || 'Device is offline or command failed';
           return { success: false, data: parsed, error: serverMessage };
         }
       } catch (e) {
         // If response is not JSON, treat as error
+        console.error('Failed to parse response as JSON:', e);
+        console.error('Raw response:', result);
         logDeviceMessage('streaming', `start_stream_channel_${channelNum}`, requestData, result, false, 'Invalid JSON response');
         return { success: false, error: 'Invalid response from device', raw: result };
       }
@@ -1110,8 +1133,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       if (apiTemplate?.streaming?.urlFormat === 'live') {
         // jc400 format: https://{streamingServer}/live/{channelIndex}/{deviceId}.flv
-        // Channels start at 0, so channel 1 = index 0, channel 2 = index 1
+        // Channel mapping: Channel 1 → index 0, Channel 2 → index 1
         const channelIndex = channelNum - 1;
+        console.log(`📡 Channel mapping: UI Channel ${channelNum} → URL index ${channelIndex}`);
         if (cleanServer.startsWith('http://') || cleanServer.startsWith('https://')) {
           videoUrl = `${cleanServer}/live/${channelIndex}/${device.uniqueId}.flv`;
         } else {
@@ -1130,18 +1154,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Streaming URL:', videoUrl);
       console.log('Streaming server (raw):', streamingServer);
       console.log('Channel:', channelNum);
+      console.log('Channel Index (for jc400):', apiTemplate?.streaming?.urlFormat === 'live' ? channelNum - 1 : 'N/A');
       console.log('Device uniqueId:', device.uniqueId);
       console.log('Device Model:', deviceModel);
       console.log('URL Format:', apiTemplate?.streaming?.urlFormat === 'live' 
         ? `{streamingServer}/live/{channelIndex}/{deviceId}.flv` 
         : `{streamingServer}/{channel}/{deviceId}.flv`);
+      console.log('Full constructed URL:', videoUrl);
       console.log('================================');
       
+      console.log('📺 Setting streaming video URL:', videoUrl);
       setStreamingVideoUrl(videoUrl);
       setStreamingError(null);
       setStreamingRetryCount(retryCount);
       
       // Player initialization will happen in useEffect when streamingVideoUrl is set
+      console.log('✅ Streaming URL set, FLV player should initialize via useEffect');
     } catch (error) {
       console.error('Error loading video stream:', error);
       if (retryCount < 10) {
@@ -1191,9 +1219,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Check if response indicates success
       if (response.success) {
-        // File is available immediately after activation - start loading right away
-        console.log('Streaming command sent successfully, loading video file...');
-        loadVideoStream(selectedChannel, 0, true);
+        // For jc400, wait a bit for the stream to be ready
+        const deviceModel = getDeviceModel;
+        if (deviceModel === 'jc400') {
+          console.log('Streaming command sent successfully for jc400, waiting 2 seconds before loading...');
+          setTimeout(() => {
+            loadVideoStream(selectedChannel, 0, true);
+          }, 2000); // 2 second delay for jc400
+        } else {
+          // File is available immediately after activation for jc181 - start loading right away
+          console.log('Streaming command sent successfully, loading video file...');
+          loadVideoStream(selectedChannel, 0, true);
+        }
       } else {
         // Device is offline or command failed
         setStreamingError(response.error || 'Device is offline or command failed');
@@ -1204,7 +1241,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setStreamingError(error.message || 'Failed to refresh streaming');
       setStreamingLoading(false);
     }
-  }, [selectedChannel, sendStreamingRequest, loadVideoStream]);
+  }, [selectedChannel, sendStreamingRequest, loadVideoStream, getDeviceModel]);
 
   // Handle channel tab change
   const handleChannelChange = useCallback(async (e, newValue) => {
@@ -1238,11 +1275,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         const response = await sendStreamingRequest(newValue);
         
         // Check if response indicates success
+        console.log('Streaming response:', response);
         if (response.success) {
-          // File is available immediately after activation - start loading right away
-          console.log('Streaming command sent successfully, loading video file...');
-          loadVideoStream(newValue, 0, true);
+          console.log('✅ Streaming request successful, preparing to load stream...');
+          // For jc400, wait a bit for the stream to be ready
+          const deviceModel = getDeviceModel;
+          if (deviceModel === 'jc400') {
+            console.log('⏳ jc400 detected, waiting 2 seconds before loading stream...');
+            setTimeout(() => {
+              console.log('🚀 Loading jc400 stream now...');
+              loadVideoStream(newValue, 0, true);
+            }, 2000); // 2 second delay for jc400
+          } else {
+            // File is available immediately after activation for jc181 - start loading right away
+            console.log('🚀 Loading jc181 stream immediately...');
+            loadVideoStream(newValue, 0, true);
+          }
         } else {
+          console.error('❌ Streaming request failed:', response.error);
           // Device is offline or command failed
           setStreamingError(response.error || 'Device is offline or command failed');
           setStreamingLoading(false);
@@ -1253,7 +1303,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setStreamingLoading(false);
       }
     }
-  }, [sendStreamingRequest, loadVideoStream]);
+  }, [sendStreamingRequest, loadVideoStream, getDeviceModel]);
 
   // Initialize flv.js player when video URL is set and video element is ready
   useEffect(() => {
@@ -1284,16 +1334,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Initializing FLV player with URL:', streamingVideoUrl);
       console.log('Video element:', videoElement);
 
+      // Determine if this is a live stream based on device model
+      const deviceModel = getDeviceModel;
+      const apiTemplate = deviceModel ? getApiTemplate(deviceModel) : null;
+      const isLiveStream = apiTemplate?.streaming?.urlFormat === 'live'; // jc400 uses live streaming
+
+      console.log('Device model:', deviceModel);
+      console.log('Is live stream:', isLiveStream);
+
       // Create flv.js player
       const flvPlayer = flvjs.createPlayer({
         type: 'flv',
         url: streamingVideoUrl,
-        isLive: false,
+        isLive: isLiveStream, // jc400 uses live streaming, jc181 uses file-based
         hasAudio: true,
         hasVideo: true,
         enableWorker: false,
-        enableStashBuffer: true,
-        stashInitialSize: 128,
+        enableStashBuffer: isLiveStream, // Enable for live streams
+        stashInitialSize: isLiveStream ? 128 : 128,
         autoCleanupSourceBuffer: true
       });
 
@@ -1355,7 +1413,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     return () => {
       clearTimeout(timer);
     };
-  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, streamingLoading, loadVideoStream]);
+  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, streamingLoading, loadVideoStream, getDeviceModel, getApiTemplate]);
 
   // Cleanup on unmount or when switching channels
   useEffect(() => {
@@ -1370,30 +1428,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     };
   }, [selectedChannel]);
 
-  // Reset tab when modal opens to first enabled tab
+  // Reset tab when modal opens to first enabled tab (only on initial open, not when switching channels)
+  const modalOpenedRef = useRef(false);
   useEffect(() => {
     if (moreDetailsModalOpen && device) {
       const hasIoTHub = !!device.attributes?.iothub;
       const hasHikiVision = !!device.attributes?.hikivision;
       
-      // Reset to first enabled tab
-      if (hasIoTHub) {
-        setMoreDetailsActiveTab(0);
-        setSelectedChannel(0); // Reset to Playback tab
-        // Reset video list dates to today
-        setVideoListStartDate(dayjs().startOf('day').format('YYYY-MM-DDTHH:mm'));
-        setVideoListEndDate(dayjs().endOf('day').format('YYYY-MM-DDTHH:mm'));
-        // Set all channels as selected by default
-        const allChannels = Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
-        setVideoListSelectedChannels(allChannels.length > 0 ? allChannels : ['1']);
-        setVideoListSelectedStatuses(['uploaded_ok', 'not_uploaded', 'upload_errored']);
-        setVideosCurrentPage(1); // Reset to first page
-        // Fetch videos when modal opens
-        fetchVideos();
-      } else if (hasHikiVision) {
-        setMoreDetailsActiveTab(1);
+      // Only reset if this is the first time opening the modal (not when already open)
+      if (!modalOpenedRef.current) {
+        modalOpenedRef.current = true;
+        
+        // Reset to first enabled tab
+        if (hasIoTHub) {
+          setMoreDetailsActiveTab(0);
+          setSelectedChannel(0); // Reset to Playback tab
+          // Reset video list dates to today
+          setVideoListStartDate(dayjs().startOf('day').format('YYYY-MM-DDTHH:mm'));
+          setVideoListEndDate(dayjs().endOf('day').format('YYYY-MM-DDTHH:mm'));
+          // Set all channels as selected by default
+          const allChannels = Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
+          setVideoListSelectedChannels(allChannels.length > 0 ? allChannels : ['1']);
+          setVideoListSelectedStatuses(['uploaded_ok', 'not_uploaded', 'upload_errored']);
+          setVideosCurrentPage(1); // Reset to first page
+          // Fetch videos when modal opens
+          fetchVideos();
+        } else if (hasHikiVision) {
+          setMoreDetailsActiveTab(1);
+        }
       }
     } else if (!moreDetailsModalOpen) {
+      // Reset flag when modal closes
+      modalOpenedRef.current = false;
       // Cleanup streaming when modal closes
       console.log('Cleaning up streaming - modal closed');
       if (streamingRetryTimeoutRef.current) {
@@ -1410,7 +1476,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setStreamingRetryCount(0);
       setSelectedChannel(0);
     }
-  }, [moreDetailsModalOpen, device, fetchVideos, getIoTHubChannels]);
+  }, [moreDetailsModalOpen, device?.id, getIoTHubChannels]); // Only depend on device.id, not the whole device object
 
   // Filter and sort videos by selected channels and statuses
   const filteredVideos = useMemo(() => {
