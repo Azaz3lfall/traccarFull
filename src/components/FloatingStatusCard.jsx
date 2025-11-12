@@ -700,6 +700,48 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device]);
 
+  // Get device model from iothub attributes (lowercased)
+  const getDeviceModel = useMemo(() => {
+    if (!device?.attributes?.iothub) return null;
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const deviceModel = iothub?.deviceModel || '';
+      return deviceModel.toLowerCase().trim();
+    } catch (e) {
+      return null;
+    }
+  }, [device]);
+
+  // API templates for different device models
+  const getApiTemplate = useCallback((model) => {
+    const normalizedModel = model?.toLowerCase().trim() || '';
+    
+    // jc181 template
+    if (normalizedModel === 'jc181') {
+      return {
+        videoList: {
+          proNo: '37381',
+          cmdType: 'normallns',
+          serverFlagId: '0',
+          platform: 'web',
+          requestId: '6',
+          offLineFlag: '1'
+        },
+        streaming: {
+          proNo: '37121',
+          cmdType: 'normallns',
+          serverFlagId: '0',
+          platform: 'web',
+          requestId: '6',
+          offLineFlag: '1'
+        }
+      };
+    }
+    
+    // Return null for unsupported models
+    return null;
+  }, []);
+
   // Send instruct command to device to upload/transcode videos
   const sendVideoListInstruct = useCallback(async () => {
     if (!device?.attributes?.iothub || !device?.uniqueId) {
@@ -707,6 +749,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
 
     try {
+      // Get device model and validate support
+      const deviceModel = getDeviceModel;
+      if (!deviceModel) {
+        throw new Error('Device model not found in iothub configuration');
+      }
+
+      const apiTemplate = getApiTemplate(deviceModel);
+      if (!apiTemplate) {
+        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" is supported.`);
+      }
+
       const iothub = JSON.parse(device.attributes.iothub);
       const iothubServer = iothub?.iothubServer || '';
       const token = iothub?.token || '';
@@ -740,12 +793,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         "storageType": 0,
         "instructionID": "123456789"
       }));
-      urlencoded.append("serverFlagId", "0");
-      urlencoded.append("proNo", "37381");
-      urlencoded.append("platform", "web");
-      urlencoded.append("requestId", "6");
-      urlencoded.append("cmdType", "normallns");
-      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("serverFlagId", apiTemplate.videoList.serverFlagId);
+      urlencoded.append("proNo", apiTemplate.videoList.proNo);
+      urlencoded.append("platform", apiTemplate.videoList.platform);
+      urlencoded.append("requestId", apiTemplate.videoList.requestId);
+      urlencoded.append("cmdType", apiTemplate.videoList.cmdType);
+      urlencoded.append("offLineFlag", apiTemplate.videoList.offLineFlag);
       urlencoded.append("token", token);
 
       // Build URL from iothubServer - ensure it has protocol and path
@@ -789,7 +842,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.error('Error sending video list instruct:', error);
       throw error;
     }
-  }, [device, videoListStartDate, videoListEndDate, logDeviceMessage]);
+  }, [device, videoListStartDate, videoListEndDate, logDeviceMessage, getDeviceModel, getApiTemplate]);
 
   // Handle upload button click - just logs video details
   const handleUploadVideo = useCallback((video, e) => {
@@ -859,6 +912,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
 
     try {
+      // Get device model and validate support
+      const deviceModel = getDeviceModel;
+      if (!deviceModel) {
+        throw new Error('Device model not found in iothub configuration');
+      }
+
+      const apiTemplate = getApiTemplate(deviceModel);
+      if (!apiTemplate) {
+        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" is supported.`);
+      }
+
       const iothub = JSON.parse(device.attributes.iothub);
       const iothubServer = iothub?.iothubServer || '';
       const ftpServerIp = iothub?.ftpServerIp || '';
@@ -879,12 +943,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         "videoUDPPort": "0"
       };
       urlencoded.append("cmdContent", JSON.stringify(cmdContent));
-      urlencoded.append("serverFlagId", "0");
-      urlencoded.append("proNo", "37121");
-      urlencoded.append("platform", "web");
-      urlencoded.append("requestId", "6");
-      urlencoded.append("cmdType", "normallns");
-      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("serverFlagId", apiTemplate.streaming.serverFlagId);
+      urlencoded.append("proNo", apiTemplate.streaming.proNo);
+      urlencoded.append("platform", apiTemplate.streaming.platform);
+      urlencoded.append("requestId", apiTemplate.streaming.requestId);
+      urlencoded.append("cmdType", apiTemplate.streaming.cmdType);
+      urlencoded.append("offLineFlag", apiTemplate.streaming.offLineFlag);
       urlencoded.append("token", token);
 
       const myHeaders = new Headers();
@@ -910,12 +974,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.log('Body Parameters:');
       console.log('  - deviceImei:', device.uniqueId);
       console.log('  - cmdContent:', JSON.stringify(cmdContent, null, 2));
-      console.log('  - serverFlagId: 0');
-      console.log('  - proNo: 37121');
-      console.log('  - platform: web');
-      console.log('  - requestId: 6');
-      console.log('  - cmdType: normallns');
-      console.log('  - offLineFlag: 1');
+      console.log('  - serverFlagId:', apiTemplate.streaming.serverFlagId);
+      console.log('  - proNo:', apiTemplate.streaming.proNo);
+      console.log('  - platform:', apiTemplate.streaming.platform);
+      console.log('  - requestId:', apiTemplate.streaming.requestId);
+      console.log('  - cmdType:', apiTemplate.streaming.cmdType);
+      console.log('  - offLineFlag:', apiTemplate.streaming.offLineFlag);
       console.log('  - token:', token ? `${token.substring(0, 10)}...` : '(empty)');
       console.log('Full URL-encoded body:', urlencoded.toString());
       console.log('====================================');
@@ -957,7 +1021,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.error('Error sending streaming request:', error);
       throw error;
     }
-  }, [device, logDeviceMessage]);
+  }, [device, logDeviceMessage, getDeviceModel, getApiTemplate]);
 
   // Load video stream with retry logic using flv.js
   const loadVideoStream = useCallback((channelNum, retryCount = 0, isInitialLoad = false) => {
@@ -5780,6 +5844,50 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     height: desktop ? '100%' : 'auto',
                     minHeight: desktop ? 0 : 'auto'
                   }}>
+                    {/* Device Model Support Warning */}
+                    {(() => {
+                      const deviceModel = getDeviceModel;
+                      const apiTemplate = deviceModel ? getApiTemplate(deviceModel) : null;
+                      if (deviceModel && !apiTemplate) {
+                        return (
+                          <Alert 
+                            severity="warning" 
+                            style={{ 
+                              marginBottom: '16px',
+                              backgroundColor: '#fff3cd',
+                              color: '#856404',
+                              border: '1px solid #ffc107'
+                            }}
+                          >
+                            <Typography variant="body2" style={{ fontWeight: '600', marginBottom: '4px' }}>
+                              Device Model Not Supported
+                            </Typography>
+                            <Typography variant="body2" style={{ fontSize: '13px' }}>
+                              Device model "{deviceModel}" is not currently supported. Only "jc181" is supported at this time. 
+                              Video playback and streaming features will not work for this device.
+                            </Typography>
+                          </Alert>
+                        );
+                      }
+                      if (!deviceModel) {
+                        return (
+                          <Alert 
+                            severity="info" 
+                            style={{ 
+                              marginBottom: '16px',
+                              backgroundColor: '#d1ecf1',
+                              color: '#0c5460',
+                              border: '1px solid #bee5eb'
+                            }}
+                          >
+                            <Typography variant="body2" style={{ fontSize: '13px' }}>
+                              Device model not configured in iothub settings. Please configure the device model to enable video features.
+                            </Typography>
+                          </Alert>
+                        );
+                      }
+                      return null;
+                    })()}
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
