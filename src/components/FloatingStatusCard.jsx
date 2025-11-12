@@ -920,6 +920,75 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device, logDeviceMessage]);
 
+  // Send RTMP,OFF command for jc400 (must be sent before starting any stream)
+  const sendRtmpOffCommand = useCallback(async () => {
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      throw new Error('Device iothub configuration not found');
+    }
+
+    try {
+      const iothub = JSON.parse(device.attributes.iothub);
+      const iothubServer = iothub?.iothubServer || '';
+      const token = iothub?.token || '';
+
+      if (!iothubServer || !token) {
+        throw new Error('IoTHub Server or Token not configured');
+      }
+
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("deviceImei", device.uniqueId);
+      urlencoded.append("cmdContent", "RTMP,OFF");
+      urlencoded.append("proNo", "128");
+      urlencoded.append("token", token);
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      const apiUrl = iothubServer.startsWith('http') 
+        ? `${iothubServer}/api/device/sendInstruct`
+        : `https://${iothubServer}/api/device/sendInstruct`;
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow"
+      };
+
+      console.log('=== Sending RTMP,OFF command ===');
+      console.log('URL:', apiUrl);
+      console.log('cmdContent: RTMP,OFF');
+      console.log('================================');
+
+      const response = await fetch(apiUrl, requestOptions);
+      const result = await response.text();
+      console.log('RTMP,OFF response:', result);
+
+      try {
+        const parsed = JSON.parse(result);
+        const isSuccess = parsed.code === 0 && parsed.msg === "success";
+        
+        if (isSuccess) {
+          console.log('✅ RTMP,OFF command successful');
+          return { success: true, data: parsed };
+        } else {
+          console.warn('⚠️ RTMP,OFF command returned non-success response:', parsed);
+          // Still return success if code is 0, as the device might already be off
+          if (parsed.code === 0) {
+            return { success: true, data: parsed };
+          }
+          return { success: false, data: parsed, error: parsed.msg || 'RTMP,OFF command failed' };
+        }
+      } catch (e) {
+        console.error('Failed to parse RTMP,OFF response:', e);
+        return { success: false, error: 'Invalid response from device', raw: result };
+      }
+    } catch (error) {
+      console.error('Error sending RTMP,OFF command:', error);
+      throw error;
+    }
+  }, [device]);
+
   // Send streaming request to API
   const sendStreamingRequest = useCallback(async (channelNum) => {
     if (!device?.attributes?.iothub || !device?.uniqueId) {
@@ -936,6 +1005,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       const apiTemplate = getApiTemplate(deviceModel);
       if (!apiTemplate || !apiTemplate.streaming) {
         throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" and "jc400" are supported.`);
+      }
+
+      // For jc400, first send RTMP,OFF command, wait 500ms, then send streaming command
+      if (deviceModel === 'jc400') {
+        console.log('📡 jc400 detected: Sending RTMP,OFF command first...');
+        const rtmpOffResponse = await sendRtmpOffCommand();
+        
+        if (!rtmpOffResponse.success) {
+          console.warn('⚠️ RTMP,OFF command failed, but continuing with streaming request...');
+        }
+        
+        // Wait 500ms after RTMP,OFF success
+        console.log('⏳ Waiting 500ms after RTMP,OFF...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('✅ 500ms delay completed, proceeding with streaming command...');
       }
 
       const iothub = JSON.parse(device.attributes.iothub);
@@ -1096,7 +1180,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.error('Error sending streaming request:', error);
       throw error;
     }
-  }, [device, logDeviceMessage, getDeviceModel, getApiTemplate]);
+  }, [device, logDeviceMessage, getDeviceModel, getApiTemplate, sendRtmpOffCommand]);
 
   // Load video stream with retry logic using flv.js
   const loadVideoStream = useCallback((channelNum, retryCount = 0, isInitialLoad = false) => {
