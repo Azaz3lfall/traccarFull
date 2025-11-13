@@ -486,9 +486,14 @@ async function sendGpsToTraccar(gpsData) {
 // ──────────────────────────────────────────────────────────────────────
 // 1. SERVE MP4 VIDEO — with deviceModel in path (MUST COME FIRST)
 // ──────────────────────────────────────────────────────────────────────
-app.get('/:imei/:name/MP4/:deviceModel(jc181|jc400)', async (req, res) => {
+app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
   const { imei, name, deviceModel } = req.params;
-  const deviceModelLower = deviceModel.toLowerCase();
+  
+  // Only allow known device models, skip if invalid
+  const deviceModelLower = deviceModel?.toLowerCase();
+  if (deviceModelLower !== 'jc181' && deviceModelLower !== 'jc400') {
+    return next(); // Skip to next route
+  }
   
   let file;
   if (deviceModelLower === 'jc400') {
@@ -552,9 +557,19 @@ app.get('/:imei/:name/MP4', async (req, res) => {
 // ──────────────────────────────────────────────────────────────────────
 // 2. SERVE THUMBNAIL (with deviceModel as path param - only match known device models, not "MP4")
 // ──────────────────────────────────────────────────────────────────────
-app.get('/:imei/:name/:deviceModel(jc181|jc400)', async (req, res) => {
+app.get('/:imei/:name/:deviceModel', async (req, res, next) => {
   const { imei, name, deviceModel } = req.params;
-  const deviceModelLower = deviceModel.toLowerCase();
+  
+  // Skip if deviceModel is "MP4" (that's a video request, not thumbnail)
+  if (deviceModel === 'MP4' || deviceModel?.toLowerCase() === 'mp4') {
+    return next(); // Skip to next route
+  }
+  
+  // Only allow known device models, skip if invalid
+  const deviceModelLower = deviceModel?.toLowerCase();
+  if (deviceModelLower !== 'jc181' && deviceModelLower !== 'jc400') {
+    return next(); // Skip to next route
+  }
   
   let file;
   if (deviceModelLower === 'jc400') {
