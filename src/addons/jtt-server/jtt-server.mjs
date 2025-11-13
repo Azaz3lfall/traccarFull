@@ -48,6 +48,11 @@ app.use(cors); // CORS FIRST
 app.use(bodyParser.text({ type: '*/*', limit: '50mb' }));
 
 // ──────────────────────────────────────────────────────────────────────
+// Pending file list requests - wait for pushresourcelist response
+// ──────────────────────────────────────────────────────────────────────
+const pendingFileListRequests = new Map(); // deviceImei -> { resolve, reject, timeout }
+
+// ──────────────────────────────────────────────────────────────────────
 // REQUEST LOGGING MIDDLEWARE
 // ──────────────────────────────────────────────────────────────────────
 app.use((req, res, next) => {
@@ -746,11 +751,47 @@ async function processDeviceJC400(imei) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// Get files from server folder (onServer)
+// ──────────────────────────────────────────────────────────────────────
+async function getFilesOnServer(deviceImei) {
+  const deviceFolder = `/home/_${deviceImei}`;
+  if (!await fsExists(deviceFolder)) return [];
+  
+  const processedFolder = path.join(deviceFolder, 'processedVideos');
+  const files = [];
+  
+  if (await fsExists(processedFolder)) {
+    const mp4Files = fs.readdirSync(processedFolder).filter(f => f.endsWith('.mp4'));
+    for (const file of mp4Files) {
+      const parsed = parseFilename(file);
+      if (!parsed) continue;
+      
+      const mp4Path = path.join(processedFolder, file);
+      const mp4Size = fs.statSync(mp4Path).size;
+      const cleanName = path.parse(file).name;
+      
+      files.push({
+        channel: parsed.channel,
+        beginTime: parsed.beginTime,
+        endTime: parsed.endTime,
+        expected_file: file,
+        file_exists: true,
+        file_size: mp4Size,
+        thumbnail_url: `${MEDIA_SERVER}/${deviceImei}/${cleanName}/jc181`,
+        video_url: `${MEDIA_SERVER}/${deviceImei}/${cleanName}/MP4/jc181`
+      });
+    }
+  }
+  
+  return files;
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // 3. getFileList
 // ──────────────────────────────────────────────────────────────────────
 app.post('/getFileList', async (req, res) => {
   try {
-    const { deviceImei, deviceModel } = JSON.parse(req.body || "{}");
+    const { deviceImei, deviceModel, beginTime, endTime, token, jimiServer } = JSON.parse(req.body || "{}");
     if (!deviceImei) return res.json({ code: 0, ok: true });
     
     const deviceModelLower = (deviceModel || 'jc181').toLowerCase();
@@ -760,37 +801,161 @@ app.post('/getFileList', async (req, res) => {
       const report = await processDeviceJC400(deviceImei);
       return res.json(report);
     } else {
-      // jc181: default behavior - read from status_report.json
-      const reportPath = `/home/_${deviceImei}/status_report.json`;
-      if (!await fsExists(reportPath)) return res.json({ code: 0, ok: true });
-      const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-      
-      // Update URLs to include deviceModel if not present
-      if (report.videos) {
-        report.videos.forEach(video => {
+      // jc181: check if we need to request file list from device
+      if (beginTime && endTime && token && jimiServer) {
+        console.log(`[getFileList] Requesting file list from device ${deviceImei} via jimi server`);
+        console.log(`[getFileList] Received jimiServer: "${jimiServer}"`);
+        
+        // Create promise to wait for pushresourcelist response
+        const waitForResponse = new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            pendingFileListRequests.delete(deviceImei);
+            reject(new Error('Timeout waiting for device response'));
+          }, 30000); // 30 second timeout
+          
+          pendingFileListRequests.set(deviceImei, { resolve, reject, timeout });
+        });
+        
+        // Make request to jimi server
+        try {
+          // Remove trailing slash from jimiServer if present
+          const cleanJimiServer = (jimiServer || '').replace(/\/+$/, '');
+          
+          if (!cleanJimiServer) {
+            throw new Error('jimiServer is required but was not provided');
+          }
+          
+          const urlencoded = new URLSearchParams();
+          urlencoded.append("deviceImei", deviceImei);
+          urlencoded.append("cmdContent", JSON.stringify({
+            channel: 0,
+            beginTime: beginTime,
+            endTime: endTime,
+            alarmFlag: 0,
+            resourceType: 0,
+            codeType: 0,
+            storageType: 0,
+            instructionID: "123456789"
+          }));
+          urlencoded.append("serverFlagId", "0");
+          urlencoded.append("proNo", "37381");
+          urlencoded.append("platform", "web");
+          urlencoded.append("requestId", "6");
+          urlencoded.append("cmdType", "normallns");
+          urlencoded.append("offLineFlag", "1");
+          urlencoded.append("token", token);
+          
+          const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
+          console.log(`[getFileList] Full API URL: ${apiUrl}`);
+          console.log(`[getFileList] Request params:`, {
+            deviceImei,
+            beginTime,
+            endTime,
+            token: token ? '***' : 'missing',
+            jimiServer: cleanJimiServer
+          });
+          
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: urlencoded,
+            redirect: "follow"
+          });
+          
+          const result = await response.text();
+          console.log(`[getFileList] jimi server response:`, result);
+          
+          // Wait for pushresourcelist to process and create status_report.json
+          await waitForResponse;
+          
+          // Get files from server and device
+          const onServer = await getFilesOnServer(deviceImei);
+          
+          const reportPath = `/home/_${deviceImei}/status_report.json`;
+          let onDevice = [];
+          if (await fsExists(reportPath)) {
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            onDevice = report.videos || [];
+            
+            // Update URLs to include deviceModel
+            onDevice.forEach(video => {
+              if (video.thumbnail_url && !video.thumbnail_url.includes('/jc181') && !video.thumbnail_url.includes('/jc400')) {
+                if (!video.thumbnail_url.endsWith('/jc181') && !video.thumbnail_url.endsWith('/jc400')) {
+                  video.thumbnail_url = video.thumbnail_url + '/jc181';
+                }
+              }
+              if (video.video_url && !video.video_url.includes('/jc181') && !video.video_url.includes('/jc400')) {
+                if (video.video_url.endsWith('/MP4')) {
+                  video.video_url = video.video_url + '/jc181';
+                } else if (!video.video_url.includes('/MP4/')) {
+                  video.video_url = video.video_url.replace(/\/MP4$/, '/MP4/jc181');
+                }
+              }
+            });
+          }
+          
+          return res.json({
+            onServer,
+            onDevice
+          });
+        } catch (error) {
+          // Clean up pending request
+          if (pendingFileListRequests.has(deviceImei)) {
+            const pending = pendingFileListRequests.get(deviceImei);
+            clearTimeout(pending.timeout);
+            pendingFileListRequests.delete(deviceImei);
+          }
+          
+          console.log(`[getFileList] Error requesting from jimi server:`, error.message);
+          
+          // Fallback to reading existing status_report.json
+          const reportPath = `/home/_${deviceImei}/status_report.json`;
+          if (!await fsExists(reportPath)) {
+            return res.json({ onServer: [], onDevice: [] });
+          }
+          
+          const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+          const onServer = await getFilesOnServer(deviceImei);
+          const onDevice = report.videos || [];
+          
+          return res.json({ onServer, onDevice });
+        }
+      } else {
+        // jc181: default behavior - read from status_report.json
+        const reportPath = `/home/_${deviceImei}/status_report.json`;
+        if (!await fsExists(reportPath)) {
+          const onServer = await getFilesOnServer(deviceImei);
+          return res.json({ onServer, onDevice: [] });
+        }
+        
+        const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+        const onServer = await getFilesOnServer(deviceImei);
+        const onDevice = report.videos || [];
+        
+        // Update URLs to include deviceModel if not present
+        onDevice.forEach(video => {
           if (video.thumbnail_url && !video.thumbnail_url.includes('/jc181') && !video.thumbnail_url.includes('/jc400')) {
-            // Append /jc181 to thumbnail URL: https://.../{imei}/{name} -> https://.../{imei}/{name}/jc181
             if (!video.thumbnail_url.endsWith('/jc181') && !video.thumbnail_url.endsWith('/jc400')) {
               video.thumbnail_url = video.thumbnail_url + '/jc181';
             }
           }
           if (video.video_url && !video.video_url.includes('/jc181') && !video.video_url.includes('/jc400')) {
-            // Update video URL: https://.../{imei}/{name}/MP4 -> https://.../{imei}/{name}/MP4/jc181
             if (video.video_url.endsWith('/MP4')) {
               video.video_url = video.video_url + '/jc181';
             } else if (!video.video_url.includes('/MP4/')) {
-              // If it doesn't have /MP4, it might be malformed, but try to fix it
               video.video_url = video.video_url.replace(/\/MP4$/, '/MP4/jc181');
             }
           }
         });
+        
+        return res.json({ onServer, onDevice });
       }
-      
-      res.json(report);
     }
   } catch (e) {
     console.log(`[getFileList] Error:`, e.message);
-    res.json({ code: 0, ok: true });
+    res.json({ onServer: [], onDevice: [] });
   }
 });
 
@@ -873,6 +1038,16 @@ app.post(/\/pushURL\/(pushftpfileupload|pushresourcelist)/, async (req, res) => 
   }
 
   await processDevice(imei, deviceFolder, expected, req.originalUrl.includes('ftp') ? 'FTP' : 'LIST');
+  
+  // Check if there's a pending file list request waiting for this response
+  if (pendingFileListRequests.has(imei)) {
+    const pending = pendingFileListRequests.get(imei);
+    clearTimeout(pending.timeout);
+    pendingFileListRequests.delete(imei);
+    pending.resolve(); // Notify waiting request
+    console.log(`[pushresourcelist] Notified pending request for ${imei}`);
+  }
+  
   res.json({ code: 0, ok: true });
 });
 
