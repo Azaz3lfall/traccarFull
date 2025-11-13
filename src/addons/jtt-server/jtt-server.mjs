@@ -141,7 +141,7 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// Parse filename to channel + time
+// Parse filename to channel + time (jc181 format)
 // ──────────────────────────────────────────────────────────────────────
 function parseFilename(filename) {
   const m = filename.match(/^CH(\d)_(\d{6})_(\d{6})_000000\.mp4$/);
@@ -154,6 +154,17 @@ function parseFilename(filename) {
   const mi = hhmmss.slice(2, 4);
   const beginTime = `20${yy}-${mm}-${dd} ${hh}:${mi}:00`;
   return { channel: Number(ch), beginTime, endTime: beginTime };
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Parse jc400 filename: EVENT_IMEI_00000000_YYYY_MM_DD_HH_MM_SS_TYPE_CHANNEL.mp4
+// ──────────────────────────────────────────────────────────────────────
+function parseJC400Filename(filename) {
+  const m = filename.match(/^EVENT_(\d+)_00000000_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_([FI])_(\d+)\.mp4$/);
+  if (!m) return null;
+  const [_, imei, year, month, day, hour, minute, second, type, channel] = m;
+  const beginTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  return { imei, channel: Number(channel), beginTime, endTime: beginTime, type };
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -473,24 +484,30 @@ async function sendGpsToTraccar(gpsData) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// 1. SERVE THUMBNAIL
-// ──────────────────────────────────────────────────────────────────────
-app.get('/:imei/:name', async (req, res) => {
-  const file = `/home/_${req.params.imei}/${req.params.name}.mp4.jpg`;
-  if (!await fsExists(file)) {
-    console.log(`[404] ${file}`);
-    return res.status(200).send('FILE NOT UPLOADED');
-  }
-  res.setHeader('Content-Type', 'image/jpeg');
-  res.sendFile(file);
-});
-
-// ──────────────────────────────────────────────────────────────────────
-// 2. SERVE MP4 VIDEO — STRIP _000000 BEFORE ADDING
+// 1. SERVE MP4 VIDEO — STRIP _000000 BEFORE ADDING (MUST COME BEFORE THUMBNAIL ROUTE)
 // ──────────────────────────────────────────────────────────────────────
 app.get('/:imei/:name/MP4', async (req, res) => {
-  const baseName = req.params.name.replace(/_000000$/, '');
-  const file = `/home/_${req.params.imei}/processedVideos/${baseName}_000000.mp4`;
+  const { imei, name } = req.params;
+  const deviceModelLower = (req.query.deviceModel || 'jc181').toLowerCase();
+  
+  let file;
+  if (deviceModelLower === 'jc400') {
+    // jc400: look for video in /iothub/dvr-upload/uploadFile
+    // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
+    const uploadFolder = '/iothub/dvr-upload/uploadFile';
+    if (!await fsExists(uploadFolder)) {
+      console.log(`[MP4 NOT FOUND] Upload folder not found: ${uploadFolder}`);
+      return res.status(200).send('FILE NOT UPLOADED');
+    }
+    // Video file should be: {name}.mp4
+    const videoFile = `${name}.mp4`;
+    file = path.join(uploadFolder, videoFile);
+  } else {
+    // jc181: default behavior
+    const baseName = name.replace(/_000000$/, '');
+    file = `/home/_${imei}/processedVideos/${baseName}_000000.mp4`;
+  }
+  
   if (!await fsExists(file)) {
     console.log(`[MP4 NOT FOUND] ${file}`);
     return res.status(200).send('FILE NOT UPLOADED');
@@ -500,17 +517,231 @@ app.get('/:imei/:name/MP4', async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────────────
+// 2. SERVE THUMBNAIL (with optional deviceModel as path param or query param)
+// ──────────────────────────────────────────────────────────────────────
+app.get('/:imei/:name/:deviceModel', async (req, res) => {
+  const { imei, name, deviceModel } = req.params;
+  const deviceModelLower = (deviceModel || req.query.deviceModel || 'jc181').toLowerCase();
+  
+  let file;
+  if (deviceModelLower === 'jc400') {
+    // jc400: look for thumbnail in /iothub/dvr-upload/uploadFile
+    // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
+    const uploadFolder = '/iothub/dvr-upload/uploadFile';
+    if (!await fsExists(uploadFolder)) {
+      console.log(`[404] Upload folder not found: ${uploadFolder}`);
+      return res.status(200).send('FILE NOT UPLOADED');
+    }
+    // Thumbnail file should be: {name}.mp4.jpg
+    const thumbFile = `${name}.mp4.jpg`;
+    file = path.join(uploadFolder, thumbFile);
+  } else {
+    // jc181: default behavior
+    file = `/home/_${imei}/${name}.mp4.jpg`;
+  }
+  
+  if (!await fsExists(file)) {
+    console.log(`[404] ${file}`);
+    return res.status(200).send('FILE NOT UPLOADED');
+  }
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(file);
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// 2b. SERVE THUMBNAIL (without deviceModel - defaults to jc181)
+// ──────────────────────────────────────────────────────────────────────
+app.get('/:imei/:name', async (req, res) => {
+  const { imei, name } = req.params;
+  const deviceModelLower = (req.query.deviceModel || 'jc181').toLowerCase();
+  
+  let file;
+  if (deviceModelLower === 'jc400') {
+    // jc400: look for thumbnail in /iothub/dvr-upload/uploadFile
+    // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
+    const uploadFolder = '/iothub/dvr-upload/uploadFile';
+    if (!await fsExists(uploadFolder)) {
+      console.log(`[404] Upload folder not found: ${uploadFolder}`);
+      return res.status(200).send('FILE NOT UPLOADED');
+    }
+    // Thumbnail file should be: {name}.mp4.jpg
+    const thumbFile = `${name}.mp4.jpg`;
+    file = path.join(uploadFolder, thumbFile);
+  } else {
+    // jc181: default behavior
+    file = `/home/_${imei}/${name}.mp4.jpg`;
+  }
+  
+  if (!await fsExists(file)) {
+    console.log(`[404] ${file}`);
+    return res.status(200).send('FILE NOT UPLOADED');
+  }
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(file);
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// Process jc400 device - scan /iothub/dvr-upload/uploadFile and filter by IMEI
+// ──────────────────────────────────────────────────────────────────────
+async function processDeviceJC400(imei) {
+  console.log(`\n[JC400] START PROCESSING IMEI: ${imei}`);
+  const uploadFolder = '/iothub/dvr-upload/uploadFile';
+  
+  if (!await fsExists(uploadFolder)) {
+    console.log(`[JC400] Upload folder not found: ${uploadFolder}`);
+    return {
+      imei,
+      generated_at: new Date().toISOString(),
+      resource_count: 0,
+      videos: [],
+      summary: { uploaded_ok: 0, upload_errored: 0, not_uploaded: 0 }
+    };
+  }
+
+  const allFiles = fs.readdirSync(uploadFolder);
+  const videoFiles = allFiles.filter(f => 
+    f.startsWith(`EVENT_${imei}_`) && 
+    f.endsWith('.mp4') && 
+    !f.endsWith('.mp4.jpg')
+  );
+
+  console.log(`[JC400] FOUND ${videoFiles.length} video files for IMEI ${imei}`);
+
+  const report = {
+    imei,
+    generated_at: new Date().toISOString(),
+    resource_count: videoFiles.length,
+    videos: [],
+    summary: { uploaded_ok: 0, upload_errored: 0, not_uploaded: 0 }
+  };
+
+  // Group by channel and get latest thumbnail per channel
+  const thumbFiles = allFiles.filter(f => 
+    f.startsWith(`EVENT_${imei}_`) && 
+    f.endsWith('.mp4.jpg')
+  );
+
+  const latestThumbByChannel = {};
+  thumbFiles.forEach(thumbFile => {
+    const parsed = parseJC400Filename(thumbFile.replace('.mp4.jpg', '.mp4'));
+    if (parsed) {
+      const stats = fs.statSync(path.join(uploadFolder, thumbFile));
+      if (!latestThumbByChannel[parsed.channel] || stats.mtime > latestThumbByChannel[parsed.channel].mtime) {
+        latestThumbByChannel[parsed.channel] = {
+          name: thumbFile.replace('.mp4.jpg', ''),
+          channel: parsed.channel,
+          mtime: stats.mtime
+        };
+      }
+    }
+  });
+
+  // Process each video file
+  for (const videoFile of videoFiles) {
+    const parsed = parseJC400Filename(videoFile);
+    if (!parsed) {
+      console.log(`[JC400] Cannot parse: ${videoFile}`);
+      continue;
+    }
+
+    const videoPath = path.join(uploadFolder, videoFile);
+    const thumbFile = `${videoFile}.jpg`;
+    const thumbPath = path.join(uploadFolder, thumbFile);
+
+    const videoExists = await fsExists(videoPath);
+    const videoSize = videoExists ? fs.statSync(videoPath).size : 0;
+    const thumbExists = await fsExists(thumbPath);
+    const thumbSize = thumbExists ? fs.statSync(thumbPath).size : 0;
+
+    let status = 'not_uploaded';
+    if (videoExists && videoSize > 0) {
+      status = (thumbExists && thumbSize > 0) ? 'uploaded_ok' : 'upload_errored';
+    } else if (videoExists) {
+      status = 'upload_errored';
+    }
+
+    const cleanName = path.parse(videoFile).name;
+    const deviceModel = 'jc400';
+    const thumbUrl = `${MEDIA_SERVER}/${imei}/${cleanName}/${deviceModel}`;
+    const mp4Url = `${MEDIA_SERVER}/${imei}/${cleanName}/MP4/${deviceModel}`;
+
+    let thumbnail_url = null;
+    if (thumbExists && thumbSize > 0) {
+      thumbnail_url = thumbUrl;
+    } else {
+      const latest = latestThumbByChannel[parsed.channel];
+      if (latest) thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}/${deviceModel}`;
+    }
+
+    report.videos.push({
+      channel: parsed.channel,
+      beginTime: parsed.beginTime,
+      endTime: parsed.endTime,
+      expected_file: videoFile,
+      expected_size: videoSize,
+      file_exists: videoExists,
+      file_size: videoSize,
+      thumbnail_exists: thumbExists,
+      thumbnail_size: thumbSize,
+      in_processed_folder: false,
+      status,
+      thumbnail_url,
+      video_url: videoExists ? mp4Url : null
+    });
+    report.summary[status]++;
+  }
+
+  console.log(`[JC400] REPORT: ${report.videos.length} videos`);
+  console.log(`[JC400] OK: ${report.summary.uploaded_ok} | ERR: ${report.summary.upload_errored} | PENDING: ${report.summary.not_uploaded}`);
+  
+  return report;
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // 3. getFileList
 // ──────────────────────────────────────────────────────────────────────
 app.post('/getFileList', async (req, res) => {
   try {
-    const { deviceImei } = JSON.parse(req.body || "{}");
+    const { deviceImei, deviceModel } = JSON.parse(req.body || "{}");
     if (!deviceImei) return res.json({ code: 0, ok: true });
-    const reportPath = `/home/_${deviceImei}/status_report.json`;
-    if (!await fsExists(reportPath)) return res.json({ code: 0, ok: true });
-    const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-    res.json(report);
+    
+    const deviceModelLower = (deviceModel || 'jc181').toLowerCase();
+    
+    if (deviceModelLower === 'jc400') {
+      // jc400: scan /iothub/dvr-upload/uploadFile and filter by IMEI
+      const report = await processDeviceJC400(deviceImei);
+      return res.json(report);
+    } else {
+      // jc181: default behavior - read from status_report.json
+      const reportPath = `/home/_${deviceImei}/status_report.json`;
+      if (!await fsExists(reportPath)) return res.json({ code: 0, ok: true });
+      const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+      
+      // Update URLs to include deviceModel if not present
+      if (report.videos) {
+        report.videos.forEach(video => {
+          if (video.thumbnail_url && !video.thumbnail_url.includes('/jc181') && !video.thumbnail_url.includes('/jc400')) {
+            // Append /jc181 to thumbnail URL: https://.../{imei}/{name} -> https://.../{imei}/{name}/jc181
+            if (!video.thumbnail_url.endsWith('/jc181') && !video.thumbnail_url.endsWith('/jc400')) {
+              video.thumbnail_url = video.thumbnail_url + '/jc181';
+            }
+          }
+          if (video.video_url && !video.video_url.includes('/jc181') && !video.video_url.includes('/jc400')) {
+            // Update video URL: https://.../{imei}/{name}/MP4 -> https://.../{imei}/{name}/MP4/jc181
+            if (video.video_url.endsWith('/MP4')) {
+              video.video_url = video.video_url + '/jc181';
+            } else if (!video.video_url.includes('/MP4/')) {
+              // If it doesn't have /MP4, it might be malformed, but try to fix it
+              video.video_url = video.video_url.replace(/\/MP4$/, '/MP4/jc181');
+            }
+          }
+        });
+      }
+      
+      res.json(report);
+    }
   } catch (e) {
+    console.log(`[getFileList] Error:`, e.message);
     res.json({ code: 0, ok: true });
   }
 });
