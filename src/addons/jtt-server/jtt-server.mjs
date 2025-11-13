@@ -897,6 +897,8 @@ app.post('/getFileList', async (req, res) => {
           }
           
           return res.json({
+            onServerLength: onServer.length,
+            onDeviceLength: onDevice.length,
             onServer,
             onDevice
           });
@@ -913,21 +915,36 @@ app.post('/getFileList', async (req, res) => {
           // Fallback to reading existing status_report.json
           const reportPath = `/home/_${deviceImei}/status_report.json`;
           if (!await fsExists(reportPath)) {
-            return res.json({ onServer: [], onDevice: [] });
+            return res.json({ 
+              onServerLength: 0,
+              onDeviceLength: 0,
+              onServer: [], 
+              onDevice: []
+            });
           }
           
           const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
           const onServer = await getFilesOnServer(deviceImei);
           const onDevice = report.videos || [];
           
-          return res.json({ onServer, onDevice });
+          return res.json({ 
+            onServerLength: onServer.length,
+            onDeviceLength: onDevice.length,
+            onServer, 
+            onDevice
+          });
         }
       } else {
         // jc181: default behavior - read from status_report.json
         const reportPath = `/home/_${deviceImei}/status_report.json`;
         if (!await fsExists(reportPath)) {
           const onServer = await getFilesOnServer(deviceImei);
-          return res.json({ onServer, onDevice: [] });
+          return res.json({ 
+            onServerLength: onServer.length,
+            onDeviceLength: 0,
+            onServer, 
+            onDevice: []
+          });
         }
         
         const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
@@ -950,12 +967,22 @@ app.post('/getFileList', async (req, res) => {
           }
         });
         
-        return res.json({ onServer, onDevice });
+        return res.json({ 
+          onServerLength: onServer.length,
+          onDeviceLength: onDevice.length,
+          onServer, 
+          onDevice
+        });
       }
     }
   } catch (e) {
     console.log(`[getFileList] Error:`, e.message);
-    res.json({ onServer: [], onDevice: [] });
+    res.json({ 
+      onServerLength: 0,
+      onDeviceLength: 0,
+      onServer: [], 
+      onDevice: []
+    });
   }
 });
 
