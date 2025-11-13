@@ -484,7 +484,40 @@ async function sendGpsToTraccar(gpsData) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// 1. SERVE MP4 VIDEO — STRIP _000000 BEFORE ADDING (MUST COME BEFORE THUMBNAIL ROUTE)
+// 1. SERVE MP4 VIDEO — with deviceModel in path (MUST COME FIRST)
+// ──────────────────────────────────────────────────────────────────────
+app.get('/:imei/:name/MP4/:deviceModel(jc181|jc400)', async (req, res) => {
+  const { imei, name, deviceModel } = req.params;
+  const deviceModelLower = deviceModel.toLowerCase();
+  
+  let file;
+  if (deviceModelLower === 'jc400') {
+    // jc400: look for video in /iothub/dvr-upload/uploadFile
+    // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
+    const uploadFolder = '/iothub/dvr-upload/uploadFile';
+    if (!await fsExists(uploadFolder)) {
+      console.log(`[MP4 NOT FOUND] Upload folder not found: ${uploadFolder}`);
+      return res.status(200).send('FILE NOT UPLOADED');
+    }
+    // Video file should be: {name}.mp4
+    const videoFile = `${name}.mp4`;
+    file = path.join(uploadFolder, videoFile);
+  } else {
+    // jc181: default behavior
+    const baseName = name.replace(/_000000$/, '');
+    file = `/home/_${imei}/processedVideos/${baseName}_000000.mp4`;
+  }
+  
+  if (!await fsExists(file)) {
+    console.log(`[MP4 NOT FOUND] ${file}`);
+    return res.status(200).send('FILE NOT UPLOADED');
+  }
+  res.setHeader('Content-Type', 'video/mp4');
+  res.sendFile(file);
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// 1b. SERVE MP4 VIDEO — without deviceModel (defaults to jc181, query param supported)
 // ──────────────────────────────────────────────────────────────────────
 app.get('/:imei/:name/MP4', async (req, res) => {
   const { imei, name } = req.params;
@@ -517,11 +550,11 @@ app.get('/:imei/:name/MP4', async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────────────
-// 2. SERVE THUMBNAIL (with optional deviceModel as path param or query param)
+// 2. SERVE THUMBNAIL (with deviceModel as path param - only match known device models, not "MP4")
 // ──────────────────────────────────────────────────────────────────────
-app.get('/:imei/:name/:deviceModel', async (req, res) => {
+app.get('/:imei/:name/:deviceModel(jc181|jc400)', async (req, res) => {
   const { imei, name, deviceModel } = req.params;
-  const deviceModelLower = (deviceModel || req.query.deviceModel || 'jc181').toLowerCase();
+  const deviceModelLower = deviceModel.toLowerCase();
   
   let file;
   if (deviceModelLower === 'jc400') {
