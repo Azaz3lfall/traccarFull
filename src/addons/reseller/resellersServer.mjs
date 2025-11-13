@@ -1665,15 +1665,50 @@ app.post('/api/resellers/delete', async (req, res) => {
   }
 });
 
+// Track active builds to prevent concurrent builds for the same reseller
+const activeBuilds = new Map();
+
 // Async function to handle Flutter build process
 async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType = 'apk') {
+  const buildKey = `${resellerDirName}_${buildType}`;
+  
+  // Check if build is already in progress
+  if (activeBuilds.has(buildKey)) {
+    console.log(`⚠️ Build already in progress for ${buildKey}, skipping...`);
+    throw new Error(`Build already in progress for ${resellerDirName} (${buildType})`);
+  }
+  
+  // Mark build as active
+  activeBuilds.set(buildKey, true);
+  
   try {
     console.log(`🔨 Starting Flutter build process for ${buildType.toUpperCase()}...`);
     const buildDir = path.join(resellerDirPath, 'build');
+    const gradleDir = path.join(resellerDirPath, 'android', '.gradle');
     
     // Clean previous build
     if (fs.existsSync(buildDir)) {
       fs.rmSync(buildDir, { recursive: true, force: true });
+    }
+    
+    // Clean Gradle cache and lock files to prevent lock errors
+    if (fs.existsSync(gradleDir)) {
+      console.log('🧹 Cleaning Gradle cache and lock files...');
+      try {
+        // Remove entire .gradle directory to clear all locks and cache
+        fs.rmSync(gradleDir, { recursive: true, force: true });
+        console.log('✅ Gradle directory removed completely');
+      } catch (rmError) {
+        console.warn('⚠️ Could not remove .gradle directory, trying alternative cleanup:', rmError.message);
+        // Fallback: try to remove lock files specifically
+        try {
+          await execAsync(`cd "${resellerDirPath}" && find android/.gradle -name "*.lock" -delete 2>/dev/null || true`, { timeout: 30000 });
+          await execAsync(`cd "${resellerDirPath}" && find android/.gradle -name "fileHashes" -type f -delete 2>/dev/null || true`, { timeout: 30000 });
+          console.log('✅ Gradle lock files removed');
+        } catch (fallbackError) {
+          console.warn('⚠️ Gradle cleanup failed (non-blocking):', fallbackError.message);
+        }
+      }
     }
 
                 // Clean and initialize Flutter project first
@@ -1684,6 +1719,50 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
                 console.log('🔧 Initializing Flutter project...');
                 await execAsync(`cd "${resellerDirPath}" && flutter pub get`, { timeout: 300000 }); // 5 minutes
                 console.log('✅ Flutter project initialized');
+                
+                // Clean Gradle again after flutter pub get (it might recreate .gradle)
+                console.log('🧹 Stopping Gradle daemon and cleaning .gradle after pub get...');
+                try {
+                  // Stop any running Gradle daemons first (try multiple methods)
+                  await execAsync(`cd "${resellerDirPath}" && ./android/gradlew --stop 2>/dev/null || true`, { timeout: 30000 }).catch(() => {});
+                  // Also try stopping from user's gradle home
+                  await execAsync(`cd "${resellerDirPath}" && gradle --stop 2>/dev/null || true`, { timeout: 30000 }).catch(() => {});
+                  
+                  // Wait a moment for locks to be released
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  
+                  // Remove .gradle directory
+                  if (fs.existsSync(gradleDir)) {
+                    fs.rmSync(gradleDir, { recursive: true, force: true });
+                    console.log('✅ Gradle directory removed after pub get');
+                  }
+                  
+                  // Also clean any lock files that might exist
+                  await execAsync(`cd "${resellerDirPath}" && find android/.gradle -name "*.lock" -delete 2>/dev/null || true`, { timeout: 10000 }).catch(() => {});
+                  await execAsync(`cd "${resellerDirPath}" && find android/.gradle -name "fileHashes" -type f -delete 2>/dev/null || true`, { timeout: 10000 }).catch(() => {});
+                  
+                  console.log('✅ Gradle cleaned after pub get');
+                } catch (gradleCleanError2) {
+                  console.warn('⚠️ Second Gradle cleanup warning (non-blocking):', gradleCleanError2.message);
+                }
+                
+                // Configure Gradle to not use daemon to prevent lock issues
+                const gradlePropertiesPath = path.join(resellerDirPath, 'android', 'gradle.properties');
+                let gradleProperties = '';
+                if (fs.existsSync(gradlePropertiesPath)) {
+                  gradleProperties = fs.readFileSync(gradlePropertiesPath, 'utf8');
+                }
+                
+                // Add or update daemon settings
+                if (!gradleProperties.includes('org.gradle.daemon=false')) {
+                  if (gradleProperties && !gradleProperties.endsWith('\n')) {
+                    gradleProperties += '\n';
+                  }
+                  gradleProperties += 'org.gradle.daemon=false\n';
+                  gradleProperties += 'org.gradle.parallel=false\n';
+                  fs.writeFileSync(gradlePropertiesPath, gradleProperties);
+                  console.log('✅ Gradle daemon disabled in gradle.properties');
+                }
 
     // Run Flutter build based on requested type
     if (buildType === 'apk') {
@@ -1843,6 +1922,11 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
     console.log('🎉 Mobile app build process completed successfully!');
   } catch (error) {
     console.error('❌ Error in build process:', error);
+    throw error; // Re-throw to allow caller to handle
+  } finally {
+    // Always remove from active builds, even if build failed
+    activeBuilds.delete(buildKey);
+    console.log(`🧹 Removed ${buildKey} from active builds`);
   }
 }
 

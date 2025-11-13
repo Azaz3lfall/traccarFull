@@ -73,6 +73,7 @@ export default defineConfig(() => {
         targets: [
           { src: 'node_modules/@mapbox/mapbox-gl-rtl-text/dist/mapbox-gl-rtl-text.js', dest: '' },
           { src: 'src/addons/reseller', dest: 'addons' },
+          { src: 'src/addons/jtt-server', dest: 'addons' },
         ],
       }),
     ],
