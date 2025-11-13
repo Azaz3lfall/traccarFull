@@ -215,20 +215,39 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
     .filter(f => f.endsWith('.mp4.jpg'))
     .map(f => {
       const stats = fs.statSync(path.join(deviceFolder, f));
-      const rawName = path.parse(f).name;
-      const name = rawName.replace(/\.mp4$/, '');
+      const rawName = path.parse(f).name; // e.g., "CH1_251109_001400_000000.mp4" from "CH1_251109_001400_000000.mp4.jpg"
+      const name = rawName.replace(/\.mp4$/, ''); // e.g., "CH1_251109_001400_000000"
       const chMatch = f.match(/^CH(\d)_/);
       const channel = chMatch ? Number(chMatch[1]) : null;
-      return { name, channel, mtime: stats.mtime };
+      
+      // Extract timestamp from filename for sorting (YYMMDDHHMMSS format)
+      // Format: CH1_YYMMDD_HHMMSS_000000.mp4.jpg
+      const timeMatch = name.match(/^CH\d+_(\d{6})_(\d{6})_/);
+      let timestamp = 0;
+      if (timeMatch) {
+        const yymmdd = timeMatch[1]; // YYMMDD
+        const hhmmss = timeMatch[2]; // HHMMSS
+        timestamp = parseInt(yymmdd + hhmmss, 10); // YYMMDDHHMMSS as number for sorting
+      }
+      
+      return { name, channel, mtime: stats.mtime, filename: f, timestamp }; // Store timestamp for sorting
     })
     .filter(t => t.channel !== null);
 
   console.log(`[THUMBS] FOUND IN ROOT: ${allThumbs.length}`);
 
+  // Sort by timestamp (most recent first), then by mtime as fallback
   const latestThumbByChannel = {};
   allThumbs.forEach(thumb => {
-    if (!latestThumbByChannel[thumb.channel] || thumb.mtime > latestThumbByChannel[thumb.channel].mtime) {
+    if (!latestThumbByChannel[thumb.channel]) {
       latestThumbByChannel[thumb.channel] = thumb;
+    } else {
+      const current = latestThumbByChannel[thumb.channel];
+      // Prefer higher timestamp (more recent video), fallback to mtime
+      if (thumb.timestamp > current.timestamp || 
+          (thumb.timestamp === current.timestamp && thumb.mtime > current.mtime)) {
+        latestThumbByChannel[thumb.channel] = thumb;
+      }
     }
   });
 
@@ -253,16 +272,81 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
     }
 
     const cleanName = path.parse(file).name;
-    const thumbUrl = `${MEDIA_SERVER}/${imei}/${cleanName}`;
-    const mp4Url = `${MEDIA_SERVER}/${imei}/${cleanName}/MP4`;
+    const thumbUrl = `${MEDIA_SERVER}/${imei}/${cleanName}/jc181`;
+    const mp4Url = `${MEDIA_SERVER}/${imei}/${cleanName}/MP4/jc181`;
 
+    // For not_uploaded and upload_errored, use most recent thumbnail for that channel
+    // For uploaded_ok, use specific thumbnail if exists, otherwise latest for channel
     let thumbnail_url = null;
-    if (thumbExists && thumbSize > 0) {
-      thumbnail_url = thumbUrl;
-    } else {
+    if (status === 'not_uploaded' || status === 'upload_errored') {
+      // Always use latest thumbnail for that channel (verify it exists using original filename)
       const latest = latestThumbByChannel[vid.channel];
-      if (latest) thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}`;
+      if (latest) {
+        // Use the original filename we found to verify existence
+        const latestThumbPath = path.join(deviceFolder, latest.filename);
+        if (await fsExists(latestThumbPath)) {
+          thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}/jc181`;
+          console.log(`[THUMB] ${status} video CH${vid.channel} using latest thumbnail: ${latest.name} (timestamp: ${latest.timestamp})`);
+        } else {
+          // Latest thumbnail file doesn't exist, try fallback
+          const allLatest = Object.values(latestThumbByChannel);
+          for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+            const thumbPath = path.join(deviceFolder, thumb.filename);
+            if (await fsExists(thumbPath)) {
+              thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+              break;
+            }
+          }
+        }
+      } else {
+        // Fallback: use latest thumbnail from any channel if this channel has none
+        const allLatest = Object.values(latestThumbByChannel);
+        for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+          const thumbPath = path.join(deviceFolder, thumb.filename);
+          if (await fsExists(thumbPath)) {
+            thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+            break;
+          }
+        }
+      }
+    } else {
+      // uploaded_ok: use specific thumbnail if exists, otherwise latest for channel
+      if (thumbExists && thumbSize > 0) {
+        thumbnail_url = thumbUrl;
+      } else {
+        const latest = latestThumbByChannel[vid.channel];
+        if (latest) {
+          // Use the original filename we found to verify existence
+          const latestThumbPath = path.join(deviceFolder, latest.filename);
+          if (await fsExists(latestThumbPath)) {
+            thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}/jc181`;
+          } else {
+            // Fallback: use latest thumbnail from any channel
+            const allLatest = Object.values(latestThumbByChannel);
+            for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+              const thumbPath = path.join(deviceFolder, thumb.filename);
+              if (await fsExists(thumbPath)) {
+                thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+                break;
+              }
+            }
+          }
+        } else {
+          // Fallback: use latest thumbnail from any channel
+          const allLatest = Object.values(latestThumbByChannel);
+          for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+            const thumbPath = path.join(deviceFolder, thumb.filename);
+            if (await fsExists(thumbPath)) {
+              thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+              break;
+            }
+          }
+        }
+      }
     }
+
+    // Only set video_url for uploaded_ok videos (file exists and is valid)
+    const video_url = (status === 'uploaded_ok' && mp4Exists && mp4Size > 0) ? mp4Url : null;
 
     report.videos.push({
       channel: vid.channel,
@@ -277,7 +361,7 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       in_processed_folder: true,
       status,
       thumbnail_url,
-      video_url: mp4Exists ? mp4Url : null
+      video_url
     });
     report.summary[status]++;
   }
@@ -304,16 +388,80 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       : 'upload_errored';
 
     const cleanName = path.parse(file).name;
-    const thumbUrl = `${MEDIA_SERVER}/${imei}/${cleanName}`;
-    const mp4Url = `${MEDIA_SERVER}/${imei}/${cleanName}/MP4`;
+    const thumbUrl = `${MEDIA_SERVER}/${imei}/${cleanName}/jc181`;
+    const mp4Url = `${MEDIA_SERVER}/${imei}/${cleanName}/MP4/jc181`;
 
+    // For not_uploaded and upload_errored, use most recent thumbnail for that channel
+    // For uploaded_ok, use specific thumbnail if exists, otherwise latest for channel
     let thumbnail_url = null;
-    if (thumbExists && thumbSize > 0) {
-      thumbnail_url = thumbUrl;
-    } else {
+    if (status === 'not_uploaded' || status === 'upload_errored') {
+      // Always use latest thumbnail for that channel (verify it exists using original filename)
       const latest = latestThumbByChannel[parsed.channel];
-      if (latest) thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}`;
+      if (latest) {
+        // Use the original filename we found to verify existence
+        const latestThumbPath = path.join(deviceFolder, latest.filename);
+        if (await fsExists(latestThumbPath)) {
+          thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}/jc181`;
+        } else {
+          // Latest thumbnail file doesn't exist, try fallback
+          const allLatest = Object.values(latestThumbByChannel);
+          for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+            const thumbPath = path.join(deviceFolder, thumb.filename);
+            if (await fsExists(thumbPath)) {
+              thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+              break;
+            }
+          }
+        }
+      } else {
+        // Fallback: use latest thumbnail from any channel if this channel has none
+        const allLatest = Object.values(latestThumbByChannel);
+        for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+          const thumbPath = path.join(deviceFolder, thumb.filename);
+          if (await fsExists(thumbPath)) {
+            thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+            break;
+          }
+        }
+      }
+    } else {
+      // uploaded_ok: use specific thumbnail if exists, otherwise latest for channel
+      if (thumbExists && thumbSize > 0) {
+        thumbnail_url = thumbUrl;
+      } else {
+        const latest = latestThumbByChannel[parsed.channel];
+        if (latest) {
+          // Use the original filename we found to verify existence
+          const latestThumbPath = path.join(deviceFolder, latest.filename);
+          if (await fsExists(latestThumbPath)) {
+            thumbnail_url = `${MEDIA_SERVER}/${imei}/${latest.name}/jc181`;
+          } else {
+            // Fallback: use latest thumbnail from any channel
+            const allLatest = Object.values(latestThumbByChannel);
+            for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+              const thumbPath = path.join(deviceFolder, thumb.filename);
+              if (await fsExists(thumbPath)) {
+                thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+                break;
+              }
+            }
+          }
+        } else {
+          // Fallback: use latest thumbnail from any channel
+          const allLatest = Object.values(latestThumbByChannel);
+          for (const thumb of allLatest.sort((a, b) => b.mtime - a.mtime)) {
+            const thumbPath = path.join(deviceFolder, thumb.filename);
+            if (await fsExists(thumbPath)) {
+              thumbnail_url = `${MEDIA_SERVER}/${imei}/${thumb.name}/jc181`;
+              break;
+            }
+          }
+        }
+      }
     }
+
+    // Only set video_url for uploaded_ok videos (file exists and is valid)
+    const video_url = (status === 'uploaded_ok' && mp4Size > 0) ? mp4Url : null;
 
     report.videos.push({
       channel: parsed.channel,
@@ -328,7 +476,7 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       in_processed_folder: true,
       status,
       thumbnail_url,
-      video_url: mp4Url
+      video_url
     });
     report.summary[status]++;
   }

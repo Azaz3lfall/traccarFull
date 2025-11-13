@@ -68,7 +68,6 @@ import { PieChart } from 'lucide-react';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
-import { IoShareOutline, IoRefreshOutline } from "react-icons/io5";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -86,7 +85,7 @@ import flvjs from 'flv.js';
 dayjs.extend(relativeTime);
 
 // VideoItem component with lazy loading - moved outside to prevent re-creation on every render
-const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVideo, setShowVideoPlayer }) => {
+const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef(null);
@@ -149,11 +148,11 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
         border: `1px solid ${colors.border}`,
         overflow: 'hidden',
         boxSizing: 'border-box',
-        cursor: video.video_url ? 'pointer' : 'default',
+        cursor: (video.video_url && video.status === 'uploaded_ok') ? 'pointer' : 'default',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       }}
       onMouseEnter={(e) => {
-        if (video.video_url) {
+        if (video.video_url && video.status === 'uploaded_ok') {
           e.currentTarget.style.transform = 'scale(1.02)';
           e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
         }
@@ -163,7 +162,7 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
         e.currentTarget.style.boxShadow = 'none';
       }}
       onClick={() => {
-        if (video.video_url) {
+        if (video.video_url && video.status === 'uploaded_ok') {
           setSelectedVideo(video);
           setShowVideoPlayer(true);
         }
@@ -177,36 +176,62 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
         right: 0,
         bottom: 0,
       }}>
-        {imageLoaded && video.thumbnail_url ? (
+        {imageLoaded && video.thumbnail_url && !imageError ? (
           <img
             src={video.thumbnail_url}
             alt={`Channel ${video.channel} - ${video.beginTime}`}
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover'
+              objectFit: 'cover',
+              display: imageError ? 'none' : 'block'
             }}
-            onError={() => setImageError(true)}
+            onError={(e) => {
+              setImageError(true);
+              e.target.style.display = 'none';
+            }}
+            onLoad={() => {
+              setImageError(false);
+            }}
           />
-        ) : (
+        ) : null}
+        {/* Fallback when no image or image error */}
+        {(!imageLoaded || !video.thumbnail_url || imageError) && (
           <div style={{
             width: '100%',
             height: '100%',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colors.secondary,
+            gap: '8px'
           }}>
-            {!imageLoaded && !imageError && (
+            {!imageError && !imageLoaded && video.thumbnail_url && (
               <CircularProgress size={24} />
             )}
-            {imageError && (
-              <Typography variant="body2" style={{ 
-                color: colors.textSecondary,
-                fontSize: '12px'
-              }}>
-                No thumbnail
-              </Typography>
+            {(imageError || !video.thumbnail_url) && (
+              <>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: colors.border,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.textSecondary
+                }}>
+                  <PlayArrowIcon style={{ fontSize: '24px' }} />
+                </div>
+                <Typography variant="body2" style={{ 
+                  color: colors.textSecondary,
+                  fontSize: '11px',
+                  textAlign: 'center'
+                }}>
+                  No thumbnail
+                </Typography>
+              </>
             )}
           </div>
         )}
@@ -251,40 +276,9 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
         </div>
       </div>
 
-      {/* Upload/Share button for not_uploaded and upload_errored videos - Apple style */}
-      {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
-        <IconButton
-          onClick={(e) => handleUploadVideo(video, e)}
-          size="small"
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(10px)',
-            color: '#fff',
-            width: '32px',
-            height: '32px',
-            padding: '6px',
-            zIndex: 10,
-          }}
-          sx={{
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            }
-          }}
-          title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
-        >
-          {video.status === 'upload_errored' ? (
-            <IoRefreshOutline style={{ fontSize: '18px', color: '#fff' }} />
-          ) : (
-            <IoShareOutline style={{ fontSize: '18px', color: '#fff' }} />
-          )}
-        </IconButton>
-      )}
 
-      {/* Play button overlay for videos with URL */}
-      {video.video_url && (
+      {/* Play button overlay for videos with URL and uploaded_ok status only */}
+      {video.video_url && video.status === 'uploaded_ok' && (
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -301,6 +295,39 @@ const VideoItem = memo(({ video, index, colors, handleUploadVideo, setSelectedVi
         }}>
           <PlayArrowIcon style={{ fontSize: '28px', color: '#fff' }} />
         </div>
+      )}
+
+      {/* Upload button for not_uploaded and upload_errored videos */}
+      {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Video Data:', video);
+          }}
+          size="small"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(10px)',
+            color: '#fff',
+            width: '48px',
+            height: '48px',
+            padding: '6px',
+            zIndex: 10,
+          }}
+          sx={{
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            }
+          }}
+          title={video.status === 'upload_errored' ? "Retry upload" : "Upload video"}
+        >
+          <UploadIcon style={{ fontSize: '24px', color: '#fff' }} />
+        </IconButton>
       )}
     </div>
   );
@@ -860,23 +887,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device, videoListStartDate, videoListEndDate, logDeviceMessage, getDeviceModel, getApiTemplate]);
 
-  // Handle upload button click - just logs video details
-  const handleUploadVideo = useCallback((video, e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    console.log('Video Details:', {
-      channel: video.channel,
-      beginTime: video.beginTime,
-      endTime: video.endTime,
-      status: video.status,
-      expected_file: video.expected_file,
-      video_url: video.video_url,
-      thumbnail_url: video.thumbnail_url,
-      deviceImei: device?.uniqueId
-    });
-  }, [device]);
-
   // Fetch videos from media server
   const fetchVideos = useCallback(async () => {
     if (!device?.uniqueId) {
@@ -893,14 +903,54 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         throw new Error('Media server URL not configured');
       }
 
+      const deviceModel = getDeviceModel;
+      let requestBody;
+      
+      // For jc181, send request with beginTime, endTime, token, jimiServer
+      if (deviceModel === 'jc181') {
+        const iothub = JSON.parse(device.attributes.iothub);
+        const iothubServer = iothub?.iothubServer || '';
+        const token = iothub?.token || '';
+        
+        if (!iothubServer || !token) {
+          throw new Error('IoTHub Server or Token not configured');
+        }
+
+        // Format dates as YYMMDDHHMMSS from date pickers
+        const formatDateTime = (dateTimeString) => {
+          if (!dateTimeString) return '';
+          const date = dayjs(dateTimeString);
+          return date.format('YYMMDDHHmmss');
+        };
+
+        // Use date picker values, default to today if not set
+        const startDate = videoListStartDate || dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
+        const endDate = videoListEndDate || dayjs().endOf('day').format('YYYY-MM-DDTHH:mm');
+        
+        const beginTime = formatDateTime(startDate);
+        const endTime = formatDateTime(endDate);
+
+        requestBody = {
+          deviceImei: device.uniqueId,
+          deviceModel: 'jc181',
+          beginTime: beginTime,
+          endTime: endTime,
+          token: token,
+          jimiServer: iothubServer
+        };
+      } else {
+        // For other device models, use old format
+        requestBody = {
+          deviceImei: device.uniqueId
+        };
+      }
+
       const response = await fetch(`${mediaServerUrl}/getFileList`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          deviceImei: device.uniqueId
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -908,8 +958,38 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       }
 
       const data = await response.json();
-      setVideos(data.videos || []);
-      setVideosTotalCount(data.resource_count || 0);
+      
+      // Handle new response format for jc181 (onServer and onDevice)
+      if (deviceModel === 'jc181' && data.onServer !== undefined && data.onDevice !== undefined) {
+        const allVideos = [];
+        
+        // Process onServer videos - mark as "uploaded_ok" (unless < 1MB, then "upload_errored")
+        (data.onServer || []).forEach(video => {
+          const fileSize = video.file_size || 0;
+          const status = fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok'; // 1MB = 1024 * 1024 bytes
+          
+          allVideos.push({
+            ...video,
+            status: status
+          });
+        });
+        
+        // Process onDevice videos - always mark as "not_uploaded"
+        (data.onDevice || []).forEach(video => {
+          allVideos.push({
+            ...video,
+            status: 'not_uploaded'
+          });
+        });
+        
+        setVideos(allVideos);
+        setVideosTotalCount(allVideos.length);
+      } else {
+        // Old format - videos array
+        setVideos(data.videos || []);
+        setVideosTotalCount(data.resource_count || 0);
+      }
+      
       setVideosCurrentPage(1); // Reset to first page when new data is fetched
     } catch (error) {
       console.error('Error fetching videos:', error);
@@ -919,7 +999,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } finally {
       setVideosLoading(false);
     }
-  }, [device, logDeviceMessage]);
+  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage]);
 
   // Send RTMP,OFF command for jc400 (must be sent before starting any stream)
   const sendRtmpOffCommand = useCallback(async () => {
@@ -6167,23 +6247,23 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           minHeight: desktop ? 0 : 'auto'
                         }}>
                           {/* On Server Content - moved outside tabs */}
-                          <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: desktop ? '100%' : 'auto',
-                            overflow: desktop ? 'hidden' : 'visible',
-                            boxSizing: 'border-box',
-                            minHeight: desktop ? 0 : 'auto'
-                          }}>
-                            <Typography variant="subtitle2" style={{ 
-                              color: colors.text, 
-                              marginBottom: '16px',
-                              fontWeight: '600'
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              height: desktop ? '100%' : 'auto',
+                              overflow: desktop ? 'hidden' : 'visible',
+                              boxSizing: 'border-box',
+                              minHeight: desktop ? 0 : 'auto'
                             }}>
-                              Videos
-                            </Typography>
-                      
-                            {/* Date pickers and channel selection */}
+                              <Typography variant="subtitle2" style={{ 
+                                color: colors.text, 
+                                marginBottom: '16px',
+                                fontWeight: '600'
+                              }}>
+                                Videos
+                              </Typography>
+                        
+                        {/* Date pickers and channel selection */}
                         <div style={{
                           display: 'flex',
                           flexDirection: desktop ? 'row' : 'column',
@@ -6376,38 +6456,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             </div>
                             <button
                               onClick={async () => {
-                                // Format dates as YYMMDDHHmmss
-                                const formatDateTime = (dateTimeString) => {
-                                  if (!dateTimeString) return '';
-                                  const date = dayjs(dateTimeString);
-                                  return date.format('YYMMDDHHmmss');
-                                };
-                                
-                                const beginTime = formatDateTime(videoListStartDate);
-                                const endTime = formatDateTime(videoListEndDate);
-                                
-                                console.log('=== Load from Device ===');
-                                console.log('beginTime:', beginTime);
-                                console.log('endTime:', endTime);
-                                console.log('========================');
-                                
-                                setVideosLoading(true);
-                                setVideosError(null);
-                                
-                                try {
-                                  // First, send instruct command to device
-                                  await sendVideoListInstruct();
-                                  
-                                  // Wait at least 20 seconds for device to process (upload/transcode)
-                                  // Then fetch videos from media server to get updated list
-                                  setTimeout(() => {
-                                    fetchVideos();
-                                  }, 20000); // 20 second delay
-                                } catch (error) {
-                                  console.error('Error in load from device:', error);
-                                  setVideosError(error.message || 'Failed to send command to device');
-                                  setVideosLoading(false);
-                                }
+                                // Reload videos with current date picker values
+                                await fetchVideos();
                               }}
                               disabled={videosLoading}
                               style={{
@@ -6438,14 +6488,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   e.currentTarget.style.borderColor = '#1976d2';
                                 }
                               }}
-                              title="Load videos from device"
+                              title="Reload videos"
                             >
                               {videosLoading ? (
                                 <CircularProgress size={12} style={{ color: '#1976d2' }} />
                               ) : (
                                 <RefreshOutlinedIcon style={{ fontSize: '14px', color: '#1976d2' }} />
                               )}
-                              Load from Device
+                              Reload
                             </button>
                           </div>
                         </div>
@@ -6500,7 +6550,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   video={video} 
                                   index={index}
                                   colors={colors}
-                                  handleUploadVideo={handleUploadVideo}
                                   setSelectedVideo={setSelectedVideo}
                                   setShowVideoPlayer={setShowVideoPlayer}
                                 />
@@ -6559,7 +6608,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             )}
                           </>
                         )}
-                          </div>
+                            </div>
                         </div>
                       );
                     })()}
