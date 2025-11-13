@@ -1992,8 +1992,8 @@ async function copyAppImages(resellerDirPath, resellerData) {
       for (const iconSize of notificationIconSizes) {
         const targetPath = path.join(androidResPath, iconSize.folder, 'ic_stat_notify.png');
         if (fs.existsSync(targetPath)) {
-          // Resize and copy notification icon
-          await resizeAndCopyImage(notificationIconPath, targetPath, iconSize.size, iconSize.size);
+          // Resize and copy notification icon (convert to white for Android notifications)
+          await resizeAndCopyImage(notificationIconPath, targetPath, iconSize.size, iconSize.size, true);
           console.log(`✅ Android ${iconSize.folder} notification icon updated`);
         }
       }
@@ -2021,8 +2021,8 @@ async function copyAppImages(resellerDirPath, resellerData) {
       const notificationPngPath = path.join(androidResPath, 'drawable', 'ic_stat_notify.png');
       
       if (fs.existsSync(notificationDrawablePath)) {
-        // Copy reseller notification icon as PNG and remove the XML vector drawable
-        await resizeAndCopyImage(notificationIconPath, notificationPngPath, 24, 24);
+        // Copy reseller notification icon as PNG (convert to white for Android notifications) and remove the XML vector drawable
+        await resizeAndCopyImage(notificationIconPath, notificationPngPath, 24, 24, true);
         fs.unlinkSync(notificationDrawablePath); // Remove the XML file
         console.log('✅ Android notification icon replaced with PNG image');
       }
@@ -2069,21 +2069,62 @@ async function copyAppImages(resellerDirPath, resellerData) {
   }
 }
 
-// Function to resize and copy image
-async function resizeAndCopyImage(sourcePath, targetPath, width, height) {
+// Function to resize and copy image with high quality
+async function resizeAndCopyImage(sourcePath, targetPath, width, height, isNotificationIcon = false) {
   try {
     console.log(`🔄 Resizing image: ${sourcePath} -> ${targetPath} (${width}x${height})`);
     
     const sharp = (await import('sharp')).default;
     
-    // Resize and copy the image
-    await sharp(sourcePath)
-      .resize(width, height, {
-        fit: 'cover',
-        position: 'center'
+    let pipeline = sharp(sourcePath);
+    
+    // For notification icons, convert to white on transparent background
+    // Android notification icons must be white on transparent background
+    if (isNotificationIcon) {
+      // Resize first and ensure we have alpha channel
+      const resizedBuffer = await sharp(sourcePath)
+        .resize(width, height, {
+          fit: 'contain',
+          background: { r: 0, g: 0, b: 0, alpha: 0 } // Transparent background
+        })
+        .ensureAlpha()
+        .toBuffer();
+      
+      // Extract alpha channel from resized image
+      const alphaChannel = await sharp(resizedBuffer)
+        .extractChannel(3) // Alpha channel is channel 3 (0=R, 1=G, 2=B, 3=A)
+        .toBuffer();
+      
+      // Create white image and apply the alpha channel
+      pipeline = sharp({
+        create: {
+          width: width,
+          height: height,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 255 } // White
+        }
       })
-      .png()
-      .toFile(targetPath);
+      .joinChannel(alphaChannel) // Apply the extracted alpha channel
+      .png({ 
+        compressionLevel: 0, // No compression for maximum quality
+        quality: 100,
+        palette: false // Don't use palette for better quality
+      });
+    } else {
+      // For regular icons, maintain quality with minimal compression
+      pipeline = pipeline
+        .resize(width, height, {
+          fit: 'cover',
+          position: 'center'
+        })
+        .png({ 
+          compressionLevel: 0, // No compression for maximum quality
+          quality: 100,
+          palette: false // Don't use palette for better quality
+        });
+    }
+    
+    await pipeline.toFile(targetPath);
       
     console.log(`✅ Image resized and copied: ${width}x${height} -> ${targetPath}`);
   } catch (error) {
