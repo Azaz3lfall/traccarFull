@@ -6166,61 +6166,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           boxSizing: 'border-box',
                           minHeight: desktop ? 0 : 'auto'
                         }}>
-                          {/* Playback Sub-tabs */}
-                          <Tabs
-                            value={playbackSubTab}
-                            onChange={(e, newValue) => setPlaybackSubTab(newValue)}
-                            variant="standard"
-                            style={{
+                          {/* On Server Content - moved outside tabs */}
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            height: desktop ? '100%' : 'auto',
+                            overflow: desktop ? 'hidden' : 'visible',
+                            boxSizing: 'border-box',
+                            minHeight: desktop ? 0 : 'auto'
+                          }}>
+                            <Typography variant="subtitle2" style={{ 
+                              color: colors.text, 
                               marginBottom: '16px',
-                              borderBottom: `1px solid ${colors.border}`
-                            }}
-                            sx={{
-                              '& .MuiTab-root': {
-                                color: colors.textSecondary,
-                                fontSize: '13px',
-                                fontWeight: '500',
-                                textTransform: 'none',
-                                minHeight: '40px',
-                                padding: '8px 16px',
-                                '&.Mui-selected': {
-                                  color: '#1976d2',
-                                  fontWeight: '600',
-                                },
-                                '&:hover': {
-                                  color: '#1976d2',
-                                },
-                              },
-                              '& .MuiTabs-indicator': {
-                                backgroundColor: '#1976d2',
-                                height: '2px',
-                              },
-                            }}
-                          >
-                            <Tab label="On Server" />
-                            <Tab label="On Device" />
-                            <Tab label="Events" />
-                          </Tabs>
-
-                          {/* On Server Tab Content */}
-                          {playbackSubTab === 0 && (
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              height: desktop ? '100%' : 'auto',
-                              overflow: desktop ? 'hidden' : 'visible',
-                              boxSizing: 'border-box',
-                              minHeight: desktop ? 0 : 'auto'
+                              fontWeight: '600'
                             }}>
-                              <Typography variant="subtitle2" style={{ 
-                                color: colors.text, 
-                                marginBottom: '16px',
-                                fontWeight: '600'
-                              }}>
-                                Videos
-                              </Typography>
-                        
-                        {/* Date pickers and channel selection */}
+                              Videos
+                            </Typography>
+                      
+                            {/* Date pickers and channel selection */}
                         <div style={{
                           display: 'flex',
                           flexDirection: desktop ? 'row' : 'column',
@@ -6596,102 +6559,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             )}
                           </>
                         )}
-                            </div>
-                          )}
-
-                          {/* On Device Tab Content */}
-                          {playbackSubTab === 1 && (
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              height: desktop ? '100%' : 'auto',
-                              overflow: desktop ? 'auto' : 'visible',
-                              boxSizing: 'border-box',
-                              minHeight: desktop ? 0 : 'auto'
-                            }}>
-                              <Typography variant="subtitle2" style={{ 
-                                color: colors.text, 
-                                marginBottom: '16px',
-                                fontWeight: '600'
-                              }}>
-                                Device Videos
-                              </Typography>
-                              
-                              {/* 30 Empty Placeholders */}
-                              <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))',
-                                gap: '16px',
-                                paddingBottom: '16px'
-                              }}>
-                                {Array.from({ length: 30 }, (_, index) => (
-                                  <div
-                                    key={index}
-                                    style={{
-                                      aspectRatio: '16/9',
-                                      backgroundColor: colors.secondary,
-                                      borderRadius: '8px',
-                                      border: `1px solid ${colors.border}`,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      color: colors.textSecondary,
-                                      fontSize: '14px'
-                                    }}
-                                  >
-                                    Placeholder {index + 1}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Events Tab Content */}
-                          {playbackSubTab === 2 && (
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              height: desktop ? '100%' : 'auto',
-                              overflow: desktop ? 'auto' : 'visible',
-                              boxSizing: 'border-box',
-                              minHeight: desktop ? 0 : 'auto'
-                            }}>
-                              <Typography variant="subtitle2" style={{ 
-                                color: colors.text, 
-                                marginBottom: '16px',
-                                fontWeight: '600'
-                              }}>
-                                Events
-                              </Typography>
-                              
-                              {/* 30 Empty Placeholders */}
-                              <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))',
-                                gap: '16px',
-                                paddingBottom: '16px'
-                              }}>
-                                {Array.from({ length: 30 }, (_, index) => (
-                                  <div
-                                    key={index}
-                                    style={{
-                                      aspectRatio: '16/9',
-                                      backgroundColor: colors.secondary,
-                                      borderRadius: '8px',
-                                      border: `1px solid ${colors.border}`,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      color: colors.textSecondary,
-                                      fontSize: '14px'
-                                    }}
-                                  >
-                                    Placeholder {index + 1}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          </div>
                         </div>
                       );
                     })()}
