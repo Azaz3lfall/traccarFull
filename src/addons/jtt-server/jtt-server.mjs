@@ -115,6 +115,69 @@ app.use((req, res, next) => {
 const fsExists = p => new Promise(r => fs.access(p, fs.constants.F_OK, e => r(!e)));
 const fsMkdir = p => new Promise(r => fs.mkdir(p, { recursive: true }, () => r()));
 const fsRename = (a, b) => new Promise((res, rej) => fs.rename(a, b, e => e ? rej(e) : res()));
+
+// Wait for file to stabilize (not being written to)
+async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 200) {
+  let lastSize = 0;
+  let stableCount = 0;
+  const requiredStableChecks = 6; // File must be same size for 6 consecutive checks
+  
+  const startTime = Date.now();
+  while (Date.now() - startTime < maxWaitMs) {
+    try {
+      const stats = fs.statSync(filePath);
+      if (stats.size === lastSize) {
+        stableCount++;
+        if (stableCount >= requiredStableChecks) {
+          return true; // File is stable
+        }
+      } else {
+        stableCount = 0; // Reset counter if size changed
+        lastSize = stats.size;
+      }
+    } catch (err) {
+      // File might not exist yet
+      return false;
+    }
+    await new Promise(resolve => setTimeout(resolve, checkIntervalMs));
+  }
+  return false; // Timeout
+}
+
+// Safe file move using copy + unlink to avoid corruption
+async function safeMoveFile(sourcePath, destPath) {
+  try {
+    // First, ensure destination directory exists
+    const destDir = path.dirname(destPath);
+    if (!await fsExists(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    
+    // Copy file first, then delete source (safer than rename if file might be in use)
+    fs.copyFileSync(sourcePath, destPath);
+    
+    // Verify copy was successful by comparing sizes
+    const sourceStats = fs.statSync(sourcePath);
+    const destStats = fs.statSync(destPath);
+    
+    if (sourceStats.size !== destStats.size) {
+      throw new Error(`Copy size mismatch: source=${sourceStats.size}, dest=${destStats.size}`);
+    }
+    
+    // Only delete source if copy was successful
+    fs.unlinkSync(sourcePath);
+    return true;
+  } catch (err) {
+    console.log(`[SAFE_MOVE] Error: ${err.message}`);
+    // If copy failed, try rename as fallback
+    try {
+      await fsRename(sourcePath, destPath);
+      return true;
+    } catch (renameErr) {
+      throw new Error(`Both copy and rename failed: ${err.message}, ${renameErr.message}`);
+    }
+  }
+}
 const runFF = cmd => new Promise((res, rej) => exec(cmd, { timeout: 60000 }, e => e ? rej(e) : res()));
 
 // ──────────────────────────────────────────────────────────────────────
@@ -488,12 +551,28 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       const mp4Path = path.join(deviceFolder, file);
       const thumbPath = path.join(deviceFolder, `${file}.jpg`);
       const dest = path.join(processedFolder, file);
-      const stats = fs.statSync(mp4Path);
-
+      
       try {
-        if (stats.size > 0) await generateSmallThumbnail(mp4Path, thumbPath);
-        console.log(`[MOVE] ${file} to processedVideos/`);
-        await fsRename(mp4Path, dest);
+        // Wait for file to stabilize (not being written to) before processing
+        console.log(`[FORCE] Waiting for ${file} to stabilize...`);
+        const isStable = await waitForFileStable(mp4Path, 10000, 800); // Wait up to 10 seconds, check every 800ms (6 checks = 4.8s)
+        if (!isStable) {
+          console.log(`[FORCE] WARNING: ${file} may still be uploading, proceeding anyway...`);
+        }
+        
+        const stats = fs.statSync(mp4Path);
+        if (stats.size === 0) {
+          console.log(`[FORCE] SKIP: ${file} is 0 bytes`);
+          continue;
+        }
+        
+        if (stats.size > 0) {
+          await generateSmallThumbnail(mp4Path, thumbPath);
+        }
+        
+        console.log(`[MOVE] ${file} (${stats.size} bytes) to processedVideos/`);
+        await safeMoveFile(mp4Path, dest);
+        console.log(`[MOVE] SUCCESS: ${file} moved successfully`);
       } catch (err) {
         console.log(`[FORCE] FAILED ${file}: ${err.message}`);
       }
