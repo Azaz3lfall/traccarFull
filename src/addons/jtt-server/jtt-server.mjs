@@ -165,8 +165,9 @@ async function safeMoveFile(sourcePath, destPath) {
     
     // CRITICAL: Verify stability one more time RIGHT BEFORE copying
     // This ensures no writes happened between the initial check and the copy
+    // M2M SIM delays can cause intermittent writes, so allow longer wait
     console.log(`[SAFE_MOVE] Final stability verification before copy...`);
-    const finalCheck = await waitForFileStable(sourcePath, 10000, 1000); // Quick check: 10 seconds max, 1 second intervals
+    const finalCheck = await waitForFileStable(sourcePath, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
     if (!finalCheck) {
       throw new Error(`File ${sourcePath} became unstable right before copy operation`);
     }
@@ -218,8 +219,8 @@ async function safeMoveFile(sourcePath, destPath) {
     console.log(`[SAFE_MOVE] Error: ${err.message}`);
     // If copy failed, try rename as fallback (but only if file is stable)
     try {
-      // Quick stability check before rename
-      const isStable = await waitForFileStable(sourcePath, 5000, 500);
+      // Stability check before rename (allow longer for M2M SIM delays)
+      const isStable = await waitForFileStable(sourcePath, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
       if (isStable) {
         await fsRename(sourcePath, destPath);
         console.log(`[SAFE_MOVE] Fallback rename successful`);
@@ -258,8 +259,9 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
   try {
     // CRITICAL: Verify stability one more time RIGHT BEFORE ffmpeg
     // This ensures no writes happened between the initial check and ffmpeg
+    // M2M SIM delays can cause intermittent writes, so allow longer wait
     console.log(`[THUMB] Final stability verification before ffmpeg...`);
-    const finalCheck = await waitForFileStable(mp4Path, 10000, 1000); // Quick check: 10 seconds max, 1 second intervals
+    const finalCheck = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
     if (!finalCheck) {
       throw new Error(`File ${mp4Path} became unstable right before ffmpeg operation`);
     }
@@ -282,7 +284,8 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
     if (size > 30000) {
       console.log(`[THUMB] RECOMPRESSING...`);
       // File should still be stable, but verify one more time before second ffmpeg call
-      const secondCheck = await waitForFileStable(mp4Path, 10000, 1000);
+      // M2M SIM delays can cause intermittent writes, so allow longer wait
+      const secondCheck = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
       if (!secondCheck) {
         throw new Error(`File ${mp4Path} became unstable before second ffmpeg operation`);
       }
@@ -653,8 +656,9 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       try {
         // CRITICAL: Wait for file stability BEFORE any operations
         // This prevents corruption by ensuring file is fully written
+        // M2M SIM delays can cause long upload times, so allow sufficient wait
         console.log(`[FORCE] Waiting for ${file} to stabilize...`);
-        await waitForFileStable(mp4Path);
+        await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds for M2M SIM delays, check every 40 seconds
         
         // Now safe to check file size
         const stats = fs.statSync(mp4Path);
@@ -854,9 +858,9 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
   
   // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
   // For jc181 files in processedVideos, they should already be stable, but verify anyway
-  // For jc400 files in upload folder, they might still be uploading
+  // For jc400 files in upload folder, they might still be uploading via M2M SIM (high latency)
   console.log(`[MP4] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
   if (!isStable) {
     console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
   }
@@ -897,9 +901,9 @@ app.get('/:imei/:name/MP4', async (req, res) => {
   
   // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
   // For jc181 files in processedVideos, they should already be stable, but verify anyway
-  // For jc400 files in upload folder, they might still be uploading
+  // For jc400 files in upload folder, they might still be uploading via M2M SIM (high latency)
   console.log(`[MP4] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
   if (!isStable) {
     console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
   }
@@ -948,8 +952,9 @@ app.get('/:imei/:name/:deviceModel', async (req, res, next) => {
   }
   
   // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  // M2M SIM cards can have high latency, so allow longer wait time
   console.log(`[THUMB] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
   if (!isStable) {
     console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
   }
@@ -988,8 +993,9 @@ app.get('/:imei/:name', async (req, res) => {
   }
   
   // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  // M2M SIM cards can have high latency, so allow longer wait time
   console.log(`[THUMB] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
   if (!isStable) {
     console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
   }
