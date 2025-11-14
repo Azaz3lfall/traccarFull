@@ -937,8 +937,9 @@ async function getFilesOnServer(deviceImei) {
 // ──────────────────────────────────────────────────────────────────────
 // 3. FTP Upload Endpoint (MUST BE BEFORE REGEX ROUTES)
 // ──────────────────────────────────────────────────────────────────────
+console.log(`[SERVER START] Registering /ftpupload route...`);
 app.post('/ftpupload', async (req, res) => {
-  console.log(`\n[FTPUPLOAD] ROUTE HIT! Starting handler...`);
+  console.log(`\n[FTPUPLOAD] ========== ROUTE HIT! ========== Starting handler...`);
   try {
     console.log(`[FTPUPLOAD] Parsing body...`);
     const data = JSON.parse(req.body || "{}");
@@ -1021,22 +1022,9 @@ app.post('/ftpupload', async (req, res) => {
       const cleanJimiServer = jimiServer.replace(/\/+$/, '');
       const urlencoded = new URLSearchParams();
       urlencoded.append("deviceImei", deviceImei);
-      urlencoded.append("cmdContent", JSON.stringify({
-        "serverAddress": ftpServerIp,
-        "ftpPort": ftpPort,
-        "userName": `_${deviceImei}`,
-        "password": `_${deviceImei}`,
-        "fileUploadPath": fileUploadPath,
-        "channel": channel,
-        "beginTime": beginTimeFormatted,
-        "endTime": endTimeFormatted,
-        "alarmFlag": 0,
-        "resourceType": 0,
-        "codeType": 0,
-        "storageType": 0,
-        "condition": 1,
-        "instructionID": "123456789"
-      }));
+      // Format cmdContent with newlines to match reference format
+      const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
+      urlencoded.append("cmdContent", cmdContentJson);
       urlencoded.append("serverFlagId", "0");
       urlencoded.append("proNo", "37382");
       urlencoded.append("platform", "web");
@@ -1057,10 +1045,18 @@ app.post('/ftpupload', async (req, res) => {
         ftpServerIp,
         ftpPort,
         fileUploadPath,
-        token: token ? '***' : 'missing'
+        token: token
       });
       
       console.log(`[FTPUPLOAD] About to call fetch...`);
+      console.log(`[FTPUPLOAD] ========== JIMI SERVER REQUEST ==========`);
+      console.log(`[FTPUPLOAD] URL: ${apiUrl}`);
+      console.log(`[FTPUPLOAD] Method: POST`);
+      console.log(`[FTPUPLOAD] Headers:`, {
+        "Content-Type": "application/x-www-form-urlencoded"
+      });
+      console.log(`[FTPUPLOAD] Body:`, urlencoded.toString());
+      console.log(`[FTPUPLOAD] =========================================`);
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -1431,5 +1427,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`→ MP4:   ${MEDIA_SERVER}/<imei>/<name>/MP4`);
   console.log(`→ CORS:  *.rastreadorautoram.com.br + 192.168.*.* (http & https)`);
   console.log(`→ SELF-SIGNED SSL SUPPORTED`);
-  console.log(`→ 100% DONE | NO CORS ERRORS | NO DOUBLE _000000\n`);
+  console.log(`→ 100% DONE | NO CORS ERRORS | NO DOUBLE _000000`);
+  console.log(`→ REGISTERED ROUTES: /ftpupload, /getFileList, /pushURL/*\n`);
 });

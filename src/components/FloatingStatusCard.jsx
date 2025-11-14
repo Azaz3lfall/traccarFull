@@ -224,13 +224,13 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                 }}>
                   <PlayArrowIcon style={{ fontSize: '24px' }} />
                 </div>
-                <Typography variant="body2" style={{ 
-                  color: colors.textSecondary,
+              <Typography variant="body2" style={{ 
+                color: colors.textSecondary,
                   fontSize: '11px',
                   textAlign: 'center'
-                }}>
-                  No thumbnail
-                </Typography>
+              }}>
+                No thumbnail
+              </Typography>
               </>
             )}
           </div>
@@ -319,16 +319,45 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               console.error('Error parsing iothub:', e);
             }
             
-            // Prepare data to send
+            // Log the raw video object to debug
+            console.log('=== UPLOAD BUTTON CLICKED ===');
+            console.log('Raw video object:', JSON.stringify(video, null, 2));
+            console.log('Video beginTime:', video.beginTime);
+            console.log('Video endTime:', video.endTime);
+            console.log('Video expected_file:', video.expected_file);
+            
+            // Ensure we use the video's actual beginTime and endTime from the server response
+            // These should be in format "2025-11-13 13:47:52" from the device
+            if (!video.beginTime || !video.endTime) {
+              console.error('❌ Video missing beginTime or endTime!', {
+                beginTime: video.beginTime,
+                endTime: video.endTime,
+                fullVideo: video
+              });
+            } else {
+              // Validate the format - should be "YYYY-MM-DD HH:mm:ss"
+              const timeFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+              if (!timeFormat.test(video.beginTime) || !timeFormat.test(video.endTime)) {
+                console.error('❌ Video beginTime/endTime format is wrong!', {
+                  beginTime: video.beginTime,
+                  endTime: video.endTime
+                });
+              }
+            }
+            
+            // Prepare data to send - use video's actual times, not date picker values
             const uploadData = {
               ...video,
+              beginTime: video.beginTime, // Use actual video beginTime from server
+              endTime: video.endTime,     // Use actual video endTime from server
               deviceImei: device?.uniqueId,
               deviceModel: iothub?.deviceModel || 'jc181',
               iothub: iothub
             };
             
-            // Log video data with iothub attributes
-            console.log('Video Data with IoTHub:', uploadData);
+            // Log final upload data
+            console.log('Final upload data:', JSON.stringify(uploadData, null, 2));
+            console.log('================================');
             
             // Send POST request to /ftpupload endpoint
             try {
@@ -1015,21 +1044,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         const allVideos = [];
         
         // Process onServer videos - mark as "uploaded_ok" (unless < 1MB, then "upload_errored")
+        // IMPORTANT: Preserve beginTime and endTime from server response - do NOT use date picker values
         (data.onServer || []).forEach(video => {
           const fileSize = video.file_size || 0;
           const status = fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok'; // 1MB = 1024 * 1024 bytes
           
           allVideos.push({
             ...video,
-            status: status
+            status: status,
+            // Explicitly preserve beginTime and endTime from server response
+            beginTime: video.beginTime,
+            endTime: video.endTime
           });
         });
         
         // Process onDevice videos - always mark as "not_uploaded"
+        // IMPORTANT: Preserve beginTime and endTime from server response - do NOT use date picker values
         (data.onDevice || []).forEach(video => {
           allVideos.push({
             ...video,
-            status: 'not_uploaded'
+            status: 'not_uploaded',
+            // Explicitly preserve beginTime and endTime from server response
+            beginTime: video.beginTime,
+            endTime: video.endTime
           });
         });
         
@@ -1037,8 +1074,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setVideosTotalCount(allVideos.length);
       } else {
         // Old format - videos array
-        setVideos(data.videos || []);
-        setVideosTotalCount(data.resource_count || 0);
+      setVideos(data.videos || []);
+      setVideosTotalCount(data.resource_count || 0);
       }
       
       setVideosCurrentPage(1); // Reset to first page when new data is fetched
