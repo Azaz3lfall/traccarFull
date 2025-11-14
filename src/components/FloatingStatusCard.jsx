@@ -300,44 +300,61 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
       {/* Upload button for not_uploaded and upload_errored videos */}
       {(video.status === 'not_uploaded' || video.status === 'upload_errored') && (
         <IconButton
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
             e.preventDefault();
-            
-            // Debug: Log device to see what we have
-            console.log('Device object:', device);
-            console.log('Device attributes:', device?.attributes);
-            console.log('Device iothub raw:', device?.attributes?.iothub);
             
             // Parse iothub attributes from device
             let iothub = {};
             try {
               if (device?.attributes?.iothub) {
                 const iothubRaw = device.attributes.iothub;
-                console.log('iothubRaw type:', typeof iothubRaw);
-                console.log('iothubRaw value:', iothubRaw);
-                
                 if (typeof iothubRaw === 'string') {
                   iothub = JSON.parse(iothubRaw);
-                  console.log('Parsed iothub from string:', iothub);
                 } else {
                   iothub = iothubRaw;
-                  console.log('iothub already object:', iothub);
                 }
-              } else {
-                console.warn('device.attributes.iothub is missing!');
               }
             } catch (e) {
               console.error('Error parsing iothub:', e);
-              console.error('Error stack:', e.stack);
             }
             
-            // Log video data with iothub attributes
-            console.log('Video Data with IoTHub:', {
+            // Prepare data to send
+            const uploadData = {
               ...video,
               deviceImei: device?.uniqueId,
+              deviceModel: iothub?.deviceModel || 'jc181',
               iothub: iothub
-            });
+            };
+            
+            // Log video data with iothub attributes
+            console.log('Video Data with IoTHub:', uploadData);
+            
+            // Send POST request to /ftpupload endpoint
+            try {
+              const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+              if (!mediaServerUrl) {
+                console.error('Media server URL not configured');
+                return;
+              }
+              
+              const response = await fetch(`${mediaServerUrl}/ftpupload`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(uploadData)
+              });
+              
+              const result = await response.json();
+              console.log('FTP upload response:', result);
+              
+              if (!response.ok) {
+                console.error('FTP upload failed:', result);
+              }
+            } catch (error) {
+              console.error('Error sending FTP upload request:', error);
+            }
           }}
           size="small"
           style={{

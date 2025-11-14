@@ -1227,7 +1227,57 @@ app.post(/\/pushURL\/(pushftpfileupload|pushresourcelist)/, async (req, res) => 
 });
 
 // ──────────────────────────────────────────────────────────────────────
-// 6. CATCH-ALL
+// 6. FTP Upload Endpoint
+// ──────────────────────────────────────────────────────────────────────
+app.post('/ftpupload', async (req, res) => {
+  try {
+    const data = JSON.parse(req.body || "{}");
+    
+    // Console log the received POST data
+    console.log(`\n[FTPUPLOAD] Received POST request:`);
+    console.log(JSON.stringify(data, null, 2));
+    
+    const { deviceModel } = data;
+    const deviceModelLower = (deviceModel || '').toLowerCase();
+    
+    // Filter by deviceModel - for now only handle jc181
+    if (deviceModelLower === 'jc181') {
+      console.log(`[FTPUPLOAD] Processing jc181 device`);
+      // TODO: Implement jc181 FTP upload logic
+      
+      return res.json({ 
+        code: 0, 
+        ok: true,
+        message: 'jc181 FTP upload request received',
+        deviceModel: 'jc181'
+      });
+    } else if (deviceModelLower) {
+      console.log(`[FTPUPLOAD] Device model ${deviceModelLower} not yet supported`);
+      return res.status(400).json({ 
+        code: 1, 
+        ok: false, 
+        error: `Device model ${deviceModelLower} not yet supported. Only jc181 is supported at this time.` 
+      });
+    } else {
+      console.log(`[FTPUPLOAD] Missing deviceModel in request`);
+      return res.status(400).json({ 
+        code: 1, 
+        ok: false, 
+        error: 'Missing deviceModel in request' 
+      });
+    }
+  } catch (error) {
+    console.log(`[FTPUPLOAD] Error: ${error.message}`);
+    return res.status(500).json({ 
+      code: 1, 
+      ok: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// 7. CATCH-ALL
 // ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => res.json({ code: 0, ok: true }));
 
