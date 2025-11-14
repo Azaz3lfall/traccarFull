@@ -85,7 +85,7 @@ import flvjs from 'flv.js';
 dayjs.extend(relativeTime);
 
 // VideoItem component with lazy loading - moved outside to prevent re-creation on every render
-const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer, device, setFtpUploadRequest, fetchVideos, setVideos }) => {
+const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer, device, setFtpUploadRequest, fetchVideos, setVideos, showSnackbar }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef(null);
@@ -309,7 +309,8 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
           width: '48px',
           height: '48px',
           borderRadius: '50%',
-          backgroundColor: 'rgba(33, 150, 243, 0.9)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(10px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -329,6 +330,19 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
           onClick={async (e) => {
             e.stopPropagation();
             e.preventDefault();
+            
+            // Store original status to revert if upload fails
+            const originalStatus = video.status;
+            
+            // IMMEDIATELY set status to pending to show circular progress and prevent multiple clicks
+            if (setVideos) {
+              setVideos(prevVideos => prevVideos.map(v => {
+                if (v.expected_file === video.expected_file) {
+                  return { ...v, status: 'pending' };
+                }
+                return v;
+              }));
+            }
             
             // Parse iothub attributes from device
             let iothub = {};
@@ -390,6 +404,18 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
               if (!mediaServerUrl) {
                 console.error('Media server URL not configured');
+                // Revert status on error
+                if (setVideos) {
+                  setVideos(prevVideos => prevVideos.map(v => {
+                    if (v.expected_file === video.expected_file) {
+                      return { ...v, status: originalStatus };
+                    }
+                    return v;
+                  }));
+                }
+                if (showSnackbar) {
+                  showSnackbar('Media server URL not configured', 'error');
+                }
                 return;
               }
               
@@ -404,33 +430,58 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               const result = await response.json();
               console.log('FTP upload response:', result);
               
-              // Store upload request in localStorage with current timestamp and device model
-              if (uploadData.expected_file) {
-                const deviceModel = (uploadData.deviceModel || iothub?.deviceModel || 'jc181').toLowerCase();
-                setFtpUploadRequest(uploadData.expected_file, Date.now(), deviceModel);
-                console.log('FTP upload request stored in localStorage:', uploadData.expected_file, 'deviceModel:', deviceModel);
-                
-                // Immediately update the video status in the current list if it exists
-                if (setVideos) {
-                  setVideos(prevVideos => prevVideos.map(v => {
-                    if (v.expected_file === uploadData.expected_file) {
-                      return { ...v, status: 'pending' };
-                    }
-                    return v;
-                  }));
+              // Check if upload was successful
+              if (response.ok && result.code === 0) {
+                // Store upload request in localStorage with current timestamp and device model
+                if (uploadData.expected_file) {
+                  const deviceModel = (uploadData.deviceModel || iothub?.deviceModel || 'jc181').toLowerCase();
+                  setFtpUploadRequest(uploadData.expected_file, Date.now(), deviceModel);
+                  console.log('FTP upload request stored in localStorage:', uploadData.expected_file, 'deviceModel:', deviceModel);
                 }
-              }
-              
-              if (!response.ok) {
-                console.error('FTP upload failed:', result);
-              } else {
+                
+                // Show success snackbar
+                if (showSnackbar) {
+                  showSnackbar('FTP upload request sent successfully', 'success');
+                }
+                
                 // Refresh video list to update pending status
                 if (fetchVideos) {
                   fetchVideos();
                 }
+              } else {
+                // Upload failed - revert status and show error
+                if (setVideos) {
+                  setVideos(prevVideos => prevVideos.map(v => {
+                    if (v.expected_file === video.expected_file) {
+                      return { ...v, status: originalStatus };
+                    }
+                    return v;
+                  }));
+                }
+                
+                const errorMessage = result.error || result.message || 'FTP upload request failed';
+                console.error('FTP upload failed:', result);
+                if (showSnackbar) {
+                  showSnackbar(errorMessage, 'error');
+                }
               }
             } catch (error) {
               console.error('Error sending FTP upload request:', error);
+              
+              // Revert status on error
+              if (setVideos) {
+                setVideos(prevVideos => prevVideos.map(v => {
+                  if (v.expected_file === video.expected_file) {
+                    return { ...v, status: originalStatus };
+                  }
+                  return v;
+                }));
+              }
+              
+              // Show error snackbar
+              if (showSnackbar) {
+                showSnackbar(`Error sending FTP upload request: ${error.message}`, 'error');
+              }
             }
           }}
           size="small"
@@ -465,6 +516,7 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
     prevProps.video.channel === nextProps.video.channel &&
     prevProps.video.beginTime === nextProps.video.beginTime &&
     prevProps.video.status === nextProps.video.status &&
+    prevProps.showSnackbar === nextProps.showSnackbar &&
     prevProps.video.video_url === nextProps.video.video_url &&
     prevProps.video.thumbnail_url === nextProps.video.thumbnail_url &&
     prevProps.index === nextProps.index
@@ -6846,6 +6898,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   setFtpUploadRequest={setFtpUploadRequest}
                                   fetchVideos={fetchVideos}
                                   setVideos={setVideos}
+                                  showSnackbar={showSnackbar}
                                 />
                               ))}
                             </Box>
