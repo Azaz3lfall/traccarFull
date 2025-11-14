@@ -246,7 +246,7 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       // Prefer higher timestamp (more recent video), fallback to mtime
       if (thumb.timestamp > current.timestamp || 
           (thumb.timestamp === current.timestamp && thumb.mtime > current.mtime)) {
-        latestThumbByChannel[thumb.channel] = thumb;
+      latestThumbByChannel[thumb.channel] = thumb;
       }
     }
   });
@@ -311,10 +311,10 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       }
     } else {
       // uploaded_ok: use specific thumbnail if exists, otherwise latest for channel
-      if (thumbExists && thumbSize > 0) {
-        thumbnail_url = thumbUrl;
-      } else {
-        const latest = latestThumbByChannel[vid.channel];
+    if (thumbExists && thumbSize > 0) {
+      thumbnail_url = thumbUrl;
+    } else {
+      const latest = latestThumbByChannel[vid.channel];
         if (latest) {
           // Use the original filename we found to verify existence
           const latestThumbPath = path.join(deviceFolder, latest.filename);
@@ -426,10 +426,10 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       }
     } else {
       // uploaded_ok: use specific thumbnail if exists, otherwise latest for channel
-      if (thumbExists && thumbSize > 0) {
-        thumbnail_url = thumbUrl;
-      } else {
-        const latest = latestThumbByChannel[parsed.channel];
+    if (thumbExists && thumbSize > 0) {
+      thumbnail_url = thumbUrl;
+    } else {
+      const latest = latestThumbByChannel[parsed.channel];
         if (latest) {
           // Use the original filename we found to verify existence
           const latestThumbPath = path.join(deviceFolder, latest.filename);
@@ -935,7 +935,197 @@ async function getFilesOnServer(deviceImei) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// 3. getFileList
+// 3. FTP Upload Endpoint (MUST BE BEFORE REGEX ROUTES)
+// ──────────────────────────────────────────────────────────────────────
+app.post('/ftpupload', async (req, res) => {
+  console.log(`\n[FTPUPLOAD] ROUTE HIT! Starting handler...`);
+  try {
+    console.log(`[FTPUPLOAD] Parsing body...`);
+    const data = JSON.parse(req.body || "{}");
+    
+    // Console log the received POST data
+    console.log(`\n[FTPUPLOAD] Received POST request:`);
+    console.log(JSON.stringify(data, null, 2));
+    
+    const { deviceModel, deviceImei, channel, beginTime, endTime, iothub } = data;
+    const deviceModelLower = (deviceModel || '').toLowerCase();
+    
+    // Filter by deviceModel - for now only handle jc181
+    if (deviceModelLower === 'jc181') {
+      console.log(`[FTPUPLOAD] Processing jc181 device`);
+      
+      // Validate required fields
+      console.log(`[FTPUPLOAD] Validating fields...`);
+      if (!deviceImei || channel === undefined || !beginTime || !endTime || !iothub) {
+        console.log(`[FTPUPLOAD] Missing required fields - deviceImei: ${!!deviceImei}, channel: ${channel}, beginTime: ${!!beginTime}, endTime: ${!!endTime}, iothub: ${!!iothub}`);
+        return res.status(400).json({ 
+          code: 1, 
+          ok: false, 
+          error: 'Missing required fields: deviceImei, channel, beginTime, endTime, or iothub' 
+        });
+      }
+      console.log(`[FTPUPLOAD] All required fields present`);
+      
+      // Extract iothub configuration
+      console.log(`[FTPUPLOAD] Extracting iothub configuration...`);
+      const token = iothub?.token || '';
+      const jimiServer = iothub?.iothubServer || '';
+      const ftpServerIp = iothub?.ftpServerIp || '';
+      const ftpPort = parseInt(iothub?.ftpPort || '21', 10);
+      const fileUploadPath = iothub?.fileUploadPath || '/';
+      
+      if (!token || !jimiServer || !ftpServerIp || !fileUploadPath) {
+        console.log(`[FTPUPLOAD] Missing iothub config - token: ${!!token}, jimiServer: ${!!jimiServer}, ftpServerIp: ${!!ftpServerIp}, fileUploadPath: ${!!fileUploadPath}`);
+        return res.status(400).json({ 
+          code: 1, 
+          ok: false, 
+          error: 'Missing required iothub configuration: token, iothubServer, ftpServerIp, or fileUploadPath' 
+        });
+      }
+      console.log(`[FTPUPLOAD] All iothub config present`);
+      
+      // Format dates from "2025-11-02 00:00:00" to "YYMMDDHHMMSS" (251102000000)
+      console.log(`[FTPUPLOAD] Formatting dates...`);
+      const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return '';
+        try {
+          const date = new Date(dateTimeString.replace(' ', 'T'));
+          const yy = date.getFullYear().toString().slice(-2);
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          const hh = String(date.getHours()).padStart(2, '0');
+          const mi = String(date.getMinutes()).padStart(2, '0');
+          const ss = String(date.getSeconds()).padStart(2, '0');
+          return `${yy}${mm}${dd}${hh}${mi}${ss}`;
+        } catch (e) {
+          console.log(`[FTPUPLOAD] Error formatting date: ${e.message}`);
+          return '';
+        }
+      };
+      
+      const beginTimeFormatted = formatDateTime(beginTime);
+      const endTimeFormatted = formatDateTime(endTime);
+      
+      if (!beginTimeFormatted || !endTimeFormatted) {
+        console.log(`[FTPUPLOAD] Invalid date format - beginTime: ${beginTimeFormatted}, endTime: ${endTimeFormatted}`);
+        return res.status(400).json({ 
+          code: 1, 
+          ok: false, 
+          error: 'Invalid date format for beginTime or endTime' 
+        });
+      }
+      console.log(`[FTPUPLOAD] Dates formatted: ${beginTimeFormatted} to ${endTimeFormatted}`);
+      
+      // Send FTP upload request to Jimi server
+      console.log(`[FTPUPLOAD] Building request...`);
+      const cleanJimiServer = jimiServer.replace(/\/+$/, '');
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("deviceImei", deviceImei);
+      urlencoded.append("cmdContent", JSON.stringify({
+        "serverAddress": ftpServerIp,
+        "ftpPort": ftpPort,
+        "userName": `_${deviceImei}`,
+        "password": `_${deviceImei}`,
+        "fileUploadPath": fileUploadPath,
+        "channel": channel,
+        "beginTime": beginTimeFormatted,
+        "endTime": endTimeFormatted,
+        "alarmFlag": 0,
+        "resourceType": 0,
+        "codeType": 0,
+        "storageType": 0,
+        "condition": 1,
+        "instructionID": "123456789"
+      }));
+      urlencoded.append("serverFlagId", "0");
+      urlencoded.append("proNo", "37382");
+      urlencoded.append("platform", "web");
+      urlencoded.append("requestId", "6");
+      urlencoded.append("cmdType", "normallns");
+      urlencoded.append("offLineFlag", "1");
+      urlencoded.append("token", token);
+      
+      const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
+      
+      console.log(`[FTPUPLOAD] Sending request to: ${apiUrl}`);
+      console.log(`[FTPUPLOAD] Request body:`, urlencoded.toString());
+      console.log(`[FTPUPLOAD] Request params:`, {
+        deviceImei,
+        channel,
+        beginTime: beginTimeFormatted,
+        endTime: endTimeFormatted,
+        ftpServerIp,
+        ftpPort,
+        fileUploadPath,
+        token: token ? '***' : 'missing'
+      });
+      
+      console.log(`[FTPUPLOAD] About to call fetch...`);
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: urlencoded,
+          redirect: "follow"
+        });
+        
+        console.log(`[FTPUPLOAD] Fetch completed, status: ${response.status}`);
+        const responseText = await response.text();
+        console.log(`[FTPUPLOAD] Jimi server response status: ${response.status}`);
+        console.log(`[FTPUPLOAD] Jimi server response:`, responseText);
+        
+        // Return the Jimi server response as the ftpupload response
+        // Try to parse as JSON, if it fails return as text
+        let responseData;
+        try {
+          responseData = JSON.parse(responseText);
+        } catch (e) {
+          responseData = responseText;
+        }
+        
+        console.log(`[FTPUPLOAD] Returning response to client`);
+        // Return the response with the same status code from Jimi server
+        return res.status(response.status).json(responseData);
+      } catch (error) {
+        console.log(`[FTPUPLOAD] ERROR in fetch:`);
+        console.log(`[FTPUPLOAD] Error message: ${error.message}`);
+        console.log(`[FTPUPLOAD] Error stack: ${error.stack}`);
+        return res.status(500).json({ 
+          code: 1, 
+          ok: false, 
+          error: `Failed to send FTP upload request: ${error.message}`,
+          details: error.stack
+        });
+      }
+    } else if (deviceModelLower) {
+      console.log(`[FTPUPLOAD] Device model ${deviceModelLower} not yet supported`);
+      return res.status(400).json({ 
+        code: 1, 
+        ok: false, 
+        error: `Device model ${deviceModelLower} not yet supported. Only jc181 is supported at this time.` 
+      });
+    } else {
+      console.log(`[FTPUPLOAD] Missing deviceModel in request`);
+      return res.status(400).json({ 
+        code: 1, 
+        ok: false, 
+        error: 'Missing deviceModel in request' 
+      });
+    }
+  } catch (error) {
+    console.log(`[FTPUPLOAD] Error: ${error.message}`);
+    return res.status(500).json({ 
+      code: 1, 
+      ok: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// 4. getFileList
 // ──────────────────────────────────────────────────────────────────────
 app.post('/getFileList', async (req, res) => {
   try {
@@ -1021,10 +1211,10 @@ app.post('/getFileList', async (req, res) => {
           // Get files from server and device
           const onServer = await getFilesOnServer(deviceImei);
           
-          const reportPath = `/home/_${deviceImei}/status_report.json`;
+    const reportPath = `/home/_${deviceImei}/status_report.json`;
           let onDevice = [];
           if (await fsExists(reportPath)) {
-            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+    const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
             onDevice = report.videos || [];
             
             // Update URLs to include deviceModel
@@ -1224,176 +1414,6 @@ app.post(/\/pushURL\/(pushftpfileupload|pushresourcelist)/, async (req, res) => 
   }
   
   res.json({ code: 0, ok: true });
-});
-
-// ──────────────────────────────────────────────────────────────────────
-// 6. FTP Upload Endpoint
-// ──────────────────────────────────────────────────────────────────────
-app.post('/ftpupload', async (req, res) => {
-  try {
-    const data = JSON.parse(req.body || "{}");
-    
-    // Console log the received POST data
-    console.log(`\n[FTPUPLOAD] Received POST request:`);
-    console.log(JSON.stringify(data, null, 2));
-    
-    const { deviceModel, deviceImei, channel, beginTime, endTime, iothub } = data;
-    const deviceModelLower = (deviceModel || '').toLowerCase();
-    
-    // Filter by deviceModel - for now only handle jc181
-    if (deviceModelLower === 'jc181') {
-      console.log(`[FTPUPLOAD] Processing jc181 device`);
-      
-      // Validate required fields
-      if (!deviceImei || channel === undefined || !beginTime || !endTime || !iothub) {
-        return res.status(400).json({ 
-          code: 1, 
-          ok: false, 
-          error: 'Missing required fields: deviceImei, channel, beginTime, endTime, or iothub' 
-        });
-      }
-      
-      // Extract iothub configuration
-      const token = iothub?.token || '';
-      const jimiServer = iothub?.iothubServer || '';
-      const ftpServerIp = iothub?.ftpServerIp || '';
-      const ftpPort = parseInt(iothub?.ftpPort || '21', 10);
-      const fileUploadPath = iothub?.fileUploadPath || '/';
-      
-      if (!token || !jimiServer || !ftpServerIp || !fileUploadPath) {
-        return res.status(400).json({ 
-          code: 1, 
-          ok: false, 
-          error: 'Missing required iothub configuration: token, iothubServer, ftpServerIp, or fileUploadPath' 
-        });
-      }
-      
-      // Format dates from "2025-11-02 00:00:00" to "YYMMDDHHMMSS" (251102000000)
-      const formatDateTime = (dateTimeString) => {
-        if (!dateTimeString) return '';
-        try {
-          const date = new Date(dateTimeString.replace(' ', 'T'));
-          const yy = date.getFullYear().toString().slice(-2);
-          const mm = String(date.getMonth() + 1).padStart(2, '0');
-          const dd = String(date.getDate()).padStart(2, '0');
-          const hh = String(date.getHours()).padStart(2, '0');
-          const mi = String(date.getMinutes()).padStart(2, '0');
-          const ss = String(date.getSeconds()).padStart(2, '0');
-          return `${yy}${mm}${dd}${hh}${mi}${ss}`;
-        } catch (e) {
-          console.log(`[FTPUPLOAD] Error formatting date: ${e.message}`);
-          return '';
-        }
-      };
-      
-      const beginTimeFormatted = formatDateTime(beginTime);
-      const endTimeFormatted = formatDateTime(endTime);
-      
-      if (!beginTimeFormatted || !endTimeFormatted) {
-        return res.status(400).json({ 
-          code: 1, 
-          ok: false, 
-          error: 'Invalid date format for beginTime or endTime' 
-        });
-      }
-      
-      // Send FTP upload request to Jimi server
-      const cleanJimiServer = jimiServer.replace(/\/+$/, '');
-      const urlencoded = new URLSearchParams();
-      urlencoded.append("deviceImei", deviceImei);
-      urlencoded.append("cmdContent", JSON.stringify({
-        "serverAddress": ftpServerIp,
-        "ftpPort": ftpPort,
-        "userName": `_${deviceImei}`,
-        "password": `_${deviceImei}`,
-        "fileUploadPath": fileUploadPath,
-        "channel": channel,
-        "beginTime": beginTimeFormatted,
-        "endTime": endTimeFormatted,
-        "alarmFlag": 0,
-        "resourceType": 0,
-        "codeType": 0,
-        "storageType": 0,
-        "condition": 1,
-        "instructionID": "123456789"
-      }));
-      urlencoded.append("serverFlagId", "0");
-      urlencoded.append("proNo", "37382");
-      urlencoded.append("platform", "web");
-      urlencoded.append("requestId", "6");
-      urlencoded.append("cmdType", "normallns");
-      urlencoded.append("offLineFlag", "1");
-      urlencoded.append("token", token);
-      
-      console.log(`[FTPUPLOAD] Sending request to: ${cleanJimiServer}/api/device/sendInstruct`);
-      console.log(`[FTPUPLOAD] Request body:`, urlencoded.toString());
-      console.log(`[FTPUPLOAD] Request params:`, {
-        deviceImei,
-        channel,
-        beginTime: beginTimeFormatted,
-        endTime: endTimeFormatted,
-        ftpServerIp,
-        ftpPort,
-        fileUploadPath,
-        token: token ? '***' : 'missing'
-      });
-      
-      try {
-        const response = await fetch(`${cleanJimiServer}/api/device/sendInstruct`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: urlencoded,
-          redirect: "follow"
-        });
-        
-        const responseText = await response.text();
-        console.log(`[FTPUPLOAD] Jimi server response status: ${response.status}`);
-        console.log(`[FTPUPLOAD] Jimi server response:`, responseText);
-        
-        // Return the Jimi server response as the ftpupload response
-        // Try to parse as JSON, if it fails return as text
-        let responseData;
-        try {
-          responseData = JSON.parse(responseText);
-        } catch (e) {
-          responseData = responseText;
-        }
-        
-        // Return the response with the same status code from Jimi server
-        return res.status(response.status).json(responseData);
-      } catch (error) {
-        console.log(`[FTPUPLOAD] Error sending request to Jimi server: ${error.message}`);
-        return res.status(500).json({ 
-          code: 1, 
-          ok: false, 
-          error: `Failed to send FTP upload request: ${error.message}` 
-        });
-      }
-    } else if (deviceModelLower) {
-      console.log(`[FTPUPLOAD] Device model ${deviceModelLower} not yet supported`);
-      return res.status(400).json({ 
-        code: 1, 
-        ok: false, 
-        error: `Device model ${deviceModelLower} not yet supported. Only jc181 is supported at this time.` 
-      });
-    } else {
-      console.log(`[FTPUPLOAD] Missing deviceModel in request`);
-      return res.status(400).json({ 
-        code: 1, 
-        ok: false, 
-        error: 'Missing deviceModel in request' 
-      });
-    }
-  } catch (error) {
-    console.log(`[FTPUPLOAD] Error: ${error.message}`);
-    return res.status(500).json({ 
-      code: 1, 
-      ok: false, 
-      error: error.message 
-    });
-  }
 });
 
 // ──────────────────────────────────────────────────────────────────────
