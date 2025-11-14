@@ -163,32 +163,70 @@ async function safeMoveFile(sourcePath, destPath) {
       console.log(`[SAFE_MOVE] File ${sourcePath} is stable, proceeding with move...`);
     }
     
+    // CRITICAL: Verify stability one more time RIGHT BEFORE copying
+    // This ensures no writes happened between the initial check and the copy
+    console.log(`[SAFE_MOVE] Final stability verification before copy...`);
+    const finalCheck = await waitForFileStable(sourcePath, 10000, 1000); // Quick check: 10 seconds max, 1 second intervals
+    if (!finalCheck) {
+      throw new Error(`File ${sourcePath} became unstable right before copy operation`);
+    }
+    
+    // Get source file size BEFORE copying to verify after
+    const sourceStatsBefore = fs.statSync(sourcePath);
+    const expectedSize = sourceStatsBefore.size;
+    
     // First, ensure destination directory exists
     const destDir = path.dirname(destPath);
     if (!await fsExists(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });
     }
     
-    // Copy file first, then delete source (safer than rename if file might be in use)
-    fs.copyFileSync(sourcePath, destPath);
+    // Copy file using streams for better reliability
+    // Use fsPromises for async copy to avoid blocking
+    await fsPromises.copyFile(sourcePath, destPath);
     
-    // Verify copy was successful by comparing sizes
-    const sourceStats = fs.statSync(sourcePath);
-    const destStats = fs.statSync(destPath);
-    
-    if (sourceStats.size !== destStats.size) {
-      throw new Error(`Copy size mismatch: source=${sourceStats.size}, dest=${destStats.size}`);
+    // CRITICAL: Verify source file hasn't changed during copy
+    const sourceStatsAfter = fs.statSync(sourcePath);
+    if (sourceStatsAfter.size !== expectedSize || sourceStatsAfter.mtimeMs !== sourceStatsBefore.mtimeMs) {
+      // File was modified during copy - delete destination and abort
+      try {
+        await fsPromises.unlink(destPath);
+      } catch (e) {
+        // Ignore errors deleting corrupted copy
+      }
+      throw new Error(`File ${sourcePath} was modified during copy operation (size: ${sourceStatsBefore.size} -> ${sourceStatsAfter.size}, mtime changed)`);
     }
     
-    // Only delete source if copy was successful
+    // Verify copy was successful by comparing sizes
+    const destStats = fs.statSync(destPath);
+    
+    if (destStats.size !== expectedSize) {
+      // Delete corrupted destination
+      try {
+        await fsPromises.unlink(destPath);
+      } catch (e) {
+        // Ignore errors
+      }
+      throw new Error(`Copy size mismatch: source=${expectedSize}, dest=${destStats.size}`);
+    }
+    
+    // Only delete source if copy was successful and verified
     fs.unlinkSync(sourcePath);
+    console.log(`[SAFE_MOVE] Successfully moved ${sourcePath} to ${destPath} (${expectedSize} bytes)`);
     return true;
   } catch (err) {
     console.log(`[SAFE_MOVE] Error: ${err.message}`);
-    // If copy failed, try rename as fallback
+    // If copy failed, try rename as fallback (but only if file is stable)
     try {
-      await fsRename(sourcePath, destPath);
-      return true;
+      // Quick stability check before rename
+      const isStable = await waitForFileStable(sourcePath, 5000, 500);
+      if (isStable) {
+        await fsRename(sourcePath, destPath);
+        console.log(`[SAFE_MOVE] Fallback rename successful`);
+        return true;
+      } else {
+        throw new Error(`File not stable for rename fallback`);
+      }
     } catch (renameErr) {
       throw new Error(`Both copy and rename failed: ${err.message}, ${renameErr.message}`);
     }
@@ -218,14 +256,46 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
 
   console.log(`[THUMB] START: ${mp4Path} to ${thumbPath}`);
   try {
+    // CRITICAL: Verify stability one more time RIGHT BEFORE ffmpeg
+    // This ensures no writes happened between the initial check and ffmpeg
+    console.log(`[THUMB] Final stability verification before ffmpeg...`);
+    const finalCheck = await waitForFileStable(mp4Path, 10000, 1000); // Quick check: 10 seconds max, 1 second intervals
+    if (!finalCheck) {
+      throw new Error(`File ${mp4Path} became unstable right before ffmpeg operation`);
+    }
+    
+    // Get file size before ffmpeg to verify it hasn't changed
+    const statsBefore = fs.statSync(mp4Path);
+    const expectedSize = statsBefore.size;
+    
     // File is stable, safe to use ffmpeg
     await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 8 "${thumbPath}"`);
+    
+    // CRITICAL: Verify source file hasn't changed during ffmpeg
+    const statsAfter = fs.statSync(mp4Path);
+    if (statsAfter.size !== expectedSize || statsAfter.mtimeMs !== statsBefore.mtimeMs) {
+      throw new Error(`File ${mp4Path} was modified during ffmpeg operation (size: ${expectedSize} -> ${statsAfter.size}, mtime changed)`);
+    }
+    
     let size = fs.statSync(thumbPath).size;
     console.log(`[THUMB] FIRST PASS: ${size} bytes`);
     if (size > 30000) {
       console.log(`[THUMB] RECOMPRESSING...`);
       // File should still be stable, but verify one more time before second ffmpeg call
+      const secondCheck = await waitForFileStable(mp4Path, 10000, 1000);
+      if (!secondCheck) {
+        throw new Error(`File ${mp4Path} became unstable before second ffmpeg operation`);
+      }
+      
+      const statsBeforeSecond = fs.statSync(mp4Path);
       await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 12 "${thumbPath}"`);
+      
+      // Verify again after second ffmpeg
+      const statsAfterSecond = fs.statSync(mp4Path);
+      if (statsAfterSecond.size !== statsBeforeSecond.size || statsAfterSecond.mtimeMs !== statsBeforeSecond.mtimeMs) {
+        throw new Error(`File ${mp4Path} was modified during second ffmpeg operation`);
+      }
+      
       size = fs.statSync(thumbPath).size;
     }
     console.log(`[THUMB] SUCCESS: ${thumbPath} (${size}B)`);
@@ -781,6 +851,16 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
     console.log(`[MP4 NOT FOUND] ${file}`);
     return res.status(200).send('FILE NOT UPLOADED');
   }
+  
+  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  // For jc181 files in processedVideos, they should already be stable, but verify anyway
+  // For jc400 files in upload folder, they might still be uploading
+  console.log(`[MP4] Verifying file stability before serving: ${file}`);
+  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  if (!isStable) {
+    console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
+  }
+  
   res.setHeader('Content-Type', 'video/mp4');
   res.sendFile(file);
 });
@@ -814,6 +894,16 @@ app.get('/:imei/:name/MP4', async (req, res) => {
     console.log(`[MP4 NOT FOUND] ${file}`);
     return res.status(200).send('FILE NOT UPLOADED');
   }
+  
+  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  // For jc181 files in processedVideos, they should already be stable, but verify anyway
+  // For jc400 files in upload folder, they might still be uploading
+  console.log(`[MP4] Verifying file stability before serving: ${file}`);
+  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  if (!isStable) {
+    console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
+  }
+  
   res.setHeader('Content-Type', 'video/mp4');
   res.sendFile(file);
 });
@@ -856,6 +946,14 @@ app.get('/:imei/:name/:deviceModel', async (req, res, next) => {
     console.log(`[404] ${file}`);
     return res.status(200).send('FILE NOT UPLOADED');
   }
+  
+  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  console.log(`[THUMB] Verifying file stability before serving: ${file}`);
+  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  if (!isStable) {
+    console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
+  }
+  
   res.setHeader('Content-Type', 'image/jpeg');
   res.sendFile(file);
 });
@@ -888,6 +986,14 @@ app.get('/:imei/:name', async (req, res) => {
     console.log(`[404] ${file}`);
     return res.status(200).send('FILE NOT UPLOADED');
   }
+  
+  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
+  console.log(`[THUMB] Verifying file stability before serving: ${file}`);
+  const isStable = await waitForFileStable(file, 5000, 500); // Quick check: 5 seconds max
+  if (!isStable) {
+    console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
+  }
+  
   res.setHeader('Content-Type', 'image/jpeg');
   res.sendFile(file);
 });
