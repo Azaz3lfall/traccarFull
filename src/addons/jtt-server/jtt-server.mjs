@@ -581,20 +581,26 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       const dest = path.join(processedFolder, file);
       
       try {
-        // Check file exists and has size before processing
+        // CRITICAL: Wait for file stability BEFORE any operations
+        // This prevents corruption by ensuring file is fully written
+        console.log(`[FORCE] Waiting for ${file} to stabilize...`);
+        await waitForFileStable(mp4Path);
+        
+        // Now safe to check file size
         const stats = fs.statSync(mp4Path);
         if (stats.size === 0) {
           console.log(`[FORCE] SKIP: ${file} is 0 bytes`);
           continue;
         }
         
-        // generateSmallThumbnail will wait for file stability before using ffmpeg
+        // generateSmallThumbnail will wait for file stability again before using ffmpeg
         // This ensures the file is completely written before any ffmpeg operations
         if (stats.size > 0) {
           await generateSmallThumbnail(mp4Path, thumbPath);
         }
         
         // After thumbnail generation, file should be stable, safe to move
+        // safeMoveFile will also wait for stability, but file should already be stable
         const finalStats = fs.statSync(mp4Path);
         console.log(`[MOVE] ${file} (${finalStats.size} bytes) to processedVideos/`);
         await safeMoveFile(mp4Path, dest);
