@@ -647,43 +647,90 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
   }
 
   // ────── 4. FORCE CLEANUP ROOT MP4s ──────
+  // CRITICAL: Process each file independently - one broken file should not stop others
+  // Files that aren't ready will be retried on next run (they'll still be in root folder)
   if (rootMp4s.length > 0) {
-    console.log(`[FORCE] ${rootMp4s.length} MP4s in root to MOVING`);
+    console.log(`[FORCE] ${rootMp4s.length} MP4s in root to process`);
+    let processedCount = 0;
+    let skippedCount = 0;
+    
     for (const file of rootMp4s) {
       const mp4Path = path.join(deviceFolder, file);
       const thumbPath = path.join(deviceFolder, `${file}.jpg`);
       const dest = path.join(processedFolder, file);
       
+      // Process each file independently - each step is independent
       try {
-        // CRITICAL: Wait for file stability BEFORE any operations
-        // This prevents corruption by ensuring file is fully written
-        // M2M SIM delays can cause long upload times, so allow sufficient wait
-        console.log(`[FORCE] Waiting for ${file} to stabilize...`);
-        await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds for M2M SIM delays, check every 40 seconds
+        const fileIndex = rootMp4s.indexOf(file) + 1;
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Processing ${file}...`);
         
-        // Now safe to check file size
-        const stats = fs.statSync(mp4Path);
+        // STEP 1: Check if file exists and has size (quick check first)
+        let stats;
+        try {
+          stats = fs.statSync(mp4Path);
+        } catch (statErr) {
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} - file not found or inaccessible`);
+          skippedCount++;
+          continue; // Skip and move to next file
+        }
+        
         if (stats.size === 0) {
-          console.log(`[FORCE] SKIP: ${file} is 0 bytes`);
-          continue;
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} is 0 bytes (will retry on next run)`);
+          skippedCount++;
+          continue; // Skip and move to next - will be retried on next run
         }
         
-        // generateSmallThumbnail will wait for file stability again before using ffmpeg
-        // This ensures the file is completely written before any ffmpeg operations
-        if (stats.size > 0) {
-          await generateSmallThumbnail(mp4Path, thumbPath);
+        // STEP 2: Wait for file stability (independent - if timeout, skip and retry later)
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Waiting for ${file} to stabilize...`);
+        const isStable = await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds for M2M SIM delays, check every 40 seconds
+        if (!isStable) {
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} did not stabilize within timeout (will retry on next run)`);
+          skippedCount++;
+          continue; // Skip this file and move to next - will be retried on next run
         }
         
-        // After thumbnail generation, file should be stable, safe to move
-        // safeMoveFile will also wait for stability, but file should already be stable
-        const finalStats = fs.statSync(mp4Path);
-        console.log(`[MOVE] ${file} (${finalStats.size} bytes) to processedVideos/`);
-        await safeMoveFile(mp4Path, dest);
-        console.log(`[MOVE] SUCCESS: ${file} moved successfully`);
+        // STEP 3: Generate thumbnail (independent - if fails, skip and retry later)
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Generating thumbnail for ${file}...`);
+        let thumbSuccess = false;
+        try {
+          thumbSuccess = await generateSmallThumbnail(mp4Path, thumbPath);
+          if (!thumbSuccess) {
+            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} thumbnail generation failed (will retry on next run)`);
+            skippedCount++;
+            continue; // Skip moving if thumbnail failed - will be retried on next run
+          }
+        } catch (thumbErr) {
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} thumbnail error: ${thumbErr.message} (will retry on next run)`);
+          skippedCount++;
+          continue; // Skip this file and move to next - will be retried on next run
+        }
+        
+        // STEP 4: Move file (independent - if fails, skip and retry later)
+        // Only move if thumbnail was successful
+        if (thumbSuccess) {
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Moving ${file} to processedVideos/...`);
+          try {
+            const finalStats = fs.statSync(mp4Path);
+            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] ${file} size: ${finalStats.size} bytes`);
+            await safeMoveFile(mp4Path, dest);
+            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SUCCESS: ${file} moved successfully`);
+            processedCount++;
+          } catch (moveErr) {
+            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} move error: ${moveErr.message} (will retry on next run)`);
+            skippedCount++;
+            // Continue to next file - don't stop processing
+            // File will still be in root folder, so it will be retried on next run
+          }
+        }
       } catch (err) {
-        console.log(`[FORCE] FAILED ${file}: ${err.message}`);
+        // Catch-all for any unexpected errors - log and continue to next file
+        console.log(`[FORCE] [${rootMp4s.indexOf(file) + 1}/${rootMp4s.length}] FAILED ${file}: ${err.message} (will retry on next run)`);
+        skippedCount++;
+        // Continue to next file - processing is file-independent
+        // File will still be in root folder, so it will be retried on next run
       }
     }
+    console.log(`[FORCE] Completed: ${processedCount} processed, ${skippedCount} skipped (will retry skipped files on next run)`);
   }
 
   // ────── 5. WRITE REPORT ──────
