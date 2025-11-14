@@ -117,23 +117,29 @@ const fsMkdir = p => new Promise(r => fs.mkdir(p, { recursive: true }, () => r()
 const fsRename = (a, b) => new Promise((res, rej) => fs.rename(a, b, e => e ? rej(e) : res()));
 
 // Wait for file to stabilize (not being written to)
+// Uses file modification time instead of frequent size checks to avoid interference
 async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 200) {
   let lastSize = 0;
+  let lastMtime = 0;
   let stableCount = 0;
-  const requiredStableChecks = 6; // File must be same size for 6 consecutive checks
+  const requiredStableChecks = 3; // File must be same size and mtime for 3 consecutive checks
   
   const startTime = Date.now();
   while (Date.now() - startTime < maxWaitMs) {
     try {
       const stats = fs.statSync(filePath);
-      if (stats.size === lastSize) {
+      // Check both size and modification time - if both are unchanged, file is stable
+      if (stats.size === lastSize && stats.mtimeMs === lastMtime) {
         stableCount++;
         if (stableCount >= requiredStableChecks) {
+          // Final wait to ensure file is completely written
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 more seconds
           return true; // File is stable
         }
       } else {
-        stableCount = 0; // Reset counter if size changed
+        stableCount = 0; // Reset counter if size or mtime changed
         lastSize = stats.size;
+        lastMtime = stats.mtimeMs;
       }
     } catch (err) {
       // File might not exist yet
@@ -554,10 +560,13 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       
       try {
         // Wait for file to stabilize (not being written to) before processing
+        // Use a simpler approach: check file size and mtime stability with fewer checks
         console.log(`[FORCE] Waiting for ${file} to stabilize...`);
-        const isStable = await waitForFileStable(mp4Path, 10000, 800); // Wait up to 10 seconds, check every 800ms (6 checks = 4.8s)
+        const isStable = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds, check every 5 seconds (3 checks = 15s + 2s final wait = 17s total)
         if (!isStable) {
           console.log(`[FORCE] WARNING: ${file} may still be uploading, proceeding anyway...`);
+        } else {
+          console.log(`[FORCE] File ${file} is stable, proceeding with processing...`);
         }
         
         const stats = fs.statSync(mp4Path);
