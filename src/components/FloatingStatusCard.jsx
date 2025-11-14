@@ -85,7 +85,7 @@ import flvjs from 'flv.js';
 dayjs.extend(relativeTime);
 
 // VideoItem component with lazy loading - moved outside to prevent re-creation on every render
-const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer }) => {
+const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer, device }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef(null);
@@ -303,7 +303,41 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log('Video Data:', video);
+            
+            // Debug: Log device to see what we have
+            console.log('Device object:', device);
+            console.log('Device attributes:', device?.attributes);
+            console.log('Device iothub raw:', device?.attributes?.iothub);
+            
+            // Parse iothub attributes from device
+            let iothub = {};
+            try {
+              if (device?.attributes?.iothub) {
+                const iothubRaw = device.attributes.iothub;
+                console.log('iothubRaw type:', typeof iothubRaw);
+                console.log('iothubRaw value:', iothubRaw);
+                
+                if (typeof iothubRaw === 'string') {
+                  iothub = JSON.parse(iothubRaw);
+                  console.log('Parsed iothub from string:', iothub);
+                } else {
+                  iothub = iothubRaw;
+                  console.log('iothub already object:', iothub);
+                }
+              } else {
+                console.warn('device.attributes.iothub is missing!');
+              }
+            } catch (e) {
+              console.error('Error parsing iothub:', e);
+              console.error('Error stack:', e.stack);
+            }
+            
+            // Log video data with iothub attributes
+            console.log('Video Data with IoTHub:', {
+              ...video,
+              deviceImei: device?.uniqueId,
+              iothub: iothub
+            });
           }}
           size="small"
           style={{
@@ -6552,6 +6586,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   colors={colors}
                                   setSelectedVideo={setSelectedVideo}
                                   setShowVideoPlayer={setShowVideoPlayer}
+                                  device={device}
                                 />
                               ))}
                             </Box>
