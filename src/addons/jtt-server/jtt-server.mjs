@@ -161,11 +161,10 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
   return false; // Timeout
 }
 
-// Safe file move using copy + unlink to avoid corruption
-// IMPORTANT: Always wait for file stability before moving to prevent corruption
-// REMOVED: safeMoveFile function - file moving operations disabled
-// REMOVED: runFF function - ffmpeg operations disabled
-// REMOVED: generateSmallThumbnail function - thumbnail generation disabled
+// REMOVED: All ffmpeg and file moving operations to prevent corruption
+// - safeMoveFile function removed
+// - runFF function removed  
+// - generateSmallThumbnail function removed
 
 // ──────────────────────────────────────────────────────────────────────
 // Parse filename to channel + time (jc181 format)
@@ -216,10 +215,9 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
 
   const rootFiles = fs.readdirSync(deviceFolder);
   const procFiles = fs.readdirSync(processedFolder);
-  const rootMp4s = rootFiles.filter(f => f.endsWith('.mp4'));
   const allMp4s = procFiles.filter(f => f.endsWith('.mp4'));
 
-  console.log(`[SCAN] ROOT FILES: ${rootFiles.length} | ROOT MP4s: ${rootMp4s.length}`);
+  console.log(`[SCAN] ROOT FILES: ${rootFiles.length}`);
   console.log(`[SCAN] PROCESSED FILES: ${procFiles.length} | MP4s: ${allMp4s.length}`);
 
   const report = {
@@ -504,74 +502,8 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
   }
 
   // ────── 4. FORCE CLEANUP ROOT MP4s ──────
-  // CRITICAL: Process each file independently - one broken file should not stop others
-  // Files that aren't ready will be retried on next run (they'll still be in root folder)
-  if (rootMp4s.length > 0) {
-    console.log(`[FORCE] ${rootMp4s.length} MP4s in root to process`);
-    let processedCount = 0;
-    let skippedCount = 0;
-    
-    for (const file of rootMp4s) {
-      const mp4Path = path.join(deviceFolder, file);
-      const thumbPath = path.join(deviceFolder, `${file}.jpg`);
-      const dest = path.join(processedFolder, file);
-      
-      // Process each file independently - each step is independent
-      try {
-        const fileIndex = rootMp4s.indexOf(file) + 1;
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Processing ${file}...`);
-        
-        // STEP 1: Check if file exists and has size (quick check first)
-        let stats;
-        try {
-          stats = fs.statSync(mp4Path);
-        } catch (statErr) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} - file not found or inaccessible`);
-          skippedCount++;
-          continue; // Skip and move to next file
-        }
-        
-        if (stats.size === 0) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} is 0 bytes (will retry on next run)`);
-          skippedCount++;
-          continue; // Skip and move to next - will be retried on next run
-        }
-        
-        // STEP 2: Wait for file stability (independent - if timeout, skip and retry later)
-        // First do a quick check to see if file is already stable (2 checks, 1 second apart = 2 seconds)
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Checking if ${file} is already stable...`);
-        let isStable = await waitForFileStable(mp4Path, 5000, 1000, 2); // Quick check: 5 seconds max, 1 second intervals, only 2 stable checks required
-        
-        // If not stable yet, do a longer wait (but with shorter intervals to detect stability faster)
-        if (!isStable) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File not stable yet, waiting longer for ${file}...`);
-          // Use shorter intervals (5 seconds) to detect stability faster, but allow up to 2 minutes total
-          isStable = await waitForFileStable(mp4Path, 120000, 5000, 3); // Wait up to 120 seconds, check every 5 seconds, 3 stable checks required
-        }
-        
-        if (!isStable) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} did not stabilize within timeout (will retry on next run)`);
-          skippedCount++;
-          continue; // Skip this file and move to next - will be retried on next run
-        }
-        
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} is stable`);
-        
-        // REMOVED: Thumbnail generation (ffmpeg operations disabled)
-        // REMOVED: File moving operations disabled
-        // Files will remain in root folder - processing will be handled by new steps
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} verified as stable - waiting for new processing steps`);
-        skippedCount++; // Count as skipped for now until new steps are implemented
-      } catch (err) {
-        // Catch-all for any unexpected errors - log and continue to next file
-        console.log(`[FORCE] [${rootMp4s.indexOf(file) + 1}/${rootMp4s.length}] FAILED ${file}: ${err.message} (will retry on next run)`);
-        skippedCount++;
-        // Continue to next file - processing is file-independent
-        // File will still be in root folder, so it will be retried on next run
-      }
-    }
-    console.log(`[FORCE] Completed: ${processedCount} processed, ${skippedCount} skipped (will retry skipped files on next run)`);
-  }
+  // DISABLED: All file processing operations removed - waiting for new steps
+  // Files remain in root folder untouched
 
   // ────── 5. WRITE REPORT ──────
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), { mode: 0o644 });
@@ -744,21 +676,8 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // Thorough stability check before serving (files in processedVideos should already be stable)
-  // After all 10 step checks, if file is not ready, delete it instead of serving corrupted file
-  console.log(`[MP4] Stability check before serving (10 checks): ${file}`);
-  const isStable = await waitForFileStable(file, 10000, 1000, 10); // 10 seconds max, check every 1 second, require 10 stable checks
-  if (!isStable) {
-    console.log(`[MP4] File ${file} failed stability check after 10 steps - deleting corrupted file`);
-    try {
-      fs.unlinkSync(file);
-      console.log(`[MP4] Deleted corrupted file: ${file}`);
-    } catch (err) {
-      console.log(`[MP4] Error deleting file ${file}: ${err.message}`);
-    }
-    return res.status(200).send('FILE NOT UPLOADED');
-  }
-  
+  // Files are served immediately - no stability checks or file operations
+  // All file processing operations have been removed
   res.setHeader('Content-Type', 'video/mp4');
   res.sendFile(file);
 });
@@ -793,21 +712,8 @@ app.get('/:imei/:name/MP4', async (req, res) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // Thorough stability check before serving (files in processedVideos should already be stable)
-  // After all 10 step checks, if file is not ready, delete it instead of serving corrupted file
-  console.log(`[MP4] Stability check before serving (10 checks): ${file}`);
-  const isStable = await waitForFileStable(file, 10000, 1000, 10); // 10 seconds max, check every 1 second, require 10 stable checks
-  if (!isStable) {
-    console.log(`[MP4] File ${file} failed stability check after 10 steps - deleting corrupted file`);
-    try {
-      fs.unlinkSync(file);
-      console.log(`[MP4] Deleted corrupted file: ${file}`);
-    } catch (err) {
-      console.log(`[MP4] Error deleting file ${file}: ${err.message}`);
-    }
-    return res.status(200).send('FILE NOT UPLOADED');
-  }
-  
+  // Files are served immediately - no stability checks or file operations
+  // All file processing operations have been removed
   res.setHeader('Content-Type', 'video/mp4');
   res.sendFile(file);
 });
