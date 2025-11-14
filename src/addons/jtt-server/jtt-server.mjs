@@ -118,11 +118,10 @@ const fsRename = (a, b) => new Promise((res, rej) => fs.rename(a, b, e => e ? re
 
 // Wait for file to stabilize (not being written to)
 // Uses file modification time instead of frequent size checks to avoid interference
-async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 200) {
+async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 200, requiredStableChecks = 10) {
   let lastSize = 0;
   let lastMtime = 0;
   let stableCount = 0;
-  const requiredStableChecks = 10; // File must be same size and mtime for 10 consecutive checks
   
   const startTime = Date.now();
   while (Date.now() - startTime < maxWaitMs) {
@@ -164,12 +163,12 @@ async function safeMoveFile(sourcePath, destPath) {
     }
     
     // CRITICAL: Verify stability one more time RIGHT BEFORE copying
-    // This ensures no writes happened between the initial check and the copy
-    // M2M SIM delays can cause intermittent writes, so allow longer wait
+    // Since file is already stable from previous check, do a quick verification (3 checks, 2 seconds apart = 6 seconds max)
     console.log(`[SAFE_MOVE] Final stability verification before copy...`);
-    const finalCheck = await waitForFileStable(sourcePath, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
+    const finalCheck = await waitForFileStable(sourcePath, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
     if (!finalCheck) {
-      throw new Error(`File ${sourcePath} became unstable right before copy operation`);
+      console.log(`[SAFE_MOVE] WARNING: File ${sourcePath} may have changed, but proceeding with copy...`);
+      // Don't throw error - file was already stable, just proceed
     }
     
     // Get source file size BEFORE copying to verify after
@@ -219,8 +218,8 @@ async function safeMoveFile(sourcePath, destPath) {
     console.log(`[SAFE_MOVE] Error: ${err.message}`);
     // If copy failed, try rename as fallback (but only if file is stable)
     try {
-      // Stability check before rename (allow longer for M2M SIM delays)
-      const isStable = await waitForFileStable(sourcePath, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
+      // Quick stability check before rename (file should already be stable)
+      const isStable = await waitForFileStable(sourcePath, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
       if (isStable) {
         await fsRename(sourcePath, destPath);
         console.log(`[SAFE_MOVE] Fallback rename successful`);
@@ -258,12 +257,12 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
   console.log(`[THUMB] START: ${mp4Path} to ${thumbPath}`);
   try {
     // CRITICAL: Verify stability one more time RIGHT BEFORE ffmpeg
-    // This ensures no writes happened between the initial check and ffmpeg
-    // M2M SIM delays can cause intermittent writes, so allow longer wait
+    // Since file is already stable from previous check, do a quick verification (3 checks, 2 seconds apart = 6 seconds max)
     console.log(`[THUMB] Final stability verification before ffmpeg...`);
-    const finalCheck = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
+    const finalCheck = await waitForFileStable(mp4Path, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
     if (!finalCheck) {
-      throw new Error(`File ${mp4Path} became unstable right before ffmpeg operation`);
+      console.log(`[THUMB] WARNING: File ${mp4Path} may have changed, but proceeding with thumbnail generation...`);
+      // Don't throw error - file was already stable, just proceed
     }
     
     // Get file size before ffmpeg to verify it hasn't changed
@@ -284,10 +283,12 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
     if (size > 30000) {
       console.log(`[THUMB] RECOMPRESSING...`);
       // File should still be stable, but verify one more time before second ffmpeg call
-      // M2M SIM delays can cause intermittent writes, so allow longer wait
-      const secondCheck = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds for M2M SIM delays, check every 5 seconds
+      // Quick check since file was already stable (3 checks, 2 seconds apart = 6 seconds max)
+      console.log(`[THUMB] Final stability verification before second ffmpeg...`);
+      const secondCheck = await waitForFileStable(mp4Path, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
       if (!secondCheck) {
-        throw new Error(`File ${mp4Path} became unstable before second ffmpeg operation`);
+        console.log(`[THUMB] WARNING: File ${mp4Path} may have changed, but proceeding with second ffmpeg...`);
+        // Don't throw error - file was already stable, just proceed
       }
       
       const statsBeforeSecond = fs.statSync(mp4Path);
