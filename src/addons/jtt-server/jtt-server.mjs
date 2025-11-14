@@ -3,8 +3,6 @@ import bodyParser from 'body-parser';
 import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
-import { promises as fsPromises } from 'fs';
 
 // ──────────────────────────────────────────────────────────────────────
 // CONFIG: MEDIA SERVER DOMAIN
@@ -114,7 +112,7 @@ app.use((req, res, next) => {
 // ──────────────────────────────────────────────────────────────────────
 const fsExists = p => new Promise(r => fs.access(p, fs.constants.F_OK, e => r(!e)));
 const fsMkdir = p => new Promise(r => fs.mkdir(p, { recursive: true }, () => r()));
-const fsRename = (a, b) => new Promise((res, rej) => fs.rename(a, b, e => e ? rej(e) : res()));
+// REMOVED: fsRename - no longer used (file moving operations disabled)
 
 // Wait for file to stabilize (not being written to)
 // Uses file modification time instead of frequent size checks to avoid interference
@@ -165,164 +163,9 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
 
 // Safe file move using copy + unlink to avoid corruption
 // IMPORTANT: Always wait for file stability before moving to prevent corruption
-async function safeMoveFile(sourcePath, destPath) {
-  try {
-    // Wait for file to be stable before moving (in case it wasn't checked before)
-    console.log(`[SAFE_MOVE] Checking file stability before moving: ${sourcePath}`);
-    const isStable = await waitForFileStable(sourcePath, 450000, 40000); // Wait up to 450 seconds, check every 40 seconds (10 checks = 400s + 2s final wait = 402s total)
-    if (!isStable) {
-      console.log(`[SAFE_MOVE] WARNING: File ${sourcePath} may still be uploading, but proceeding with move...`);
-    } else {
-      console.log(`[SAFE_MOVE] File ${sourcePath} is stable, proceeding with move...`);
-    }
-    
-    // CRITICAL: Verify stability one more time RIGHT BEFORE copying
-    // Since file is already stable from previous check, do a quick verification (3 checks, 2 seconds apart = 6 seconds max)
-    console.log(`[SAFE_MOVE] Final stability verification before copy...`);
-    const finalCheck = await waitForFileStable(sourcePath, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
-    if (!finalCheck) {
-      console.log(`[SAFE_MOVE] WARNING: File ${sourcePath} may have changed, but proceeding with copy...`);
-      // Don't throw error - file was already stable, just proceed
-    }
-    
-    // Get source file size BEFORE copying to verify after
-    const sourceStatsBefore = fs.statSync(sourcePath);
-    const expectedSize = sourceStatsBefore.size;
-    
-    // First, ensure destination directory exists
-    const destDir = path.dirname(destPath);
-    if (!await fsExists(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-    
-    // Copy file using streams for better reliability
-    // Use fsPromises for async copy to avoid blocking
-    await fsPromises.copyFile(sourcePath, destPath);
-    
-    // CRITICAL: Verify source file hasn't changed during copy
-    const sourceStatsAfter = fs.statSync(sourcePath);
-    if (sourceStatsAfter.size !== expectedSize || sourceStatsAfter.mtimeMs !== sourceStatsBefore.mtimeMs) {
-      // File was modified during copy - delete destination and abort
-      try {
-        await fsPromises.unlink(destPath);
-      } catch (e) {
-        // Ignore errors deleting corrupted copy
-      }
-      throw new Error(`File ${sourcePath} was modified during copy operation (size: ${sourceStatsBefore.size} -> ${sourceStatsAfter.size}, mtime changed)`);
-    }
-    
-    // Verify copy was successful by comparing sizes
-    const destStats = fs.statSync(destPath);
-    
-    if (destStats.size !== expectedSize) {
-      // Delete corrupted destination
-      try {
-        await fsPromises.unlink(destPath);
-      } catch (e) {
-        // Ignore errors
-      }
-      throw new Error(`Copy size mismatch: source=${expectedSize}, dest=${destStats.size}`);
-    }
-    
-    // Only delete source if copy was successful and verified
-    fs.unlinkSync(sourcePath);
-    console.log(`[SAFE_MOVE] Successfully moved ${sourcePath} to ${destPath} (${expectedSize} bytes)`);
-    return true;
-  } catch (err) {
-    console.log(`[SAFE_MOVE] Error: ${err.message}`);
-    // If copy failed, try rename as fallback (but only if file is stable)
-    try {
-      // Quick stability check before rename (file should already be stable)
-      const isStable = await waitForFileStable(sourcePath, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
-      if (isStable) {
-        await fsRename(sourcePath, destPath);
-        console.log(`[SAFE_MOVE] Fallback rename successful`);
-        return true;
-      } else {
-        throw new Error(`File not stable for rename fallback`);
-      }
-    } catch (renameErr) {
-      throw new Error(`Both copy and rename failed: ${err.message}, ${renameErr.message}`);
-    }
-  }
-}
-const runFF = cmd => new Promise((res, rej) => exec(cmd, { timeout: 60000 }, e => e ? rej(e) : res()));
-
-// ──────────────────────────────────────────────────────────────────────
-// Generate thumbnail < 30KB — SKIP 0-BYTE
-// ──────────────────────────────────────────────────────────────────────
-// IMPORTANT: Always wait for file stability before using ffmpeg to prevent corruption
-async function generateSmallThumbnail(mp4Path, thumbPath) {
-  // First, wait for file to be stable before touching it with ffmpeg
-  console.log(`[THUMB] Checking file stability before processing: ${mp4Path}`);
-  const isStable = await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds, check every 40 seconds (10 checks = 400s + 2s final wait = 402s total)
-  if (!isStable) {
-    console.log(`[THUMB] WARNING: File ${mp4Path} may still be uploading, but proceeding with thumbnail generation...`);
-  } else {
-    console.log(`[THUMB] File ${mp4Path} is stable, proceeding with thumbnail generation...`);
-  }
-  
-  const stats = fs.statSync(mp4Path);
-  if (stats.size === 0) {
-    console.log(`[THUMB] SKIP: ${mp4Path} is 0 bytes`);
-    return false;
-  }
-
-  console.log(`[THUMB] START: ${mp4Path} to ${thumbPath}`);
-  try {
-    // CRITICAL: Verify stability one more time RIGHT BEFORE ffmpeg
-    // Since file is already stable from previous check, do a quick verification (3 checks, 2 seconds apart = 6 seconds max)
-    console.log(`[THUMB] Final stability verification before ffmpeg...`);
-    const finalCheck = await waitForFileStable(mp4Path, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
-    if (!finalCheck) {
-      console.log(`[THUMB] WARNING: File ${mp4Path} may have changed, but proceeding with thumbnail generation...`);
-      // Don't throw error - file was already stable, just proceed
-    }
-    
-    // Get file size before ffmpeg to verify it hasn't changed
-    const statsBefore = fs.statSync(mp4Path);
-    const expectedSize = statsBefore.size;
-    
-    // File is stable, safe to use ffmpeg
-    await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 8 "${thumbPath}"`);
-    
-    // CRITICAL: Verify source file hasn't changed during ffmpeg
-    const statsAfter = fs.statSync(mp4Path);
-    if (statsAfter.size !== expectedSize || statsAfter.mtimeMs !== statsBefore.mtimeMs) {
-      throw new Error(`File ${mp4Path} was modified during ffmpeg operation (size: ${expectedSize} -> ${statsAfter.size}, mtime changed)`);
-    }
-    
-    let size = fs.statSync(thumbPath).size;
-    console.log(`[THUMB] FIRST PASS: ${size} bytes`);
-    if (size > 30000) {
-      console.log(`[THUMB] RECOMPRESSING...`);
-      // File should still be stable, but verify one more time before second ffmpeg call
-      // Quick check since file was already stable (3 checks, 2 seconds apart = 6 seconds max)
-      console.log(`[THUMB] Final stability verification before second ffmpeg...`);
-      const secondCheck = await waitForFileStable(mp4Path, 10000, 2000, 3); // Quick check: 10 seconds max, 2 second intervals, only 3 stable checks required
-      if (!secondCheck) {
-        console.log(`[THUMB] WARNING: File ${mp4Path} may have changed, but proceeding with second ffmpeg...`);
-        // Don't throw error - file was already stable, just proceed
-      }
-      
-      const statsBeforeSecond = fs.statSync(mp4Path);
-      await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 12 "${thumbPath}"`);
-      
-      // Verify again after second ffmpeg
-      const statsAfterSecond = fs.statSync(mp4Path);
-      if (statsAfterSecond.size !== statsBeforeSecond.size || statsAfterSecond.mtimeMs !== statsBeforeSecond.mtimeMs) {
-        throw new Error(`File ${mp4Path} was modified during second ffmpeg operation`);
-      }
-      
-      size = fs.statSync(thumbPath).size;
-    }
-    console.log(`[THUMB] SUCCESS: ${thumbPath} (${size}B)`);
-    return size > 0;
-  } catch (err) {
-    console.log(`[THUMB] FAILED: ${err.message}`);
-    return false;
-  }
-}
+// REMOVED: safeMoveFile function - file moving operations disabled
+// REMOVED: runFF function - ffmpeg operations disabled
+// REMOVED: generateSmallThumbnail function - thumbnail generation disabled
 
 // ──────────────────────────────────────────────────────────────────────
 // Parse filename to channel + time (jc181 format)
@@ -712,41 +555,13 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
           continue; // Skip this file and move to next - will be retried on next run
         }
         
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} is stable, proceeding...`);
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} is stable`);
         
-        // STEP 3: Generate thumbnail (independent - if fails, skip and retry later)
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Generating thumbnail for ${file}...`);
-        let thumbSuccess = false;
-        try {
-          thumbSuccess = await generateSmallThumbnail(mp4Path, thumbPath);
-          if (!thumbSuccess) {
-            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} thumbnail generation failed (will retry on next run)`);
-            skippedCount++;
-            continue; // Skip moving if thumbnail failed - will be retried on next run
-          }
-        } catch (thumbErr) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} thumbnail error: ${thumbErr.message} (will retry on next run)`);
-          skippedCount++;
-          continue; // Skip this file and move to next - will be retried on next run
-        }
-        
-        // STEP 4: Move file (independent - if fails, skip and retry later)
-        // Only move if thumbnail was successful
-        if (thumbSuccess) {
-          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Moving ${file} to processedVideos/...`);
-          try {
-            const finalStats = fs.statSync(mp4Path);
-            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] ${file} size: ${finalStats.size} bytes`);
-            await safeMoveFile(mp4Path, dest);
-            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SUCCESS: ${file} moved successfully`);
-            processedCount++;
-          } catch (moveErr) {
-            console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} move error: ${moveErr.message} (will retry on next run)`);
-            skippedCount++;
-            // Continue to next file - don't stop processing
-            // File will still be in root folder, so it will be retried on next run
-          }
-        }
+        // REMOVED: Thumbnail generation (ffmpeg operations disabled)
+        // REMOVED: File moving operations disabled
+        // Files will remain in root folder - processing will be handled by new steps
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} verified as stable - waiting for new processing steps`);
+        skippedCount++; // Count as skipped for now until new steps are implemented
       } catch (err) {
         // Catch-all for any unexpected errors - log and continue to next file
         console.log(`[FORCE] [${rootMp4s.indexOf(file) + 1}/${rootMp4s.length}] FAILED ${file}: ${err.message} (will retry on next run)`);
@@ -929,13 +744,19 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
-  // For jc181 files in processedVideos, they should already be stable, but verify anyway
-  // For jc400 files in upload folder, they might still be uploading via M2M SIM (high latency)
-  console.log(`[MP4] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
+  // Thorough stability check before serving (files in processedVideos should already be stable)
+  // After all 10 step checks, if file is not ready, delete it instead of serving corrupted file
+  console.log(`[MP4] Stability check before serving (10 checks): ${file}`);
+  const isStable = await waitForFileStable(file, 10000, 1000, 10); // 10 seconds max, check every 1 second, require 10 stable checks
   if (!isStable) {
-    console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
+    console.log(`[MP4] File ${file} failed stability check after 10 steps - deleting corrupted file`);
+    try {
+      fs.unlinkSync(file);
+      console.log(`[MP4] Deleted corrupted file: ${file}`);
+    } catch (err) {
+      console.log(`[MP4] Error deleting file ${file}: ${err.message}`);
+    }
+    return res.status(200).send('FILE NOT UPLOADED');
   }
   
   res.setHeader('Content-Type', 'video/mp4');
@@ -972,13 +793,19 @@ app.get('/:imei/:name/MP4', async (req, res) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
-  // For jc181 files in processedVideos, they should already be stable, but verify anyway
-  // For jc400 files in upload folder, they might still be uploading via M2M SIM (high latency)
-  console.log(`[MP4] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
+  // Thorough stability check before serving (files in processedVideos should already be stable)
+  // After all 10 step checks, if file is not ready, delete it instead of serving corrupted file
+  console.log(`[MP4] Stability check before serving (10 checks): ${file}`);
+  const isStable = await waitForFileStable(file, 10000, 1000, 10); // 10 seconds max, check every 1 second, require 10 stable checks
   if (!isStable) {
-    console.log(`[MP4] WARNING: File ${file} may still be uploading, but serving anyway...`);
+    console.log(`[MP4] File ${file} failed stability check after 10 steps - deleting corrupted file`);
+    try {
+      fs.unlinkSync(file);
+      console.log(`[MP4] Deleted corrupted file: ${file}`);
+    } catch (err) {
+      console.log(`[MP4] Error deleting file ${file}: ${err.message}`);
+    }
+    return res.status(200).send('FILE NOT UPLOADED');
   }
   
   res.setHeader('Content-Type', 'video/mp4');
@@ -1024,14 +851,8 @@ app.get('/:imei/:name/:deviceModel', async (req, res, next) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
-  // M2M SIM cards can have high latency, so allow longer wait time
-  console.log(`[THUMB] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
-  if (!isStable) {
-    console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
-  }
-  
+  // Thumbnails are served immediately - no stability check needed
+  // They are generated during processing and should already be stable
   res.setHeader('Content-Type', 'image/jpeg');
   res.sendFile(file);
 });
@@ -1065,14 +886,8 @@ app.get('/:imei/:name', async (req, res) => {
     return res.status(200).send('FILE NOT UPLOADED');
   }
   
-  // CRITICAL: Verify file is stable before serving (prevents serving corrupted/incomplete files)
-  // M2M SIM cards can have high latency, so allow longer wait time
-  console.log(`[THUMB] Verifying file stability before serving: ${file}`);
-  const isStable = await waitForFileStable(file, 120000, 5000); // Wait up to 120 seconds (2 min) for M2M SIM delays, check every 5 seconds
-  if (!isStable) {
-    console.log(`[THUMB] WARNING: File ${file} may still be uploading, but serving anyway...`);
-  }
-  
+  // Thumbnails are served immediately - no stability check needed
+  // They are generated during processing and should already be stable
   res.setHeader('Content-Type', 'image/jpeg');
   res.sendFile(file);
 });
