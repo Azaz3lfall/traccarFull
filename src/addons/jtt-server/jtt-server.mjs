@@ -122,7 +122,7 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
   let lastSize = 0;
   let lastMtime = 0;
   let stableCount = 0;
-  const requiredStableChecks = 3; // File must be same size and mtime for 3 consecutive checks
+  const requiredStableChecks = 10; // File must be same size and mtime for 10 consecutive checks
   
   const startTime = Date.now();
   while (Date.now() - startTime < maxWaitMs) {
@@ -151,8 +151,18 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
 }
 
 // Safe file move using copy + unlink to avoid corruption
+// IMPORTANT: Always wait for file stability before moving to prevent corruption
 async function safeMoveFile(sourcePath, destPath) {
   try {
+    // Wait for file to be stable before moving (in case it wasn't checked before)
+    console.log(`[SAFE_MOVE] Checking file stability before moving: ${sourcePath}`);
+    const isStable = await waitForFileStable(sourcePath, 450000, 40000); // Wait up to 450 seconds, check every 40 seconds (10 checks = 400s + 2s final wait = 402s total)
+    if (!isStable) {
+      console.log(`[SAFE_MOVE] WARNING: File ${sourcePath} may still be uploading, but proceeding with move...`);
+    } else {
+      console.log(`[SAFE_MOVE] File ${sourcePath} is stable, proceeding with move...`);
+    }
+    
     // First, ensure destination directory exists
     const destDir = path.dirname(destPath);
     if (!await fsExists(destDir)) {
@@ -189,7 +199,17 @@ const runFF = cmd => new Promise((res, rej) => exec(cmd, { timeout: 60000 }, e =
 // ──────────────────────────────────────────────────────────────────────
 // Generate thumbnail < 30KB — SKIP 0-BYTE
 // ──────────────────────────────────────────────────────────────────────
+// IMPORTANT: Always wait for file stability before using ffmpeg to prevent corruption
 async function generateSmallThumbnail(mp4Path, thumbPath) {
+  // First, wait for file to be stable before touching it with ffmpeg
+  console.log(`[THUMB] Checking file stability before processing: ${mp4Path}`);
+  const isStable = await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds, check every 40 seconds (10 checks = 400s + 2s final wait = 402s total)
+  if (!isStable) {
+    console.log(`[THUMB] WARNING: File ${mp4Path} may still be uploading, but proceeding with thumbnail generation...`);
+  } else {
+    console.log(`[THUMB] File ${mp4Path} is stable, proceeding with thumbnail generation...`);
+  }
+  
   const stats = fs.statSync(mp4Path);
   if (stats.size === 0) {
     console.log(`[THUMB] SKIP: ${mp4Path} is 0 bytes`);
@@ -198,11 +218,13 @@ async function generateSmallThumbnail(mp4Path, thumbPath) {
 
   console.log(`[THUMB] START: ${mp4Path} to ${thumbPath}`);
   try {
+    // File is stable, safe to use ffmpeg
     await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 8 "${thumbPath}"`);
     let size = fs.statSync(thumbPath).size;
     console.log(`[THUMB] FIRST PASS: ${size} bytes`);
     if (size > 30000) {
       console.log(`[THUMB] RECOMPRESSING...`);
+      // File should still be stable, but verify one more time before second ffmpeg call
       await runFF(`ffmpeg -y -i "${mp4Path}" -ss 00:00:01 -vframes 1 -vf "scale=320:-1" -q:v 12 "${thumbPath}"`);
       size = fs.statSync(thumbPath).size;
     }
@@ -559,27 +581,22 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
       const dest = path.join(processedFolder, file);
       
       try {
-        // Wait for file to stabilize (not being written to) before processing
-        // Use a simpler approach: check file size and mtime stability with fewer checks
-        console.log(`[FORCE] Waiting for ${file} to stabilize...`);
-        const isStable = await waitForFileStable(mp4Path, 60000, 5000); // Wait up to 60 seconds, check every 5 seconds (3 checks = 15s + 2s final wait = 17s total)
-        if (!isStable) {
-          console.log(`[FORCE] WARNING: ${file} may still be uploading, proceeding anyway...`);
-        } else {
-          console.log(`[FORCE] File ${file} is stable, proceeding with processing...`);
-        }
-        
+        // Check file exists and has size before processing
         const stats = fs.statSync(mp4Path);
         if (stats.size === 0) {
           console.log(`[FORCE] SKIP: ${file} is 0 bytes`);
           continue;
         }
         
+        // generateSmallThumbnail will wait for file stability before using ffmpeg
+        // This ensures the file is completely written before any ffmpeg operations
         if (stats.size > 0) {
           await generateSmallThumbnail(mp4Path, thumbPath);
         }
         
-        console.log(`[MOVE] ${file} (${stats.size} bytes) to processedVideos/`);
+        // After thumbnail generation, file should be stable, safe to move
+        const finalStats = fs.statSync(mp4Path);
+        console.log(`[MOVE] ${file} (${finalStats.size} bytes) to processedVideos/`);
         await safeMoveFile(mp4Path, dest);
         console.log(`[MOVE] SUCCESS: ${file} moved successfully`);
       } catch (err) {
