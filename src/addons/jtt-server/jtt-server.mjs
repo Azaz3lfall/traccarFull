@@ -119,11 +119,25 @@ const fsRename = (a, b) => new Promise((res, rej) => fs.rename(a, b, e => e ? re
 // Wait for file to stabilize (not being written to)
 // Uses file modification time instead of frequent size checks to avoid interference
 async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 200, requiredStableChecks = 10) {
-  let lastSize = 0;
-  let lastMtime = 0;
+  let lastSize = null; // Use null to detect first check
+  let lastMtime = null;
   let stableCount = 0;
   
   const startTime = Date.now();
+  
+  // First check - get initial values
+  try {
+    const initialStats = fs.statSync(filePath);
+    lastSize = initialStats.size;
+    lastMtime = initialStats.mtimeMs;
+  } catch (err) {
+    // File doesn't exist
+    return false;
+  }
+  
+  // Wait a bit before first comparison to see if file changes
+  await new Promise(resolve => setTimeout(resolve, checkIntervalMs));
+  
   while (Date.now() - startTime < maxWaitMs) {
     try {
       const stats = fs.statSync(filePath);
@@ -141,7 +155,7 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
         lastMtime = stats.mtimeMs;
       }
     } catch (err) {
-      // File might not exist yet
+      // File might have been deleted
       return false;
     }
     await new Promise(resolve => setTimeout(resolve, checkIntervalMs));
@@ -681,13 +695,24 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
         }
         
         // STEP 2: Wait for file stability (independent - if timeout, skip and retry later)
-        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Waiting for ${file} to stabilize...`);
-        const isStable = await waitForFileStable(mp4Path, 450000, 40000); // Wait up to 450 seconds for M2M SIM delays, check every 40 seconds
+        // First do a quick check to see if file is already stable (2 checks, 1 second apart = 2 seconds)
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Checking if ${file} is already stable...`);
+        let isStable = await waitForFileStable(mp4Path, 5000, 1000, 2); // Quick check: 5 seconds max, 1 second intervals, only 2 stable checks required
+        
+        // If not stable yet, do a longer wait (but with shorter intervals to detect stability faster)
+        if (!isStable) {
+          console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File not stable yet, waiting longer for ${file}...`);
+          // Use shorter intervals (5 seconds) to detect stability faster, but allow up to 2 minutes total
+          isStable = await waitForFileStable(mp4Path, 120000, 5000, 3); // Wait up to 120 seconds, check every 5 seconds, 3 stable checks required
+        }
+        
         if (!isStable) {
           console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] SKIP: ${file} did not stabilize within timeout (will retry on next run)`);
           skippedCount++;
           continue; // Skip this file and move to next - will be retried on next run
         }
+        
+        console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] File ${file} is stable, proceeding...`);
         
         // STEP 3: Generate thumbnail (independent - if fails, skip and retry later)
         console.log(`[FORCE] [${fileIndex}/${rootMp4s.length}] Generating thumbnail for ${file}...`);
