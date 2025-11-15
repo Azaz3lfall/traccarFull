@@ -1035,12 +1035,16 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] Dates formatted: ${beginTimeFormatted} to ${endTimeFormatted}`);
       
       // Send FTP upload request to Jimi server
+      // Match EXACT format from Postman reference request
       console.log(`[FTPUPLOAD] Building request...`);
       const cleanJimiServer = jimiServer.replace(/\/+$/, '');
+      
+      // Build cmdContent JSON string - EXACT format matching Postman reference
+      const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
+      
+      // Build URLSearchParams - EXACT order matching Postman reference
       const urlencoded = new URLSearchParams();
       urlencoded.append("deviceImei", deviceImei);
-      // Format cmdContent with newlines to match reference format
-      const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
       urlencoded.append("cmdContent", cmdContentJson);
       urlencoded.append("serverFlagId", "0");
       urlencoded.append("proNo", "37382");
@@ -1052,6 +1056,7 @@ app.post('/ftpupload', async (req, res) => {
       
       const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
       
+      // Log for debugging
       console.log(`[FTPUPLOAD] Sending request to: ${apiUrl}`);
       console.log(`[FTPUPLOAD] Request body:`, urlencoded.toString());
       console.log(`[FTPUPLOAD] Request params:`, {
@@ -1074,13 +1079,15 @@ app.post('/ftpupload', async (req, res) => {
       });
       console.log(`[FTPUPLOAD] Body:`, urlencoded.toString());
       console.log(`[FTPUPLOAD] =========================================`);
+      
       try {
+        // Use urlencoded.toString() for body to match Postman exactly
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: urlencoded,
+          body: urlencoded.toString(),
           redirect: "follow"
         });
         
