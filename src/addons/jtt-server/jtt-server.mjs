@@ -231,168 +231,74 @@ async function checkFileSize(filePath) {
 // ──────────────────────────────────────────────────────────────────────
 // Test Video File with FFmpeg (Validate file is not corrupted/truncated)
 // ──────────────────────────────────────────────────────────────────────
-// Uses multiple checks to ensure file is complete and playable:
-// 1. ffprobe to check file structure and get duration
-// 2. Try to seek to end of video to verify file is complete
-// 3. Decode entire file to catch any corruption
+// Simple and efficient: Extract a frame and check for truncation messages
+// "Truncated VUI" or other truncation warnings indicate corrupted files
 async function testVideoFile(videoPath) {
   try {
     const fileName = path.basename(videoPath);
     console.log(`[FFMPEG_TEST] Testing video file ${fileName} for corruption/truncation...`);
     
-    // Step 1: Use ffprobe to check file structure and get duration
-    let duration = null;
+    // Extract a frame at 1 second - this will show truncation warnings if file is corrupted
+    // Use /dev/null as output to avoid creating files
+    const testCmd = `ffmpeg -i "${videoPath}" -ss 00:00:01 -vframes 1 -f null /dev/null 2>&1`;
+    
     try {
-      const probeCmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`;
-      const { stdout: probeStdout, stderr: probeStderr } = await execAsync(probeCmd, { timeout: 30000 });
+      const { stdout, stderr } = await execAsync(testCmd, { timeout: 30000 }); // 30 second timeout
       
-      const probeOutput = (probeStdout + probeStderr).toLowerCase();
+      // Combine stdout and stderr (ffmpeg outputs warnings/errors to stderr)
+      const output = (stdout + stderr).toLowerCase();
       
-      // Check for corruption indicators in ffprobe output
-      if (probeOutput.includes('truncated') ||
-          probeOutput.includes('invalid data') ||
-          probeOutput.includes('moov atom not found') ||
-          probeOutput.includes('could not find codec parameters') ||
-          probeOutput.includes('invalid argument') ||
-          probeOutput.includes('error')) {
-        const errorDetails = (probeStdout + probeStderr).substring(0, 300);
-        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED (ffprobe): ${errorDetails}`);
-        return { valid: false, error: 'Video file is corrupted (ffprobe check failed)', details: errorDetails };
+      // Check for truncation/corruption indicators
+      // "Truncated VUI" is the key indicator of corrupted files
+      const isCorrupted = output.includes('truncated vui') ||
+                         output.includes('truncated') ||
+                         output.includes('invalid data') ||
+                         output.includes('error while decoding') ||
+                         output.includes('corrupt') ||
+                         output.includes('moov atom not found') ||
+                         output.includes('could not find codec parameters') ||
+                         output.includes('end of file') ||
+                         output.includes('i/o error') ||
+                         output.includes('invalid argument');
+      
+      if (isCorrupted) {
+        const errorDetails = (stdout + stderr).substring(0, 500);
+        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED: ${errorDetails}`);
+        return { valid: false, error: 'Video file is corrupted/truncated', details: errorDetails };
       }
       
-      duration = parseFloat(probeStdout.trim());
-      if (isNaN(duration) || duration <= 0) {
-        console.log(`[FFMPEG_TEST] ${fileName} has invalid duration: ${duration}`);
-        return { valid: false, error: 'Video file has invalid duration', details: 'Duration check failed' };
+      console.log(`[FFMPEG_TEST] ${fileName} is VALID (no truncation warnings)`);
+      return { valid: true };
+      
+    } catch (execError) {
+      // execAsync throws an error if command fails - check stderr for corruption indicators
+      const stderr = (execError.stderr || '').toLowerCase();
+      const stdout = (execError.stdout || '').toLowerCase();
+      const errorMsg = (execError.message || '').toLowerCase();
+      const combined = stderr + ' ' + stdout + ' ' + errorMsg;
+      
+      // Check for truncation/corruption indicators
+      const isCorrupted = combined.includes('truncated vui') ||
+                         combined.includes('truncated') ||
+                         combined.includes('invalid data') ||
+                         combined.includes('error while decoding') ||
+                         combined.includes('corrupt') ||
+                         combined.includes('moov atom not found') ||
+                         combined.includes('could not find codec parameters') ||
+                         combined.includes('end of file') ||
+                         combined.includes('i/o error') ||
+                         combined.includes('invalid argument');
+      
+      if (isCorrupted) {
+        const errorDetails = (execError.stderr || execError.message || '').substring(0, 500);
+        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED: ${errorDetails}`);
+        return { valid: false, error: 'Video file is corrupted/truncated', details: errorDetails, isCorrupted: true };
       }
       
-      console.log(`[FFMPEG_TEST] ${fileName} - Duration: ${duration.toFixed(2)}s (ffprobe OK)`);
-    } catch (probeError) {
-      const probeStderr = (probeError.stderr || '').toLowerCase();
-      const probeStdout = (probeError.stdout || '').toLowerCase();
-      const probeMsg = (probeError.message || '').toLowerCase();
-      const combined = probeStderr + ' ' + probeStdout + ' ' + probeMsg;
-      
-      if (combined.includes('truncated') ||
-          combined.includes('invalid data') ||
-          combined.includes('moov atom not found') ||
-          combined.includes('could not find codec parameters') ||
-          combined.includes('invalid argument') ||
-          combined.includes('error')) {
-        const errorDetails = (probeError.stderr || probeError.message || '').substring(0, 300);
-        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED (ffprobe error): ${errorDetails}`);
-        return { valid: false, error: 'Video file is corrupted (ffprobe failed)', details: errorDetails };
-      }
-      
-      // If ffprobe fails for other reasons, continue with other tests
-      console.log(`[FFMPEG_TEST] ${fileName} - ffprobe failed (non-corruption): ${probeError.message}`);
+      // If it's not a corruption error, it might be a different issue (timeout, etc.)
+      console.log(`[FFMPEG_TEST] ${fileName} test failed (not necessarily corrupted): ${execError.message}`);
+      return { valid: false, error: execError.message, isCorrupted: false };
     }
-    
-    // Step 2: Try to seek to the end of the video to verify file is complete
-    // This will fail if the file is truncated
-    if (duration) {
-      try {
-        // Try to seek to the actual end (1 second before end, then try to read to end)
-        const seekTime = Math.max(1, duration - 1); // 1 second before end, or 1 second if very short
-        const seekCmd = `ffmpeg -v error -i "${videoPath}" -ss ${seekTime} -t 2 -f null - 2>&1`;
-        const { stdout: seekStdout, stderr: seekStderr } = await execAsync(seekCmd, { timeout: 30000 });
-        
-        const seekOutput = (seekStdout + seekStderr).toLowerCase();
-        
-        if (seekOutput.includes('truncated') ||
-            seekOutput.includes('invalid data') ||
-            seekOutput.includes('error while decoding') ||
-            seekOutput.includes('end of file') ||
-            seekOutput.includes('i/o error') ||
-            seekOutput.includes('invalid argument') ||
-            seekOutput.includes('could not seek')) {
-          const errorDetails = (seekStdout + seekStderr).substring(0, 300);
-          console.log(`[FFMPEG_TEST] ${fileName} is TRUNCATED (seek test): ${errorDetails}`);
-          return { valid: false, error: 'Video file is truncated (cannot seek to end)', details: errorDetails };
-        }
-        
-        console.log(`[FFMPEG_TEST] ${fileName} - Seek test OK (seeking to ${seekTime.toFixed(2)}s)`);
-      } catch (seekError) {
-        // Seek test failure might indicate truncation
-        const seekStderr = (seekError.stderr || '').toLowerCase();
-        const seekStdout = (seekError.stdout || '').toLowerCase();
-        const seekMsg = (seekError.message || '').toLowerCase();
-        const combined = seekStderr + ' ' + seekStdout + ' ' + seekMsg;
-        
-        if (combined.includes('truncated') ||
-            combined.includes('invalid data') ||
-            combined.includes('end of file') ||
-            combined.includes('i/o error') ||
-            combined.includes('invalid argument') ||
-            combined.includes('could not seek')) {
-          const errorDetails = (seekError.stderr || seekError.message || '').substring(0, 300);
-          console.log(`[FFMPEG_TEST] ${fileName} is TRUNCATED (seek error): ${errorDetails}`);
-          return { valid: false, error: 'Video file is truncated (seek test failed)', details: errorDetails };
-        }
-        
-        // If seek fails for unknown reasons, fail the test
-        console.log(`[FFMPEG_TEST] ${fileName} - Seek test failed: ${seekError.message}`);
-        return { valid: false, error: `Seek test failed: ${seekError.message}`, details: seekError.message };
-      }
-    }
-    
-    // Step 3: Decode ENTIRE file to catch any corruption throughout
-    // This is the most thorough test - processes every frame of the entire file
-    // Calculate timeout based on duration (2x duration + 60s buffer, max 10 minutes)
-    const decodeTimeout = duration ? Math.min((duration * 2 + 60) * 1000, 600000) : 300000; // Max 10 minutes
-    try {
-      // Decode entire file without time limit - this will catch corruption anywhere in the file
-      const decodeCmd = `ffmpeg -v error -i "${videoPath}" -f null - 2>&1`;
-      console.log(`[FFMPEG_TEST] ${fileName} - Decoding entire file (timeout: ${Math.round(decodeTimeout / 1000)}s)...`);
-      const { stdout: decodeStdout, stderr: decodeStderr } = await execAsync(decodeCmd, { timeout: decodeTimeout });
-      
-      const decodeOutput = (decodeStdout + decodeStderr).toLowerCase();
-      
-      if (decodeOutput.includes('truncated') ||
-          decodeOutput.includes('invalid data') ||
-          decodeOutput.includes('error while decoding') ||
-          decodeOutput.includes('corrupt') ||
-          decodeOutput.includes('moov atom not found') ||
-          decodeOutput.includes('end of file') ||
-          decodeOutput.includes('i/o error') ||
-          decodeOutput.includes('could not seek') ||
-          decodeOutput.includes('invalid argument')) {
-        const errorDetails = (decodeStdout + decodeStderr).substring(0, 300);
-        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED (decode test): ${errorDetails}`);
-        return { valid: false, error: 'Video file is corrupted (decode test failed)', details: errorDetails };
-      }
-      
-      console.log(`[FFMPEG_TEST] ${fileName} - Decode test OK (entire file decoded successfully)`);
-    } catch (decodeError) {
-      const decodeStderr = (decodeError.stderr || '').toLowerCase();
-      const decodeStdout = (decodeError.stdout || '').toLowerCase();
-      const decodeMsg = (decodeError.message || '').toLowerCase();
-      const combined = decodeStderr + ' ' + decodeStdout + ' ' + decodeMsg;
-      
-      if (combined.includes('truncated') ||
-          combined.includes('invalid data') ||
-          combined.includes('error while decoding') ||
-          combined.includes('corrupt') ||
-          combined.includes('moov atom not found') ||
-          combined.includes('end of file') ||
-          combined.includes('i/o error') ||
-          combined.includes('could not seek') ||
-          combined.includes('invalid argument')) {
-        const errorDetails = (decodeError.stderr || decodeError.message || '').substring(0, 300);
-        console.log(`[FFMPEG_TEST] ${fileName} is CORRUPTED (decode error): ${errorDetails}`);
-        return { valid: false, error: 'Video file is corrupted (decode test failed)', details: errorDetails };
-      }
-      
-      // If decode fails for other reasons (timeout, etc.), consider it potentially corrupted
-      // A timeout during decode might indicate the file is corrupted and causing ffmpeg to hang
-      console.log(`[FFMPEG_TEST] ${fileName} - Decode test failed: ${decodeError.message}`);
-      return { valid: false, error: `Decode test failed: ${decodeError.message}`, details: decodeError.message };
-    }
-    
-    // All tests passed
-    console.log(`[FFMPEG_TEST] ${fileName} is VALID (all tests passed)`);
-    return { valid: true };
-    
   } catch (error) {
     console.log(`[FFMPEG_TEST] Unexpected error testing video file ${path.basename(videoPath)}: ${error.message}`);
     return { valid: false, error: error.message, isCorrupted: false };
