@@ -1040,7 +1040,8 @@ app.post('/ftpupload', async (req, res) => {
       const cleanJimiServer = jimiServer.replace(/\/+$/, '');
       
       // Build cmdContent JSON string - EXACT format matching Postman reference
-      // Format must match exactly: newlines, spacing, and structure
+      // Postman uses: 4 spaces for indentation, 12 spaces for beginTime/endTime, 2 spaces for closing brace
+      // URLSearchParams encodes spaces as + or %20, but we need to match Postman's exact format
       const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
       
       // Build URLSearchParams - EXACT order matching Postman reference
@@ -1055,8 +1056,12 @@ app.post('/ftpupload', async (req, res) => {
       urlencoded.append("offLineFlag", "1");
       urlencoded.append("token", token);
       
+      // URLSearchParams.toString() encodes spaces as +, but we need %20 to match Postman
+      // Convert + to %20 to match Postman's exact encoding
+      let bodyString = urlencoded.toString();
+      bodyString = bodyString.replace(/\+/g, '%20');
+      
       // Log the exact body string for debugging
-      const bodyString = urlencoded.toString();
       console.log(`[FTPUPLOAD] Exact body string (for comparison with Postman):`);
       console.log(bodyString);
       
@@ -1087,13 +1092,13 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] =========================================`);
       
       try {
-        // Use urlencoded.toString() for body to match Postman exactly
+        // Use bodyString with %20 encoding (not +) to match Postman exactly
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: urlencoded.toString(),
+          body: bodyString,
           redirect: "follow"
         });
         
