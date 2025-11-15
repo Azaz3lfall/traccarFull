@@ -1555,8 +1555,8 @@ async function processDeviceJC400(imei) {
   // Process each video file
   for (const { file: videoFile, isProcessed } of allVideoFiles) {
     const parsed = parseJC400Filename(videoFile);
-    if (!parsed) {
-      console.log(`[JC400] Cannot parse: ${videoFile}`);
+    if (!parsed || parsed.channel === null) {
+      console.log(`[JC400] Cannot parse or invalid channel: ${videoFile}`);
       continue;
     }
 
