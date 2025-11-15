@@ -1056,15 +1056,6 @@ app.post('/ftpupload', async (req, res) => {
       urlencoded.append("offLineFlag", "1");
       urlencoded.append("token", token);
       
-      // URLSearchParams.toString() encodes spaces as +, but we need %20 to match Postman
-      // Convert + to %20 to match Postman's exact encoding
-      let bodyString = urlencoded.toString();
-      bodyString = bodyString.replace(/\+/g, '%20');
-      
-      // Log the exact body string for debugging
-      console.log(`[FTPUPLOAD] Exact body string (for comparison with Postman):`);
-      console.log(bodyString);
-      
       const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
       
       // Log for debugging
@@ -1092,13 +1083,13 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] =========================================`);
       
       try {
-        // Use bodyString with %20 encoding (not +) to match Postman exactly
+        // Use urlencoded.toString() directly - this is the working format
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: bodyString,
+          body: urlencoded.toString(),
           redirect: "follow"
         });
         
