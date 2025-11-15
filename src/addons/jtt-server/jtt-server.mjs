@@ -1318,7 +1318,7 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
   
   let file;
   if (deviceModelLower === 'jc400') {
-    // jc400: look for video in /iothub/dvr-upload/uploadFile
+    // jc400: look for video in /iothub/dvr-upload/uploadFile (processedVideos or upload folder)
     // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
     const uploadFolder = '/iothub/dvr-upload/uploadFile';
     if (!await fsExists(uploadFolder)) {
@@ -1327,7 +1327,10 @@ app.get('/:imei/:name/MP4/:deviceModel', async (req, res, next) => {
     }
     // Video file should be: {name}.mp4
     const videoFile = `${name}.mp4`;
-    file = path.join(uploadFolder, videoFile);
+    // Check processedVideos first, then upload folder
+    const processedPath = path.join(uploadFolder, 'processedVideos', videoFile);
+    const uploadPath = path.join(uploadFolder, videoFile);
+    file = (await fsExists(processedPath)) ? processedPath : uploadPath;
   } else {
     // jc181: default behavior
     const baseName = name.replace(/_000000$/, '');
@@ -1354,7 +1357,7 @@ app.get('/:imei/:name/MP4', async (req, res) => {
   
   let file;
   if (deviceModelLower === 'jc400') {
-    // jc400: look for video in /iothub/dvr-upload/uploadFile
+    // jc400: look for video in /iothub/dvr-upload/uploadFile (processedVideos or upload folder)
     // name parameter is the full filename without extension (e.g., EVENT_862798052572175_00000000_2025_11_12_10_40_40_F_23)
     const uploadFolder = '/iothub/dvr-upload/uploadFile';
     if (!await fsExists(uploadFolder)) {
@@ -1363,7 +1366,10 @@ app.get('/:imei/:name/MP4', async (req, res) => {
     }
     // Video file should be: {name}.mp4
     const videoFile = `${name}.mp4`;
-    file = path.join(uploadFolder, videoFile);
+    // Check processedVideos first, then upload folder
+    const processedPath = path.join(uploadFolder, 'processedVideos', videoFile);
+    const uploadPath = path.join(uploadFolder, videoFile);
+    file = (await fsExists(processedPath)) ? processedPath : uploadPath;
   } else {
     // jc181: default behavior
     const baseName = name.replace(/_000000$/, '');
