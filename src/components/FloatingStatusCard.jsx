@@ -476,7 +476,8 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               if (response.ok && result.code === 0 && shouldMarkAsPending) {
                 // Upload was accepted - keep status as pending in local state
                 // Server will mark as pending in status_report.json, but it may take a moment
-                // Don't refresh immediately to avoid overwriting the pending status
+                // Don't refresh the list to avoid losing the pending status
+                // The status will be updated when user manually refreshes or on next automatic refresh
                 
                 // Show response message with appropriate severity
                 const severity = isOfflineCommand ? 'warning' : 'success';
@@ -486,13 +487,8 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                 showSnackbar(responseMessage, severity);
                 console.log('[FTP_UPLOAD] showSnackbar called');
                 
-                // Refresh video list after a delay to allow server to update status_report.json
-                // Keep the pending status in local state until server confirms it
-                if (fetchVideos) {
-                  setTimeout(() => {
-                    fetchVideos();
-                  }, 2000); // Wait 2 seconds for server to process
-                }
+                // Do NOT refresh the list automatically - let the pending status stay visible
+                // The server will update status_report.json, and the next manual/automatic refresh will show the updated status
               } else {
                 // Upload was NOT accepted - revert status, don't add to localStorage, show error
                 if (setVideos) {
