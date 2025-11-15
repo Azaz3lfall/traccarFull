@@ -7620,6 +7620,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       autoHideDuration={6000}
       onClose={hideSnackbar}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      sx={{ zIndex: 9999 }}
     >
       <Alert
         onClose={hideSnackbar}
