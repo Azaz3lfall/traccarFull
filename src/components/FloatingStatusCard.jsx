@@ -1986,17 +1986,29 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   // Initialize all channels as selected when device is available
   useEffect(() => {
-    if (device && getIoTHubChannels > 0) {
-      // Get unique channels from videos to ensure we include all channels
-      const videoChannels = [...new Set(videos.map(v => String(v.channel)).filter(Boolean))];
-      if (videoChannels.length > 0 && videoListSelectedChannels.length === 0) {
-        // Use channels from videos, or fallback to configured channels
-        const channelsToSelect = videoChannels.length > 0 ? videoChannels : 
-          Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
-        setVideoListSelectedChannels(channelsToSelect);
+    if (device) {
+      const deviceModel = getDeviceModel;
+      
+      // For jc400, always use channels from videos (event-based, channels can be any number)
+      if (deviceModel === 'jc400') {
+        const videoChannels = [...new Set(videos.map(v => String(v.channel)).filter(Boolean))];
+        if (videoChannels.length > 0) {
+          // Always update to match all channels in videos for jc400
+          setVideoListSelectedChannels(videoChannels);
+        }
+      } else if (getIoTHubChannels > 0) {
+        // For other devices (jc181), use configured channels
+        // Get unique channels from videos to ensure we include all channels
+        const videoChannels = [...new Set(videos.map(v => String(v.channel)).filter(Boolean))];
+        if (videoChannels.length > 0 && videoListSelectedChannels.length === 0) {
+          // Use channels from videos, or fallback to configured channels
+          const channelsToSelect = videoChannels.length > 0 ? videoChannels : 
+            Array.from({ length: getIoTHubChannels }, (_, i) => (i + 1).toString());
+          setVideoListSelectedChannels(channelsToSelect);
+        }
       }
     }
-  }, [device, getIoTHubChannels, videos]);
+  }, [device, getIoTHubChannels, videos, getDeviceModel, videoListSelectedChannels.length]);
 
   // Handle Escape key to close video player
   useEffect(() => {
@@ -6679,22 +6691,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               alignItems: 'center',
                               flexWrap: 'wrap'
                             }}>
-                              {Array.from({ length: getIoTHubChannels }, (_, i) => i + 1).map((channelNum) => (
-                                <FormControlLabel
-                                  key={channelNum}
-                                  control={
-                                    <Checkbox
-                                      checked={videoListSelectedChannels.includes(channelNum.toString())}
-                                      onChange={(e) => {
-                                        const channelStr = channelNum.toString();
-                                        if (e.target.checked) {
-                                          setVideoListSelectedChannels(prev => 
-                                            prev.includes(channelStr) ? prev : [...prev, channelStr]
-                                          );
-                                        } else {
-                                          setVideoListSelectedChannels(prev => prev.filter(ch => ch !== channelStr));
-                                        }
-                                      }}
+                              {/* For jc400, use channels from videos; for others, use getIoTHubChannels */}
+                              {(() => {
+                                const deviceModel = getDeviceModel;
+                                let channelsToShow = [];
+                                
+                                if (deviceModel === 'jc400') {
+                                  // For jc400, get unique channels from videos
+                                  const uniqueChannels = [...new Set(videos.map(v => v.channel).filter(Boolean))];
+                                  channelsToShow = uniqueChannels.sort((a, b) => a - b);
+                                } else {
+                                  // For other devices, use configured channels
+                                  channelsToShow = Array.from({ length: getIoTHubChannels }, (_, i) => i + 1);
+                                }
+                                
+                                return channelsToShow.map((channelNum) => (
+                                  <FormControlLabel
+                                    key={channelNum}
+                                    control={
+                                      <Checkbox
+                                        checked={videoListSelectedChannels.includes(String(channelNum))}
+                                        onChange={(e) => {
+                                          const channelStr = String(channelNum);
+                                          if (e.target.checked) {
+                                            setVideoListSelectedChannels(prev => 
+                                              prev.includes(channelStr) ? prev : [...prev, channelStr]
+                                            );
+                                          } else {
+                                            setVideoListSelectedChannels(prev => prev.filter(ch => ch !== channelStr));
+                                          }
+                                        }}
                                       sx={{
                                         color: colors.text,
                                         '&.Mui-checked': {
