@@ -3,6 +3,9 @@ import bodyParser from 'body-parser';
 import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+const execAsync = promisify(exec);
 
 // ──────────────────────────────────────────────────────────────────────
 // CONFIG: MEDIA SERVER DOMAIN
@@ -161,10 +164,323 @@ async function waitForFileStable(filePath, maxWaitMs = 5000, checkIntervalMs = 2
   return false; // Timeout
 }
 
-// REMOVED: All ffmpeg and file moving operations to prevent corruption
-// - safeMoveFile function removed
-// - runFF function removed  
-// - generateSmallThumbnail function removed
+// ──────────────────────────────────────────────────────────────────────
+// File Processing System - Global File Tracker
+// ──────────────────────────────────────────────────────────────────────
+// Track files being processed to avoid duplicate processing
+const trackedFiles = new Map(); // filePath -> { checkCount, lastSize, stableCount, startTime }
+
+// ──────────────────────────────────────────────────────────────────────
+// File Size Checking Function (Non-blocking, Non-intrusive)
+// ──────────────────────────────────────────────────────────────────────
+// Checks file size up to 30 times, 30 seconds between each check
+// If file size doesn't change for 4 consecutive checks, file is considered stable
+async function checkFileSize(filePath) {
+  const maxChecks = 30;
+  const checkIntervalMs = 30000; // 30 seconds
+  const requiredStableChecks = 4;
+  
+  let checkCount = 0;
+  let lastSize = null;
+  let stableCount = 0;
+  
+  while (checkCount < maxChecks) {
+    try {
+      const stats = fs.statSync(filePath);
+      const currentSize = stats.size;
+      
+      if (lastSize === null) {
+        // First check
+        lastSize = currentSize;
+        checkCount++;
+        console.log(`[FILE_CHECK] [${checkCount}/${maxChecks}] ${path.basename(filePath)}: ${currentSize} bytes (initial)`);
+      } else if (currentSize === lastSize) {
+        // Size unchanged
+        stableCount++;
+        checkCount++;
+        console.log(`[FILE_CHECK] [${checkCount}/${maxChecks}] ${path.basename(filePath)}: ${currentSize} bytes (stable ${stableCount}/${requiredStableChecks})`);
+        
+        if (stableCount >= requiredStableChecks) {
+          console.log(`[FILE_CHECK] ${path.basename(filePath)}: File is stable after ${checkCount} checks`);
+          return { stable: true, size: currentSize };
+        }
+      } else {
+        // Size changed - reset stable count
+        stableCount = 0;
+        checkCount++;
+        lastSize = currentSize;
+        console.log(`[FILE_CHECK] [${checkCount}/${maxChecks}] ${path.basename(filePath)}: ${currentSize} bytes (growing, reset stable count)`);
+      }
+      
+      // Wait before next check (except on last check)
+      if (checkCount < maxChecks) {
+        await new Promise(resolve => setTimeout(resolve, checkIntervalMs));
+      }
+    } catch (err) {
+      // File doesn't exist or inaccessible
+      console.log(`[FILE_CHECK] ${path.basename(filePath)}: File not found or inaccessible`);
+      return { stable: false, error: err.message };
+    }
+  }
+  
+  // After 30 checks, file is still growing - considered corrupted
+  console.log(`[FILE_CHECK] ${path.basename(filePath)}: File still growing after ${maxChecks} checks - will be deleted`);
+  return { stable: false, stillGrowing: true };
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Thumbnail Generation Function
+// ──────────────────────────────────────────────────────────────────────
+async function generateThumbnail(videoPath, thumbnailPath) {
+  try {
+    // Generate thumbnail at 1 second into the video
+    // Output format: JPEG, 320x240, quality 85
+    const ffmpegCmd = `ffmpeg -i "${videoPath}" -ss 00:00:01 -vframes 1 -vf "scale=320:240" -q:v 2 "${thumbnailPath}"`;
+    
+    console.log(`[THUMBNAIL] Generating thumbnail for ${path.basename(videoPath)}...`);
+    await execAsync(ffmpegCmd, { timeout: 30000 }); // 30 second timeout
+    
+    // Check if thumbnail was created and has size
+    if (await fsExists(thumbnailPath)) {
+      const thumbStats = fs.statSync(thumbnailPath);
+      if (thumbStats.size > 0) {
+        console.log(`[THUMBNAIL] Successfully generated ${path.basename(thumbnailPath)} (${thumbStats.size} bytes)`);
+        return { success: true };
+      } else {
+        console.log(`[THUMBNAIL] Thumbnail file created but is 0 bytes - video may be corrupted`);
+        return { success: false, error: 'Thumbnail file is 0 bytes' };
+      }
+    } else {
+      console.log(`[THUMBNAIL] Thumbnail file was not created`);
+      return { success: false, error: 'Thumbnail file not created' };
+    }
+  } catch (error) {
+    console.log(`[THUMBNAIL] Error generating thumbnail: ${error.message}`);
+    // Check if error indicates truncated/corrupted video
+    const errorMsg = error.message.toLowerCase();
+    const isTruncated = errorMsg.includes('truncated') || 
+                       errorMsg.includes('invalid data') ||
+                       errorMsg.includes('error while decoding') ||
+                       errorMsg.includes('corrupt');
+    
+    return { success: false, error: error.message, isTruncated };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Move File to processedVideos
+// ──────────────────────────────────────────────────────────────────────
+async function moveToProcessedVideos(filePath, userHomeFolder) {
+  try {
+    const fileName = path.basename(filePath);
+    const processedVideosFolder = path.join(userHomeFolder, 'processedVideos');
+    
+    // Ensure processedVideos folder exists
+    await fsMkdir(processedVideosFolder);
+    
+    const destPath = path.join(processedVideosFolder, fileName);
+    
+    // Copy file to destination
+    await fs.promises.copyFile(filePath, destPath);
+    
+    // Verify copy was successful
+    const sourceStats = fs.statSync(filePath);
+    const destStats = fs.statSync(destPath);
+    
+    if (sourceStats.size === destStats.size) {
+      // Delete original file
+      await fs.promises.unlink(filePath);
+      console.log(`[MOVE] Successfully moved ${fileName} to processedVideos`);
+      return { success: true };
+    } else {
+      console.log(`[MOVE] Copy verification failed - sizes don't match`);
+      // Delete incomplete copy
+      try {
+        await fs.promises.unlink(destPath);
+      } catch {
+        // Ignore errors when cleaning up incomplete copy
+      }
+      return { success: false, error: 'Copy verification failed' };
+    }
+  } catch (error) {
+    console.log(`[MOVE] Error moving file: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Delete Corrupted File
+// ──────────────────────────────────────────────────────────────────────
+async function deleteCorruptedFile(filePath) {
+  try {
+    await fs.promises.unlink(filePath);
+    console.log(`[DELETE] Deleted corrupted file: ${path.basename(filePath)}`);
+    return { success: true };
+  } catch (error) {
+    console.log(`[DELETE] Error deleting file: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Process Single File (Non-blocking)
+// ──────────────────────────────────────────────────────────────────────
+async function processFile(filePath, userHomeFolder) {
+  const fileName = path.basename(filePath);
+  const fileKey = filePath;
+  
+  // Skip if already being tracked
+  if (trackedFiles.has(fileKey)) {
+    return;
+  }
+  
+  // Mark as tracked
+  trackedFiles.set(fileKey, { startTime: Date.now() });
+  console.log(`[PROCESS] Starting processing for ${fileName}`);
+  
+  try {
+    // Step 1: Check file size (non-blocking, runs in background)
+    const sizeCheck = await checkFileSize(filePath);
+    
+    if (!sizeCheck.stable) {
+      // File is not stable or still growing
+      if (sizeCheck.stillGrowing) {
+        // File still growing after 10 checks - delete it
+        await deleteCorruptedFile(filePath);
+      } else if (sizeCheck.error) {
+        // File doesn't exist or inaccessible - remove from tracking
+        console.log(`[PROCESS] ${fileName}: ${sizeCheck.error}`);
+      }
+      trackedFiles.delete(fileKey);
+      return;
+    }
+    
+    // Step 2: Generate thumbnail
+    const thumbnailPath = `${filePath}.jpg`;
+    const thumbnailResult = await generateThumbnail(filePath, thumbnailPath);
+    
+    if (!thumbnailResult.success) {
+      // Thumbnail generation failed - delete corrupted file
+      console.log(`[PROCESS] ${fileName}: Thumbnail generation failed - ${thumbnailResult.error}`);
+      await deleteCorruptedFile(filePath);
+      // Delete thumbnail if it exists but is invalid
+      try {
+        if (await fsExists(thumbnailPath)) {
+          await fs.promises.unlink(thumbnailPath);
+        }
+      } catch {
+        // Ignore errors when cleaning up invalid thumbnail
+      }
+      trackedFiles.delete(fileKey);
+      return;
+    }
+    
+    // Step 3: Move file to processedVideos
+    const moveResult = await moveToProcessedVideos(filePath, userHomeFolder);
+    
+    if (!moveResult.success) {
+      // Move failed - delete thumbnail and keep original file
+      console.log(`[PROCESS] ${fileName}: Move failed - ${moveResult.error}`);
+      try {
+        if (await fsExists(thumbnailPath)) {
+          await fs.promises.unlink(thumbnailPath);
+        }
+      } catch {
+        // Ignore errors when cleaning up thumbnail after move failure
+      }
+      trackedFiles.delete(fileKey);
+      return;
+    }
+    
+    // Success! File processed and moved
+    console.log(`[PROCESS] Successfully processed ${fileName}`);
+    trackedFiles.delete(fileKey);
+    
+  } catch (error) {
+    console.log(`[PROCESS] Error processing ${fileName}: ${error.message}`);
+    trackedFiles.delete(fileKey);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Global File Scanner (Runs every 45 seconds)
+// ──────────────────────────────────────────────────────────────────────
+async function scanForNewFiles() {
+  try {
+    const homeDir = '/home';
+    
+    // Check if /home exists
+    if (!await fsExists(homeDir)) {
+      console.log(`[SCAN] /home directory not found`);
+      return;
+    }
+    
+    // Read all user folders in /home
+    const entries = await fs.promises.readdir(homeDir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      
+      const userFolder = path.join(homeDir, entry.name);
+      const userHomeFolder = userFolder;
+      
+      try {
+        // Read all files in user folder
+        const files = await fs.promises.readdir(userFolder, { withFileTypes: true });
+        
+        for (const file of files) {
+          if (file.isFile() && file.name.endsWith('.mp4')) {
+            const filePath = path.join(userFolder, file.name);
+            const fileKey = filePath;
+            
+            // Skip if already tracked or already in processedVideos
+            if (trackedFiles.has(fileKey)) {
+              continue;
+            }
+            
+            // Check if file is already in processedVideos
+            const processedPath = path.join(userHomeFolder, 'processedVideos', file.name);
+            if (await fsExists(processedPath)) {
+              continue; // Already processed
+            }
+            
+            // Check if thumbnail already exists (indicates processing started)
+            const thumbnailPath = `${filePath}.jpg`;
+            if (await fsExists(thumbnailPath)) {
+              // Thumbnail exists but file not moved - might be in progress, skip for now
+              continue;
+            }
+            
+            // New file found - start processing (non-blocking)
+            processFile(filePath, userHomeFolder).catch(err => {
+              console.log(`[SCAN] Error starting processing for ${file.name}: ${err.message}`);
+            });
+          }
+        }
+      } catch (err) {
+        // Skip user folder if can't read it
+        console.log(`[SCAN] Cannot read folder ${entry.name}: ${err.message}`);
+      }
+    }
+  } catch (error) {
+    console.log(`[SCAN] Error scanning for files: ${error.message}`);
+  }
+}
+
+// Start the global scanner - runs every 45 seconds
+console.log(`[SCAN] Starting global file scanner (runs every 45 seconds)`);
+setInterval(() => {
+  scanForNewFiles().catch(err => {
+    console.log(`[SCAN] Error in scanner: ${err.message}`);
+  });
+}, 45000); // 45 seconds
+
+// Run initial scan after 5 seconds (give server time to start)
+setTimeout(() => {
+  scanForNewFiles().catch(err => {
+    console.log(`[SCAN] Error in initial scan: ${err.message}`);
+  });
+}, 5000);
 
 // ──────────────────────────────────────────────────────────────────────
 // Parse filename to channel + time (jc181 format)
