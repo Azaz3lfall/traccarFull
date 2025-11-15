@@ -510,24 +510,31 @@ async function processFile(filePath, userHomeFolder) {
 // ──────────────────────────────────────────────────────────────────────
 // Cleanup Stuck Files in Tracking Queue
 // ──────────────────────────────────────────────────────────────────────
+// Maximum expected processing time:
+// - File size check: 30 checks × 30 seconds = 15 minutes
+// - Thumbnail generation: ~30 seconds
+// - FFmpeg test: ~60 seconds
+// - Move operation: ~10 seconds
+// Total: ~16-17 minutes max
+// Set cleanup threshold to 25 minutes to account for legitimate processing
 function cleanupStuckFiles() {
   const now = Date.now();
-  const maxAge = 30 * 60 * 1000; // 30 minutes - if file has been in queue longer, it's stuck
+  const maxProcessingTime = 25 * 60 * 1000; // 25 minutes - if file has been in queue longer, it's stuck
   const stuckFiles = [];
   
   for (const [filePath, trackingInfo] of trackedFiles.entries()) {
     const age = now - trackingInfo.startTime;
-    if (age > maxAge) {
+    if (age > maxProcessingTime) {
       stuckFiles.push({ filePath, age });
     }
   }
   
   if (stuckFiles.length > 0) {
-    console.log(`[CLEANUP] Found ${stuckFiles.length} stuck file(s) in tracking queue:`);
+    console.log(`[CLEANUP] Found ${stuckFiles.length} stuck file(s) in tracking queue (older than 25 minutes):`);
     for (const { filePath, age } of stuckFiles) {
       const fileName = path.basename(filePath);
       const ageMinutes = Math.round(age / 60000);
-      console.log(`[CLEANUP] Removing stuck file: ${fileName} (in queue for ${ageMinutes} minutes)`);
+      console.log(`[CLEANUP] Removing stuck file: ${fileName} (in queue for ${ageMinutes} minutes - exceeds max processing time)`);
       trackedFiles.delete(filePath);
     }
   }
@@ -572,20 +579,23 @@ async function scanForNewFiles() {
             const filePath = path.join(userFolder, file.name);
             const fileKey = filePath;
             
-            // Check if already tracked - if stuck (>30 min), remove and retry
+            // Check if already tracked - if stuck (>25 min), remove and retry
+            // Max expected processing time: 30 checks × 30s (15 min) + thumbnail (30s) + ffmpeg (60s) + move (10s) = ~17 min
             if (trackedFiles.has(fileKey)) {
               const trackingInfo = trackedFiles.get(fileKey);
               const age = Date.now() - trackingInfo.startTime;
-              const maxAge = 30 * 60 * 1000; // 30 minutes
+              const maxProcessingTime = 25 * 60 * 1000; // 25 minutes (allows buffer for legitimate processing)
               
-              if (age > maxAge) {
+              if (age > maxProcessingTime) {
                 // File is stuck - remove from tracking and retry
                 console.log(`[SCAN] ${file.name} is stuck in queue (${Math.round(age / 60000)} min) - removing and retrying`);
                 trackedFiles.delete(fileKey);
                 // Continue to process below
               } else {
-                // File is still being processed (recently added)
-                console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${Math.round(age / 1000)}s ago)`);
+                // File is still being processed (recently added or within expected processing time)
+                const ageMinutes = Math.round(age / 60000);
+                const ageSeconds = Math.round(age / 1000);
+                console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${ageMinutes > 0 ? ageMinutes + 'm ' : ''}${ageSeconds % 60}s ago)`);
                 continue;
               }
             }
