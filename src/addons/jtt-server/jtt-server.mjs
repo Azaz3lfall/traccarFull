@@ -1040,6 +1040,7 @@ app.post('/ftpupload', async (req, res) => {
       const cleanJimiServer = jimiServer.replace(/\/+$/, '');
       
       // Build cmdContent JSON string - EXACT format matching Postman reference
+      // Format must match exactly: newlines, spacing, and structure
       const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
       
       // Build URLSearchParams - EXACT order matching Postman reference
@@ -1053,6 +1054,11 @@ app.post('/ftpupload', async (req, res) => {
       urlencoded.append("cmdType", "normallns");
       urlencoded.append("offLineFlag", "1");
       urlencoded.append("token", token);
+      
+      // Log the exact body string for debugging
+      const bodyString = urlencoded.toString();
+      console.log(`[FTPUPLOAD] Exact body string (for comparison with Postman):`);
+      console.log(bodyString);
       
       const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
       

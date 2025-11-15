@@ -430,7 +430,10 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               const result = await response.json();
               console.log('FTP upload response:', result);
               
-              // Check if upload was successful
+              // Always show the response message to the user
+              const responseMessage = result.msg || result.message || result.error || 'Unknown response';
+              
+              // Check if upload was successful (code === 0 means request was accepted)
               if (response.ok && result.code === 0) {
                 // Store upload request in localStorage with current timestamp and device model
                 if (uploadData.expected_file) {
@@ -439,9 +442,14 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                   console.log('FTP upload request stored in localStorage:', uploadData.expected_file, 'deviceModel:', deviceModel);
                 }
                 
-                // Show success snackbar
+                // Show response message (even if device is offline, user should know)
+                // Use warning if device is offline/timed out, success otherwise
+                const severity = responseMessage.toLowerCase().includes('offline') || 
+                                responseMessage.toLowerCase().includes('timed out') 
+                                ? 'warning' : 'success';
+                
                 if (showSnackbar) {
-                  showSnackbar('FTP upload request sent successfully', 'success');
+                  showSnackbar(responseMessage, severity);
                 }
                 
                 // Refresh video list to update pending status
@@ -459,10 +467,9 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                   }));
                 }
                 
-                const errorMessage = result.error || result.message || 'FTP upload request failed';
                 console.error('FTP upload failed:', result);
                 if (showSnackbar) {
-                  showSnackbar(errorMessage, 'error');
+                  showSnackbar(responseMessage, 'error');
                 }
               }
             } catch (error) {
