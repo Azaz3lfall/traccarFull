@@ -6738,7 +6738,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                     margin: 0,
                                   }}
                                 />
-                              ))}
+                              ));
+                              })()}
                             </div>
                             {/* Hide status tag buttons for jc400 - event-based uploads don't need status filtering */}
                             {getDeviceModel !== 'jc400' && (
