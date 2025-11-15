@@ -2028,6 +2028,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         } else {
           setShowVideoPlayer(false);
           setSelectedVideo(null);
+          // Clear videos list to prevent showing old device's videos when switching devices
+          setVideos([]);
+          setVideosTotalCount(0);
         }
       }
     };
@@ -7443,6 +7446,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             if (e.target === e.currentTarget) {
               setShowVideoPlayer(false);
               setSelectedVideo(null);
+              // Clear videos list to prevent showing old device's videos when switching devices
+              setVideos([]);
+              setVideosTotalCount(0);
             }
           }}
         >
@@ -7496,6 +7502,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 onClick={() => {
                   setShowVideoPlayer(false);
                   setSelectedVideo(null);
+                  // Clear videos list to prevent showing old device's videos when switching devices
+                  setVideos([]);
+                  setVideosTotalCount(0);
                 }}
                 size="small"
                 style={{
