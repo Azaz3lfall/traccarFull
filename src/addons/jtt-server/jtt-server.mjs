@@ -331,29 +331,42 @@ async function processFile(filePath, userHomeFolder) {
   
   // Skip if already being tracked
   if (trackedFiles.has(fileKey)) {
+    console.log(`[PROCESS] Skipping ${fileName} - already being processed`);
+    return;
+  }
+  
+  // Verify file exists before tracking
+  if (!await fsExists(filePath)) {
+    console.log(`[PROCESS] Skipping ${fileName} - file does not exist`);
     return;
   }
   
   // Mark as tracked
   trackedFiles.set(fileKey, { startTime: Date.now() });
-  console.log(`[PROCESS] Starting processing for ${fileName}`);
+  console.log(`[PROCESS] Starting processing for ${fileName} (path: ${filePath})`);
   
   try {
     // Step 1: Check file size (non-blocking, runs in background)
+    console.log(`[PROCESS] ${fileName} - Starting file size check...`);
     const sizeCheck = await checkFileSize(filePath);
     
     if (!sizeCheck.stable) {
       // File is not stable or still growing
       if (sizeCheck.stillGrowing) {
-        // File still growing after 10 checks - delete it
+        // File still growing after 30 checks - delete it
+        console.log(`[PROCESS] ${fileName} - File still growing after 30 checks, deleting...`);
         await deleteCorruptedFile(filePath);
       } else if (sizeCheck.error) {
         // File doesn't exist or inaccessible - remove from tracking
-        console.log(`[PROCESS] ${fileName}: ${sizeCheck.error}`);
+        console.log(`[PROCESS] ${fileName} - File check error: ${sizeCheck.error}`);
+      } else {
+        console.log(`[PROCESS] ${fileName} - File not stable (timeout or error)`);
       }
       trackedFiles.delete(fileKey);
       return;
     }
+    
+    console.log(`[PROCESS] ${fileName} - File is stable (${sizeCheck.size} bytes), generating thumbnail...`);
     
     // Step 2: Generate thumbnail
     const thumbnailPath = `${filePath}.jpg`;
@@ -375,12 +388,14 @@ async function processFile(filePath, userHomeFolder) {
       return;
     }
     
+    console.log(`[PROCESS] ${fileName} - Thumbnail generated successfully, moving to processedVideos...`);
+    
     // Step 3: Move file to processedVideos
     const moveResult = await moveToProcessedVideos(filePath, userHomeFolder);
     
     if (!moveResult.success) {
       // Move failed - delete thumbnail and keep original file
-      console.log(`[PROCESS] ${fileName}: Move failed - ${moveResult.error}`);
+      console.log(`[PROCESS] ${fileName} - Move failed: ${moveResult.error}`);
       try {
         if (await fsExists(thumbnailPath)) {
           await fs.promises.unlink(thumbnailPath);
@@ -393,7 +408,7 @@ async function processFile(filePath, userHomeFolder) {
     }
     
     // Success! File processed and moved
-    console.log(`[PROCESS] Successfully processed ${fileName}`);
+    console.log(`[PROCESS] Successfully processed ${fileName} - moved to processedVideos`);
     trackedFiles.delete(fileKey);
     
   } catch (error) {
@@ -406,6 +421,7 @@ async function processFile(filePath, userHomeFolder) {
 // Global File Scanner (Runs every 45 seconds)
 // ──────────────────────────────────────────────────────────────────────
 async function scanForNewFiles() {
+  console.log(`[SCAN] ========== Starting file scan ==========`);
   try {
     const homeDir = '/home';
     
@@ -417,6 +433,7 @@ async function scanForNewFiles() {
     
     // Read all user folders in /home
     const entries = await fs.promises.readdir(homeDir, { withFileTypes: true });
+    console.log(`[SCAN] Found ${entries.length} entries in /home`);
     
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
@@ -427,31 +444,77 @@ async function scanForNewFiles() {
       try {
         // Read all files in user folder
         const files = await fs.promises.readdir(userFolder, { withFileTypes: true });
+        const mp4Files = files.filter(f => f.isFile() && f.name.endsWith('.mp4'));
+        console.log(`[SCAN] User folder ${entry.name}: ${mp4Files.length} MP4 files found`);
         
         for (const file of files) {
           if (file.isFile() && file.name.endsWith('.mp4')) {
             const filePath = path.join(userFolder, file.name);
             const fileKey = filePath;
             
-            // Skip if already tracked or already in processedVideos
+            // Skip if already tracked (being processed)
             if (trackedFiles.has(fileKey)) {
+              console.log(`[SCAN] Skipping ${file.name} - already in tracking queue`);
               continue;
             }
             
             // Check if file is already in processedVideos
             const processedPath = path.join(userHomeFolder, 'processedVideos', file.name);
             if (await fsExists(processedPath)) {
+              console.log(`[SCAN] Skipping ${file.name} - already in processedVideos`);
               continue; // Already processed
             }
             
-            // Check if thumbnail already exists (indicates processing started)
-            const thumbnailPath = `${filePath}.jpg`;
-            if (await fsExists(thumbnailPath)) {
-              // Thumbnail exists but file not moved - might be in progress, skip for now
+            // Check if file exists and has size
+            try {
+              const stats = fs.statSync(filePath);
+              if (stats.size === 0) {
+                console.log(`[SCAN] Skipping ${file.name} - file is 0 bytes`);
+                continue;
+              }
+            } catch (err) {
+              console.log(`[SCAN] Skipping ${file.name} - cannot access file: ${err.message}`);
               continue;
             }
             
-            // New file found - start processing (non-blocking)
+            // Check if thumbnail already exists
+            const thumbnailPath = `${filePath}.jpg`;
+            const thumbnailExists = await fsExists(thumbnailPath);
+            
+            if (thumbnailExists) {
+              // Thumbnail exists but file not moved - might be from failed previous attempt
+              // Check if thumbnail is valid (has size)
+              try {
+                const thumbStats = fs.statSync(thumbnailPath);
+                if (thumbStats.size === 0) {
+                  // Invalid thumbnail - delete it and reprocess
+                  console.log(`[SCAN] ${file.name} has invalid thumbnail (0 bytes) - deleting and reprocessing`);
+                  await fs.promises.unlink(thumbnailPath);
+                } else {
+                  // Valid thumbnail but file not moved - file might be stuck
+                  // Check file age - if older than 5 minutes, retry processing
+                  const fileStats = fs.statSync(filePath);
+                  const fileAge = Date.now() - fileStats.mtimeMs;
+                  const fiveMinutes = 5 * 60 * 1000;
+                  
+                  if (fileAge > fiveMinutes) {
+                    console.log(`[SCAN] ${file.name} has thumbnail but file not moved (age: ${Math.round(fileAge / 1000)}s) - retrying processing`);
+                    // Delete thumbnail and reprocess
+                    await fs.promises.unlink(thumbnailPath);
+                  } else {
+                    // File is recent, might still be processing - skip for now
+                    console.log(`[SCAN] Skipping ${file.name} - has valid thumbnail and file is recent (age: ${Math.round(fileAge / 1000)}s)`);
+                    continue;
+                  }
+                }
+              } catch (err) {
+                console.log(`[SCAN] Error checking thumbnail for ${file.name}: ${err.message} - will reprocess`);
+                // Continue to process the file
+              }
+            }
+            
+            // New file found or needs reprocessing - start processing (non-blocking)
+            console.log(`[SCAN] Found new file to process: ${file.name}`);
             processFile(filePath, userHomeFolder).catch(err => {
               console.log(`[SCAN] Error starting processing for ${file.name}: ${err.message}`);
             });
@@ -462,8 +525,10 @@ async function scanForNewFiles() {
         console.log(`[SCAN] Cannot read folder ${entry.name}: ${err.message}`);
       }
     }
+    console.log(`[SCAN] ========== File scan completed ==========`);
   } catch (error) {
     console.log(`[SCAN] Error scanning for files: ${error.message}`);
+    console.log(`[SCAN] Error stack: ${error.stack}`);
   }
 }
 
