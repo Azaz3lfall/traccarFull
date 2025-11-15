@@ -824,11 +824,16 @@ function parseFilename(filename) {
 // Parse jc400 filename: EVENT_IMEI_00000000_YYYY_MM_DD_HH_MM_SS_TYPE_CHANNEL.mp4
 // ──────────────────────────────────────────────────────────────────────
 function parseJC400Filename(filename) {
+  // Format: EVENT_IMEI_SEQUENCE_YYYY_MM_DD_HH_MM_SS_CHANNEL(F|I)_EVENTTYPE.mp4
+  // Example: EVENT_862798052572175_00000000_2025_11_12_11_32_22_F_23.mp4
+  // Channel is F or I, eventType is the number at the end
   const m = filename.match(/^EVENT_(\d+)_00000000_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_([FI])_(\d+)\.mp4$/);
   if (!m) return null;
-  const [_, imei, year, month, day, hour, minute, second, type, channel] = m;
+  const [_, imei, year, month, day, hour, minute, second, channel, eventType] = m;
   const beginTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-  return { imei, channel: Number(channel), beginTime, endTime: beginTime, type };
+  // Map F/I to channel numbers: F = 1, I = 2
+  const channelNumber = channel === 'F' ? 1 : (channel === 'I' ? 2 : null);
+  return { imei, channel: channelNumber, channelLabel: channel, eventType: Number(eventType), beginTime, endTime: beginTime };
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -1535,7 +1540,7 @@ async function processDeviceJC400(imei) {
   const latestThumbByChannel = {};
   thumbFiles.forEach(thumbFile => {
     const parsed = parseJC400Filename(thumbFile.replace('.mp4.jpg', '.mp4'));
-    if (parsed) {
+    if (parsed && parsed.channel !== null) {
       const stats = fs.statSync(path.join(uploadFolder, thumbFile));
       if (!latestThumbByChannel[parsed.channel] || stats.mtime > latestThumbByChannel[parsed.channel].mtime) {
         latestThumbByChannel[parsed.channel] = {
