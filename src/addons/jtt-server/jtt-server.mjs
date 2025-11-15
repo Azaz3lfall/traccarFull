@@ -483,6 +483,13 @@ setTimeout(() => {
 }, 5000);
 
 // ──────────────────────────────────────────────────────────────────────
+// Check if file is being processed (in trackedFiles)
+// ──────────────────────────────────────────────────────────────────────
+function isFileBeingProcessed(filePath) {
+  return trackedFiles.has(filePath);
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // Parse filename to channel + time (jc181 format)
 // ──────────────────────────────────────────────────────────────────────
 function parseFilename(filename) {
@@ -541,7 +548,7 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
     generated_at: new Date().toISOString(),
     resource_count: expectedVideos.length,
     videos: [],
-    summary: { uploaded_ok: 0, upload_errored: 0, not_uploaded: 0 }
+    summary: { uploaded_ok: 0, upload_errored: 0, not_uploaded: 0, pending: 0 }
   };
 
   const expectedSet = new Set(expectedVideos.map(v => buildFilename(v.channel, v.beginTime)));
@@ -593,6 +600,7 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
   for (const vid of expectedVideos) {
     const file = buildFilename(vid.channel, vid.beginTime);
     const mp4Path = path.join(processedFolder, file);
+    const rootMp4Path = path.join(deviceFolder, file); // Check root folder for tracked files
     const thumbPath = path.join(deviceFolder, `${file}.jpg`);
 
     const mp4Exists = await fsExists(mp4Path);
@@ -600,8 +608,14 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
     const thumbExists = await fsExists(thumbPath);
     const thumbSize = thumbExists ? fs.statSync(thumbPath).size : 0;
 
+    // Check if file is being processed by global file processing system
+    const isInProcessingQueue = isFileBeingProcessed(rootMp4Path);
+    
     let status = 'not_uploaded';
-    if (mp4Exists && mp4Size > 0) {
+    if (isInProcessingQueue) {
+      // File is in processing queue - mark as pending
+      status = 'pending';
+    } else if (mp4Exists && mp4Size > 0) {
       status = (thumbExists && thumbSize > 0) ? 'uploaded_ok' : 'upload_errored';
     } else if (mp4Exists) {
       status = 'upload_errored';
@@ -821,10 +835,28 @@ async function processDevice(imei, deviceFolder, expectedVideos = [], triggerSou
   // DISABLED: All file processing operations removed - waiting for new steps
   // Files remain in root folder untouched
 
-  // ────── 5. WRITE REPORT ──────
+  // ────── 5. CORRECT STATUS FOR TRACKED FILES ──────
+  // After creating report, check tracked files and update status
+  for (const video of report.videos) {
+    const file = video.expected_file;
+    const rootMp4Path = path.join(deviceFolder, file);
+    
+    // If file is being processed, update status to pending
+    if (isFileBeingProcessed(rootMp4Path)) {
+      // Update summary counts
+      if (video.status !== 'pending') {
+        report.summary[video.status]--;
+        report.summary.pending = (report.summary.pending || 0) + 1;
+        video.status = 'pending';
+        console.log(`[REPORT] Updated ${file} status to pending (in processing queue)`);
+      }
+    }
+  }
+
+  // ────── 6. WRITE REPORT ──────
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), { mode: 0o644 });
   console.log(`[REPORT] SAVED: ${report.videos.length} videos`);
-  console.log(`[REPORT] OK: ${report.summary.uploaded_ok} | ERR: ${report.summary.upload_errored} | PENDING: ${report.summary.not_uploaded}`);
+  console.log(`[REPORT] OK: ${report.summary.uploaded_ok} | ERR: ${report.summary.upload_errored} | NOT_UPLOADED: ${report.summary.not_uploaded} | PENDING: ${report.summary.pending || 0}`);
 }
 
 // ──────────────────────────────────────────────────────────────────────

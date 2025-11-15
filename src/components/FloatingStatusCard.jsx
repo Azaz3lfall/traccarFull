@@ -85,7 +85,7 @@ import flvjs from 'flv.js';
 dayjs.extend(relativeTime);
 
 // VideoItem component with lazy loading - moved outside to prevent re-creation on every render
-const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer, device, setFtpUploadRequest, fetchVideos, setVideos, showSnackbar }) => {
+const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPlayer, device, fetchVideos, setVideos, showSnackbar }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef(null);
@@ -452,20 +452,14 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               const shouldMarkAsPending = isOfflineCommand || isSuccess;
               
               if (response.ok && result.code === 0 && shouldMarkAsPending) {
-                // Upload was accepted - store in localStorage and mark as pending
-                if (uploadData.expected_file) {
-                  const deviceModel = (uploadData.deviceModel || iothub?.deviceModel || 'jc181').toLowerCase();
-                  setFtpUploadRequest(uploadData.expected_file, Date.now(), deviceModel);
-                  console.log('FTP upload request stored in localStorage:', uploadData.expected_file, 'deviceModel:', deviceModel);
-                }
-                
+                // Upload was accepted - server will mark as pending in status_report.json
                 // Show response message with appropriate severity
                 const severity = isOfflineCommand ? 'warning' : 'success';
                 
                 console.log('[FTP_UPLOAD] Calling showSnackbar with:', responseMessage, severity);
                 showSnackbar(responseMessage, severity);
                 
-                // Refresh video list to update pending status
+                // Refresh video list to get updated status from server
                 if (fetchVideos) {
                   fetchVideos();
                 }
@@ -753,43 +747,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videoListEndDate, setVideoListEndDate] = useState(getTodayEnd());
   const [videoListSelectedChannels, setVideoListSelectedChannels] = useState([]);
   const [videoListSelectedStatuses, setVideoListSelectedStatuses] = useState(['uploaded_ok', 'not_uploaded', 'upload_errored', 'pending']);
-  
-  // localStorage key for FTP upload tracking
-  const FTP_UPLOAD_STORAGE_KEY = 'ftp_upload_requests';
-  
-  // Helper functions for localStorage management
-  const getFtpUploadRequests = useCallback(() => {
-    try {
-      const stored = localStorage.getItem(FTP_UPLOAD_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch (e) {
-      console.error('Error reading FTP upload requests from localStorage:', e);
-      return {};
-    }
-  }, []);
-  
-  const setFtpUploadRequest = useCallback((filename, timestamp, deviceModel) => {
-    try {
-      const requests = getFtpUploadRequests();
-      requests[filename] = {
-        timestamp,
-        deviceModel: deviceModel || 'jc181' // Default to jc181 for now
-      };
-      localStorage.setItem(FTP_UPLOAD_STORAGE_KEY, JSON.stringify(requests));
-    } catch (e) {
-      console.error('Error saving FTP upload request to localStorage:', e);
-    }
-  }, [getFtpUploadRequests]);
-  
-  const removeFtpUploadRequest = useCallback((filename) => {
-    try {
-      const requests = getFtpUploadRequests();
-      delete requests[filename];
-      localStorage.setItem(FTP_UPLOAD_STORAGE_KEY, JSON.stringify(requests));
-    } catch (e) {
-      console.error('Error removing FTP upload request from localStorage:', e);
-    }
-  }, [getFtpUploadRequests]);
   
   const [videos, setVideos] = useState([]);
   const [videosTotalCount, setVideosTotalCount] = useState(0);
@@ -1203,19 +1160,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (deviceModel === 'jc181' && data.onServer !== undefined && data.onDevice !== undefined) {
         const allVideos = [];
         
-        // Process onServer videos - mark as "uploaded_ok" (unless < 1MB, then "upload_errored")
-        // IMPORTANT: Preserve beginTime and endTime from server response - do NOT use date picker values
-        const ftpUploadRequests = getFtpUploadRequests();
-        
+        // Process onServer videos - use status from server (uploaded_ok or upload_errored)
+        // Server may also provide 'pending' status if file is being processed
         (data.onServer || []).forEach(video => {
           const fileSize = video.file_size || 0;
-          const status = fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok'; // 1MB = 1024 * 1024 bytes
-          
-          // If video is uploaded_ok and exists in localStorage, remove it (no longer pending)
-          if (status === 'uploaded_ok' && video.expected_file && ftpUploadRequests[video.expected_file]) {
-            removeFtpUploadRequest(video.expected_file);
-            console.log(`[CLEANUP] Removed ${video.expected_file} from localStorage - now uploaded_ok`);
-          }
+          // Use server status if provided, otherwise determine from file size
+          const status = video.status || (fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok');
           
           allVideos.push({
             ...video,
@@ -1226,37 +1176,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           });
         });
         
-        // Process onDevice videos - always mark as "not_uploaded" (or "pending" if in localStorage < 15 min)
-        // IMPORTANT: Preserve beginTime and endTime from server response - do NOT use date picker values
-        // Use the same ftpUploadRequests from above (already fetched, but refresh to get latest after onServer cleanup)
-        const now = Date.now();
-        const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
-        // Normalize device model for comparison (case-insensitive)
-        const currentDeviceModel = (deviceModel || 'jc181').toLowerCase();
-        
+        // Process onDevice videos - use status from server (not_uploaded, pending, or upload_errored)
+        // Server provides 'pending' status if file is in processing queue
         (data.onDevice || []).forEach(video => {
-          let status = 'not_uploaded';
-          const filename = video.expected_file;
-          
-          // Check if this video has a pending FTP upload request
-          if (filename && ftpUploadRequests[filename]) {
-            const requestData = ftpUploadRequests[filename];
-            // Handle both old format (just timestamp) and new format (object with timestamp and deviceModel)
-            const uploadTimestamp = typeof requestData === 'number' ? requestData : requestData.timestamp;
-            const requestDeviceModel = typeof requestData === 'object' ? (requestData.deviceModel || 'jc181').toLowerCase() : 'jc181';
-            const age = now - uploadTimestamp;
-            
-            // Only mark as pending if device model matches and age is less than 15 minutes
-            if (age < fifteenMinutes && requestDeviceModel === currentDeviceModel) {
-              status = 'pending';
-              console.log(`[PENDING] Marking ${filename} as pending (deviceModel: ${requestDeviceModel}, age: ${Math.round(age / 1000)}s)`);
-            } else if (age >= fifteenMinutes) {
-              // Remove old entry (older than 15 minutes)
-              removeFtpUploadRequest(filename);
-            } else {
-              console.log(`[PENDING] Not marking ${filename} as pending - deviceModel mismatch: ${requestDeviceModel} !== ${currentDeviceModel}`);
-            }
-          }
+          // Use server status if provided, otherwise default to 'not_uploaded'
+          const status = video.status || 'not_uploaded';
           
           allVideos.push({
             ...video,
@@ -1265,42 +1189,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             beginTime: video.beginTime,
             endTime: video.endTime
           });
-        });
-        
-        // Also check onServer videos with upload_errored status
-        allVideos.forEach(video => {
-          if (video.status === 'upload_errored' || video.status === 'not_uploaded') {
-            const filename = video.expected_file;
-            if (filename && ftpUploadRequests[filename]) {
-              const requestData = ftpUploadRequests[filename];
-              // Handle both old format (just timestamp) and new format (object with timestamp and deviceModel)
-              const uploadTimestamp = typeof requestData === 'number' ? requestData : requestData.timestamp;
-              const requestDeviceModel = typeof requestData === 'object' ? (requestData.deviceModel || 'jc181').toLowerCase() : 'jc181';
-              const age = now - uploadTimestamp;
-              
-              // Only mark as pending if device model matches and age is less than 15 minutes
-              if (age < fifteenMinutes && requestDeviceModel === currentDeviceModel) {
-                video.status = 'pending';
-                console.log(`[PENDING] Marking ${filename} as pending (deviceModel: ${requestDeviceModel}, age: ${Math.round(age / 1000)}s)`);
-              } else if (age >= fifteenMinutes) {
-                // Remove old entry (older than 15 minutes)
-                removeFtpUploadRequest(filename);
-              } else {
-                console.log(`[PENDING] Not marking ${filename} as pending - deviceModel mismatch: ${requestDeviceModel} !== ${currentDeviceModel}`);
-              }
-            }
-          }
-        });
-        
-        // Final cleanup: Remove any localStorage entries for videos that are now uploaded_ok
-        // This prevents duplicates if the same file appears in both onServer and onDevice
-        // Also ensures we don't show pending for files that are already uploaded
-        const finalFtpUploadRequests = getFtpUploadRequests(); // Refresh after all processing
-        allVideos.forEach(video => {
-          if (video.status === 'uploaded_ok' && video.expected_file && finalFtpUploadRequests[video.expected_file]) {
-            removeFtpUploadRequest(video.expected_file);
-            console.log(`[CLEANUP] Removed ${video.expected_file} from localStorage - duplicate with uploaded_ok status`);
-          }
         });
         
         setVideos(allVideos);
@@ -1320,40 +1208,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } finally {
       setVideosLoading(false);
     }
-  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage, getFtpUploadRequests, removeFtpUploadRequest]);
-  
-  // Cleanup old FTP upload requests - must be defined after fetchVideos
-  const cleanupOldFtpUploadRequests = useCallback(() => {
-    try {
-      const requests = getFtpUploadRequests();
-      const now = Date.now();
-      const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
-      let hasChanges = false;
-      
-      Object.keys(requests).forEach(filename => {
-        const requestData = requests[filename];
-        // Handle both old format (just timestamp) and new format (object with timestamp and deviceModel)
-        const timestamp = typeof requestData === 'number' ? requestData : requestData.timestamp;
-        if (now - timestamp > fifteenMinutes) {
-          delete requests[filename];
-          hasChanges = true;
-        }
-      });
-      
-      if (hasChanges) {
-        localStorage.setItem(FTP_UPLOAD_STORAGE_KEY, JSON.stringify(requests));
-        // Revalidate video list if it's loaded
-        if (videos.length > 0 && fetchVideos) {
-          fetchVideos();
-        }
-      }
-      
-      return hasChanges;
-    } catch (e) {
-      console.error('Error cleaning up FTP upload requests:', e);
-      return false;
-    }
-  }, [getFtpUploadRequests, videos.length, fetchVideos]);
+  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage]);
 
   // Send RTMP,OFF command for jc400 (must be sent before starting any stream)
   const sendRtmpOffCommand = useCallback(async () => {
@@ -1927,14 +1782,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     };
   }, [selectedChannel]);
 
-  // Polling mechanism to cleanup old FTP upload requests every minute
-  useEffect(() => {
-    const interval = setInterval(() => {
-      cleanupOldFtpUploadRequests();
-    }, 60000); // Check every minute (60 seconds)
-    
-    return () => clearInterval(interval);
-  }, [cleanupOldFtpUploadRequests]);
 
   // Reset tab when modal opens to first enabled tab (only on initial open, not when switching channels)
   const modalOpenedRef = useRef(false);
@@ -6917,7 +6764,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   setSelectedVideo={setSelectedVideo}
                                   setShowVideoPlayer={setShowVideoPlayer}
                                   device={device}
-                                  setFtpUploadRequest={setFtpUploadRequest}
                                   fetchVideos={fetchVideos}
                                   setVideos={setVideos}
                                   showSnackbar={showSnackbar}
