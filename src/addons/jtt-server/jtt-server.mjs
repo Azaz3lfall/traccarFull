@@ -418,10 +418,40 @@ async function processFile(filePath, userHomeFolder) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// Cleanup Stuck Files in Tracking Queue
+// ──────────────────────────────────────────────────────────────────────
+function cleanupStuckFiles() {
+  const now = Date.now();
+  const maxAge = 30 * 60 * 1000; // 30 minutes - if file has been in queue longer, it's stuck
+  const stuckFiles = [];
+  
+  for (const [filePath, trackingInfo] of trackedFiles.entries()) {
+    const age = now - trackingInfo.startTime;
+    if (age > maxAge) {
+      stuckFiles.push({ filePath, age });
+    }
+  }
+  
+  if (stuckFiles.length > 0) {
+    console.log(`[CLEANUP] Found ${stuckFiles.length} stuck file(s) in tracking queue:`);
+    for (const { filePath, age } of stuckFiles) {
+      const fileName = path.basename(filePath);
+      const ageMinutes = Math.round(age / 60000);
+      console.log(`[CLEANUP] Removing stuck file: ${fileName} (in queue for ${ageMinutes} minutes)`);
+      trackedFiles.delete(filePath);
+    }
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // Global File Scanner (Runs every 45 seconds)
 // ──────────────────────────────────────────────────────────────────────
 async function scanForNewFiles() {
   console.log(`[SCAN] ========== Starting file scan ==========`);
+  
+  // First, cleanup stuck files from tracking queue
+  cleanupStuckFiles();
+  
   try {
     const homeDir = '/home';
     
@@ -452,10 +482,22 @@ async function scanForNewFiles() {
             const filePath = path.join(userFolder, file.name);
             const fileKey = filePath;
             
-            // Skip if already tracked (being processed)
+            // Check if already tracked - if stuck (>30 min), remove and retry
             if (trackedFiles.has(fileKey)) {
-              console.log(`[SCAN] Skipping ${file.name} - already in tracking queue`);
-              continue;
+              const trackingInfo = trackedFiles.get(fileKey);
+              const age = Date.now() - trackingInfo.startTime;
+              const maxAge = 30 * 60 * 1000; // 30 minutes
+              
+              if (age > maxAge) {
+                // File is stuck - remove from tracking and retry
+                console.log(`[SCAN] ${file.name} is stuck in queue (${Math.round(age / 60000)} min) - removing and retrying`);
+                trackedFiles.delete(fileKey);
+                // Continue to process below
+              } else {
+                // File is still being processed (recently added)
+                console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${Math.round(age / 1000)}s ago)`);
+                continue;
+              }
             }
             
             // Check if file is already in processedVideos
@@ -539,6 +581,12 @@ setInterval(() => {
     console.log(`[SCAN] Error in scanner: ${err.message}`);
   });
 }, 45000); // 45 seconds
+
+// Run cleanup for stuck files every 5 minutes
+console.log(`[CLEANUP] Starting stuck file cleanup (runs every 5 minutes)`);
+setInterval(() => {
+  cleanupStuckFiles();
+}, 5 * 60 * 1000); // 5 minutes
 
 // Run initial scan after 5 seconds (give server time to start)
 setTimeout(() => {
@@ -1496,7 +1544,7 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] =========================================`);
       
       try {
-        // Use urlencoded.toString() directly - this is the working format
+        // Use urlencoded.toString() - this matches Postman's format
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
