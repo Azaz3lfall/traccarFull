@@ -1992,11 +1992,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     if (device) {
       const deviceModel = getDeviceModel;
       
-      // For jc400, always use channels from videos (event-based, channels can be any number)
+      // For jc400, use channels from videos (event-based, channels can be any number)
+      // Only initialize if no channels are selected yet
       if (deviceModel === 'jc400') {
         const videoChannels = [...new Set(videos.map(v => String(v.channel)).filter(Boolean))];
-        if (videoChannels.length > 0) {
-          // Always update to match all channels in videos for jc400
+        if (videoChannels.length > 0 && videoListSelectedChannels.length === 0) {
+          // Only set if no channels are selected yet (initial load)
           setVideoListSelectedChannels(videoChannels);
         }
       } else if (getIoTHubChannels > 0) {
