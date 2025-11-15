@@ -1572,8 +1572,31 @@ app.post('/getFileList', async (req, res) => {
             redirect: "follow"
           });
           
-          const result = await response.text();
-          console.log(`[getFileList] jimi server response:`, result);
+          const resultText = await response.text();
+          console.log(`[getFileList] jimi server response:`, resultText);
+          
+          // Parse the response to extract device message
+          let deviceResponse = null;
+          try {
+            const result = JSON.parse(resultText);
+            deviceResponse = {
+              code: result.code,
+              msg: result.msg,
+              data: result.data ? {
+                _imei: result.data._imei,
+                _code: result.data._code,
+                _msg: result.data._msg || result.data.msg || '',
+                _content: result.data._content
+              } : null
+            };
+          } catch (e) {
+            // If response is not JSON, use the text as message
+            deviceResponse = {
+              code: response.ok ? 0 : 1,
+              msg: resultText || 'Unknown response',
+              data: null
+            };
+          }
           
           // Wait for pushresourcelist to process and create status_report.json
           await waitForResponse;
@@ -1608,7 +1631,8 @@ app.post('/getFileList', async (req, res) => {
             onServerLength: onServer.length,
             onDeviceLength: onDevice.length,
             onServer,
-            onDevice
+            onDevice,
+            deviceResponse: deviceResponse // Include device response for frontend notification
           });
         } catch (error) {
           // Clean up pending request
@@ -1639,7 +1663,14 @@ app.post('/getFileList', async (req, res) => {
             onServerLength: onServer.length,
             onDeviceLength: onDevice.length,
             onServer, 
-            onDevice
+            onDevice,
+            deviceResponse: {
+              code: 1,
+              msg: 'Error requesting from device',
+              data: {
+                _msg: error.message || 'Using cached data - device did not respond'
+              }
+            }
           });
         }
       } else {
@@ -1651,7 +1682,14 @@ app.post('/getFileList', async (req, res) => {
             onServerLength: onServer.length,
             onDeviceLength: 0,
             onServer, 
-            onDevice: []
+            onDevice: [],
+            deviceResponse: {
+              code: 0,
+              msg: 'success',
+              data: {
+                _msg: 'Using cached data - no device request made'
+              }
+            }
           });
         }
         
@@ -1679,7 +1717,14 @@ app.post('/getFileList', async (req, res) => {
           onServerLength: onServer.length,
           onDeviceLength: onDevice.length,
           onServer, 
-          onDevice
+          onDevice,
+          deviceResponse: {
+            code: 0,
+            msg: 'success',
+            data: {
+              _msg: 'Using cached data - no device request made'
+            }
+          }
         });
       }
     }

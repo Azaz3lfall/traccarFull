@@ -336,12 +336,20 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
             
             // IMMEDIATELY set status to pending to show circular progress and prevent multiple clicks
             if (setVideos) {
-              setVideos(prevVideos => prevVideos.map(v => {
-                if (v.expected_file === video.expected_file) {
-                  return { ...v, status: 'pending' };
-                }
-                return v;
-              }));
+              console.log('[FTP_UPLOAD] Setting status to pending for:', video.expected_file);
+              setVideos(prevVideos => {
+                const updated = prevVideos.map(v => {
+                  if (v.expected_file === video.expected_file) {
+                    console.log('[FTP_UPLOAD] Updating video status from', v.status, 'to pending');
+                    return { ...v, status: 'pending' };
+                  }
+                  return v;
+                });
+                console.log('[FTP_UPLOAD] Updated videos array:', updated.find(v => v.expected_file === video.expected_file));
+                return updated;
+              });
+            } else {
+              console.error('[FTP_UPLOAD] setVideos is not available!');
             }
             
             // Parse iothub attributes from device
@@ -549,10 +557,19 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
   );
 }, (prevProps, nextProps) => {
   // Custom comparison function for memo - only re-render if video data or relevant props change
+  // Return true if props are equal (skip re-render), false if different (re-render)
+  const statusChanged = prevProps.video.status !== nextProps.video.status;
+  
+  // If status changed, we MUST re-render to show/hide circular progress
+  if (statusChanged) {
+    console.log('[VideoItem] Status changed from', prevProps.video.status, 'to', nextProps.video.status, '- forcing re-render');
+    return false; // Re-render
+  }
+  
+  // Otherwise, check other props
   return (
     prevProps.video.channel === nextProps.video.channel &&
     prevProps.video.beginTime === nextProps.video.beginTime &&
-    prevProps.video.status === nextProps.video.status &&
     prevProps.showSnackbar === nextProps.showSnackbar &&
     prevProps.video.video_url === nextProps.video.video_url &&
     prevProps.video.thumbnail_url === nextProps.video.thumbnail_url &&
@@ -1178,6 +1195,33 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
       const data = await response.json();
       
+      // Show device response notification if available
+      if (data.deviceResponse) {
+        const deviceResp = data.deviceResponse;
+        let message = deviceResp.data?._msg || deviceResp.msg || 'Device response received';
+        let severity = 'info';
+        
+        // Determine severity based on response
+        if (deviceResp.code === 0 && deviceResp.msg === 'success') {
+          const msgLower = message.toLowerCase();
+          if (msgLower.includes('offline') || msgLower.includes('timeout')) {
+            severity = 'warning';
+          } else if (msgLower.includes('busy') || msgLower.includes('error') || msgLower.includes('fail')) {
+            severity = 'warning';
+          } else {
+            severity = 'success';
+          }
+        } else {
+          severity = 'error';
+        }
+        
+        // Show snackbar with device response
+        if (showSnackbar) {
+          console.log('[getFileList] Showing device response:', message, severity);
+          showSnackbar(message, severity);
+        }
+      }
+      
       // Handle new response format for jc181 (onServer and onDevice)
       if (deviceModel === 'jc181' && data.onServer !== undefined && data.onDevice !== undefined) {
         const allVideos = [];
@@ -1250,7 +1294,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } finally {
       setVideosLoading(false);
     }
-  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage]);
+  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage, showSnackbar]);
 
   // Send RTMP,OFF command for jc400 (must be sent before starting any stream)
   const sendRtmpOffCommand = useCallback(async () => {
@@ -6799,7 +6843,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             }}>
                               {paginatedVideos.map((video, index) => (
                                 <VideoItem 
-                                  key={`${video.channel}-${video.beginTime}-${index}`} 
+                                  key={`${video.channel}-${video.beginTime}-${video.status}-${index}`} 
                                   video={video} 
                                   index={index}
                                   colors={colors}
