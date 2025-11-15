@@ -1237,10 +1237,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           // Use server status if provided, otherwise determine from file size
           let status = video.status || (fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok');
           
-          // Preserve pending status from local state if server hasn't updated yet
+          // Only preserve pending status from local state if server status is also pending
+          // If server has a definitive status (uploaded_ok, upload_errored), use that instead
           const currentVideo = currentVideosMap.get(video.expected_file);
-          if (currentVideo?.status === 'pending' && status !== 'uploaded_ok') {
+          if (currentVideo?.status === 'pending' && status === 'pending') {
+            // Both are pending - keep pending
             status = 'pending';
+          } else if (status === 'uploaded_ok' || status === 'upload_errored') {
+            // Server has definitive status - use it (don't preserve pending)
+            // status is already set correctly
           }
           
           allVideos.push({
@@ -1258,10 +1263,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           // Use server status if provided, otherwise default to 'not_uploaded'
           let status = video.status || 'not_uploaded';
           
-          // Preserve pending status from local state if server hasn't updated yet
+          // Only preserve pending status from local state if server status is also pending or not_uploaded
+          // If server has a definitive status (uploaded_ok, upload_errored), use that instead
           const currentVideo = currentVideosMap.get(video.expected_file);
-          if (currentVideo?.status === 'pending') {
+          if (currentVideo?.status === 'pending' && (status === 'pending' || status === 'not_uploaded')) {
+            // Local is pending and server is pending/not_uploaded - keep pending
             status = 'pending';
+          } else if (status === 'uploaded_ok' || status === 'upload_errored') {
+            // Server has definitive status - use it (don't preserve pending)
+            // status is already set correctly
           }
           
           allVideos.push({

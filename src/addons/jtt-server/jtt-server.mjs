@@ -1455,6 +1455,41 @@ app.post('/ftpupload', async (req, res) => {
           responseData = responseText;
         }
         
+        // If upload was successful, immediately track the file as pending
+        // This ensures the file is marked as pending in status_report.json when processDevice runs
+        if (response.ok && responseData.code === 0) {
+          const dataMsg = (responseData.data?._msg || responseData.data?.msg || '').toString().toLowerCase();
+          const isSuccess = responseData.msg === 'success' && 
+                           !dataMsg.includes('busy') &&
+                           !dataMsg.includes('error') &&
+                           !dataMsg.includes('fail');
+          const isOfflineCommand = (responseData.msg || '').toLowerCase().includes('converted to an offline command') ||
+                                  dataMsg.includes('converted to an offline command');
+          
+          if (isSuccess || isOfflineCommand) {
+            // Build expected filename from channel and beginTime
+            const expectedFile = buildFilename(channel, beginTime);
+            const deviceFolder = `/home/_${deviceImei}`;
+            const rootMp4Path = path.join(deviceFolder, expectedFile);
+            
+            // Immediately add file to trackedFiles so it's marked as pending
+            // The file may not exist yet, but it will be uploaded soon
+            if (!trackedFiles.has(rootMp4Path)) {
+              trackedFiles.set(rootMp4Path, { startTime: Date.now() });
+              console.log(`[FTPUPLOAD] File ${expectedFile} added to tracking queue (will be marked as pending)`);
+              
+              // Also trigger processing if file already exists
+              // This handles the case where file was already uploaded but not yet processed
+              if (await fsExists(rootMp4Path)) {
+                console.log(`[FTPUPLOAD] File ${expectedFile} already exists - starting processing`);
+                processFile(rootMp4Path, deviceFolder).catch(err => {
+                  console.log(`[FTPUPLOAD] Error starting processing for ${expectedFile}: ${err.message}`);
+                });
+              }
+            }
+          }
+        }
+        
         console.log(`[FTPUPLOAD] Returning response to client`);
         // Return the response with the same status code from Jimi server
         return res.status(response.status).json(responseData);
