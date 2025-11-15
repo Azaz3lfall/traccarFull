@@ -431,7 +431,7 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               
               // Extract response message - check both msg and data._msg
               let responseMessage = result.msg || result.message || result.error || 'Unknown response';
-              const dataMsg = result.data?._msg || result.data?.msg || '';
+              const dataMsg = (result.data?._msg || result.data?.msg || '').toString();
               
               // If data._msg exists, use it as the primary message (more specific)
               if (dataMsg) {
@@ -442,26 +442,48 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               // Only accept if:
               // 1. msg is "success" AND data._msg doesn't indicate an error (like "Device busy")
               // 2. OR msg contains "converted to an offline command"
-              const isOfflineCommand = responseMessage.toLowerCase().includes('converted to an offline command') ||
-                                      result.msg?.toLowerCase().includes('converted to an offline command');
+              const responseMsgLower = (responseMessage || '').toString().toLowerCase();
+              const resultMsgLower = (result.msg || '').toString().toLowerCase();
+              const dataMsgLower = dataMsg.toLowerCase();
+              
+              const isOfflineCommand = responseMsgLower.includes('converted to an offline command') ||
+                                      resultMsgLower.includes('converted to an offline command');
               const isSuccess = result.msg === 'success' && 
-                               !dataMsg.toLowerCase().includes('busy') &&
-                               !dataMsg.toLowerCase().includes('error') &&
-                               !dataMsg.toLowerCase().includes('fail');
+                               !dataMsgLower.includes('busy') &&
+                               !dataMsgLower.includes('error') &&
+                               !dataMsgLower.includes('fail');
               
               const shouldMarkAsPending = isOfflineCommand || isSuccess;
               
+              console.log('[FTP_UPLOAD] Response analysis:', {
+                responseOk: response.ok,
+                resultCode: result.code,
+                resultMsg: result.msg,
+                dataMsg: dataMsg,
+                isOfflineCommand,
+                isSuccess,
+                shouldMarkAsPending
+              });
+              
               if (response.ok && result.code === 0 && shouldMarkAsPending) {
-                // Upload was accepted - server will mark as pending in status_report.json
+                // Upload was accepted - keep status as pending in local state
+                // Server will mark as pending in status_report.json, but it may take a moment
+                // Don't refresh immediately to avoid overwriting the pending status
+                
                 // Show response message with appropriate severity
                 const severity = isOfflineCommand ? 'warning' : 'success';
                 
-                console.log('[FTP_UPLOAD] Calling showSnackbar with:', responseMessage, severity);
+                console.log('[FTP_UPLOAD] Upload accepted! Calling showSnackbar with:', responseMessage, severity);
+                console.log('[FTP_UPLOAD] showSnackbar function:', typeof showSnackbar, showSnackbar);
                 showSnackbar(responseMessage, severity);
+                console.log('[FTP_UPLOAD] showSnackbar called');
                 
-                // Refresh video list to get updated status from server
+                // Refresh video list after a delay to allow server to update status_report.json
+                // Keep the pending status in local state until server confirms it
                 if (fetchVideos) {
-                  fetchVideos();
+                  setTimeout(() => {
+                    fetchVideos();
+                  }, 2000); // Wait 2 seconds for server to process
                 }
               } else {
                 // Upload was NOT accepted - revert status, don't add to localStorage, show error
@@ -1160,12 +1182,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (deviceModel === 'jc181' && data.onServer !== undefined && data.onDevice !== undefined) {
         const allVideos = [];
         
+        // Get current videos to preserve pending status that might not be on server yet
+        const currentVideosMap = new Map();
+        videos.forEach(v => {
+          if (v.expected_file) {
+            currentVideosMap.set(v.expected_file, v);
+          }
+        });
+        
         // Process onServer videos - use status from server (uploaded_ok or upload_errored)
         // Server may also provide 'pending' status if file is being processed
         (data.onServer || []).forEach(video => {
           const fileSize = video.file_size || 0;
           // Use server status if provided, otherwise determine from file size
-          const status = video.status || (fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok');
+          let status = video.status || (fileSize < 1024 * 1024 ? 'upload_errored' : 'uploaded_ok');
+          
+          // Preserve pending status from local state if server hasn't updated yet
+          const currentVideo = currentVideosMap.get(video.expected_file);
+          if (currentVideo?.status === 'pending' && status !== 'uploaded_ok') {
+            status = 'pending';
+          }
           
           allVideos.push({
             ...video,
@@ -1180,7 +1216,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         // Server provides 'pending' status if file is in processing queue
         (data.onDevice || []).forEach(video => {
           // Use server status if provided, otherwise default to 'not_uploaded'
-          const status = video.status || 'not_uploaded';
+          let status = video.status || 'not_uploaded';
+          
+          // Preserve pending status from local state if server hasn't updated yet
+          const currentVideo = currentVideosMap.get(video.expected_file);
+          if (currentVideo?.status === 'pending') {
+            status = 'pending';
+          }
           
           allVideos.push({
             ...video,
@@ -7466,12 +7508,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       autoHideDuration={6000}
       onClose={hideSnackbar}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      sx={{ zIndex: 9999 }}
+      sx={{ 
+        zIndex: 999999,
+        position: 'fixed',
+        '& .MuiSnackbar-root': {
+          zIndex: '999999 !important'
+        }
+      }}
+      style={{
+        zIndex: 999999,
+        position: 'fixed'
+      }}
     >
       <Alert
         onClose={hideSnackbar}
         severity={snackbar.severity}
-        sx={{ width: '100%' }}
+        sx={{ 
+          width: '100%',
+          zIndex: 999999,
+          position: 'relative'
+        }}
       >
         {snackbar.message}
       </Alert>
