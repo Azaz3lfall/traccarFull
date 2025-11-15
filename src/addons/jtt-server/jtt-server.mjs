@@ -1602,10 +1602,27 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] Building request...`);
       const cleanJimiServer = jimiServer.replace(/\/+$/, '');
       
+      // Ensure channel is a number (not string)
+      const channelNum = parseInt(channel, 10);
+      if (isNaN(channelNum)) {
+        console.log(`[FTPUPLOAD] ERROR: Invalid channel value: ${channel} (type: ${typeof channel})`);
+        return res.status(400).json({ 
+          code: 1, 
+          ok: false, 
+          error: `Invalid channel value: ${channel}` 
+        });
+      }
+      
       // Build cmdContent JSON string - EXACT format matching Postman reference
       // Postman uses: 4 spaces for indentation, 12 spaces for beginTime/endTime, 2 spaces for closing brace
       // URLSearchParams encodes spaces as + or %20, but we need to match Postman's exact format
-      const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channel},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
+      const cmdContentJson = `{\n    "serverAddress": "${ftpServerIp}",\n    "ftpPort": ${ftpPort},\n    "userName": "_${deviceImei}",\n    "password": "_${deviceImei}",\n    "fileUploadPath": "${fileUploadPath}",\n    "channel": ${channelNum},\n\n            "beginTime": "${beginTimeFormatted}",\n            "endTime": "${endTimeFormatted}",\n"alarmFlag": 0,\n    "resourceType": 0,\n    "codeType": 0,\n    "storageType": 0,\n    "condition": 1,\n    "instructionID": "123456789"\n  }`;
+      
+      // Log the raw JSON string BEFORE URL encoding for comparison
+      console.log(`[FTPUPLOAD] ========== CHANNEL ${channelNum} REQUEST ==========`);
+      console.log(`[FTPUPLOAD] Raw cmdContentJson (BEFORE encoding):`);
+      console.log(cmdContentJson);
+      console.log(`[FTPUPLOAD] Channel value: ${channelNum} (type: ${typeof channelNum}, original: ${channel} type: ${typeof channel})`);
       
       // Build URLSearchParams - EXACT order matching Postman reference
       const urlencoded = new URLSearchParams();
@@ -1621,18 +1638,25 @@ app.post('/ftpupload', async (req, res) => {
       
       const apiUrl = `${cleanJimiServer}/api/device/sendInstruct`;
       
+      // Log the URL-encoded body for comparison
+      const encodedBody = urlencoded.toString();
+      console.log(`[FTPUPLOAD] URL-encoded body (AFTER encoding):`);
+      console.log(encodedBody);
+      console.log(`[FTPUPLOAD] =========================================`);
+      
       // Log for debugging
       console.log(`[FTPUPLOAD] Sending request to: ${apiUrl}`);
-      console.log(`[FTPUPLOAD] Request body:`, urlencoded.toString());
       console.log(`[FTPUPLOAD] Request params:`, {
         deviceImei,
-        channel,
+        channel: channelNum,
+        channelOriginal: channel,
+        channelType: typeof channelNum,
         beginTime: beginTimeFormatted,
         endTime: endTimeFormatted,
         ftpServerIp,
         ftpPort,
         fileUploadPath,
-        token: token
+        token: token ? '***' : 'missing'
       });
       
       console.log(`[FTPUPLOAD] About to call fetch...`);
@@ -1642,17 +1666,17 @@ app.post('/ftpupload', async (req, res) => {
       console.log(`[FTPUPLOAD] Headers:`, {
         "Content-Type": "application/x-www-form-urlencoded"
       });
-      console.log(`[FTPUPLOAD] Body:`, urlencoded.toString());
+      console.log(`[FTPUPLOAD] Body:`, encodedBody);
       console.log(`[FTPUPLOAD] =========================================`);
       
       try {
-        // Use urlencoded.toString() - this matches Postman's format
+        // Use encodedBody - this matches Postman's format
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: urlencoded.toString(),
+          body: encodedBody,
           redirect: "follow"
         });
         
