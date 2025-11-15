@@ -413,9 +413,8 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                     return v;
                   }));
                 }
-                if (showSnackbar) {
-                  showSnackbar('Media server URL not configured', 'error');
-                }
+                console.log('[FTP_UPLOAD] Calling showSnackbar with: Media server URL not configured');
+                showSnackbar('Media server URL not configured', 'error');
                 return;
               }
               
@@ -430,34 +429,48 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               const result = await response.json();
               console.log('FTP upload response:', result);
               
-              // Always show the response message to the user
-              const responseMessage = result.msg || result.message || result.error || 'Unknown response';
+              // Extract response message - check both msg and data._msg
+              let responseMessage = result.msg || result.message || result.error || 'Unknown response';
+              const dataMsg = result.data?._msg || result.data?.msg || '';
               
-              // Check if upload was successful (code === 0 means request was accepted)
-              if (response.ok && result.code === 0) {
-                // Store upload request in localStorage with current timestamp and device model
+              // If data._msg exists, use it as the primary message (more specific)
+              if (dataMsg) {
+                responseMessage = dataMsg;
+              }
+              
+              // Determine if upload was actually accepted
+              // Only accept if:
+              // 1. msg is "success" AND data._msg doesn't indicate an error (like "Device busy")
+              // 2. OR msg contains "converted to an offline command"
+              const isOfflineCommand = responseMessage.toLowerCase().includes('converted to an offline command') ||
+                                      result.msg?.toLowerCase().includes('converted to an offline command');
+              const isSuccess = result.msg === 'success' && 
+                               !dataMsg.toLowerCase().includes('busy') &&
+                               !dataMsg.toLowerCase().includes('error') &&
+                               !dataMsg.toLowerCase().includes('fail');
+              
+              const shouldMarkAsPending = isOfflineCommand || isSuccess;
+              
+              if (response.ok && result.code === 0 && shouldMarkAsPending) {
+                // Upload was accepted - store in localStorage and mark as pending
                 if (uploadData.expected_file) {
                   const deviceModel = (uploadData.deviceModel || iothub?.deviceModel || 'jc181').toLowerCase();
                   setFtpUploadRequest(uploadData.expected_file, Date.now(), deviceModel);
                   console.log('FTP upload request stored in localStorage:', uploadData.expected_file, 'deviceModel:', deviceModel);
                 }
                 
-                // Show response message (even if device is offline, user should know)
-                // Use warning if device is offline/timed out, success otherwise
-                const severity = responseMessage.toLowerCase().includes('offline') || 
-                                responseMessage.toLowerCase().includes('timed out') 
-                                ? 'warning' : 'success';
+                // Show response message with appropriate severity
+                const severity = isOfflineCommand ? 'warning' : 'success';
                 
-                if (showSnackbar) {
-                  showSnackbar(responseMessage, severity);
-                }
+                console.log('[FTP_UPLOAD] Calling showSnackbar with:', responseMessage, severity);
+                showSnackbar(responseMessage, severity);
                 
                 // Refresh video list to update pending status
                 if (fetchVideos) {
                   fetchVideos();
                 }
               } else {
-                // Upload failed - revert status and show error
+                // Upload was NOT accepted - revert status, don't add to localStorage, show error
                 if (setVideos) {
                   setVideos(prevVideos => prevVideos.map(v => {
                     if (v.expected_file === video.expected_file) {
@@ -467,10 +480,12 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
                   }));
                 }
                 
-                console.error('FTP upload failed:', result);
-                if (showSnackbar) {
-                  showSnackbar(responseMessage, 'error');
-                }
+                console.error('FTP upload not accepted:', result);
+                
+                // Show error/warning message
+                const severity = response.ok && result.code === 0 ? 'warning' : 'error';
+                console.log('[FTP_UPLOAD] Calling showSnackbar with:', responseMessage, severity);
+                showSnackbar(responseMessage, severity);
               }
             } catch (error) {
               console.error('Error sending FTP upload request:', error);
@@ -486,9 +501,8 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
               }
               
               // Show error snackbar
-              if (showSnackbar) {
-                showSnackbar(`Error sending FTP upload request: ${error.message}`, 'error');
-              }
+              console.log('[FTP_UPLOAD] Calling showSnackbar with error:', error.message);
+              showSnackbar(`Error sending FTP upload request: ${error.message}`, 'error');
             }
           }}
           size="small"
@@ -812,13 +826,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     };
   }, [showSensorDropdown]);
   
-  const showSnackbar = (message, severity = 'error') => {
+  const showSnackbar = useCallback((message, severity = 'error') => {
+    console.log('[SNACKBAR] Showing snackbar:', message, severity);
     setSnackbar({ open: true, message, severity });
-  };
+  }, []);
   
-  const hideSnackbar = () => {
+  const hideSnackbar = useCallback(() => {
     setSnackbar(prev => ({ ...prev, open: false }));
-  };
+  }, []);
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
