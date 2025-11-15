@@ -1942,6 +1942,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setStreamingError(null);
       setStreamingRetryCount(0);
       setSelectedChannel(0);
+      // Clear videos list to prevent showing old device's videos when switching devices
+      setVideos([]);
+      setVideosTotalCount(0);
     }
   }, [moreDetailsModalOpen, device?.id, getIoTHubChannels]); // Only depend on device.id, not the whole device object
 
