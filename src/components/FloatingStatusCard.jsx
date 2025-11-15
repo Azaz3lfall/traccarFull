@@ -1184,6 +1184,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           token: token,
           jimiServer: iothubServer
         };
+      } else if (deviceModel === 'jc400') {
+        // For jc400, send deviceModel to get file list from server
+        requestBody = {
+          deviceImei: device.uniqueId,
+          deviceModel: 'jc400'
+        };
       } else {
         // For other device models, use old format
         requestBody = {
@@ -1300,9 +1306,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setVideos(allVideos);
         setVideosTotalCount(allVideos.length);
       } else {
-        // Old format - videos array
-      setVideos(data.videos || []);
-      setVideosTotalCount(data.resource_count || 0);
+        // Old format - videos array (used for jc400 and other models)
+        setVideos(data.videos || []);
+        setVideosTotalCount(data.resource_count || 0);
       }
       
       setVideosCurrentPage(1); // Reset to first page when new data is fetched
