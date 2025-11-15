@@ -143,7 +143,11 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
       ref={imgRef}
       style={{
         width: '100%',
-        paddingBottom: '56.25%', // 16:9 aspect ratio
+        height: '200px', // FIXED HEIGHT
+        maxHeight: '200px',
+        minHeight: '200px',
+        aspectRatio: '16/9', // Maintain 16:9 aspect ratio
+        maxWidth: '100%',
         position: 'relative',
         backgroundColor: colors.secondary,
         borderRadius: '8px',
@@ -152,24 +156,27 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
         boxSizing: 'border-box',
         cursor: (video.video_url && video.status === 'uploaded_ok') ? 'pointer' : 'default',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        margin: 0,
+        padding: '5px', // Add 5px padding inside the video item
+        display: 'block',
       }}
       onMouseEnter={(e) => {
-        if (video.video_url && video.status === 'uploaded_ok') {
-          e.currentTarget.style.transform = 'scale(1.02)';
-          e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.boxShadow = 'none';
-      }}
-      onClick={() => {
-        if (video.video_url && video.status === 'uploaded_ok') {
-          setSelectedVideo(video);
-          setShowVideoPlayer(true);
-        }
-      }}
-    >
+          if (video.video_url && video.status === 'uploaded_ok') {
+            e.currentTarget.style.transform = 'scale(1.02)';
+            e.currentTarget.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.15)`;
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        onClick={() => {
+          if (video.video_url && video.status === 'uploaded_ok') {
+            setSelectedVideo(video);
+            setShowVideoPlayer(true);
+          }
+        }}
+      >
       {/* Thumbnail */}
       <div style={{
         position: 'absolute',
@@ -177,6 +184,10 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
         left: 0,
         right: 0,
         bottom: 0,
+        width: '100%',
+        height: '100%',
+        maxHeight: '200px',
+        overflow: 'hidden',
       }}>
         {imageLoaded && video.thumbnail_url && !imageError ? (
           <img
@@ -185,6 +196,7 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
             style={{
               width: '100%',
               height: '100%',
+              maxHeight: '200px',
               objectFit: 'cover',
               display: imageError ? 'none' : 'block'
             }}
@@ -246,8 +258,10 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
         left: 0,
         right: 0,
         background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-        padding: '8px',
-        color: '#fff'
+        padding: '6px 8px', // Reduced vertical padding to minimize height
+        color: '#fff',
+        maxHeight: '50px', // Constrain text overlay height
+        overflow: 'hidden',
       }}>
         <Typography variant="caption" style={{ 
           display: 'block',
@@ -6837,15 +6851,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             <Box style={{
                               display: 'grid',
                               gridTemplateColumns: desktop ? 'repeat(4, minmax(0, 1fr))' : 'minmax(0, 1fr)',
-                              gap: '16px',
-                              overflowY: desktop ? 'auto' : 'visible',
+                              gap: '4px',
+                              rowGap: '4px',
+                              columnGap: '4px',
+                              overflowY: desktop ? 'auto' : 'visible', // ENABLE SCROLLING
                               overflowX: 'hidden',
                               paddingRight: '4px',
                               flex: desktop ? '1 1 auto' : 'none',
                               minHeight: desktop ? 0 : 'auto',
                               width: '100%',
                               maxWidth: '100%',
-                              boxSizing: 'border-box'
+                              boxSizing: 'border-box',
+                              // CRITICAL: Fixed row height exactly 205px (200px item + 5px spacing)
+                              gridAutoRows: '205px',
+                              alignItems: 'start',
+                              alignContent: 'start',
                             }}>
                               {paginatedVideos.map((video, index) => (
                                 <VideoItem 
