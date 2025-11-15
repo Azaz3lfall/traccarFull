@@ -1642,6 +1642,11 @@ app.post('/ftpupload', async (req, res) => {
       const encodedBody = urlencoded.toString();
       console.log(`[FTPUPLOAD] URL-encoded body (AFTER encoding):`);
       console.log(encodedBody);
+      
+      // Decode and show the exact cmdContent for comparison
+      const decodedCmdContent = decodeURIComponent(encodedBody.split('cmdContent=')[1]?.split('&')[0] || '');
+      console.log(`[FTPUPLOAD] Decoded cmdContent (for comparison):`);
+      console.log(decodedCmdContent);
       console.log(`[FTPUPLOAD] =========================================`);
       
       // Log for debugging
