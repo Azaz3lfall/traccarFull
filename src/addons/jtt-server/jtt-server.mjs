@@ -510,16 +510,11 @@ async function processFile(filePath, userHomeFolder) {
 // ──────────────────────────────────────────────────────────────────────
 // Cleanup Stuck Files in Tracking Queue
 // ──────────────────────────────────────────────────────────────────────
-// Maximum expected processing time:
-// - File size check: 30 checks × 30 seconds = 15 minutes
-// - Thumbnail generation: ~30 seconds
-// - FFmpeg test: ~60 seconds
-// - Move operation: ~10 seconds
-// Total: ~16-17 minutes max
-// Set cleanup threshold to 25 minutes to account for legitimate processing
+// Files should not take longer than 5 minutes to upload via FTP
+// If a file has been in the queue for more than 5 minutes, it's likely stuck
 function cleanupStuckFiles() {
   const now = Date.now();
-  const maxProcessingTime = 25 * 60 * 1000; // 25 minutes - if file has been in queue longer, it's stuck
+  const maxProcessingTime = 5 * 60 * 1000; // 5 minutes - if file has been in queue longer, it's stuck
   const stuckFiles = [];
   
   for (const [filePath, trackingInfo] of trackedFiles.entries()) {
@@ -530,11 +525,11 @@ function cleanupStuckFiles() {
   }
   
   if (stuckFiles.length > 0) {
-    console.log(`[CLEANUP] Found ${stuckFiles.length} stuck file(s) in tracking queue (older than 25 minutes):`);
+    console.log(`[CLEANUP] Found ${stuckFiles.length} stuck file(s) in tracking queue (older than 5 minutes):`);
     for (const { filePath, age } of stuckFiles) {
       const fileName = path.basename(filePath);
       const ageMinutes = Math.round(age / 60000);
-      console.log(`[CLEANUP] Removing stuck file: ${fileName} (in queue for ${ageMinutes} minutes - exceeds max processing time)`);
+      console.log(`[CLEANUP] Removing stuck file: ${fileName} (in queue for ${ageMinutes} minutes - exceeds max upload time)`);
       trackedFiles.delete(filePath);
     }
   }
@@ -579,12 +574,12 @@ async function scanForNewFiles() {
             const filePath = path.join(userFolder, file.name);
             const fileKey = filePath;
             
-            // Check if already tracked - if stuck (>25 min), remove and retry
-            // Max expected processing time: 30 checks × 30s (15 min) + thumbnail (30s) + ffmpeg (60s) + move (10s) = ~17 min
+            // Check if already tracked - if stuck (>5 min), remove and retry
+            // Files should not take longer than 5 minutes to upload via FTP
             if (trackedFiles.has(fileKey)) {
               const trackingInfo = trackedFiles.get(fileKey);
               const age = Date.now() - trackingInfo.startTime;
-              const maxProcessingTime = 25 * 60 * 1000; // 25 minutes (allows buffer for legitimate processing)
+              const maxProcessingTime = 5 * 60 * 1000; // 5 minutes - if longer, file is stuck
               
               if (age > maxProcessingTime) {
                 // File is stuck - remove from tracking and retry
@@ -592,7 +587,7 @@ async function scanForNewFiles() {
                 trackedFiles.delete(fileKey);
                 // Continue to process below
               } else {
-                // File is still being processed (recently added or within expected processing time)
+                // File is still being processed (recently added or within expected upload time)
                 const ageMinutes = Math.round(age / 60000);
                 const ageSeconds = Math.round(age / 1000);
                 console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${ageMinutes > 0 ? ageMinutes + 'm ' : ''}${ageSeconds % 60}s ago)`);
