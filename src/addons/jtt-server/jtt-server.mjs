@@ -18,7 +18,7 @@ const MEDIA_SERVER = 'https://midia.rastreadorautoram.com.br';
 const TRACCAR_SERVER_URL = 'http://rast.rastreadorautoram.com.br:5055';
 
 // ──────────────────────────────────────────────────────────────────────
-// CORS: ALLOW *.rastreadorautoram.com.br + 192.168.*.* (http & https)
+// CORS: ALLOW *.rastreadorautoram.com.br + *.codeartisan.cloud + 192.168.*.* (http & https)
 // ──────────────────────────────────────────────────────────────────────
 const cors = (req, res, next) => {
   const origin = req.headers.origin || '';
@@ -26,10 +26,13 @@ const cors = (req, res, next) => {
   const isRastreador = origin.endsWith('.rastreadorautoram.com.br') || 
                        origin === 'https://rastreadorautoram.com.br';
 
+  const isCodeartisan = origin.endsWith('.codeartisan.cloud') || 
+                        origin === 'https://codeartisan.cloud';
+
   const isLocalHttp = /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin);
   const isLocalHttps = /^https:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin);
 
-  if (isRastreador || isLocalHttp || isLocalHttps) {
+  if (isRastreador || isCodeartisan || isLocalHttp || isLocalHttps) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
@@ -2274,7 +2277,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`→ MEDIA SERVER: ${MEDIA_SERVER}`);
   console.log(`→ THUMB: ${MEDIA_SERVER}/<imei>/<name>`);
   console.log(`→ MP4:   ${MEDIA_SERVER}/<imei>/<name>/MP4`);
-  console.log(`→ CORS:  *.rastreadorautoram.com.br + 192.168.*.* (http & https)`);
+  console.log(`→ CORS:  *.rastreadorautoram.com.br + *.codeartisan.cloud + 192.168.*.* (http & https)`);
   console.log(`→ SELF-SIGNED SSL SUPPORTED`);
   console.log(`→ 100% DONE | NO CORS ERRORS | NO DOUBLE _000000`);
   console.log(`→ REGISTERED ROUTES: /ftpupload, /getFileList, /pushURL/*\n`);
