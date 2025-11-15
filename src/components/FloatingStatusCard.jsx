@@ -6708,6 +6708,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 />
                               ))}
                             </div>
+                            {/* Hide status tag buttons for jc400 - event-based uploads don't need status filtering */}
+                            {getDeviceModel !== 'jc400' && (
                             <div style={{
                               display: 'flex',
                               flexDirection: 'row',
@@ -6771,6 +6773,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 );
                               })}
                             </div>
+                            )}
                             <button
                               onClick={async () => {
                                 // Reload videos with current date picker values

@@ -545,135 +545,235 @@ function cleanupStuckFiles() {
 // ──────────────────────────────────────────────────────────────────────
 // Global File Scanner (Runs every 45 seconds)
 // ──────────────────────────────────────────────────────────────────────
+// Scans both /home (for jc181) and /iothub/dvr-upload/uploadFile (for jc400)
 async function scanForNewFiles() {
   console.log(`[SCAN] ========== Starting file scan ==========`);
   
   // First, cleanup stuck files from tracking queue
   cleanupStuckFiles();
   
+  // ────── SCAN /home (jc181 devices) ──────
   try {
     const homeDir = '/home';
     
     // Check if /home exists
-    if (!await fsExists(homeDir)) {
-      console.log(`[SCAN] /home directory not found`);
-      return;
-    }
-    
-    // Read all user folders in /home
-    const entries = await fs.promises.readdir(homeDir, { withFileTypes: true });
-    console.log(`[SCAN] Found ${entries.length} entries in /home`);
-    
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
+    if (await fsExists(homeDir)) {
+      // Read all user folders in /home
+      const entries = await fs.promises.readdir(homeDir, { withFileTypes: true });
+      console.log(`[SCAN] Found ${entries.length} entries in /home`);
       
-      const userFolder = path.join(homeDir, entry.name);
-      const userHomeFolder = userFolder;
-      
-      try {
-        // Read all files in user folder
-        const files = await fs.promises.readdir(userFolder, { withFileTypes: true });
-        const mp4Files = files.filter(f => f.isFile() && f.name.endsWith('.mp4'));
-        console.log(`[SCAN] User folder ${entry.name}: ${mp4Files.length} MP4 files found`);
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
         
-        for (const file of files) {
-          if (file.isFile() && file.name.endsWith('.mp4')) {
-            const filePath = path.join(userFolder, file.name);
-            const fileKey = filePath;
-            
-            // Check if already tracked - if stuck (>5 min), remove and retry
-            // Files should not take longer than 5 minutes to upload via FTP
-            if (trackedFiles.has(fileKey)) {
-              const trackingInfo = trackedFiles.get(fileKey);
-              const age = Date.now() - trackingInfo.startTime;
-              const maxProcessingTime = 5 * 60 * 1000; // 5 minutes - if longer, file is stuck
+        const userFolder = path.join(homeDir, entry.name);
+        const userHomeFolder = userFolder;
+        
+        try {
+          // Read all files in user folder
+          const files = await fs.promises.readdir(userFolder, { withFileTypes: true });
+          const mp4Files = files.filter(f => f.isFile() && f.name.endsWith('.mp4'));
+          console.log(`[SCAN] User folder ${entry.name}: ${mp4Files.length} MP4 files found`);
+          
+          for (const file of files) {
+            if (file.isFile() && file.name.endsWith('.mp4')) {
+              const filePath = path.join(userFolder, file.name);
+              const fileKey = filePath;
               
-              if (age > maxProcessingTime) {
-                // File is stuck - remove from tracking and retry
-                console.log(`[SCAN] ${file.name} is stuck in queue (${Math.round(age / 60000)} min) - removing and retrying`);
-                trackedFiles.delete(fileKey);
-                // Continue to process below
-              } else {
-                // File is still being processed (recently added or within expected upload time)
-                const ageMinutes = Math.round(age / 60000);
-                const ageSeconds = Math.round(age / 1000);
-                console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${ageMinutes > 0 ? ageMinutes + 'm ' : ''}${ageSeconds % 60}s ago)`);
-                continue;
-              }
-            }
-            
-            // Check if file is already in processedVideos
-            const processedPath = path.join(userHomeFolder, 'processedVideos', file.name);
-            if (await fsExists(processedPath)) {
-              console.log(`[SCAN] Skipping ${file.name} - already in processedVideos`);
-              continue; // Already processed
-            }
-            
-            // Check if file exists and has size
-            try {
-              const stats = fs.statSync(filePath);
-              if (stats.size === 0) {
-                console.log(`[SCAN] Skipping ${file.name} - file is 0 bytes`);
-                continue;
-              }
-            } catch (err) {
-              console.log(`[SCAN] Skipping ${file.name} - cannot access file: ${err.message}`);
-              continue;
-            }
-            
-            // Check if thumbnail already exists
-            const thumbnailPath = `${filePath}.jpg`;
-            const thumbnailExists = await fsExists(thumbnailPath);
-            
-            if (thumbnailExists) {
-              // Thumbnail exists but file not moved - might be from failed previous attempt
-              // Check if thumbnail is valid (has size)
-              try {
-                const thumbStats = fs.statSync(thumbnailPath);
-                if (thumbStats.size === 0) {
-                  // Invalid thumbnail - delete it and reprocess
-                  console.log(`[SCAN] ${file.name} has invalid thumbnail (0 bytes) - deleting and reprocessing`);
-                  await fs.promises.unlink(thumbnailPath);
+              // Check if already tracked - if stuck (>5 min), remove and retry
+              // Files should not take longer than 5 minutes to upload via FTP
+              if (trackedFiles.has(fileKey)) {
+                const trackingInfo = trackedFiles.get(fileKey);
+                const age = Date.now() - trackingInfo.startTime;
+                const maxProcessingTime = 5 * 60 * 1000; // 5 minutes - if longer, file is stuck
+                
+                if (age > maxProcessingTime) {
+                  // File is stuck - remove from tracking and retry
+                  console.log(`[SCAN] ${file.name} is stuck in queue (${Math.round(age / 60000)} min) - removing and retrying`);
+                  trackedFiles.delete(fileKey);
+                  // Continue to process below
                 } else {
-                  // Valid thumbnail but file not moved - file might be stuck
-                  // Check file age - if older than 5 minutes, retry processing
-                  const fileStats = fs.statSync(filePath);
-                  const fileAge = Date.now() - fileStats.mtimeMs;
-                  const fiveMinutes = 5 * 60 * 1000;
-                  
-                  if (fileAge > fiveMinutes) {
-                    console.log(`[SCAN] ${file.name} has thumbnail but file not moved (age: ${Math.round(fileAge / 1000)}s) - retrying processing`);
-                    // Delete thumbnail and reprocess
-                    await fs.promises.unlink(thumbnailPath);
-                  } else {
-                    // File is recent, might still be processing - skip for now
-                    console.log(`[SCAN] Skipping ${file.name} - has valid thumbnail and file is recent (age: ${Math.round(fileAge / 1000)}s)`);
-                    continue;
-                  }
+                  // File is still being processed (recently added or within expected upload time)
+                  const ageMinutes = Math.round(age / 60000);
+                  const ageSeconds = Math.round(age / 1000);
+                  console.log(`[SCAN] Skipping ${file.name} - already in tracking queue (${ageMinutes > 0 ? ageMinutes + 'm ' : ''}${ageSeconds % 60}s ago)`);
+                  continue;
+                }
+              }
+              
+              // Check if file is already in processedVideos
+              const processedPath = path.join(userHomeFolder, 'processedVideos', file.name);
+              if (await fsExists(processedPath)) {
+                console.log(`[SCAN] Skipping ${file.name} - already in processedVideos`);
+                continue; // Already processed
+              }
+              
+              // Check if file exists and has size
+              try {
+                const stats = fs.statSync(filePath);
+                if (stats.size === 0) {
+                  console.log(`[SCAN] Skipping ${file.name} - file is 0 bytes`);
+                  continue;
                 }
               } catch (err) {
-                console.log(`[SCAN] Error checking thumbnail for ${file.name}: ${err.message} - will reprocess`);
-                // Continue to process the file
+                console.log(`[SCAN] Skipping ${file.name} - cannot access file: ${err.message}`);
+                continue;
               }
+              
+              // Check if thumbnail already exists
+              const thumbnailPath = `${filePath}.jpg`;
+              const thumbnailExists = await fsExists(thumbnailPath);
+              
+              if (thumbnailExists) {
+                // Thumbnail exists but file not moved - might be from failed previous attempt
+                // Check if thumbnail is valid (has size)
+                try {
+                  const thumbStats = fs.statSync(thumbnailPath);
+                  if (thumbStats.size === 0) {
+                    // Invalid thumbnail - delete it and reprocess
+                    console.log(`[SCAN] ${file.name} has invalid thumbnail (0 bytes) - deleting and reprocessing`);
+                    await fs.promises.unlink(thumbnailPath);
+                  } else {
+                    // Valid thumbnail but file not moved - file might be stuck
+                    // Check file age - if older than 5 minutes, retry processing
+                    const fileStats = fs.statSync(filePath);
+                    const fileAge = Date.now() - fileStats.mtimeMs;
+                    const fiveMinutes = 5 * 60 * 1000;
+                    
+                    if (fileAge > fiveMinutes) {
+                      console.log(`[SCAN] ${file.name} has thumbnail but file not moved (age: ${Math.round(fileAge / 1000)}s) - retrying processing`);
+                      // Delete thumbnail and reprocess
+                      await fs.promises.unlink(thumbnailPath);
+                    } else {
+                      // File is recent, might still be processing - skip for now
+                      console.log(`[SCAN] Skipping ${file.name} - has valid thumbnail and file is recent (age: ${Math.round(fileAge / 1000)}s)`);
+                      continue;
+                    }
+                  }
+                } catch (err) {
+                  console.log(`[SCAN] Error checking thumbnail for ${file.name}: ${err.message} - will reprocess`);
+                  // Continue to process the file
+                }
+              }
+              
+              // New file found or needs reprocessing - start processing (non-blocking)
+              console.log(`[SCAN] Found new file to process: ${file.name}`);
+              processFile(filePath, userHomeFolder).catch(err => {
+                console.log(`[SCAN] Error starting processing for ${file.name}: ${err.message}`);
+              });
             }
-            
-            // New file found or needs reprocessing - start processing (non-blocking)
-            console.log(`[SCAN] Found new file to process: ${file.name}`);
-            processFile(filePath, userHomeFolder).catch(err => {
-              console.log(`[SCAN] Error starting processing for ${file.name}: ${err.message}`);
-            });
           }
+        } catch (err) {
+          // Skip user folder if can't read it
+          console.log(`[SCAN] Cannot read folder ${entry.name}: ${err.message}`);
         }
-      } catch (err) {
-        // Skip user folder if can't read it
-        console.log(`[SCAN] Cannot read folder ${entry.name}: ${err.message}`);
       }
+    } else {
+      console.log(`[SCAN] /home directory not found`);
     }
-    console.log(`[SCAN] ========== File scan completed ==========`);
   } catch (error) {
-    console.log(`[SCAN] Error scanning for files: ${error.message}`);
-    console.log(`[SCAN] Error stack: ${error.stack}`);
+    console.log(`[SCAN] Error scanning /home: ${error.message}`);
   }
+  
+  // ────── SCAN /iothub/dvr-upload/uploadFile (jc400 devices) ──────
+  try {
+    const jc400UploadFolder = '/iothub/dvr-upload/uploadFile';
+    
+    if (await fsExists(jc400UploadFolder)) {
+      // Read all files in jc400 upload folder
+      const files = await fs.promises.readdir(jc400UploadFolder, { withFileTypes: true });
+      const mp4Files = files.filter(f => f.isFile() && f.name.endsWith('.mp4') && f.name.startsWith('EVENT_'));
+      console.log(`[SCAN] JC400 upload folder: ${mp4Files.length} MP4 files found`);
+      
+      // Ensure processedVideos folder exists in jc400 upload folder
+      const jc400ProcessedFolder = path.join(jc400UploadFolder, 'processedVideos');
+      await fsMkdir(jc400ProcessedFolder);
+      
+      for (const file of files) {
+        if (file.isFile() && file.name.endsWith('.mp4') && file.name.startsWith('EVENT_')) {
+          const filePath = path.join(jc400UploadFolder, file.name);
+          const fileKey = filePath;
+          
+          // Check if already tracked - if stuck (>5 min), remove and retry
+          if (trackedFiles.has(fileKey)) {
+            const trackingInfo = trackedFiles.get(fileKey);
+            const age = Date.now() - trackingInfo.startTime;
+            const maxProcessingTime = 5 * 60 * 1000; // 5 minutes
+            
+            if (age > maxProcessingTime) {
+              console.log(`[SCAN] JC400 ${file.name} is stuck in queue (${Math.round(age / 60000)} min) - removing and retrying`);
+              trackedFiles.delete(fileKey);
+            } else {
+              const ageMinutes = Math.round(age / 60000);
+              const ageSeconds = Math.round(age / 1000);
+              console.log(`[SCAN] Skipping JC400 ${file.name} - already in tracking queue (${ageMinutes > 0 ? ageMinutes + 'm ' : ''}${ageSeconds % 60}s ago)`);
+              continue;
+            }
+          }
+          
+          // Check if file is already in processedVideos
+          const processedPath = path.join(jc400ProcessedFolder, file.name);
+          if (await fsExists(processedPath)) {
+            console.log(`[SCAN] Skipping JC400 ${file.name} - already in processedVideos`);
+            continue; // Already processed
+          }
+          
+          // Check if file exists and has size
+          try {
+            const stats = fs.statSync(filePath);
+            if (stats.size === 0) {
+              console.log(`[SCAN] Skipping JC400 ${file.name} - file is 0 bytes`);
+              continue;
+            }
+          } catch (err) {
+            console.log(`[SCAN] Skipping JC400 ${file.name} - cannot access file: ${err.message}`);
+            continue;
+          }
+          
+          // Check if thumbnail already exists
+          const thumbnailPath = `${filePath}.jpg`;
+          const thumbnailExists = await fsExists(thumbnailPath);
+          
+          if (thumbnailExists) {
+            try {
+              const thumbStats = fs.statSync(thumbnailPath);
+              if (thumbStats.size === 0) {
+                console.log(`[SCAN] JC400 ${file.name} has invalid thumbnail (0 bytes) - deleting and reprocessing`);
+                await fs.promises.unlink(thumbnailPath);
+              } else {
+                // Valid thumbnail but file not moved - check file age
+                const fileStats = fs.statSync(filePath);
+                const fileAge = Date.now() - fileStats.mtimeMs;
+                const fiveMinutes = 5 * 60 * 1000;
+                
+                if (fileAge > fiveMinutes) {
+                  console.log(`[SCAN] JC400 ${file.name} has thumbnail but file not moved (age: ${Math.round(fileAge / 1000)}s) - retrying processing`);
+                  await fs.promises.unlink(thumbnailPath);
+                } else {
+                  console.log(`[SCAN] Skipping JC400 ${file.name} - has valid thumbnail and file is recent (age: ${Math.round(fileAge / 1000)}s)`);
+                  continue;
+                }
+              }
+            } catch (err) {
+              console.log(`[SCAN] Error checking thumbnail for JC400 ${file.name}: ${err.message} - will reprocess`);
+            }
+          }
+          
+          // New file found or needs reprocessing - start processing (non-blocking)
+          // For jc400, use the upload folder as the "home folder" for processedVideos
+          console.log(`[SCAN] Found new JC400 file to process: ${file.name}`);
+          processFile(filePath, jc400UploadFolder).catch(err => {
+            console.log(`[SCAN] Error starting processing for JC400 ${file.name}: ${err.message}`);
+          });
+        }
+      }
+    } else {
+      console.log(`[SCAN] JC400 upload folder not found: ${jc400UploadFolder}`);
+    }
+  } catch (error) {
+    console.log(`[SCAN] Error scanning JC400 upload folder: ${error.message}`);
+  }
+  
+  console.log(`[SCAN] ========== File scan completed ==========`);
 }
 
 // Start the global scanner - runs every 45 seconds
@@ -1364,9 +1464,12 @@ app.get('/:imei/:name', async (req, res) => {
 // ──────────────────────────────────────────────────────────────────────
 // Process jc400 device - scan /iothub/dvr-upload/uploadFile and filter by IMEI
 // ──────────────────────────────────────────────────────────────────────
+// For jc400, files are event-based and uploaded directly to /iothub/dvr-upload/uploadFile
+// Processed files are moved to processedVideos subfolder
 async function processDeviceJC400(imei) {
   console.log(`\n[JC400] START PROCESSING IMEI: ${imei}`);
   const uploadFolder = '/iothub/dvr-upload/uploadFile';
+  const processedFolder = path.join(uploadFolder, 'processedVideos');
   
   if (!await fsExists(uploadFolder)) {
     console.log(`[JC400] Upload folder not found: ${uploadFolder}`);
@@ -1379,24 +1482,45 @@ async function processDeviceJC400(imei) {
     };
   }
 
-  const allFiles = fs.readdirSync(uploadFolder);
-  const videoFiles = allFiles.filter(f => 
-    f.startsWith(`EVENT_${imei}_`) && 
-    f.endsWith('.mp4') && 
-    !f.endsWith('.mp4.jpg')
-  );
+  // Ensure processedVideos folder exists
+  await fsMkdir(processedFolder);
 
-  console.log(`[JC400] FOUND ${videoFiles.length} video files for IMEI ${imei}`);
+  // Get all files from both upload folder and processedVideos
+  const allFiles = fs.readdirSync(uploadFolder);
+  const processedFiles = await fsExists(processedFolder) ? fs.readdirSync(processedFolder) : [];
+  
+  // Combine files from both locations (prioritize processedVideos for processed files)
+  const allVideoFiles = [];
+  
+  // First, add files from processedVideos (already processed)
+  for (const file of processedFiles) {
+    if (file.startsWith(`EVENT_${imei}_`) && file.endsWith('.mp4') && !file.endsWith('.mp4.jpg')) {
+      allVideoFiles.push({ file, isProcessed: true });
+    }
+  }
+  
+  // Then, add files from upload folder (not yet processed)
+  for (const file of allFiles) {
+    if (file.startsWith(`EVENT_${imei}_`) && file.endsWith('.mp4') && !file.endsWith('.mp4.jpg')) {
+      // Only add if not already in processedVideos
+      if (!processedFiles.includes(file)) {
+        allVideoFiles.push({ file, isProcessed: false });
+      }
+    }
+  }
+
+  console.log(`[JC400] FOUND ${allVideoFiles.length} video files for IMEI ${imei} (${allVideoFiles.filter(f => f.isProcessed).length} processed, ${allVideoFiles.filter(f => !f.isProcessed).length} not processed)`);
 
   const report = {
     imei,
     generated_at: new Date().toISOString(),
-    resource_count: videoFiles.length,
+    resource_count: allVideoFiles.length,
     videos: [],
     summary: { uploaded_ok: 0, upload_errored: 0, not_uploaded: 0 }
   };
 
   // Group by channel and get latest thumbnail per channel
+  // Thumbnails are in the upload folder (same location as original files)
   const thumbFiles = allFiles.filter(f => 
     f.startsWith(`EVENT_${imei}_`) && 
     f.endsWith('.mp4.jpg')
@@ -1418,14 +1542,19 @@ async function processDeviceJC400(imei) {
   });
 
   // Process each video file
-  for (const videoFile of videoFiles) {
+  for (const { file: videoFile, isProcessed } of allVideoFiles) {
     const parsed = parseJC400Filename(videoFile);
     if (!parsed) {
       console.log(`[JC400] Cannot parse: ${videoFile}`);
       continue;
     }
 
-    const videoPath = path.join(uploadFolder, videoFile);
+    // Check file location (processedVideos or upload folder)
+    const videoPath = isProcessed 
+      ? path.join(processedFolder, videoFile)
+      : path.join(uploadFolder, videoFile);
+    
+    // Thumbnail is always in upload folder (same location as original file before processing)
     const thumbFile = `${videoFile}.jpg`;
     const thumbPath = path.join(uploadFolder, thumbFile);
 
@@ -1434,6 +1563,7 @@ async function processDeviceJC400(imei) {
     const thumbExists = await fsExists(thumbPath);
     const thumbSize = thumbExists ? fs.statSync(thumbPath).size : 0;
 
+    // For jc400, all files that exist are considered uploaded_ok (event-based uploads)
     let status = 'not_uploaded';
     if (videoExists && videoSize > 0) {
       status = (thumbExists && thumbSize > 0) ? 'uploaded_ok' : 'upload_errored';
@@ -1464,16 +1594,16 @@ async function processDeviceJC400(imei) {
       file_size: videoSize,
       thumbnail_exists: thumbExists,
       thumbnail_size: thumbSize,
-      in_processed_folder: false,
+      in_processed_folder: isProcessed,
       status,
       thumbnail_url,
-      video_url: videoExists ? mp4Url : null
+      video_url: (videoExists && videoSize > 0) ? mp4Url : null
     });
     report.summary[status]++;
   }
 
   console.log(`[JC400] REPORT: ${report.videos.length} videos`);
-  console.log(`[JC400] OK: ${report.summary.uploaded_ok} | ERR: ${report.summary.upload_errored} | PENDING: ${report.summary.not_uploaded}`);
+  console.log(`[JC400] OK: ${report.summary.uploaded_ok} | ERR: ${report.summary.upload_errored} | NOT_UPLOADED: ${report.summary.not_uploaded}`);
   
   return report;
 }
