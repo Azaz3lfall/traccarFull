@@ -2113,7 +2113,14 @@ app.post(/\/pushURL\/(pushftpfileupload|pushresourcelist)/, async (req, res) => 
 // ──────────────────────────────────────────────────────────────────────
 // 7. CATCH-ALL
 // ──────────────────────────────────────────────────────────────────────
-app.use((req, res) => res.json({ code: 0, ok: true }));
+app.use((req, res) => {
+  console.log(`[CATCH-ALL] Unhandled ${req.method} ${req.originalUrl || req.url}`);
+  console.log(`[CATCH-ALL] Query params:`, JSON.stringify(req.query, null, 2));
+  if (req.body) {
+    console.log(`[CATCH-ALL] Body:`, typeof req.body === 'string' ? req.body.substring(0, 500) : JSON.stringify(req.body, null, 2));
+  }
+  res.json({ code: 0, ok: true });
+});
 
 // ──────────────────────────────────────────────────────────────────────
 // Start
