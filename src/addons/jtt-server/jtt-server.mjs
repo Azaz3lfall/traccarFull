@@ -229,6 +229,76 @@ async function checkFileSize(filePath) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// Test Video File with FFmpeg (Validate file is not corrupted)
+// ──────────────────────────────────────────────────────────────────────
+async function testVideoFile(videoPath) {
+  try {
+    // Use ffmpeg to validate the entire video file
+    // -v error: only show errors (suppress normal output)
+    // -i: input file
+    // -f null: output format is null (discard output)
+    // -: output to stdout (discarded)
+    // This will process the entire file and fail if corrupted
+    const testCmd = `ffmpeg -v error -i "${videoPath}" -f null -`;
+    
+    console.log(`[FFMPEG_TEST] Testing video file ${path.basename(videoPath)} for corruption...`);
+    
+    try {
+      const { stdout, stderr } = await execAsync(testCmd, { timeout: 60000 }); // 60 second timeout
+      
+      // Combine stdout and stderr (ffmpeg outputs errors to stderr)
+      const output = (stdout + stderr).toLowerCase();
+      
+      // Check for error messages indicating corruption
+      const isCorrupted = output.includes('truncated') ||
+                         output.includes('invalid data') ||
+                         output.includes('error while decoding') ||
+                         output.includes('corrupt') ||
+                         output.includes('moov atom not found') ||
+                         output.includes('could not find codec parameters') ||
+                         output.includes('invalid argument') ||
+                         (output.length > 0 && output.includes('error'));
+      
+      if (isCorrupted) {
+        const errorDetails = (stdout + stderr).substring(0, 300);
+        console.log(`[FFMPEG_TEST] Video file ${path.basename(videoPath)} is CORRUPTED: ${errorDetails}`);
+        return { valid: false, error: 'Video file is corrupted', details: errorDetails };
+      }
+      
+      console.log(`[FFMPEG_TEST] Video file ${path.basename(videoPath)} is VALID`);
+      return { valid: true };
+    } catch (execError) {
+      // execAsync throws an error if command fails - check stderr for corruption indicators
+      const stderr = (execError.stderr || '').toLowerCase();
+      const stdout = (execError.stdout || '').toLowerCase();
+      const errorMsg = (execError.message || '').toLowerCase();
+      const combined = stderr + ' ' + stdout + ' ' + errorMsg;
+      
+      const isCorrupted = combined.includes('truncated') ||
+                         combined.includes('invalid data') ||
+                         combined.includes('error while decoding') ||
+                         combined.includes('corrupt') ||
+                         combined.includes('moov atom not found') ||
+                         combined.includes('could not find codec parameters') ||
+                         combined.includes('invalid argument');
+      
+      if (isCorrupted) {
+        const errorDetails = (execError.stderr || execError.message || '').substring(0, 300);
+        console.log(`[FFMPEG_TEST] Video file ${path.basename(videoPath)} is CORRUPTED: ${errorDetails}`);
+        return { valid: false, error: 'Video file is corrupted', details: errorDetails, isCorrupted: true };
+      }
+      
+      // If it's not a corruption error, it might be a different issue (timeout, etc.)
+      console.log(`[FFMPEG_TEST] Video file ${path.basename(videoPath)} test failed (not necessarily corrupted): ${execError.message}`);
+      return { valid: false, error: execError.message, isCorrupted: false };
+    }
+  } catch (error) {
+    console.log(`[FFMPEG_TEST] Unexpected error testing video file ${path.basename(videoPath)}: ${error.message}`);
+    return { valid: false, error: error.message, isCorrupted: false };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // Thumbnail Generation Function
 // ──────────────────────────────────────────────────────────────────────
 async function generateThumbnail(videoPath, thumbnailPath) {
@@ -388,9 +458,29 @@ async function processFile(filePath, userHomeFolder) {
       return;
     }
     
-    console.log(`[PROCESS] ${fileName} - Thumbnail generated successfully, moving to processedVideos...`);
+    console.log(`[PROCESS] ${fileName} - Thumbnail generated successfully, testing video file with ffmpeg...`);
     
-    // Step 3: Move file to processedVideos
+    // Step 3: Test video file with ffmpeg to ensure it's not corrupted
+    const videoTest = await testVideoFile(filePath);
+    
+    if (!videoTest.valid) {
+      // Video file is corrupted - delete it and thumbnail
+      console.log(`[PROCESS] ${fileName} - Video file is CORRUPTED: ${videoTest.error}`);
+      await deleteCorruptedFile(filePath);
+      try {
+        if (await fsExists(thumbnailPath)) {
+          await fs.promises.unlink(thumbnailPath);
+        }
+      } catch {
+        // Ignore errors when cleaning up thumbnail
+      }
+      trackedFiles.delete(fileKey);
+      return;
+    }
+    
+    console.log(`[PROCESS] ${fileName} - Video file validated successfully, moving to processedVideos...`);
+    
+    // Step 4: Move file to processedVideos
     const moveResult = await moveToProcessedVideos(filePath, userHomeFolder);
     
     if (!moveResult.success) {
