@@ -783,6 +783,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
   const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
+  const [isVideoDetached, setIsVideoDetached] = useState(false);
+  const [detachedVideoPosition, setDetachedVideoPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [playbackSubTab, setPlaybackSubTab] = useState(0); // 0 = On Server, 1 = On Device, 2 = Events
@@ -1933,26 +1937,106 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } else if (!moreDetailsModalOpen) {
       // Reset flag when modal closes
       modalOpenedRef.current = false;
-      // Cleanup streaming when modal closes
-      console.log('Cleaning up streaming - modal closed');
-      if (streamingRetryTimeoutRef.current) {
-        clearTimeout(streamingRetryTimeoutRef.current);
-        streamingRetryTimeoutRef.current = null;
+      // Cleanup streaming when modal closes (only if not detached)
+      if (!isVideoDetached) {
+        console.log('Cleaning up streaming - modal closed');
+        if (streamingRetryTimeoutRef.current) {
+          clearTimeout(streamingRetryTimeoutRef.current);
+          streamingRetryTimeoutRef.current = null;
+        }
+        if (flvPlayerRef.current) {
+          flvPlayerRef.current.destroy();
+          flvPlayerRef.current = null;
+        }
+        setStreamingVideoUrl(null);
+        setStreamingLoading(false);
+        setStreamingError(null);
+        setStreamingRetryCount(0);
+        setSelectedChannel(0);
+        // Clear videos list to prevent showing old device's videos when switching devices
+        setVideos([]);
+        setVideosTotalCount(0);
       }
-      if (flvPlayerRef.current) {
-        flvPlayerRef.current.destroy();
-        flvPlayerRef.current = null;
-      }
-      setStreamingVideoUrl(null);
-      setStreamingLoading(false);
-      setStreamingError(null);
-      setStreamingRetryCount(0);
-      setSelectedChannel(0);
-      // Clear videos list to prevent showing old device's videos when switching devices
-      setVideos([]);
-      setVideosTotalCount(0);
     }
-  }, [moreDetailsModalOpen, device?.id, getIoTHubChannels]); // Only depend on device.id, not the whole device object
+  }, [moreDetailsModalOpen, device?.id, getIoTHubChannels, isVideoDetached]); // Only depend on device.id, not the whole device object
+
+  // Initialize detached video position to bottom right
+  useEffect(() => {
+    if (isVideoDetached && detachedVideoPosition.x === 0 && detachedVideoPosition.y === 0) {
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      setDetachedVideoPosition({
+        x: windowWidth - 400 - 20, // 400px width + 20px margin
+        y: windowHeight - 300 - 20 // 300px height + 20px margin
+      });
+    }
+  }, [isVideoDetached, detachedVideoPosition]);
+
+  // Handle drag for detached video
+  const handleDetachedVideoMouseDown = useCallback((e) => {
+    if (e.target.closest('button') || e.target.closest('video')) {
+      return; // Don't start drag if clicking on button or video
+    }
+    setIsDragging(true);
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  }, []);
+
+  const handleDetachedVideoMouseMove = useCallback((e) => {
+    if (!isDragging) return;
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    // Keep within viewport bounds
+    const maxX = window.innerWidth - 400;
+    const maxY = window.innerHeight - 300;
+    setDetachedVideoPosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isDragging, dragOffset]);
+
+  const handleDetachedVideoMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDetachedVideoMouseMove);
+      window.addEventListener('mouseup', handleDetachedVideoMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleDetachedVideoMouseMove);
+        window.removeEventListener('mouseup', handleDetachedVideoMouseUp);
+      };
+    }
+  }, [isDragging, handleDetachedVideoMouseMove, handleDetachedVideoMouseUp]);
+
+  // Handle detach button click
+  const handleDetachVideo = useCallback(() => {
+    setIsVideoDetached(true);
+    setMoreDetailsModalOpen(false);
+  }, []);
+
+  // Handle close detached video
+  const handleCloseDetachedVideo = useCallback(() => {
+    setIsVideoDetached(false);
+    // Cleanup streaming
+    if (flvPlayerRef.current) {
+      flvPlayerRef.current.destroy();
+      flvPlayerRef.current = null;
+    }
+    if (streamingRetryTimeoutRef.current) {
+      clearTimeout(streamingRetryTimeoutRef.current);
+      streamingRetryTimeoutRef.current = null;
+    }
+    setStreamingVideoUrl(null);
+    setStreamingLoading(false);
+    setStreamingError(null);
+    setStreamingRetryCount(0);
+  }, []);
 
   // Filter and sort videos by selected channels and statuses
   const filteredVideos = useMemo(() => {
@@ -6688,7 +6772,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             justifyContent: 'center',
             zIndex: 10004
           }}
-          onClick={() => setMoreDetailsModalOpen(false)}
+          onClick={() => {
+            setMoreDetailsModalOpen(false);
+            // If video is detached, close it when modal is explicitly closed
+            if (isVideoDetached) {
+              handleCloseDetachedVideo();
+            }
+          }}
         >
           <motion.div
             initial={{ y: -50, opacity: 0 }}
@@ -6718,7 +6808,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               gap: '12px',
             }}>
               <button
-                onClick={() => setMoreDetailsModalOpen(false)}
+                onClick={() => {
+                  setMoreDetailsModalOpen(false);
+                  // If video is detached, close it when modal is explicitly closed
+                  if (isVideoDetached) {
+                    handleCloseDetachedVideo();
+                  }
+                }}
                 style={{
                   width: '28px',
                   height: '28px',
@@ -7368,6 +7464,41 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                             overflow: 'hidden',
                             margin: '0 auto'
                           }}>
+                            {/* Detach Button */}
+                            {streamingVideoUrl && !isVideoDetached && (
+                              <button
+                                onClick={handleDetachVideo}
+                                style={{
+                                  position: 'absolute',
+                                  top: '12px',
+                                  right: '12px',
+                                  zIndex: 20,
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '6px',
+                                  border: 'none',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                  color: '#FFFFFF',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  transition: 'all 0.2s',
+                                  padding: 0
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                                }}
+                                title="Detach Video"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                                </svg>
+                              </button>
+                            )}
                             {streamingLoading && (
                               <div style={{
                                 position: 'absolute',
@@ -7416,7 +7547,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 </Typography>
                               </div>
                             )}
-                            {streamingVideoUrl && (
+                            {streamingVideoUrl && !isVideoDetached && (
                               <video
                                 ref={streamingVideoRef}
                                 autoPlay
@@ -7437,6 +7568,24 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   }
                                 }}
                               />
+                            )}
+                            {isVideoDetached && (
+                              <div style={{
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#000',
+                                color: '#FFFFFF'
+                              }}>
+                                <Typography variant="body2" style={{ 
+                                  color: colors.textSecondary,
+                                  fontSize: '14px'
+                                }}>
+                                  Video detached - check floating player
+                                </Typography>
+                              </div>
                             )}
                             {!streamingVideoUrl && !streamingLoading && !streamingError && (
                               <Typography variant="body2" style={{ 
@@ -7972,6 +8121,154 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               })()}
             </div>
           </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* Detached Video Player */}
+    <AnimatePresence>
+      {isVideoDetached && streamingVideoUrl && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.2 }}
+          onMouseDown={handleDetachedVideoMouseDown}
+          style={{
+            position: 'fixed',
+            left: `${detachedVideoPosition.x}px`,
+            top: `${detachedVideoPosition.y}px`,
+            width: '400px',
+            height: '300px',
+            backgroundColor: colors.surface,
+            borderRadius: '8px',
+            border: `1px solid ${colors.border}`,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            zIndex: 10006,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+        >
+          {/* Header */}
+          <div style={{
+            padding: '8px 12px',
+            borderBottom: `1px solid ${colors.border}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: colors.secondary,
+            cursor: 'grab'
+          }}>
+            <span style={{
+              fontSize: '12px',
+              fontWeight: '500',
+              color: colors.text,
+              userSelect: 'none'
+            }}>
+              Channel {selectedChannel} - Streaming
+            </span>
+            <button
+              onClick={handleCloseDetachedVideo}
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '4px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: colors.textSecondary,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.hover;
+                e.currentTarget.style.color = colors.text;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = colors.textSecondary;
+              }}
+              title="Close"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Video Container */}
+          <div style={{
+            flex: 1,
+            position: 'relative',
+            backgroundColor: '#000',
+            overflow: 'hidden'
+          }}>
+            {streamingLoading && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                zIndex: 10
+              }}>
+                <CircularProgress size={32} style={{ color: colors.primary }} />
+              </div>
+            )}
+            {streamingError && !streamingLoading && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                zIndex: 10,
+                padding: '16px'
+              }}>
+                <Typography variant="body2" style={{ 
+                  color: '#f44336',
+                  fontSize: '12px',
+                  textAlign: 'center'
+                }}>
+                  {streamingError}
+                </Typography>
+              </div>
+            )}
+            {streamingVideoUrl && (
+              <video
+                ref={streamingVideoRef}
+                autoPlay
+                controls
+                muted
+                playsInline
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  backgroundColor: '#000',
+                  pointerEvents: 'auto'
+                }}
+                onError={(e) => {
+                  if (!flvPlayerRef.current) {
+                    console.error('Video element error (no flv player):', e);
+                  }
+                }}
+              />
+            )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
