@@ -1978,6 +1978,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     if (e.target.closest('button') || e.target.closest('video')) {
       return; // Don't start drag if clicking on button or video
     }
+    e.preventDefault(); // Prevent text selection
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
@@ -2006,11 +2007,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   useEffect(() => {
     if (isDragging) {
+      // Prevent text selection during drag
+      const preventSelect = (e) => {
+        e.preventDefault();
+        return false;
+      };
+      
       window.addEventListener('mousemove', handleDetachedVideoMouseMove);
       window.addEventListener('mouseup', handleDetachedVideoMouseUp);
+      document.addEventListener('selectstart', preventSelect);
+      document.body.style.userSelect = 'none';
+      
       return () => {
         window.removeEventListener('mousemove', handleDetachedVideoMouseMove);
         window.removeEventListener('mouseup', handleDetachedVideoMouseUp);
+        document.removeEventListener('selectstart', preventSelect);
+        document.body.style.userSelect = '';
       };
     }
   }, [isDragging, handleDetachedVideoMouseMove, handleDetachedVideoMouseUp]);
@@ -8228,7 +8240,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            cursor: isDragging ? 'grabbing' : 'grab'
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
           }}
         >
           {/* Header */}
@@ -8239,7 +8255,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: colors.secondary,
-            cursor: 'grab'
+            cursor: 'grab',
+            userSelect: 'none',
+            WebkitUserSelect: 'none'
           }}>
             <span style={{
               fontSize: '12px',
