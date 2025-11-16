@@ -2020,6 +2020,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setIsVideoDetached(true);
     setMoreDetailsModalOpen(false);
     
+    // Hide device list when video is detached
+    if (onHideDeviceList) {
+      onHideDeviceList();
+    }
+    
     // Reinitialize flv.js player with detached video element after a short delay
     // to ensure the detached video element is in the DOM
     setTimeout(() => {
@@ -2093,7 +2098,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         flvPlayer.load();
       }
     }, 200);
-  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, getDeviceModel, getApiTemplate, loadVideoStream]);
+  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, getDeviceModel, getApiTemplate, loadVideoStream, onHideDeviceList]);
 
   // Handle close detached video
   const handleCloseDetachedVideo = useCallback(() => {
