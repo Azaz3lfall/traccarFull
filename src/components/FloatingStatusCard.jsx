@@ -71,6 +71,7 @@ import { HiOutlinePlay } from "react-icons/hi2";
 import { MdOutlineRoute } from "react-icons/md";
 import { TbBrandGoogleMaps } from "react-icons/tb";
 import { SiWaze } from "react-icons/si";
+import { FaApple } from "react-icons/fa6";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -2329,6 +2330,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } else if (app === 'google') {
       // Google Maps directions URL with origin and destination
       url = `https://www.google.com/maps/dir/?api=1&origin=${currentUserLocation.lat},${currentUserLocation.lon}&destination=${deviceLat},${deviceLon}`;
+    } else if (app === 'apple') {
+      // Apple Maps directions URL with source and destination
+      url = `https://maps.apple.com/?saddr=${currentUserLocation.lat},${currentUserLocation.lon}&daddr=${deviceLat},${deviceLon}`;
     }
 
     // Open navigation in new tab
@@ -5816,6 +5820,43 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   >
                     <TbBrandGoogleMaps size={40} />
                     <span>Google Maps</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => handleOpenNavigation('apple', e)}
+                    disabled={!position || !position.latitude || !position.longitude}
+                    style={{
+                      width: '106px',
+                      height: '106px',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: position && position.latitude && position.longitude ? '#000000' : colors.hover,
+                      color: position && position.latitude && position.longitude ? '#FFFFFF' : colors.textSecondary,
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      cursor: position && position.latitude && position.longitude ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      opacity: position && position.latitude && position.longitude ? 1 : 0.5
+                    }}
+                    onMouseEnter={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#333333';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#000000';
+                      }
+                    }}
+                  >
+                    <FaApple size={40} />
+                    <span>Apple Maps</span>
                   </button>
                 </div>
               </div>
