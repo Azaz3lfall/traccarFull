@@ -1793,7 +1793,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       return;
     }
 
-    // Small delay to ensure video element is fully in DOM
+    // Small delay to ensure video element is fully in DOM (longer delay if detached)
+    const delay = isVideoDetached ? 300 : 100;
     const timer = setTimeout(() => {
       if (!streamingVideoRef.current) {
         console.warn('Video element not ready yet');
@@ -1884,12 +1885,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       } catch (loadError) {
         console.error('Error calling flvPlayer.load():', loadError);
       }
-    }, 100);
+    }, delay);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, streamingLoading, loadVideoStream, getDeviceModel, getApiTemplate]);
+  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, streamingLoading, loadVideoStream, getDeviceModel, getApiTemplate, isVideoDetached]);
 
   // Cleanup on unmount or when switching channels
   useEffect(() => {
@@ -2018,7 +2019,81 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleDetachVideo = useCallback(() => {
     setIsVideoDetached(true);
     setMoreDetailsModalOpen(false);
-  }, []);
+    
+    // Reinitialize flv.js player with detached video element after a short delay
+    // to ensure the detached video element is in the DOM
+    setTimeout(() => {
+      if (streamingVideoUrl && streamingVideoRef.current && flvPlayerRef.current) {
+        const videoElement = streamingVideoRef.current;
+        const deviceModel = getDeviceModel;
+        const apiTemplate = deviceModel ? getApiTemplate(deviceModel) : null;
+        const isLiveStream = apiTemplate?.streaming?.urlFormat === 'live';
+        
+        // Destroy existing player
+        flvPlayerRef.current.destroy();
+        flvPlayerRef.current = null;
+        
+        // Create new player with detached video element
+        const flvPlayer = flvjs.createPlayer({
+          type: 'flv',
+          url: streamingVideoUrl,
+          isLive: isLiveStream,
+          hasAudio: true,
+          hasVideo: true,
+          enableWorker: false,
+          enableStashBuffer: isLiveStream,
+          stashInitialSize: isLiveStream ? 128 : 128,
+          autoCleanupSourceBuffer: true
+        });
+        
+        // Set up event handlers
+        flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+          console.error('FLV player error:', errorType, errorDetail, errorInfo);
+          if (flvPlayerRef.current) {
+            flvPlayerRef.current.destroy();
+            flvPlayerRef.current = null;
+          }
+          
+          if (streamingRetryCount < 10) {
+            const newRetryCount = streamingRetryCount + 1;
+            setStreamingRetryCount(newRetryCount);
+            setStreamingLoading(true);
+            streamingRetryTimeoutRef.current = setTimeout(() => {
+              if (selectedChannel > 0) {
+                loadVideoStream(selectedChannel, newRetryCount, false);
+              }
+            }, 3000);
+          } else {
+            setStreamingError('Failed to load video file after multiple attempts');
+            setStreamingLoading(false);
+          }
+        });
+        
+        flvPlayer.on(flvjs.Events.LOADING_COMPLETE, () => {
+          console.log('FLV stream loaded successfully');
+          setStreamingLoading(false);
+          setStreamingRetryCount(0);
+        });
+        
+        flvPlayer.on(flvjs.Events.MEDIA_INFO, (mediaInfo) => {
+          console.log('FLV media info received:', mediaInfo);
+          setStreamingLoading(false);
+          setStreamingRetryCount(0);
+        });
+        
+        flvPlayer.on(flvjs.Events.STATISTICS_INFO, () => {
+          if (streamingLoading) {
+            setStreamingLoading(false);
+            setStreamingRetryCount(0);
+          }
+        });
+        
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayerRef.current = flvPlayer;
+        flvPlayer.load();
+      }
+    }, 200);
+  }, [streamingVideoUrl, selectedChannel, streamingRetryCount, getDeviceModel, getApiTemplate, loadVideoStream]);
 
   // Handle close detached video
   const handleCloseDetachedVideo = useCallback(() => {
@@ -8169,34 +8244,69 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             }}>
               Channel {selectedChannel} - Streaming
             </span>
-            <button
-              onClick={handleCloseDetachedVideo}
-              style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: colors.textSecondary,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.hover;
-                e.currentTarget.style.color = colors.text;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = colors.textSecondary;
-              }}
-              title="Close"
-            >
-              <X size={16} />
-            </button>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <button
+                onClick={handleRefreshStreaming}
+                disabled={streamingLoading}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: streamingLoading ? colors.textSecondary : colors.text,
+                  cursor: streamingLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (!streamingLoading) {
+                    e.currentTarget.style.backgroundColor = colors.hover;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                title="Refresh streaming"
+              >
+                <RefreshOutlinedIcon style={{ fontSize: '16px' }} />
+              </button>
+              <button
+                onClick={handleCloseDetachedVideo}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: colors.textSecondary,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.hover;
+                  e.currentTarget.style.color = colors.text;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = colors.textSecondary;
+                }}
+                title="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Video Container */}
