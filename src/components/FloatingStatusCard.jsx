@@ -68,6 +68,7 @@ import { PieChart } from 'lucide-react';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
+import { MdOutlineRoute } from "react-icons/md";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -777,6 +778,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [sensorNames, setSensorNames] = useState({});
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
   const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
+  const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [playbackSubTab, setPlaybackSubTab] = useState(0); // 0 = On Server, 1 = On Device, 2 = Events
@@ -3510,6 +3512,31 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             <ChevronLeft size={20} color={colors.textSecondary} />
           </button>
 
+          {/* Route Button - Hidden in replay mode */}
+          {!showReplayPopover && (
+            <button
+              onClick={() => setRouteModalOpen(true)}
+              style={{
+                position: 'absolute',
+                top: !desktop ? '8px' : '12px',
+                right: !desktop ? '135px' : '140px',
+                zIndex: 10,
+                width: '28px',
+                height: '28px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Route"
+            >
+              <MdOutlineRoute size={18} color={colors.textSecondary} />
+            </button>
+          )}
+
           {/* Reports Button - Hidden in replay mode */}
           {!showReplayPopover && onOpenReports && (
             <button
@@ -5503,6 +5530,104 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   >
                     {t('addSensor')}
                   </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Route Modal */}
+      <AnimatePresence>
+        {routeModalOpen && (
+          <motion.div
+            key="route-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10004
+            }}
+            onClick={() => setRouteModalOpen(false)}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '8px',
+                width: '400px',
+                maxWidth: '90vw',
+                overflow: 'hidden',
+                boxShadow: colors.shadow
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Content */}
+              <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '8px'
+                  }}>
+                    <label style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: colors.text,
+                      margin: 0
+                    }}>
+                      Route
+                    </label>
+                    <button
+                      onClick={() => setRouteModalOpen(false)}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                        padding: 0
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                      title="Close"
+                    >
+                      <X size={20} color={colors.textSecondary} />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Placeholder for future features */}
+                <div style={{
+                  padding: '40px 20px',
+                  textAlign: 'center',
+                  color: colors.textSecondary,
+                  fontSize: '14px'
+                }}>
+                  Route features will be added here
                 </div>
               </div>
             </motion.div>
