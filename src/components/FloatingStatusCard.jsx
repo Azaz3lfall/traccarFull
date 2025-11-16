@@ -1967,7 +1967,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       const windowHeight = window.innerHeight;
       setDetachedVideoPosition({
         x: windowWidth - 400 - 20, // 400px width + 20px margin
-        y: windowHeight - 300 - 20 // 300px height + 20px margin
+        y: windowHeight - 260 - 20 // 260px height + 20px margin
       });
     }
   }, [isVideoDetached, detachedVideoPosition]);
@@ -1992,7 +1992,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     
     // Keep within viewport bounds
     const maxX = window.innerWidth - 400;
-    const maxY = window.innerHeight - 300;
+    const maxY = window.innerHeight - 260;
     setDetachedVideoPosition({
       x: Math.max(0, Math.min(newX, maxX)),
       y: Math.max(0, Math.min(newY, maxY))
@@ -8139,7 +8139,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             left: `${detachedVideoPosition.x}px`,
             top: `${detachedVideoPosition.y}px`,
             width: '400px',
-            height: '300px',
+            height: '260px',
             backgroundColor: colors.surface,
             borderRadius: '8px',
             border: `1px solid ${colors.border}`,
