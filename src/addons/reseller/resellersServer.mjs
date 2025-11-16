@@ -3031,10 +3031,25 @@ app.get('/api/reseller-logo', async (req, res) => {
       }
     }
 
-    // Return the logo as base64
+    // Convert favicon to base64
+    let faviconBase64 = null;
+    if (resellerData.favicon && resellerData.favicon.startsWith('images/')) {
+      try {
+        const faviconPath = path.join(IMAGES_DIR, resellerData.favicon.replace('images/', ''));
+        if (fs.existsSync(faviconPath)) {
+          const faviconBuffer = fs.readFileSync(faviconPath);
+          faviconBase64 = `data:image/png;base64,${faviconBuffer.toString('base64')}`;
+        }
+      } catch (error) {
+        console.error('❌ Error converting favicon to base64:', error);
+      }
+    }
+
+    // Return the logo and favicon as base64
     res.json({
       success: true,
       logo: logoBase64,
+      favicon: faviconBase64,
       companyName: resellerData.companyName || null,
       timestamp: new Date().toISOString()
     });

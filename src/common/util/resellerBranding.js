@@ -38,7 +38,7 @@ export const applyResellerBranding = (resellerData) => {
     return;
   }
 
-  const { logo, companyName } = resellerData;
+  const { logo, favicon, companyName } = resellerData;
 
   // Update page title
   if (companyName) {
@@ -51,6 +51,11 @@ export const applyResellerBranding = (resellerData) => {
     if (metaDescription) {
       metaDescription.setAttribute('content', `GPS Tracking System - ${companyName}`);
     }
+  }
+
+  // Update favicon if provided
+  if (favicon) {
+    updateFavicon(favicon);
   }
 
   // Store logo base64 for use by components
@@ -85,23 +90,20 @@ export const applyFallbackBranding = () => {
  */
 const updateFavicon = (base64Image) => {
   try {
+    // Remove all existing favicon links
+    const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+    existingFavicons.forEach(fav => fav.remove());
+    
     // Create a new favicon link element
-    const favicon = document.querySelector('link[rel="icon"]') || document.createElement('link');
+    const favicon = document.createElement('link');
     favicon.rel = 'icon';
     favicon.type = 'image/png';
     favicon.href = base64Image;
     
-    // Remove existing favicon if it exists
-    const existingFavicon = document.querySelector('link[rel="icon"]');
-    if (existingFavicon && existingFavicon !== favicon) {
-      existingFavicon.remove();
-    }
+    // Add to head
+    document.head.appendChild(favicon);
     
-    // Add or update favicon
-    if (!document.querySelector('link[rel="icon"]')) {
-      document.head.appendChild(favicon);
-    }
-    
+    console.log('✅ Favicon updated successfully');
   } catch (error) {
     console.error('❌ Error updating favicon:', error);
   }

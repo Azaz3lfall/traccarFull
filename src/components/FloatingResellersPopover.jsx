@@ -2275,8 +2275,8 @@ const FloatingResellersPopover = ({
     try {
       const originalSizeKB = (file.size / 1024).toFixed(1);
 
-      // Check if image is already small enough (under 15KB)
-      if (file.size <= 15 * 1024) {
+      // Check if image is already small enough (under 120KB)
+      if (file.size <= 120 * 1024) {
         // Image is already small enough, no compression needed
         setSelectedImage(file);
 
@@ -2293,14 +2293,14 @@ const FloatingResellersPopover = ({
           severity: 'success'
         });
       } else {
-        // Compress the image
+        // Compress the image to 80-120KB range for better quality
         const compressedFile = await compressImage(file, {
-          maxSizeKB: 15,
-          minSizeKB: 10,
-          maxWidth: 400,
-          maxHeight: 400,
+          maxSizeKB: 120,
+          minSizeKB: 80,
+          maxWidth: 1000,
+          maxHeight: 1000,
           outputFormat: 'image/png',
-          initialQuality: 0.8
+          initialQuality: 0.9
         });
 
         // Set the compressed image
@@ -2364,14 +2364,14 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image is square, compress and proceed
+      // Image is square, compress and proceed (80-120KB for better quality)
       setIsCompressingFavicon(true);
       try {
         const compressedFile = await compressImage(file, {
-          maxSizeKB: 20,
-          minSizeKB: 5,
-          maxWidth: 64,
-          maxHeight: 64,
+          maxSizeKB: 120,
+          minSizeKB: 80,
+          maxWidth: 512,
+          maxHeight: 512,
           outputFormat: 'image/png',
           initialQuality: 0.9
         });
@@ -2428,16 +2428,16 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image has correct dimensions, compress and proceed
+      // Image has correct dimensions, compress and proceed (80-120KB for better quality)
       setIsCompressingAppImage(true);
       try {
         const compressedFile = await compressImage(file, {
-          maxSizeKB: 200,
-          minSizeKB: 50,
+          maxSizeKB: 120,
+          minSizeKB: 80,
           maxWidth: 1024,
           maxHeight: 1024,
           outputFormat: 'image/png',
-          initialQuality: 0.8
+          initialQuality: 0.9
         });
 
         setSelectedAppImage(compressedFile);
@@ -2492,12 +2492,12 @@ const FloatingResellersPopover = ({
         return;
       }
 
-      // Image has correct dimensions, compress and proceed
+      // Image has correct dimensions, compress and proceed (80-120KB for better quality)
       setIsCompressingNotificationIcon(true);
       try {
         const compressedFile = await compressImage(file, {
-          maxSizeKB: 30,
-          minSizeKB: 10,
+          maxSizeKB: 120,
+          minSizeKB: 80,
           maxWidth: 192,
           maxHeight: 192,
           outputFormat: 'image/png',
