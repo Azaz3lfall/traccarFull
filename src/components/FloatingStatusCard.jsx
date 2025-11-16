@@ -2217,6 +2217,37 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       setIsLoadingDetails(false);
     }
   }, [position]);
+
+  // Handler for opening navigation apps
+  const handleOpenNavigation = useCallback((app, event) => {
+    if (!position || !position.latitude || !position.longitude) {
+      showSnackbar('Device location not available', 'error');
+      return;
+    }
+
+    const deviceLat = position.latitude;
+    const deviceLon = position.longitude;
+
+    let url = '';
+    if (app === 'waze') {
+      // Waze navigation URL - Waze will use current location automatically
+      url = `https://waze.com/ul?ll=${deviceLat},${deviceLon}&navigate=yes`;
+    } else if (app === 'google') {
+      // Google Maps directions URL - will use current location if available
+      url = `https://www.google.com/maps/dir/?api=1&destination=${deviceLat},${deviceLon}`;
+    }
+
+    if (url) {
+      // Open immediately in the click handler to avoid popup blockers
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      
+      // Fallback if popup is blocked
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Try using location.href as fallback
+        window.location.href = url;
+      }
+    }
+  }, [position, showSnackbar]);
   
 
 
@@ -5620,14 +5651,85 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   </div>
                 </div>
                 
-                {/* Placeholder for future features */}
+                {/* Navigation Buttons */}
                 <div style={{
-                  padding: '40px 20px',
-                  textAlign: 'center',
-                  color: colors.textSecondary,
-                  fontSize: '14px'
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px'
                 }}>
-                  Route features will be added here
+                  <button
+                    onClick={(e) => handleOpenNavigation('waze', e)}
+                    disabled={!position || !position.latitude || !position.longitude}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: position && position.latitude && position.longitude ? '#33CCFF' : colors.hover,
+                      color: position && position.latitude && position.longitude ? '#FFFFFF' : colors.textSecondary,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: position && position.latitude && position.longitude ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      opacity: position && position.latitude && position.longitude ? 1 : 0.5
+                    }}
+                    onMouseEnter={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#1AB8E6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#33CCFF';
+                      }
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    Waze
+                  </button>
+
+                  <button
+                    onClick={(e) => handleOpenNavigation('google', e)}
+                    disabled={!position || !position.latitude || !position.longitude}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: position && position.latitude && position.longitude ? '#4285F4' : colors.hover,
+                      color: position && position.latitude && position.longitude ? '#FFFFFF' : colors.textSecondary,
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: position && position.latitude && position.longitude ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      opacity: position && position.latitude && position.longitude ? 1 : 0.5
+                    }}
+                    onMouseEnter={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#3367D6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (position && position.latitude && position.longitude) {
+                        e.currentTarget.style.backgroundColor = '#4285F4';
+                      }
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    Google Maps
+                  </button>
                 </div>
               </div>
             </motion.div>
