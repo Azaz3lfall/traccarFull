@@ -69,6 +69,8 @@ import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
 import { HiOutlinePlay } from "react-icons/hi2";
 import { MdOutlineRoute } from "react-icons/md";
+import { TbBrandGoogleMaps } from "react-icons/tb";
+import { SiWaze } from "react-icons/si";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
@@ -779,6 +781,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [addSensorModalOpen, setAddSensorModalOpen] = useState(false);
   const [moreDetailsModalOpen, setMoreDetailsModalOpen] = useState(false);
   const [routeModalOpen, setRouteModalOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
   const [moreDetailsActiveTab, setMoreDetailsActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [playbackSubTab, setPlaybackSubTab] = useState(0); // 0 = On Server, 1 = On Device, 2 = Events
@@ -2164,6 +2167,53 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [showReplayPopover, replayPositions, currentReplayIndex, selectedDeviceId, positions]);
 
 
+  // Get user's current location (will request permission if needed)
+  const getUserLocation = useCallback(() => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation not supported'));
+        return;
+      }
+
+      // Check permission status first if Permissions API is available
+      if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+          if (result.state === 'denied') {
+            reject(new Error('PERMISSION_DENIED'));
+            return;
+          }
+          // If prompt or granted, proceed with getCurrentPosition
+          requestLocation();
+        }).catch(() => {
+          // Permissions API not fully supported, proceed anyway
+          requestLocation();
+        });
+      } else {
+        // Permissions API not available, proceed directly
+        requestLocation();
+      }
+
+      function requestLocation() {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
+            });
+          },
+          (error) => {
+            reject(error);
+          },
+          {
+            enableHighAccuracy: false, // Set to false for better compatibility
+            timeout: 30000, // Increased timeout for Opera
+            maximumAge: 300000 // Accept cached location up to 5 minutes old
+          }
+        );
+      }
+    });
+  }, []);
+
   // Check for existing anchor when device changes
   useEffect(() => {
     const checkAnchorStatus = async () => {
@@ -2193,6 +2243,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
     checkAnchorStatus();
   }, [selectedDeviceId]);
+
+  // Get user location when status card opens
+  useEffect(() => {
+    if (selectedDeviceId && device) {
+      // Small delay to ensure component is fully mounted
+      const timer = setTimeout(() => {
+        getUserLocation()
+          .then((location) => {
+            setUserLocation(location);
+          })
+          .catch((error) => {
+            // Silently fail - we'll ask again when button is clicked
+            setUserLocation(null);
+          });
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedDeviceId, device, getUserLocation]);
+
   
   
 
@@ -2219,7 +2289,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [position]);
 
   // Handler for opening navigation apps
-  const handleOpenNavigation = useCallback((app, event) => {
+  const handleOpenNavigation = useCallback(async (app, event) => {
     if (!position || !position.latitude || !position.longitude) {
       showSnackbar('Device location not available', 'error');
       return;
@@ -2228,26 +2298,42 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     const deviceLat = position.latitude;
     const deviceLon = position.longitude;
 
-    let url = '';
-    if (app === 'waze') {
-      // Waze navigation URL - Waze will use current location automatically
-      url = `https://waze.com/ul?ll=${deviceLat},${deviceLon}&navigate=yes`;
-    } else if (app === 'google') {
-      // Google Maps directions URL - will use current location if available
-      url = `https://www.google.com/maps/dir/?api=1&destination=${deviceLat},${deviceLon}`;
-    }
-
-    if (url) {
-      // Open immediately in the click handler to avoid popup blockers
-      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-      
-      // Fallback if popup is blocked
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        // Try using location.href as fallback
-        window.location.href = url;
+    // Check if we have user location, if not, get it now
+    let currentUserLocation = userLocation;
+    if (!currentUserLocation) {
+      try {
+        currentUserLocation = await getUserLocation();
+        setUserLocation(currentUserLocation);
+      } catch (error) {
+        let errorMessage = 'Unable to get your location.';
+        const errorCode = error.code || (error.message === 'PERMISSION_DENIED' ? 1 : null);
+        
+        if (errorCode === 1 || error.message === 'PERMISSION_DENIED') {
+          errorMessage = 'Location permission is required. Please allow location access in your browser settings (Opera Settings > Privacy & Security > Location Services) and try again.';
+        } else if (errorCode === 2) {
+          errorMessage = 'Location information is unavailable. Please check your device settings.';
+        } else if (errorCode === 3) {
+          errorMessage = 'Location request timed out. Please check your internet connection and ensure location services are enabled in macOS System Settings > Privacy & Security > Location Services.';
+        } else {
+          errorMessage = 'Unable to get your location. Please check your browser and macOS location settings.';
+        }
+        showSnackbar(errorMessage, 'error');
+        return;
       }
     }
-  }, [position, showSnackbar]);
+
+    let url = '';
+    if (app === 'waze') {
+      // Waze navigation URL - Waze uses user's current location automatically as origin
+      url = `https://waze.com/ul?ll=${deviceLat},${deviceLon}&navigate=yes`;
+    } else if (app === 'google') {
+      // Google Maps directions URL with origin and destination
+      url = `https://www.google.com/maps/dir/?api=1&origin=${currentUserLocation.lat},${currentUserLocation.lon}&destination=${deviceLat},${deviceLon}`;
+    }
+
+    // Open navigation in new tab
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, [position, userLocation, showSnackbar, getUserLocation]);
   
 
 
@@ -5654,23 +5740,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 {/* Navigation Buttons */}
                 <div style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px'
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  gap: '16px'
                 }}>
                   <button
                     onClick={(e) => handleOpenNavigation('waze', e)}
                     disabled={!position || !position.latitude || !position.longitude}
                     style={{
-                      width: '100%',
-                      padding: '12px 16px',
+                      width: '106px',
+                      height: '106px',
+                      padding: '16px',
                       borderRadius: '8px',
                       border: 'none',
                       backgroundColor: position && position.latitude && position.longitude ? '#33CCFF' : colors.hover,
                       color: position && position.latitude && position.longitude ? '#FFFFFF' : colors.textSecondary,
-                      fontSize: '14px',
+                      fontSize: '12px',
                       fontWeight: '500',
                       cursor: position && position.latitude && position.longitude ? 'pointer' : 'not-allowed',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
@@ -5688,26 +5777,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                    Waze
+                    <SiWaze size={40} />
+                    <span>Waze</span>
                   </button>
 
                   <button
                     onClick={(e) => handleOpenNavigation('google', e)}
                     disabled={!position || !position.latitude || !position.longitude}
                     style={{
-                      width: '100%',
-                      padding: '12px 16px',
+                      width: '106px',
+                      height: '106px',
+                      padding: '16px',
                       borderRadius: '8px',
                       border: 'none',
                       backgroundColor: position && position.latitude && position.longitude ? '#4285F4' : colors.hover,
                       color: position && position.latitude && position.longitude ? '#FFFFFF' : colors.textSecondary,
-                      fontSize: '14px',
+                      fontSize: '12px',
                       fontWeight: '500',
                       cursor: position && position.latitude && position.longitude ? 'pointer' : 'not-allowed',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
@@ -5725,10 +5814,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       }
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                    Google Maps
+                    <TbBrandGoogleMaps size={40} />
+                    <span>Google Maps</span>
                   </button>
                 </div>
               </div>
