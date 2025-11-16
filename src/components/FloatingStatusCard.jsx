@@ -6937,7 +6937,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 margin: 0,
                 flex: 1
               }}>
-                RouteGuardian <span style={{ fontStyle: 'italic', fontSize: '0.7em', verticalAlign: 'super' }}>beta</span>
+                RouteGuardian <span style={{ fontStyle: 'italic', fontSize: '0.7em', verticalAlign: 'super' }}>beta</span>{getDeviceModel ? ` (${getDeviceModel.toUpperCase()})` : ''}
               </Typography>
               <Tabs
                 value={moreDetailsActiveTab}
