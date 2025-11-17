@@ -1668,18 +1668,129 @@ app.post('/api/resellers/delete', async (req, res) => {
 // Track active builds to prevent concurrent builds for the same reseller
 const activeBuilds = new Map();
 
+// Helper function to get build lock file path
+function getBuildLockFilePath(resellerDirName, buildType) {
+  const buildKey = `${resellerDirName}_${buildType}`;
+  return path.join(DATA_DIR, `.build_lock_${buildKey.replace(/[^a-zA-Z0-9._-]/g, '_')}`);
+}
+
+// Helper function to check if build is active (checks both memory and file system)
+function isBuildActive(resellerDirName, buildType) {
+  const buildKey = `${resellerDirName}_${buildType}`;
+  // Check in-memory map first
+  if (activeBuilds.has(buildKey)) {
+    return true;
+  }
+  // Check for lock file (persists across server restarts)
+  const lockFilePath = getBuildLockFilePath(resellerDirName, buildType);
+  if (fs.existsSync(lockFilePath)) {
+    // Check if lock file is stale (older than 2 hours = likely abandoned build)
+    try {
+      const stats = fs.statSync(lockFilePath);
+      const ageInHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+      if (ageInHours > 2) {
+        console.log(`🧹 Removing stale build lock file (${ageInHours.toFixed(1)} hours old): ${lockFilePath}`);
+        fs.unlinkSync(lockFilePath);
+        return false;
+      }
+      // Lock file exists and is recent, restore to activeBuilds
+      activeBuilds.set(buildKey, true);
+      return true;
+    } catch (error) {
+      console.warn(`⚠️ Error checking lock file ${lockFilePath}:`, error.message);
+      return false;
+    }
+  }
+  return false;
+}
+
+// Helper function to create build lock file
+function createBuildLock(resellerDirName, buildType) {
+  const buildKey = `${resellerDirName}_${buildType}`;
+  const lockFilePath = getBuildLockFilePath(resellerDirName, buildType);
+  try {
+    fs.writeFileSync(lockFilePath, JSON.stringify({
+      buildKey,
+      resellerDirName,
+      buildType,
+      startTime: new Date().toISOString()
+    }), 'utf8');
+    console.log(`🔒 Created build lock file: ${lockFilePath}`);
+  } catch (error) {
+    console.error(`❌ Failed to create build lock file: ${error.message}`);
+  }
+}
+
+// Helper function to remove build lock file
+function removeBuildLock(resellerDirName, buildType) {
+  const buildKey = `${resellerDirName}_${buildType}`;
+  const lockFilePath = getBuildLockFilePath(resellerDirName, buildType);
+  try {
+    if (fs.existsSync(lockFilePath)) {
+      fs.unlinkSync(lockFilePath);
+      console.log(`🔓 Removed build lock file: ${lockFilePath}`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Failed to remove build lock file: ${error.message}`);
+  }
+}
+
+// Cleanup stale build lock files on startup
+function cleanupStaleBuildLocks() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      return;
+    }
+    
+    const files = fs.readdirSync(DATA_DIR);
+    const lockFiles = files.filter(file => file.startsWith('.build_lock_'));
+    let cleanedCount = 0;
+    
+    for (const lockFile of lockFiles) {
+      const lockFilePath = path.join(DATA_DIR, lockFile);
+      try {
+        const stats = fs.statSync(lockFilePath);
+        const ageInHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+        
+        // Remove lock files older than 2 hours (likely abandoned builds)
+        if (ageInHours > 2) {
+          fs.unlinkSync(lockFilePath);
+          cleanedCount++;
+          console.log(`🧹 Cleaned up stale build lock file: ${lockFile} (${ageInHours.toFixed(1)} hours old)`);
+        }
+      } catch (error) {
+        console.warn(`⚠️ Error processing lock file ${lockFile}: ${error.message}`);
+        // Try to remove it anyway if we can't read it
+        try {
+          fs.unlinkSync(lockFilePath);
+          cleanedCount++;
+        } catch (unlinkError) {
+          // Ignore unlink errors
+        }
+      }
+    }
+    
+    if (cleanedCount > 0) {
+      console.log(`✅ Cleaned up ${cleanedCount} stale build lock file(s) on startup`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Error during build lock cleanup: ${error.message}`);
+  }
+}
+
 // Async function to handle Flutter build process
 async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType = 'apk') {
   const buildKey = `${resellerDirName}_${buildType}`;
   
-  // Check if build is already in progress
-  if (activeBuilds.has(buildKey)) {
+  // Check if build is already in progress (check both memory and file system)
+  if (isBuildActive(resellerDirName, buildType)) {
     console.log(`⚠️ Build already in progress for ${buildKey}, skipping...`);
     throw new Error(`Build already in progress for ${resellerDirName} (${buildType})`);
   }
   
-  // Mark build as active
+  // Mark build as active (both in memory and on disk)
   activeBuilds.set(buildKey, true);
+  createBuildLock(resellerDirName, buildType);
   
   try {
     console.log(`🔨 Starting Flutter build process for ${buildType.toUpperCase()}...`);
@@ -1951,9 +2062,10 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
     console.error('❌ Error in build process:', error);
     throw error; // Re-throw to allow caller to handle
   } finally {
-    // Always remove from active builds, even if build failed
+    // Always remove from active builds and lock file, even if build failed
     activeBuilds.delete(buildKey);
-    console.log(`🧹 Removed ${buildKey} from active builds`);
+    removeBuildLock(resellerDirName, buildType);
+    console.log(`🧹 Removed ${buildKey} from active builds and lock file`);
   }
 }
 
@@ -2526,9 +2638,9 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     const aabExists = fs.existsSync(aabPath);
     const iosExists = fs.existsSync(iosPath);
     
-    // Check if build is actually running
+    // Check if build is actually running (check both memory and file system)
     const buildKey = `${resellerDirName}_${buildType}`;
-    const isBuildActive = activeBuilds.has(buildKey);
+    const isBuildActiveCheck = isBuildActive(resellerDirName, buildType);
     
     console.log(`🔍 Build status check for ${appUrl}:`);
     console.log(`📁 Reseller dir exists: ${resellerDirExists}`);
@@ -2536,18 +2648,18 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     console.log(`📁 APK exists: ${apkExists} at ${apkPath}`);
     console.log(`📁 AAB exists: ${aabExists} at ${aabPath}`);
     console.log(`📁 iOS exists: ${iosExists} at ${iosPath}`);
-    console.log(`🔨 Build is active: ${isBuildActive} (key: ${buildKey})`);
+    console.log(`🔨 Build is active: ${isBuildActiveCheck} (key: ${buildKey})`);
     
     // Determine build status based on buildType and file existence
     let buildStatus = 'NOT_BUILDED';
     let buildComplete = false;
     
     // First check if build is actively running
-    if (isBuildActive) {
+    if (isBuildActiveCheck) {
       buildStatus = 'BUILDING';
-      console.log(`🔨 Status: BUILDING (build is active in activeBuilds)`);
+      console.log(`🔨 Status: BUILDING (build is active in activeBuilds or lock file exists)`);
     }
-    // If build is not active, check file existence
+    // If build is not active, check file existence for the specific build type
     else if (buildType === 'apk' && apkExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
@@ -2568,10 +2680,28 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
       buildStatus = 'PARTIAL_BUILDED';
       console.log(`⚠️ Status: PARTIAL_BUILDED (only one file exists)`);
     }
-    // If build directory exists but no final file, it might be building or failed
-    else if (buildDirExists || (resellerDirExists && !apkExists && !aabExists && !iosExists)) {
+    // If build directory exists but no final file for this build type, it might be building or failed
+    // Also check if reseller dir exists without final files (might be mid-build)
+    else if (buildDirExists) {
+      // Build directory exists, check if it's for this specific build type
+      // If we're checking for AAB but only APK exists, or vice versa, it's NOT_BUILDED
+      if (buildType === 'aab' && apkExists && !aabExists) {
+        // APK was built but AAB wasn't - this is NOT_BUILDED for AAB
+        buildStatus = 'NOT_BUILDED';
+        console.log(`❌ Status: NOT_BUILDED (AAB not built, only APK exists)`);
+      } else if (buildType === 'apk' && aabExists && !apkExists) {
+        // AAB was built but APK wasn't - this is NOT_BUILDED for APK
+        buildStatus = 'NOT_BUILDED';
+        console.log(`❌ Status: NOT_BUILDED (APK not built, only AAB exists)`);
+      } else {
+        // Build directory exists but no final file - might be building
+        buildStatus = 'BUILDING';
+        console.log(`🔨 Status: BUILDING (build dir exists but no final file yet)`);
+      }
+    } else if (resellerDirExists && !apkExists && !aabExists && !iosExists) {
+      // Reseller dir exists but no build files - might be mid-setup
       buildStatus = 'BUILDING';
-      console.log(`🔨 Status: BUILDING (build dir exists or reseller dir exists without final files)`);
+      console.log(`🔨 Status: BUILDING (reseller dir exists without final files)`);
     } else {
       buildStatus = 'NOT_BUILDED';
       console.log(`❌ Status: NOT_BUILDED (no build files or directories found)`);
@@ -3358,6 +3488,8 @@ const ensureDirectories = () => {
 // Create directories on startup
 ensureDirectories();
 
+// Cleanup stale build locks on startup
+cleanupStaleBuildLocks();
 
 // Start server
 app.listen(PORT, async () => {

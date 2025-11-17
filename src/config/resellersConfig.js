@@ -5,8 +5,8 @@
 // In development, set VITE_RESELLERS_SERVER_URL=http://localhost:3333
 // In production, uses the separate resellers domain
 // const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://revendas.rastreadorautoram.com.br';
-// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
-const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
+// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
 
 export default {
   RESELLERS_SERVER_URL,
