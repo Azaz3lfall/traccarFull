@@ -30,7 +30,10 @@ import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { map } from '../map/core/MapView';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useDeviceReadonly } from '../common/util/permissions';
-import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
+import { distanceFromMeters, distanceToMeters, distanceUnitString, speedFromKnots, speedUnitString } from '../common/util/converter';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useCatch } from '../reactHelper';
 import {
@@ -877,6 +880,39 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // User preferences
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   const speedUnit = useAttributePreference('speedUnit');
+  
+  // Prepare chart data for replay mode speed chart
+  const replaySpeedChartData = useMemo(() => {
+    if (replayPositions.length <= 1) return [];
+    
+    return replayPositions.map((position, index) => {
+      const time = position.fixTime || position.deviceTime || position.serverTime;
+      const speedValue = position.speed || 0;
+      // Convert speed to user's preferred unit for chart display
+      const convertedSpeed = speedFromKnots(speedValue, speedUnit);
+      
+      return {
+        time: dayjs(time).valueOf(),
+        speed: parseFloat(convertedSpeed.toFixed(2)),
+        index
+      };
+    });
+  }, [replayPositions, speedUnit]);
+  
+  // Calculate chart min/max values
+  const chartMinSpeed = useMemo(() => {
+    if (replaySpeedChartData.length === 0) return 0;
+    const speeds = replaySpeedChartData.map(d => d.speed).filter(s => s != null);
+    return speeds.length > 0 ? Math.min(...speeds) : 0;
+  }, [replaySpeedChartData]);
+  
+  const chartMaxSpeed = useMemo(() => {
+    if (replaySpeedChartData.length === 0) return 100;
+    const speeds = replaySpeedChartData.map(d => d.speed).filter(s => s != null);
+    return speeds.length > 0 ? Math.max(...speeds) : 100;
+  }, [replaySpeedChartData]);
+  
+  const chartSpeedRange = chartMaxSpeed - chartMinSpeed;
   const distanceUnit = useAttributePreference('distanceUnit');
   const altitudeUnit = useAttributePreference('altitudeUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
@@ -2038,8 +2074,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   // Handle drag for timeline (mobile only)
   const handleTimelineMouseDown = useCallback((e) => {
     if (desktop) return;
-    // Only start drag if clicking on drag handle or label
-    if (!e.target.closest('.timeline-drag-handle') && !e.target.closest('label')) {
+    // Don't start drag if clicking on interactive elements (buttons, slider)
+    if (e.target.closest('button') || e.target.closest('input[type="range"]') || e.target.closest('select')) {
       return;
     }
     e.preventDefault();
@@ -2080,7 +2116,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleTimelineTouchStart = useCallback((e) => {
     if (desktop) return;
     const touch = e.touches[0];
-    if (!touch.target.closest('.timeline-drag-handle') && !touch.target.closest('label')) {
+    // Don't start drag if clicking on interactive elements (buttons, slider)
+    if (touch.target.closest('button') || touch.target.closest('input[type="range"]') || touch.target.closest('select')) {
       return;
     }
     e.preventDefault();
@@ -3958,7 +3995,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           </button>
 
           {/* Route Button - Hidden in replay mode */}
-          {!showReplayPopover && (
+          {!showReplayPopover && replayPositions.length <= 1 && (
             <button
               onClick={() => setRouteModalOpen(true)}
               style={{
@@ -3983,7 +4020,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           )}
 
           {/* Reports Button - Hidden in replay mode */}
-          {!showReplayPopover && onOpenReports && (
+          {!showReplayPopover && replayPositions.length <= 1 && onOpenReports && (
             <button
               onClick={onOpenReports}
               style={{
@@ -4008,7 +4045,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           )}
 
           {/* More Details Button - Hidden in replay mode */}
-          {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (
+          {!showReplayPopover && replayPositions.length <= 1 && !deviceReadonly && hasEditSensorsPermission && (
             <button
               onClick={() => setMoreDetailsModalOpen(true)}
               style={{
@@ -4033,7 +4070,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           )}
 
           {/* Sensor Edit Button - Hidden in replay mode */}
-          {!showReplayPopover && !deviceReadonly && hasEditSensorsPermission && (
+          {!showReplayPopover && replayPositions.length <= 1 && !deviceReadonly && hasEditSensorsPermission && (
             <button
               onClick={handleOpenSensorEdit}
               style={{
@@ -4480,8 +4517,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </>
             )}
             
-            {/* Action Buttons */}
-            {hasAnyActionButtons && (
+            {/* Action Buttons - Hidden in replay mode */}
+            {hasAnyActionButtons && !showReplayPopover && replayPositions.length <= 1 && (
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -4687,6 +4724,100 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             padding: '0px 16px 16px 16px',
             overflow: 'auto'
           }}>
+            
+            {/* Speed Chart - Only in replay mode, above sensors */}
+            {replayPositions.length > 1 && !showReplayPopover && replaySpeedChartData.length > 0 && (
+              <div style={{
+                width: '100%',
+                height: '200px',
+                marginTop: '0px',
+                marginBottom: '16px',
+                padding: '8px',
+                backgroundColor: colors.surface,
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`
+              }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={replaySpeedChartData}
+                    margin={{
+                      top: 5,
+                      right: 10,
+                      left: 0,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid 
+                      stroke={theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'} 
+                      strokeDasharray="3 3" 
+                    />
+                    <XAxis
+                      dataKey="time"
+                      type="number"
+                      scale="time"
+                      domain={['dataMin', 'dataMax']}
+                      tickFormatter={(value) => formatTime(value, 'time')}
+                      stroke={colors.text}
+                      tick={{ fill: colors.text, fontSize: '11px', fontWeight: '500' }}
+                      style={{ fontSize: '11px' }}
+                    />
+                    <YAxis
+                      type="number"
+                      domain={[Math.max(0, chartMinSpeed - chartSpeedRange * 0.1), chartMaxSpeed + chartSpeedRange * 0.1]}
+                      tickFormatter={(value) => value.toFixed(0)}
+                      stroke={colors.text}
+                      tick={{ fill: colors.text, fontSize: '11px', fontWeight: '500' }}
+                      style={{ fontSize: '11px' }}
+                      scale="linear"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: colors.surface,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '4px',
+                        color: colors.text,
+                        boxShadow: theme === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.15)'
+                      }}
+                      itemStyle={{ color: colors.text }}
+                      labelStyle={{ color: colors.text, fontWeight: '600' }}
+                      formatter={(value) => [`${value.toFixed(2)} ${speedUnitString(speedUnit, t)}`, t('positionSpeed')]}
+                      labelFormatter={(value) => formatTime(value, 'seconds')}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="speed"
+                      stroke={theme === 'dark' ? '#60A5FA' : '#2563EB'}
+                      strokeWidth={3}
+                      dot={(props) => {
+                        const { cx, cy, payload } = props;
+                        // Highlight current position with a different color
+                        if (payload.index === reduxCurrentReplayIndex) {
+                          return (
+                            <circle
+                              cx={cx}
+                              cy={cy}
+                              r={6}
+                              fill={theme === 'dark' ? '#FBBF24' : '#F59E0B'}
+                              stroke={colors.surface}
+                              strokeWidth={3}
+                            />
+                          );
+                        }
+                        return null;
+                      }}
+                      activeDot={{ 
+                        r: 5, 
+                        fill: theme === 'dark' ? '#60A5FA' : '#2563EB', 
+                        stroke: colors.surface, 
+                        strokeWidth: 2 
+                      }}
+                      connectNulls
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             
             {/* Position Attributes */}
             {position && (
@@ -8631,19 +8762,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     {/* Detached Timeline Controls - shown when replay is active and popover is hidden */}
     {replayPositions.length > 1 && !showReplayPopover && (
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -20, x: '-52%' }}
+        animate={{ opacity: 1, y: 0, x: '-52%' }}
+        exit={{ opacity: 0, y: -20, x: '-52%' }}
         transition={{ duration: 0.3 }}
         style={{
           position: 'fixed',
-          top: '16px',
+          top: '10px',
           left: '50%',
-          transform: 'translateX(-50%)',
           zIndex: 10002,
-          width: 'auto',
-          maxWidth: '90vw',
-          minWidth: '300px'
+          width: !desktop ? '70vw' : 'auto',
+          maxWidth: !desktop ? '70vw' : '500px',
+          minWidth: !desktop ? '280px' : '300px',
+          margin: 0,
+          boxSizing: 'border-box'
         }}
       >
         <div 
@@ -8657,36 +8789,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             border: `1px solid ${colors.border}`,
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             cursor: !desktop ? 'move' : 'default',
-            touchAction: !desktop ? 'none' : 'auto'
+            touchAction: !desktop ? 'none' : 'auto',
+            width: '100%',
+            boxSizing: 'border-box'
           }}
         >
-          {/* Drag Handle - visible on mobile */}
-          {!desktop && (
-            <div 
-              className="timeline-drag-handle"
-              style={{
-                width: '40px',
-                height: '4px',
-                backgroundColor: colors.border,
-                borderRadius: '2px',
-                margin: '0 auto 12px',
-                cursor: 'move'
-              }}
-            />
-          )}
-
           {/* Slider */}
           <div>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: colors.text,
-              cursor: !desktop ? 'move' : 'default'
-            }} className={!desktop ? 'timeline-drag-handle' : ''}>
-              {t('sharedTimeline')}
-            </label>
             <input
               type="range"
               min="0"
