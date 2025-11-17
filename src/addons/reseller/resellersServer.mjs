@@ -1847,15 +1847,30 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
     }
 
     // Rename output files based on what was built
+    let apkCopied = false;
+    let aabCopied = false;
+    
     if (buildType === 'apk' || buildType === 'both') {
       const apkSourcePath = path.join(resellerDirPath, 'build/app/outputs/flutter-apk/app-release.apk');
       const apkTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.apk`);
       
       if (fs.existsSync(apkSourcePath)) {
-        fs.copyFileSync(apkSourcePath, apkTargetPath);
-        console.log('✅ APK renamed to:', apkTargetPath);
+        try {
+          fs.copyFileSync(apkSourcePath, apkTargetPath);
+          // Verify the file was copied successfully
+          if (fs.existsSync(apkTargetPath)) {
+            apkCopied = true;
+            console.log('✅ APK copied to:', apkTargetPath);
+          } else {
+            throw new Error('APK file copy verification failed');
+          }
+        } catch (error) {
+          console.error('❌ Error copying APK:', error);
+          throw new Error(`Failed to copy APK: ${error.message}`);
+        }
       } else {
-        console.log('❌ APK file not found after build');
+        console.log('❌ APK file not found after build at:', apkSourcePath);
+        throw new Error('APK file not found after build');
       }
     }
     
@@ -1864,10 +1879,22 @@ async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, b
       const aabTargetPath = path.join(DATA_DIR, `${resellerData.appUrl}.aab`);
       
       if (fs.existsSync(aabSourcePath)) {
-        fs.copyFileSync(aabSourcePath, aabTargetPath);
-        console.log('✅ AAB renamed to:', aabTargetPath);
+        try {
+          fs.copyFileSync(aabSourcePath, aabTargetPath);
+          // Verify the file was copied successfully
+          if (fs.existsSync(aabTargetPath)) {
+            aabCopied = true;
+            console.log('✅ AAB copied to:', aabTargetPath);
+          } else {
+            throw new Error('AAB file copy verification failed');
+          }
+        } catch (error) {
+          console.error('❌ Error copying AAB:', error);
+          throw new Error(`Failed to copy AAB: ${error.message}`);
+        }
       } else {
-        console.log('❌ AAB file not found after build');
+        console.log('❌ AAB file not found after build at:', aabSourcePath);
+        throw new Error('AAB file not found after build');
       }
     }
     
@@ -2499,40 +2526,55 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
     const aabExists = fs.existsSync(aabPath);
     const iosExists = fs.existsSync(iosPath);
     
+    // Check if build is actually running
+    const buildKey = `${resellerDirName}_${buildType}`;
+    const isBuildActive = activeBuilds.has(buildKey);
+    
     console.log(`🔍 Build status check for ${appUrl}:`);
     console.log(`📁 Reseller dir exists: ${resellerDirExists}`);
     console.log(`📁 Build dir exists: ${buildDirExists}`);
     console.log(`📁 APK exists: ${apkExists} at ${apkPath}`);
     console.log(`📁 AAB exists: ${aabExists} at ${aabPath}`);
     console.log(`📁 iOS exists: ${iosExists} at ${iosPath}`);
+    console.log(`🔨 Build is active: ${isBuildActive} (key: ${buildKey})`);
     
     // Determine build status based on buildType and file existence
     let buildStatus = 'NOT_BUILDED';
     let buildComplete = false;
     
-    // If reseller directory exists but no build files yet, it's building
-    if (resellerDirExists && !apkExists && !aabExists && !iosExists) {
+    // First check if build is actively running
+    if (isBuildActive) {
       buildStatus = 'BUILDING';
-      console.log(`🔨 Status: BUILDING (reseller dir exists, no build files yet)`);
-    } else if (buildDirExists) {
-      buildStatus = 'BUILDING';
-      console.log(`🔨 Status: BUILDING (build dir exists)`);
-    } else if (buildType === 'apk' && apkExists) {
+      console.log(`🔨 Status: BUILDING (build is active in activeBuilds)`);
+    }
+    // If build is not active, check file existence
+    else if (buildType === 'apk' && apkExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
+      console.log(`✅ Status: BUILDED (APK file exists)`);
     } else if (buildType === 'aab' && aabExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
+      console.log(`✅ Status: BUILDED (AAB file exists)`);
     } else if ((buildType === 'ios' || buildType === 'ios_simulator' || buildType === 'ios_device') && iosExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
+      console.log(`✅ Status: BUILDED (iOS app exists)`);
     } else if (buildType === 'both' && apkExists && aabExists) {
       buildStatus = 'BUILDED';
       buildComplete = true;
+      console.log(`✅ Status: BUILDED (both APK and AAB exist)`);
     } else if (buildType === 'both' && (apkExists || aabExists)) {
       buildStatus = 'PARTIAL_BUILDED';
-    } else if (!apkExists && !aabExists && !iosExists) {
+      console.log(`⚠️ Status: PARTIAL_BUILDED (only one file exists)`);
+    }
+    // If build directory exists but no final file, it might be building or failed
+    else if (buildDirExists || (resellerDirExists && !apkExists && !aabExists && !iosExists)) {
+      buildStatus = 'BUILDING';
+      console.log(`🔨 Status: BUILDING (build dir exists or reseller dir exists without final files)`);
+    } else {
       buildStatus = 'NOT_BUILDED';
+      console.log(`❌ Status: NOT_BUILDED (no build files or directories found)`);
     }
     
     // Get file sizes if they exist
