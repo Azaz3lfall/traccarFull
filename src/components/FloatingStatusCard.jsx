@@ -865,6 +865,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [isScreenshotting, setIsScreenshotting] = useState(false);
   const intervalRef = useRef(null);
   
+  // Timeline draggable position state
+  const [timelinePosition, setTimelinePosition] = useState({ x: 0, y: 0 });
+  const [isTimelineDragging, setIsTimelineDragging] = useState(false);
+  const [timelineDragOffset, setTimelineDragOffset] = useState({ x: 0, y: 0 });
+  const timelineRef = useRef(null);
+  
   // Get replay state from Redux
   const reduxCurrentReplayIndex = useSelector((state) => state.session.currentReplayIndex);
   
@@ -2026,6 +2032,113 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       };
     }
   }, [isDragging, handleDetachedVideoMouseMove, handleDetachedVideoMouseUp]);
+
+  // Handle drag for timeline (mobile only)
+  const handleTimelineMouseDown = useCallback((e) => {
+    if (desktop) return;
+    // Only start drag if clicking on drag handle or label
+    if (!e.target.closest('.timeline-drag-handle') && !e.target.closest('label')) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    setIsTimelineDragging(true);
+    if (timelineRef.current) {
+      const rect = timelineRef.current.getBoundingClientRect();
+      const parentRect = timelineRef.current.parentElement.getBoundingClientRect();
+      setTimelineDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+    }
+  }, [desktop]);
+
+  const handleTimelineMouseMove = useCallback((e) => {
+    if (!isTimelineDragging || desktop || !timelineRef.current) return;
+    
+    const parentRect = timelineRef.current.parentElement.getBoundingClientRect();
+    const newX = e.clientX - parentRect.left - timelineDragOffset.x;
+    const newY = e.clientY - parentRect.top - timelineDragOffset.y;
+    
+    // Keep within parent bounds
+    const maxX = parentRect.width - timelineRef.current.offsetWidth;
+    const maxY = parentRect.height - timelineRef.current.offsetHeight;
+    
+    setTimelinePosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isTimelineDragging, desktop, timelineDragOffset]);
+
+  const handleTimelineMouseUp = useCallback(() => {
+    setIsTimelineDragging(false);
+  }, []);
+
+  // Touch event handlers for mobile
+  const handleTimelineTouchStart = useCallback((e) => {
+    if (desktop) return;
+    const touch = e.touches[0];
+    if (!touch.target.closest('.timeline-drag-handle') && !touch.target.closest('label')) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    setIsTimelineDragging(true);
+    if (timelineRef.current) {
+      const rect = timelineRef.current.getBoundingClientRect();
+      const parentRect = timelineRef.current.parentElement.getBoundingClientRect();
+      setTimelineDragOffset({
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      });
+    }
+  }, [desktop]);
+
+  const handleTimelineTouchMove = useCallback((e) => {
+    if (!isTimelineDragging || desktop || !timelineRef.current) return;
+    const touch = e.touches[0];
+    const parentRect = timelineRef.current.parentElement.getBoundingClientRect();
+    const newX = touch.clientX - parentRect.left - timelineDragOffset.x;
+    const newY = touch.clientY - parentRect.top - timelineDragOffset.y;
+    
+    // Keep within parent bounds
+    const maxX = parentRect.width - timelineRef.current.offsetWidth;
+    const maxY = parentRect.height - timelineRef.current.offsetHeight;
+    
+    setTimelinePosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isTimelineDragging, desktop, timelineDragOffset]);
+
+  const handleTimelineTouchEnd = useCallback(() => {
+    setIsTimelineDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isTimelineDragging && !desktop) {
+      const preventSelect = (e) => {
+        e.preventDefault();
+        return false;
+      };
+      
+      window.addEventListener('mousemove', handleTimelineMouseMove);
+      window.addEventListener('mouseup', handleTimelineMouseUp);
+      window.addEventListener('touchmove', handleTimelineTouchMove);
+      window.addEventListener('touchend', handleTimelineTouchEnd);
+      document.addEventListener('selectstart', preventSelect);
+      document.body.style.userSelect = 'none';
+      
+      return () => {
+        window.removeEventListener('mousemove', handleTimelineMouseMove);
+        window.removeEventListener('mouseup', handleTimelineMouseUp);
+        window.removeEventListener('touchmove', handleTimelineTouchMove);
+        window.removeEventListener('touchend', handleTimelineTouchEnd);
+        document.removeEventListener('selectstart', preventSelect);
+        document.body.style.userSelect = '';
+      };
+    }
+  }, [isTimelineDragging, desktop, handleTimelineMouseMove, handleTimelineMouseUp, handleTimelineTouchMove, handleTimelineTouchEnd]);
 
   // Handle detach button click
   const handleDetachVideo = useCallback(() => {
@@ -6399,238 +6512,281 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
             {/* Replay Controls Section - BELOW the Cancel and Show buttons */}
             <>
-
-                {/* Slider */}
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: colors.text
-                  }}>
-                    {t('sharedTimeline')}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max={Math.max(0, replayPositions.length - 1)}
-                    value={currentReplayIndex}
-                    onChange={handleSliderChange}
-                    disabled={replayPositions.length === 0}
+              <div style={{
+                position: !desktop ? 'relative' : 'static',
+                width: '100%',
+                minHeight: !desktop ? '200px' : 'auto'
+              }}>
+                  <div 
+                    ref={timelineRef}
+                    onMouseDown={handleTimelineMouseDown}
+                    onTouchStart={handleTimelineTouchStart}
                     style={{
-                      width: '100%',
-                      height: '8px',
-                      borderRadius: '4px',
-                      background: replayPositions.length === 0 
-                        ? colors.border 
-                        : `linear-gradient(to right, #18a9fd 0%, #18a9fd ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
-                      outline: 'none',
-                      cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      opacity: replayPositions.length === 0 ? 0.5 : 1,
-                      border: 'none'
-                    }}
-                  />
-                  <style>
-                    {`
-                      input[type="range"]::-webkit-slider-thumb {
-                        -webkit-appearance: none;
-                        appearance: none;
-                        width: 16px;
-                        height: 16px;
-                        border-radius: 50%;
-                        background: #18a9fd;
-                        cursor: pointer;
-                        border: 3px solid #ffffff;
-                        box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
-                      }
-                      
-                      input[type="range"]::-moz-range-thumb {
-                        width: 16px;
-                        height: 16px;
-                        border-radius: 50%;
-                        background: #18a9fd;
-                        cursor: pointer;
-                        border: 3px solid #ffffff;
-                        box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
-                      }
-                    `}
-                  </style>
-                </div>
+                      position: !desktop ? 'absolute' : 'relative',
+                      top: !desktop ? (timelinePosition.y === 0 ? '8px' : `${timelinePosition.y}px`) : 'auto',
+                      left: !desktop ? (timelinePosition.x === 0 && timelinePosition.y === 0 ? '50%' : `${timelinePosition.x}px`) : 'auto',
+                      transform: !desktop && timelinePosition.x === 0 && timelinePosition.y === 0 ? 'translateX(-50%)' : 'none',
+                      width: !desktop ? 'calc(100% - 32px)' : '100%',
+                      maxWidth: !desktop ? '400px' : 'none',
+                      zIndex: !desktop ? 10001 : 'auto',
+                      padding: '16px',
+                      backgroundColor: colors.surface,
+                      borderRadius: '12px',
+                      border: `1px solid ${colors.border}`,
+                      boxShadow: !desktop ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none',
+                      cursor: !desktop ? 'move' : 'default',
+                      touchAction: !desktop ? 'none' : 'auto'
+                    }}>
+                  {/* Drag Handle - visible on mobile */}
+                  {!desktop && (
+                    <div 
+                      className="timeline-drag-handle"
+                      style={{
+                        width: '40px',
+                        height: '4px',
+                        backgroundColor: colors.border,
+                        borderRadius: '2px',
+                        margin: '0 auto 12px',
+                        cursor: 'move'
+                      }}
+                    />
+                  )}
 
-                {/* Playback Controls */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  backgroundColor: colors.surface,
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.border}`
-                }}>
-                  {/* Fast Backward Button */}
-                  <button
-                    onClick={() => {
-                      const newIndex = Math.max(0, currentReplayIndex - 1);
-                      setCurrentReplayIndex(newIndex);
-                      // Update Redux state to trigger map updates
-                      dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
-                    }}
-                    disabled={replayPositions.length === 0 || currentReplayIndex <= 0}
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      border: '2px solid #000000',
-                      backgroundColor: colors.background,
-                      color: colors.textSecondary,
-                      cursor: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 0.5 : 1
-                    }}
-                    title={t('sharedFastBackward')}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M11 19V5L5 12L11 19Z" fill="currentColor"/>
-                      <path d="M19 19V5L13 12L19 19Z" fill="currentColor"/>
-                    </svg>
-                  </button>
+                  {/* Slider */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: colors.text,
+                      cursor: !desktop ? 'move' : 'default'
+                    }} className={!desktop ? 'timeline-drag-handle' : ''}>
+                      {t('sharedTimeline')}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max={Math.max(0, replayPositions.length - 1)}
+                      value={currentReplayIndex}
+                      onChange={handleSliderChange}
+                      disabled={replayPositions.length === 0}
+                      style={{
+                        width: '100%',
+                        height: '8px',
+                        borderRadius: '4px',
+                        background: replayPositions.length === 0 
+                          ? colors.border 
+                          : `linear-gradient(to right, #18a9fd 0%, #18a9fd ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} ${(currentReplayIndex / Math.max(1, replayPositions.length - 1)) * 100}%, ${colors.border} 100%)`,
+                        outline: 'none',
+                        cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        opacity: replayPositions.length === 0 ? 0.5 : 1,
+                        border: 'none'
+                      }}
+                    />
+                    <style>
+                      {`
+                        input[type="range"]::-webkit-slider-thumb {
+                          -webkit-appearance: none;
+                          appearance: none;
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: #18a9fd;
+                          cursor: pointer;
+                          border: 3px solid #ffffff;
+                          box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
+                        }
+                        
+                        input[type="range"]::-moz-range-thumb {
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: #18a9fd;
+                          cursor: pointer;
+                          border: 3px solid #ffffff;
+                          box-shadow: 0 0 0 1px #18a9fd, 0 2px 6px rgba(0,0,0,0.4);
+                        }
+                      `}
+                    </style>
+                  </div>
 
-                  <button
-                    onClick={isPlaying ? handlePause : handlePlay}
-                    disabled={replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)}
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      border: 'none',
-                      backgroundColor: "#18a9fd",
-                      color: colors.surface,
-                      cursor: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 0.5 : 1
-                    }}
-                  >
-                    {isPlaying ? (
-                      <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff"}} />
-                    ) : (
-                      <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff" }} />
-                    )}
-                  </button>
-
-                  {/* Fast Forward Button */}
-                  <button
-                    onClick={() => {
-                      const newIndex = Math.min(replayPositions.length - 1, currentReplayIndex + 1);
-                      setCurrentReplayIndex(newIndex);
-                      // Update Redux state to trigger map updates
-                      dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
-                    }}
-                    disabled={replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1}
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      border: '2px solid #000000',
-                      backgroundColor: colors.background,
-                      color: colors.textSecondary,
-                      cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 0.5 : 1
-                    }}
-                    title={t('sharedFastForward')}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13 5V19L19 12L13 5Z" fill="currentColor"/>
-                      <path d="M5 5V19L11 12L5 5Z" fill="currentColor"/>
-                    </svg>
-                  </button>
-
-                  {/* Screenshot Button */}
-                  <button
-                    onClick={handleScreenshot}
-                    disabled={replayPositions.length === 0 || isScreenshotting}
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      border: '2px solid #000000',
-                      backgroundColor: colors.background,
-                      color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
-                      cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1
-                    }}
-                    title={isScreenshotting ? t('sharedProcessing') : t('sharedScreenshot')}
-                  >
-                    {isScreenshotting ? (
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        border: '2px solid transparent',
-                        borderTop: `2px solid ${colors.textSecondary}`,
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                      }} />
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Speed Control */}
+                  {/* Playback Controls */}
                   <div style={{
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '4px'
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '12px',
+                    backgroundColor: colors.background,
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.border}`,
+                    marginTop: '12px'
                   }}>
-                    <select
-                      value={playbackSpeed}
-                      disabled={replayPositions.length === 0}
-                      onChange={(e) => {
-                        const newSpeed = Number(e.target.value);
-                        setPlaybackSpeed(newSpeed);
-                        // Stop playback when speed changes
-                        setIsPlaying(false);
-                        if (intervalRef.current) {
-                          clearInterval(intervalRef.current);
-                          intervalRef.current = null;
-                        }
+                    {/* Fast Backward Button */}
+                    <button
+                      onClick={() => {
+                        const newIndex = Math.max(0, currentReplayIndex - 1);
+                        setCurrentReplayIndex(newIndex);
+                        // Update Redux state to trigger map updates
+                        dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
                       }}
+                      disabled={replayPositions.length === 0 || currentReplayIndex <= 0}
                       style={{
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: `1px solid ${colors.border}`,
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        fontSize: '12px',
-                        cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
-                        outline: 'none',
-                        opacity: replayPositions.length === 0 ? 0.5 : 1
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        border: '2px solid #000000',
+                        backgroundColor: colors.background,
+                        color: colors.textSecondary,
+                        cursor: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 0.5 : 1
+                      }}
+                      title={t('sharedFastBackward')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 19V5L5 12L11 19Z" fill="currentColor"/>
+                        <path d="M19 19V5L13 12L19 19Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+
+                    <button
+                      onClick={isPlaying ? handlePause : handlePlay}
+                      disabled={replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)}
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        border: 'none',
+                        backgroundColor: "#18a9fd",
+                        color: colors.surface,
+                        cursor: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: (replayPositions.length === 0 || (currentReplayIndex >= replayPositions.length - 1 && !isPlaying)) ? 0.5 : 1
                       }}
                     >
-                      <option value={0.5}>0.5x</option>
-                      <option value={1}>1x</option>
-                      <option value={2}>2x</option>
-                      <option value={5}>5x</option>
-                      <option value={10}>10x</option>
-                    </select>
+                      {isPlaying ? (
+                        <PauseIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff"}} />
+                      ) : (
+                        <PlayArrowIcon style={{ fontSize: '28px', width: '28px', height: '28px', color: "#ffffff" }} />
+                      )}
+                    </button>
+
+                    {/* Fast Forward Button */}
+                    <button
+                      onClick={() => {
+                        const newIndex = Math.min(replayPositions.length - 1, currentReplayIndex + 1);
+                        setCurrentReplayIndex(newIndex);
+                        // Update Redux state to trigger map updates
+                        dispatch({ type: 'session/updateCurrentReplayIndex', payload: newIndex });
+                      }}
+                      disabled={replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        border: '2px solid #000000',
+                        backgroundColor: colors.background,
+                        color: colors.textSecondary,
+                        cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 0.5 : 1
+                      }}
+                      title={t('sharedFastForward')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 5V19L19 12L13 5Z" fill="currentColor"/>
+                        <path d="M5 5V19L11 12L5 5Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+
+                    {/* Screenshot Button */}
+                    <button
+                      onClick={handleScreenshot}
+                      disabled={replayPositions.length === 0 || isScreenshotting}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        border: '2px solid #000000',
+                        backgroundColor: colors.background,
+                        color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
+                        cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: (replayPositions.length === 0 || isScreenshotting) ? 0.5 : 1
+                      }}
+                      title={isScreenshotting ? t('sharedProcessing') : t('sharedScreenshot')}
+                    >
+                      {isScreenshotting ? (
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid transparent',
+                          borderTop: `2px solid ${colors.textSecondary}`,
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }} />
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Speed Control */}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <select
+                        value={playbackSpeed}
+                        disabled={replayPositions.length === 0}
+                        onChange={(e) => {
+                          const newSpeed = Number(e.target.value);
+                          setPlaybackSpeed(newSpeed);
+                          // Stop playback when speed changes
+                          setIsPlaying(false);
+                          if (intervalRef.current) {
+                            clearInterval(intervalRef.current);
+                            intervalRef.current = null;
+                          }
+                        }}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          border: `1px solid ${colors.border}`,
+                          backgroundColor: colors.surface,
+                          color: colors.text,
+                          fontSize: '12px',
+                          cursor: replayPositions.length === 0 ? 'not-allowed' : 'pointer',
+                          outline: 'none',
+                          opacity: replayPositions.length === 0 ? 0.5 : 1
+                        }}
+                      >
+                        <option value={0.5}>0.5x</option>
+                        <option value={1}>1x</option>
+                        <option value={2}>2x</option>
+                        <option value={5}>5x</option>
+                        <option value={10}>10x</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+              </div>
             </>
           </div>
         </motion.div>
