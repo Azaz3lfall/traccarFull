@@ -894,8 +894,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [positionAttributes]);
   
   // Get current device and position
-  // In replay mode, use replay device; otherwise use selected device
-  const device = showReplayPopover && replayDeviceId ? devices[replayDeviceId] : (selectedDeviceId ? devices[selectedDeviceId] : null);
+  // In replay mode (active or popover), use replay device; otherwise use selected device
+  const device = (replayPositions.length > 1 && replayDeviceId) || (showReplayPopover && replayDeviceId) 
+    ? devices[replayDeviceId] 
+    : (selectedDeviceId ? devices[selectedDeviceId] : null);
 
   // Helper function to generate video download URL from expected_file
   const generateVideoDownloadUrl = useCallback((expectedFile, deviceImei) => {
@@ -2450,9 +2452,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   // Memoize position to ensure it updates when replay position changes
   const position = useMemo(() => {
+    // In replay mode (when we have replay positions), use the current replay position
+    if (replayPositions.length > 1 && replayPositions[currentReplayIndex]) {
+      return replayPositions[currentReplayIndex];
+    }
+    // In replay popover mode, use replay position if available
     if (showReplayPopover && replayPositions[currentReplayIndex]) {
       return replayPositions[currentReplayIndex];
     }
+    // Normal mode: use selected device position
     return selectedDeviceId ? positions[selectedDeviceId] : null;
   }, [showReplayPopover, replayPositions, currentReplayIndex, selectedDeviceId, positions]);
 
@@ -3853,7 +3861,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       disabled={isUploadingImage}
     />
     <AnimatePresence mode="wait">
-      {((selectedDeviceId && device && !showReplayPopover) || (showReplayPopover && replayDeviceId && devices[replayDeviceId]) || (replayPositions.length > 1 && !showReplayPopover && replayDeviceId && devices[replayDeviceId])) && (
+      {(
+        // Normal mode: show when device is selected and NOT in replay mode
+        (selectedDeviceId && device && !showReplayPopover && replayPositions.length <= 1) ||
+        // Replay popover mode: show when popover is open
+        (showReplayPopover && replayDeviceId && devices[replayDeviceId]) ||
+        // Replay active mode: show when replay positions are loaded (popover hidden)
+        (replayPositions.length > 1 && !showReplayPopover && replayDeviceId && devices[replayDeviceId])
+      ) && (
         <motion.div
           key={`status-card-${selectedDeviceId || replayDeviceId}-${showReplayPopover ? 'replay' : 'normal'}`}
           initial={{ x: !desktop ? 0 : -400, y: !desktop ? 100 : 0, opacity: 0 }}
