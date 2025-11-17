@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useThemeColors } from '../common/components/ThemeProvider';
+import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useAdministrator, useRestriction } from '../common/util/permissions';
 import { sessionActions } from '../store';
 import { Card } from './ui/card';
@@ -54,6 +54,7 @@ const FloatingReportsPopover = ({
 }) => {
   const t = useTranslation();
   const colors = useThemeColors();
+  const { theme } = useTheme();
   const admin = useAdministrator();
   const readonly = useRestriction('readonly');
   
@@ -3054,34 +3055,47 @@ const FloatingReportsPopover = ({
                         <LineChart
                           data={chartItems}
                           margin={{
-                            top: 10, right: 40, left: 0, bottom: 10,
+                            top: 5,
+                            right: 10,
+                            left: -20,
+                            bottom: 5,
                           }}
                         >
+                          <CartesianGrid 
+                            stroke={theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'} 
+                            strokeDasharray="3 3" 
+                          />
                           <XAxis
-                            stroke="#666666"
                             dataKey={timeType}
                             type="number"
-                            tickFormatter={(value) => formatTime(value, 'time')}
-                            domain={['dataMin', 'dataMax']}
                             scale="time"
+                            domain={['dataMin', 'dataMax']}
+                            tickFormatter={(value) => formatTime(value, 'time')}
+                            stroke={colors.text}
+                            tick={{ fill: colors.text, fontSize: '11px', fontWeight: '500' }}
+                            style={{ fontSize: '11px' }}
                           />
                           <YAxis
-                            stroke="#666666"
                             type="number"
                             tickFormatter={(value) => value.toFixed(2)}
                             domain={[minValue - valueRange / 5, maxValue + valueRange / 5]}
+                            stroke={colors.text}
+                            tick={{ fill: colors.text, fontSize: '11px', fontWeight: '500' }}
+                            style={{ fontSize: '11px' }}
+                            scale="linear"
                           />
-                          <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
                           <Tooltip
-                            wrapperStyle={{ backgroundColor: '#ffffff', color: '#333333', border: '1px solid #e0e0e0' }}
+                            contentStyle={{
+                              backgroundColor: colors.surface,
+                              border: `1px solid ${colors.border}`,
+                              borderRadius: '4px',
+                              color: colors.text,
+                              boxShadow: theme === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.15)'
+                            }}
+                            itemStyle={{ color: colors.text }}
+                            labelStyle={{ color: colors.text, fontWeight: '600' }}
                             formatter={(value, key) => [value, positionAttributes[key]?.name || key]}
                             labelFormatter={(value) => formatTime(value, 'seconds')}
-                          />
-                          <Brush
-                            dataKey={timeType}
-                            height={30}
-                            stroke="#1976d2"
-                            tickFormatter={() => ''}
                           />
                           {selectedChartTypes.map((type, index) => (
                             <Line
@@ -3089,9 +3103,27 @@ const FloatingReportsPopover = ({
                               type="monotone"
                               dataKey={type}
                               stroke={colorPalette[index % colorPalette.length]}
-                              dot={false}
-                              activeDot={{ r: 6 }}
+                              strokeWidth={2}
+                              dot={(props) => {
+                                const { cx, cy } = props;
+                                return (
+                                  <circle
+                                    cx={cx}
+                                    cy={cy}
+                                    r={4}
+                                    fill={colorPalette[index % colorPalette.length]}
+                                    style={{ opacity: 0.6 }}
+                                  />
+                                );
+                              }}
+                              activeDot={{ 
+                                r: 5, 
+                                fill: colorPalette[index % colorPalette.length], 
+                                stroke: colors.surface, 
+                                strokeWidth: 2 
+                              }}
                               connectNulls
+                              isAnimationActive={false}
                             />
                           ))}
                         </LineChart>
