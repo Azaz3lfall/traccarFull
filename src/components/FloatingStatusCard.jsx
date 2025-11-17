@@ -4743,7 +4743,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     margin={{
                       top: 5,
                       right: 10,
-                      left: 0,
+                      left: -20,
                       bottom: 5,
                     }}
                   >
@@ -4787,7 +4787,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       type="monotone"
                       dataKey="speed"
                       stroke={theme === 'dark' ? '#60A5FA' : '#2563EB'}
-                      strokeWidth={3}
+                      strokeWidth={2}
                       dot={(props) => {
                         const { cx, cy, payload } = props;
                         // Highlight current position with a different color
