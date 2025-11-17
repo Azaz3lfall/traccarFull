@@ -3804,6 +3804,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     dispatch(sessionActions.updateCurrentReplayIndex(newIndex));
   }, [dispatch]);
 
+  const handleChartPointClick = useCallback((index) => {
+    // Pause playback if playing
+    if (isPlaying) {
+      handlePause();
+    }
+    // Update to clicked index
+    setCurrentReplayIndex(index);
+    dispatch(sessionActions.updateCurrentReplayIndex(index));
+  }, [isPlaying, handlePause, dispatch]);
+
   const handleCloseReplayPopover = useCallback(() => {
     // Store the replay device ID before clearing it
     const deviceIdToSelect = replayDeviceId;
@@ -3935,7 +3945,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           bottom: !desktop ? '0px' : 'auto',
           left: !desktop ? '0px' : (isDeviceListVisible || showReplayPopover ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '310px',
-          height: !desktop ? '47vh' : 'calc(100vh - 16px)',
+          height: !desktop ? 'calc(47vh - 50px)' : 'calc(100vh - 66px)',
           zIndex: 9998,
           pointerEvents: 'auto',
           transition: 'left 0.3s ease'
@@ -4729,7 +4739,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             {replayPositions.length > 1 && !showReplayPopover && replaySpeedChartData.length > 0 && (
               <div style={{
                 width: '100%',
-                height: '200px',
+                height: '170px',
                 marginTop: '0px',
                 marginBottom: '16px',
                 padding: '8px',
@@ -4790,20 +4800,26 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                       strokeWidth={2}
                       dot={(props) => {
                         const { cx, cy, payload } = props;
-                        // Highlight current position with a different color
-                        if (payload.index === reduxCurrentReplayIndex) {
-                          return (
-                            <circle
-                              cx={cx}
-                              cy={cy}
-                              r={6}
-                              fill={theme === 'dark' ? '#FBBF24' : '#F59E0B'}
-                              stroke={colors.surface}
-                              strokeWidth={3}
-                            />
-                          );
-                        }
-                        return null;
+                        const isCurrent = payload.index === reduxCurrentReplayIndex;
+                        // Highlight current position with a different color, show all points as clickable
+                        return (
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={isCurrent ? 6 : 4}
+                            fill={isCurrent 
+                              ? (theme === 'dark' ? '#FBBF24' : '#F59E0B')
+                              : (theme === 'dark' ? 'rgba(96, 165, 250, 0.6)' : 'rgba(37, 99, 235, 0.6)')
+                            }
+                            stroke={isCurrent ? colors.surface : 'transparent'}
+                            strokeWidth={isCurrent ? 3 : 0}
+                            style={{ cursor: 'pointer' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleChartPointClick(payload.index);
+                            }}
+                          />
+                        );
                       }}
                       activeDot={{ 
                         r: 5, 
