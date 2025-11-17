@@ -3425,16 +3425,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   });
 
-  // Clear replay positions when device selection changes
+  // Clear replay positions when device selection changes (but not when exiting replay mode)
   useEffect(() => {
-    dispatch(sessionActions.updateReplayPositions([]));
-    setCurrentReplayIndex(0);
-    setIsPlaying(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    // Only clear if we're not in replay mode (replayPositions.length <= 1 means no active replay)
+    // This prevents clearing replay positions when we're setting the device ID to exit replay
+    if (replayPositions.length <= 1) {
+      dispatch(sessionActions.updateReplayPositions([]));
+      setCurrentReplayIndex(0);
+      setIsPlaying(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
-  }, [selectedDeviceId, dispatch]);
+  }, [selectedDeviceId, dispatch, replayPositions.length]);
 
   // Replay form handlers
   const handleReplayShow = useCallback(async () => {
@@ -3764,33 +3768,45 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [dispatch]);
 
   const handleCloseReplayPopover = useCallback(() => {
-    setShowReplayPopover(false);
+    // Store the replay device ID before clearing it
+    const deviceIdToSelect = replayDeviceId;
     
-    // Clear all replay-related state variables
-    setReplayDeviceId(null);
-    setPeriod('today');
-    setCustomFrom('');
-    setCustomTo('');
-    setReplayLoading(false);
+    // Stop playback first
     setIsPlaying(false);
-    setPlaybackSpeed(1);
-    
-    // Clear local and Redux replay state
-    setCurrentReplayIndex(0);
-    dispatch(sessionActions.updateCurrentReplayIndex(0));
-    dispatch(sessionActions.updateReplayPositions([]));
-    
-    // Clear interval if running
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
     
-    // Reopen device list when closing replay popover
-    if (onShowDeviceList) {
-      onShowDeviceList();
+    // Clear local replay state
+    setShowReplayPopover(false);
+    setReplayDeviceId(null);
+    setPeriod('today');
+    setCustomFrom('');
+    setCustomTo('');
+    setReplayLoading(false);
+    setPlaybackSpeed(1);
+    setCurrentReplayIndex(0);
+    
+    // Set selected device ID to the replay device first (before clearing replay positions)
+    // This ensures the map has a valid device to show
+    if (deviceIdToSelect) {
+      dispatch(devicesActions.selectId(deviceIdToSelect));
     }
-  }, [dispatch, onShowDeviceList]);
+    
+    // Clear Redux replay state after a short delay to allow map to update
+    setTimeout(() => {
+      dispatch(sessionActions.updateCurrentReplayIndex(0));
+      dispatch(sessionActions.updateReplayPositions([]));
+    }, 200);
+    
+    // Reopen device list when closing replay popover
+    setTimeout(() => {
+      if (onShowDeviceList) {
+        onShowDeviceList();
+      }
+    }, 300);
+  }, [dispatch, onShowDeviceList, replayDeviceId]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -3810,8 +3826,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   // Handle replay mode changes - ensure proper data source switching
   useEffect(() => {
-    // When exiting replay mode, reset to first position and stop playback
-    if (!showReplayPopover && replayPositions.length > 0) {
+    // When exiting replay mode (replayPositions cleared), reset to first position and stop playback
+    // But only if we're not in active replay mode (replayPositions.length > 1 means replay is active)
+    if (!showReplayPopover && replayPositions.length === 0 && replayDeviceId === null) {
       setCurrentReplayIndex(0);
       setIsPlaying(false);
       if (intervalRef.current) {
@@ -3819,7 +3836,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         intervalRef.current = null;
       }
     }
-  }, [showReplayPopover, replayPositions.length]);
+  }, [showReplayPopover, replayPositions.length, replayDeviceId]);
 
   // Close replay popover when status card is closed (selectedDeviceId becomes null)
   // But not when we're intentionally entering replay mode (replayDeviceId is set)
@@ -3903,8 +3920,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             onClick={(e) => {
               e.stopPropagation();
               
-              // If in replay mode, close replay popover (which will also show device list)
-              if (showReplayPopover) {
+              // If in replay mode (popover open or replay active), exit replay mode
+              if (showReplayPopover || (replayPositions.length > 1 && replayDeviceId)) {
                 handleCloseReplayPopover();
               } else {
                 // Normal mode: just deselect device
