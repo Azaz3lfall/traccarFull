@@ -3945,7 +3945,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           bottom: !desktop ? '0px' : 'auto',
           left: !desktop ? '0px' : (isDeviceListVisible || showReplayPopover ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '310px',
-          height: !desktop ? 'calc(47vh - 50px)' : 'calc(100vh - 66px)',
+          height: !desktop ? 'calc(47vh - 50px)' : 'calc(100vh - 16px)',
           zIndex: 9998,
           pointerEvents: 'auto',
           transition: 'left 0.3s ease'

@@ -1131,10 +1131,28 @@ const FloatingReportsPopover = ({
     const fromTime = selectedFrom.valueOf();
     const toTime = selectedTo.valueOf();
     
-    return chartItems.filter(item => {
+    const filtered = chartItems.filter(item => {
       const itemTime = item[timeType];
+      // Ensure itemTime is a valid number
+      if (!itemTime || typeof itemTime !== 'number') {
+        return false;
+      }
       return itemTime >= fromTime && itemTime <= toTime;
     });
+    
+    // Debug: Log filtering results
+    if (filtered.length > 0) {
+      console.log('Chart filtering:', {
+        totalItems: chartItems.length,
+        filteredItems: filtered.length,
+        fromTime: new Date(fromTime).toISOString(),
+        toTime: new Date(toTime).toISOString(),
+        firstItemTime: filtered[0] ? new Date(filtered[0][timeType]).toISOString() : 'N/A',
+        lastItemTime: filtered[filtered.length - 1] ? new Date(filtered[filtered.length - 1][timeType]).toISOString() : 'N/A'
+      });
+    }
+    
+    return filtered;
   }, [chartItems, period, customFrom, customTo, timeType]);
 
   // Chart calculations (using filtered data)
@@ -3088,7 +3106,7 @@ const FloatingReportsPopover = ({
                   </div>
                   
                   {/* Chart Display */}
-                  {chartItems.length > 0 && (
+                  {filteredChartItems.length > 0 && (
                     <div style={{ 
                       flex: 1, 
                       overflow: 'auto',
