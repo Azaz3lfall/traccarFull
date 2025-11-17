@@ -6736,16 +6736,18 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
                   {/* Slider */}
                   <div>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: colors.text,
-                      cursor: !desktop ? 'move' : 'default'
-                    }} className={!desktop ? 'timeline-drag-handle' : ''}>
-                      {t('sharedTimeline')}
-                    </label>
+                    {!desktop && (
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: colors.text,
+                        cursor: 'move'
+                      }} className="timeline-drag-handle">
+                        {t('sharedTimeline')}
+                      </label>
+                    )}
                     <input
                       type="range"
                       min="0"
@@ -6820,7 +6822,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         width: '28px',
                         height: '28px',
                         borderRadius: '50%',
-                        border: '2px solid #000000',
+                        border: 'none',
                         backgroundColor: colors.background,
                         color: colors.textSecondary,
                         cursor: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 'not-allowed' : 'pointer',
@@ -6874,7 +6876,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         width: '28px',
                         height: '28px',
                         borderRadius: '50%',
-                        border: '2px solid #000000',
+                        border: 'none',
                         backgroundColor: colors.background,
                         color: colors.textSecondary,
                         cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
@@ -6899,7 +6901,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         width: '40px',
                         height: '40px',
                         borderRadius: '50%',
-                        border: '2px solid #000000',
+                        border: 'none',
                         backgroundColor: colors.background,
                         color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
                         cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
@@ -8885,7 +8887,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                border: '2px solid #000000',
+                border: 'none',
                 backgroundColor: colors.background,
                 color: colors.textSecondary,
                 cursor: (replayPositions.length === 0 || currentReplayIndex <= 0) ? 'not-allowed' : 'pointer',
@@ -8938,7 +8940,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                border: '2px solid #000000',
+                border: 'none',
                 backgroundColor: colors.background,
                 color: colors.textSecondary,
                 cursor: (replayPositions.length === 0 || currentReplayIndex >= replayPositions.length - 1) ? 'not-allowed' : 'pointer',
@@ -8963,7 +8965,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                border: '2px solid #000000',
+                border: 'none',
                 backgroundColor: colors.background,
                 color: isScreenshotting ? colors.textSecondary : colors.textSecondary,
                 cursor: (replayPositions.length === 0 || isScreenshotting) ? 'not-allowed' : 'pointer',
