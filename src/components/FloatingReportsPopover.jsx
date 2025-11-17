@@ -1091,8 +1091,54 @@ const FloatingReportsPopover = ({
     return !deviceIds.length || chartLoading;
   };
 
-  // Chart calculations
-  const chartValues = chartItems.map((it) => selectedChartTypes.map((type) => it[type]).filter((value) => value != null));
+  // Filter chart items to only show data within selected time range
+  const filteredChartItems = useMemo(() => {
+    if (chartItems.length === 0) return [];
+    
+    let selectedFrom;
+    let selectedTo;
+    switch (period) {
+      case 'today':
+        selectedFrom = dayjs().startOf('day');
+        selectedTo = dayjs().endOf('day');
+        break;
+      case 'yesterday':
+        selectedFrom = dayjs().subtract(1, 'day').startOf('day');
+        selectedTo = dayjs().subtract(1, 'day').endOf('day');
+        break;
+      case 'thisWeek':
+        selectedFrom = dayjs().startOf('week');
+        selectedTo = dayjs().endOf('week');
+        break;
+      case 'previousWeek':
+        selectedFrom = dayjs().subtract(1, 'week').startOf('week');
+        selectedTo = dayjs().subtract(1, 'week').endOf('week');
+        break;
+      case 'thisMonth':
+        selectedFrom = dayjs().startOf('month');
+        selectedTo = dayjs().endOf('month');
+        break;
+      case 'previousMonth':
+        selectedFrom = dayjs().subtract(1, 'month').startOf('month');
+        selectedTo = dayjs().subtract(1, 'month').endOf('month');
+        break;
+      default:
+        selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
+        selectedTo = dayjs(customTo, 'YYYY-MM-DDTHH:mm');
+        break;
+    }
+    
+    const fromTime = selectedFrom.valueOf();
+    const toTime = selectedTo.valueOf();
+    
+    return chartItems.filter(item => {
+      const itemTime = item[timeType];
+      return itemTime >= fromTime && itemTime <= toTime;
+    });
+  }, [chartItems, period, customFrom, customTo, timeType]);
+
+  // Chart calculations (using filtered data)
+  const chartValues = filteredChartItems.map((it) => selectedChartTypes.map((type) => it[type]).filter((value) => value != null));
   const minValue = chartValues.length ? Math.min(...chartValues) : 0;
   const maxValue = chartValues.length ? Math.max(...chartValues) : 100;
   const valueRange = maxValue - minValue;
@@ -3053,7 +3099,7 @@ const FloatingReportsPopover = ({
                     }}>
                       <ResponsiveContainer width="100%" height={400}>
                         <LineChart
-                          data={chartItems}
+                          data={filteredChartItems}
                           margin={{
                             top: 5,
                             right: 10,
