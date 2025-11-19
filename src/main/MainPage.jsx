@@ -266,15 +266,143 @@ const MainPage = () => {
     endereco: '',
     tipoOcorrencia: ''
   });
+  const [ocorrenciaAddress, setOcorrenciaAddress] = useState(null); // { lat, lon }
+  const [addressSearchResults, setAddressSearchResults] = useState([]);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const [ocorrenciaRouteData, setOcorrenciaRouteData] = useState(null);
+  const [isSavingOcorrencia, setIsSavingOcorrencia] = useState(false);
+
+  // Get Mapbox access token from user session
+  const mapboxToken = useSelector(state => state.session.user?.attributes?.mapboxAccessToken);
 
   // Occurrence types for autocomplete
   const ocorrenciaTypes = [
-    { value: 'emergencia', label: 'Emergência' },
+    { value: 'emergencia_medica', label: 'Emergência Médica' },
     { value: 'acidente', label: 'Acidente' },
     { value: 'assalto', label: 'Assalto' },
     { value: 'incendio', label: 'Incêndio' },
+    { value: 'violencia_domestica', label: 'Violência Doméstica' },
     { value: 'outros', label: 'Outros' }
   ];
+
+  // Address search functionality using Mapbox for Ocorrências
+  const searchOcorrenciaAddresses = useCallback(async (query) => {
+    if (!query.trim() || query.trim().length < 5) {
+      setAddressSearchResults([]);
+      setIsSearchingAddress(false);
+      return;
+    }
+
+    setIsSearchingAddress(true);
+
+    try {
+      if (!mapboxToken) {
+        throw new Error('Mapbox access token not found');
+      }
+
+      // Use default 'pt' for language (existing language variable is declared later in component)
+      const mapboxLanguage = 'pt';
+      
+      const request = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&limit=15&types=address,poi&country=BR&language=${mapboxLanguage}`;
+      const response = await fetch(request);
+      
+      if (!response.ok) {
+        throw new Error(`Mapbox API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      const results = data.features.map((feature) => {
+        return {
+          type: 'Feature',
+          geometry: feature.geometry,
+          place_name: feature.place_name,
+          properties: {
+            display_name: feature.place_name,
+            ...feature.properties
+          },
+          text: feature.place_name,
+          place_type: feature.place_type,
+          center: feature.center, // [lon, lat]
+        };
+      });
+      
+      setAddressSearchResults(results);
+    } catch (error) {
+      console.error('Address search error:', error);
+      setAddressSearchResults([]);
+    } finally {
+      setIsSearchingAddress(false);
+    }
+  }, [mapboxToken]);
+
+  // Handle address input change with debouncing
+  const addressSearchTimeoutRef = useRef(null);
+  const handleAddressInputChange = useCallback((value) => {
+    setOcorrenciaData(prev => ({
+      ...prev,
+      endereco: value
+    }));
+    
+    // Clear address coordinates when input changes
+    setOcorrenciaAddress(null);
+    
+    // Clear previous timeout
+    if (addressSearchTimeoutRef.current) {
+      clearTimeout(addressSearchTimeoutRef.current);
+    }
+    
+    if (value.trim().length >= 5) {
+      // Debounce search with 800ms delay
+      addressSearchTimeoutRef.current = setTimeout(() => {
+        searchOcorrenciaAddresses(value);
+      }, 800);
+    } else {
+      // Clear results if less than 5 characters
+      setAddressSearchResults([]);
+      setIsSearchingAddress(false);
+    }
+  }, [searchOcorrenciaAddresses]);
+
+  // Handle address selection
+  const handleAddressSelect = useCallback((result) => {
+    const address = result.properties?.display_name || result.text || result.place_name;
+    const [lon, lat] = result.center;
+    
+    setOcorrenciaData(prev => ({
+      ...prev,
+      endereco: address
+    }));
+    
+    setOcorrenciaAddress({ lat, lon });
+    setAddressSearchResults([]);
+  }, []);
+
+  // Cleanup timeout when modal closes
+  useEffect(() => {
+    if (!showOcorrenciasModal) {
+      if (addressSearchTimeoutRef.current) {
+        clearTimeout(addressSearchTimeoutRef.current);
+        addressSearchTimeoutRef.current = null;
+      }
+      setAddressSearchResults([]);
+      setIsSearchingAddress(false);
+      setOcorrenciaRouteData(null);
+    }
+  }, [showOcorrenciasModal]);
+
+  // Calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
   
   
   // Custom autocomplete states
@@ -1389,6 +1517,97 @@ const MainPage = () => {
   const positions = useSelector((state) => state.session.positions);
   const devices = useSelector((state) => state.devices.items);
   const currentReplayIndex = useSelector((state) => state.session.currentReplayIndex);
+
+  // Handle save button - find closest device and get route
+  const handleSaveOcorrencia = useCallback(async () => {
+    if (!ocorrenciaAddress || !ocorrenciaAddress.lat || !ocorrenciaAddress.lon) {
+      showSnackbar('Por favor, selecione um endereço válido', 'error');
+      return;
+    }
+
+    setIsSavingOcorrencia(true);
+
+    try {
+      // Get all online devices with positions
+      const onlineDevices = Object.values(devices).filter(device => {
+        const position = positions[device.id];
+        return position && (device.status === 'online' || position.fixTime);
+      });
+
+      if (onlineDevices.length === 0) {
+        showSnackbar('Nenhum dispositivo online encontrado', 'error');
+        setIsSavingOcorrencia(false);
+        return;
+      }
+
+      // Calculate distances and find closest device
+      let closestDevice = null;
+      let minDistance = Infinity;
+
+      onlineDevices.forEach(device => {
+        const position = positions[device.id];
+        if (position && position.latitude && position.longitude) {
+          const distance = calculateDistance(
+            ocorrenciaAddress.lat,
+            ocorrenciaAddress.lon,
+            position.latitude,
+            position.longitude
+          );
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestDevice = { device, position, distance };
+          }
+        }
+      });
+
+      if (!closestDevice) {
+        showSnackbar('Não foi possível encontrar um dispositivo próximo', 'error');
+        setIsSavingOcorrencia(false);
+        return;
+      }
+
+      // Get route from Mapbox Directions API
+      if (!mapboxToken) {
+        showSnackbar('Token do Mapbox não encontrado', 'error');
+        setIsSavingOcorrencia(false);
+        return;
+      }
+
+      // Build coordinates: device (start) -> address (end)
+      // Mapbox expects [lon, lat] format
+      const startCoords = `${closestDevice.position.longitude},${closestDevice.position.latitude}`;
+      const endCoords = `${ocorrenciaAddress.lon},${ocorrenciaAddress.lat}`;
+      const coordinates = `${startCoords};${endCoords}`;
+
+      const request = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&language=pt`;
+      
+      const response = await fetch(request);
+      const routeData = await response.json();
+
+      if (routeData.code !== 'Ok' || !routeData.routes || routeData.routes.length === 0) {
+        showSnackbar('Erro ao calcular rota', 'error');
+        setIsSavingOcorrencia(false);
+        return;
+      }
+
+      // Set route data to display on map (merge with existing route planner data if any)
+      setOcorrenciaRouteData(routeData);
+      
+      // Select the closest device to highlight it on map
+      dispatch(devicesActions.selectId(closestDevice.device.id));
+
+      // Close modal
+      setShowOcorrenciasModal(false);
+
+      showSnackbar(`Dispositivo mais próximo encontrado: ${closestDevice.device.name} (${minDistance.toFixed(2)} km)`, 'success');
+
+    } catch (error) {
+      console.error('Error saving ocorrência:', error);
+      showSnackbar('Erro ao salvar ocorrência', 'error');
+    } finally {
+      setIsSavingOcorrencia(false);
+    }
+  }, [ocorrenciaAddress, devices, positions, mapboxToken, dispatch, showSnackbar]);
   const [filteredPositions, setFilteredPositions] = useState([]);
   const selectedPosition = filteredPositions.find((position) => selectedDeviceId && position.deviceId === selectedDeviceId);
 
@@ -1477,7 +1696,7 @@ const MainPage = () => {
           onMapClick={onMapClick}
           selectedMapStyle={selectedMapStyle}
           currentReplayIndex={currentReplayIndex}
-          routePlannerData={routePlannerData}
+          routePlannerData={ocorrenciaRouteData || routePlannerData}
           selectedRouteIndex={selectedRouteIndex}
           onRouteChange={handleRouteChange}
         />
@@ -1676,6 +1895,9 @@ const MainPage = () => {
               endereco: '',
               tipoOcorrencia: ''
             });
+            setOcorrenciaAddress(null);
+            setAddressSearchResults([]);
+            setIsSearchingAddress(false);
             setShowOcorrenciasModal(true);
           }}
           onMouseEnter={(e) => {
@@ -7830,27 +8052,91 @@ const MainPage = () => {
                   />
 
                   {/* Endereço da Ocorrência */}
-                  <TextField
-                    fullWidth
-                    label="Endereço da Ocorrência"
+                  <Autocomplete
+                    freeSolo
+                    options={addressSearchResults}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') return option;
+                      return option.properties?.display_name || option.text || option.place_name || '';
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      if (typeof option === 'string' || typeof value === 'string') return option === value;
+                      return option.place_name === value?.place_name;
+                    }}
                     value={ocorrenciaData.endereco}
-                    onChange={(e) => setOcorrenciaData({
-                      ...ocorrenciaData,
-                      endereco: e.target.value
-                    })}
+                    onInputChange={(event, newInputValue, reason) => {
+                      if (reason === 'input') {
+                        handleAddressInputChange(newInputValue);
+                      }
+                    }}
+                    onChange={(event, newValue, reason) => {
+                      if (reason === 'selectOption' && newValue && typeof newValue !== 'string') {
+                        handleAddressSelect(newValue);
+                      } else if (reason === 'clear') {
+                        setOcorrenciaData(prev => ({ ...prev, endereco: '' }));
+                        setOcorrenciaAddress(null);
+                        setAddressSearchResults([]);
+                      }
+                    }}
+                    loading={isSearchingAddress}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Endereço da Ocorrência"
+                        placeholder="Digite pelo menos 5 caracteres para buscar"
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInputRoot': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabelRoot': { 
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.place_name || option.text}>
+                        <div style={{ color: colors.text, fontSize: '14px' }}>
+                          {option.properties?.display_name || option.text || option.place_name}
+                        </div>
+                      </li>
+                    )}
+                    fullWidth
                     size="small"
-                    multiline
-                    rows={3}
-                    sx={{
-                      '& .MuiOutlinedInputRoot': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                    disablePortal={false}
+                    ListboxProps={{
+                      style: {
+                        zIndex: 10006,
                       },
-                      '& .MuiInputLabelRoot': { 
-                        color: colors.textSecondary,
-                        '&.Mui-focused': { color: colors.primary }
+                    }}
+                    componentsProps={{
+                      popper: {
+                        style: {
+                          zIndex: 10006,
+                        },
+                      },
+                    }}
+                    PaperComponent={(props) => (
+                      <div 
+                        {...props} 
+                        style={{ 
+                          ...props.style, 
+                          zIndex: 10006,
+                          border: `1px solid ${colors.border}`,
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                          borderRadius: '8px',
+                          backgroundColor: colors.surface
+                        }} 
+                      />
+                    )}
+                    sx={{
+                      '& .MuiAutocomplete-popper': {
+                        zIndex: '10006 !important',
                       },
                     }}
                   />
@@ -7923,6 +8209,42 @@ const MainPage = () => {
                       },
                     }}
                   />
+                </div>
+
+                {/* Save Button */}
+                <div style={{
+                  padding: '20px',
+                  borderTop: `1px solid ${colors.border}`,
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: '12px'
+                }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveOcorrencia}
+                    disabled={isSavingOcorrencia || !ocorrenciaAddress}
+                    sx={{
+                      backgroundColor: colors.primary,
+                      color: colors.surface,
+                      '&:hover': {
+                        backgroundColor: colors.primary,
+                        opacity: 0.9
+                      },
+                      '&:disabled': {
+                        backgroundColor: colors.border,
+                        color: colors.textSecondary
+                      }
+                    }}
+                  >
+                    {isSavingOcorrencia ? (
+                      <>
+                        <CircularProgress size={16} sx={{ marginRight: '8px', color: 'inherit' }} />
+                        Salvando...
+                      </>
+                    ) : (
+                      'Salvar'
+                    )}
+                  </Button>
                 </div>
               </div>
             </motion.div>
