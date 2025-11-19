@@ -257,6 +257,24 @@ const MainPage = () => {
   const [resellerUsersFetched, setResellerUsersFetched] = useState(false);
   const [resellerAutocompleteOpen, setResellerAutocompleteOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showOcorrenciasModal, setShowOcorrenciasModal] = useState(false);
+  const [ocorrenciaNumber, setOcorrenciaNumber] = useState(null);
+  const [ocorrenciaData, setOcorrenciaData] = useState({
+    numeroOrigem: '',
+    dataHoraChamada: '',
+    nome: '',
+    endereco: '',
+    tipoOcorrencia: ''
+  });
+
+  // Occurrence types for autocomplete
+  const ocorrenciaTypes = [
+    { value: 'emergencia', label: 'Emergência' },
+    { value: 'acidente', label: 'Acidente' },
+    { value: 'assalto', label: 'Assalto' },
+    { value: 'incendio', label: 'Incêndio' },
+    { value: 'outros', label: 'Outros' }
+  ];
   
   
   // Custom autocomplete states
@@ -1638,8 +1656,27 @@ const MainPage = () => {
           onClick={() => {
             const tooltip = document.getElementById('menu-tooltip-ocorrencias');
             if (tooltip) tooltip.remove();
-            // TODO: Add handler for Ocorrências
-            console.log('Ocorrências clicked');
+            // Generate random occurrence number
+            const randomNumber = Math.floor(Math.random() * 100000) + 1;
+            setOcorrenciaNumber(randomNumber);
+            // Set current datetime (localized using toLocaleString)
+            const now = new Date();
+            const currentDateTime = now.toLocaleString(undefined, {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            });
+            setOcorrenciaData({
+              numeroOrigem: '',
+              dataHoraChamada: currentDateTime,
+              nome: '',
+              endereco: '',
+              tipoOcorrencia: ''
+            });
+            setShowOcorrenciasModal(true);
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = colors.menuHover;
@@ -7620,6 +7657,278 @@ const MainPage = () => {
         id="user-photo-upload"
         disabled={isUploadingPhoto}
       />
+
+      {/* Ocorrências Modal */}
+      <AnimatePresence>
+        {showOcorrenciasModal && (
+          <motion.div
+            key="ocorrencias-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10005
+            }}
+            onClick={() => setShowOcorrenciasModal(false)}
+          >
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: '12px',
+                width: '90vw',
+                maxWidth: '600px',
+                maxHeight: '90vh',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px',
+                borderBottom: `1px solid ${colors.border}`
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={() => setShowOcorrenciasModal(false)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: colors.textSecondary,
+                      borderRadius: '4px',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.menuHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <h2 style={{
+                    margin: 0,
+                    fontSize: '20px',
+                    fontWeight: '600',
+                    color: colors.text
+                  }}>
+                    Triagem {ocorrenciaNumber}
+                  </h2>
+                </div>
+              </div>
+
+              {/* Modal Content */}
+              <div style={{
+                flex: 1,
+                overflow: 'auto',
+                padding: '20px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  {/* Número de Origem */}
+                  <TextField
+                    fullWidth
+                    label="Número de Origem"
+                    value={ocorrenciaData.numeroOrigem}
+                    onChange={(e) => setOcorrenciaData({
+                      ...ocorrenciaData,
+                      numeroOrigem: e.target.value
+                    })}
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': { 
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  {/* Data/Hora da chamada */}
+                  <TextField
+                    fullWidth
+                    label="Data/Hora da chamada"
+                    value={ocorrenciaData.dataHoraChamada}
+                    onChange={(e) => setOcorrenciaData({
+                      ...ocorrenciaData,
+                      dataHoraChamada: e.target.value
+                    })}
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': { 
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  {/* Nome */}
+                  <TextField
+                    fullWidth
+                    label="Nome"
+                    value={ocorrenciaData.nome}
+                    onChange={(e) => setOcorrenciaData({
+                      ...ocorrenciaData,
+                      nome: e.target.value
+                    })}
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': { 
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  {/* Endereço da Ocorrência */}
+                  <TextField
+                    fullWidth
+                    label="Endereço da Ocorrência"
+                    value={ocorrenciaData.endereco}
+                    onChange={(e) => setOcorrenciaData({
+                      ...ocorrenciaData,
+                      endereco: e.target.value
+                    })}
+                    size="small"
+                    multiline
+                    rows={3}
+                    sx={{
+                      '& .MuiOutlinedInputRoot': {
+                        backgroundColor: colors.secondary,
+                        '& fieldset': { borderColor: colors.border },
+                        '&:hover fieldset': { borderColor: colors.primary },
+                        '&.Mui-focused fieldset': { borderColor: colors.primary },
+                      },
+                      '& .MuiInputLabelRoot': { 
+                        color: colors.textSecondary,
+                        '&.Mui-focused': { color: colors.primary }
+                      },
+                    }}
+                  />
+
+                  {/* Tipo de ocorrência */}
+                  <Autocomplete
+                    options={ocorrenciaTypes}
+                    getOptionLabel={(option) => option.label || ''}
+                    isOptionEqualToValue={(option, value) => option.value === value?.value}
+                    value={ocorrenciaData.tipoOcorrencia 
+                      ? ocorrenciaTypes.find(opt => opt.value === ocorrenciaData.tipoOcorrencia) || null
+                      : null}
+                    onChange={(event, newValue) => {
+                      setOcorrenciaData({
+                        ...ocorrenciaData,
+                        tipoOcorrencia: newValue ? newValue.value : ''
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Tipo de ocorrência"
+                        placeholder="Selecione um tipo"
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInputRoot': {
+                            backgroundColor: colors.secondary,
+                            '& fieldset': { borderColor: colors.border },
+                            '&:hover fieldset': { borderColor: colors.primary },
+                            '&.Mui-focused fieldset': { borderColor: colors.primary },
+                          },
+                          '& .MuiInputLabelRoot': { 
+                            color: colors.textSecondary,
+                            '&.Mui-focused': { color: colors.primary }
+                          },
+                        }}
+                      />
+                    )}
+                    fullWidth
+                    size="small"
+                    disablePortal={false}
+                    ListboxProps={{
+                      style: {
+                        zIndex: 10006,
+                      },
+                    }}
+                    componentsProps={{
+                      popper: {
+                        style: {
+                          zIndex: 10006,
+                        },
+                      },
+                    }}
+                    PaperComponent={(props) => (
+                      <div 
+                        {...props} 
+                        style={{ 
+                          ...props.style, 
+                          zIndex: 10006,
+                          border: `1px solid ${colors.border}`,
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                          borderRadius: '8px',
+                          backgroundColor: colors.surface
+                        }} 
+                      />
+                    )}
+                    sx={{
+                      '& .MuiAutocomplete-popper': {
+                        zIndex: '10006 !important',
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Snackbar for notifications */}
       <Snackbar
