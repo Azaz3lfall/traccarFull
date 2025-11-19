@@ -194,11 +194,21 @@ const MainPage = () => {
   const [showUsersPopover, setShowUsersPopover] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error', hasRouteButton: false, deviceInfo: null });
 
   // Snackbar handler
-  const showSnackbar = (message, severity = 'error') => {
-    setSnackbar({ open: true, message, severity });
+  const showSnackbar = (messageOrObject, severity = 'error') => {
+    if (typeof messageOrObject === 'string') {
+      setSnackbar({ open: true, message: messageOrObject, severity, hasRouteButton: false, deviceInfo: null });
+    } else {
+      setSnackbar({ 
+        open: true, 
+        message: messageOrObject.message || '', 
+        severity: messageOrObject.severity || severity,
+        hasRouteButton: messageOrObject.hasRouteButton || false,
+        deviceInfo: messageOrObject.deviceInfo || null
+      });
+    }
   };
 
   const handleSnackbarClose = () => {
@@ -271,9 +281,22 @@ const MainPage = () => {
   const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   const [ocorrenciaRouteData, setOcorrenciaRouteData] = useState(null);
   const [isSavingOcorrencia, setIsSavingOcorrencia] = useState(false);
+  const [addressAutocompleteOpen, setAddressAutocompleteOpen] = useState(false);
+  const [deviceIdWithRoute, setDeviceIdWithRoute] = useState(null);
+  const [closestDeviceInfo, setClosestDeviceInfo] = useState(null);
 
   // Get Mapbox access token from user session
   const mapboxToken = useSelector(state => state.session.user?.attributes?.mapboxAccessToken);
+
+  // Handle "Enviar Rota" button click
+  const handleEnviarRota = useCallback(() => {
+    const deviceInfo = snackbar.deviceInfo || closestDeviceInfo;
+    if (deviceInfo) {
+      setDeviceIdWithRoute(deviceInfo.deviceId);
+      setClosestDeviceInfo(deviceInfo); // Keep it in state too
+      showSnackbar('Rota enviada para o dispositivo', 'success');
+    }
+  }, [snackbar.deviceInfo, closestDeviceInfo]);
 
   // Occurrence types for autocomplete
   const ocorrenciaTypes = [
@@ -328,6 +351,10 @@ const MainPage = () => {
       });
       
       setAddressSearchResults(results);
+      // Open autocomplete when results are available
+      if (results.length > 0) {
+        setAddressAutocompleteOpen(true);
+      }
     } catch (error) {
       console.error('Address search error:', error);
       setAddressSearchResults([]);
@@ -361,6 +388,7 @@ const MainPage = () => {
       // Clear results if less than 5 characters
       setAddressSearchResults([]);
       setIsSearchingAddress(false);
+      setAddressAutocompleteOpen(false);
     }
   }, [searchOcorrenciaAddresses]);
 
@@ -376,6 +404,7 @@ const MainPage = () => {
     
     setOcorrenciaAddress({ lat, lon });
     setAddressSearchResults([]);
+    setAddressAutocompleteOpen(false);
   }, []);
 
   // Cleanup timeout when modal closes
@@ -388,6 +417,9 @@ const MainPage = () => {
       setAddressSearchResults([]);
       setIsSearchingAddress(false);
       setOcorrenciaRouteData(null);
+      setAddressAutocompleteOpen(false);
+      setClosestDeviceInfo(null);
+      setDeviceIdWithRoute(null);
     }
   }, [showOcorrenciasModal]);
 
@@ -1596,10 +1628,43 @@ const MainPage = () => {
       // Select the closest device to highlight it on map
       dispatch(devicesActions.selectId(closestDevice.device.id));
 
+      // Extract route information
+      const selectedRoute = routeData.routes[0];
+      const routeDistance = selectedRoute.distance / 1000; // Convert to km
+      const routeDuration = selectedRoute.duration; // Duration in seconds
+      
+      // Format duration (hours and minutes)
+      const hours = Math.floor(routeDuration / 3600);
+      const minutes = Math.floor((routeDuration % 3600) / 60);
+      let durationText = '';
+      if (hours > 0) {
+        durationText = `${hours}h ${minutes}min`;
+      } else {
+        durationText = `${minutes}min`;
+      }
+
+      // Store closest device info for snackbar button
+      const deviceInfo = {
+        deviceId: closestDevice.device.id,
+        deviceName: closestDevice.device.name,
+        distance: routeDistance,
+        duration: durationText
+      };
+      setClosestDeviceInfo(deviceInfo);
+
       // Close modal
       setShowOcorrenciasModal(false);
 
-      showSnackbar(`Dispositivo mais próximo encontrado: ${closestDevice.device.name} (${minDistance.toFixed(2)} km)`, 'success');
+      // Show snackbar with button and device info
+      showSnackbar(
+        {
+          message: `Viatura livre mais próxima: ${closestDevice.device.name} | Distância: ${routeDistance.toFixed(2)} km | Tempo estimado: ${durationText}`,
+          severity: 'success',
+          hasRouteButton: true,
+          deviceInfo: deviceInfo
+        },
+        'success'
+      );
 
     } catch (error) {
       console.error('Error saving ocorrência:', error);
@@ -1699,6 +1764,8 @@ const MainPage = () => {
           routePlannerData={ocorrenciaRouteData || routePlannerData}
           selectedRouteIndex={selectedRouteIndex}
           onRouteChange={handleRouteChange}
+          ocorrenciaDestination={ocorrenciaAddress}
+          deviceIdWithRoute={deviceIdWithRoute}
         />
       )}
       <div className={classes.sidebar}>
@@ -1711,9 +1778,10 @@ const MainPage = () => {
                 onMapClick={onMapClick}
                 selectedMapStyle={selectedMapStyle}
                 currentReplayIndex={currentReplayIndex}
-                routePlannerData={routePlannerData}
+                routePlannerData={ocorrenciaRouteData || routePlannerData}
                 selectedRouteIndex={selectedRouteIndex}
                 onRouteChange={handleRouteChange}
+                ocorrenciaDestination={ocorrenciaAddress}
               />
             </div>
           )}
@@ -8054,6 +8122,13 @@ const MainPage = () => {
                   {/* Endereço da Ocorrência */}
                   <Autocomplete
                     freeSolo
+                    open={addressAutocompleteOpen}
+                    onOpen={() => {
+                      if (addressSearchResults.length > 0) {
+                        setAddressAutocompleteOpen(true);
+                      }
+                    }}
+                    onClose={() => setAddressAutocompleteOpen(false)}
                     options={addressSearchResults}
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') return option;
@@ -8076,6 +8151,7 @@ const MainPage = () => {
                         setOcorrenciaData(prev => ({ ...prev, endereco: '' }));
                         setOcorrenciaAddress(null);
                         setAddressSearchResults([]);
+                        setAddressAutocompleteOpen(false);
                       }
                     }}
                     loading={isSearchingAddress}
@@ -8224,15 +8300,16 @@ const MainPage = () => {
                     onClick={handleSaveOcorrencia}
                     disabled={isSavingOcorrencia || !ocorrenciaAddress}
                     sx={{
-                      backgroundColor: colors.primary,
-                      color: colors.surface,
+                      backgroundColor: muiTheme.palette.mode === 'dark' ? '#2563eb' : '#1d4ed8',
+                      color: '#ffffff',
+                      fontWeight: '600',
                       '&:hover': {
-                        backgroundColor: colors.primary,
-                        opacity: 0.9
+                        backgroundColor: muiTheme.palette.mode === 'dark' ? '#1d4ed8' : '#1e40af',
                       },
                       '&:disabled': {
                         backgroundColor: colors.border,
-                        color: colors.textSecondary
+                        color: colors.textSecondary,
+                        opacity: 0.6
                       }
                     }}
                   >
@@ -8255,7 +8332,7 @@ const MainPage = () => {
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={snackbar.severity === 'success' ? 30000 : 6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
@@ -8263,6 +8340,26 @@ const MainPage = () => {
           onClose={handleSnackbarClose}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
+          action={
+            snackbar.hasRouteButton && (snackbar.deviceInfo || closestDeviceInfo) ? (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleEnviarRota}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: '600',
+                  backgroundColor: muiTheme.palette.mode === 'dark' ? '#2563eb' : '#1d4ed8',
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: muiTheme.palette.mode === 'dark' ? '#1d4ed8' : '#1e40af',
+                  }
+                }}
+              >
+                Enviar Rota
+              </Button>
+            ) : null
+          }
         >
           {snackbar.message}
         </Alert>

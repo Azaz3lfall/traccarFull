@@ -17,10 +17,12 @@ import MapScale from '../map/MapScale';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapRoutePlanner from '../map/MapRoutePlanner.jsx';
+import MapOcorrenciaDestination from '../map/MapOcorrenciaDestination.js';
+import MapDeviceRouteCircle from '../map/MapDeviceRouteCircle.js';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
 
-const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData, selectedRouteIndex = 0, onRouteChange }) => {
+const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData, selectedRouteIndex = 0, onRouteChange, ocorrenciaDestination, deviceIdWithRoute }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -71,6 +73,12 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
           selectedRouteIndex={selectedRouteIndex}
           onRouteChange={onRouteChange}
         />
+        {ocorrenciaDestination && (
+          <MapOcorrenciaDestination destination={ocorrenciaDestination} />
+        )}
+        {deviceIdWithRoute && (
+          <MapDeviceRouteCircle deviceId={deviceIdWithRoute} />
+        )}
         <PoiMap />
         {/* MapPositions always last to ensure vehicle markers appear on top */}
         <MapPositions
