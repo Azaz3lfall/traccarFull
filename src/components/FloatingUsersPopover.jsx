@@ -109,6 +109,7 @@ const FloatingUsersPopover = ({
     setAccessLevelCheckboxes({
       'Main Menu': true,
       'Device List': true,
+      'Ocorrências': true,
       'Reports': true,
       'Geofences': true,
       'Settings': true,
@@ -162,6 +163,7 @@ const FloatingUsersPopover = ({
         const newCheckboxState = {
           'Main Menu': accessLevel.mainMenu || false,
           'Device List': accessLevel.deviceList || false,
+          'Ocorrências': accessLevel.ocorrencias || false,
           'Reports': accessLevel.reports || false,
           'Geofences': accessLevel.geofences || false,
           'Settings': accessLevel.settings || false,
@@ -200,6 +202,7 @@ const FloatingUsersPopover = ({
       setAccessLevelCheckboxes({
         'Main Menu': false,
         'Device List': false,
+        'Ocorrências': false,
         'Reports': false,
         'Geofences': false,
         'Settings': false,
@@ -265,6 +268,7 @@ const FloatingUsersPopover = ({
   const [accessLevelCheckboxes, setAccessLevelCheckboxes] = useState({
     'Main Menu': true,
     'Device List': true,
+    'Ocorrências': true,
     'Reports': true,
     'Geofences': true,
     'Settings': true,
@@ -579,6 +583,7 @@ const FloatingUsersPopover = ({
     const accessLevel = {
       mainMenu: true, // Always true - readonly
       deviceList: accessLevelCheckboxes['Device List'],
+      ocorrencias: accessLevelCheckboxes['Ocorrências'],
       reports: accessLevelCheckboxes['Reports'],
       geofences: accessLevelCheckboxes['Geofences'],
       settings: accessLevelCheckboxes['Settings'],
@@ -1406,6 +1411,19 @@ const FloatingUsersPopover = ({
                                 />
                               }
                               label={t('showHideDevices')}
+                            />
+                            <FormControlLabel
+                              control={
+                                <Checkbox 
+                                  checked={accessLevelCheckboxes['Ocorrências']}
+                                  onChange={handleIndividualCheckbox('Ocorrências')}
+                                  sx={{ 
+                                    '&:hover': { backgroundColor: 'transparent !important' },
+                                    '&.Mui-checked:hover': { backgroundColor: 'transparent !important' }
+                                  }}
+                                />
+                              }
+                              label="Ocorrências"
                             />
                             <FormControlLabel
                               control={

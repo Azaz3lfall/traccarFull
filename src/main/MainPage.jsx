@@ -70,6 +70,7 @@ import {
 import { 
   HiOutlineWrenchScrewdriver,
 } from "react-icons/hi2";
+import { LuShieldAlert } from "react-icons/lu";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HelpIcon from '@mui/icons-material/Help';
@@ -451,6 +452,18 @@ const MainPage = () => {
     try {
       const accessLevel = JSON.parse(user.attributes.accessLevel);
       return accessLevel.deviceList === true;
+    } catch (error) {
+      return false; // Parse error means no permission
+    }
+  }, [user]);
+
+  const hasOcorrenciasPermission = useMemo(() => {
+    if (!user || !user.attributes || !user.attributes.accessLevel) {
+      return false; // No accessLevel means no permission
+    }
+    try {
+      const accessLevel = JSON.parse(user.attributes.accessLevel);
+      return accessLevel.ocorrencias === true;
     } catch (error) {
       return false; // Parse error means no permission
     }
@@ -1607,6 +1620,75 @@ const MainPage = () => {
               </>
             )}
           </div>
+          
+          {/* Ocorrências Button */}
+          {hasOcorrenciasPermission && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-ocorrencias');
+            if (tooltip) tooltip.remove();
+            // TODO: Add handler for Ocorrências
+            console.log('Ocorrências clicked');
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Ocorrências';
+              tooltip.id = 'menu-tooltip-ocorrencias';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: 0 4px 12px ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-ocorrencias');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <LuShieldAlert size={18} color={colors.textSecondary} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.6'
+              }}>
+                Ocorrências
+              </span>
+            )}
+          </div>
+          )}
           
           {/* Device List Toggle Button */}
           {hasDeviceListPermission && (
