@@ -16,7 +16,7 @@ sshpass -p "$PASSWORD" ssh root@$HOST "mv /opt/traccar/build /opt/traccar/web"
 sshpass -p "$PASSWORD" ssh root@$HOST "ls /opt/traccar/web"
 
 # Install dependencies and restart resellersServer
-sshpass -p "$PASSWORD" ssh root@$HOST "cd /opt/traccar/addons/reseller && yarn"
+sshpass -p "$PASSWORD" ssh root@$HOST "source ~/.nvm/nvm.sh && nvm use v22.14.0 && export PATH=\$PATH && cd /opt/traccar/web/addons/reseller && yarn --update-env"
 sshpass -p "$PASSWORD" ssh root@$HOST "pm2 restart resellersServer"
 
 sshpass -p "$PASSWORD" ssh root@$HOST "systemctl restart traccar"
