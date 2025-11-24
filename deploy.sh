@@ -15,13 +15,9 @@ sshpass -p "$PASSWORD" ssh root@$HOST "mv /opt/traccar/build /opt/traccar/web"
 
 sshpass -p "$PASSWORD" ssh root@$HOST "ls /opt/traccar/web"
 
-# Install dependencies and manage resellersServer with PM2
-# sshpass -p "$PASSWORD" ssh root@$HOST "source ~/.nvm/nvm.sh && nvm install v22.14.0 && nvm use v22.14.0 && cd /opt/traccar/web/addons/reseller && npm install"
-# sshpass -p "$PASSWORD" ssh root@$HOST "pm2 stop resellersServer || true"
-# sshpass -p "$PASSWORD" ssh root@$HOST "pm2 delete resellersServer || true"
-# sshpass -p "$PASSWORD" ssh root@$HOST "source ~/.nvm/nvm.sh && nvm use v22.14.0 && cd /opt/traccar/web/addons/reseller && pm2 start /opt/traccar/web/addons/reseller/resellersServer.mjs --name resellersServer"
-# sshpass -p "$PASSWORD" ssh root@$HOST "pm2 save"
-# sshpass -p "$PASSWORD" ssh root@$HOST "pm2 startup"
+# Install dependencies and restart resellersServer
+sshpass -p "$PASSWORD" ssh root@$HOST "cd /opt/traccar/addons/reseller && yarn"
+sshpass -p "$PASSWORD" ssh root@$HOST "pm2 restart resellersServer"
 
 sshpass -p "$PASSWORD" ssh root@$HOST "systemctl restart traccar"
 
