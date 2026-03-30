@@ -8,7 +8,8 @@ import MapAccuracy from '../map/main/MapAccuracy';
 import MapGeofence from '../map/MapGeofence';
 import PoiMap from '../map/main/PoiMap';
 import MapPadding from '../map/MapPadding';
-import { devicesActions } from '../store';
+import { devicesActions, sessionActions, fleetActions } from '../store';
+import { processPositions } from '../common/util/positionUtils';
 import MapDefaultCamera from '../map/main/MapDefaultCamera';
 import MapLiveRoutes from '../map/main/MapLiveRoutes';
 import MapPositions from '../map/MapPositions';
@@ -16,11 +17,13 @@ import MapOverlay from '../map/overlay/MapOverlay';
 import MapScale from '../map/MapScale';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
+import MapStopMarkers from '../map/MapStopMarkers';
 import MapRoutePlanner from '../map/MapRoutePlanner.jsx';
 import MapOcorrenciaDestination from '../map/MapOcorrenciaDestination.js';
 import MapDeviceRouteCircle from '../map/MapDeviceRouteCircle.js';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
+import MapHeatmap from '../map/MapHeatmap';
 
 const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData, selectedRouteIndex = 0, onRouteChange, ocorrenciaDestination, deviceIdWithRoute }) => {
   const theme = useTheme();
@@ -28,10 +31,25 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const replayPositions = useSelector((state) => state.session.replayPositions);
+  const historyPositions = useSelector((state) => state.session.historyPositions);
+  const fleetItems = useSelector((state) => state.fleet.items);
+
+  const vehicleByDeviceId = useMemo(() => {
+    const map = {};
+    (fleetItems || []).forEach((v) => {
+      const ids = v.deviceIds || (v.devices?.map((d) => d.id)) || (v.device_id != null ? [v.device_id] : []);
+      ids.forEach((id) => { if (id != null) map[id] = v; });
+    });
+    return map;
+  }, [fleetItems]);
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
-  }, [dispatch]);
+    const vehicle = vehicleByDeviceId[deviceId];
+    if (vehicle?.plate) {
+      dispatch(fleetActions.setSelectedPlate(vehicle.plate));
+    }
+  }, [dispatch, vehicleByDeviceId]);
 
   const handleMapClick = useCallback(() => {
     // Deselect device when clicking on map
@@ -42,15 +60,38 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
     }
   }, [dispatch, onMapClick]);
 
+  const processedHistoryPositions = useMemo(() => processPositions(historyPositions), [historyPositions]);
+
+  const lastHistoryPosition = useMemo(() => {
+    if (processedHistoryPositions.length === 0) return [];
+    return [processedHistoryPositions[processedHistoryPositions.length - 1]];
+  }, [processedHistoryPositions]);
+
+  const onHistoryPointClick = useCallback((_, pointIndex) => {
+    dispatch(sessionActions.updateSelectedHistoryPointIndex(pointIndex));
+  }, [dispatch]);
+
   // Determine which positions to show on the map
   const mapPositions = useMemo(() => {
+    if (historyPositions.length > 0) {
+      return [];
+    }
     if (replayPositions.length > 0 && currentReplayIndex < replayPositions.length) {
-      // When we have replay positions, show only the current replay position
       return [replayPositions[currentReplayIndex]];
     }
-    // In normal mode, show all filtered positions
     return filteredPositions;
-  }, [replayPositions, currentReplayIndex, filteredPositions]);
+  }, [historyPositions, replayPositions, currentReplayIndex, filteredPositions]);
+
+  // Determine which positions to use for heatmap (use all replay positions or filtered positions)
+  const heatmapPositions = useMemo(() => {
+    if (historyPositions.length > 0) {
+      return processedHistoryPositions;
+    }
+    if (replayPositions.length > 0) {
+      return replayPositions;
+    }
+    return filteredPositions;
+  }, [historyPositions, processedHistoryPositions, replayPositions, filteredPositions]);
 
   return (
     <>
@@ -59,6 +100,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         <MapGeofence />
         <MapAccuracy positions={filteredPositions} />
         <MapLiveRoutes />
+        <MapHeatmap positions={heatmapPositions} />
         {/* Replay components - only show when we have replay positions */}
         {replayPositions.length > 0 && (
           <>
@@ -66,8 +108,22 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
             <MapRoutePoints positions={replayPositions} />
           </>
         )}
-        <MapDefaultCamera />
-        <MapSelectedDevice />
+        {/* History components - only show when we have history positions */}
+        {processedHistoryPositions.length > 0 && (
+          <>
+            <MapRoutePath positions={processedHistoryPositions} />
+            <MapRoutePoints positions={processedHistoryPositions} onClick={onHistoryPointClick} showSpeedControl={false} />
+            <MapStopMarkers positions={processedHistoryPositions} />
+            <MapPositions
+              positions={lastHistoryPosition}
+              onMarkerClick={(_, __) => onHistoryPointClick(null, processedHistoryPositions.length - 1)}
+              titleField="fixTime"
+            />
+            <MapCamera positions={processedHistoryPositions} />
+          </>
+        )}
+        {historyPositions.length === 0 && <MapDefaultCamera />}
+        {historyPositions.length === 0 && <MapSelectedDevice />}
         <MapRoutePlanner 
           routeData={routePlannerData} 
           selectedRouteIndex={selectedRouteIndex}

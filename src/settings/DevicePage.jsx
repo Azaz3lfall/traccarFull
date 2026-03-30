@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Accordion,
@@ -9,8 +9,19 @@ import {
   Checkbox,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddIcon from '@mui/icons-material/Add';
 import { MuiFileInput } from 'mui-file-input';
 import EditItemView from './components/EditItemView';
 import EditAttributesAccordion from './components/EditAttributesAccordion';
@@ -25,6 +36,8 @@ import { useCatch } from '../reactHelper';
 import useSettingsStyles from './common/useSettingsStyles';
 import QrCodeDialog from '../common/components/QrCodeDialog';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+
+const TELECOM_BASE = '/gestao/telecom';
 
 const DevicePage = () => {
   const { classes } = useSettingsStyles();
@@ -41,6 +54,100 @@ const DevicePage = () => {
   const [item, setItem] = useState(uniqueId ? { uniqueId } : null);
   const [showQr, setShowQr] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [availableChips, setAvailableChips] = useState([]);
+  const [selectedChipId, setSelectedChipId] = useState(null);
+  const [addChipOpen, setAddChipOpen] = useState(false);
+  const [newChipNumero, setNewChipNumero] = useState('');
+
+  const fetchAvailableChips = useCallback(async () => {
+    try {
+      const deviceId = item?.id ? parseInt(item.id, 10) : null;
+      const url = deviceId ? `${TELECOM_BASE}/chips/available?deviceId=${deviceId}` : `${TELECOM_BASE}/chips/available`;
+      const res = await fetchOrThrow(url, { credentials: 'include' });
+      const data = await res.json();
+      setAvailableChips(Array.isArray(data) ? data : []);
+    } catch {
+      setAvailableChips([]);
+    }
+  }, [item?.id]);
+
+  useEffect(() => {
+    if (item) fetchAvailableChips();
+  }, [item, fetchAvailableChips]);
+
+  useEffect(() => {
+    if (item?.phone && availableChips.length > 0) {
+      const match = availableChips.find((c) => c.numero === item.phone || String(c.numero) === String(item.phone));
+      setSelectedChipId(match?.id ?? null);
+    } else {
+      setSelectedChipId(null);
+    }
+  }, [item?.phone, availableChips]);
+
+  const handleChipSelect = (chipId) => {
+    setSelectedChipId(chipId);
+    const chip = availableChips.find((c) => c.id === chipId);
+    if (chip) {
+      setItem({ ...item, phone: chip.numero });
+    } else {
+      setItem({ ...item, phone: '' });
+    }
+  };
+
+  const handleAddChip = async () => {
+    if (!newChipNumero?.trim()) return;
+    try {
+      const res = await fetchOrThrow(`${TELECOM_BASE}/chips`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ numero: newChipNumero.trim() }),
+      });
+      const created = await res.json();
+      setAddChipOpen(false);
+      setNewChipNumero('');
+      await fetchAvailableChips();
+      handleChipSelect(created.id);
+    } catch (e) {
+      alert(e.message || 'Erro ao criar chip');
+    }
+  };
+
+  const handleSaveWithChip = useCatch(async () => {
+    const url = item.id ? `/api/devices/${item.id}` : '/api/devices';
+    const res = await fetchOrThrow(url, {
+      method: item.id ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    });
+    const saved = await res.json();
+    const deviceId = saved.id ? parseInt(saved.id, 10) : null;
+    if (deviceId) {
+      try {
+        const currentRes = await fetchOrThrow(`${TELECOM_BASE}/chips/by-device/${deviceId}`, { credentials: 'include' });
+        const currentChip = await currentRes.json();
+        if (currentChip && currentChip.id !== selectedChipId) {
+          await fetchOrThrow(`${TELECOM_BASE}/chips/${currentChip.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ traccar_device_id: null }),
+          });
+        }
+        if (selectedChipId) {
+          await fetchOrThrow(`${TELECOM_BASE}/chips/${selectedChipId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ traccar_device_id: deviceId }),
+          });
+        }
+      } catch {
+        // ignore chip link errors
+      }
+    }
+    window.history.back();
+  });
 
   const handleFileInput = useCatch(async (newFile) => {
     setImageFile(newFile);
@@ -65,6 +172,7 @@ const DevicePage = () => {
       item={item}
       setItem={setItem}
       validate={validate}
+      customSaveHandler={handleSaveWithChip}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'sharedDevice']}
     >
@@ -104,11 +212,38 @@ const DevicePage = () => {
                 endpoint="/api/groups"
                 label={t('groupParent')}
               />
-              <TextField
-                value={item.phone || ''}
-                onChange={(event) => setItem({ ...item, phone: event.target.value })}
-                label={t('sharedPhone')}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('sharedPhone')}</InputLabel>
+                  <Select
+                    value={selectedChipId || ''}
+                    label={t('sharedPhone')}
+                    onChange={(e) => handleChipSelect(e.target.value || null)}
+                    displayEmpty
+                  >
+                    <MenuItem value="">
+                      <em>Nenhum chip selecionado</em>
+                    </MenuItem>
+                    {availableChips.map((c) => (
+                      <MenuItem key={c.id} value={c.id}>
+                        {c.numero} {c.operadora ? `(${c.operadora})` : ''}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <IconButton
+                  onClick={() => setAddChipOpen(true)}
+                  title="Adicionar chip"
+                  sx={{ mt: 0.5 }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              {availableChips.length === 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  Nenhum chip disponível. Clique no + para adicionar.
+                </Typography>
+              )}
               <TextField
                 value={item.model || ''}
                 onChange={(event) => setItem({ ...item, model: event.target.value })}
@@ -184,6 +319,26 @@ const DevicePage = () => {
         </>
       )}
       <QrCodeDialog open={showQr} onClose={() => setShowQr(false)} />
+      <Dialog open={addChipOpen} onClose={() => setAddChipOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Adicionar chip</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Número da linha"
+            value={newChipNumero}
+            onChange={(e) => setNewChipNumero(e.target.value)}
+            placeholder="5511999999999"
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddChipOpen(false)}>Cancelar</Button>
+          <Button variant="contained" onClick={handleAddChip} disabled={!newChipNumero?.trim()}>
+            Salvar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </EditItemView>
   );
 };

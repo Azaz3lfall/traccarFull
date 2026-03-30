@@ -4,8 +4,8 @@
 // Use environment variable or default to the resellers server domain
 // In development, set VITE_RESELLERS_SERVER_URL=http://localhost:3333
 // In production, uses the separate resellers domain
-// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://revendas.rastreadorautoram.com.br';
-const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
+const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://revendas.rastreadorautoram.com.br';
+// const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'http://localhost:3333';
 // const RESELLERS_SERVER_URL = import.meta.env.VITE_RESELLERS_SERVER_URL || 'https://resellers.codeartisan.cloud';
 
 export default {
@@ -18,8 +18,9 @@ export default {
     UPDATE: (id) => `${RESELLERS_SERVER_URL}/api/resellers/${id}`,
     DELETE: `${RESELLERS_SERVER_URL}/api/resellers/delete`,
     UPLOAD: `${RESELLERS_SERVER_URL}/api/upload`,
-    CHECK: `${RESELLERS_SERVER_URL}/api/reseller-check`,
-    CHECK_DOMAIN: `${RESELLERS_SERVER_URL}/api/check-domain`,
+    // URLs relativas - nginx em rast faz proxy para revendas (evita CORS)
+    CHECK: '/api/reseller-check',
+    CHECK_DOMAIN: '/api/check-domain',
     LOGS: `${RESELLERS_SERVER_URL}/api/resellers/logs`,
     LOGS_DELETE: `${RESELLERS_SERVER_URL}/api/resellers/logs/delete`,
     BUILD: `${RESELLERS_SERVER_URL}/api/resellers/build`,
@@ -27,8 +28,9 @@ export default {
     `${RESELLERS_SERVER_URL}/api/resellers/build/status/${encodeURIComponent(appUrl)}?parentUserId=${parentUserId}&currentDomain=${currentDomain}&buildType=${buildType}`,
   DOWNLOAD: (appUrl, buildType = 'apk') =>
     `${RESELLERS_SERVER_URL}/api/resellers/download?appUrl=${encodeURIComponent(appUrl)}&buildType=${buildType}`,
+  // Usa URL relativa para evitar CORS - o nginx em rast faz proxy para revendas
   RESELLER_LOGO: (domain) =>
-    `${RESELLERS_SERVER_URL}/api/reseller-logo?domain=${encodeURIComponent(domain)}`,
+    `/api/reseller-logo?domain=${encodeURIComponent(domain)}`,
   CLEAN_APPS: `${RESELLERS_SERVER_URL}/api/resellers/clean-apps`,
   }
 };

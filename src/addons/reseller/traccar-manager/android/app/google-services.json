@@ -1,40 +1,21 @@
 {
   "project_info": {
-    "project_number": "366024970424",
-    "project_id": "absmult-rastreamento",
-    "storage_bucket": "absmult-rastreamento.firebasestorage.app"
+    "project_number": "458316186992",
+    "project_id": "rastreador-autoram",
+    "storage_bucket": "rastreador-autoram.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:366024970424:android:6ae3642d88c91a3eb4644d",
+        "mobilesdk_app_id": "1:458316186992:android:492246b40a6f517fd1fbb5",
         "android_client_info": {
-          "package_name": "br.com.absmultipla.gps"
+          "package_name": "br.com.rastreadorautoram.mobile"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBFvFNk9_NRKOGc5YBc98B9UOxz2pR1-Co"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:366024970424:android:5527030d4f437f20b4644d",
-        "android_client_info": {
-          "package_name": "com.absmultirastreamento.mobile"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBFvFNk9_NRKOGc5YBc98B9UOxz2pR1-Co"
+          "current_key": "AIzaSyDbgqRvwW3IAGkASZaRen7ESjRwlts2KV8"
         }
       ],
       "services": {

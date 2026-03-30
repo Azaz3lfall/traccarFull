@@ -294,6 +294,10 @@ export default (t) => useMemo(() => ({
     name: t('positionArmed'),
     type: 'boolean',
   },
+  door: {
+    name: t('positionDoor'),
+    type: 'boolean',
+  },
   geofence: {
     name: t('sharedGeofence'),
     type: 'string',

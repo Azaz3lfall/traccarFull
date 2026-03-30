@@ -30,4 +30,8 @@ export default (t) => useMemo(() => ({
     name: t('attributeForwardUrl'),
     type: 'string',
   },
+  doorSensorMode: {
+    name: t('attributeDoorSensorMode'),
+    type: 'string',
+  },
 }), [t]);

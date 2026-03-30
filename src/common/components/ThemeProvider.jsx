@@ -113,5 +113,37 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const useThemeColors = () => {
   const context = useContext(ThemeContext);
-  return context.themes[context.theme].colors;
+  
+  // Default colors fallback to prevent undefined errors
+  const defaultColors = {
+    primary: '#3B82F6',
+    secondary: '#F3F4F6',
+    background: '#FFFFFF',
+    surface: '#FFFFFF',
+    text: '#111827',
+    textSecondary: '#9CA3AF',
+    border: '#E5E7EB',
+    hover: '#F3F4F6',
+    shadow: 'rgba(0, 0, 0, 0.15)',
+    menuSurface: '#FFFFFF',
+    menuText: '#111827',
+    menuTextSecondary: '#6B7280',
+    menuHover: '#F3F4F6',
+    menuBorder: '#E5E7EB',
+    menuShadow: 'rgba(0, 0, 0, 0.15)',
+    avatarBackground: '#6B7280',
+    avatarText: '#FFFFFF',
+    badgeText: '#FFFFFF',
+    overlay: 'rgba(15, 23, 42, 0.6)',
+  };
+  
+  // Ensure context and theme exist before accessing
+  if (!context || !context.theme || !context.themes || !context.themes[context.theme]) {
+    return defaultColors;
+  }
+  
+  const themeColors = context.themes[context.theme].colors;
+  
+  // Merge with defaults to ensure all properties exist
+  return { ...defaultColors, ...themeColors };
 };

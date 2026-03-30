@@ -2,13 +2,13 @@
 const API_CONFIG = {
   // Development
   development: {
-    baseURL: 'https://gps.codeartisan.cloud:8082',
-    wsURL: 'wss://gps.codeartisan.cloud:8082',
+    baseURL: 'https://rast.rastreadorautoram.com.br:8082',
+    wsURL: 'wss://rast.rastreadorautoram.com.br:8082',
   },
   // Production
   production: {
-    baseURL: 'https://gps.codeartisan.cloud:8082',
-    wsURL: 'wss://gps.codeartisan.cloud:8082',
+    baseURL: 'https://rast.rastreadorautoram.com.br:8082',
+    wsURL: 'wss://rast.rastreadorautoram.com.br:8082',
   }
 };
 

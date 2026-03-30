@@ -91,11 +91,12 @@ export const getTimeFilterCounts = (items, timeFilterOptions, dateField = 'lastU
  * @returns {Array} - Filtered array of items
  */
 export const filterItemsByTimeAndSearch = (
-  items, 
-  selectedTimeFilter, 
-  searchKeyword, 
+  items,
+  selectedTimeFilter,
+  searchKeyword,
   searchFields = ['name', 'uniqueId', 'phone', 'model', 'contact'],
-  dateField = 'lastUpdate'
+  dateField = 'lastUpdate',
+  searchValueExtractor = null
 ) => {
   return items.filter(item => {
     // First apply time filter
@@ -109,9 +110,18 @@ export const filterItemsByTimeAndSearch = (
     }
 
     const lowerCaseKeyword = searchKeyword.toLowerCase();
-    return searchFields.some(field => 
-      item[field] && item[field].toLowerCase().includes(lowerCaseKeyword)
-    );
+    const matchesStandardFields = searchFields.some(field => {
+      const val = item[field];
+      return val != null && String(val).toLowerCase().includes(lowerCaseKeyword);
+    });
+    if (matchesStandardFields) return true;
+
+    // Check extra searchable text (e.g. vehicle, client)
+    if (searchValueExtractor && typeof searchValueExtractor === 'function') {
+      const extraText = searchValueExtractor(item);
+      return extraText && String(extraText).toLowerCase().includes(lowerCaseKeyword);
+    }
+    return false;
   });
 };
 

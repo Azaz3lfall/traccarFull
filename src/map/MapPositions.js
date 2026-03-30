@@ -3,17 +3,54 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useMemo,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import maplibregl from 'maplibre-gl';
 import { map } from './core/MapView';
-import { formatTime, getStatusColor } from '../common/util/formatter';
+import {
+  formatTime,
+  getStatusColor,
+  reverseGeocode,
+} from '../common/util/formatter';
+import { getDeviceStatusDescriptors } from '../common/util/deviceStatusFromAttributes';
 import { mapIconKey } from './core/preloadImages';
 import { useAttributePreference } from '../common/util/preferences';
+import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatchCallback } from '../reactHelper';
 import { findFonts } from './core/mapUtil';
+
+const markerAddressCache = new Map();
+
+/** Safe string for HTML `title` / tooltips in marker popup HTML. */
+const escapeHtmlAttr = (str) => String(str ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
+  .replace(/</g, '&lt;');
+
+const markerPopupLucideSvg = (pathsInner) => `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${pathsInner}</svg>`;
+
+// Paths from Lucide (ISC) — keys aligned with getDeviceStatusDescriptors
+const MARKER_POPUP_ICONS = {
+  ignition: markerPopupLucideSvg(
+    '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/>',
+  ),
+  lock: markerPopupLucideSvg(
+    '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  ),
+  battery: markerPopupLucideSvg(
+    '<path d="M 22 14 L 22 10"/><rect x="2" y="6" width="16" height="12" rx="2"/>',
+  ),
+  power: markerPopupLucideSvg(
+    '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+  ),
+  rssi: markerPopupLucideSvg(
+    '<path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>',
+  ),
+};
 
 const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, selectedPosition, titleField }) => {
   const id = useId();
@@ -21,6 +58,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const selected = `${id}-selected`;
 
   const theme = useTheme();
+  const t = useTranslation();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   // const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
   const iconScale = useAttributePreference("iconScale", desktop ? 0.47 : 0.53);
@@ -28,17 +66,42 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const devices = useSelector((state) => state.devices.items);
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
+  const vehicles = useSelector((state) => state.fleet.items) || [];
+
+  // Only primary vehicle trackers on map: IDs from fleet (vehicle.device_id = principal)
+  const primaryDeviceIds = useMemo(() => {
+    if (!Array.isArray(vehicles) || vehicles.length === 0) return null;
+    return new Set(vehicles.map((v) => v.device_id).filter(Boolean));
+  }, [vehicles]);
+
+  const vehicleByDeviceId = useMemo(() => {
+    const m = {};
+    (vehicles || []).forEach((v) => {
+      const ids = v.deviceIds || (v.devices?.map((d) => d.id)) || (v.device_id != null ? [v.device_id] : []);
+      ids.forEach((id) => { if (id != null) m[id] = v; });
+    });
+    return m;
+  }, [vehicles]);
 
   const mapCluster = useAttributePreference('mapCluster', true);
   const directionType = useAttributePreference('mapDirection', 'selected');
   
   // Popup ref for cluster hover
   const popupRef = useRef(null);
+  const markerPopupRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const retryTimeoutRef = useRef(null);
 
+  // Refs for marker click popup - avoid recreating onMarkerClickCallback when positions/devices update (prevents layer blink)
+  const positionsRef = useRef(positions);
+  const devicesRef = useRef(devices);
+  const vehicleByDeviceIdRef = useRef(vehicleByDeviceId);
+  positionsRef.current = positions;
+  devicesRef.current = devices;
+  vehicleByDeviceIdRef.current = vehicleByDeviceId;
 
-  const createFeature = (devices, position, selectedPositionId) => {
+
+  const createFeature = (devices, position, selectedPositionId, displayNameOverride) => {
     const device = devices[position.deviceId];
     let showDirection;
     switch (directionType) {
@@ -52,8 +115,11 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         showDirection = selectedPositionId === position.id && position.course > 0;
         break;
     }
-    
-    const displayName = device.name.length > 15 ? device.name.substring(0, 15) + '...' : device.name;
+
+    const rawName = displayNameOverride != null && String(displayNameOverride).trim() !== ''
+      ? String(displayNameOverride).trim()
+      : (device?.name || '');
+    const displayName = rawName.length > 15 ? rawName.substring(0, 15) + '...' : rawName;
     const nameLength = displayName.length;
     
     // Calculate width based on character types: 7px for lowercase, 8px for uppercase, 5px for symbols, 6px for spaces
@@ -152,6 +218,51 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
             </div>
           `).join('')}
         </div>
+      </div>
+    `;
+  };
+
+  const createMarkerPopupHTML = (vehicleName, address, fixTime, attrs) => {
+    const isDark = theme.palette.mode === 'dark';
+    const bgColor = isDark ? '#1F2937' : '#FFFFFF';
+    const borderColor = isDark ? '#374151' : '#E5E7EB';
+    const secondaryColor = isDark ? '#9CA3AF' : '#6B7280';
+    const iconChip = (tooltip, svgMarkup, color, opacity = 1) => (
+      `<span style="display:inline-flex;align-items:center;justify-content:center;color:${color};opacity:${opacity};line-height:0;flex-shrink:0;" title="${escapeHtmlAttr(tooltip)}">${svgMarkup}</span>`
+    );
+    const sensorIcons = [];
+    const a = attrs && typeof attrs === 'object' ? attrs : null;
+    if (a) {
+      const descriptors = getDeviceStatusDescriptors(a, t);
+      descriptors.forEach(({ key, title, color, opacity, value }) => {
+        const svg = MARKER_POPUP_ICONS[key];
+        if (!svg) return;
+        const tip = value != null ? `${title}: ${value}` : title;
+        sensorIcons.push(iconChip(tip, svg, color, opacity));
+      });
+    }
+    const sensorHtml = sensorIcons.length
+      ? `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;padding-top:6px;border-top:1px solid ${borderColor};">${sensorIcons.join('')}</div>`
+      : '';
+    return `
+      <div style="
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        min-width: 200px;
+        max-width: 280px;
+        padding: 8px 10px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      ">
+        <div style="color: #3B82F6; font-weight: 600; font-size: 14px; margin-bottom: 4px; line-height: 1.25;">${vehicleName || '-'}</div>
+        <div style="font-size: 11px; color: ${secondaryColor}; margin-bottom: 3px; line-height: 1.35;">
+          <strong>Endereço:</strong> ${address || '-'}
+        </div>
+        <div style="font-size: 11px; color: ${secondaryColor}; line-height: 1.35;">
+          <strong>Última comunicação:</strong> ${fixTime || '-'}
+        </div>
+        ${sensorHtml}
       </div>
     `;
   };
@@ -284,8 +395,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   }, []);
 
   const onMapClickCallback = useCallback((event) => {
-    if (!event.defaultPrevented && onMapClick) {
-      onMapClick(event.lngLat.lat, event.lngLat.lng);
+    if (!event.defaultPrevented) {
+      if (markerPopupRef.current) {
+        markerPopupRef.current.remove();
+        markerPopupRef.current = null;
+      }
+      if (onMapClick) {
+        onMapClick(event.lngLat.lat, event.lngLat.lng);
+      }
     }
   }, [onMapClick]);
 
@@ -293,10 +410,73 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const onMarkerClickCallback = useCallback((event) => {
     event.preventDefault();
     const feature = event.features[0];
+    const deviceId = feature.properties.deviceId;
     if (onMarkerClick) {
-      onMarkerClick(feature.properties.id, feature.properties.deviceId);
+      onMarkerClick(feature.properties.id, deviceId);
     }
-  }, [onMarkerClick]);
+    const positionsData = positionsRef.current;
+    const devicesData = devicesRef.current;
+    const vehicleMap = vehicleByDeviceIdRef.current;
+    const position = positionsData.find((p) => p.deviceId === deviceId);
+    const device = devicesData[deviceId];
+    const vehicle = vehicleMap[deviceId];
+    const vehicleName = vehicle?.nickname || vehicle?.plate || device?.name || device?.uniqueId || '-';
+    const fixTime = position?.fixTime ? formatTime(position.fixTime, 'seconds') : '-';
+    const positionAttrs = position?.attributes;
+
+    let initialAddress = position?.address?.trim() || '';
+    if (!initialAddress && position?.latitude != null && position?.longitude != null) {
+      const cacheKey = `${position.latitude}_${position.longitude}`;
+      initialAddress = markerAddressCache.get(cacheKey) || 'Carregando...';
+    } else if (!initialAddress) {
+      initialAddress = '-';
+    }
+
+    if (markerPopupRef.current) {
+      markerPopupRef.current.remove();
+      markerPopupRef.current = null;
+    }
+    const popup = new maplibregl.Popup({
+      closeButton: true,
+      closeOnClick: true,
+      closeOnMove: false,
+      focusAfterOpen: false,
+      offset: [0, -25],
+      className: 'custom-marker-popup',
+    });
+    popup
+      .setLngLat(feature.geometry.coordinates)
+      .setHTML(createMarkerPopupHTML(vehicleName, initialAddress, fixTime, positionAttrs))
+      .addTo(map);
+    markerPopupRef.current = popup;
+
+    if (
+      !position?.address?.trim() &&
+      position?.latitude != null &&
+      position?.longitude != null &&
+      !markerAddressCache.has(`${position.latitude}_${position.longitude}`)
+    ) {
+      const lat = position.latitude;
+      const lon = position.longitude;
+      const cacheKey = `${lat}_${lon}`;
+      reverseGeocode(lat, lon)
+        .then((addr) => {
+          if (addr) markerAddressCache.set(cacheKey, addr);
+          if (markerPopupRef.current === popup) {
+            popup.setHTML(
+              createMarkerPopupHTML(vehicleName, addr || '-', fixTime, positionAttrs)
+            );
+          }
+        })
+        .catch(() => {
+          if (markerPopupRef.current === popup) {
+            popup.setHTML(
+              createMarkerPopupHTML(vehicleName, `${lat.toFixed(6)}, ${lon.toFixed(6)}`, fixTime, positionAttrs)
+            );
+          }
+        });
+    }
+  }, [onMarkerClick, t, theme]);
 
   const onClusterClick = useCatchCallback(async (event) => {
     event.preventDefault();
@@ -620,10 +800,27 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   useEffect(() => {
     const updateData = async () => {
-      const features = positions.filter((it) => devices.hasOwnProperty(it.deviceId))
-        .filter((it) => (it.deviceId !== selectedDeviceId))
+      // Show marker if: device exists AND (is primary vehicle device OR is the currently selected device)
+      const allowedPositions = (pos) => {
+        if (!devices.hasOwnProperty(pos.deviceId)) return false;
+        if (primaryDeviceIds == null) return true;
+        const isVehiclePrimary = primaryDeviceIds.has(pos.deviceId);
+        const isCurrentlySelected = pos.deviceId === selectedDeviceId;
+        return isVehiclePrimary || isCurrentlySelected;
+      };
+
+      const getMarkerLabel = (position) => {
+        const vehicle = vehicleByDeviceId[position.deviceId];
+        const isVehiclePrimary = !!vehicle;
+        return isVehiclePrimary
+          ? (vehicle.plate || vehicle.name || '')
+          : (devices[position.deviceId]?.name || '');
+      };
+
+      const features = positions.filter((it) => it.deviceId !== selectedDeviceId && allowedPositions(it))
         .map((position) => {
-          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id);
+          const label = getMarkerLabel(position);
+          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id, label);
           return {
             type: 'Feature',
             geometry: {
@@ -634,10 +831,10 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           };
         });
 
-      const selectedFeatures = positions.filter((it) => devices.hasOwnProperty(it.deviceId))
-        .filter((it) => (it.deviceId === selectedDeviceId))
+      const selectedFeatures = positions.filter((it) => it.deviceId === selectedDeviceId && allowedPositions(it))
         .map((position) => {
-          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id);
+          const label = getMarkerLabel(position);
+          const feature = createFeature(devices, position, selectedPosition && selectedPosition.id, label);
           return {
             type: 'Feature',
             geometry: {
@@ -670,7 +867,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     };
 
     updateData();
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers, primaryDeviceIds, vehicleByDeviceId, selectedDeviceId]);
 
   // Cleanup effect
   useEffect(() => {
@@ -687,13 +884,19 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         retryTimeoutRef.current = null;
       }
       
-      // Clear popup
+      // Clear cluster popup
       if (popupRef.current) {
         if (popupRef.current.hideTimeout) {
           clearTimeout(popupRef.current.hideTimeout);
         }
         popupRef.current.remove();
         popupRef.current = null;
+      }
+      
+      // Clear marker popup
+      if (markerPopupRef.current) {
+        markerPopupRef.current.remove();
+        markerPopupRef.current = null;
       }
     };
   }, []);

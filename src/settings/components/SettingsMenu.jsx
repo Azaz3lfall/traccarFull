@@ -13,6 +13,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import TodayIcon from '@mui/icons-material/Today';
 import PublishIcon from '@mui/icons-material/Publish';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
+import SimCardIcon from '@mui/icons-material/SimCard';
+import MessageIcon from '@mui/icons-material/Message';
 import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
@@ -61,12 +63,36 @@ const SettingsMenu = () => {
               icon={<PersonIcon />}
               selected={location.pathname === `/settings/user/${userId}`}
             />
-            <MenuItem
-              title={t('deviceTitle')}
-              link="/settings/devices"
-              icon={<SmartphoneIcon />}
-              selected={location.pathname.startsWith('/settings/device')}
-            />
+            {admin && (
+              <MenuItem
+                title={t('deviceTitle')}
+                link="/settings/devices"
+                icon={<SmartphoneIcon />}
+                selected={location.pathname.startsWith('/settings/device')}
+              />
+            )}
+            {admin && (
+              <>
+                <MenuItem
+                  title="Clientes"
+                  link="/settings/clients"
+                  icon={<PeopleIcon />}
+                  selected={location.pathname === '/settings/clients'}
+                />
+                <MenuItem
+                  title="Simcards"
+                  link="/settings/chips"
+                  icon={<SimCardIcon />}
+                  selected={location.pathname === '/settings/chips'}
+                />
+                <MenuItem
+                  title="Painel SMS"
+                  link="/settings/sms-templates"
+                  icon={<MessageIcon />}
+                  selected={location.pathname === '/settings/sms-templates'}
+                />
+              </>
+            )}
             <MenuItem
               title={t('sharedGeofences')}
               link="/geofences"

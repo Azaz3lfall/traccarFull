@@ -34,6 +34,7 @@ import useCommonUserAttributes from '../common/attributes/useCommonUserAttribute
 import { useAdministrator, useRestriction, useManager } from '../common/util/permissions';
 import { useCatch } from '../reactHelper';
 import useMapStyles from '../map/core/useMapStyles';
+import { DEFAULT_MAP_ID } from '../map/core/mapStyleDefaults';
 import { map } from '../map/core/MapView';
 import useSettingsStyles from './common/useSettingsStyles';
 import fetchOrThrow from '../common/util/fetchOrThrow';
@@ -214,7 +215,7 @@ const UserPage = () => {
                 <InputLabel>{t('mapDefault')}</InputLabel>
                 <Select
                   label={t('mapDefault')}
-                  value={item.map || 'locationIqStreets'}
+                  value={item.map || DEFAULT_MAP_ID}
                   onChange={(e) => setItem({ ...item, map: e.target.value })}
                 >
                   {mapStyles.filter((style) => style.available).map((style) => (

@@ -9,6 +9,7 @@ import PositionsReportPage from './reports/PositionsReportPage';
 import ServerPage from './settings/ServerPage';
 import UsersPage from './settings/UsersPage';
 import CustomUsersPage from './settings/CustomUsersPage';
+import ClientsPage from './settings/ClientsPage';
 import DevicePage from './settings/DevicePage';
 import UserPage from './settings/UserPage';
 import NotificationsPage from './settings/NotificationsPage';
@@ -19,6 +20,7 @@ import PositionPage from './other/PositionPage';
 import NetworkPage from './other/NetworkPage';
 import EventReportPage from './reports/EventReportPage';
 import ReplayPage from './other/ReplayPage';
+import WebHistoryPage from './other/WebHistoryPage';
 import TripReportPage from './reports/TripReportPage';
 import StopReportPage from './reports/StopReportPage';
 import SummaryReportPage from './reports/SummaryReportPage';
@@ -41,7 +43,7 @@ import AuthTransition from './login/AuthTransition';
 import GeofencesPage from './other/GeofencesPage';
 import GeofencePage from './settings/GeofencePage';
 import { useEffectAsync } from './reactHelper';
-import { devicesActions } from './store';
+import { devicesActions, sessionActions } from './store';
 import EventPage from './other/EventPage';
 import PreferencesPage from './settings/PreferencesPage';
 import AccumulatorsPage from './settings/AccumulatorsPage';
@@ -50,6 +52,8 @@ import CommandGroupPage from './settings/CommandGroupPage';
 import App from './App';
 import ChangeServerPage from './login/ChangeServerPage';
 import DevicesPage from './settings/DevicesPage';
+import ChipsPage from './settings/ChipsPage';
+import SmsTemplatesPage from './settings/SmsTemplatesPage';
 import ScheduledPage from './reports/ScheduledPage';
 import DeviceConnectionsPage from './settings/DeviceConnectionsPage';
 import GroupConnectionsPage from './settings/GroupConnectionsPage';
@@ -62,8 +66,10 @@ import Loader from './common/components/Loader';
 import { generateLoginToken } from './common/components/NativeInterface';
 import { useLocalization } from './common/components/LocalizationProvider';
 import fetchOrThrow from './common/util/fetchOrThrow';
+import parseShareTokenResponseBody from './common/util/parseShareTokenResponse';
 import AuditPage from './reports/AuditPage';
 import BriefingPage from './BriefingPage';
+import OSPage from './other/os/OSPage';
 
 const Navigation = () => {
   const dispatch = useDispatch();
@@ -86,8 +92,13 @@ const Navigation = () => {
     }
 
     if (searchParams.has('token')) {
-      const token = searchParams.get('token');
-      await fetch(`/api/session?token=${encodeURIComponent(token)}`);
+      const token = parseShareTokenResponseBody(searchParams.get('token') || '');
+      const response = await fetch(`/api/session?token=${encodeURIComponent(token)}`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        dispatch(sessionActions.updateUser(await response.json()));
+      }
       newParams.delete('token');
     }
 
@@ -127,8 +138,10 @@ const Navigation = () => {
         <Route path="network/:positionId" element={<NetworkPage />} />
         <Route path="event/:id" element={<EventPage />} />
         <Route path="replay" element={<ReplayPage />} />
+        <Route path="history" element={<WebHistoryPage />} />
         <Route path="geofences" element={<GeofencesPage />} />
         <Route path="emulator" element={<EmulatorPage />} />
+        <Route path="os" element={<OSPage />} />
 
         <Route path="settings">
           <Route path="accumulators/:deviceId" element={<AccumulatorsPage />} />
@@ -143,6 +156,8 @@ const Navigation = () => {
           <Route path="attribute/:id" element={<ComputedAttributePage />} />
           <Route path="attribute" element={<ComputedAttributePage />} />
           <Route path="devices" element={<DevicesPage />} />
+          <Route path="chips" element={<ChipsPage />} />
+          <Route path="sms-templates" element={<SmsTemplatesPage />} />
           <Route path="device/:id/connections" element={<DeviceConnectionsPage />} />
           <Route path="device/:id/command" element={<CommandDevicePage />} />
           <Route path="device/:id/share" element={<SharePage />} />
@@ -168,6 +183,7 @@ const Navigation = () => {
           <Route path="server" element={<ServerPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="custom-users" element={<CustomUsersPage />} />
+          <Route path="clients" element={<ClientsPage />} />
           <Route path="user/:id/connections" element={<UserConnectionsPage />} />
           <Route path="user/:id" element={<UserPage />} />
           <Route path="user" element={<UserPage />} />

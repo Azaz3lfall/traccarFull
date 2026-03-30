@@ -37,7 +37,12 @@ const SocketController = () => {
     }
     if (events.some((e) => soundEvents.includes(e.type)
         || (e.type === 'alarm' && soundAlarms.includes(e.attributes.alarm)))) {
-      new Audio(alarm).play();
+      const audio = new Audio(alarm);
+      audio.play().catch((error) => {
+        // Silenciosamente ignora erros de autoplay bloqueado pelo navegador
+        // O áudio só pode ser reproduzido após interação do usuário
+        console.debug('Audio play blocked by browser autoplay policy:', error.message);
+      });
     }
     setNotifications(prev => {
       const newNotifications = events.map((event) => ({

@@ -22,6 +22,7 @@ const ModernBottomMenu = () => {
     { path: '/', icon: Home, label: 'Home' },
     { path: '/reports', icon: BarChart3, label: 'Reports' },
     { path: '/settings', icon: Settings, label: 'Settings' },
+    { path: '/os', icon: FileText, label: 'OS' },
     { path: '/geofences', icon: Map, label: 'Geofences' },
   ];
 

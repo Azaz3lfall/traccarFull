@@ -54,6 +54,7 @@ import truckSvg from "../../resources/images/newIcons/truck.png";
 import vanSvg from "../../resources/images/newIcons/van.png";
 import defaultSvg from "../../resources/images/newIcons/default.png";
 import animalSvg from "../../resources/images/newIcons/animal.png";
+import tagSvg from "../../resources/images/newIcons/marker_tag.png";
 
 import backgroundSvg from "../../resources/images/newBackground.png";
 import deviceNameBgSvg from "../../resources/images/device-name-bg.svg";
@@ -78,6 +79,7 @@ export const mapIcons = {
   ship: shipSvg,
   start: startSvg,
   tractor: tractorSvg,
+  tag: tagSvg,
   trailer: trailerSvg,
   train: trainSvg,
   tram: tramSvg,
@@ -87,6 +89,7 @@ export const mapIcons = {
 };
 
 export const mapIconKey = (category) => {
+  if (category === 'tag') return 'tag';
   switch (category) {
     case 'offroad':
     case 'pickup':
@@ -100,22 +103,61 @@ export const mapIconKey = (category) => {
 
 export const mapImages = {};
 
-// Theme colors are no longer needed since we're not tinting icons
+let preloadPromise = null;
 
 export default async () => {
-  const background = await loadImage(backgroundSvg);
-  mapImages.background = await prepareIcon(background);
-  mapImages.direction = await prepareIconWithShadow(await loadImage(directionSvg));
-  mapImages['device-name-bg'] = await prepareIcon(background, await loadImage(deviceNameBgSvg));
-  
-  await Promise.all(Object.keys(mapIcons).map(async (category) => {
-    const results = [];
-    ['info', 'success', 'error', 'neutral'].forEach((color) => {
-      results.push(loadImage(mapIcons[category]).then((icon) => {
-        mapImages[`${category}-${color}`] = prepareIconWithShadow(icon);
+  if (preloadPromise) return preloadPromise;
+
+  preloadPromise = (async () => {
+    try {
+      const background = await loadImage(backgroundSvg);
+      mapImages.background = await prepareIcon(background);
+      mapImages.direction = await prepareIconWithShadow(await loadImage(directionSvg));
+      mapImages['device-name-bg'] = await prepareIcon(background, await loadImage(deviceNameBgSvg));
+      
+      // Pre-carrega o ícone padrão para usar como fallback imediato
+      const defaultIconImg = await loadImage(mapIcons.default);
+      const defaultData = prepareIconWithShadow(defaultIconImg);
+      
+      Object.keys(mapIcons).forEach((category) => {
+        ['info', 'success', 'error', 'neutral'].forEach((color) => {
+          mapImages[`${category}-${color}`] = defaultData;
+        });
+      });
+
+      await Promise.all(Object.keys(mapIcons).map(async (category) => {
+        try {
+          const icon = await loadImage(mapIcons[category]);
+          let finalIcon = icon;
+          
+          if (category === 'tag') {
+            // Removendo canvas manual para evitar perda de qualidade/tamanho
+            // Deixando o navegador/mapa lidar com a imagem original que é grande
+            finalIcon = icon;
+          }
+          
+          ['info', 'success', 'error', 'neutral'].forEach((color) => {
+            mapImages[`${category}-${color}`] = prepareIconWithShadow(finalIcon);
+          });
+        } catch (error) {
+          console.error(`Error loading icon for category ${category}:`, error);
+          // Fallback para não quebrar o mapa se um ícone falhar
+          try {
+            const defaultIcon = await loadImage(mapIcons.default);
+            ['info', 'success', 'error', 'neutral'].forEach((color) => {
+              if (!mapImages[`${category}-${color}`]) {
+                mapImages[`${category}-${color}`] = prepareIconWithShadow(defaultIcon);
+              }
+            });
+          } catch (e) {
+            console.error('Critical failure: Could not even load default icon');
+          }
+        }
       }));
-    });
-    await Promise.all(results);
-  }));
-  
+    } catch (globalError) {
+      console.error('Error in preloadImages:', globalError);
+    }
+  })();
+
+  return preloadPromise;
 };

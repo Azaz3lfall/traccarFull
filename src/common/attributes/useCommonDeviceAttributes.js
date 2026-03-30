@@ -6,6 +6,14 @@ export default (t) => useMemo(() => ({
     type: 'number',
     subtype: 'speed',
   },
+  ktag_hashedKey: {
+    name: t('attributeKtagHashedKey'),
+    type: 'string',
+  },
+  ktag_privateKey: {
+    name: t('attributeKtagPrivateKey'),
+    type: 'string',
+  },
   fuelDropThreshold: {
     name: t('attributeFuelDropThreshold'),
     type: 'number',

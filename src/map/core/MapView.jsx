@@ -6,10 +6,15 @@ import React, {
   useMemo,
 } from 'react';
 import { useTheme } from '@mui/material';
-import { useAttributePreference, usePreference } from '../../common/util/preferences';
-import usePersistedState, { savePersistedState } from '../../common/util/usePersistedState';
+import { useAttributePreference } from '../../common/util/preferences';
 import { mapImages } from './preloadImages';
+import preloadImages from './preloadImages';
 import useMapStyles from './useMapStyles';
+import {
+  DEFAULT_ACTIVE_MAP_STYLES,
+  activeMapStylesContains,
+  resolveAppliedMapStyle,
+} from './mapStyleDefaults';
 import { useEffectAsync } from '../../reactHelper';
 
 const element = document.createElement('div');
@@ -43,17 +48,21 @@ const updateReadyValue = (value) => {
 
 const initMap = async () => {
   if (ready) return;
-  if (!map.hasImage('background')) {
-    Object.entries(mapImages).forEach(([key, value]) => {
-      try {
+  
+  // Wait for images to be preloaded before adding them to the map
+  await preloadImages();
+  
+  Object.entries(mapImages).forEach(([key, value]) => {
+    try {
+      if (!map.hasImage(key)) {
         map.addImage(key, value, {
           pixelRatio: window.devicePixelRatio,
         });
-      } catch (error) {
-        console.error(`Failed to add image ${key}:`, error);
       }
-    });
-  }
+    } catch (error) {
+      console.error(`Failed to add image ${key}:`, error);
+    }
+  });
 };
 
 const MapView = ({ children, selectedMapStyle }) => {
@@ -64,8 +73,7 @@ const MapView = ({ children, selectedMapStyle }) => {
   const [mapReady, setMapReady] = useState(false);
 
   const mapStyles = useMapStyles();
-  const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,locationIqDark,openFreeMap');
-  const [defaultMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'locationIqStreets'));
+  const activeMapStyles = useAttributePreference('activeMapStyles', DEFAULT_ACTIVE_MAP_STYLES);
   const mapboxAccessToken = useAttributePreference('mapboxAccessToken');
   const maxZoom = useAttributePreference('web.maxZoom');
 
@@ -155,16 +163,23 @@ const MapView = ({ children, selectedMapStyle }) => {
   // Handle external map style changes from props
   useEffect(() => {
     if (selectedMapStyle && map) {
-      const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
-      const selectedStyle = filteredStyles.find((s) => s.id === selectedMapStyle);
-      
-      if (selectedStyle && selectedStyle.style) {
+      let filteredStyles = mapStyles.filter(
+        (s) => s.available && activeMapStylesContains(activeMapStyles, s.id),
+      );
+      if (!filteredStyles.length) {
+        filteredStyles = mapStyles.filter((s) => s.available);
+      }
+      const selectedStyle = resolveAppliedMapStyle(selectedMapStyle, filteredStyles);
+
+      if (selectedStyle?.style) {
         updateReadyValue(false);
         map.setStyle(selectedStyle.style, { diff: false });
         if (selectedStyle.transformRequest) {
           map.setTransformRequest(selectedStyle.transformRequest);
+        } else {
+          map.setTransformRequest(null);
         }
-        
+
         map.once('styledata', () => {
           const waiting = () => {
             if (!map.loaded()) {

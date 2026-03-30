@@ -1,8 +1,8 @@
 #!/bin/zsh
 
 # Define hosts and passwords arrays (must have the same number of elements)
-HOSTS=("codeartisan.cloud")
-PASSWORDS=("F@z3rF@z3r2025")
+HOSTS=("rast.rastreadorautoram.com.br")
+PASSWORDS=("fallen292935")
 
 # Validate that arrays have the same length
 if [ ${#HOSTS[@]} -ne ${#PASSWORDS[@]} ]; then
@@ -12,7 +12,7 @@ fi
 
 # Build once for all hosts
 rm -rf build build.tar.gz
-# VITE_RESELLERS_SERVER_URL=https://resellers.codeartisan.cloud 
+# VITE_RESELLERS_SERVER_URL=https://revendas.rastreadorautoram.com.br
 npm run build
 tar czvf build.tar.gz build
 

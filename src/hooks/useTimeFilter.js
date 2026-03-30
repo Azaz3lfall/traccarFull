@@ -22,6 +22,7 @@ export const useTimeFilter = (items = [], options = {}) => {
   const {
     dateField = 'lastUpdate',
     searchFields = ['name', 'uniqueId', 'phone', 'model', 'contact'],
+    searchValueExtractor = null,
     timeFilterOptions = defaultTimeFilterOptions,
     resetOnVisible = true,
     isVisible = true
@@ -55,13 +56,14 @@ export const useTimeFilter = (items = [], options = {}) => {
   // Filter items based on time filter and search
   const filteredItems = useMemo(() => {
     return filterItemsByTimeAndSearch(
-      items, 
-      selectedTimeFilter, 
-      searchKeyword, 
-      searchFields, 
-      dateField
+      items,
+      selectedTimeFilter,
+      searchKeyword,
+      searchFields,
+      dateField,
+      searchValueExtractor
     );
-  }, [items, selectedTimeFilter, searchKeyword, searchFields, dateField]);
+  }, [items, selectedTimeFilter, searchKeyword, searchFields, dateField, searchValueExtractor]);
 
   // Handle time filter selection
   const handleTimeFilterSelect = (filterKey) => {

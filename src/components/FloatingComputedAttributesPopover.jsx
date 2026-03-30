@@ -31,7 +31,6 @@ import {
   Tabs,
   Tab,
   Snackbar,
-  createFilterOptions,
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -81,6 +80,22 @@ const FloatingComputedAttributesPopover = ({
   const administrator = useAdministrator();
   const positionAttributes = usePositionAttributes(t);
 
+  const options = Object.entries(positionAttributes).filter(([key, value]) => !value.property || allowedProperties.includes(key)).map(([key, value]) => ({
+    key,
+    name: value.name,
+    type: value.type,
+  }));
+
+  const resolveAttributeFromInput = (input) => {
+    const v = (input || '').trim();
+    if (!v) return { attribute: '', type: null };
+    const byName = options.find((o) => o.name === v);
+    if (byName) return { attribute: byName.key, type: byName.type };
+    const byKey = options.find((o) => o.key === v);
+    if (byKey) return { attribute: byKey.key, type: byKey.type };
+    return { attribute: v, type: null };
+  };
+
   // State management
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedAttribute, setSelectedAttribute] = useState(null);
@@ -102,6 +117,14 @@ const FloatingComputedAttributesPopover = ({
   const attributeInputRef = useRef(null);
   const deviceInputRef = useRef(null);
 
+  const buildEditingPayload = () => {
+    const { attribute, type } = resolveAttributeFromInput(attributeInputValue);
+    return {
+      ...editingAttribute,
+      attribute,
+      ...(type === null ? {} : { type }),
+    };
+  };
 
   // Fetch computed attributes with TanStack Query
   const { data: attributes = [], isLoading, error } = useQuery({
@@ -240,12 +263,14 @@ const FloatingComputedAttributesPopover = ({
     },
   });
 
-  // Handle save attribute
+  // Handle save attribute (attribute field is free text; sync from attributeInputValue on save)
   const handleSaveAttribute = () => {
+    if (!editingAttribute) return;
+    const payload = buildEditingPayload();
     if (editingAttribute.id) {
-      updateAttributeMutation.mutate({ id: editingAttribute.id, attributeData: editingAttribute });
+      updateAttributeMutation.mutate({ id: editingAttribute.id, attributeData: payload });
     } else {
-      createAttributeMutation.mutate(editingAttribute);
+      createAttributeMutation.mutate(payload);
     }
   };
 
@@ -253,10 +278,11 @@ const FloatingComputedAttributesPopover = ({
   const testAttribute = useCatch(async () => {
     const query = new URLSearchParams({ deviceId });
     const url = `/api/attributes/computed/test?${query.toString()}`;
+    const payload = buildEditingPayload();
     const response = await fetchOrThrow(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingAttribute),
+      body: JSON.stringify(payload),
     });
     setTestResult(await response.text());
   });
@@ -282,17 +308,6 @@ const FloatingComputedAttributesPopover = ({
   const getAttributeTypeIcon = (type) => {
     return <FunctionsIcon />;
   };
-
-  // Options for attribute autocomplete
-  const options = Object.entries(positionAttributes).filter(([key, value]) => !value.property || allowedProperties.includes(key)).map(([key, value]) => ({
-    key,
-    name: value.name,
-    type: value.type,
-  }));
-
-  const filter = createFilterOptions({
-    stringify: (option) => option.name,
-  });
 
   return (
     <AnimatePresence mode="wait">
@@ -354,6 +369,7 @@ const FloatingComputedAttributesPopover = ({
                     type: 'string',
                     priority: 0
                   });
+                  setAttributeInputValue('');
                   setActiveTab(0);
                   setEditDialog(true);
                 }}

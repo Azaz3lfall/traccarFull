@@ -10,6 +10,9 @@ import { driversReducer as drivers } from './drivers';
 import { maintenancesReducer as maintenances } from './maintenances';
 import { calendarsReducer as calendars } from './calendars';
 import { resellersReducer as resellers } from './resellers';
+import { fleetReducer as fleet } from './fleet';
+import { clientsReducer as clients } from './clients';
+import { usersReducer as users } from './users';
 import throttleMiddleware from './throttleMiddleware';
 
 const reducer = combineReducers({
@@ -23,11 +26,14 @@ const reducer = combineReducers({
   maintenances,
   calendars,
   resellers,
+  fleet,
+  clients,
+  users,
 });
 
 export { errorsActions } from './errors';
 export { sessionActions } from './session';
-export { devicesActions } from './devices';
+export { devicesActions, fetchAllDevices } from './devices';
 export { eventsActions } from './events';
 export { geofencesActions } from './geofences';
 export { groupsActions } from './groups';
@@ -35,6 +41,9 @@ export { driversActions } from './drivers';
 export { maintenancesActions } from './maintenances';
 export { calendarsActions } from './calendars';
 export { resellersActions } from './resellers';
+export { fleetActions, fetchFleetMap, fetchVehicles, fetchAvailableDevicesForVehicle, addVehicle, updateVehicle, deleteVehicle } from './fleet';
+export { clientsActions, fetchClients, addClient, updateClient, deleteClient } from './clients';
+export { usersActions, fetchTraccarUsers } from './users';
 
 export default configureStore({
   reducer,

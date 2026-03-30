@@ -1,5 +1,9 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 build.tar.gz
+.env
+uploads/
+logs/
+
 # dependencies
 node_modules
 

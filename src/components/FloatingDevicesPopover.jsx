@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import {
@@ -17,13 +19,17 @@ import {
   MenuItem,
   Typography,
   Box,
-  Chip,
   FormControlLabel,
   CircularProgress,
   Alert,
   Checkbox,
   Tabs,
   Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { MuiFileInput } from 'mui-file-input';
 import {
@@ -34,8 +40,14 @@ import {
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
   Link as LinkIcon,
+  LinkOff as LinkOffIcon,
   Save as SaveIcon,
   Check as CheckIcon,
+  Send as SendIcon,
+  RestartAlt as RestartAltIcon,
+  Map as MapIcon,
+  LocationOn as LocationOnIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { formatStatus, formatNotificationTitle, formatTime } from '../common/util/formatter';
@@ -52,7 +64,26 @@ import { useRestriction, useManager } from '../common/util/permissions';
 import LinkField from '../common/components/LinkField';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import CustomPagination from './CustomPagination';
-import { devicesActions, errorsActions } from '../store';
+
+const TELECOM_BASE = import.meta.env.VITE_GESTAO_API_URL
+  ? `${import.meta.env.VITE_GESTAO_API_URL}/gestao/telecom`
+  : '/gestao/telecom';
+
+const EXCLUDED_MODELS = ['atlasTrax', 'k-tag', 'c-tag'];
+
+const JIMI_IOT_DEFAULTS = {
+  iothubServer: 'https://jimi.rastreadorautoram.com.br',
+  ftpServerIp: '50.30.32.171',
+  ftpPort: '21',
+  fileUploadPath: '/',
+  token: '123',
+  streamingServer: 'https://streaming.rastreadorautoram.com.br',
+  midiaServer: 'https://midia.rastreadorautoram.com.br',
+};
+import { devicesActions, errorsActions, fetchVehicles } from '../store';
+import DeviceStatusIcons from '../settings/components/DeviceStatusIcons';
+import DeviceVehicleHistoryDialog from '../settings/components/DeviceVehicleHistoryDialog';
+import SmsSendModal from '../settings/components/SmsSendModal';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
@@ -78,6 +109,7 @@ import truckIcon from '../resources/images/newIcons/truck.png';
 import vanIcon from '../resources/images/newIcons/van.png';
 import defaultIcon from '../resources/images/newIcons/default.png';
 import animalIcon from '../resources/images/newIcons/animal.png';
+import tagIcon from '../resources/images/newIcons/marker_tag.png';
 
 const FloatingDevicesPopover = ({ 
   desktop, 
@@ -90,6 +122,9 @@ const FloatingDevicesPopover = ({
   const colors = useThemeColors();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const positions = useSelector((state) => state.session.positions);
+  const vehicles = useSelector((state) => state.fleet.vehicles) || [];
   
   const limitDevices = useRestriction('limitDevices');
   const manager = useManager();
@@ -116,6 +151,7 @@ const FloatingDevicesPopover = ({
     tram: tramIcon,
     truck: truckIcon,
     van: vanIcon,
+    tag: tagIcon,
     default: defaultIcon,
   };
 
@@ -174,13 +210,64 @@ const FloatingDevicesPopover = ({
   const [imageFile, setImageFile] = useState(null);
   const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
   const [calendarDropdownOpen, setCalendarDropdownOpen] = useState(false);
   const [groupInputRef, setGroupInputRef] = useState(null);
   const [categoryInputRef, setCategoryInputRef] = useState(null);
+  const [modelInputRef, setModelInputRef] = useState(null);
   const [calendarInputRef, setCalendarInputRef] = useState(null);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
+  const [smsModalDeviceId, setSmsModalDeviceId] = useState(null);
+  const [smsModalPhone, setSmsModalPhone] = useState('');
+  const [configPromptOpen, setConfigPromptOpen] = useState(false);
+  const [configPromptDeviceId, setConfigPromptDeviceId] = useState(null);
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [resetDeviceId, setResetDeviceId] = useState(null);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState(null);
+  const [showUnlinkedOnly, setShowUnlinkedOnly] = useState(false);
 
+  useEffect(() => {
+    if (isVisible) {
+      dispatch(fetchVehicles());
+    }
+  }, [isVisible, dispatch]);
+
+  const deviceToVehicle = useMemo(() => {
+    const map = {};
+    vehicles.forEach((v) => {
+      const ids = v.deviceIds || (v.devices?.map((d) => d.id)) || (v.device_id != null ? [v.device_id] : []);
+      (Array.isArray(ids) ? ids : []).forEach((id) => {
+        const key = id != null ? id : null;
+        if (key == null) return;
+        if (!map[key]) map[key] = [];
+        map[key].push(v);
+      });
+    });
+    return map;
+  }, [vehicles]);
+
+  const getVehicleDisplay = useCallback((deviceId) => {
+    const list = deviceToVehicle[deviceId];
+    if (!list || list.length === 0) return '-';
+    return list.map((v) => v.nickname || v.plate).join(', ');
+  }, [deviceToVehicle]);
+
+  const getClientDisplay = useCallback((deviceId) => {
+    const list = deviceToVehicle[deviceId];
+    if (!list || list.length === 0) return '-';
+    const names = [...new Set(list.map((v) => v.client_name).filter(Boolean))];
+    return names.join(', ') || '-';
+  }, [deviceToVehicle]);
+
+  const searchValueExtractor = useCallback((device) => {
+    if (!device || device.id == null) return '';
+    return `${getVehicleDisplay(device.id)} ${getClientDisplay(device.id)}`;
+  }, [getVehicleDisplay, getClientDisplay]);
 
   // Show snackbar notification
   const showSnackbar = (message, severity = 'error') => {
@@ -188,32 +275,19 @@ const FloatingDevicesPopover = ({
     console.log(`${severity.toUpperCase()}: ${message}`);
   };
 
-  // Handle XLSX export
-  const handleExport = useCatch(async () => {
-    // Create groups lookup object
-    const groupsLookup = {};
-    groups.forEach(group => {
-      groupsLookup[group.id] = group;
-    });
-
-    const data = filteredDevices.map((device) => {
-      const deviceData = {
-        [t('sharedName')]: device.name,
-        [t('deviceIdentifier')]: device.uniqueId,
-        [t('groupParent')]: device.groupId ? groupsLookup[device.groupId]?.name : null,
-        [t('sharedPhone')]: device.phone,
-        [t('deviceModel')]: device.model,
-        [t('deviceContact')]: device.contact,
-        [t('deviceLastUpdate')]: device.lastUpdate ? formatTime(device.lastUpdate, 'minutes') : '-',
-      };
-      
-      // Only include device status for administrators and managers
-      if (manager) {
-        deviceData[t('deviceStatus')] = formatStatus(device.status, t);
-      }
-      
-      return deviceData;
-    });
+  // Handle XLSX export - receives devices array (uses displayedDevices when called from UI)
+  const handleExport = useCatch(async (devicesToExport) => {
+    const devices = devicesToExport ?? filteredDevices;
+    const data = devices.map((device) => ({
+      [t('deviceIdentifier')]: device.uniqueId,
+      [t('sharedName')]: device.name,
+      [t('deviceModel')]: device.model,
+      [t('sharedPhone')]: device.phone,
+      [t('deviceVehicle')]: getVehicleDisplay(device.id),
+      [t('deviceClient')]: getClientDisplay(device.id),
+      [t('deviceLastUpdate')]: device.lastUpdate ? formatTime(device.lastUpdate, 'minutes') : '-',
+      ...(manager ? { [t('deviceStatus')]: formatStatus(device.status, t) } : {}),
+    }));
 
     if (data.length === 0) {
       showSnackbar('No devices to export', 'warning');
@@ -284,6 +358,7 @@ const FloatingDevicesPopover = ({
   } = useTimeFilter(devices, {
     dateField: 'lastUpdate',
     searchFields: ['name', 'uniqueId', 'phone', 'model', 'contact'],
+    searchValueExtractor,
     isVisible
   });
 
@@ -308,16 +383,30 @@ const FloatingDevicesPopover = ({
   });
 
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or unlinked filter changes
   useEffect(() => {
     setPage(1);
-  }, [searchKeyword]);
+  }, [searchKeyword, showUnlinkedOnly]);
 
+  // Filter devices without vehicle association when showUnlinkedOnly is active
+  const displayedDevices = useMemo(() => {
+    if (!showUnlinkedOnly) return filteredDevices;
+    return filteredDevices.filter((device) => {
+      const linked = deviceToVehicle[device?.id];
+      return !linked || linked.length === 0;
+    });
+  }, [filteredDevices, showUnlinkedOnly, deviceToVehicle]);
 
+  const unlinkedCount = useMemo(() => {
+    return filteredDevices.filter((device) => {
+      const linked = deviceToVehicle[device?.id];
+      return !linked || linked.length === 0;
+    }).length;
+  }, [filteredDevices, deviceToVehicle]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredDevices.length / pageSize);
-  const paginatedDevices = filteredDevices.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(displayedDevices.length / pageSize);
+  const paginatedDevices = displayedDevices.slice((page - 1) * pageSize, page * pageSize);
 
   // Create device mutation
   const createDeviceMutation = useMutation({
@@ -336,14 +425,26 @@ const FloatingDevicesPopover = ({
         throw new Error('Device creation failed');
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries(['devices']);
       dispatch(devicesActions.update([data]));
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
-      // Show success message for 200 OK
       dispatch(errorsActions.push(`✅ ${t('deviceCreatedSuccessfully')}`));
+
+      try {
+        await fetchOrThrow(`${TELECOM_BASE}/sync/devices-to-chips`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch { /* sync failure is non-blocking */ }
+
+      const model = (data.model || '').toLowerCase();
+      if (!EXCLUDED_MODELS.includes(model)) {
+        setConfigPromptDeviceId(data.id);
+        setConfigPromptOpen(true);
+      }
     },
     onError: (error) => {
       console.error('Create device error:', error);
@@ -377,12 +478,25 @@ const FloatingDevicesPopover = ({
         throw error;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries(['devices']);
       dispatch(devicesActions.update([data]));
       setEditDialog(false);
       setEditingDevice(null);
       setActiveTab(0);
+
+      try {
+        await fetchOrThrow(`${TELECOM_BASE}/sync/devices-to-chips`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch { /* sync failure is non-blocking */ }
+
+      const model = (data.model || '').toLowerCase();
+      if (!EXCLUDED_MODELS.includes(model)) {
+        setConfigPromptDeviceId(data.id);
+        setConfigPromptOpen(true);
+      }
     },
     onError: (error) => {
       console.error('Update device mutation error:', error);
@@ -445,6 +559,30 @@ const FloatingDevicesPopover = ({
     }
   };
 
+  // Sync ftpUser/ftpPassword with uniqueId when model is JC181, JC400 or JC450
+  useEffect(() => {
+    if (!editDialog || !editingDevice) return;
+    const model = editingDevice.model;
+    if (!['JC181', 'JC400', 'JC450'].includes(model)) return;
+    const uniqueId = editingDevice.uniqueId;
+    if (!uniqueId) return;
+    const expectedFtpCred = `_${uniqueId}`;
+    if (editingDevice?.iothub?.ftpUser === expectedFtpCred && editingDevice?.iothub?.ftpPassword === expectedFtpCred) return;
+    setEditingDevice((prev) => {
+      if (!prev || !['JC181', 'JC400', 'JC450'].includes(prev.model) || !prev.uniqueId) return prev;
+      const exp = `_${prev.uniqueId}`;
+      if (prev?.iothub?.ftpUser === exp && prev?.iothub?.ftpPassword === exp) return prev;
+      return {
+        ...prev,
+        iothub: {
+          ...(prev?.iothub || {}),
+          ftpUser: exp,
+          ftpPassword: exp,
+        },
+      };
+    });
+  }, [editDialog, editingDevice?.uniqueId, editingDevice?.model]);
+
   // Click outside handlers for dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -453,6 +591,9 @@ const FloatingDevicesPopover = ({
       }
       if (categoryInputRef && !categoryInputRef.contains(event.target)) {
         setCategoryDropdownOpen(false);
+      }
+      if (modelInputRef && !modelInputRef.contains(event.target)) {
+        setModelDropdownOpen(false);
       }
       if (calendarInputRef && !calendarInputRef.contains(event.target)) {
         setCalendarDropdownOpen(false);
@@ -554,6 +695,39 @@ const FloatingDevicesPopover = ({
     setAnchorEl(null);
   };
 
+  const handleResetConfirm = async () => {
+    if (!resetDeviceId) return;
+    setResetLoading(true);
+    setResetError(null);
+    try {
+      const res = await fetchOrThrow(`${TELECOM_BASE}/sms/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ deviceId: resetDeviceId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResetModalOpen(false);
+        setResetDeviceId(null);
+      } else {
+        setResetError(data.error || data.message || 'Erro ao resetar.');
+      }
+    } catch (e) {
+      let errMsg = e.message || 'Erro ao resetar simcard.';
+      try {
+        const parsed = JSON.parse(errMsg);
+        if (parsed?.error) errMsg = parsed.error;
+      } catch { /* ignore */ }
+      if (errMsg.includes('Cannot POST') || errMsg.includes('404')) {
+        errMsg = 'Rota não encontrada. Verifique se o backend de Gestão (porta 3666) está rodando e se o proxy nginx inclui nginx-gestao-proxy.conf.';
+      }
+      setResetError(errMsg);
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   const handleFileInput = useCatch(async (newFile) => {
     setImageFile(newFile);
     if (newFile && editingDevice?.id) {
@@ -600,6 +774,72 @@ const FloatingDevicesPopover = ({
       icon: <DeleteIcon fontSize="small" />,
       handler: handleDeleteClick,
       show: !limitDevices,
+    },
+    {
+      key: 'sendSms',
+      title: t('deviceSendSms'),
+      icon: <SendIcon fontSize="small" />,
+      handler: (device) => {
+        if (device?.id) {
+          setSmsModalDeviceId(device.id);
+          setSmsModalPhone(device.phone || '');
+          setSmsModalOpen(true);
+        }
+        setAnchorEl(null);
+      },
+      show: true,
+    },
+    {
+      key: 'resetSimcard',
+      title: t('deviceResetSimcard'),
+      icon: <RestartAltIcon fontSize="small" />,
+      handler: (device) => {
+        if (device?.id) {
+          setResetDeviceId(device.id);
+          setResetError(null);
+          setResetModalOpen(true);
+        }
+        setAnchorEl(null);
+      },
+      show: true,
+    },
+    {
+      key: 'googleMaps',
+      title: t('deviceOpenGoogleMaps'),
+      icon: <MapIcon fontSize="small" />,
+      handler: (device) => {
+        const pos = positions[device?.id];
+        if (pos?.latitude != null && pos?.longitude != null) {
+          window.open(`https://www.google.com/maps?q=${pos.latitude},${pos.longitude}`, '_blank');
+        }
+      },
+      show: true,
+    },
+    {
+      key: 'monitor',
+      title: t('deviceMonitor'),
+      icon: <LocationOnIcon fontSize="small" />,
+      handler: (device) => {
+        if (device?.id) {
+          dispatch(devicesActions.selectId(device.id));
+          navigate('/');
+          onClose?.();
+        }
+      },
+      show: true,
+    },
+    {
+      key: 'vehicleHistory',
+      title: t('deviceVehicleHistory'),
+      icon: <HistoryIcon fontSize="small" />,
+      handler: (device) => {
+        if (device?.id) {
+          setHistoryDialogDeviceId(device.id);
+          setHistoryDialogOpen(true);
+        }
+        setAnchorEl(null);
+      },
+      show: true,
     },
   ];
 
@@ -798,11 +1038,40 @@ const FloatingDevicesPopover = ({
                     </div>
                   );
                 })}
+                {/* Unlinked filter button */}
+                <div
+                  onClick={() => setShowUnlinkedOnly((prev) => !prev)}
+                  style={{
+                    backgroundColor: showUnlinkedOnly ? '#1976d2' : 'transparent',
+                    color: showUnlinkedOnly ? '#ffffff' : '#1976d2',
+                    border: '1px solid #1976d2',
+                    borderRadius: '6px',
+                    padding: '4px 12px',
+                    fontSize: '11px',
+                    height: '24px',
+                    fontWeight: '500',
+                    minWidth: 'fit-content',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    userSelect: 'none',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    flexShrink: 0,
+                  }}
+                  title={t('deviceFilterUnlinked')}
+                >
+                  <LinkOffIcon style={{ fontSize: 14 }} />
+                  {t('deviceFilterUnlinked')}: {unlinkedCount}
+                </div>
                 </div>
                 
                 {/* XLSX Export Button */}
                 <IconButton
-                  onClick={handleExport}
+                  onClick={() => handleExport(displayedDevices)}
                   size="small"
                   style={{
                     color: colors.text,
@@ -862,16 +1131,29 @@ const FloatingDevicesPopover = ({
                       <TableHead>
                         <TableRow style={{ backgroundColor: colors.surface }}>
                           <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('deviceIdentifier')}
+                          </TableCell>
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                             {t('sharedName')}
                           </TableCell>
                           {desktop && (
                             <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                              {t('deviceIdentifier')}
+                              {t('deviceModel')}
                             </TableCell>
                           )}
-                          {desktop && manager && (
+                          {desktop && (
                             <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
-                              {t('deviceStatus')}
+                              {t('sharedPhone')}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                              {t('deviceVehicle')}
+                            </TableCell>
+                          )}
+                          {desktop && (
+                            <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                              {t('deviceClient')}
                             </TableCell>
                           )}
                           {desktop && (
@@ -879,6 +1161,9 @@ const FloatingDevicesPopover = ({
                               {t('deviceLastUpdate')}
                             </TableCell>
                           )}
+                          <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
+                            {t('deviceStatus')}
+                          </TableCell>
                           <TableCell align="right" style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px', textAlign: 'right' }}>
                             {t('sharedActions')}
                           </TableCell>
@@ -901,6 +1186,11 @@ const FloatingDevicesPopover = ({
                             sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                           >
                             <TableCell>
+                              <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                {device.uniqueId}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
                               <Typography variant="body2" style={{ color: colors.text, fontWeight: '500', lineHeight: 1.8, fontSize: '13px' }}>
                                 {device.name}
                               </Typography>
@@ -908,22 +1198,29 @@ const FloatingDevicesPopover = ({
                             {desktop && (
                               <TableCell>
                                 <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
-                                  {device.uniqueId}
+                                  {device.model || '-'}
                                 </Typography>
                               </TableCell>
                             )}
-                            {desktop && manager && (
+                            {desktop && (
                               <TableCell>
-                                <Chip
-                                  label={formatStatus(device.status, t)}
-                                  size="small"
-                                  style={{
-                                    backgroundColor: device.status === 'online' ? colors.success : colors.error,
-                                    color: colors.text,
-                                    fontSize: '10px',
-                                    height: '16px',
-                                  }}
-                                />
+                                <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {device.phone || '-'}
+                                </Typography>
+                              </TableCell>
+                            )}
+                            {desktop && (
+                              <TableCell>
+                                <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {getVehicleDisplay(device.id)}
+                                </Typography>
+                              </TableCell>
+                            )}
+                            {desktop && (
+                              <TableCell>
+                                <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
+                                  {getClientDisplay(device.id)}
+                                </Typography>
                               </TableCell>
                             )}
                             {desktop && (
@@ -933,6 +1230,9 @@ const FloatingDevicesPopover = ({
                                 </Typography>
                               </TableCell>
                             )}
+                            <TableCell>
+                              <DeviceStatusIcons position={positions[device.id]} />
+                            </TableCell>
                             <TableCell align="right" style={{ textAlign: 'right', padding: '4px' }}>
                               <IconButton
                                 size="small"
@@ -968,7 +1268,7 @@ const FloatingDevicesPopover = ({
                       zIndex: 1,
                     }}>
                       <Typography style={{ color: colors.textSecondary, fontSize: '11px', lineHeight: 0.8 }}>
-                        {page} / {totalPages} ({filteredDevices.length} {t('sharedDevices')})
+                        {page} / {totalPages} ({displayedDevices.length} {t('sharedDevices')})
                         {selectedTimeFilter !== 'all' && (
                           <span style={{ color: colors.textSecondary, opacity: 0.7 }}>
                             {' '}• {getCurrentFilterInfo().label}
@@ -1300,8 +1600,14 @@ const FloatingDevicesPopover = ({
                           fullWidth
                           label={t('deviceModel')}
                           value={editingDevice?.model || ''}
-                          onChange={(e) => setEditingDevice({ ...editingDevice, model: e.target.value })}
+                          onChange={(e) => {
+                            setEditingDevice({ ...editingDevice, model: e.target.value });
+                            if (!modelDropdownOpen) setModelDropdownOpen(true);
+                          }}
+                          onFocus={() => setModelDropdownOpen(true)}
                           size="small"
+                          ref={setModelInputRef}
+                          autoComplete="off"
                           sx={{
                             '& .MuiOutlinedInputRoot': {
                               backgroundColor: colors.secondary,
@@ -1315,6 +1621,64 @@ const FloatingDevicesPopover = ({
                             },
                           }}
                         />
+                        {modelDropdownOpen && (
+                          <div style={{
+                            position: 'fixed',
+                            zIndex: 10004,
+                            maxHeight: '200px',
+                            overflow: 'auto',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '6px',
+                            backgroundColor: colors.surface,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                            left: modelInputRef?.getBoundingClientRect().left || 0,
+                            top: (modelInputRef?.getBoundingClientRect().bottom || 0) + 4,
+                            width: modelInputRef?.getBoundingClientRect().width || 200,
+                          }}>
+                            {['AtlasTrax', 'J16', 'EC33', 'E3+', 'k-tag', 'Oneblock', 'JC181', 'JC400', 'JC450']
+                              .filter(m => !editingDevice?.model || m.toLowerCase().includes(editingDevice.model.toLowerCase()))
+                              .map((model) => (
+                              <div
+                                key={model}
+                                style={{
+                                  padding: '8px 12px',
+                                  cursor: 'pointer',
+                                  color: colors.text,
+                                  fontSize: '14px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                }}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  if (model === 'k-tag') {
+                                    const attrs = { ...(editingDevice?.attributes || {}) };
+                                    if (attrs.ktag_hashedKey === undefined) attrs.ktag_hashedKey = '';
+                                    if (attrs.ktag_privateKey === undefined) attrs.ktag_privateKey = '';
+                                    setEditingDevice({ ...editingDevice, model: model, attributes: attrs });
+                                  } else if (['JC181', 'JC400', 'JC450'].includes(model)) {
+                                    const imeiPrefix = editingDevice?.uniqueId ? `_${editingDevice.uniqueId}` : '';
+                                    const channels = model === 'JC450' ? '5' : '2';
+                                    setEditingDevice({
+                                      ...editingDevice,
+                                      model: model,
+                                      iothub: {
+                                        ...JIMI_IOT_DEFAULTS,
+                                        ftpUser: imeiPrefix,
+                                        ftpPassword: imeiPrefix,
+                                        deviceModel: model,
+                                        channels,
+                                      },
+                                    });
+                                  } else {
+                                    setEditingDevice({ ...editingDevice, model: model });
+                                  }
+                                  setModelDropdownOpen(false);
+                                }}
+                              >
+                                {model}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         <TextField
                           fullWidth
@@ -1350,10 +1714,11 @@ const FloatingDevicesPopover = ({
                                 src={categoryIcons[editingDevice?.category || 'default'] || categoryIcons.default}
                                 alt={editingDevice?.category || 'default'}
                                 style={{ 
-                                  width: '24px', 
-                                  height: '24px',
+                                  width: editingDevice?.category === 'tag' ? '100px' : '44px', 
+                                  height: editingDevice?.category === 'tag' ? '100px' : '44px',
                                   objectFit: 'contain',
-                                  marginRight: '8px'
+                                  marginRight: editingDevice?.category === 'tag' ? '-20px' : '8px',
+                                  marginLeft: editingDevice?.category === 'tag' ? '-20px' : '0px'
                                 }}
                               />
                             ),
@@ -1413,9 +1778,10 @@ const FloatingDevicesPopover = ({
                                       src={iconSrc}
                                       alt={category}
                                       style={{ 
-                                        width: '26px', 
-                                        height: '26px',
-                                        objectFit: 'contain'
+                                        width: category === 'tag' ? '120px' : '48px', 
+                                        height: category === 'tag' ? '120px' : '48px',
+                                        objectFit: 'contain',
+                                        margin: category === 'tag' ? '-30px' : '0px'
                                       }}
                                     />
                                     {t(`category${category.replace(/^\w/, (c) => c.toUpperCase())}`)}
@@ -2128,6 +2494,70 @@ const FloatingDevicesPopover = ({
               </>
             )}
           </AnimatePresence>
+
+          <DeviceVehicleHistoryDialog
+            open={historyDialogOpen}
+            onClose={() => { setHistoryDialogOpen(false); setHistoryDialogDeviceId(null); }}
+            deviceId={historyDialogDeviceId}
+          />
+          {createPortal(
+            <Dialog
+              open={configPromptOpen}
+              onClose={() => { setConfigPromptOpen(false); setConfigPromptDeviceId(null); }}
+              slotProps={{ root: { sx: { zIndex: 99999 } } }}
+            >
+              <DialogTitle>Configurar dispositivo</DialogTitle>
+              <DialogContent>
+                <Typography>Deseja configurar o dispositivo agora via SMS?</Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => { setConfigPromptOpen(false); setConfigPromptDeviceId(null); }}>
+                  Não
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setConfigPromptOpen(false);
+                    setSmsModalDeviceId(configPromptDeviceId);
+                    setSmsModalOpen(true);
+                    setConfigPromptDeviceId(null);
+                  }}
+                >
+                  Sim
+                </Button>
+              </DialogActions>
+            </Dialog>,
+            document.body
+          )}
+          <SmsSendModal
+            open={smsModalOpen}
+            onClose={() => { setSmsModalOpen(false); setSmsModalDeviceId(null); setSmsModalPhone(''); }}
+            deviceId={smsModalDeviceId}
+            phone={smsModalPhone}
+          />
+          <Dialog
+            open={resetModalOpen}
+            onClose={() => !resetLoading && setResetModalOpen(false)}
+            slotProps={{ root: { sx: { zIndex: 99999 } } }}
+          >
+            <DialogTitle>{t('deviceResetSimcard')}</DialogTitle>
+            <DialogContent>
+              {resetError && (
+                <Alert severity="error" sx={{ mb: 2 }} onClose={() => setResetError(null)}>
+                  {resetError}
+                </Alert>
+              )}
+              Deseja resetar o simcard deste dispositivo?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => !resetLoading && setResetModalOpen(false)} disabled={resetLoading}>
+                Cancelar
+              </Button>
+              <Button variant="contained" color="secondary" onClick={handleResetConfirm} disabled={resetLoading}>
+                {resetLoading ? <CircularProgress size={20} /> : t('deviceResetSimcard')}
+              </Button>
+            </DialogActions>
+          </Dialog>
         </motion.div>
       )}
     </AnimatePresence>

@@ -2,6 +2,7 @@ import {
   useState, useEffect, useCallback, useRef, useMemo, memo
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { createPortal } from 'react-dom';
@@ -25,6 +26,7 @@ import {
   errorsActions,
   sessionActions
 } from '../store';
+import { eventsActions } from '../store/events';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { map } from '../map/core/MapView';
@@ -35,6 +37,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { processPositions } from '../common/util/positionUtils';
 import { useCatch } from '../reactHelper';
 import {
   formatPercentage,
@@ -49,7 +52,8 @@ import {
   formatBoolean,
   formatAlarm,
   formatNumber,
-  formatNumericHours
+  formatNumericHours,
+  reverseGeocode
 } from '../common/util/formatter';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import localStorageAsync from '../common/util/localStorageAsync';
@@ -67,6 +71,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
+import WarningIcon from '@mui/icons-material/Warning';
 import { PieChart } from 'lucide-react';
 import CommandDialog from './CommandDialog';
 import ShareDialog from './ShareDialog';
@@ -88,6 +93,7 @@ import { Card } from './ui/card';
 import { useResellerBranding } from '../common/hooks/useResellerBranding';
 import fallbackLogo from '../resources/images/image170.png?inline';
 import flvjs from 'flv.js';
+import FleetVehicleCard from './fleet/FleetVehicleCard';
 
 dayjs.extend(relativeTime);
 
@@ -596,14 +602,16 @@ const VideoItem = memo(({ video, index, colors, setSelectedVideo, setShowVideoPl
 
 VideoItem.displayName = 'VideoItem';
 
-const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList, onShowDeviceList, onOpenReports }) => {
+const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, showReplayPopover, setShowReplayPopover, onHideDeviceList, onShowDeviceList, onOpenReports, onOpenHistory }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const t = useTranslation();
   const colors = useThemeColors();
   const { theme } = useTheme();
   
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
+  const selectedPlate = useSelector((state) => state.fleet.selectedPlate);
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const replayPositions = useSelector((state) => state.session.replayPositions);
@@ -761,8 +769,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   }, [user]);
   
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsModalDeviceId, setDetailsModalDeviceId] = useState(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailedPosition, setDetailedPosition] = useState(null);
+  const lastPositionIdRef = useRef(null);
+  const lastAttributesHashRef = useRef(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editField, setEditField] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -934,6 +945,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const device = (replayPositions.length > 1 && replayDeviceId) || (showReplayPopover && replayDeviceId) 
     ? devices[replayDeviceId] 
     : (selectedDeviceId ? devices[selectedDeviceId] : null);
+
+  // For details modal: when opened from FleetVehicleCard, use the specified device
+  const modalDevice = detailsModalDeviceId ? devices[detailsModalDeviceId] : device;
+
 
   // Helper function to generate video download URL from expected_file
   const generateVideoDownloadUrl = useCallback((expectedFile, deviceImei) => {
@@ -1783,7 +1798,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
     // Cleanup streaming when switching away from streaming tabs
     if (newValue === 0 || newValue === 'playback') {
-      console.log('Cleaning up streaming - switching away from streaming tabs');
       // Destroy flv player
       if (flvPlayerRef.current) {
         flvPlayerRef.current.destroy();
@@ -1984,7 +1998,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       modalOpenedRef.current = false;
       // Cleanup streaming when modal closes (only if not detached)
       if (!isVideoDetached) {
-        console.log('Cleaning up streaming - modal closed');
         if (streamingRetryTimeoutRef.current) {
           clearTimeout(streamingRetryTimeoutRef.current);
           streamingRetryTimeoutRef.current = null;
@@ -2481,6 +2494,87 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Fall back to original translation
     return positionAttributes[sensorKey]?.name || sensorKey;
   }, [device, positionAttributes]);
+
+  // Track confirmed door status (only updates when wire state is confirmed)
+  const confirmedDoorStatusRef = useRef({});
+  // Track pending door status (prevents flickering while waiting for confirmation)
+  const pendingDoorStatusRef = useRef({});
+  
+  // Helper function to check if value is sharedUnknown
+  const isSharedUnknown = useCallback((val) => {
+    if (!val) return false;
+    const unknownText = t('sharedUnknown');
+    return val === 'sharedUnknown' || val === unknownText || String(val).trim() === unknownText;
+  }, [t]);
+  
+  // Use reverse geocoding function (already imported)
+  
+  // Helper function to calculate door status from position
+  // Uses confirmed status if available, otherwise uses pending status, otherwise calculates from current position
+  const getDoorStatus = useCallback((pos, dev) => {
+    if (!pos || !dev) return null;
+    
+    const deviceId = dev.id;
+    const doorSensorMode = String(dev?.attributes?.doorSensorMode || '1');
+    const hasDoorAttribute = pos.attributes?.hasOwnProperty('door');
+    const doorValue = pos.attributes?.door;
+    
+    // Detect wire state:
+    // - When door doesn't exist in attributes = wire is grounded
+    // - When door exists with sharedUnknown or string value = wire is ungrounded
+    const unknownText = t('sharedUnknown');
+    const isSharedUnknownValue = doorValue === 'sharedUnknown' || 
+                                 doorValue === unknownText || 
+                                 (typeof doorValue === 'string' && 
+                                  (doorValue.trim() === unknownText || 
+                                   doorValue.trim().toLowerCase() === 'sharedunknown'));
+    
+    // Wire is grounded when door attribute doesn't exist
+    const isGrounded = !hasDoorAttribute;
+    // Wire is ungrounded when door exists with sharedUnknown or string value
+    const isUngrounded = hasDoorAttribute && (isSharedUnknownValue || typeof doorValue === 'string');
+    
+    // Check if we have a confirmed status for this device (highest priority - most stable)
+    const confirmedStatus = confirmedDoorStatusRef.current[deviceId];
+    if (confirmedStatus !== undefined) {
+      return {
+        isOpen: confirmedStatus,
+        displayText: confirmedStatus ? t('positionDoorOpen') : t('positionDoorClosed')
+      };
+    }
+    
+    // Check if we have a pending status (intermediate priority - prevents flickering)
+    const pendingStatus = pendingDoorStatusRef.current[deviceId];
+    if (pendingStatus !== undefined) {
+      return {
+        isOpen: pendingStatus,
+        displayText: pendingStatus ? t('positionDoorOpen') : t('positionDoorClosed')
+      };
+    }
+    
+    // Otherwise, calculate from current position (for initial display only)
+    let isOpen = false;
+    if (doorSensorMode === '1' || doorSensorMode === 1) {
+      // Option 1: Aterrado = Porta Aberta (com alerta), Desaterrado = Porta Fechada
+      // Grounded = Door Open (with alert), Ungrounded = Door Closed
+      isOpen = isGrounded ? true : false;
+    } else if (doorSensorMode === '2' || doorSensorMode === 2) {
+      // Option 2: Aterrado = Porta Fechada, Desaterrado = Porta Aberta (com alerta)
+      // Grounded = Door Closed, Ungrounded = Door Open (with alert)
+      isOpen = isGrounded ? false : true;
+    } else {
+      // Fallback to mode 1
+      isOpen = isGrounded ? true : false;
+    }
+    
+    // Store as pending status to prevent flickering
+    pendingDoorStatusRef.current[deviceId] = isOpen;
+    
+    return {
+      isOpen,
+      displayText: isOpen ? t('positionDoorOpen') : t('positionDoorClosed')
+    };
+  }, [t]);
   
   // Sync local state with Redux state
   useEffect(() => {
@@ -2500,6 +2594,73 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     // Normal mode: use selected device position
     return selectedDeviceId ? positions[selectedDeviceId] : null;
   }, [showReplayPopover, replayPositions, currentReplayIndex, selectedDeviceId, positions]);
+
+  // State to store resolved address from reverse geocoding
+  const [resolvedAddress, setResolvedAddress] = useState(null);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const addressCache = useRef(new Map()); // Cache de endereços resolvidos
+  const resolvingRef = useRef(false); // Flag para evitar múltiplas requisições simultâneas
+
+  // Effect to resolve address when position changes and there's no address but there are coordinates
+  useEffect(() => {
+    // Reset if no position
+    if (!position) {
+      setResolvedAddress(null);
+      resolvingRef.current = false;
+      setIsResolvingAddress(false);
+      return;
+    }
+
+    const hasCoordinates = position.latitude && position.longitude;
+    // Check if address exists and is not empty string
+    const hasAddress = position.address && position.address.trim() !== '';
+    const currentKey = `${position.latitude}_${position.longitude}`;
+
+    // If we already have an address, clear resolved address
+    if (hasAddress) {
+      setResolvedAddress(null);
+      resolvingRef.current = false;
+      setIsResolvingAddress(false);
+      return;
+    }
+
+    // If we have coordinates but no address, try to resolve
+    if (hasCoordinates && !hasAddress && !resolvingRef.current) {
+      // Check cache first
+      if (addressCache.current.has(currentKey)) {
+        const cachedAddress = addressCache.current.get(currentKey);
+        setResolvedAddress(cachedAddress);
+        return;
+      }
+
+      // Set flag to prevent multiple simultaneous requests
+      resolvingRef.current = true;
+      setIsResolvingAddress(true);
+      
+      reverseGeocode(position.latitude, position.longitude)
+        .then((address) => {
+          if (address) {
+            // Cache the result
+            addressCache.current.set(currentKey, address);
+            setResolvedAddress(address);
+          } else {
+            setResolvedAddress(null);
+          }
+          setIsResolvingAddress(false);
+          resolvingRef.current = false;
+        })
+        .catch(() => {
+          setResolvedAddress(null);
+          setIsResolvingAddress(false);
+          resolvingRef.current = false;
+        });
+    } else if (!hasCoordinates) {
+      // No coordinates, clear everything
+      setResolvedAddress(null);
+      resolvingRef.current = false;
+      setIsResolvingAddress(false);
+    }
+  }, [position]);
 
 
   // Get user's current location (will request permission if needed)
@@ -2588,8 +2749,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           .then((location) => {
             setUserLocation(location);
           })
-          .catch((error) => {
-            // Silently fail - we'll ask again when button is clicked
+          .catch(() => {
             setUserLocation(null);
           });
       }, 500);
@@ -2604,6 +2764,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const handleMoreDetails = useCallback(async () => {
     if (!position || !position.id) return;
     
+    setDetailsModalDeviceId(null);
     setShowDetailsModal(true);
     setIsLoadingDetails(true);
     setDetailedPosition(null);
@@ -2623,6 +2784,279 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [position]);
 
+  const openDetailsForDevice = useCallback((deviceId, position) => {
+    if (!deviceId) return;
+    setDetailsModalDeviceId(deviceId);
+    setShowDetailsModal(true);
+    setIsLoadingDetails(false);
+    setDetailedPosition(position || null);
+  }, []);
+
+  // Update detailedPosition when position changes (for real-time updates)
+  useEffect(() => {
+    const effectiveDeviceId = detailsModalDeviceId ?? selectedDeviceId;
+    if (showDetailsModal && effectiveDeviceId) {
+      // Always update detailedPosition with the latest position data
+      // This ensures door status updates in real-time when wire state changes
+      const currentPosition = positions[effectiveDeviceId];
+      
+      if (currentPosition) {
+        // Create a hash of attributes to detect changes
+        const attributesHash = JSON.stringify(currentPosition.attributes);
+        const positionIdChanged = currentPosition.id !== lastPositionIdRef.current;
+        const attributesHashChanged = attributesHash !== lastAttributesHashRef.current;
+        
+        console.log('🔄 useEffect triggered - positions changed:', {
+          showDetailsModal,
+          effectiveDeviceId,
+          currentPositionId: currentPosition.id,
+          lastPositionIdRef: lastPositionIdRef.current,
+          positionIdChanged,
+          attributesHashChanged,
+          currentPositionAttributes: Object.keys(currentPosition.attributes),
+          doorAttribute: currentPosition.attributes?.door,
+          hasDoor: currentPosition.attributes.hasOwnProperty('door'),
+          positionsObjectKeys: Object.keys(positions),
+          positionsObjectSize: Object.keys(positions).length
+        });
+        
+        // Always update if no previous detailedPosition, or if position ID changed, or if attributes changed
+        if (!detailedPosition || positionIdChanged || attributesHashChanged) {
+          const oldHasDoor = detailedPosition?.attributes?.hasOwnProperty('door');
+          const newHasDoor = currentPosition.attributes?.hasOwnProperty('door');
+          const oldDoorValue = detailedPosition?.attributes?.door;
+          const newDoorValue = currentPosition.attributes?.door;
+          
+          console.log('🔄 Updating detailedPosition with new position data:', {
+            oldPositionId: detailedPosition?.id,
+            newPositionId: currentPosition.id,
+            positionIdChanged,
+            attributesHashChanged,
+            oldDoor: oldDoorValue,
+            newDoor: newDoorValue,
+            oldHasDoor,
+            newHasDoor,
+            oldAttributes: detailedPosition ? Object.keys(detailedPosition.attributes) : [],
+            newAttributes: Object.keys(currentPosition.attributes),
+            allAttributes: currentPosition.attributes
+          });
+          
+          lastPositionIdRef.current = currentPosition.id;
+          lastAttributesHashRef.current = attributesHash;
+          setDetailedPosition(currentPosition);
+        } else {
+          console.log('⏸️ Skipping update - no changes detected', {
+            currentPositionId: currentPosition.id,
+            lastPositionId: lastPositionIdRef.current,
+            currentHash: attributesHash.substring(0, 50),
+            lastHash: lastAttributesHashRef.current?.substring(0, 50)
+          });
+        }
+      } else {
+        console.log('⚠️ No current position found for device:', effectiveDeviceId);
+      }
+    } else {
+      // Reset refs when modal closes
+      lastPositionIdRef.current = null;
+      lastAttributesHashRef.current = null;
+    }
+  }, [showDetailsModal, selectedDeviceId, detailsModalDeviceId, positions]);
+
+  // Monitor door status changes and generate notifications when door opens
+  // Track the physical wire state (grounded/ungrounded) instead of calculated door status
+  const lastWireStateRef = useRef({}); // Track: true = wire is grounded, false = wire is ungrounded
+  const lastDoorStatusRef = useRef({}); // Track last calculated door status for display
+  const wireStateHistoryRef = useRef({}); // Track recent wire states to verify consistency
+  const lastUpdateTimeRef = useRef({}); // Track last update time to debounce rapid changes
+  
+  useEffect(() => {
+    if (!selectedDeviceId || !device) return;
+    
+    const currentPosition = positions[selectedDeviceId];
+    if (!currentPosition) return;
+    
+    const doorStatus = getDoorStatus(currentPosition, device);
+    if (!doorStatus) return;
+    
+    const deviceId = selectedDeviceId;
+    const now = Date.now();
+    
+    // Track the physical wire state: grounded (door attribute doesn't exist) vs ungrounded (door attribute exists)
+    const hasDoorAttribute = currentPosition.attributes?.hasOwnProperty('door');
+    const currentWireState = !hasDoorAttribute; // true = grounded, false = ungrounded
+    const lastWireState = lastWireStateRef.current[deviceId];
+    const lastStatus = lastDoorStatusRef.current[deviceId];
+    const lastUpdateTime = lastUpdateTimeRef.current[deviceId] || 0;
+    
+    // Initialize history if needed
+    if (!wireStateHistoryRef.current[deviceId]) {
+      wireStateHistoryRef.current[deviceId] = [];
+    }
+    
+    // Add current state to history (keep last 10 states for better tracking)
+    const history = wireStateHistoryRef.current[deviceId];
+    history.push({ state: currentWireState, time: now, positionId: currentPosition.id });
+    if (history.length > 10) {
+      history.shift();
+    }
+    
+    // Check if wire state is consistent in recent history
+    // Require ALL 5 most recent states to be the same (very strict)
+    const recentStates = history.slice(-5);
+    const consecutiveSameState = recentStates.length >= 5 && 
+      recentStates.every(s => s.state === currentWireState);
+    
+    // Check if the state has been stable in recent history (check time span of recent states)
+    // Only consider states that match currentWireState in recent history
+    const matchingRecentStates = recentStates.filter(s => s.state === currentWireState);
+    const stateStableTime = matchingRecentStates.length > 0 
+      ? now - matchingRecentStates[0].time  // Time since first matching state in recent history
+      : 0;
+    const stateStable = matchingRecentStates.length >= 5 && stateStableTime >= 8000; // 8 seconds stability with 5 matching states
+    
+    // Only update if:
+    // 1. Wire state actually changed from last known state
+    // 2. The new state is consistent (ALL 5 recent states must match)
+    // 3. The state has been stable for at least 8 seconds (with 5 matching states)
+    // 4. At least 8 seconds have passed since last update (debounce)
+    const wireStateChanged = lastWireState !== undefined && lastWireState !== currentWireState;
+    const enoughTimePassed = now - lastUpdateTime > 8000; // 8 seconds debounce
+    
+    // CRITICAL: All conditions must be true - use explicit checks to prevent false positives
+    // If consecutiveSameState is false, shouldUpdate MUST be false (safety check)
+    let shouldUpdate = false;
+    if (wireStateChanged && consecutiveSameState && stateStable && enoughTimePassed) {
+      shouldUpdate = true;
+    }
+    
+    // Safety check: log if we detect an inconsistency
+    if (wireStateChanged && !consecutiveSameState && stateStable && enoughTimePassed) {
+      console.warn('🚪 WARNING: Conditions met but consecutiveSameState is false!', {
+        wireStateChanged,
+        consecutiveSameState,
+        stateStable,
+        enoughTimePassed,
+        matchingStatesCount: matchingRecentStates.length,
+        recentStates: recentStates.map(h => ({ state: h.state ? 'grounded' : 'ungrounded' }))
+      });
+    }
+    
+    if (shouldUpdate) {
+      console.log('🚪 Wire state changed (CONFIRMED):', {
+        deviceId,
+        lastWireState: lastWireState ? 'grounded' : 'ungrounded',
+        currentWireState: currentWireState ? 'grounded' : 'ungrounded',
+        lastStatus: lastStatus ? 'open' : 'closed',
+        newStatus: doorStatus.isOpen ? 'open' : 'closed',
+        hasDoorAttribute,
+        recentStates: recentStates.map(h => ({ state: h.state ? 'grounded' : 'ungrounded', time: new Date(h.time).toISOString() })),
+        consecutiveSameState,
+        matchingStatesCount: matchingRecentStates.length,
+        stateStableTime: `${(stateStableTime / 1000).toFixed(1)}s`,
+        timeSinceLastUpdate: `${((now - lastUpdateTime) / 1000).toFixed(1)}s`,
+        allConditions: {
+          wireStateChanged,
+          consecutiveSameState,
+          stateStable,
+          enoughTimePassed
+        }
+      });
+      
+      // Check if door status changed from closed to open
+      if (lastStatus === false && doorStatus.isOpen === true) {
+        // Door just opened - create notification event
+        const event = {
+          id: Date.now(), // Temporary ID
+          deviceId: deviceId,
+          type: 'alarm',
+          eventTime: new Date().toISOString(),
+          positionId: currentPosition.id,
+          attributes: {
+            alarm: 'door',
+            message: `${device.name || t('deviceUnknown')}: ${t('positionDoorOpen')}`
+          }
+        };
+        
+        console.log('🚪 Door opened - creating notification:', event);
+        
+        // Dispatch event to trigger notification
+        dispatch(eventsActions.add([event]));
+        
+        // Play alarm sound if configured
+        const soundAlarms = localStorage.getItem('soundAlarms') || 'sos';
+        if (soundAlarms.includes('door')) {
+          try {
+            const alarmSound = new Audio('/alarm.mp3');
+            alarmSound.play().catch(err => console.error('Error playing alarm sound:', err));
+          } catch (error) {
+            console.error('Error creating alarm sound:', error);
+          }
+        }
+      }
+      
+      // Update wire state and door status only when wire state actually changed and is consistent
+      lastWireStateRef.current[deviceId] = currentWireState;
+      lastDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+      lastUpdateTimeRef.current[deviceId] = now;
+      // Update confirmed status (this is what will be displayed)
+      confirmedDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+      // Clear pending status once confirmed
+      delete pendingDoorStatusRef.current[deviceId];
+      // Keep last 3 states in history for reference, but reset to current state
+      wireStateHistoryRef.current[deviceId] = history.slice(-3);
+    } else if (lastWireState === undefined) {
+      // Initialize on first run
+      lastWireStateRef.current[deviceId] = currentWireState;
+      lastDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+      lastUpdateTimeRef.current[deviceId] = now;
+      // Set as pending status immediately to prevent flickering
+      pendingDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+      // Initialize confirmed status after a short delay to allow for initial consistency check
+      // Wait for at least 3 consistent states before confirming initial status
+      if (history.length >= 3 && history.slice(-3).every(s => s.state === currentWireState)) {
+        confirmedDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+        // Clear pending status once confirmed
+        delete pendingDoorStatusRef.current[deviceId];
+      }
+      wireStateHistoryRef.current[deviceId] = [{ state: currentWireState, time: now, positionId: currentPosition.id }];
+    } else if (!confirmedDoorStatusRef.current.hasOwnProperty(deviceId)) {
+      // If we don't have a confirmed status yet, update pending status and try to establish one after consistency
+      pendingDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+      if (history.length >= 3 && history.slice(-3).every(s => s.state === currentWireState)) {
+        confirmedDoorStatusRef.current[deviceId] = doorStatus.isOpen;
+        // Clear pending status once confirmed
+        delete pendingDoorStatusRef.current[deviceId];
+      }
+    } else if (wireStateChanged && (!consecutiveSameState || !stateStable || !enoughTimePassed)) {
+      // Log when state changes but is not consistent/stable yet
+      // Only log occasionally to reduce console spam (every 3 seconds)
+      const lastLogTime = wireStateHistoryRef.current[deviceId]?.lastLogTime || 0;
+      if (now - lastLogTime > 3000) {
+        console.log('🚪 Wire state changed but not confirmed yet:', {
+          deviceId,
+          lastWireState: lastWireState ? 'grounded' : 'ungrounded',
+          currentWireState: currentWireState ? 'grounded' : 'ungrounded',
+          consecutiveSameState,
+          matchingStatesCount: matchingRecentStates.length,
+          stateStableTime: `${(stateStableTime / 1000).toFixed(1)}s`,
+          timeSinceLastUpdate: `${((now - lastUpdateTime) / 1000).toFixed(1)}s`,
+          recentStates: recentStates.map(h => ({ state: h.state ? 'grounded' : 'ungrounded' })),
+          allConditions: {
+            wireStateChanged,
+            consecutiveSameState,
+            stateStable,
+            enoughTimePassed
+          }
+        });
+        if (!wireStateHistoryRef.current[deviceId].lastLogTime) {
+          wireStateHistoryRef.current[deviceId].lastLogTime = 0;
+        }
+        wireStateHistoryRef.current[deviceId].lastLogTime = now;
+      }
+    }
+    // Don't update if wire state hasn't changed or is not consistent - this prevents false status changes
+  }, [selectedDeviceId, device, positions, getDoorStatus, dispatch, t]);
+
   // Handler for opening navigation apps
   const handleOpenNavigation = useCallback(async (app, event) => {
     if (!position || !position.latitude || !position.longitude) {
@@ -2633,43 +3067,35 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     const deviceLat = position.latitude;
     const deviceLon = position.longitude;
 
-    // Check if we have user location, if not, get it now
     let currentUserLocation = userLocation;
     if (!currentUserLocation) {
       try {
         currentUserLocation = await getUserLocation();
         setUserLocation(currentUserLocation);
-      } catch (error) {
-        let errorMessage = 'Unable to get your location.';
-        const errorCode = error.code || (error.message === 'PERMISSION_DENIED' ? 1 : null);
-        
-        if (errorCode === 1 || error.message === 'PERMISSION_DENIED') {
-          errorMessage = 'Location permission is required. Please allow location access in your browser settings (Opera Settings > Privacy & Security > Location Services) and try again.';
-        } else if (errorCode === 2) {
-          errorMessage = 'Location information is unavailable. Please check your device settings.';
-        } else if (errorCode === 3) {
-          errorMessage = 'Location request timed out. Please check your internet connection and ensure location services are enabled in macOS System Settings > Privacy & Security > Location Services.';
+      } catch {
+        // Waze doesn't need origin - it uses the device's GPS automatically
+        if (app === 'waze') {
+          currentUserLocation = null;
         } else {
-          errorMessage = 'Unable to get your location. Please check your browser and macOS location settings.';
+          // Google/Apple Maps work without origin too (they'll use device location)
+          currentUserLocation = null;
         }
-        showSnackbar(errorMessage, 'error');
-        return;
       }
     }
 
     let url = '';
     if (app === 'waze') {
-      // Waze navigation URL - Waze uses user's current location automatically as origin
       url = `https://waze.com/ul?ll=${deviceLat},${deviceLon}&navigate=yes`;
     } else if (app === 'google') {
-      // Google Maps directions URL with origin and destination
-      url = `https://www.google.com/maps/dir/?api=1&origin=${currentUserLocation.lat},${currentUserLocation.lon}&destination=${deviceLat},${deviceLon}`;
+      url = currentUserLocation
+        ? `https://www.google.com/maps/dir/?api=1&origin=${currentUserLocation.lat},${currentUserLocation.lon}&destination=${deviceLat},${deviceLon}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${deviceLat},${deviceLon}`;
     } else if (app === 'apple') {
-      // Apple Maps directions URL with source and destination
-      url = `https://maps.apple.com/?saddr=${currentUserLocation.lat},${currentUserLocation.lon}&daddr=${deviceLat},${deviceLon}`;
+      url = currentUserLocation
+        ? `https://maps.apple.com/?saddr=${currentUserLocation.lat},${currentUserLocation.lon}&daddr=${deviceLat},${deviceLon}`
+        : `https://maps.apple.com/?daddr=${deviceLat},${deviceLon}`;
     }
 
-    // Open navigation in new tab
     window.open(url, '_blank', 'noopener,noreferrer');
   }, [position, userLocation, showSnackbar, getUserLocation]);
   
@@ -3491,6 +3917,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       let selectedTo;
       
       switch (period) {
+        case 'last1h':
+          selectedFrom = dayjs().subtract(1, 'hour');
+          selectedTo = dayjs();
+          break;
         case 'today':
           selectedFrom = dayjs().startOf('day');
           selectedTo = dayjs().endOf('day');
@@ -3499,21 +3929,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           selectedFrom = dayjs().subtract(1, 'day').startOf('day');
           selectedTo = dayjs().subtract(1, 'day').endOf('day');
           break;
-        case 'thisWeek':
-          selectedFrom = dayjs().startOf('week');
-          selectedTo = dayjs().endOf('week');
-          break;
-        case 'previousWeek':
-          selectedFrom = dayjs().subtract(1, 'week').startOf('week');
-          selectedTo = dayjs().subtract(1, 'week').endOf('week');
-          break;
         case 'thisMonth':
           selectedFrom = dayjs().startOf('month');
           selectedTo = dayjs().endOf('month');
-          break;
-        case 'previousMonth':
-          selectedFrom = dayjs().subtract(1, 'month').startOf('month');
-          selectedTo = dayjs().subtract(1, 'month').endOf('month');
           break;
         default:
           selectedFrom = dayjs(customFrom, 'YYYY-MM-DDTHH:mm');
@@ -3521,19 +3939,20 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           break;
       }
 
+      const toDate = selectedTo.isAfter(dayjs()) ? dayjs() : selectedTo;
       const query = new URLSearchParams({
         deviceId: replayDeviceId,
         from: selectedFrom.toISOString(),
-        to: selectedTo.toISOString()
+        to: toDate.toISOString()
       });
 
       
       const response = await fetchOrThrow(`/api/positions?${query.toString()}`);
-      const positions = await response.json();
-      
+      const rawPositions = await response.json();
+      const positions = processPositions(rawPositions);
              
-             // Store positions for map plotting
-             dispatch(sessionActions.updateReplayPositions(positions));
+      // Store positions for map plotting
+      dispatch(sessionActions.updateReplayPositions(positions));
              
              if (positions.length > 1) {
                // Hide popover when we have positions, keep status card and controls visible
@@ -3926,8 +4345,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     />
     <AnimatePresence mode="wait">
       {(
+        // Fleet mode: show FleetVehicleCard when a fleet vehicle is selected
+        (selectedPlate && !showReplayPopover && replayPositions.length <= 1) ||
         // Normal mode: show when device is selected and NOT in replay mode
-        (selectedDeviceId && device && !showReplayPopover && replayPositions.length <= 1) ||
+        // Allow rendering even if device is not loaded yet (will show loading state)
+        (selectedDeviceId && !selectedPlate && !showReplayPopover && replayPositions.length <= 1) ||
         // Replay popover mode: show when popover is open
         (showReplayPopover && replayDeviceId && devices[replayDeviceId]) ||
         // Replay active mode: show when replay positions are loaded (popover hidden)
@@ -3946,22 +4368,55 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           left: !desktop ? '0px' : (isDeviceListVisible || showReplayPopover ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '310px',
           height: !desktop ? 'calc(47vh - 50px)' : 'calc(100vh - 16px)',
-          zIndex: 9998,
+          zIndex: selectedPlate ? 10000 : 9998,
           pointerEvents: 'auto',
           transition: 'left 0.3s ease'
         }}
       >
-        <Card style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          borderRadius: !desktop ? '16px 16px 0px 0px' : (isDeviceListVisible ? '0px 16px 16px 0px' : '0px 16px 16px 0px'),
-          backgroundColor: colors.surface,
-          border: `1px solid ${colors.border}`,
-          boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
-          overflow: 'hidden',
-          position: 'relative'
-        }}>
+        {selectedPlate && !showReplayPopover && replayPositions.length <= 1 ? (
+          // Render FleetVehicleCard when a fleet vehicle is selected
+          <div style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            position: 'relative',
+            zIndex: 1000,
+          }}>
+            <FleetVehicleCard
+              onOpenReplay={(id) => { onOpenHistory ? onOpenHistory(id) : navigate(`/history?deviceId=${id}`); }}
+              onOpenDetails={(deviceId, position) => { openDetailsForDevice(deviceId, position); }}
+            />
+          </div>
+        ) : (
+          <Card style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: !desktop ? '16px 16px 0px 0px' : (isDeviceListVisible ? '0px 16px 16px 0px' : '0px 16px 16px 0px'),
+            backgroundColor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            boxShadow: !desktop ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
+          {/* Show loading state if device is not loaded yet */}
+          {!device && selectedDeviceId ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              color: colors.textSecondary,
+              padding: '20px'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ marginBottom: '12px' }}>Carregando dispositivo...</div>
+                <div style={{ fontSize: '12px', opacity: 0.7 }}>ID: {selectedDeviceId}</div>
+              </div>
+            </div>
+          ) : device ? (
+            <>
           {/* Back Button */}
           <button
             onClick={(e) => {
@@ -4315,9 +4770,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                     margin: 0,
                     lineHeight: '1.4'
                   }}>
-                    {position?.address || (position?.latitude && position?.longitude ?
-                      `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` :
-                      t('sharedNoData'))}
+                    {(() => {
+                      // Priority: original address > resolved address > loading > coordinates > no data
+                      if (position?.address && position.address.trim() !== '') {
+                        return position.address;
+                      }
+                      if (resolvedAddress) {
+                        return resolvedAddress;
+                      }
+                      if (isResolvingAddress) {
+                        return t('sharedLoading');
+                      }
+                      if (position?.latitude && position?.longitude) {
+                        return `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}`;
+                      }
+                      return t('sharedNoData');
+                    })()}
                   </p>
                 </div>
               </div>
@@ -4519,9 +4987,22 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 margin: 0,
                 lineHeight: '1.4'
               }}>
-                {position?.address || (position?.latitude && position?.longitude ?
-                  `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` :
-                  t('sharedNoData'))}
+                {(() => {
+                  // Priority: original address > resolved address > loading > coordinates > no data
+                  if (position?.address && position.address.trim() !== '') {
+                    return position.address;
+                  }
+                  if (resolvedAddress) {
+                    return resolvedAddress;
+                  }
+                  if (isResolvingAddress) {
+                    return t('sharedLoading');
+                  }
+                  if (position?.latitude && position?.longitude) {
+                    return `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}`;
+                  }
+                  return t('sharedNoData');
+                })()}
               </p>
             </div>
               </>
@@ -4599,27 +5080,16 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </button>
               )}
               
-              {/* Button 3 - Replay */}
+              {/* Button 3 - Replay / History */}
               {hasReplayPermission && (
                 <button
              onClick={(e) => {
                e.stopPropagation(); // Prevent event bubbling to map
-               
-               // Store the current deviceId for replay
-               setReplayDeviceId(selectedDeviceId);
-               
-               // Hide device list but keep device selection
-               onHideDeviceList();
-               
-               // Initialize form with current time
-               const now = dayjs();
-               setCustomFrom(now.subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
-               setCustomTo(now.format('YYYY-MM-DDTHH:mm'));
-               
-               // Show popover and close device list
-               setShowReplayPopover(true);
-               onHideDeviceList();
-               
+               if (onOpenHistory) {
+                 onOpenHistory(selectedDeviceId);
+               } else {
+                 navigate(`/history?deviceId=${selectedDeviceId}`);
+               }
              }}
                   style={{
                     width: !desktop ? '58px' : '42px',
@@ -4839,9 +5309,61 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
             {position && (
               <div style={{ marginBottom: '4px' }}>
                 
-                {positionItems.split(',').filter((key) => key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key))).map((key, index) => {
+                {positionItems.split(',').filter((key) => {
+                  // For door, always include if device has doorSensorMode configured
+                  if (key === 'door') {
+                    return device?.attributes?.doorSensorMode !== undefined;
+                  }
+                  // For other attributes, check if they exist
+                  return key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key));
+                }).map((key, index) => {
                   const attributeName = getSensorDisplayName(key);
-                  const value = position.hasOwnProperty(key) ? position[key] : position.attributes[key];
+                  // Special handling for door attribute - get value or undefined if doesn't exist
+                  const value = key === 'door' 
+                    ? (position.attributes.hasOwnProperty('door') ? position.attributes.door : undefined)
+                    : (position.hasOwnProperty(key) ? position[key] : position.attributes[key]);
+                  
+                  // Special handling for door attribute
+                  if (key === 'door') {
+                    const doorInfo = getDoorStatus(position, device);
+                    const isDoorOpen = doorInfo ? doorInfo.isOpen : false;
+                    
+                    return (
+                      <div key={`position-door-${index}`} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '4px 0',
+                        borderBottom: `1px solid ${colors.border}`,
+                        backgroundColor: isDoorOpen ? 'rgba(244, 67, 54, 0.1)' : 'transparent'
+                      }}>
+                        <span style={{
+                          fontSize: '12px',
+                          color: colors.textSecondary,
+                          fontWeight: '500'
+                        }}>
+                          {attributeName}
+                        </span>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          <span style={{
+                            fontSize: '12px',
+                            color: isDoorOpen ? '#f44336' : colors.text,
+                            fontWeight: isDoorOpen ? '600' : 'normal',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            {isDoorOpen && <WarningIcon sx={{ fontSize: '14px', color: '#f44336' }} />}
+                            {doorInfo ? doorInfo.displayText : '-'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
                   
                   return (
                     <div key={`position-${key || 'empty'}-${index}`} style={{
@@ -4894,10 +5416,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                           key === 'latitude' || key === 'longitude' ? 
                             formatCoordinate(key, value, coordinateFormat) :
                           key === 'address' ? 
-                            value || t('sharedUnknown') :
+                            (value || '-') :
+                          // Check if value is sharedUnknown and replace with dash
+                          isSharedUnknown(value) ? 
+                            '-' :
                           value !== null && value !== undefined && typeof value === 'number' ? 
                             formatNumber(value, 2) :
-                            value || t('sharedUnknown')}
+                            (value || '-')}
                         </span>
                         {!deviceReadonly && (key === 'totalDistance' || key === 'hours') && (
                           (key === 'totalDistance' && hasTotalDistancePermission) || (key === 'hours' && hasHoursPermission)
@@ -4927,7 +5452,10 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </div>
             )}
           </div>
+          </>
+          ) : null}
         </Card>
+        )}
       </motion.div>
       )}
     </AnimatePresence>
@@ -4953,7 +5481,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               justifyContent: 'center',
               zIndex: 10002
             }}
-            onClick={() => setShowDetailsModal(false)}
+            onClick={() => { setShowDetailsModal(false); setDetailsModalDeviceId(null); }}
           >
             <motion.div
               initial={{ y: -50, opacity: 0 }}
@@ -4980,7 +5508,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 gap: '8px'
               }}>
                 <button
-                  onClick={() => setShowDetailsModal(false)}
+                  onClick={() => { setShowDetailsModal(false); setDetailsModalDeviceId(null); }}
                   style={{
                     width: '28px',
                     height: '28px',
@@ -5010,7 +5538,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   fontWeight: '600',
                   color: colors.text
                 }}>
-                  {device?.name} {t('sharedDetails')}
+                  {modalDevice?.name} {t('sharedDetails')}
                 </h2>
               </div>
 
@@ -5082,12 +5610,12 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   {property}
                                 </div>
                               )}
-                              <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
+                                <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
                                 {(() => {
                                   // Check for custom sensor name first
-                                  if (device?.attributes?.customSensors) {
+                                  if (modalDevice?.attributes?.customSensors) {
                                     try {
-                                      const customSensors = JSON.parse(device.attributes.customSensors);
+                                      const customSensors = JSON.parse(modalDevice.attributes.customSensors);
                                       if (customSensors[property]) {
                                         return customSensors[property];
                                       }
@@ -5138,12 +5666,15 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                   property === 'latitude' || property === 'longitude' ? 
                                     formatCoordinate(property, value, coordinateFormat) :
                                   property === 'address' ? 
-                                    value || t('sharedUnknown') :
+                                    (value || '-') :
+                                  // Check if value is sharedUnknown and replace with dash
+                                  isSharedUnknown(value) ? 
+                                    '-' :
                                   value !== null && value !== undefined && typeof value === 'number' ? 
                                     formatNumber(value, 2) :
                                   value !== null && value !== undefined && typeof value === 'object' ? 
                                     JSON.stringify(value) :
-                                    value || t('sharedUnknown')}
+                                    (value || '-')}
                               </div>
                               {!deviceReadonly && (property === 'totalDistance' || property === 'hours') && (
                                 (property === 'totalDistance' && hasTotalDistancePermission) || (property === 'hours' && hasHoursPermission)
@@ -5189,129 +5720,308 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                         })}
                         
                         {/* Position Attributes */}
-                        {Object.getOwnPropertyNames(detailedPosition.attributes).filter((attr) => attr).map((attribute, attrIndex) => {
-                          const value = detailedPosition.attributes[attribute];
-                          return (
-                            <div key={`attribute-${attribute || 'empty'}-${attrIndex}`} style={{
-                              display: 'grid',
-                              gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
-                              gap: '16px',
-                              padding: '8px 16px',
-                              borderBottom: `1px solid ${colors.border}`,
-                              fontSize: '12px',
-                              lineHeight: '1.4',
-                              minHeight: '32px'
-                            }}>
-                              {desktop && (
-                                <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
-                                  {attribute}
-                                </div>
-                              )}
-                              <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
-                                {(() => {
-                                  // Check for custom sensor name first
-                                  if (device?.attributes?.customSensors) {
-                                    try {
-                                      const customSensors = JSON.parse(device.attributes.customSensors);
-                                      if (customSensors[attribute]) {
-                                        return customSensors[attribute];
+                        {(() => {
+                          // Helper function to format door attribute
+                          const formatDoorAttribute = (doorValue, doorSensorMode) => {
+                            // Detect wire state: 
+                            // - If door doesn't exist in attributes = wire is grounded
+                            // - If door exists with sharedUnknown/string = wire is ungrounded
+                            // - If door exists with boolean value = use the boolean value directly
+                            const hasDoorAttribute = detailedPosition.attributes.hasOwnProperty('door');
+                            const unknownText = t('sharedUnknown');
+                            
+                            // More robust detection of sharedUnknown
+                            const isSharedUnknownValue = doorValue === 'sharedUnknown' || 
+                                                         doorValue === unknownText || 
+                                                         (typeof doorValue === 'string' && 
+                                                          (doorValue.trim() === unknownText || 
+                                                           doorValue.trim().toLowerCase() === 'sharedunknown' ||
+                                                           doorValue.trim() === ''));
+                            
+                            // Wire is grounded when door attribute doesn't exist
+                            // Wire is ungrounded when door exists with sharedUnknown or empty string
+                            const isGrounded = !hasDoorAttribute;
+                            const isUngrounded = hasDoorAttribute && (isSharedUnknownValue || doorValue === null || doorValue === undefined);
+                            
+                            // Debug logs
+                            console.log('🚪 DOOR DEBUG:', {
+                              hasDoorAttribute,
+                              doorValue,
+                              doorValueType: typeof doorValue,
+                              doorValueString: String(doorValue),
+                              unknownText,
+                              isSharedUnknownValue,
+                              isGrounded,
+                              isUngrounded,
+                              doorSensorMode,
+                              allAttributes: Object.keys(detailedPosition.attributes)
+                            });
+                            
+                            // Determine door status based on sensor mode
+                            // IMPORTANT: The door attribute existence indicates wire state:
+                            // - If door doesn't exist (hasDoorAttribute = false) = wire is GROUNDED
+                            // - If door exists (hasDoorAttribute = true) = wire is UNGROUNDED
+                            // The boolean value from backend when door exists doesn't matter for our logic
+                            // We use the wire state (grounded/ungrounded) + sensor mode to determine door status
+                            const mode = String(doorSensorMode || '1'); // default option 1, ensure string
+                            let doorStatus;
+                            
+                            // Always use sensor mode to determine status based on wire state
+                            // Don't use the boolean value directly - it's just indicating wire state
+                            if (mode === '1' || mode === 1) {
+                              // Option 1: Grounded = Door Open, Ungrounded = Door Closed
+                              // If door doesn't exist (grounded) = door open
+                              // If door exists (ungrounded) = door closed
+                              doorStatus = isGrounded ? true : false; // true = open
+                              console.log('🚪 Mode 1 - Grounded:', isGrounded, 'Ungrounded:', isUngrounded, 'Door Open:', doorStatus, 'doorValue:', doorValue);
+                            } else if (mode === '2' || mode === 2) {
+                              // Option 2: Grounded = Door Closed, Ungrounded = Door Open
+                              // If door doesn't exist (grounded) = door closed
+                              // If door exists (ungrounded) = door open (regardless of boolean value)
+                              doorStatus = isGrounded ? false : true; // true = open
+                              console.log('🚪 Mode 2 - Grounded:', isGrounded, 'Ungrounded:', isUngrounded, 'Door Open:', doorStatus, 'doorValue:', doorValue);
+                            } else {
+                              // Fallback to mode 1
+                              doorStatus = isGrounded ? true : false;
+                              console.log('🚪 Unknown mode:', mode, 'using mode 1 fallback');
+                            }
+                            
+                            return {
+                              isOpen: doorStatus,
+                              displayText: doorStatus ? t('positionDoorOpen') : t('positionDoorClosed')
+                            };
+                          };
+
+                          // Get all attributes including door if it should be displayed
+                          const allAttributes = Object.getOwnPropertyNames(detailedPosition.attributes).filter((attr) => attr);
+                          
+                          // Check if door should be added (when grounded, door doesn't exist in attributes)
+                          // Ensure doorSensorMode is read as string (can be "1", "2", 1, or 2)
+                          const doorSensorModeRaw = modalDevice?.attributes?.doorSensorMode;
+                          const doorSensorMode = doorSensorModeRaw ? String(doorSensorModeRaw) : '1';
+                          const hasDoorAttribute = detailedPosition.attributes.hasOwnProperty('door');
+                          
+                          // Debug log
+                          console.log('🚪 DOOR CONFIG:', {
+                            doorSensorModeRaw,
+                            doorSensorMode,
+                            hasDoorAttribute,
+                            doorValue: detailedPosition.attributes.door,
+                            allAttributes: allAttributes
+                          });
+                          
+                          // Always show door attribute if device has doorSensorMode configured or if door exists
+                          // This ensures door is displayed even when grounded (when it doesn't exist in attributes)
+                          if (!allAttributes.includes('door')) {
+                            allAttributes.push('door');
+                          }
+
+                          return allAttributes.map((attribute, attrIndex) => {
+                            // Special handling for door attribute - get value or undefined if doesn't exist
+                            const value = detailedPosition.attributes.hasOwnProperty(attribute) 
+                              ? detailedPosition.attributes[attribute] 
+                              : undefined;
+                            
+                            // Special handling for door attribute
+                            if (attribute === 'door') {
+                              // Use getDoorStatus which respects confirmed/pending status (prevents flickering)
+                              const doorInfo = getDoorStatus(detailedPosition, modalDevice);
+                              const isDoorOpen = doorInfo ? doorInfo.isOpen : false;
+                              
+                              // Only log occasionally to reduce console spam
+                              if (Math.random() < 0.1) { // Log ~10% of renders
+                                console.log('🚪 Rendering door (using confirmed/pending status):', {
+                                  attribute,
+                                  value,
+                                  doorSensorMode,
+                                  isDoorOpen,
+                                  displayText: doorInfo?.displayText,
+                                  hasConfirmedStatus: confirmedDoorStatusRef.current[modalDevice?.id] !== undefined,
+                                  hasPendingStatus: pendingDoorStatusRef.current[modalDevice?.id] !== undefined
+                                });
+                              }
+                              
+                              return (
+                                <div key={`attribute-door-${attrIndex}`} style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
+                                  gap: '16px',
+                                  padding: '8px 16px',
+                                  borderBottom: `1px solid ${colors.border}`,
+                                  fontSize: '12px',
+                                  lineHeight: '1.4',
+                                  minHeight: '32px',
+                                  backgroundColor: isDoorOpen ? 'rgba(244, 67, 54, 0.1)' : 'transparent'
+                                }}>
+                                  {desktop && (
+                                    <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                                      {attribute}
+                                    </div>
+                                  )}
+                                  <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
+                                    {(() => {
+                                      // Check for custom sensor name first
+                                      if (modalDevice?.attributes?.customSensors) {
+                                        try {
+                                          const customSensors = JSON.parse(modalDevice.attributes.customSensors);
+                                          if (customSensors[attribute]) {
+                                            return customSensors[attribute];
+                                          }
+                                        } catch (error) {
+                                          console.error('Error parsing customSensors:', error);
+                                        }
                                       }
-                                    } catch (error) {
-                                      console.error('Error parsing customSensors:', error);
-                                    }
-                                  }
-                                  // Fall back to position attributes or attribute name
-                                  return positionAttributes[attribute]?.name || attribute;
-                                })()}
-                              </div>
-                              <div style={{ 
-                                color: colors.text, 
-                                textAlign: 'right', 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'flex-end', 
-                                gap: '8px', 
-                                flexWrap: 'wrap', 
-                                paddingLeft: '16px', 
-                                paddingRight: '8px' 
+                                      // Fall back to position attributes or attribute name
+                                      return positionAttributes[attribute]?.name || attribute;
+                                    })()}
+                                  </div>
+                                  <div style={{ 
+                                    color: isDoorOpen ? '#f44336' : colors.text, 
+                                    textAlign: 'right', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'flex-end', 
+                                    gap: '8px', 
+                                    flexWrap: 'wrap', 
+                                    paddingLeft: '16px', 
+                                    paddingRight: '8px',
+                                    fontWeight: isDoorOpen ? '600' : 'normal'
+                                  }}>
+                                    <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: '16px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                                      {isDoorOpen && <WarningIcon sx={{ fontSize: '16px', color: '#f44336' }} />}
+                                      {doorInfo.displayText}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Regular attribute rendering
+                            return (
+                              <div key={`attribute-${attribute || 'empty'}-${attrIndex}`} style={{
+                                display: 'grid',
+                                gridTemplateColumns: desktop ? '20% 20% 60%' : '30% 70%',
+                                gap: '16px',
+                                padding: '8px 16px',
+                                borderBottom: `1px solid ${colors.border}`,
+                                fontSize: '12px',
+                                lineHeight: '1.4',
+                                minHeight: '32px'
                               }}>
-                                <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (attribute === 'totalDistance' || attribute === 'hours') ? '4px' : '16px' }}>
-                                  {attribute === 'fixTime' || attribute === 'deviceTime' || attribute === 'serverTime' ? 
-                                    formatTime(value, 'seconds') :
-                                attribute === 'speed' ? 
-                                  formatSpeed(value, speedUnit, t) :
-                                attribute === 'course' ? 
-                                  formatCourse(value, t) :
-                                attribute === 'altitude' ? 
-                                  formatAltitude(value, altitudeUnit, t) :
-                                attribute === 'accuracy' || attribute === 'odometer' || attribute === 'serviceOdometer' || 
-                                attribute === 'tripOdometer' || attribute === 'obdOdometer' || attribute === 'distance' || 
-                                attribute === 'totalDistance' ? 
-                                formatDistance(value, distanceUnit, t) :
-                                  attribute === 'batteryLevel' ? 
-                                    formatPercentage(value) :
-                                  attribute === 'battery' ? 
-                                    formatVoltage(value, t) :
-                                attribute === 'fuel' ? 
-                                  formatVolume(value, volumeUnit, t) :
-                                attribute === 'hours' ? 
-                                  formatNumericHours(value, t) :
-                                attribute === 'ignition' || attribute === 'motion' || attribute === 'armed' ? 
-                                  formatBoolean(value, t) :
-                                attribute === 'alarm' ? 
-                                  formatAlarm(value, t) :
-                                  attribute === 'latitude' || attribute === 'longitude' ? 
-                                    formatCoordinate(attribute, value, coordinateFormat) :
-                                  attribute === 'address' ? 
-                                    value || t('sharedUnknown') :
-                                  value !== null && value !== undefined && typeof value === 'number' ? 
-                                    formatNumber(value, 2) :
-                                  value !== null && value !== undefined && typeof value === 'object' ? 
-                                    JSON.stringify(value) :
-                                    value || t('sharedUnknown')}
+                                {desktop && (
+                                  <div style={{ color: colors.textSecondary, fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>
+                                    {attribute}
+                                  </div>
+                                )}
+                                <div style={{ color: colors.text, fontWeight: '500', display: 'flex', alignItems: 'center' }}>
+                                  {(() => {
+                                    // Check for custom sensor name first
+                                    if (modalDevice?.attributes?.customSensors) {
+                                      try {
+                                        const customSensors = JSON.parse(modalDevice.attributes.customSensors);
+                                        if (customSensors[attribute]) {
+                                          return customSensors[attribute];
+                                        }
+                                      } catch (error) {
+                                        console.error('Error parsing customSensors:', error);
+                                      }
+                                    }
+                                    // Fall back to position attributes or attribute name
+                                    return positionAttributes[attribute]?.name || attribute;
+                                  })()}
+                                </div>
+                                <div style={{ 
+                                  color: colors.text, 
+                                  textAlign: 'right', 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  justifyContent: 'flex-end', 
+                                  gap: '8px', 
+                                  flexWrap: 'wrap', 
+                                  paddingLeft: '16px', 
+                                  paddingRight: '8px' 
+                                }}>
+                                  <div style={{ flex: 1, wordBreak: 'break-word', lineHeight: '1.4', overflowX: 'hidden', overflowY: 'visible', paddingRight: (attribute === 'totalDistance' || attribute === 'hours') ? '4px' : '16px' }}>
+                                    {attribute === 'fixTime' || attribute === 'deviceTime' || attribute === 'serverTime' ? 
+                                      formatTime(value, 'seconds') :
+                                    attribute === 'speed' ? 
+                                      formatSpeed(value, speedUnit, t) :
+                                    attribute === 'course' ? 
+                                      formatCourse(value, t) :
+                                    attribute === 'altitude' ? 
+                                      formatAltitude(value, altitudeUnit, t) :
+                                    attribute === 'accuracy' || attribute === 'odometer' || attribute === 'serviceOdometer' || 
+                                    attribute === 'tripOdometer' || attribute === 'obdOdometer' || attribute === 'distance' || 
+                                    attribute === 'totalDistance' ? 
+                                    formatDistance(value, distanceUnit, t) :
+                                      attribute === 'batteryLevel' ? 
+                                        formatPercentage(value) :
+                                      attribute === 'battery' ? 
+                                        formatVoltage(value, t) :
+                                    attribute === 'fuel' ? 
+                                      formatVolume(value, volumeUnit, t) :
+                                    attribute === 'hours' ? 
+                                      formatNumericHours(value, t) :
+                                    attribute === 'ignition' || attribute === 'motion' || attribute === 'armed' ? 
+                                      formatBoolean(value, t) :
+                                    attribute === 'alarm' ? 
+                                      formatAlarm(value, t) :
+                                      attribute === 'latitude' || attribute === 'longitude' ? 
+                                        formatCoordinate(attribute, value, coordinateFormat) :
+                                      attribute === 'address' ? 
+                                        (value || '-') :
+                                      // Check if value is sharedUnknown and replace with dash
+                                      isSharedUnknown(value) ? 
+                                        '-' :
+                                      value !== null && value !== undefined && typeof value === 'number' ? 
+                                        formatNumber(value, 2) :
+                                      value !== null && value !== undefined && typeof value === 'object' ? 
+                                        JSON.stringify(value) :
+                                        value || '-'}
+                                  </div>
+                                  {!deviceReadonly && (attribute === 'totalDistance' || attribute === 'hours') && (
+                                    (attribute === 'totalDistance' && hasTotalDistancePermission) || (attribute === 'hours' && hasHoursPermission)
+                                  ) && (
+                                    <button
+                                      onClick={() => handleEditField(attribute, detailedPosition.attributes[attribute])}
+                                      style={{
+                                        width: '22px',
+                                        height: '22px',
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        backgroundColor: 'transparent',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        marginTop: '2px',
+                                        marginRight: '16px',
+                                        padding: '2px'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = colors.secondary;
+                                        e.target.style.borderColor = colors.border;
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.borderColor = colors.border;
+                                      }}
+                                      onMouseDown={(e) => {
+                                        e.target.style.backgroundColor = colors.hover;
+                                      }}
+                                      onMouseUp={(e) => {
+                                        e.target.style.backgroundColor = colors.secondary;
+                                      }}
+                                    >
+                                      <Settings size={14} color={colors.textSecondary} />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                              {!deviceReadonly && (attribute === 'totalDistance' || attribute === 'hours') && (
-                                (attribute === 'totalDistance' && hasTotalDistancePermission) || (attribute === 'hours' && hasHoursPermission)
-                              ) && (
-                                <button
-                                  onClick={() => handleEditField(attribute, detailedPosition.attributes[attribute])}
-                                  style={{
-                                    width: '22px',
-                                    height: '22px',
-                                    borderRadius: '4px',
-                                    border: 'none',
-                                    backgroundColor: 'transparent',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0,
-                                    marginTop: '2px',
-                                    marginRight: '16px',
-                                    padding: '2px'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = colors.secondary;
-                                    e.target.style.borderColor = colors.border;
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.borderColor = colors.border;
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.target.style.backgroundColor = colors.hover;
-                                  }}
-                                  onMouseUp={(e) => {
-                                    e.target.style.backgroundColor = colors.secondary;
-                                  }}
-                                >
-                                  <Settings size={14} color={colors.textSecondary} />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                          );
-                        })}
+                            );
+                          });
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -6543,23 +7253,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                   backgroundSize: '16px'
                 }}
               >
+                <option value="last1h" style={{ backgroundColor: colors.surface, color: colors.text }}>
+                  {t('replayLast1Hour')}
+                </option>
                 <option value="today" style={{ backgroundColor: colors.surface, color: colors.text }}>
                   {t('reportToday')}
                 </option>
                 <option value="yesterday" style={{ backgroundColor: colors.surface, color: colors.text }}>
                   {t('reportYesterday')}
                 </option>
-                <option value="thisWeek" style={{ backgroundColor: colors.surface, color: colors.text }}>
-                  {t('reportThisWeek')}
-                </option>
-                <option value="previousWeek" style={{ backgroundColor: colors.surface, color: colors.text }}>
-                  {t('reportPreviousWeek')}
-                </option>
                 <option value="thisMonth" style={{ backgroundColor: colors.surface, color: colors.text }}>
                   {t('reportThisMonth')}
-                </option>
-                <option value="previousMonth" style={{ backgroundColor: colors.surface, color: colors.text }}>
-                  {t('reportPreviousMonth')}
                 </option>
                 <option value="custom" style={{ backgroundColor: colors.surface, color: colors.text }}>
                   {t('reportCustom')}
@@ -9035,7 +9739,6 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         </div>
       </motion.div>
     )}
-    
     </>
   );
 };

@@ -19,14 +19,12 @@ import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { prefixString } from '../common/util/stringUtils';
 import { defaultTimeFilterOptions, getTimeFilterCounts } from '../common/util/timeFilter';
-import EngineIcon from '../resources/images/data/engine.svg?react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { 
   Search, 
   Filter, 
   Battery, 
-  AlertTriangle,
   Gauge,
   Check,
   ChevronDown,
@@ -39,6 +37,8 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress, Tooltip } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
+import { FleetDeviceCard } from './fleet';
+import DeviceStatusIcons from '../settings/components/DeviceStatusIcons';
 
 dayjs.extend(relativeTime);
 
@@ -71,8 +71,10 @@ const FloatingDeviceList = ({
   const devices = useSelector((state) => state.devices.items || {});
   const geofences = useSelector((state) => state.geofences?.items || {});
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
+  const fleetItems = useSelector((state) => state.fleet.items || []);
   
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('devices'); // 'devices' | 'fleet'
   const [showWandModal, setShowWandModal] = useState(false);
   const [smartLinkSelectedDeviceIds, setSmartLinkSelectedDeviceIds] = useState([]);
   const [smartLinkSelectedGeofenceIds, setSmartLinkSelectedGeofenceIds] = useState([]);
@@ -1304,77 +1306,14 @@ const FloatingDeviceList = ({
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: !desktop ? '3px' : '2px',
-                      flexWrap: 'nowrap',
+                      gap: '4px',
+                      flexWrap: 'wrap',
                       justifyContent: 'flex-end',
-                      minWidth: !desktop ? '80px' : '60px',
-                      paddingRight: '4px'
+                      minWidth: !desktop ? '120px' : '100px',
+                      paddingRight: '4px',
+                      flexShrink: 0,
                     }}>
-                      <div style={{
-                        width: !desktop ? '19px' : '15px',
-                        height: !desktop ? '19px' : '15px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <AlertTriangle style={{ 
-                          width: !desktop ? '17px' : '15px', 
-                          height: !desktop ? '17px' : '15px', 
-                          color: position?.attributes?.alarm ? '#EF4444' : '#D1D5DB' 
-                        }} />
-                      </div>
-                      <div style={{
-                        width: !desktop ? '19px' : '15px',
-                        height: !desktop ? '19px' : '15px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <EngineIcon style={{ 
-                          width: !desktop ? '17px' : '15px', 
-                          height: !desktop ? '17px' : '15px', 
-                          color: position?.attributes?.ignition ? '#10B981' : '#D1D5DB' 
-                        }} />
-                      </div>
-                      <div style={{
-                        width: !desktop ? '19px' : '15px',
-                        height: !desktop ? '19px' : '15px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <div style={{
-                          width: !desktop ? '9px' : '7px',
-                          height: !desktop ? '9px' : '7px',
-                          borderRadius: '50%',
-                          backgroundColor: position?.attributes?.motion ? '#3B82F6' : '#D1D5DB'
-                        }} />
-                      </div>
-                      <div style={{
-                        width: !desktop ? '19px' : '15px',
-                        height: !desktop ? '19px' : '15px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <div style={{
-                          width: !desktop ? '13px' : '11px',
-                          height: !desktop ? '9px' : '7px',
-                          border: `2px solid ${position?.attributes?.door ? '#10B981' : '#D1D5DB'}`,
-                          borderRadius: '2px',
-                          position: 'relative'
-                        }}>
-                          <div style={{
-                            position: 'absolute',
-                            top: '-2px',
-                            right: '-2px',
-                            width: !desktop ? '4px' : '3px',
-                            height: !desktop ? '4px' : '3px',
-                            backgroundColor: position?.attributes?.door ? '#10B981' : '#D1D5DB',
-                            borderRadius: '50%'
-                          }} />
-                        </div>
-                      </div>
+                      {position ? <DeviceStatusIcons position={position} /> : null}
                     </div>
                   </div>
                   {/* Status - Only visible to administrators and managers */}
@@ -1439,6 +1378,21 @@ const FloatingDeviceList = ({
   }, [colors, devicePrimary, getStatusColor, formatLastUpdate, getBatteryIcon, handleDeviceClick, mapIcons, mapIconKey, speedUnit, t, coordinateFormat]);
   // Note: Data is now passed directly to List component for better performance
   
+  // Filtrar fleet items baseado na busca
+  const filteredFleetItems = useMemo(() => {
+    if (!keyword || keyword.trim() === '') {
+      return fleetItems;
+    }
+    const searchTerm = keyword.toLowerCase().trim();
+    return fleetItems.filter((item) => {
+      const plateMatch = item.plate?.toLowerCase().includes(searchTerm);
+      const clientMatch = item.client_name?.toLowerCase().includes(searchTerm);
+      const makeMatch = item.make?.toLowerCase().includes(searchTerm);
+      const modelMatch = item.model?.toLowerCase().includes(searchTerm);
+      return plateMatch || clientMatch || makeMatch || modelMatch;
+    });
+  }, [fleetItems, keyword]);
+
   // Don't render anything if we don't have proper data
   if (!filteredDevices || !Array.isArray(filteredDevices)) {
     return (
@@ -1456,9 +1410,13 @@ const FloatingDeviceList = ({
     );
   }
 
+  // Determinar qual lista usar baseado no modo
+  const itemsToRender = viewMode === 'fleet' ? filteredFleetItems : filteredDevices;
+  const itemCount = viewMode === 'fleet' ? filteredFleetItems.length : filteredDevices.length;
+
   // TanStack Virtual setup - simplified for better performance
   const virtualizer = useVirtualizer({
-    count: filteredDevices.length,
+    count: itemCount,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 105, // Estimated height of each device row
     overscan: 6, // Fixed overscan for consistent performance
@@ -1550,7 +1508,7 @@ const FloatingDeviceList = ({
             }} />
             <Input
               id="floating-device-search"
-              placeholder={t('sharedSearchDevices')}
+              placeholder={viewMode === 'fleet' ? 'Buscar veículos...' : t('sharedSearchDevices')}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               style={{
@@ -1571,7 +1529,35 @@ const FloatingDeviceList = ({
                 e.target.style.borderColor = colors.border;
               }}
             />
-            {/* Device count - First button (leftmost) */}
+            {/* Toggle Mode Button */}
+            <button
+              type="button"
+              onClick={() => setViewMode(viewMode === 'devices' ? 'fleet' : 'devices')}
+              style={{
+                position: 'absolute',
+                right: '120px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '10px',
+                color: colors.text,
+                backgroundColor: viewMode === 'fleet' ? colors.primary : colors.secondary,
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: `1px solid ${colors.border}`,
+                cursor: 'pointer',
+                zIndex: 1,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = viewMode === 'fleet' ? colors.primary : colors.secondary;
+              }}
+            >
+              {viewMode === 'devices' ? 'Frota' : 'Dispositivos'}
+            </button>
+            {/* Device/Fleet count - First button (leftmost) */}
             <div style={{
               position: 'absolute',
               right: '88px',
@@ -1585,7 +1571,7 @@ const FloatingDeviceList = ({
               border: `1px solid ${colors.border}`,
               zIndex: 1
             }}>
-              {filteredDevices.length}
+              {itemCount}
             </div>
             {/* Filter button - Second button */}
             <button
@@ -2203,7 +2189,7 @@ const FloatingDeviceList = ({
           }}
           onClick={handleContainerClick}
         >
-          {filteredDevices && Array.isArray(filteredDevices) && filteredDevices.length > 0 ? (
+          {itemCount > 0 ? (
             <div 
               key={virtualizerContainerKey}
               ref={parentRef}
@@ -2224,32 +2210,57 @@ const FloatingDeviceList = ({
                 }}
               >
                 {virtualizerItems.map((virtualItem) => {
-                  const device = filteredDevices[virtualItem.index];
-                  return (
-                    <div
-                      key={`device-${device.id || 'unknown'}-${virtualItem.index}`}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: `${virtualItem.size}px`,
-                        transform: `translateY(${virtualItem.start}px)`,
-                        padding: '0',
-                        boxSizing: 'border-box'
-                      }}
-                    >
-                      <DeviceRow 
-                        index={virtualItem.index} 
-                        style={{}} 
-                        data={{
-                          devices: filteredDevices,
-                          positions: positions || [],
-                          selectedDeviceId: selectedDeviceId
-                        }} 
-                      />
-                    </div>
-                  );
+                  if (viewMode === 'fleet') {
+                    const fleetItem = filteredFleetItems[virtualItem.index];
+                    return (
+                      <div
+                        key={`fleet-${fleetItem.plate}-${virtualItem.index}`}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: `${virtualItem.size}px`,
+                          transform: `translateY(${virtualItem.start}px)`,
+                          padding: '0',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <FleetDeviceCard 
+                          item={fleetItem}
+                          index={virtualItem.index}
+                          desktop={desktop}
+                        />
+                      </div>
+                    );
+                  } else {
+                    const device = filteredDevices[virtualItem.index];
+                    return (
+                      <div
+                        key={`device-${device.id || 'unknown'}-${virtualItem.index}`}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: `${virtualItem.size}px`,
+                          transform: `translateY(${virtualItem.start}px)`,
+                          padding: '0',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <DeviceRow 
+                          index={virtualItem.index} 
+                          style={{}} 
+                          data={{
+                            devices: filteredDevices,
+                            positions: positions || [],
+                            selectedDeviceId: selectedDeviceId
+                          }} 
+                        />
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>

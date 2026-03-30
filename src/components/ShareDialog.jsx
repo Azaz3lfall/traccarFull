@@ -1,31 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+dayjs.extend(localizedFormat);
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import parseShareTokenResponseBody from '../common/util/parseShareTokenResponse';
 import QRCode from 'react-qr-code';
 import { Copy, Check } from 'lucide-react';
+
+const PRESETS = [
+  { id: '1h', hours: 1 },
+  { id: '2h', hours: 2 },
+  { id: '12h', hours: 12 },
+  { id: '24h', hours: 24 },
+];
+
+function computeExpirationISO(preset, customLocal) {
+  if (preset === 'custom') {
+    if (!customLocal) return null;
+    const d = dayjs(customLocal);
+    if (!d.isValid()) return null;
+    if (!d.isAfter(dayjs())) return null;
+    return d.toISOString();
+  }
+  const row = PRESETS.find((p) => p.id === preset);
+  const hours = row?.hours ?? 24;
+  return dayjs().add(hours, 'hour').toISOString();
+}
 
 const ShareDialog = ({ open, onClose, deviceId }) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { type: 'success'|'error', message: string }
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
-  
+  const [durationPreset, setDurationPreset] = useState('24h');
+  const [customLocal, setCustomLocal] = useState('');
+
   const t = useTranslation();
   const colors = useThemeColors();
 
+  const tr = (key, fallback) => {
+    const v = t(key);
+    return v === key ? fallback : v;
+  };
+
+  useEffect(() => {
+    if (open) {
+      setDurationPreset('24h');
+      setCustomLocal(dayjs().add(24, 'hour').format('YYYY-MM-DDTHH:mm'));
+    }
+  }, [open]);
+
+  const expirationISO = useMemo(
+    () => computeExpirationISO(durationPreset, customLocal),
+    [durationPreset, customLocal],
+  );
+
+  const expirationPreview = useMemo(() => {
+    if (!expirationISO) return '';
+    return dayjs(expirationISO).format('L LTS');
+  }, [expirationISO]);
+
+  const expiresSummaryTemplate = tr(
+    'deviceShareExpiresSummary',
+    'The link expires on {date}',
+  );
+  const expiresSummary = expirationPreview
+    ? expiresSummaryTemplate.replace(/\{date\}/g, expirationPreview)
+    : '';
+
   const handleShare = async () => {
     if (!deviceId) return;
-    
+    if (!expirationISO) return;
+
     setLoading(true);
     setResult(null);
-    
+
     try {
-      // Calculate expiration date (current time + 24 hours)
-      const expiration = new Date();
-      expiration.setHours(expiration.getHours() + 24);
-      const expirationISO = expiration.toISOString();
+      const expirationISOValue = expirationISO;
       
       
       const response = await fetchOrThrow('/api/devices/share', {
@@ -36,16 +91,16 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
         },
         body: new URLSearchParams({
           deviceId: deviceId.toString(),
-          expiration: expirationISO
-        })
+          expiration: expirationISOValue,
+        }),
       });
 
       if (response.ok) {
-        const responseText = await response.text();
-        
+        const token = parseShareTokenResponseBody(await response.text());
+
         // Build share URL with server address and token
         const serverAddress = window.location.origin;
-        const url = `${serverAddress}?token=${responseText}`;
+        const url = `${serverAddress}?token=${encodeURIComponent(token)}`;
         
         setShareUrl(url);
         setResult({ type: 'success', message: t('deviceShared') });
@@ -67,8 +122,23 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
     setLoading(false);
     setShareUrl('');
     setCopied(false);
+    setDurationPreset('24h');
+    setCustomLocal(dayjs().add(24, 'hour').format('YYYY-MM-DDTHH:mm'));
     onClose();
   };
+
+  const datetimeMin = dayjs().format('YYYY-MM-DDTHH:mm');
+
+  const chipBase = (active) => ({
+    padding: '8px 12px',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    border: `1px solid ${active ? '#3B82F6' : colors.border}`,
+    backgroundColor: active ? 'rgba(59, 130, 246, 0.12)' : 'transparent',
+    color: active ? '#3B82F6' : colors.textSecondary,
+  });
 
   const handleCopyUrl = async () => {
     try {
@@ -160,13 +230,99 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                 </h3>
                 
                 <p style={{
-                  margin: '0 0 20px 0',
+                  margin: '0 0 12px 0',
                   fontSize: '14px',
                   color: colors.textSecondary,
-                  lineHeight: '1.5'
+                  lineHeight: '1.5',
                 }}>
                   {t('deviceShareConfirm')}
                 </p>
+
+                <p style={{
+                  margin: '0 0 8px 0',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: colors.text,
+                }}>
+                  {tr('deviceShareDurationLabel', 'Valid for')}
+                </p>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  marginBottom: '12px',
+                }}>
+                  {PRESETS.map(({ id, hours }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setDurationPreset(id)}
+                      style={chipBase(durationPreset === id)}
+                    >
+                      {`${hours}h`}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setDurationPreset('custom')}
+                    style={chipBase(durationPreset === 'custom')}
+                  >
+                    {tr('deviceShareDurationCustom', 'Custom')}
+                  </button>
+                </div>
+
+                {durationPreset === 'custom' && (
+                  <div style={{ marginBottom: '12px' }}>
+                    <label
+                      htmlFor="share-custom-expiry"
+                      style={{
+                        display: 'block',
+                        marginBottom: '6px',
+                        fontSize: '13px',
+                        color: colors.textSecondary,
+                      }}
+                    >
+                      {tr('deviceShareCustomExpiry', 'Expiration (local time)')}
+                    </label>
+                    <input
+                      id="share-custom-expiry"
+                      type="datetime-local"
+                      min={datetimeMin}
+                      value={customLocal}
+                      onChange={(e) => setCustomLocal(e.target.value)}
+                      style={{
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: `1px solid ${colors.border}`,
+                        backgroundColor: colors.background,
+                        color: colors.text,
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {expiresSummary ? (
+                  <p style={{
+                    margin: '0 0 20px 0',
+                    fontSize: '13px',
+                    color: colors.textSecondary,
+                    lineHeight: '1.5',
+                  }}>
+                    {expiresSummary}
+                  </p>
+                ) : durationPreset === 'custom' ? (
+                  <p style={{
+                    margin: '0 0 20px 0',
+                    fontSize: '13px',
+                    color: '#EF4444',
+                    lineHeight: '1.5',
+                  }}>
+                    {tr('deviceShareCustomInvalid', 'Select a future date and time.')}
+                  </p>
+                ) : null}
 
                 <div style={{
                   display: 'flex',
@@ -191,7 +347,7 @@ const ShareDialog = ({ open, onClose, deviceId }) => {
                   </button>
                   <button
                     onClick={handleShare}
-                    disabled={loading}
+                    disabled={loading || !expirationISO}
                     style={{
                       padding: '10px 20px',
                       border: `1px solid #3B82F6`,

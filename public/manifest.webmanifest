@@ -1,0 +1,17 @@
+{
+  "name": "Traccar GPS Tracking",
+  "short_name": "Traccar",
+  "description": "Traccar GPS Tracking System",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1976d2",
+  "background_color": "#1F2937",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

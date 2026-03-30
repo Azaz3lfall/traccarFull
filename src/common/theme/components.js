@@ -16,6 +16,9 @@ export default {
       sizeMedium: {
         height: '40px',
       },
+      root: ({ ownerState }) => (ownerState.variant === 'contained'
+        ? { backgroundImage: 'none' }
+        : {}),
     },
   },
   MuiFormControl: {

@@ -1,62 +1,32 @@
 import React from "react";
 
 if (process.env.NODE_ENV === "development") {
-  const originalCreateElement = React.createElement;
-  const originalMap = Array.prototype.map;
-  let mapCallCount = 0;
+  try {
+    const originalCreateElement = React.createElement;
+    
+    // NOTE: We removed the Array.prototype.map override because it causes issues
+    // with CSS-in-JS libraries like Emotion/stylis. We'll only override
+    // React.createElement to catch empty keys, which is safer and doesn't
+    // interfere with internal library operations.
+    // Added try-catch to ensure we never break the app if something goes wrong.
 
-  // Override Array.prototype.map to log all map operations
-  Array.prototype.map = function(callback, thisArg) {
-    const result = originalMap.call(this, callback, thisArg);
-    
-    // Prevent infinite recursion
-    if (mapCallCount > 0) {
-      mapCallCount--;
-      return result;
-    }
-    
-    mapCallCount++;
-    
-    // Get stack trace to find origin
-    const stack = new Error().stack;
-    const caller = stack.split('\n')[2] || 'unknown';
-    
-    // Simple key extraction without using map
-    const keys = [];
-    const duplicateKeys = [];
-    for (let i = 0; i < result.length; i++) {
-      const item = result[i];
-      if (item && item.key !== undefined) {
-        if (keys.includes(item.key)) {
-          duplicateKeys.push(item.key);
-        } else {
-          keys.push(item.key);
+    React.createElement = (type, props, ...children) => {
+      try {
+        // Only check for empty keys if props exists and is an object
+        if (props && typeof props === 'object' && props.key !== undefined) {
+          if (props.key === null || props.key === "") {
+            console.warn("⚠️ Empty key detected:", { type, props });
+          }
         }
+        return originalCreateElement(type, props, ...children);
+      } catch (error) {
+        // If anything goes wrong, fall back to original createElement
+        console.error("Error in React.createElement override:", error);
+        return originalCreateElement(type, props, ...children);
       }
-    }
-    
-    // Only log when duplicates are found
-    if (duplicateKeys.length > 0) {
-      console.warn("🚨 DUPLICATE KEYS FOUND:", {
-        arrayLength: this.length,
-        resultLength: result.length,
-        caller: caller.trim(),
-        firstFewItems: this.slice(0, 3),
-        keys: keys,
-        duplicateKeys: duplicateKeys
-      });
-    }
-    
-    mapCallCount--;
-    return result;
-  };
-
-  React.createElement = (type, props, ...children) => {
-    if (props && props.key !== undefined) {
-      if (props.key === null || props.key === "") {
-        console.warn("⚠️ Empty key detected:", { type, props });
-      }
-    }
-    return originalCreateElement(type, props, ...children);
-  };
+    };
+  } catch (error) {
+    // If we can't override React.createElement, just continue without it
+    console.warn("Could not set up debug-keys:", error);
+  }
 }

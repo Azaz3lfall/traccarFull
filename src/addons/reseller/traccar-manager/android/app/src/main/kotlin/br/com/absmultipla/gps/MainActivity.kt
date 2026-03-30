@@ -1,4 +1,4 @@
-package br.com.absmultipla.gps
+package br.com.rastreadorautoram.mobile
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

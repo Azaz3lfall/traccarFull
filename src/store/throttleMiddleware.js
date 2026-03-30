@@ -6,9 +6,7 @@ const minInterval = 1500;
 const maxInterval = 30000;
 const scaleFactor = 1000;
 
-// eslint-disable-next-line no-undef
-const debugMode = process.env.NODE_ENV === 'development';
-const debugLog = (message) => debugMode && console.log(message);
+const debugLog = () => {};
 
 export default () => (next) => {
   const buffer = [];

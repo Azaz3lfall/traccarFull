@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import { filterItemByTime } from '../common/util/timeFilter';
 
-export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop = true) => {
+export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop = true, restrictToDeviceIds = null) => {
   const groups = useSelector((state) => state.groups.items);
   const devices = useSelector((state) => state.devices.items);
 
@@ -39,6 +39,11 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
         const lowerCaseKeyword = keyword.toLowerCase();
         return [device.name, device.uniqueId, device.phone, device.model, device.contact].some((s) => s && s.toLowerCase().includes(lowerCaseKeyword));
       });
+
+    // Restrict to devices associated with fleet vehicles (when device list is shown)
+    if (restrictToDeviceIds && restrictToDeviceIds.size > 0) {
+      filtered = filtered.filter((device) => restrictToDeviceIds.has(device.id));
+    }
     
     // Only sort if filterSort is specified
     if (filterSort) {
@@ -64,5 +69,5 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
       : Object.values(positions));
     return;
 
-  }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions, desktop]);
+  }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions, desktop, restrictToDeviceIds]);
 };

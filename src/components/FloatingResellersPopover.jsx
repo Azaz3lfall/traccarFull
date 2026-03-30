@@ -66,6 +66,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors, useTheme } from '../common/components/ThemeProvider';
 import { useManager, useAdministrator } from '../common/util/permissions';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { DEFAULT_ACTIVE_MAP_STYLES, DEFAULT_MAP_ID } from '../map/core/mapStyleDefaults';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 import { resellersActions } from '../store';
 import { groupsActions } from '../store/groups';
@@ -932,7 +933,7 @@ const FloatingResellersPopover = ({
               password: row.userLogin,
               readonly: false,
               administrator: false,
-              map: "googleRoad",
+              map: DEFAULT_MAP_ID,
               latitude: 0,
               longitude: 0,
               zoom: 0,
@@ -949,7 +950,7 @@ const FloatingResellersPopover = ({
               totpKey: null,
               temporary: false,
               attributes: {
-                activeMapStyles: "locationIqStreets,locationIqDark,openFreeMap,osm,openTopoMap,carto,googleRoad,googleSatellite,googleHybrid",
+                activeMapStyles: DEFAULT_ACTIVE_MAP_STYLES,
                 positionItems: "fixTime,address,totalDistance,course,altitude,accuracy,protocol,deviceTime,serverTime,index,hdop,vdop,pdop,sat,satVisible,rssi,coolantTemp,engineTemp,gps,roaming,latitude,longitude,event,alarm,status,odometer,serviceOdometer,tripOdometer,hours,steps,heartRate,valid,blocked,speed,ignition",
                 mapLiveRoutes: "selected",
                 mapFollow: true,

@@ -12,6 +12,9 @@ const { reducer, actions } = createSlice({
     history: {},
     replayPositions: [],
     currentReplayIndex: 0,
+    historyPositions: [],
+    historyDeviceId: null,
+    selectedHistoryPointIndex: null,
     resellerBranding: null,
     resellerBrandingLoaded: false,
   },
@@ -55,6 +58,15 @@ const { reducer, actions } = createSlice({
     },
     updateCurrentReplayIndex(state, action) {
       state.currentReplayIndex = action.payload;
+    },
+    updateHistoryPositions(state, action) {
+      state.historyPositions = action.payload;
+    },
+    updateHistoryDeviceId(state, action) {
+      state.historyDeviceId = action.payload;
+    },
+    updateSelectedHistoryPointIndex(state, action) {
+      state.selectedHistoryPointIndex = action.payload;
     },
     updateResellerBranding(state, action) {
       state.resellerBranding = action.payload;

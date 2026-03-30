@@ -1,12 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { MapPin, Clock, Battery, Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { reverseGeocode } from '../common/util/formatter';
 
 const DeviceCard = ({ device, position, onClick, isSelected = false }) => {
+  const [resolvedAddress, setResolvedAddress] = useState(null);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const addressCacheKey = useRef(null);
+
+  // Effect to resolve address when position changes
+  useEffect(() => {
+    if (!position) {
+      setResolvedAddress(null);
+      addressCacheKey.current = null;
+      return;
+    }
+
+    const hasCoordinates = position.latitude && position.longitude;
+    const hasAddress = position.address;
+    const currentKey = `${position.latitude}_${position.longitude}`;
+
+    // If we already have an address, clear resolved address
+    if (hasAddress) {
+      setResolvedAddress(null);
+      addressCacheKey.current = null;
+      return;
+    }
+
+    // If we have coordinates but no address, and we haven't resolved this location yet
+    if (hasCoordinates && !hasAddress && addressCacheKey.current !== currentKey && !isResolvingAddress) {
+      setIsResolvingAddress(true);
+      addressCacheKey.current = currentKey;
+      
+      reverseGeocode(position.latitude, position.longitude)
+        .then((address) => {
+          if (address) {
+            setResolvedAddress(address);
+          } else {
+            setResolvedAddress(null);
+          }
+          setIsResolvingAddress(false);
+        })
+        .catch((error) => {
+          console.warn('Failed to resolve address:', error);
+          setResolvedAddress(null);
+          setIsResolvingAddress(false);
+        });
+    }
+  }, [position, isResolvingAddress]);
   const getStatusColor = (status) => {
     switch (status) {
       case 'online':
@@ -99,7 +144,9 @@ const DeviceCard = ({ device, position, onClick, isSelected = false }) => {
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4" />
                 <span>
-                  {position.address || `${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}`}
+                  {position.address || resolvedAddress || (isResolvingAddress ? 'Carregando...' : (position.latitude && position.longitude ? 
+                    `${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}` : 
+                    'Sem dados'))}
                 </span>
               </div>
             )}

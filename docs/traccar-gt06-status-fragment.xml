@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fragmento para mesclar em /opt/traccar/conf/traccar.xml (GT06 + ícones de estado na UI).
+
+  Chaves comuns em position.attributes (Traccar decoder GT06 / variantes): ignition, blocked,
+  armed, lock, alarm, power, charge, battery, batteryLevel, rssi, status, sat, motion, etc.
+  Inspecione GET /api/positions?deviceId=... (ou WebSocket) no seu ambiente para confirmar.
+
+  processing.copyAttributes: copia estes atributos da posição anterior quando o pacote novo
+  não os traz — necessário para alarm/rssi/ignição entre heartbeats e pacotes parciais.
+
+  filter.skipAttributes: não remove atributos; evita que posições com esses atributos sejam
+  descartadas pelo filtro de distância/duplicata quando filter.enable=true.
+-->
+<properties>
+  <entry key="filter.skipAttributes.enable">true</entry>
+  <entry key="filter.skipAttributes">alarm,power-cut,status</entry>
+  <entry key="processing.copyAttributes.enable">true</entry>
+  <entry key="processing.copyAttributes">power,voltage,adc1,ignition,charge,battery,blocked,armed,result,sat,motion,power-cut,vibration,lock,batteryLevel,driverUniqueId,alarm,rssi,status</entry>
+</properties>

@@ -18,6 +18,7 @@ import SettingsMenu from './components/SettingsMenu';
 import { useCatchCallback } from '../reactHelper';
 import useSettingsStyles from './common/useSettingsStyles';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import parseShareTokenResponseBody from '../common/util/parseShareTokenResponse';
 
 const SharePage = () => {
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ const SharePage = () => {
       method: 'POST',
       body: new URLSearchParams(`deviceId=${id}&expiration=${expirationTime}`),
     });
-    const token = await response.text();
-    setLink(`${window.location.origin}?token=${token}`);
+    const token = parseShareTokenResponseBody(await response.text());
+    setLink(`${window.location.origin}?token=${encodeURIComponent(token)}`);
   }, [id, expiration, setLink]);
 
   return (

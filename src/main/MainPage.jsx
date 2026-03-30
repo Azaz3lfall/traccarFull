@@ -10,6 +10,12 @@ import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import useMapStyles from '../map/core/useMapStyles';
+import {
+  DEFAULT_ACTIVE_MAP_STYLES,
+  DEFAULT_MAP_ID,
+  activeMapStylesContains,
+  resolveAppliedMapStyle,
+} from '../map/core/mapStyleDefaults';
 import useMapOverlays from '../map/overlay/useMapOverlays';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import { useTranslationKeys } from '../common/components/LocalizationProvider';
@@ -18,6 +24,8 @@ import { sessionActions } from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import resellersConfig from '../config/resellersConfig';
 import { resellersActions } from '../store';
+import { fetchFleetMap } from '../store';
+import { FleetVehicleCard, FloatingFleetList } from '../components/fleet';
 import { useCatch } from '../reactHelper';
 import { nativePostMessage } from '../common/components/NativeInterface';
 import fallbackLogo from '../resources/images/image170.png?inline';
@@ -26,10 +34,18 @@ import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
 import FloatingGeofencesPopover from '../components/FloatingGeofencesPopover';
 import FloatingReportsPopover from '../components/FloatingReportsPopover';
+import FloatingGestaoPopover from '../components/FloatingGestaoPopover';
+import FloatingOSPopover from '../components/FloatingOSPopover';
+import FloatingClientsPopover from '../components/FloatingClientsPopover';
+import FloatingVehiclesPopover from '../components/FloatingVehiclesPopover';
+import FloatingChipsPopover from '../components/FloatingChipsPopover';
+import FloatingSmsTemplatesPopover from '../components/FloatingSmsTemplatesPopover';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
+import { HEATMAP_FEATURE_ENABLED } from '../map/MapHeatmap';
 import FloatingDeviceList from '../components/FloatingDeviceList';
 import FloatingStatusCard from '../components/FloatingStatusCard';
+import HistoryPanel from '../other/HistoryPanel';
 import FloatingUsersPopover from '../components/FloatingUsersPopover';
 import FloatingCommandsPopover from '../components/FloatingCommandsPopover';
 import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover';
@@ -40,10 +56,11 @@ import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
-import UsersModal from './UsersModal';
 import { 
   Truck, 
+  Cpu,
   PieChart, 
+  FileText,
   ChevronLeft,
   Map,
   Check,
@@ -51,7 +68,9 @@ import {
   Minus,
   Search,
   Sun,
-  Moon
+  Moon,
+  Activity,
+  Users
 } from 'lucide-react';
 import CropIcon from '@mui/icons-material/Crop';
 import { AiOutlineCloudServer } from "react-icons/ai";
@@ -72,9 +91,13 @@ import {
 } from "react-icons/hi2";
 import { LuShieldAlert } from "react-icons/lu";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import SimCardIcon from '@mui/icons-material/SimCard';
+import MessageIcon from '@mui/icons-material/Message';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
+import PeopleIcon from '@mui/icons-material/People';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SaveIcon from '@mui/icons-material/Save';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -111,7 +134,9 @@ import {
   Chip,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogContent
 } from '@mui/material';
 import { 
   useAdministrator, 
@@ -174,7 +199,8 @@ const MainPage = () => {
 
   const desktop = useMediaQuery(muiTheme.breakpoints.up('md'));
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-  const [isDeviceListVisible, setIsDeviceListVisible] = useState(true);
+  const [isDeviceListVisible, setIsDeviceListVisible] = useState(false);
+  const [isFleetListVisible, setIsFleetListVisible] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showEventsPopover, setShowEventsPopover] = useState(false);
   const [eventsButtonRef, setEventsButtonRef] = useState(null);
@@ -190,7 +216,6 @@ const MainPage = () => {
   const [userPopoverRef, setUserPopoverRef] = useState(null);
   const [showLanguagePopover, setShowLanguagePopover] = useState(false);
   const [languageRef, setLanguageRef] = useState(null);
-  const [showUsersModal, setShowUsersModal] = useState(false);
   const [showUsersPopover, setShowUsersPopover] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -223,6 +248,7 @@ const MainPage = () => {
   const [showDevicesPopover, setShowDevicesPopover] = useState(false);
   const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
   const [showReplayPopover, setShowReplayPopover] = useState(false);
+  const [historyDeviceId, setHistoryDeviceId] = useState(null);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
   const [preferencesAttributes, setPreferencesAttributes] = useState({});
@@ -502,7 +528,7 @@ const MainPage = () => {
 
   // Map switcher handlers
   const mapStyles = useMapStyles();
-  const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,locationIqDark,openFreeMap');
+  const activeMapStyles = useAttributePreference('activeMapStyles', DEFAULT_ACTIVE_MAP_STYLES);
   
   // Preferences hooks
   // Translation and permissions - moved early to avoid hoisting issues
@@ -520,236 +546,220 @@ const MainPage = () => {
   
   // Check if user has reports permission
   const hasReportsPermission = useMemo(() => {
+    if (admin) return true;
     if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
+      return true; // Default to true if no accessLevel attribute
     }
     try {
       const accessLevel = JSON.parse(user.attributes.accessLevel);
       return accessLevel.reports === true;
     } catch (error) {
-      return false; // Parse error means no permission
+      return true;
     }
-  }, [user]);
+  }, [user, admin]);
   
   // Check if user has geofences permission
   const hasGeofencesPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.geofences === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.geofences !== false; // Only false if explicitly set to false
+      }
+    } catch (error) {}
+    return true; // Default to true
+  }, [user, admin]);
   
   // Check if user has settings permission
   const hasSettingsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.settings === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.settings !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has notifications permission
   const hasNotificationsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.notifications === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.notifications !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has account permission
   const hasAccountPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.account === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.account !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has devices permission
   const hasDevicesPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.devices === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.devices !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has groups permission
   const hasGroupsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.groups === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.groups !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has drivers permission
   const hasDriversPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.drivers === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.drivers !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has device list permission
   const hasDeviceListPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.deviceList === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.deviceList !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
 
   const hasOcorrenciasPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.ocorrencias === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.ocorrencias !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has calendars permission
   const hasCalendarsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.calendars === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.calendars !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has computed attributes permission
   const hasComputedAttributesPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.computedAttributes === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.computedAttributes !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has maintenance permission
   const hasMaintenancePermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.maintenance === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.maintenance !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has saved commands permission
   const hasSavedCommandsPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.savedCommands === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.savedCommands !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has announcement permission
   const hasAnnouncementPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.announcement === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.announcement !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has server permission
   const hasServerPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.server === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.server !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has users permission
   const hasUsersPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.users === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.users !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   
   // Check if user has reseller panel permission
   const hasResellerPanelPermission = useMemo(() => {
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return false; // No accessLevel means no permission
-    }
+    if (admin) return true;
     try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.resellerPanel === true;
-    } catch (error) {
-      return false; // Parse error means no permission
-    }
-  }, [user]);
+      if (user?.attributes?.accessLevel) {
+        const accessLevel = JSON.parse(user.attributes.accessLevel);
+        return accessLevel.resellerPanel !== false;
+      }
+    } catch (error) {}
+    return true;
+  }, [user, admin]);
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -772,13 +782,54 @@ const MainPage = () => {
   }));
   
   const createFilter = createFilterOptions();
-  const [selectedMapStyle, setSelectedMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'locationIqStreets'));
+  const [selectedMapStyle, setSelectedMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', DEFAULT_MAP_ID));
+
+  const stylesForSwitcher = useMemo(() => mapStyles.filter(
+    (style) => style.available && activeMapStylesContains(activeMapStyles, style.id),
+  ), [mapStyles, activeMapStyles]);
+
+  const appliedMapStyleForView = useMemo(() => {
+    let filtered = mapStyles.filter((s) => s.available && activeMapStylesContains(activeMapStyles, s.id));
+    if (!filtered.length) {
+      filtered = mapStyles.filter((s) => s.available);
+    }
+    const resolved = resolveAppliedMapStyle(selectedMapStyle, filtered);
+    return resolved?.id ?? selectedMapStyle;
+  }, [mapStyles, activeMapStyles, selectedMapStyle]);
+
+  useEffect(() => {
+    if (appliedMapStyleForView !== selectedMapStyle) {
+      setSelectedMapStyle(appliedMapStyleForView);
+    }
+  }, [appliedMapStyleForView, selectedMapStyle, setSelectedMapStyle]);
+
+  const mapHeatmapEnabled = useAttributePreference('mapHeatmap', true);
   
   const handleMapStyleChange = (styleId) => {
     setSelectedMapStyle(styleId);
     setShowMapSwitcher(false);
     // The map will automatically update through the MapView component
   };
+
+  // Toggle heatmap handler
+  const handleToggleHeatmap = useCatch(async () => {
+    if (!user?.id) return;
+    const newValue = !mapHeatmapEnabled;
+    try {
+      const updatedAttributes = {
+        ...user.attributes,
+        mapHeatmap: newValue,
+      };
+      const response = await fetchOrThrow(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, attributes: updatedAttributes }),
+      });
+      dispatch(sessionActions.updateUser(await response.json()));
+    } catch (error) {
+      console.error('Error toggling heatmap:', error);
+    }
+  });
 
   // Zoom handlers
   const handleZoomIn = () => {
@@ -1003,6 +1054,74 @@ const MainPage = () => {
       setNotificatorsItems(await response.json());
     }
   }, [showAnnouncementDrawer]);
+
+  // Auto-link logic for Globalstar ignition
+  useEffectAsync(async () => {
+    if (user && admin) {
+      try {
+        const attrResponse = await fetch('/api/attributes/computed');
+        if (!attrResponse.ok) return;
+        const attributes = await attrResponse.json();
+
+        const expression = 'speed > 1.0 || (motion != null && motion) || (alarm != null && alarm.contains("vibration")) || (io2 != null && io2) || (in2 != null && in2)';
+        const description = 'Ignicao Virtual (Globalstar)';
+
+        let targetAttr = attributes.find(a => a.description === description);
+
+        if (!targetAttr || targetAttr.expression !== expression || targetAttr.priority !== 100) {
+          const method = targetAttr ? 'PUT' : 'POST';
+          const url = targetAttr ? `/api/attributes/computed/${targetAttr.id}` : '/api/attributes/computed';
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...(targetAttr || {}),
+              description,
+              expression,
+              type: 'boolean',
+              attribute: 'ignition',
+              priority: 100,
+            }),
+          });
+          if (response.ok) {
+            targetAttr = method === 'POST' ? await response.json() : { ...targetAttr, expression, priority: 100 };
+          }
+        }
+
+        if (targetAttr) {
+          const devResponse = await fetch('/api/devices?all=true');
+          if (devResponse.ok) {
+            const devices = await devResponse.json();
+            const targetDevices = devices.filter(d => 
+              (d.model && d.model.toLowerCase().includes('atlastrax')) ||
+              (d.name && d.name.toLowerCase().includes('sat'))
+            );
+
+            for (const device of targetDevices) {
+              const linkedResponse = await fetch(`/api/attributes/computed?deviceId=${device.id}`);
+              if (linkedResponse.ok) {
+                const linkedAttrs = await linkedResponse.json();
+                const isLinked = linkedAttrs.some(a => a.id === targetAttr.id);
+
+                if (!isLinked) {
+                  await fetch('/api/permissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      deviceId: device.id,
+                      attributeId: targetAttr.id,
+                    }),
+                  });
+                }
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Auto-link logic error:', error);
+      }
+    }
+  }, [user, admin]);
 
   // Filtered options for custom autocomplete
   const filteredUsersOptions = useMemo(() => {
@@ -1354,6 +1473,10 @@ const MainPage = () => {
         dispatch(resellersActions.clearCurrentReseller());
         return;
       }
+      if (user.temporary) {
+        dispatch(resellersActions.clearCurrentReseller());
+        return;
+      }
 
       try {
         const response = await fetch(resellersConfig.ENDPOINTS.CHECK, {
@@ -1549,6 +1672,7 @@ const MainPage = () => {
   const positions = useSelector((state) => state.session.positions);
   const devices = useSelector((state) => state.devices.items);
   const currentReplayIndex = useSelector((state) => state.session.currentReplayIndex);
+  const selectedPlate = useSelector((state) => state.fleet.selectedPlate);
 
   // Handle save button - find closest device and get route
   const handleSaveOcorrencia = useCallback(async () => {
@@ -1689,10 +1813,40 @@ const MainPage = () => {
 
   const [eventsOpen, setEventsOpen] = useState(false);
   const [geofencesPopoverVisible, setGeofencesPopoverVisible] = useState(false);
+  const [gestaoPopoverVisible, setGestaoPopoverVisible] = useState(false);
+  const [osPopoverVisible, setOsPopoverVisible] = useState(false);
+  const [clientsPopoverVisible, setClientsPopoverVisible] = useState(false);
+  const [vehiclesPopoverVisible, setVehiclesPopoverVisible] = useState(false);
+  const [chipsPopoverVisible, setChipsPopoverVisible] = useState(false);
+  const [smsTemplatesPopoverVisible, setSmsTemplatesPopoverVisible] = useState(false);
   const [routePlannerData, setRoutePlannerData] = useState(null);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
 
+  const closeAllPanels = useCallback(() => {
+    setShowDevicesPopover(false);
+    setShowUsersPopover(false);
+    setShowCommandsPopover(false);
+    setShowMaintenancePopover(false);
+    setShowComputedAttributesPopover(false);
+    setShowCalendarsPopover(false);
+    setShowDriversPopover(false);
+    setShowGroupsPopover(false);
+    setShowNotificationsPopover(false);
+    setShowResellersPopover(false);
+    setGeofencesPopoverVisible(false);
+    setGestaoPopoverVisible(false);
+    setOsPopoverVisible(false);
+    setClientsPopoverVisible(false);
+    setVehiclesPopoverVisible(false);
+    setChipsPopoverVisible(false);
+    setSmsTemplatesPopoverVisible(false);
+    setReportsPopoverVisible(false);
+    setShowServerDrawer(false);
+    setShowPreferencesDrawer(false);
+    setShowAnnouncementDrawer(false);
+    setShowResellerDrawer(false);
+  }, []);
 
   const onMapClick = useCallback(() => {
     dispatch(devicesActions.selectId(null));
@@ -1719,8 +1873,31 @@ const MainPage = () => {
   }, [dispatch]);
 
 
+  // Device IDs from fleet vehicles (for restricting device list to trackers in vehicles)
+  const fleetItems = useSelector((state) => state.fleet.items || []);
+  const deviceIdsFromFleet = useMemo(() => {
+    const ids = new Set();
+    fleetItems.forEach((item) => {
+      const deviceIds = item.deviceIds || (item.devices?.map((d) => d.id)) || (item.device_id != null ? [item.device_id] : []);
+      deviceIds.forEach((id) => ids.add(id));
+    });
+    return ids;
+  }, [fleetItems]);
+
+  // Share links log in as Traccar temporary users: devices exist only in Traccar, not in Core /api/fleet/map.
+  // Default desktop layout opens the fleet panel (empty for them); open device list instead.
+  useEffect(() => {
+    if (user?.temporary && desktop) {
+      setIsDeviceListVisible(true);
+      setIsFleetListVisible(false);
+    }
+  }, [user?.temporary, desktop]);
+
   // Always call useFilter (required by Rules of Hooks)
-  useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop);
+  const restrictToDeviceIds = user?.temporary
+    ? null
+    : (isDeviceListVisible && deviceIdsFromFleet.size > 0 ? deviceIdsFromFleet : null);
+  useFilter(keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions, desktop, restrictToDeviceIds);
 
   // Track previous selectedDeviceId to detect when user goes back from selected device
   const prevSelectedDeviceIdRef = useRef(selectedDeviceId);
@@ -1752,6 +1929,22 @@ const MainPage = () => {
     }
   }, [desktop, isDeviceListVisible, refreshDevices]);
 
+  // Fechar popover de Clientes se usuário não for admin
+  useEffect(() => {
+    if (!admin && clientsPopoverVisible) {
+      setClientsPopoverVisible(false);
+    }
+  }, [admin, clientsPopoverVisible]);
+
+  // Fetch fleet map on mount and poll every 10 seconds
+  useEffect(() => {
+    dispatch(fetchFleetMap());
+    const interval = setInterval(() => {
+      dispatch(fetchFleetMap());
+    }, 10000); // 10 seconds
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   return (
     <div className={classes.root}>
       {desktop && (
@@ -1759,7 +1952,7 @@ const MainPage = () => {
           filteredPositions={filteredPositions}
           selectedPosition={selectedPosition}
           onMapClick={onMapClick}
-          selectedMapStyle={selectedMapStyle}
+          selectedMapStyle={appliedMapStyleForView}
           currentReplayIndex={currentReplayIndex}
           routePlannerData={ocorrenciaRouteData || routePlannerData}
           selectedRouteIndex={selectedRouteIndex}
@@ -1776,7 +1969,7 @@ const MainPage = () => {
                 filteredPositions={filteredPositions}
                 selectedPosition={selectedPosition}
                 onMapClick={onMapClick}
-                selectedMapStyle={selectedMapStyle}
+                selectedMapStyle={appliedMapStyleForView}
                 currentReplayIndex={currentReplayIndex}
                 routePlannerData={ocorrenciaRouteData || routePlannerData}
                 selectedRouteIndex={selectedRouteIndex}
@@ -1805,6 +1998,49 @@ const MainPage = () => {
         onClose={() => setReportsPopoverVisible(false)}
       />
       
+      <FloatingGestaoPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isDeviceListVisible={isDeviceListVisible}
+        isVisible={gestaoPopoverVisible}
+        onClose={() => setGestaoPopoverVisible(false)}
+      />
+      
+      <FloatingOSPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={osPopoverVisible}
+        onClose={() => setOsPopoverVisible(false)}
+      />
+      
+      <FloatingClientsPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={clientsPopoverVisible}
+        onClose={() => setClientsPopoverVisible(false)}
+      />
+      
+      <FloatingVehiclesPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={vehiclesPopoverVisible}
+        onClose={() => setVehiclesPopoverVisible(false)}
+      />
+      
+      <FloatingChipsPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={chipsPopoverVisible}
+        onClose={() => setChipsPopoverVisible(false)}
+      />
+      
+      <FloatingSmsTemplatesPopover 
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={smsTemplatesPopoverVisible}
+        onClose={() => setSmsTemplatesPopoverVisible(false)}
+      />
+      
       {/* Desktop Menu */}
       {desktop && hasMainMenuPermission && (
         <div style={{
@@ -1814,7 +2050,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible || showReplayPopover || showResellersPopover) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || isFleetListVisible || selectedPlate || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible || showReplayPopover || showResellersPopover || gestaoPopoverVisible || osPopoverVisible || clientsPopoverVisible || vehiclesPopoverVisible || chipsPopoverVisible || smsTemplatesPopoverVisible) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
@@ -1926,8 +2162,7 @@ const MainPage = () => {
             )}
           </div>
           
-          {/* Ocorrências Button */}
-          {hasOcorrenciasPermission && (
+          {/* Fleet List Toggle Button */}
           <div style={{
             width: '100%',
             height: '40px',
@@ -1941,40 +2176,17 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => {
-            const tooltip = document.getElementById('menu-tooltip-ocorrencias');
+            const tooltip = document.getElementById('menu-tooltip-fleet-list');
             if (tooltip) tooltip.remove();
-            // Generate random occurrence number
-            const randomNumber = Math.floor(Math.random() * 100000) + 1;
-            setOcorrenciaNumber(randomNumber);
-            // Set current datetime (localized using toLocaleString)
-            const now = new Date();
-            const currentDateTime = now.toLocaleString(undefined, {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
-            });
-            setOcorrenciaData({
-              numeroOrigem: '',
-              dataHoraChamada: currentDateTime,
-              nome: '',
-              endereco: '',
-              tipoOcorrencia: ''
-            });
-            setOcorrenciaAddress(null);
-            setAddressSearchResults([]);
-            setIsSearchingAddress(false);
-            setShowOcorrenciasModal(true);
+            setIsFleetListVisible(!isFleetListVisible);
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-              tooltip.textContent = 'Ocorrências';
-              tooltip.id = 'menu-tooltip-ocorrencias';
+              tooltip.textContent = 'Lista de Veículos';
+              tooltip.id = 'menu-tooltip-fleet-list';
               tooltip.style.cssText = `
                 position: fixed;
                 left: ${rect.right + 8}px;
@@ -1984,7 +2196,7 @@ const MainPage = () => {
                 color: ${colors.menuSurface};
                 padding: 6px 10px;
                 border-radius: 6px;
-                font-size: 12px;
+                font-size: '12px';
                 font-weight: 500;
                 white-space: nowrap;
                 z-index: 10001;
@@ -1997,11 +2209,11 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
             if (!isMenuExpanded) {
-              const tooltip = document.getElementById('menu-tooltip-ocorrencias');
+              const tooltip = document.getElementById('menu-tooltip-fleet-list');
               if (tooltip) tooltip.remove();
             }
           }}>
-            <LuShieldAlert size={18} color={colors.textSecondary} />
+            <Truck size={18} color={colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2011,11 +2223,10 @@ const MainPage = () => {
                 whiteSpace: 'nowrap',
                 lineHeight: '1.6'
               }}>
-                Ocorrências
+                Lista de Veículos
               </span>
             )}
           </div>
-          )}
           
           {/* Device List Toggle Button */}
           {hasDeviceListPermission && (
@@ -2069,7 +2280,7 @@ const MainPage = () => {
               if (tooltip) tooltip.remove();
             }
           }}>
-            <Truck size={18} color={colors.textSecondary} />
+            <Cpu size={18} color={colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2102,6 +2313,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-reports');
             if (tooltip) tooltip.remove();
+              closeAllPanels();
               setReportsPopoverVisible(true);
           }}
           onMouseEnter={(e) => {
@@ -2170,6 +2382,7 @@ const MainPage = () => {
           onClick={() => {
             const tooltip = document.getElementById('menu-tooltip-geofences');
             if (tooltip) tooltip.remove();
+            closeAllPanels();
             setGeofencesPopoverVisible(true);
           }}
             onMouseEnter={(e) => {
@@ -2221,8 +2434,7 @@ const MainPage = () => {
           </div>
           )}
           
-          {/* Settings Icon */}
-          {hasSettingsPermission && (
+          {/* Gestão Icon */}
           <div style={{
             width: '100%',
             height: '40px',
@@ -2236,17 +2448,18 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => {
-            const tooltip = document.getElementById('menu-tooltip-settings');
+            const tooltip = document.getElementById('menu-tooltip-gestao');
             if (tooltip) tooltip.remove();
-            setShowPreferencesDrawer(true);
+            closeAllPanels();
+            setGestaoPopoverVisible(true);
           }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-              tooltip.textContent = t('settingsTitle');
-              tooltip.id = 'menu-tooltip-settings';
+              tooltip.textContent = 'Gestão';
+              tooltip.id = 'menu-tooltip-gestao';
               tooltip.style.cssText = `
                 position: fixed;
                 left: ${rect.right + 8}px;
@@ -2269,11 +2482,11 @@ const MainPage = () => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
             if (!isMenuExpanded) {
-              const tooltip = document.getElementById('menu-tooltip-settings');
+              const tooltip = document.getElementById('menu-tooltip-gestao');
               if (tooltip) tooltip.remove();
             }
           }}>
-            <AiOutlineSetting style={{ fontSize: 18, color: colors.textSecondary }} />
+            <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2283,14 +2496,13 @@ const MainPage = () => {
                 whiteSpace: 'nowrap',
                 lineHeight: '1.6'
               }}>
-                {t('settingsTitle')}
+                Gestão
               </span>
             )}
           </div>
-          )}
-          
-          {/* Notifications Icon */}
-          {!readonly && hasNotificationsPermission && (
+
+          {/* Ordens de Serviço Icon */}
+          {user?.administrator && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -2304,17 +2516,18 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-notifications');
+            const tooltip = document.getElementById('menu-tooltip-os');
             if (tooltip) tooltip.remove();
-              setShowNotificationsPopover(true);
+            closeAllPanels();
+            setOsPopoverVisible(true);
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
+            e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
               const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-                tooltip.textContent = t('sharedNotifications');
-                tooltip.id = 'menu-tooltip-notifications';
+              tooltip.textContent = 'Ordens de Serviço';
+              tooltip.id = 'menu-tooltip-os';
               tooltip.style.cssText = `
                 position: fixed;
                 left: ${rect.right + 8}px;
@@ -2335,13 +2548,13 @@ const MainPage = () => {
             }
           }}
           onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.backgroundColor = 'transparent';
             if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-notifications');
+              const tooltip = document.getElementById('menu-tooltip-os');
               if (tooltip) tooltip.remove();
             }
           }}>
-              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            <FileText size={18} color={colors.textSecondary} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
@@ -2351,84 +2564,150 @@ const MainPage = () => {
                 whiteSpace: 'nowrap',
                 lineHeight: '1.6'
               }}>
-                  {t('sharedNotifications')}
-                </span>
-              )}
-            </div>
-          )}
-          
-          {/* User Profile Icon */}
-          {!readonly && hasAccountPermission && (
-            <div style={{
-              width: '100%',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              borderRadius: '0px',
-              paddingLeft: isMenuExpanded ? '12px' : '0px',
-              transition: 'all 0.2s'
-            }}
-            onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-user');
-              if (tooltip) tooltip.remove();
-              setShowUserPopover(false);
-              setEditingUserId(user.id);
-              setShowUsersPopover(true);
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
-              if (!isMenuExpanded) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const tooltip = document.createElement('div');
-                tooltip.textContent = t('settingsUser');
-                tooltip.id = 'menu-tooltip-user';
-                tooltip.style.cssText = `
-                  position: fixed;
-                  left: ${rect.right + 8}px;
-                  top: ${rect.top + rect.height / 2}px;
-                  transform: translateY(-50%);
-                  background: ${colors.menuText};
-                  color: ${colors.menuSurface};
-                  padding: 6px 10px;
-                  border-radius: 6px;
-                  font-size: 12px;
-                  font-weight: 500;
-                  white-space: nowrap;
-                  z-index: 10001;
-                  pointer-events: none;
-                  box-shadow: ${colors.menuShadow};
-                `;
-                document.body.appendChild(tooltip);
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-user');
-                if (tooltip) tooltip.remove();
-              }
-            }}>
-              <AiOutlineUser style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                whiteSpace: 'nowrap',
-                lineHeight: '1.5'
-              }}>
-                  {t('settingsUser')}
+                Ordens de Serviço
               </span>
             )}
           </div>
           )}
-          
-          {/* Devices Icon */}
-          {!readonly && hasDevicesPermission && (
+
+          {/* Clientes Icon - apenas para admin */}
+          {admin && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-clients');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setClientsPopoverVisible(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Clientes';
+              tooltip.id = 'menu-tooltip-clients';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-clients');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <PeopleIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.6'
+              }}>
+                Clientes
+              </span>
+            )}
+          </div>
+          )}
+
+          {/* Veículos Icon */}
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-vehicles');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setVehiclesPopoverVisible(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Veículos';
+              tooltip.id = 'menu-tooltip-vehicles';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-vehicles');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <DirectionsCarIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.6'
+              }}>
+                Veículos
+              </span>
+            )}
+          </div>
+
+          {/* Devices Icon (Objetos) */}
+          {!readonly && hasDevicesPermission && admin && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -2444,6 +2723,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-devices');
             if (tooltip) tooltip.remove();
+              closeAllPanels();
               setShowDevicesPopover(true);
           }}
           onMouseEnter={(e) => {
@@ -2495,8 +2775,8 @@ const MainPage = () => {
           </div>
           )}
           
-          {/* Groups Icon */}
-          {!readonly && !features.disableGroups && hasGroupsPermission && (
+          {/* Users Icon (Usuários) */}
+          {manager && hasUsersPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -2510,17 +2790,18 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-groups');
+            const tooltip = document.getElementById('menu-tooltip-users');
             if (tooltip) tooltip.remove();
-              setShowGroupsPopover(true);
+            closeAllPanels();
+            setShowUsersPopover(true);
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
+            e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
-                const rect = e.currentTarget.getBoundingClientRect();
+              const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-                tooltip.textContent = t('settingsGroups');
-                tooltip.id = 'menu-tooltip-groups';
+              tooltip.textContent = t('settingsUsers');
+              tooltip.id = 'menu-tooltip-users';
               tooltip.style.cssText = `
                 position: fixed;
                 left: ${rect.right + 8}px;
@@ -2541,30 +2822,168 @@ const MainPage = () => {
             }
           }}
           onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.backgroundColor = 'transparent';
             if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-groups');
+              const tooltip = document.getElementById('menu-tooltip-users');
               if (tooltip) tooltip.remove();
             }
           }}>
-              <AiOutlineTeam style={{ fontSize: 18, color: colors.textSecondary }} />
+            <AiOutlineUsergroupAdd style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
                 color: colors.textSecondary,
                 fontSize: '14px',
-                  fontWeight: '400',
+                fontWeight: '400',
                 whiteSpace: 'nowrap',
                 lineHeight: '1.5'
               }}>
-                  {t('settingsGroups')}
+                {t('settingsUsers')}
+              </span>
+            )}
+          </div>
+          )}
+
+          {/* Simcards Icon */}
+          {!readonly && hasDevicesPermission && admin && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-chips');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setChipsPopoverVisible(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Simcards';
+              tooltip.id = 'menu-tooltip-chips';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-chips');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <SimCardIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                Simcards
+              </span>
+            )}
+          </div>
+          )}
+
+          {/* Painel SMS Icon */}
+          {!readonly && hasDevicesPermission && admin && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-sms-templates');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setSmsTemplatesPopoverVisible(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Painel SMS';
+              tooltip.id = 'menu-tooltip-sms-templates';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-sms-templates');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <MessageIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                Painel SMS
               </span>
             )}
           </div>
           )}
           
-          {/* Drivers Icon */}
-          {!readonly && !features.disableDrivers && hasDriversPermission && (
+          {/* Notifications Icon */}
+          {!readonly && hasNotificationsPermission && (
           <div style={{
             width: '100%',
             height: '40px',
@@ -2578,17 +2997,18 @@ const MainPage = () => {
             transition: 'all 0.2s'
           }}
           onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-drivers');
+              const tooltip = document.getElementById('menu-tooltip-notifications');
             if (tooltip) tooltip.remove();
-              setShowDriversPopover(true);
+              closeAllPanels();
+              setShowNotificationsPopover(true);
           }}
           onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
             if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
               const tooltip = document.createElement('div');
-                tooltip.textContent = t('sharedDrivers');
-                tooltip.id = 'menu-tooltip-drivers';
+                tooltip.textContent = t('sharedNotifications');
+                tooltip.id = 'menu-tooltip-notifications';
               tooltip.style.cssText = `
                 position: fixed;
                 left: ${rect.right + 8}px;
@@ -2611,24 +3031,24 @@ const MainPage = () => {
           onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
             if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-drivers');
+                const tooltip = document.getElementById('menu-tooltip-notifications');
               if (tooltip) tooltip.remove();
             }
           }}>
-              <PiSteeringWheelLight style={{ fontSize: 18, color: colors.textSecondary }} />
+              <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.textSecondary }} />
             {isMenuExpanded && (
               <span style={{
                 marginLeft: '12px',
                 color: colors.textSecondary,
                 fontSize: '14px',
-                  fontWeight: '400',
+                fontWeight: '400',
                 whiteSpace: 'nowrap',
-                lineHeight: '1.5'
+                lineHeight: '1.6'
               }}>
-                  {t('sharedDrivers')}
-              </span>
-            )}
-          </div>
+                  {t('sharedNotifications')}
+                </span>
+              )}
+            </div>
           )}
           
           {/* Calendars Icon */}
@@ -2648,6 +3068,7 @@ const MainPage = () => {
           onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-calendars');
             if (tooltip) tooltip.remove();
+              closeAllPanels();
               setShowCalendarsPopover(true);
           }}
           onMouseEnter={(e) => {
@@ -2699,6 +3120,75 @@ const MainPage = () => {
             </div>
           )}
           
+          {/* Drivers Icon */}
+          {!readonly && !features.disableDrivers && hasDriversPermission && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-drivers');
+            if (tooltip) tooltip.remove();
+              closeAllPanels();
+              setShowDriversPopover(true);
+          }}
+          onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+                tooltip.textContent = t('sharedDrivers');
+                tooltip.id = 'menu-tooltip-drivers';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-drivers');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+              <PiSteeringWheelLight style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                  fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('sharedDrivers')}
+              </span>
+            )}
+          </div>
+          )}
+          
           {/* Computed Attributes Icon */}
           {!readonly && !features.disableComputedAttributes && hasComputedAttributesPermission && (
             <div style={{
@@ -2716,6 +3206,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-attributes');
               if (tooltip) tooltip.remove();
+              closeAllPanels();
               setShowComputedAttributesPopover(true);
             }}
             onMouseEnter={(e) => {
@@ -2784,6 +3275,7 @@ const MainPage = () => {
             onClick={() => {
               const tooltip = document.getElementById('menu-tooltip-maintenance');
               if (tooltip) tooltip.remove();
+              closeAllPanels();
               setShowMaintenancePopover(true);
             }}
             onMouseEnter={(e) => {
@@ -2835,8 +3327,77 @@ const MainPage = () => {
             </div>
           )}
           
-          {/* Saved Commands Icon */}
-          {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
+          {/* Groups Icon */}
+          {!readonly && !features.disableGroups && hasGroupsPermission && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-groups');
+            if (tooltip) tooltip.remove();
+              closeAllPanels();
+              setShowGroupsPopover(true);
+          }}
+          onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+                tooltip.textContent = t('settingsGroups');
+                tooltip.id = 'menu-tooltip-groups';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-groups');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+              <AiOutlineTeam style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                  fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('settingsGroups')}
+              </span>
+            )}
+          </div>
+          )}
+          
+          {/* Announcement Icon */}
+          {manager && hasAnnouncementPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -2850,17 +3411,18 @@ const MainPage = () => {
               transition: 'all 0.2s'
             }}
             onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-commands');
+              const tooltip = document.getElementById('menu-tooltip-announcement');
               if (tooltip) tooltip.remove();
-              setShowCommandsPopover(true);
+              closeAllPanels();
+              setShowAnnouncementDrawer(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
-                tooltip.textContent = t('sharedSavedCommands');
-                tooltip.id = 'menu-tooltip-commands';
+                tooltip.textContent = t('serverAnnouncement');
+                tooltip.id = 'menu-tooltip-announcement';
                 tooltip.style.cssText = `
                   position: fixed;
                   left: ${rect.right + 8}px;
@@ -2883,21 +3445,228 @@ const MainPage = () => {
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
               if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-commands');
+                const tooltip = document.getElementById('menu-tooltip-announcement');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+              <AiOutlineSound style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                  fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('serverAnnouncement')}
+                </span>
+              )}
+            </div>
+          )}
+          
+          {/* Settings Icon */}
+          {hasSettingsPermission && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-settings');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setShowPreferencesDrawer(true);
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = t('settingsTitle');
+              tooltip.id = 'menu-tooltip-settings';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-settings');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <AiOutlineSetting style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.6'
+              }}>
+                {t('settingsTitle')}
+              </span>
+            )}
+          </div>
+          )}
+          
+          {/* Server Icon */}
+          {admin && hasServerPermission && (
+            <div style={{
+              width: '100%',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              borderRadius: '0px',
+              paddingLeft: isMenuExpanded ? '12px' : '0px',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-server');
+              if (tooltip) tooltip.remove();
+              closeAllPanels();
+              setShowServerDrawer(true);
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+              if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const tooltip = document.createElement('div');
+                tooltip.textContent = t('settingsServer');
+                tooltip.id = 'menu-tooltip-server';
+                tooltip.style.cssText = `
+                  position: fixed;
+                  left: ${rect.right + 8}px;
+                  top: ${rect.top + rect.height / 2}px;
+                  transform: translateY(-50%);
+                  background: ${colors.menuText};
+                  color: ${colors.menuSurface};
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  white-space: nowrap;
+                  z-index: 10001;
+                  pointer-events: none;
+                  box-shadow: ${colors.menuShadow};
+                `;
+                document.body.appendChild(tooltip);
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-server');
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <AiOutlineSend style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('sharedSavedCommands')}
+              <AiOutlineCloudServer style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('settingsServer')}
+                </span>
+              )}
+            </div>
+          )}
+          
+          {/* Resellers Icon */}
+          {(admin || isReseller) && hasResellerPanelPermission && (
+            <div style={{
+              width: '100%',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              borderRadius: '0px',
+              paddingLeft: isMenuExpanded ? '12px' : '0px',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => {
+              const tooltip = document.getElementById('menu-tooltip-reseller');
+              if (tooltip) tooltip.remove();
+              closeAllPanels();
+              setShowResellersPopover(true);
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.menuHover;
+              if (!isMenuExpanded) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const tooltip = document.createElement('div');
+                tooltip.textContent = t('resellerPanel');
+                tooltip.id = 'menu-tooltip-reseller';
+                tooltip.style.cssText = `
+                  position: fixed;
+                  left: ${rect.right + 8}px;
+                  top: ${rect.top + rect.height / 2}px;
+                  transform: translateY(-50%);
+                  background: ${colors.menuText};
+                  color: ${colors.menuSurface};
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  white-space: nowrap;
+                  z-index: 10001;
+                  pointer-events: none;
+                  box-shadow: ${colors.menuShadow};
+                `;
+                document.body.appendChild(tooltip);
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              if (!isMenuExpanded) {
+                const tooltip = document.getElementById('menu-tooltip-reseller');
+                if (tooltip) tooltip.remove();
+              }
+            }}>
+              <HiMiniCubeTransparent style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                  {t('resellerPanel')}
                 </span>
               )}
             </div>
@@ -2956,18 +3725,18 @@ const MainPage = () => {
               }
             }}>
               <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('userBilling')}
-                </span>
-              )}
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                {t('userBilling')}
+              </span>
+            )}
             </div>
           )}
           
@@ -3024,23 +3793,23 @@ const MainPage = () => {
               }
             }}>
               <HelpIcon style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('settingsSupport')}
-                </span>
-              )}
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                {t('settingsSupport')}
+              </span>
+            )}
             </div>
           )}
           
-          {/* Manager Section - Server Announcement */}
-          {manager && hasAnnouncementPermission && (
+          {/* Saved Commands Icon */}
+          {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
             <div style={{
               width: '100%',
               height: '40px',
@@ -3054,17 +3823,18 @@ const MainPage = () => {
               transition: 'all 0.2s'
             }}
             onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-announcement');
+              const tooltip = document.getElementById('menu-tooltip-commands');
               if (tooltip) tooltip.remove();
-              setShowAnnouncementDrawer(true);
+              closeAllPanels();
+              setShowCommandsPopover(true);
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = colors.menuHover;
               if (!isMenuExpanded) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const tooltip = document.createElement('div');
-                tooltip.textContent = t('serverAnnouncement');
-                tooltip.id = 'menu-tooltip-announcement';
+                tooltip.textContent = t('sharedSavedCommands');
+                tooltip.id = 'menu-tooltip-commands';
                 tooltip.style.cssText = `
                   position: fixed;
                   left: ${rect.right + 8}px;
@@ -3087,229 +3857,26 @@ const MainPage = () => {
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
               if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-announcement');
+                const tooltip = document.getElementById('menu-tooltip-commands');
                 if (tooltip) tooltip.remove();
               }
             }}>
-              <AiOutlineSound style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('serverAnnouncement')}
-                </span>
-              )}
+              <AiOutlineSend style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                {t('sharedSavedCommands')}
+              </span>
+            )}
             </div>
           )}
           
-          {/* Manager Section - Server Settings */}
-          {admin && hasServerPermission && (
-            <div style={{
-              width: '100%',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              borderRadius: '0px',
-              paddingLeft: isMenuExpanded ? '12px' : '0px',
-              transition: 'all 0.2s'
-            }}
-            onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-server');
-              if (tooltip) tooltip.remove();
-              setShowServerDrawer(true);
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
-              if (!isMenuExpanded) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const tooltip = document.createElement('div');
-                tooltip.textContent = t('settingsServer');
-                tooltip.id = 'menu-tooltip-server';
-                tooltip.style.cssText = `
-                  position: fixed;
-                  left: ${rect.right + 8}px;
-                  top: ${rect.top + rect.height / 2}px;
-                  transform: translateY(-50%);
-                  background: ${colors.menuText};
-                  color: ${colors.menuSurface};
-                  padding: 6px 10px;
-                  border-radius: 6px;
-                  font-size: 12px;
-                  font-weight: 500;
-                  white-space: nowrap;
-                  z-index: 10001;
-                  pointer-events: none;
-                  box-shadow: ${colors.menuShadow};
-                `;
-                document.body.appendChild(tooltip);
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-server');
-                if (tooltip) tooltip.remove();
-              }
-            }}>
-              <AiOutlineCloudServer style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('settingsServer')}
-                </span>
-              )}
-            </div>
-          )}
-          
-          {/* Manager Section - Users Management */}
-          {manager && hasUsersPermission && (
-            <div style={{
-              width: '100%',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              borderRadius: '0px',
-              paddingLeft: isMenuExpanded ? '12px' : '0px',
-              transition: 'all 0.2s'
-            }}
-            onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-users');
-              if (tooltip) tooltip.remove();
-              setShowUsersPopover(true);
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
-              if (!isMenuExpanded) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const tooltip = document.createElement('div');
-                tooltip.textContent = t('settingsUsers');
-                tooltip.id = 'menu-tooltip-users';
-                tooltip.style.cssText = `
-                  position: fixed;
-                  left: ${rect.right + 8}px;
-                  top: ${rect.top + rect.height / 2}px;
-                  transform: translateY(-50%);
-                  background: ${colors.menuText};
-                  color: ${colors.menuSurface};
-                  padding: 6px 10px;
-                  border-radius: 6px;
-                  font-size: 12px;
-                  font-weight: 500;
-                  white-space: nowrap;
-                  z-index: 10001;
-                  pointer-events: none;
-                  box-shadow: ${colors.menuShadow};
-                `;
-                document.body.appendChild(tooltip);
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-users');
-                if (tooltip) tooltip.remove();
-              }
-            }}>
-              <AiOutlineUsergroupAdd style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('settingsUsers')}
-                </span>
-              )}
-            </div>
-          )}
-          
-          {/* Manager Section - Reseller Management */}
-          {(admin || isReseller) && hasResellerPanelPermission && (
-            <div style={{
-              width: '100%',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              borderRadius: '0px',
-              paddingLeft: isMenuExpanded ? '12px' : '0px',
-              transition: 'all 0.2s'
-            }}
-            onClick={() => {
-              const tooltip = document.getElementById('menu-tooltip-reseller');
-              if (tooltip) tooltip.remove();
-              setShowResellersPopover(true);
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.menuHover;
-              if (!isMenuExpanded) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const tooltip = document.createElement('div');
-                tooltip.textContent = t('resellerPanel');
-                tooltip.id = 'menu-tooltip-reseller';
-                tooltip.style.cssText = `
-                  position: fixed;
-                  left: ${rect.right + 8}px;
-                  top: ${rect.top + rect.height / 2}px;
-                  transform: translateY(-50%);
-                  background: ${colors.menuText};
-                  color: ${colors.menuSurface};
-                  padding: 6px 10px;
-                  border-radius: 6px;
-                  font-size: 12px;
-                  font-weight: 500;
-                  white-space: nowrap;
-                  z-index: 10001;
-                  pointer-events: none;
-                  box-shadow: ${colors.menuShadow};
-                `;
-                document.body.appendChild(tooltip);
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              if (!isMenuExpanded) {
-                const tooltip = document.getElementById('menu-tooltip-reseller');
-                if (tooltip) tooltip.remove();
-              }
-            }}>
-              <HiMiniCubeTransparent style={{ fontSize: 18, color: colors.textSecondary }} />
-              {isMenuExpanded && (
-                <span style={{
-                  marginLeft: '12px',
-                  color: colors.textSecondary,
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.5'
-                }}>
-                  {t('resellerPanel')}
-                </span>
-              )}
-            </div>
-          )}
           
           {/* Spacer to push logout to bottom */}
           <div style={{ flex: 1 }} />
@@ -3402,18 +3969,42 @@ const MainPage = () => {
         onDrawerOpen={() => setDrawerOpen(true)}
       />
       
-      {/* Floating Status Card */}
-      <FloatingStatusCard 
-        desktop={desktop} 
-        isMenuExpanded={isMenuExpanded} 
-        isDeviceListVisible={isDeviceListVisible}
+      {/* Floating Fleet List */}
+      <FloatingFleetList
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={desktop ? (isFleetListVisible || selectedPlate) : false} // Desktop: visible if toggled OR vehicle selected, Mobile: hidden
         geofencesPopoverVisible={geofencesPopoverVisible}
-        showReplayPopover={showReplayPopover}
-        setShowReplayPopover={setShowReplayPopover}
-        onHideDeviceList={() => setIsDeviceListVisible(false)}
-        onShowDeviceList={() => setIsDeviceListVisible(true)}
-        onOpenReports={() => setReportsPopoverVisible(true)}
+        onDrawerOpen={() => setDrawerOpen(true)}
       />
+      
+      {/* History Panel - shown when history mode is active */}
+      {historyDeviceId && (
+        <HistoryPanel
+          deviceId={historyDeviceId}
+          onClose={() => setHistoryDeviceId(null)}
+          desktop={desktop}
+          isMenuExpanded={isMenuExpanded}
+        />
+      )}
+      {/* Floating Status Card - hidden when history mode is active */}
+      {!historyDeviceId && (
+        <FloatingStatusCard 
+          desktop={desktop} 
+          isMenuExpanded={isMenuExpanded} 
+          isDeviceListVisible={isDeviceListVisible}
+          geofencesPopoverVisible={geofencesPopoverVisible}
+          showReplayPopover={showReplayPopover}
+          setShowReplayPopover={setShowReplayPopover}
+          onHideDeviceList={() => setIsDeviceListVisible(false)}
+          onShowDeviceList={() => setIsDeviceListVisible(true)}
+          onOpenReports={() => {
+            closeAllPanels();
+            setReportsPopoverVisible(true);
+          }}
+          onOpenHistory={(deviceId) => setHistoryDeviceId(deviceId)}
+        />
+      )}
       
       {/* Vertical Control Bar - Left of Device List */}
       <AnimatePresence>
@@ -3719,6 +4310,36 @@ const MainPage = () => {
             <Sun size={18} color={colors.textSecondary} />
           )}
         </button>
+        
+        {/* Heatmap Toggle Button - hidden when HEATMAP_FEATURE_ENABLED is false */}
+        {HEATMAP_FEATURE_ENABLED && (
+        <button
+          data-control-button
+          onClick={handleToggleHeatmap}
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: mapHeatmapEnabled ? '#10B981' : colors.textSecondary,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            outline: 'none !important',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            boxShadow: 'none !important'
+          }}
+          title={mapHeatmapEnabled ? 'Ocultar Mapa de Calor' : 'Mostrar Mapa de Calor'}>
+          <Activity size={18} style={{ userSelect: 'none', pointerEvents: 'none' }} />
+        </button>
+        )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -3920,19 +4541,19 @@ const MainPage = () => {
               maxHeight: '240px',
               overflowY: 'auto'
             }}>
-              {mapStyles
-                .filter((style) => style.available && activeMapStyles.includes(style.id))
+              {stylesForSwitcher
                 .map((style, index) => (
                   <button
                     key={style.id}
+                    type="button"
                     onClick={() => handleMapStyleChange(style.id)}
                     style={{
                       width: '100%',
                       padding: '12px 16px',
                       textAlign: 'left',
                       fontSize: '14px',
-                      color: selectedMapStyle === style.id ? colors.text : colors.textSecondary,
-                      backgroundColor: selectedMapStyle === style.id ? colors.hover : 'transparent',
+                      color: appliedMapStyleForView === style.id ? colors.text : colors.textSecondary,
+                      backgroundColor: appliedMapStyleForView === style.id ? colors.hover : 'transparent',
                       border: 'none',
                       outline: 'none',
                       boxShadow: 'none',
@@ -3942,23 +4563,23 @@ const MainPage = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       transition: 'all 0.2s',
-                      borderBottom: index < mapStyles.filter(s => s.available && activeMapStyles.includes(s.id)).length - 1 ? `1px solid ${colors.border}` : 'none'
+                      borderBottom: index < stylesForSwitcher.length - 1 ? `1px solid ${colors.border}` : 'none'
                     }}
                     onMouseEnter={(e) => {
-                      if (selectedMapStyle !== style.id) {
+                      if (appliedMapStyleForView !== style.id) {
                         e.target.style.backgroundColor = colors.hover;
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (selectedMapStyle !== style.id) {
+                      if (appliedMapStyleForView !== style.id) {
                         e.target.style.backgroundColor = 'transparent';
                       }
                     }}
                   >
-                    <span style={{ fontWeight: selectedMapStyle === style.id ? '600' : '400' }}>
+                    <span style={{ fontWeight: appliedMapStyleForView === style.id ? '600' : '400' }}>
                       {style.title}
                     </span>
-                    {selectedMapStyle === style.id && (
+                    {appliedMapStyleForView === style.id && (
                       <Check size={16} color="#10B981" />
                     )}
                   </button>
@@ -4518,6 +5139,7 @@ const MainPage = () => {
                     if (hasAccountPermission || admin) {
                       setShowUserPopover(false);
                       setEditingUserId(user.id);
+                      closeAllPanels();
                       setShowUsersPopover(true);
                     }
                   }}
@@ -4681,12 +5303,6 @@ const MainPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Users Management Modal */}
-      <UsersModal 
-        open={showUsersModal} 
-        onClose={() => setShowUsersModal(false)} 
-      />
       
       {/* Users Management Popover */}
       <FloatingUsersPopover
@@ -6223,7 +6839,7 @@ const MainPage = () => {
                     <InputLabel>{t('mapActive')}</InputLabel>
                     <Select
                       label={t('mapActive')}
-                      value={preferencesAttributes.activeMapStyles?.split(',') || ['locationIqStreets', 'locationIqDark', 'openFreeMap']}
+                      value={(preferencesAttributes.activeMapStyles || DEFAULT_ACTIVE_MAP_STYLES).split(',').map((s) => s.trim()).filter(Boolean)}
                       onChange={(e) => {
                         setPreferencesAttributes({ ...preferencesAttributes, activeMapStyles: e.target.value.join(',') });
                       }}
@@ -7263,6 +7879,7 @@ const MainPage = () => {
                   {!disableReports && hasReportsPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setReportsPopoverVisible(true);
                         setDrawerOpen(false);
                       }}
@@ -7299,6 +7916,7 @@ const MainPage = () => {
                   {hasSettingsPermission && (
                   <button
                     onClick={() => {
+                      closeAllPanels();
                       setShowPreferencesDrawer(true);
                       setDrawerOpen(false);
                     }}
@@ -7339,6 +7957,7 @@ const MainPage = () => {
                   {!readonly && hasNotificationsPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowNotificationsPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7371,48 +7990,11 @@ const MainPage = () => {
                     </button>
                   )}
 
-                  {/* User Profile */}
-                  {!readonly && hasAccountPermission && (
-                    <button
-                      onClick={() => {
-                        setShowUserPopover(false);
-                        setEditingUserId(user.id);
-                        setShowUsersPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineUser style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsUser')}
-                    </button>
-                  )}
-
                   {/* Devices Management */}
-                  {!readonly && hasDevicesPermission && (
+                  {!readonly && hasDevicesPermission && admin && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowDevicesPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7445,10 +8027,85 @@ const MainPage = () => {
                     </button>
                   )}
 
+                  {/* Simcards */}
+                  {!readonly && hasDevicesPermission && admin && (
+                    <button
+                      onClick={() => {
+                        closeAllPanels();
+                        setChipsPopoverVisible(true);
+                        setDrawerOpen(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '12px 20px',
+                        background: 'none',
+                        border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none',
+                      borderRadius: '0',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        color: colors.text,
+                        fontSize: '14px',
+                        fontWeight: '400',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = colors.menuHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <SimCardIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      Simcards
+                    </button>
+                  )}
+
+                  {/* Painel SMS */}
+                  {!readonly && hasDevicesPermission && admin && (
+                    <button
+                      onClick={() => {
+                        closeAllPanels();
+                        setSmsTemplatesPopoverVisible(true);
+                        setDrawerOpen(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '12px 20px',
+                        background: 'none',
+                        border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none',
+                      borderRadius: '0',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        color: colors.text,
+                        fontSize: '14px',
+                        fontWeight: '400',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = colors.menuHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <MessageIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
+                      Painel SMS
+                    </button>
+                  )}
+
                   {/* Groups */}
                   {!readonly && !features.disableGroups && hasGroupsPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowGroupsPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7485,6 +8142,7 @@ const MainPage = () => {
                   {!readonly && !features.disableDrivers && hasDriversPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowDriversPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7521,6 +8179,7 @@ const MainPage = () => {
                   {!readonly && !features.disableCalendars && hasCalendarsPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowCalendarsPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7557,6 +8216,7 @@ const MainPage = () => {
                   {!readonly && !features.disableComputedAttributes && hasComputedAttributesPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowComputedAttributesPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7593,6 +8253,7 @@ const MainPage = () => {
                   {!readonly && !features.disableMaintenance && hasMaintenancePermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowMaintenancePopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7629,6 +8290,7 @@ const MainPage = () => {
                   {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowCommandsPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7737,6 +8399,7 @@ const MainPage = () => {
                   {manager && hasAnnouncementPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowAnnouncementDrawer(true);
                         setDrawerOpen(false);
                       }}
@@ -7773,6 +8436,7 @@ const MainPage = () => {
                   {manager && admin && hasServerPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowServerDrawer(true);
                         setDrawerOpen(false);
                       }}
@@ -7809,6 +8473,7 @@ const MainPage = () => {
                   {manager && hasUsersPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowUsersPopover(true);
                         setDrawerOpen(false);
                       }}
@@ -7849,6 +8514,7 @@ const MainPage = () => {
                   {(admin || isReseller) && hasResellerPanelPermission && (
                     <button
                       onClick={() => {
+                        closeAllPanels();
                         setShowResellersPopover(true);
                         setDrawerOpen(false);
                       }}

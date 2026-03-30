@@ -40,16 +40,14 @@ const LinkField = ({
   const listRef = useRef(null);
 
   useEffectAsync(async () => {
-    if (active) {
-      const response = await fetchOrThrow(endpointAll);
-      setItems(await response.json());
-    }
-  }, [active]);
+    const response = await fetchOrThrow(endpointLinked);
+    setLinked(await response.json());
+  }, []);
 
   useEffectAsync(async () => {
     if (active) {
-      const response = await fetchOrThrow(endpointLinked);
-      setLinked(await response.json());
+      const response = await fetchOrThrow(endpointAll);
+      setItems(await response.json());
     }
   }, [active]);
 

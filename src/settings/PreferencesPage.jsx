@@ -15,6 +15,7 @@ import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import SelectField from '../common/components/SelectField';
 import useMapStyles from '../map/core/useMapStyles';
+import { DEFAULT_ACTIVE_MAP_STYLES } from '../map/core/mapStyleDefaults';
 import useMapOverlays from '../map/overlay/useMapOverlays';
 import { useCatch } from '../reactHelper';
 import { sessionActions } from '../store';
@@ -101,7 +102,7 @@ const PreferencesPage = () => {
                   <InputLabel>{t('mapActive')}</InputLabel>
                   <Select
                     label={t('mapActive')}
-                    value={attributes.activeMapStyles?.split(',') || ['locationIqStreets', 'locationIqDark', 'openFreeMap']}
+                    value={(attributes.activeMapStyles || DEFAULT_ACTIVE_MAP_STYLES).split(',').map((s) => s.trim()).filter(Boolean)}
                     onChange={(e, child) => {
                       const clicked = mapStyles.find((s) => s.id === child.props.value);
                       if (clicked.available) {
