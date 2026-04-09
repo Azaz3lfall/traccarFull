@@ -21,12 +21,7 @@ import {
   IconButton,
   Tooltip,
   Autocomplete,
-  Chip,
   InputAdornment,
-  Popover,
-  List,
-  ListItem,
-  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,7 +31,7 @@ import {
   Image as ImageIcon,
   DeleteOutline as DeleteOutlineIcon,
   Check as CheckIcon,
-  Devices as DevicesIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { fetchVehicles, fetchAvailableDevicesForVehicle, addVehicle, updateVehicle, deleteVehicle, fleetActions } from '../store';
 import { fetchClients } from '../store';
@@ -53,6 +48,8 @@ import { compressImage, validateImageFile } from '../utils/imageCompression';
 import deviceCategories from '../common/util/deviceCategories';
 import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import { vehicleTypeToIcon } from '../common/util/vehicleTypeIcon';
+import VehicleDetailsModal from './components/VehicleDetailsModal';
+import DeviceStatusIcons from './components/DeviceStatusIcons';
 
 const VehiclesPage = () => {
   const { classes } = useSettingsStyles();
@@ -72,12 +69,15 @@ const VehiclesPage = () => {
   const { vehicles, loading, error, availableDevicesForVehicle = [], availableDevicesLoading } = useSelector((state) => state.fleet);
   const { items: clients } = useSelector((state) => state.clients);
   const { allDevices = [] } = useSelector((state) => state.devices || {});
+  const positions = useSelector((state) => state.session.positions || {});
 
   // Estado local
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicleId, setEditingVehicleId] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [itemToDeleteId, setItemToDeleteId] = useState(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [detailsVehicle, setDetailsVehicle] = useState(null);
   const [formData, setFormData] = useState({
     plate: '',
     client_id: '',
@@ -99,7 +99,6 @@ const VehiclesPage = () => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [vehicleTypeDropdownOpen, setVehicleTypeDropdownOpen] = useState(false);
   const vehicleTypeInputRef = useRef(null);
-  const [trackersPopover, setTrackersPopover] = useState({ anchorEl: null, devices: [] });
 
   // Dispositivos disponíveis para vincular (vindos da API - apenas não associados a outros veículos)
   const availableDevices = availableDevicesForVehicle;
@@ -479,7 +478,7 @@ const VehiclesPage = () => {
                   <TableCell>Modelo</TableCell>
                   <TableCell>Ano</TableCell>
                   <TableCell>Tipo de veículo</TableCell>
-                  <TableCell>Rastreadores</TableCell>
+                  <TableCell>Estado</TableCell>
                   <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
@@ -543,34 +542,44 @@ const VehiclesPage = () => {
                         })()}
                       </TableCell>
                       <TableCell>
-                        {associatedDevices.length === 0 ? (
-                          <Typography variant="body2" color="text.secondary">-</Typography>
-                        ) : associatedDevices.length === 1 ? (
-                          <Tooltip title={associatedDevices[0]?.name || `ID: ${associatedDevices[0]?.id ?? 'N/A'}`} arrow>
-                            <Chip
-                              label={associatedDevices[0]?.name || `ID: ${associatedDevices[0]?.id ?? 'N/A'}`}
-                              size="small"
-                              sx={{ maxWidth: '200px' }}
-                            />
-                          </Tooltip>
-                        ) : (
-                          <Tooltip title="Clique para ver a lista" arrow>
-                            <Chip
-                              icon={<DevicesIcon sx={{ fontSize: 16 }} />}
-                              label={`${associatedDevices.length} rastreadores`}
-                              size="small"
-                              onClick={(e) => setTrackersPopover({ anchorEl: e.currentTarget, devices: associatedDevices })}
-                              sx={{
-                                cursor: 'pointer',
-                                maxWidth: '180px',
-                                '&:hover': { backgroundColor: 'action.hover' },
-                              }}
-                            />
-                          </Tooltip>
-                        )}
+                        {(() => {
+                          const mostRecentDevice = associatedDevices.reduce((best, dev) => {
+                            const pos = positions?.[dev.id];
+                            if (!pos) return best;
+                            if (!best) return dev;
+                            const bestPos = positions?.[best.id];
+                            if (!bestPos) return dev;
+                            return new Date(pos.fixTime) > new Date(bestPos.fixTime) ? dev : best;
+                          }, null);
+                          return mostRecentDevice ? (
+                            <DeviceStatusIcons position={positions[mostRecentDevice.id]} />
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">-</Typography>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Ver detalhes" arrow>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setDetailsVehicle(vehicle);
+                                setDetailsModalOpen(true);
+                              }}
+                              sx={{
+                                color: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                border: '1.5px solid rgba(16, 185, 129, 0.5)',
+                                borderRadius: '6px',
+                                padding: '6px',
+                                minWidth: '32px',
+                                minHeight: '32px',
+                              }}
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title="Editar veículo" arrow>
                             <IconButton
                               size="small"
@@ -628,40 +637,6 @@ const VehiclesPage = () => {
             </Table>
           </TableContainer>
         </Paper>
-
-        {/* Popover com lista de rastreadores ao clicar na quantidade */}
-        <Popover
-          open={Boolean(trackersPopover.anchorEl)}
-          anchorEl={trackersPopover.anchorEl}
-          onClose={() => setTrackersPopover({ anchorEl: null, devices: [] })}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          sx={{ zIndex: 13000 }}
-          container={document.body}
-          PaperProps={{
-            sx: {
-              mt: 1.5,
-              maxHeight: 300,
-              minWidth: 220,
-              backgroundColor: colors.surface,
-              border: `1px solid ${colors.border}`,
-              zIndex: 13000,
-            },
-          }}
-        >
-          <List dense sx={{ py: 0 }}>
-            {trackersPopover.devices.map((d) => (
-              <ListItem key={d.id} sx={{ '&:not(:last-child)': { borderBottom: `1px solid ${colors.border}` } }}>
-                <ListItemText
-                  primary={d?.name || `ID: ${d?.id ?? 'N/A'}`}
-                  secondary={d?.uniqueId ? `IMEI: ${d.uniqueId}` : null}
-                  primaryTypographyProps={{ fontSize: '0.9rem' }}
-                  secondaryTypographyProps={{ fontSize: '0.75rem', color: colors.textSecondary }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Popover>
 
         {/* Dialog de formulário */}
         <Dialog
@@ -1191,6 +1166,14 @@ const VehiclesPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+        <VehicleDetailsModal
+          open={detailsModalOpen}
+          onClose={() => {
+            setDetailsModalOpen(false);
+            setDetailsVehicle(null);
+          }}
+          vehicle={detailsVehicle}
+        />
       </Box>
   );
 
@@ -1222,12 +1205,15 @@ export const VehiclesContent = () => {
   const { vehicles, loading, error, availableDevicesForVehicle = [], availableDevicesLoading } = useSelector((state) => state.fleet);
   const { items: clients } = useSelector((state) => state.clients);
   const { allDevices = [] } = useSelector((state) => state.devices || {});
+  const positions = useSelector((state) => state.session.positions || {});
 
   // Estado local
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicleId, setEditingVehicleId] = useState(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [itemToDeleteId, setItemToDeleteId] = useState(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [detailsVehicle, setDetailsVehicle] = useState(null);
   const [formData, setFormData] = useState({
     plate: '',
     client_id: '',
@@ -1249,7 +1235,6 @@ export const VehiclesContent = () => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [vehicleTypeDropdownOpen, setVehicleTypeDropdownOpen] = useState(false);
   const vehicleTypeInputRef = useRef(null);
-  const [trackersPopover, setTrackersPopover] = useState({ anchorEl: null, devices: [] });
 
   // Dispositivos disponíveis para vincular (vindos da API - apenas não associados a outros veículos)
   const availableDevices = availableDevicesForVehicle;
@@ -1625,7 +1610,7 @@ export const VehiclesContent = () => {
                 <TableCell>Modelo</TableCell>
                 <TableCell>Ano</TableCell>
                 <TableCell>Tipo de veículo</TableCell>
-                <TableCell>Rastreadores</TableCell>
+                <TableCell>Estado</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -1689,34 +1674,44 @@ export const VehiclesContent = () => {
                       })()}
                     </TableCell>
                     <TableCell>
-                      {associatedDevices.length === 0 ? (
-                        <Typography variant="body2" color="text.secondary">-</Typography>
-                      ) : associatedDevices.length === 1 ? (
-                        <Tooltip title={associatedDevices[0]?.name || `ID: ${associatedDevices[0]?.id ?? 'N/A'}`} arrow>
-                          <Chip
-                            label={associatedDevices[0]?.name || `ID: ${associatedDevices[0]?.id ?? 'N/A'}`}
-                            size="small"
-                            sx={{ maxWidth: '200px' }}
-                          />
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Clique para ver a lista" arrow>
-                          <Chip
-                            icon={<DevicesIcon sx={{ fontSize: 16 }} />}
-                            label={`${associatedDevices.length} rastreadores`}
-                            size="small"
-                            onClick={(e) => setTrackersPopover({ anchorEl: e.currentTarget, devices: associatedDevices })}
-                            sx={{
-                              cursor: 'pointer',
-                              maxWidth: '180px',
-                              '&:hover': { backgroundColor: 'action.hover' },
-                            }}
-                          />
-                        </Tooltip>
-                      )}
+                      {(() => {
+                        const mostRecentDevice = associatedDevices.reduce((best, dev) => {
+                          const pos = positions?.[dev.id];
+                          if (!pos) return best;
+                          if (!best) return dev;
+                          const bestPos = positions?.[best.id];
+                          if (!bestPos) return dev;
+                          return new Date(pos.fixTime) > new Date(bestPos.fixTime) ? dev : best;
+                        }, null);
+                        return mostRecentDevice ? (
+                          <DeviceStatusIcons position={positions[mostRecentDevice.id]} />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">-</Typography>
+                        );
+                      })()}
                     </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Ver detalhes" arrow>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setDetailsVehicle(vehicle);
+                                setDetailsModalOpen(true);
+                              }}
+                              sx={{
+                                color: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                border: '1.5px solid rgba(16, 185, 129, 0.5)',
+                                borderRadius: '6px',
+                                padding: '6px',
+                                minWidth: '32px',
+                                minHeight: '32px',
+                              }}
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title="Editar veículo" arrow>
                             <IconButton
                               size="small"
@@ -1774,40 +1769,6 @@ export const VehiclesContent = () => {
             </Table>
           </TableContainer>
         </Paper>
-
-        {/* Popover com lista de rastreadores ao clicar na quantidade */}
-        <Popover
-          open={Boolean(trackersPopover.anchorEl)}
-          anchorEl={trackersPopover.anchorEl}
-          onClose={() => setTrackersPopover({ anchorEl: null, devices: [] })}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          sx={{ zIndex: 13000 }}
-          container={document.body}
-          PaperProps={{
-            sx: {
-              mt: 1.5,
-              maxHeight: 300,
-              minWidth: 220,
-              backgroundColor: colors.surface,
-              border: `1px solid ${colors.border}`,
-              zIndex: 13000,
-            },
-          }}
-        >
-          <List dense sx={{ py: 0 }}>
-            {trackersPopover.devices.map((d) => (
-              <ListItem key={d.id} sx={{ '&:not(:last-child)': { borderBottom: `1px solid ${colors.border}` } }}>
-                <ListItemText
-                  primary={d?.name || `ID: ${d?.id ?? 'N/A'}`}
-                  secondary={d?.uniqueId ? `IMEI: ${d.uniqueId}` : null}
-                  primaryTypographyProps={{ fontSize: '0.9rem' }}
-                  secondaryTypographyProps={{ fontSize: '0.75rem', color: colors.textSecondary }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Popover>
 
         {/* Dialog de formulário */}
         <Dialog
@@ -2330,6 +2291,14 @@ export const VehiclesContent = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <VehicleDetailsModal
+        open={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setDetailsVehicle(null);
+        }}
+        vehicle={detailsVehicle}
+      />
     </Box>
   );
 };

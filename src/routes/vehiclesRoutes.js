@@ -775,4 +775,147 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+async function syncVehicleAlertsToTraccar(vehicleId, alerts) {
+  const traccarApiUrl = process.env.TRACCAR_API_URL;
+  const traccarEmail = process.env.TRACCAR_EMAIL;
+  const traccarPassword = process.env.TRACCAR_PASSWORD;
+  if (!traccarApiUrl || !traccarEmail || !traccarPassword || !vehicleId || !alerts) return;
+
+  const auth = { username: traccarEmail, password: traccarPassword };
+  const { rows } = await pool.query('SELECT device_id FROM vehicle_devices WHERE vehicle_id = $1::uuid', [vehicleId]);
+  const deviceIds = rows.map((r) => r.device_id).filter(Boolean);
+  if (!deviceIds.length) return;
+
+  const typeMap = {
+    ignitionOn: 'ignitionOn',
+    ignitionOff: 'ignitionOff',
+    deviceOffline: 'deviceOffline',
+    geofenceEnter: 'geofenceEnter',
+    geofenceExit: 'geofenceExit',
+    deviceOverspeed: 'deviceOverspeed',
+  };
+  const alarmMap = {
+    alarm_sos: 'sos',
+    alarm_lock: 'lock',
+    alarm_unlock: 'unlock',
+  };
+
+  const notificationsRes = await axios.get(`${traccarApiUrl}/api/notifications`, { auth });
+  const allNotifications = Array.isArray(notificationsRes.data) ? notificationsRes.data : [];
+
+  for (const [alertKey, value] of Object.entries(alerts)) {
+    const enabled = !!value?.enabled;
+    const config = value?.config || {};
+    const existing = allNotifications.filter((n) => n?.name === `vehicle:${vehicleId}:${alertKey}`);
+
+    if (!enabled) {
+      for (const item of existing) {
+        try {
+          await axios.delete(`${traccarApiUrl}/api/notifications/${item.id}`, { auth });
+        } catch (err) {
+          console.error('Error deleting notification:', err?.message);
+        }
+      }
+      continue;
+    }
+
+    let notificationId = existing[0]?.id;
+    if (!notificationId) {
+      const payload = {
+        name: `vehicle:${vehicleId}:${alertKey}`,
+        type: alarmMap[alertKey] ? 'alarm' : typeMap[alertKey],
+        always: true,
+        attributes: alarmMap[alertKey]
+          ? { alarm: alarmMap[alertKey] }
+          : (alertKey === 'deviceOverspeed' && config.speedLimit ? { speedLimit: Number(config.speedLimit) } : {}),
+      };
+      const createRes = await axios.post(`${traccarApiUrl}/api/notifications`, payload, { auth });
+      notificationId = createRes?.data?.id;
+    }
+
+    if (notificationId) {
+      for (const deviceId of deviceIds) {
+        try {
+          await axios.post(`${traccarApiUrl}/api/permissions`, { deviceId, notificationId }, { auth });
+        } catch {
+          // ignore existing link
+        }
+      }
+    }
+  }
+}
+
+router.get('/:id/alerts', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS vehicle_alerts (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+        alert_type VARCHAR(50) NOT NULL,
+        enabled BOOLEAN DEFAULT FALSE,
+        config JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(vehicle_id, alert_type)
+      )
+    `);
+    const { rows } = await pool.query(
+      'SELECT alert_type, enabled, config FROM vehicle_alerts WHERE vehicle_id = $1::uuid',
+      [id],
+    );
+    const result = {};
+    for (const row of rows) {
+      result[row.alert_type] = { enabled: !!row.enabled, config: row.config || {} };
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('GET /api/vehicles/:id/alerts error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.put('/:id/alerts', async (req, res) => {
+  const { id } = req.params;
+  const alerts = req.body || {};
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS vehicle_alerts (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+        alert_type VARCHAR(50) NOT NULL,
+        enabled BOOLEAN DEFAULT FALSE,
+        config JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(vehicle_id, alert_type)
+      )
+    `);
+    await client.query('BEGIN');
+    for (const [alertType, value] of Object.entries(alerts)) {
+      await client.query(
+        `INSERT INTO vehicle_alerts (vehicle_id, alert_type, enabled, config)
+         VALUES ($1::uuid, $2, $3, $4)
+         ON CONFLICT (vehicle_id, alert_type) DO UPDATE SET
+           enabled = EXCLUDED.enabled,
+           config = EXCLUDED.config,
+           updated_at = NOW()`,
+        [id, alertType, !!value?.enabled, JSON.stringify(value?.config || {})],
+      );
+    }
+    await client.query('COMMIT');
+    syncVehicleAlertsToTraccar(id, alerts).catch((err) => {
+      console.error('Error syncing vehicle alerts:', err?.message);
+    });
+    res.json({ message: 'Alerts updated successfully' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('PUT /api/vehicles/:id/alerts error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+});
+
 export default router;
