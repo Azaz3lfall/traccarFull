@@ -466,6 +466,7 @@ const MainPage = () => {
   // Custom autocomplete states
   const [usersItems, setUsersItems] = useState([]);
   const [notificatorsItems, setNotificatorsItems] = useState([]);
+  const [notificationTypes, setNotificationTypes] = useState([]);
   const [usersAutocompleteOpen, setUsersAutocompleteOpen] = useState(false);
   const [notificatorsAutocompleteOpen, setNotificatorsAutocompleteOpen] = useState(false);
   const [usersInputValue, setUsersInputValue] = useState('');
@@ -1054,6 +1055,13 @@ const MainPage = () => {
       setNotificatorsItems(await response.json());
     }
   }, [showAnnouncementDrawer]);
+
+  useEffectAsync(async () => {
+    if (showPreferencesDrawer && notificationTypes.length === 0) {
+      const response = await fetchOrThrow('/api/notifications/types');
+      setNotificationTypes(await response.json());
+    }
+  }, [showPreferencesDrawer]);
 
   // Auto-link logic for Globalstar ignition
   useEffectAsync(async () => {
@@ -6751,6 +6759,7 @@ const MainPage = () => {
                     {activePreferencesTab === 2 && t('sharedSound')}
                     {activePreferencesTab === 3 && t('userToken')}
                     {activePreferencesTab === 4 && t('sharedInfoTitle')}
+                    {activePreferencesTab === 5 && t('sharedNotification')}
                   </Typography>
                 </div>
                 <IconButton
@@ -6825,6 +6834,7 @@ const MainPage = () => {
                   <Tab label={t('sharedSound')} />
                   <Tab label={t('userToken')} />
                   <Tab label={t('sharedInfoTitle')} />
+                  <Tab label={t('sharedNotification')} />
                 </Tabs>
 
                 {/* Map Tab */}
@@ -7484,6 +7494,58 @@ const MainPage = () => {
                       {t('serverReboot')}
                     </Button>
                   )}
+                        </div>
+                      </>
+                    )}
+                  </Box>
+                )}
+
+                {activePreferencesTab === 5 && (
+                  <Box>
+                    {!readonly && (
+                      <>
+                        <div style={{ marginBottom: '24px' }}>
+                          <FormControl fullWidth margin="normal">
+                            <InputLabel>{t('eventsVisibleTypes')}</InputLabel>
+                            <Select
+                              label={t('eventsVisibleTypes')}
+                              value={preferencesAttributes.visibleEventTypes?.split(',').filter(Boolean) || []}
+                              onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, visibleEventTypes: e.target.value.join(',') })}
+                              multiple
+                              MenuProps={{
+                                disablePortal: false,
+                                style: { zIndex: 10010 },
+                                PaperProps: {
+                                  style: {
+                                    backgroundColor: colors.surface,
+                                    border: `1px solid ${colors.border}`,
+                                    zIndex: 10010,
+                                  },
+                                },
+                              }}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  backgroundColor: colors.secondary,
+                                  '& fieldset': { borderColor: colors.border },
+                                  '&:hover fieldset': { borderColor: colors.primary },
+                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                },
+                                '& .MuiInputLabel-root': {
+                                  color: colors.textSecondary,
+                                  '&.Mui-focused': { color: colors.primary },
+                                },
+                              }}
+                            >
+                              {notificationTypes.map((nt) => (
+                                <MenuItem key={nt.type} value={nt.type}>
+                                  {t(prefixString('event', nt.type))}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <Typography variant="caption" style={{ color: colors.textSecondary, display: 'block', marginTop: '8px' }}>
+                            {t('eventsVisibleTypesDescription')}
+                          </Typography>
                         </div>
                       </>
                     )}

@@ -23,11 +23,13 @@ const SocketController = () => {
   const includeLogs = useSelector((state) => state.session.includeLogs);
 
   const socketRef = useRef();
+  const handleEventsRef = useRef();
 
   const [notifications, setNotifications] = useState([]);
 
   const soundEvents = useAttributePreference('soundEvents', '');
   const soundAlarms = useAttributePreference('soundAlarms', 'sos');
+  const visibleEventTypes = useAttributePreference('visibleEventTypes', '');
 
   const features = useFeatures();
 
@@ -44,27 +46,33 @@ const SocketController = () => {
         console.debug('Audio play blocked by browser autoplay policy:', error.message);
       });
     }
+    const visibleTypes = visibleEventTypes ? visibleEventTypes.split(',').filter(Boolean) : [];
     setNotifications(prev => {
-      const newNotifications = events.map((event) => ({
-        id: event.id,
-        deviceId: event.deviceId,
-        type: event.type,
-        attributes: event.attributes,
-        eventTime: event.eventTime,
-        show: true,
-      }));
-      
-      // Filter out any existing notifications with the same ID to prevent duplicates
+      const newNotifications = events
+        .filter((event) => {
+          if (visibleTypes.length === 0) return true;
+          return visibleTypes.includes(event.type);
+        })
+        .map((event) => ({
+          id: event.id,
+          deviceId: event.deviceId,
+          type: event.type,
+          attributes: event.attributes,
+          eventTime: event.eventTime,
+          show: true,
+        }));
+      if (newNotifications.length === 0) return prev;
+
       const existingIds = new Set(prev.map(n => n.id));
       const uniqueNewNotifications = newNotifications.filter(n => !existingIds.has(n.id));
-      
-      // Keep existing notifications and add only new unique ones
       const combined = [...prev, ...uniqueNewNotifications];
-      
-      // Keep only the 10 most recent notifications to prevent memory issues
       return combined.slice(-10);
     });
-  }, [features, dispatch, soundEvents, soundAlarms]);
+  }, [features, dispatch, soundEvents, soundAlarms, visibleEventTypes]);
+
+  useEffect(() => {
+    handleEventsRef.current = handleEvents;
+  }, [handleEvents]);
 
   const connectSocket = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -106,7 +114,7 @@ const SocketController = () => {
         dispatch(sessionActions.updatePositions(data.positions));
       }
       if (data.events) {
-        handleEvents(data.events);
+        handleEventsRef.current(data.events);
       }
       if (data.logs) {
         dispatch(sessionActions.updateLogs(data.logs));

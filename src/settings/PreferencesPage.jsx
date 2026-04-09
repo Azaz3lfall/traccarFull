@@ -283,6 +283,27 @@ const PreferencesPage = () => {
                 />
               </AccordionDetails>
             </Accordion>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle1">
+                  {t('sharedNotification')}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails className={classes.details}>
+                <SelectField
+                  multiple
+                  value={attributes.visibleEventTypes?.split(',').filter(Boolean) || []}
+                  onChange={(e) => setAttributes({ ...attributes, visibleEventTypes: e.target.value.join(',') })}
+                  endpoint="/api/notifications/types"
+                  keyGetter={(it) => it.type}
+                  titleGetter={(it) => t(prefixString('event', it.type))}
+                  label={t('eventsVisibleTypes')}
+                />
+                <Typography variant="caption" color="textSecondary">
+                  {t('eventsVisibleTypesDescription')}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
           </>
         )}
         <Accordion>

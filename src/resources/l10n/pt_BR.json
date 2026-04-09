@@ -260,6 +260,8 @@
   "eventsScrollToLast": "Rolar até o final",
   "eventsSoundAlarms": "Som de alarmes",
   "eventsSoundEvents": "Som de eventos",
+  "eventsVisibleTypes": "Eventos visíveis na tela",
+  "eventsVisibleTypesDescription": "Selecione quais tipos de evento serão exibidos como notificação no mapa. Se nenhum for selecionado, todos serão exibidos.",
   "groupDialog": "Grupo",
   "groupNoGroup": "Sem Grupo",
   "groupParent": "Grupo",

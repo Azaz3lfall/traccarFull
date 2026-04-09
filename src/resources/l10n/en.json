@@ -626,6 +626,8 @@
   "eventsScrollToLast": "Scroll to Last",
   "eventsSoundEvents": "Sound Events",
   "eventsSoundAlarms": "Sound Alarms",
+  "eventsVisibleTypes": "Visible events on screen",
+  "eventsVisibleTypesDescription": "Select which event types will be shown as notifications on the map. If none are selected, all will be shown.",
   "alarmGeneral": "General",
   "alarmSos": "SOS",
   "alarmVibration": "Vibration",
