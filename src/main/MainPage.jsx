@@ -1440,6 +1440,27 @@ const MainPage = () => {
     country: values[1].country, 
     name: values[1].name 
   }));
+
+  const handleLanguageChange = useCallback(async (langCode) => {
+    setLocalLanguage(langCode);
+    if (!user?.id) return;
+    try {
+      const response = await fetchOrThrow(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...user,
+          attributes: {
+            ...(user.attributes || {}),
+            language: langCode,
+          },
+        }),
+      });
+      dispatch(sessionActions.updateUser(await response.json()));
+    } catch (error) {
+      console.error('Failed to persist language preference:', error?.message || error);
+    }
+  }, [setLocalLanguage, user, dispatch]);
   
   // Theme functionality
   const { theme: currentTheme, setLocalTheme } = useCustomTheme();
@@ -4776,7 +4797,7 @@ const MainPage = () => {
                     document.documentElement.style.opacity = '0.8';
                     
                     setTimeout(() => {
-                      setLocalLanguage(lang.code);
+                      handleLanguageChange(lang.code);
                       setShowLanguagePopover(false);
                       
                       // Restore opacity after language change
