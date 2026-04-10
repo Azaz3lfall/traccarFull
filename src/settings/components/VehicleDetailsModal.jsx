@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogActions,
   Box,
   Typography,
   Button,
@@ -24,11 +28,13 @@ import {
   Switch,
   TextField,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
   Devices as DevicesIcon,
   Notifications as NotificationsIcon,
+  InfoOutlined as InfoOutlinedIcon,
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -40,11 +46,21 @@ import {
   Link as LinkIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
-import { useAdministrator } from '../../common/util/permissions';
+import { useAdministrator, useDeviceReadonly, useManager } from '../../common/util/permissions';
 import { useThemeColors } from '../../common/components/ThemeProvider';
+import RemoveDialog from '../../common/components/RemoveDialog';
 import DeviceStatusIcons from './DeviceStatusIcons';
-import { devicesActions } from '../../store';
+import SmsSendModal from './SmsSendModal';
+import DeviceVehicleHistoryDialog from './DeviceVehicleHistoryDialog';
+import { devicesActions, fetchAllDevices, fetchVehicles } from '../../store';
 import fetchOrThrow from '../../common/util/fetchOrThrow';
+
+const TELECOM_BASE = '/gestao/telecom';
+
+/** Empilhamento alinhado ao FloatingDevicesPopover: base do detalhe, menu 100002, modais filhos 110000+. */
+const Z_VEHICLE_DETAILS = 100000;
+const Z_VEHICLE_DETAILS_MENU = 100002;
+const Z_ACTION_OVER_DETAILS = 110000;
 
 const ALERT_TYPES = [
   { key: 'ignitionOn', label: 'Ignição Ligada' },
@@ -61,6 +77,8 @@ const ALERT_TYPES = [
 const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const t = useTranslation();
   const admin = useAdministrator();
+  const manager = useManager();
+  const deviceReadonly = useDeviceReadonly();
   const colors = useThemeColors() || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,12 +86,22 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const allDevices = useSelector((state) => state.devices.allDevices) || [];
   const positions = useSelector((state) => state.session.positions || {});
 
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeSection, setActiveSection] = useState('devices');
   const [alerts, setAlerts] = useState({});
   const [alertsLoading, setAlertsLoading] = useState(false);
   const [alertsSaving, setAlertsSaving] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const [removeDeviceId, setRemoveDeviceId] = useState(null);
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
+  const [smsModalDeviceId, setSmsModalDeviceId] = useState(null);
+  const [smsModalPhone, setSmsModalPhone] = useState('');
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [resetDeviceId, setResetDeviceId] = useState(null);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState(null);
 
   const associatedDevices = useMemo(() => {
     const rawIds = (vehicle?.deviceIds && Array.isArray(vehicle.deviceIds) && vehicle.deviceIds.length > 0)
@@ -98,8 +126,70 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   }, [vehicle?.id]);
 
   useEffect(() => {
-    if (open && activeTab === 1) loadAlerts();
-  }, [open, activeTab, loadAlerts]);
+    if (open && activeSection === 'alerts') loadAlerts();
+  }, [open, activeSection, loadAlerts]);
+
+  useEffect(() => {
+    if (open) {
+      setActiveSection('devices');
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!manager && activeSection === 'data') {
+      setActiveSection('devices');
+    }
+  }, [manager, activeSection]);
+
+  useEffect(() => {
+    if (!open) {
+      setSmsModalOpen(false);
+      setSmsModalDeviceId(null);
+      setSmsModalPhone('');
+      setHistoryDialogOpen(false);
+      setHistoryDialogDeviceId(null);
+      setResetModalOpen(false);
+      setResetDeviceId(null);
+      setResetError(null);
+      setRemoveDeviceId(null);
+      setAnchorEl(null);
+    }
+  }, [open]);
+
+  const refreshAfterDeviceChange = useCallback(() => {
+    dispatch(fetchAllDevices());
+    dispatch(fetchVehicles());
+  }, [dispatch]);
+
+  const handleRemoveDeviceResult = useCallback((removed) => {
+    setRemoveDeviceId(null);
+    if (removed) refreshAfterDeviceChange();
+  }, [refreshAfterDeviceChange]);
+
+  const handleResetConfirm = async () => {
+    if (!resetDeviceId) return;
+    setResetLoading(true);
+    setResetError(null);
+    try {
+      const res = await fetchOrThrow(`${TELECOM_BASE}/sms/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ deviceId: resetDeviceId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResetModalOpen(false);
+        setResetDeviceId(null);
+      } else {
+        setResetError(data.error || data.message || 'Erro ao resetar.');
+      }
+    } catch (e) {
+      setResetError(e.message || 'Erro ao resetar simcard.');
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSaveAlerts = async () => {
     if (!vehicle?.id) return;
@@ -115,12 +205,63 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
     }
   };
 
-  const actions = [
-    { key: 'edit', title: t('sharedEdit'), icon: <EditIcon fontSize="small" />, show: admin, handler: () => {} },
-    { key: 'connections', title: t('sharedConnections'), icon: <LinkIcon fontSize="small" />, show: admin, handler: () => {} },
-    { key: 'delete', title: t('sharedRemove'), icon: <DeleteIcon fontSize="small" />, show: admin, handler: () => {} },
-    { key: 'sendSms', title: t('deviceSendSms'), icon: <SendIcon fontSize="small" />, show: true, handler: () => {} },
-    { key: 'resetSimcard', title: t('deviceResetSimcard'), icon: <RestartAltIcon fontSize="small" />, show: true, handler: () => {} },
+  const actions = useMemo(() => [
+    {
+      key: 'edit',
+      title: t('sharedEdit'),
+      icon: <EditIcon fontSize="small" />,
+      show: admin && !deviceReadonly,
+      handler: (device) => {
+        if (!device?.id) return;
+        onClose();
+        navigate(`/settings/device/${device.id}`);
+      },
+    },
+    {
+      key: 'connections',
+      title: t('sharedConnections'),
+      icon: <LinkIcon fontSize="small" />,
+      show: admin && !deviceReadonly,
+      handler: (device) => {
+        if (!device?.id) return;
+        onClose();
+        navigate(`/settings/device/${device.id}/connections`);
+      },
+    },
+    {
+      key: 'delete',
+      title: t('sharedRemove'),
+      icon: <DeleteIcon fontSize="small" />,
+      show: admin && !deviceReadonly,
+      handler: (device) => {
+        if (!device?.id) return;
+        setRemoveDeviceId(device.id);
+      },
+    },
+    {
+      key: 'sendSms',
+      title: t('deviceSendSms'),
+      icon: <SendIcon fontSize="small" />,
+      show: true,
+      handler: (device) => {
+        if (!device?.id) return;
+        setSmsModalDeviceId(device.id);
+        setSmsModalPhone(device.phone || '');
+        setSmsModalOpen(true);
+      },
+    },
+    {
+      key: 'resetSimcard',
+      title: t('deviceResetSimcard'),
+      icon: <RestartAltIcon fontSize="small" />,
+      show: true,
+      handler: (device) => {
+        if (!device?.id) return;
+        setResetDeviceId(device.id);
+        setResetError(null);
+        setResetModalOpen(true);
+      },
+    },
     {
       key: 'googleMaps',
       title: t('deviceOpenGoogleMaps'),
@@ -141,12 +282,23 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       handler: (device) => {
         if (device?.id) {
           dispatch(devicesActions.selectId(device.id));
+          onClose();
           navigate('/');
         }
       },
     },
-    { key: 'vehicleHistory', title: t('deviceVehicleHistory'), icon: <HistoryIcon fontSize="small" />, show: true, handler: () => {} },
-  ];
+    {
+      key: 'vehicleHistory',
+      title: t('deviceVehicleHistory'),
+      icon: <HistoryIcon fontSize="small" />,
+      show: true,
+      handler: (device) => {
+        if (!device?.id) return;
+        setHistoryDialogDeviceId(device.id);
+        setHistoryDialogOpen(true);
+      },
+    },
+  ], [t, admin, deviceReadonly, onClose, navigate, dispatch, positions]);
 
   return (
     <Dialog
@@ -154,7 +306,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      slotProps={{ root: { sx: { zIndex: 99999 } } }}
+      slotProps={{ root: { sx: { zIndex: Z_VEHICLE_DETAILS } } }}
       PaperProps={{
         sx: {
           maxHeight: '90vh',
@@ -177,14 +329,20 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Paper sx={{ flex: '1 1 200px', minWidth: 200, p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
             <List dense disablePadding>
-              <ListItemButton selected={activeTab === 0} onClick={() => setActiveTab(0)}>
+              <ListItemButton selected={activeSection === 'devices'} onClick={() => setActiveSection('devices')}>
                 <ListItemIcon sx={{ minWidth: 36 }}><DevicesIcon fontSize="small" /></ListItemIcon>
                 <ListItemText primary="Dispositivos" />
               </ListItemButton>
-              <ListItemButton selected={activeTab === 1} onClick={() => setActiveTab(1)}>
+              <ListItemButton selected={activeSection === 'alerts'} onClick={() => setActiveSection('alerts')}>
                 <ListItemIcon sx={{ minWidth: 36 }}><NotificationsIcon fontSize="small" /></ListItemIcon>
                 <ListItemText primary="Alertas" />
               </ListItemButton>
+              {manager && (
+                <ListItemButton selected={activeSection === 'data'} onClick={() => setActiveSection('data')}>
+                  <ListItemIcon sx={{ minWidth: 36 }}><InfoOutlinedIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Dados" />
+                </ListItemButton>
+              )}
             </List>
             <Button fullWidth startIcon={<ArrowBackIcon />} onClick={onClose} sx={{ mt: 2, color: colors.textSecondary || '#9CA3AF' }}>
               Voltar
@@ -192,7 +350,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
           </Paper>
 
           <Box sx={{ flex: '2 1 400px', minWidth: 0 }}>
-            {activeTab === 0 && (
+            {activeSection === 'devices' && (
               <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
                 <TableContainer>
                   <Table size="small">
@@ -237,7 +395,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
               </Paper>
             )}
 
-            {activeTab === 1 && (
+            {activeSection === 'alerts' && (
               <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
                 {alertsLoading ? <CircularProgress size={20} /> : ALERT_TYPES.map((item) => (
                   <Box key={item.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1 }}>
@@ -277,11 +435,48 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                 </Button>
               </Paper>
             )}
+
+            {manager && activeSection === 'data' && (
+              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+                <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 0.5 }}>
+                  Detalhes da instalação
+                </Typography>
+                <Typography sx={{ color: colors.text || '#111827', mb: 2, whiteSpace: 'pre-wrap' }}>
+                  {(vehicle?.installation_details && String(vehicle.installation_details).trim()) || '—'}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 0.5 }}>
+                  Data de cadastro
+                </Typography>
+                <Typography sx={{ color: colors.text || '#111827', mb: 2 }}>
+                  {vehicle?.created_at
+                    ? new Date(vehicle.created_at).toLocaleString('pt-BR')
+                    : '—'}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 0.5 }}>
+                  Cliente
+                </Typography>
+                <Typography sx={{ color: colors.text || '#111827' }}>
+                  {(vehicle?.client_name && String(vehicle.client_name).trim()) || '—'}
+                </Typography>
+              </Paper>
+            )}
           </Box>
         </Box>
       </DialogContent>
 
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        style={{ zIndex: Z_VEHICLE_DETAILS_MENU }}
+        PaperProps={{
+          style: {
+            zIndex: Z_VEHICLE_DETAILS_MENU,
+            backgroundColor: colors.surface || '#fff',
+            border: `1px solid ${colors.border || '#E5E7EB'}`,
+          },
+        }}
+      >
         {actions.filter((action) => action.show !== false).map((action) => (
           <MenuItem
             key={action.key}
@@ -295,6 +490,65 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
           </MenuItem>
         ))}
       </Menu>
+
+      <RemoveDialog
+        open={!!removeDeviceId}
+        endpoint="devices"
+        itemId={removeDeviceId}
+        onResult={handleRemoveDeviceResult}
+        snackbarZIndex={Z_ACTION_OVER_DETAILS}
+      />
+      <SmsSendModal
+        open={smsModalOpen}
+        onClose={() => {
+          setSmsModalOpen(false);
+          setSmsModalDeviceId(null);
+          setSmsModalPhone('');
+        }}
+        deviceId={smsModalDeviceId}
+        phone={smsModalPhone}
+        rootZIndex={Z_ACTION_OVER_DETAILS}
+      />
+      <DeviceVehicleHistoryDialog
+        open={historyDialogOpen}
+        onClose={() => {
+          setHistoryDialogOpen(false);
+          setHistoryDialogDeviceId(null);
+        }}
+        deviceId={historyDialogDeviceId}
+        dialogZIndex={Z_ACTION_OVER_DETAILS}
+      />
+      <Dialog
+        open={resetModalOpen}
+        onClose={() => !resetLoading && setResetModalOpen(false)}
+        slotProps={{ root: { sx: { zIndex: Z_ACTION_OVER_DETAILS } } }}
+        PaperProps={{
+          sx: {
+            backgroundColor: colors.surface || '#fff',
+            border: `1px solid ${colors.border || '#E5E7EB'}`,
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text || '#111827' }}>{t('deviceResetSimcard')}</DialogTitle>
+        <DialogContent>
+          {resetError && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setResetError(null)}>
+              {resetError}
+            </Alert>
+          )}
+          <Typography sx={{ color: colors.text || '#111827' }}>
+            Deseja resetar o simcard deste dispositivo?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => !resetLoading && setResetModalOpen(false)} disabled={resetLoading} sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+            Cancelar
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleResetConfirm} disabled={resetLoading}>
+            {resetLoading ? <CircularProgress size={20} /> : t('deviceResetSimcard')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

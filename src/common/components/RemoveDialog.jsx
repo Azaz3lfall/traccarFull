@@ -20,7 +20,7 @@ const useStyles = makeStyles()((theme) => ({
 }));
 
 const RemoveDialog = ({
-  open, endpoint, itemId, onResult,
+  open, endpoint, itemId, onResult, snackbarZIndex,
 }) => {
   const { classes } = useStyles();
   const t = useTranslation();
@@ -33,6 +33,7 @@ const RemoveDialog = ({
   return (
     <Snackbar
       className={classes.root}
+      sx={snackbarZIndex != null ? { zIndex: snackbarZIndex } : undefined}
       open={open}
       autoHideDuration={snackBarDurationLongMs}
       onClose={() => onResult(false)}

@@ -31,7 +31,11 @@ import fetchOrThrow from '../../common/util/fetchOrThrow';
 
 const TELECOM_BASE = '/gestao/telecom';
 
-const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
+const DEFAULT_SMS_ROOT_Z = 99999;
+
+const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex = DEFAULT_SMS_ROOT_Z }) => {
+  const nestedDialogZ = rootZIndex + 1;
+  const selectMenuZ = rootZIndex + 2;
   const [numero, setNumero] = useState(initialPhone || '');
   const [operadora, setOperadora] = useState(null);
   const [mensagem, setMensagem] = useState('');
@@ -255,7 +259,7 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
       fullWidth
       slotProps={{
         root: {
-          sx: { zIndex: 99999 },
+          sx: { zIndex: rootZIndex },
         },
       }}
     >
@@ -307,8 +311,8 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
                 onChange={(e) => setSelectedTemplateId(e.target.value || '')}
                 displayEmpty
                 MenuProps={{
-                  style: { zIndex: 100001 },
-                  PaperProps: { sx: { zIndex: 100001 } },
+                  style: { zIndex: selectMenuZ },
+                  PaperProps: { sx: { zIndex: selectMenuZ } },
                 }}
               >
                 <MenuItem value="">
@@ -422,7 +426,7 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
         fullWidth
         slotProps={{
           root: {
-            sx: { zIndex: 100000 },
+            sx: { zIndex: nestedDialogZ },
           },
         }}
       >
@@ -460,7 +464,7 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
         onClose={() => !batchSending && setBatchConfigOpen(false)}
         maxWidth="xs"
         fullWidth
-        slotProps={{ root: { sx: { zIndex: 100000 } } }}
+        slotProps={{ root: { sx: { zIndex: nestedDialogZ } } }}
       >
         <DialogTitle>Enviar configuração em lote</DialogTitle>
         <DialogContent>
@@ -473,7 +477,7 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone }) => {
                 onChange={(e) => setSelectedBatchId(e.target.value || '')}
                 displayEmpty
                 disabled={batchSending}
-                MenuProps={{ style: { zIndex: 100001 } }}
+                MenuProps={{ style: { zIndex: selectMenuZ } }}
               >
                 <MenuItem value="">
                   <em>Selecione...</em>

@@ -12,7 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { fetchVehicles } from '../../store';
 
-const DeviceVehicleHistoryDialog = ({ open, onClose, deviceId }) => {
+const DEFAULT_HISTORY_Z = 99999;
+
+const DeviceVehicleHistoryDialog = ({ open, onClose, deviceId, dialogZIndex = DEFAULT_HISTORY_Z }) => {
   const t = useTranslation();
   const dispatch = useDispatch();
   const vehicles = useSelector((state) => state.fleet.vehicles) || [];
@@ -38,7 +40,7 @@ const DeviceVehicleHistoryDialog = ({ open, onClose, deviceId }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ root: { sx: { zIndex: 99999 } } }}
+      slotProps={{ root: { sx: { zIndex: dialogZIndex } } }}
     >
       <DialogTitle>{t('deviceVehicleHistory')}</DialogTitle>
       <DialogContent>
