@@ -62,6 +62,55 @@ export const getWorkOrders = async (req, res) => {
   }
 };
 
+function mapAttachmentFilePaths(rows) {
+  return rows.map((a) => {
+    const url = toOsUploadUrl(a.file_path) || a.file_path.replace(/^.*[/\\]uploads[/\\]os[/\\]/, '/os-uploads/');
+    return { ...a, file_path: url };
+  });
+}
+
+export const getWorkOrdersByPlate = async (req, res) => {
+  if (!pool) {
+    return res.status(503).json({ error: 'Módulo OS não configurado. Verifique DATABASE_OS_URL.' });
+  }
+  const rawPlate = req.params.plate;
+  const plate = rawPlate != null ? String(rawPlate).trim() : '';
+  if (!plate) {
+    return res.json([]);
+  }
+  try {
+    const ordersRes = await pool.query(
+      `SELECT * FROM os_module.work_orders
+       WHERE LOWER(TRIM(vehicle_plate)) = LOWER(TRIM($1))
+       ORDER BY created_at DESC`,
+      [plate]
+    );
+    const orders = ordersRes.rows;
+    if (orders.length === 0) {
+      return res.json([]);
+    }
+    const ids = orders.map((o) => o.id);
+    const attachmentsRes = await pool.query(
+      'SELECT * FROM os_module.attachments WHERE work_order_id = ANY($1::int[])',
+      [ids]
+    );
+    const byOrderId = new Map();
+    for (const row of attachmentsRes.rows) {
+      const wid = row.work_order_id;
+      if (!byOrderId.has(wid)) byOrderId.set(wid, []);
+      byOrderId.get(wid).push(row);
+    }
+    const payload = orders.map((order) => ({
+      ...order,
+      attachments: mapAttachmentFilePaths(byOrderId.get(order.id) || []),
+    }));
+    res.json(payload);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar ordens de serviço por placa' });
+  }
+};
+
 export const getWorkOrderDetails = async (req, res) => {
   if (!pool) {
     return res.status(503).json({ error: 'Módulo OS não configurado. Verifique DATABASE_OS_URL.' });
@@ -77,10 +126,7 @@ export const getWorkOrderDetails = async (req, res) => {
     const attachments = await pool.query('SELECT * FROM os_module.attachments WHERE work_order_id = $1', [id]);
 
     const checklistRow = checklist.rows[0] || null;
-    const attachmentsWithUrl = attachments.rows.map(a => {
-      const url = toOsUploadUrl(a.file_path) || a.file_path.replace(/^.*[/\\]uploads[/\\]os[/\\]/, '/os-uploads/');
-      return { ...a, file_path: url };
-    });
+    const attachmentsWithUrl = mapAttachmentFilePaths(attachments.rows);
 
     const signatureUrl = checklistRow?.client_signature_path
       ? (toOsUploadUrl(checklistRow.client_signature_path) || checklistRow.client_signature_path)

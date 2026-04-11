@@ -29,6 +29,7 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Divider,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -54,6 +55,7 @@ import SmsSendModal from './SmsSendModal';
 import DeviceVehicleHistoryDialog from './DeviceVehicleHistoryDialog';
 import { devicesActions, fetchAllDevices, fetchVehicles } from '../../store';
 import fetchOrThrow from '../../common/util/fetchOrThrow';
+import { OS_STATUS_LABELS } from '../../other/os/constants';
 
 const TELECOM_BASE = '/gestao/telecom';
 
@@ -102,6 +104,9 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const [resetDeviceId, setResetDeviceId] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState(null);
+  const [osOrders, setOsOrders] = useState([]);
+  const [osLoading, setOsLoading] = useState(false);
+  const [osFetchError, setOsFetchError] = useState(null);
 
   const associatedDevices = useMemo(() => {
     const rawIds = (vehicle?.deviceIds && Array.isArray(vehicle.deviceIds) && vehicle.deviceIds.length > 0)
@@ -153,8 +158,45 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       setResetError(null);
       setRemoveDeviceId(null);
       setAnchorEl(null);
+      setOsOrders([]);
+      setOsFetchError(null);
+      setOsLoading(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !manager || activeSection !== 'data' || !vehicle?.plate) {
+      return;
+    }
+    let cancelled = false;
+    const plate = String(vehicle.plate).trim();
+    if (!plate) return;
+
+    const loadOsByPlate = async () => {
+      setOsLoading(true);
+      setOsFetchError(null);
+      try {
+        const res = await fetchOrThrow(
+          `/os-api/work-orders/by-plate/${encodeURIComponent(plate)}`,
+          { credentials: 'include' },
+        );
+        const data = await res.json();
+        if (!cancelled) {
+          setOsOrders(Array.isArray(data) ? data : []);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setOsOrders([]);
+          setOsFetchError(e?.message || 'Não foi possível carregar as OS.');
+        }
+      } finally {
+        if (!cancelled) setOsLoading(false);
+      }
+    };
+
+    loadOsByPlate();
+    return () => { cancelled = true; };
+  }, [open, manager, activeSection, vehicle?.plate]);
 
   const refreshAfterDeviceChange = useCallback(() => {
     dispatch(fetchAllDevices());
@@ -455,9 +497,71 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                 <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 0.5 }}>
                   Cliente
                 </Typography>
-                <Typography sx={{ color: colors.text || '#111827' }}>
+                <Typography sx={{ color: colors.text || '#111827', mb: 2 }}>
                   {(vehicle?.client_name && String(vehicle.client_name).trim()) || '—'}
                 </Typography>
+
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text || '#111827', mb: 1 }}>
+                  Fotos da OS
+                </Typography>
+                {osFetchError && (
+                  <Alert severity="warning" sx={{ mb: 2 }}>{osFetchError}</Alert>
+                )}
+                {osLoading && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                    <CircularProgress size={28} />
+                  </Box>
+                )}
+                {!osLoading && !osFetchError && osOrders.length === 0 && (
+                  <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+                    Nenhuma OS encontrada para este veículo.
+                  </Typography>
+                )}
+                {!osLoading && osOrders.length > 0 && osOrders.map((order) => {
+                  const statusLabel = OS_STATUS_LABELS[order.status] || order.status || '—';
+                  const created = order.created_at
+                    ? new Date(order.created_at).toLocaleString('pt-BR')
+                    : '—';
+                  const attachments = Array.isArray(order.attachments) ? order.attachments : [];
+                  return (
+                    <Box key={order.id} sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 1 }}>
+                        OS #{order.id} — {order.type || '—'} — {statusLabel} — {created}
+                      </Typography>
+                      {attachments.length === 0 ? (
+                        <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 1 }}>
+                          Nenhuma foto anexada.
+                        </Typography>
+                      ) : (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {attachments.map((attachment, index) => {
+                            const raw = attachment.file_path || '';
+                            const imgUrl = raw.replace('/var/www/os_system/uploads/', '/os-uploads/');
+                            return (
+                              <Box
+                                key={attachment.id != null ? attachment.id : `${order.id}-${index}`}
+                                component="img"
+                                src={imgUrl}
+                                alt=""
+                                sx={{
+                                  width: 96,
+                                  height: 96,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                  border: '1px solid',
+                                  borderColor: colors.border || 'divider',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => window.open(imgUrl, '_blank')}
+                              />
+                            );
+                          })}
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                })}
               </Paper>
             )}
           </Box>

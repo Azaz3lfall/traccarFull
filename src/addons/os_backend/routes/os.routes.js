@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/work-orders', osController.createWorkOrder);
 router.get('/work-orders', osController.getWorkOrders);
+router.get('/work-orders/by-plate/:plate', osController.getWorkOrdersByPlate);
 router.get('/work-orders/:id', osController.getWorkOrderDetails);
 router.patch('/work-orders/:id', osController.updateWorkOrder);
 router.patch('/work-orders/:id/status', osController.updateStatus);
