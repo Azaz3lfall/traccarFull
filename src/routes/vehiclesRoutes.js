@@ -918,4 +918,133 @@ router.put('/:id/alerts', async (req, res) => {
   }
 });
 
+async function ensureVehicleScheduledCommandsTable(executor) {
+  await executor.query(`
+    CREATE TABLE IF NOT EXISTS vehicle_scheduled_commands (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+      day_of_week SMALLINT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+      lock_time TIME,
+      unlock_time TIME,
+      enabled BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(vehicle_id, day_of_week)
+    )`);
+  await executor.query(
+    'CREATE INDEX IF NOT EXISTS idx_vsc_vehicle_id ON vehicle_scheduled_commands(vehicle_id)',
+  );
+}
+
+function formatTimeForApi(value) {
+  if (value == null) return null;
+  const s = typeof value === 'string' ? value : String(value);
+  const t = s.trim();
+  if (!t) return null;
+  if (t.length >= 5) return t.slice(0, 5);
+  return t;
+}
+
+function parseTimeInput(value) {
+  if (value == null || value === '') return null;
+  const s = String(value).trim();
+  if (!s) return null;
+  if (/^\d{1,2}:\d{2}$/.test(s)) {
+    const [h, m] = s.split(':');
+    return `${String(parseInt(h, 10)).padStart(2, '0')}:${String(parseInt(m, 10)).padStart(2, '0')}:00`;
+  }
+  if (/^\d{2}:\d{2}:\d{2}$/.test(s)) return s;
+  return null;
+}
+
+/** GET /:id/scheduled-commands — horários de bloqueio/desbloqueio por dia da semana */
+router.get('/:id/scheduled-commands', async (req, res) => {
+  const { id } = req.params;
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+  try {
+    await ensureVehicleScheduledCommandsTable(pool);
+    const { rows } = await pool.query(
+      `SELECT day_of_week, lock_time, unlock_time, enabled
+       FROM vehicle_scheduled_commands
+       WHERE vehicle_id = $1::uuid`,
+      [id],
+    );
+    const byDay = new Map(rows.map((r) => [Number(r.day_of_week), r]));
+    const schedules = [];
+    for (let d = 0; d <= 6; d += 1) {
+      const r = byDay.get(d);
+      schedules.push({
+        day_of_week: d,
+        lock_time: r?.lock_time != null ? formatTimeForApi(r.lock_time) : null,
+        unlock_time: r?.unlock_time != null ? formatTimeForApi(r.unlock_time) : null,
+        enabled: r?.enabled !== false,
+      });
+    }
+    res.json({ schedules });
+  } catch (err) {
+    console.error('GET /api/vehicles/:id/scheduled-commands error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/** PUT /:id/scheduled-commands — body: { schedules: [{ day_of_week, lock_time, unlock_time, enabled }] } */
+router.put('/:id/scheduled-commands', async (req, res) => {
+  const { id } = req.params;
+  const body = req.body || {};
+  const schedules = Array.isArray(body.schedules) ? body.schedules : null;
+  if (!schedules || schedules.length !== 7) {
+    return res.status(400).json({ error: 'Validation error', message: 'schedules must be an array of 7 entries (day_of_week 0–6).' });
+  }
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+
+  const seen = new Set();
+  for (const s of schedules) {
+    const dow = Number(s.day_of_week);
+    if (!Number.isInteger(dow) || dow < 0 || dow > 6) {
+      return res.status(400).json({ error: 'Validation error', message: 'day_of_week must be 0–6.' });
+    }
+    if (seen.has(dow)) {
+      return res.status(400).json({ error: 'Validation error', message: 'Duplicate day_of_week.' });
+    }
+    seen.add(dow);
+  }
+  if (seen.size !== schedules.length || seen.size !== 7) {
+    return res.status(400).json({ error: 'Validation error', message: 'Each day_of_week 0–6 must appear exactly once.' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await ensureVehicleScheduledCommandsTable(client);
+    await client.query('BEGIN');
+    for (const s of schedules) {
+      const dow = Number(s.day_of_week);
+      const lockT = parseTimeInput(s.lock_time);
+      const unlockT = parseTimeInput(s.unlock_time);
+      const enabled = s.enabled !== false;
+      await client.query(
+        `INSERT INTO vehicle_scheduled_commands (vehicle_id, day_of_week, lock_time, unlock_time, enabled)
+         VALUES ($1::uuid, $2, $3::time, $4::time, $5)
+         ON CONFLICT (vehicle_id, day_of_week) DO UPDATE SET
+           lock_time = EXCLUDED.lock_time,
+           unlock_time = EXCLUDED.unlock_time,
+           enabled = EXCLUDED.enabled,
+           updated_at = NOW()`,
+        [id, dow, lockT, unlockT, enabled],
+      );
+    }
+    await client.query('COMMIT');
+    res.json({ message: 'Scheduled commands updated successfully' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('PUT /api/vehicles/:id/scheduled-commands error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+});
+
 export default router;

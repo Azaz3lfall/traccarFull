@@ -45,6 +45,7 @@ import {
   LocationOn as LocationOnIcon,
   History as HistoryIcon,
   Link as LinkIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useAdministrator, useDeviceReadonly, useManager } from '../../common/util/permissions';
@@ -63,6 +64,26 @@ const TELECOM_BASE = '/gestao/telecom';
 const Z_VEHICLE_DETAILS = 100000;
 const Z_VEHICLE_DETAILS_MENU = 100002;
 const Z_ACTION_OVER_DETAILS = 110000;
+
+const COMMAND_DAY_DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+const COMMAND_DAY_LABELS = {
+  0: 'Domingo',
+  1: 'Segunda-feira',
+  2: 'Terça-feira',
+  3: 'Quarta-feira',
+  4: 'Quinta-feira',
+  5: 'Sexta-feira',
+  6: 'Sábado',
+};
+
+function defaultCommandSchedules() {
+  return Array.from({ length: 7 }, (_, d) => ({
+    day_of_week: d,
+    lock_time: null,
+    unlock_time: null,
+    enabled: true,
+  }));
+}
 
 const ALERT_TYPES = [
   { key: 'ignitionOn', label: 'Ignição Ligada' },
@@ -107,6 +128,10 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const [osOrders, setOsOrders] = useState([]);
   const [osLoading, setOsLoading] = useState(false);
   const [osFetchError, setOsFetchError] = useState(null);
+  const [commandSchedules, setCommandSchedules] = useState(() => defaultCommandSchedules());
+  const [commandSchedulesLoading, setCommandSchedulesLoading] = useState(false);
+  const [commandSchedulesSaving, setCommandSchedulesSaving] = useState(false);
+  const [commandSchedulesError, setCommandSchedulesError] = useState(null);
 
   const associatedDevices = useMemo(() => {
     const rawIds = (vehicle?.deviceIds && Array.isArray(vehicle.deviceIds) && vehicle.deviceIds.length > 0)
@@ -147,6 +172,79 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   }, [manager, activeSection]);
 
   useEffect(() => {
+    if (!manager && activeSection === 'commands') {
+      setActiveSection('devices');
+    }
+  }, [manager, activeSection]);
+
+  const loadCommandSchedules = useCallback(async () => {
+    if (!vehicle?.id) return;
+    setCommandSchedulesLoading(true);
+    setCommandSchedulesError(null);
+    try {
+      const response = await fetchOrThrow(`/api/vehicles/${vehicle.id}/scheduled-commands`, {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      const list = Array.isArray(data?.schedules) ? data.schedules : [];
+      if (list.length === 7) {
+        setCommandSchedules(list);
+      } else {
+        setCommandSchedules(defaultCommandSchedules());
+      }
+    } catch (e) {
+      setCommandSchedules(defaultCommandSchedules());
+      setCommandSchedulesError(e?.message || 'Erro ao carregar agendamento.');
+    } finally {
+      setCommandSchedulesLoading(false);
+    }
+  }, [vehicle?.id]);
+
+  useEffect(() => {
+    if (open && manager && activeSection === 'commands') {
+      loadCommandSchedules();
+    }
+  }, [open, manager, activeSection, loadCommandSchedules]);
+
+  const updateCommandScheduleRow = useCallback((dayOfWeek, patch) => {
+    setCommandSchedules((prev) => {
+      const base = prev.length === 7 ? prev : defaultCommandSchedules();
+      return base.map((row) => (
+        row.day_of_week === dayOfWeek ? { ...row, ...patch } : row
+      ));
+    });
+  }, []);
+
+  const handleSaveCommandSchedules = async () => {
+    if (!vehicle?.id) return;
+    setCommandSchedulesSaving(true);
+    setCommandSchedulesError(null);
+    try {
+      const schedules = commandSchedules.map((row) => ({
+        day_of_week: row.day_of_week,
+        lock_time: row.lock_time && String(row.lock_time).trim() ? String(row.lock_time).trim().slice(0, 5) : null,
+        unlock_time: row.unlock_time && String(row.unlock_time).trim() ? String(row.unlock_time).trim().slice(0, 5) : null,
+        enabled: row.enabled !== false,
+      }));
+      if (schedules.length !== 7) {
+        setCommandSchedulesError('Dados incompletos (7 dias).');
+        return;
+      }
+      await fetchOrThrow(`/api/vehicles/${vehicle.id}/scheduled-commands`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ schedules }),
+      });
+      await loadCommandSchedules();
+    } catch (e) {
+      setCommandSchedulesError(e?.message || 'Erro ao salvar.');
+    } finally {
+      setCommandSchedulesSaving(false);
+    }
+  };
+
+  useEffect(() => {
     if (!open) {
       setSmsModalOpen(false);
       setSmsModalDeviceId(null);
@@ -161,6 +259,9 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       setOsOrders([]);
       setOsFetchError(null);
       setOsLoading(false);
+      setCommandSchedules(defaultCommandSchedules());
+      setCommandSchedulesError(null);
+      setCommandSchedulesLoading(false);
     }
   }, [open]);
 
@@ -380,6 +481,12 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                 <ListItemText primary="Alertas" />
               </ListItemButton>
               {manager && (
+                <ListItemButton selected={activeSection === 'commands'} onClick={() => setActiveSection('commands')}>
+                  <ListItemIcon sx={{ minWidth: 36 }}><ScheduleIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Comandos" />
+                </ListItemButton>
+              )}
+              {manager && (
                 <ListItemButton selected={activeSection === 'data'} onClick={() => setActiveSection('data')}>
                   <ListItemIcon sx={{ minWidth: 36 }}><InfoOutlinedIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary="Dados" />
@@ -475,6 +582,94 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                 <Button variant="contained" onClick={handleSaveAlerts} disabled={alertsSaving} sx={{ mt: 2 }}>
                   {alertsSaving ? 'Salvando...' : 'Salvar Alertas'}
                 </Button>
+              </Paper>
+            )}
+
+            {manager && activeSection === 'commands' && (
+              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text || '#111827', mb: 1 }}>
+                  Comandos programados
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 2 }}>
+                  Bloqueio e desbloqueio automáticos do motor (Traccar: engineStop / engineResume), por dia da semana.
+                  O horário segue o relógio do servidor (defina TZ no ambiente do backend se necessário).
+                </Typography>
+                {commandSchedulesError && (
+                  <Alert severity="warning" sx={{ mb: 2 }}>{commandSchedulesError}</Alert>
+                )}
+                {commandSchedulesLoading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <>
+                    <TableContainer>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Dia</TableCell>
+                            <TableCell>Bloqueio</TableCell>
+                            <TableCell>Desbloqueio</TableCell>
+                            <TableCell align="center">Ativo</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {COMMAND_DAY_DISPLAY_ORDER.map((dow) => {
+                            const row = commandSchedules.find((r) => r.day_of_week === dow) || {
+                              day_of_week: dow,
+                              lock_time: null,
+                              unlock_time: null,
+                              enabled: true,
+                            };
+                            return (
+                              <TableRow key={dow}>
+                                <TableCell>{COMMAND_DAY_LABELS[dow]}</TableCell>
+                                <TableCell>
+                                  <TextField
+                                    type="time"
+                                    size="small"
+                                    value={row.lock_time || ''}
+                                    onChange={(e) => updateCommandScheduleRow(dow, {
+                                      lock_time: e.target.value ? e.target.value.slice(0, 5) : null,
+                                    })}
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{ step: 60 }}
+                                    sx={{ minWidth: 130 }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <TextField
+                                    type="time"
+                                    size="small"
+                                    value={row.unlock_time || ''}
+                                    onChange={(e) => updateCommandScheduleRow(dow, {
+                                      unlock_time: e.target.value ? e.target.value.slice(0, 5) : null,
+                                    })}
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{ step: 60 }}
+                                    sx={{ minWidth: 130 }}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <Switch
+                                    checked={row.enabled !== false}
+                                    onChange={(e) => updateCommandScheduleRow(dow, { enabled: e.target.checked })}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveCommandSchedules}
+                      disabled={commandSchedulesSaving || commandSchedules.length !== 7}
+                      sx={{ mt: 2 }}
+                    >
+                      {commandSchedulesSaving ? 'Salvando...' : 'Salvar comandos'}
+                    </Button>
+                  </>
+                )}
               </Paper>
             )}
 

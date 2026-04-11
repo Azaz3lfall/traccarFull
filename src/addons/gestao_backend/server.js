@@ -12,6 +12,7 @@ import pool from '../traccar_wrapper/db/index.js';
 import telecomPool from '../telecom/db/index.js';
 import registerTelecomRoutes from '../telecom/routes/index.js';
 import registerOSRoutes from '../os_backend/routes/index.js';
+import { startCommandScheduler } from './schedulers/commandScheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -79,6 +80,10 @@ app.listen(PORT, () => {
     console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'OK' : 'Faltando DATABASE_URL'}`);
     console.log(`📱 Comtele SMS: ${process.env.COMTELE_API_KEY ? 'OK (COMTELE_API_KEY configurada)' : 'Não configurada'}`);
     console.log(`📋 OS Backend: ${process.env.DATABASE_OS_URL || process.env.DATABASE_URL ? 'OK' : 'Faltando DATABASE_OS_URL'}\n`);
+
+    startCommandScheduler().catch((e) => {
+        console.error('Falha ao iniciar agendador de comandos:', e?.message);
+    });
 });
 
 process.on('SIGTERM', () => {
