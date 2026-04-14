@@ -88,6 +88,7 @@ import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttri
 import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import EditAttributesAccordion from '../settings/components/EditAttributesAccordion';
 import deviceCategories from '../common/util/deviceCategories';
+import { getDeviceModelOptions } from '../common/util/deviceModels';
 
 // Import device category icons (same as map markers) - optimized imports
 import bicycleIcon from '../resources/images/newIcons/bicycle.png';
@@ -218,6 +219,10 @@ const FloatingDevicesPopover = ({
   const [calendarInputRef, setCalendarInputRef] = useState(null);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
+  const deviceModelOptions = useMemo(
+    () => getDeviceModelOptions((devices || []).map((device) => device?.model)),
+    [devices],
+  );
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
@@ -1635,7 +1640,7 @@ const FloatingDevicesPopover = ({
                             top: (modelInputRef?.getBoundingClientRect().bottom || 0) + 4,
                             width: modelInputRef?.getBoundingClientRect().width || 200,
                           }}>
-                            {['AtlasTrax', 'J16', 'EC33', 'E3+', 'k-tag', 'Oneblock', 'JC181', 'JC400', 'JC450']
+                            {deviceModelOptions
                               .filter(m => !editingDevice?.model || m.toLowerCase().includes(editingDevice.model.toLowerCase()))
                               .map((model) => (
                               <div

@@ -36,6 +36,7 @@ import { useCatch } from '../reactHelper';
 import useSettingsStyles from './common/useSettingsStyles';
 import QrCodeDialog from '../common/components/QrCodeDialog';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import { getDeviceModelOptions } from '../common/util/deviceModels';
 
 const TELECOM_BASE = '/gestao/telecom';
 
@@ -58,6 +59,7 @@ const DevicePage = () => {
   const [selectedChipId, setSelectedChipId] = useState(null);
   const [addChipOpen, setAddChipOpen] = useState(false);
   const [newChipNumero, setNewChipNumero] = useState('');
+  const [modelOptions, setModelOptions] = useState(() => getDeviceModelOptions());
 
   const fetchAvailableChips = useCallback(async () => {
     try {
@@ -74,6 +76,20 @@ const DevicePage = () => {
   useEffect(() => {
     if (item) fetchAvailableChips();
   }, [item, fetchAvailableChips]);
+
+  useEffect(() => {
+    const fetchModelOptions = async () => {
+      try {
+        const response = await fetchOrThrow('/api/devices?all=true');
+        const devices = await response.json();
+        const models = Array.isArray(devices) ? devices.map((device) => device?.model) : [];
+        setModelOptions(getDeviceModelOptions(models));
+      } catch {
+        setModelOptions(getDeviceModelOptions());
+      }
+    };
+    fetchModelOptions();
+  }, []);
 
   useEffect(() => {
     if (item?.phone && availableChips.length > 0) {
@@ -121,6 +137,7 @@ const DevicePage = () => {
       body: JSON.stringify(item),
     });
     const saved = await res.json();
+    setModelOptions((previous) => getDeviceModelOptions([...(previous || []), saved?.model]));
     const deviceId = saved.id ? parseInt(saved.id, 10) : null;
     if (deviceId) {
       try {
@@ -248,7 +265,13 @@ const DevicePage = () => {
                 value={item.model || ''}
                 onChange={(event) => setItem({ ...item, model: event.target.value })}
                 label={t('deviceModel')}
+                inputProps={{ list: 'predefined-device-models' }}
               />
+              <datalist id="predefined-device-models">
+                {modelOptions.map((model) => (
+                  <option key={model} value={model} />
+                ))}
+              </datalist>
               <TextField
                 value={item.contact || ''}
                 onChange={(event) => setItem({ ...item, contact: event.target.value })}
