@@ -336,7 +336,7 @@ const FloatingDevicesPopover = ({
 
 
   // Fetch devices with TanStack Query
-  const { data: devices = [], isLoading, error } = useQuery({
+  const { data: devicesData = [], isLoading, error } = useQuery({
     queryKey: ['devices'],
     queryFn: async () => {
       const response = await fetchOrThrow('/api/devices?all=true');
@@ -347,8 +347,8 @@ const FloatingDevicesPopover = ({
   });
 
   const deviceModelOptions = useMemo(
-    () => getDeviceModelOptions(devices.map((device) => device?.model)),
-    [devices],
+    () => getDeviceModelOptions(devicesData.map((device) => device?.model)),
+    [devicesData],
   );
 
   // Use the reusable time filter hook
@@ -361,7 +361,7 @@ const FloatingDevicesPopover = ({
     handleTimeFilterSelect,
     handleSearchChange,
     getCurrentFilterInfo
-  } = useTimeFilter(devices, {
+  } = useTimeFilter(devicesData, {
     dateField: 'lastUpdate',
     searchFields: ['name', 'uniqueId', 'phone', 'model', 'contact'],
     searchValueExtractor,
