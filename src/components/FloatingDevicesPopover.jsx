@@ -219,10 +219,6 @@ const FloatingDevicesPopover = ({
   const [calendarInputRef, setCalendarInputRef] = useState(null);
   const [connectionsDialog, setConnectionsDialog] = useState(false);
   const [selectedDeviceForConnections, setSelectedDeviceForConnections] = useState(null);
-  const deviceModelOptions = useMemo(
-    () => getDeviceModelOptions((devices || []).map((device) => device?.model)),
-    [devices],
-  );
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
@@ -349,6 +345,11 @@ const FloatingDevicesPopover = ({
     },
     enabled: isVisible,
   });
+
+  const deviceModelOptions = useMemo(
+    () => getDeviceModelOptions(devices.map((device) => device?.model)),
+    [devices],
+  );
 
   // Use the reusable time filter hook
   const {
