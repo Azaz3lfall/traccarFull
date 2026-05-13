@@ -5,10 +5,11 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import {
   Table, TableRow, TableCell, TableHead, TableBody, Button, TableFooter, FormControlLabel, Switch,
-  Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Alert,
+  Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Alert, Checkbox,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MapIcon from '@mui/icons-material/Map';
@@ -26,6 +27,7 @@ import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import DeviceStatusIcons from './components/DeviceStatusIcons';
 import DeviceVehicleHistoryDialog from './components/DeviceVehicleHistoryDialog';
 import SmsSendModal from './components/SmsSendModal';
+import CommandSendModal from './components/CommandSendModal';
 import { formatTime } from '../common/util/formatter';
 import { useAdministrator, useDeviceReadonly, useManager } from '../common/util/permissions';
 import useSettingsStyles from './common/useSettingsStyles';
@@ -58,7 +60,12 @@ const DevicesPage = () => {
   const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
   const [smsModalDeviceId, setSmsModalDeviceId] = useState(null);
+  const [smsModalDeviceIds, setSmsModalDeviceIds] = useState([]);
   const [smsModalPhone, setSmsModalPhone] = useState('');
+  const [commandModalOpen, setCommandModalOpen] = useState(false);
+  const [commandModalDeviceId, setCommandModalDeviceId] = useState(null);
+  const [commandModalDeviceIds, setCommandModalDeviceIds] = useState([]);
+  const [selectedSmsDeviceIds, setSelectedSmsDeviceIds] = useState([]);
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [resetDeviceId, setResetDeviceId] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
@@ -197,10 +204,31 @@ const DevicesPage = () => {
     handler: (deviceId) => {
       const device = items.find((d) => d.id === deviceId);
       setSmsModalDeviceId(deviceId);
+      setSmsModalDeviceIds([]);
       setSmsModalPhone(device?.phone || '');
       setSmsModalOpen(true);
     },
   };
+
+  const actionSendCommand = {
+    key: 'sendCommand',
+    title: t('deviceSendCommand'),
+    icon: <TerminalIcon fontSize="small" />,
+    handler: (deviceId) => {
+      setCommandModalDeviceId(deviceId);
+      setCommandModalDeviceIds([]);
+      setCommandModalOpen(true);
+    },
+  };
+
+  const toggleSelectSmsDevice = (deviceId) => {
+    setSelectedSmsDeviceIds((prev) => (
+      prev.includes(deviceId) ? prev.filter((id) => id !== deviceId) : [...prev, deviceId]
+    ));
+  };
+
+  const allFilteredSelected = filteredItems.length > 0
+    && filteredItems.every((item) => selectedSmsDeviceIds.includes(item.id));
 
   const actionResetSimcard = {
     key: 'resetSimcard',
@@ -272,6 +300,7 @@ const DevicesPage = () => {
 
   const customActions = [
     actionConnections,
+    actionSendCommand,
     actionSendSms,
     actionResetSimcard,
     actionGoogleMaps,
@@ -279,7 +308,7 @@ const DevicesPage = () => {
     actionVehicleHistory,
   ];
 
-  const columnCount = 9;
+  const columnCount = 10;
 
   if (!admin) return null;
 
@@ -289,6 +318,19 @@ const DevicesPage = () => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={allFilteredSelected}
+                indeterminate={!allFilteredSelected && selectedSmsDeviceIds.length > 0}
+                onChange={() => {
+                  if (allFilteredSelected) {
+                    setSelectedSmsDeviceIds((prev) => prev.filter((id) => !filteredItems.some((item) => item.id === id)));
+                  } else {
+                    setSelectedSmsDeviceIds((prev) => [...new Set([...prev, ...filteredItems.map((item) => item.id)])]);
+                  }
+                }}
+              />
+            </TableCell>
             <TableCell>{t('deviceIdentifier')}</TableCell>
             <TableCell>{t('sharedName')}</TableCell>
             <TableCell>{t('deviceModel')}</TableCell>
@@ -303,6 +345,12 @@ const DevicesPage = () => {
         <TableBody>
           {!loading ? filteredItems.map((item) => (
             <TableRow key={item.id}>
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={selectedSmsDeviceIds.includes(item.id)}
+                  onChange={() => toggleSelectSmsDevice(item.id)}
+                />
+              </TableCell>
               <TableCell>{item.uniqueId}</TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.model}</TableCell>
@@ -330,6 +378,35 @@ const DevicesPage = () => {
           <TableRow>
             <TableCell>
               <Button onClick={handleExport} variant="text">{t('reportExport')}</Button>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<SendIcon />}
+                disabled={selectedSmsDeviceIds.length === 0}
+                onClick={() => {
+                  setSmsModalDeviceId(null);
+                  setSmsModalDeviceIds(selectedSmsDeviceIds);
+                  setSmsModalPhone('');
+                  setSmsModalOpen(true);
+                }}
+                sx={{ ml: 1 }}
+              >
+                Enviar SMS selecionados ({selectedSmsDeviceIds.length})
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<TerminalIcon />}
+                disabled={selectedSmsDeviceIds.length === 0}
+                onClick={() => {
+                  setCommandModalDeviceId(null);
+                  setCommandModalDeviceIds(selectedSmsDeviceIds);
+                  setCommandModalOpen(true);
+                }}
+                sx={{ ml: 1 }}
+              >
+                Enviar comando selecionados ({selectedSmsDeviceIds.length})
+              </Button>
               <Button
                 variant={filterUnlinkedOnly ? 'contained' : 'outlined'}
                 size="small"
@@ -365,9 +442,25 @@ const DevicesPage = () => {
       />
       <SmsSendModal
         open={smsModalOpen}
-        onClose={() => { setSmsModalOpen(false); setSmsModalDeviceId(null); setSmsModalPhone(''); }}
+        onClose={() => {
+          setSmsModalOpen(false);
+          setSmsModalDeviceId(null);
+          setSmsModalDeviceIds([]);
+          setSmsModalPhone('');
+        }}
         deviceId={smsModalDeviceId}
+        deviceIds={smsModalDeviceIds}
         phone={smsModalPhone}
+      />
+      <CommandSendModal
+        open={commandModalOpen}
+        onClose={() => {
+          setCommandModalOpen(false);
+          setCommandModalDeviceId(null);
+          setCommandModalDeviceIds([]);
+        }}
+        deviceId={commandModalDeviceId}
+        deviceIds={commandModalDeviceIds}
       />
       <Dialog
         open={resetModalOpen}

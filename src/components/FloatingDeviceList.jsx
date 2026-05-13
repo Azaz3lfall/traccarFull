@@ -38,7 +38,7 @@ import { Card } from './ui/card';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, CircularProgress, Tooltip } from '@mui/material';
 import { Check as CheckIcon } from '@mui/icons-material';
 import { FleetDeviceCard } from './fleet';
-import DeviceStatusIcons from '../settings/components/DeviceStatusIcons';
+import VehicleTelemetryStatusBar from '../settings/components/VehicleTelemetryStatusBar';
 
 dayjs.extend(relativeTime);
 
@@ -1303,18 +1303,6 @@ const FloatingDeviceList = ({
                     }}>
                       {device[devicePrimary] || 'Unknown'}
                     </h3>
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px',
-                      flexWrap: 'wrap',
-                      justifyContent: 'flex-end',
-                      minWidth: !desktop ? '120px' : '100px',
-                      paddingRight: '4px',
-                      flexShrink: 0,
-                    }}>
-                      {position ? <DeviceStatusIcons position={position} /> : null}
-                    </div>
                   </div>
                   {/* Status - Only visible to administrators and managers */}
                   {manager && (
@@ -1369,6 +1357,11 @@ const FloatingDeviceList = ({
                     `${formatCoordinate('latitude', position.latitude, coordinateFormat)}, ${formatCoordinate('longitude', position.longitude, coordinateFormat)}` : 
                     t('sharedNoData'))}
                 </p>
+                {position && (
+                  <div style={{ marginTop: '8px', width: '100%', pointerEvents: 'auto' }}>
+                    <VehicleTelemetryStatusBar position={position} device={device} compact />
+                  </div>
+                )}
               </div>
             </div>
           </Card>

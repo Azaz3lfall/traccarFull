@@ -33,7 +33,14 @@ const TELECOM_BASE = '/gestao/telecom';
 
 const DEFAULT_SMS_ROOT_Z = 99999;
 
-const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex = DEFAULT_SMS_ROOT_Z }) => {
+const SmsSendModal = ({
+  open,
+  onClose,
+  deviceId,
+  deviceIds = [],
+  phone: initialPhone,
+  rootZIndex = DEFAULT_SMS_ROOT_Z,
+}) => {
   const nestedDialogZ = rootZIndex + 1;
   const selectMenuZ = rootZIndex + 2;
   const [numero, setNumero] = useState(initialPhone || '');
@@ -55,36 +62,46 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
   const [batchTemplates, setBatchTemplates] = useState([]);
   const [selectedBatchId, setSelectedBatchId] = useState('');
   const [batchSending, setBatchSending] = useState(false);
+  const [sendSummary, setSendSummary] = useState(null);
+  const [backgroundInfo, setBackgroundInfo] = useState(null);
+  const targetDeviceIds = [...new Set([
+    ...((Array.isArray(deviceIds) ? deviceIds : []).map((id) => parseInt(id, 10)).filter((id) => !Number.isNaN(id) && id > 0)),
+    ...(deviceId != null ? [parseInt(deviceId, 10)] : []),
+  ])];
+  const hasDeviceTargets = targetDeviceIds.length > 0;
+  const isSingleDeviceMode = targetDeviceIds.length === 1;
 
   const fetchPhone = useCallback(async () => {
-    if (!deviceId || numero) return;
+    if (!isSingleDeviceMode || numero) return;
+    const targetDeviceId = targetDeviceIds[0];
     try {
-      const res = await fetchOrThrow(`${TELECOM_BASE}/chips/by-device/${deviceId}`, { credentials: 'include' });
+      const res = await fetchOrThrow(`${TELECOM_BASE}/chips/by-device/${targetDeviceId}`, { credentials: 'include' });
       const chip = await res.json();
       if (chip?.numero) setNumero(chip.numero);
       if (chip?.operadora) setOperadora(chip.operadora);
     } catch {
       // ignore
     }
-  }, [deviceId, numero]);
+  }, [isSingleDeviceMode, targetDeviceIds, numero]);
 
   useEffect(() => {
     setNumero(initialPhone || '');
     if (!open) setOperadora(null);
+    if (!open) setSendSummary(null);
   }, [initialPhone, open]);
 
   useEffect(() => {
-    if (open && deviceId && !numero) fetchPhone();
-  }, [open, deviceId, numero, fetchPhone]);
+    if (open && isSingleDeviceMode && !numero) fetchPhone();
+  }, [open, isSingleDeviceMode, numero, fetchPhone]);
 
   useEffect(() => {
-    if (open && deviceId && numero && !operadora) {
-      fetchOrThrow(`${TELECOM_BASE}/chips/by-device/${deviceId}`, { credentials: 'include' })
+    if (open && isSingleDeviceMode && numero && !operadora) {
+      fetchOrThrow(`${TELECOM_BASE}/chips/by-device/${targetDeviceIds[0]}`, { credentials: 'include' })
         .then((r) => r.json())
         .then((chip) => chip?.operadora && setOperadora(chip.operadora))
         .catch(() => {});
     }
-  }, [open, deviceId, numero, operadora]);
+  }, [open, isSingleDeviceMode, targetDeviceIds, numero, operadora]);
 
   const fetchTemplates = useCallback(async () => {
     try {
@@ -142,7 +159,7 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
 
   const handleSend = async () => {
     const num = numero?.trim().replace(/\D/g, '') || '';
-    if (num.length < 10) {
+    if (!hasDeviceTargets && num.length < 10) {
       setError('Informe um número válido.');
       return;
     }
@@ -151,17 +168,33 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
       return;
     }
     setError(null);
+    setSendSummary(null);
+    setBackgroundInfo(null);
     setSending(true);
-    try {
-      await fetchOrThrow(`${TELECOM_BASE}/sms/send`, {
+    const payload = {
+      numero: num || undefined,
+      mensagem: mensagem.trim(),
+      deviceId: isSingleDeviceMode ? targetDeviceIds[0] : undefined,
+      deviceIds: targetDeviceIds.length > 1 ? targetDeviceIds : undefined,
+    };
+    setBackgroundInfo('Envio iniciado em segundo plano. Você pode continuar usando o sistema.');
+    setMensagem('');
+    // Disparo em segundo plano: não bloqueia interação da tela.
+    void fetchOrThrow(`${TELECOM_BASE}/sms/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ numero: num, mensagem: mensagem.trim(), deviceId }),
+        body: JSON.stringify(payload),
+      }).then(async (res) => {
+      const data = await res.json();
+      setSendSummary({
+        total: data.total ?? (Array.isArray(data.results) ? data.results.length : 1),
+        successCount: data.successCount ?? (data.success ? 1 : 0),
+        errorCount: data.errorCount ?? (data.success ? 0 : 1),
+        results: Array.isArray(data.results) ? data.results : [],
       });
-      setMensagem('');
       fetchHistory();
-    } catch (e) {
+    }).catch((e) => {
       let errMsg = e.message || 'Erro ao enviar SMS';
       let hint = '';
       try {
@@ -176,14 +209,15 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
         errMsg += ' Consulte os logs do servidor (backend Gestão) para detalhes.';
       }
       setError(hint ? `${errMsg} ${hint}` : errMsg);
-    } finally {
+      setBackgroundInfo(null);
+    }).finally(() => {
       setSending(false);
-    }
+    });
   };
 
   const handleSendBatch = async () => {
     const num = numero?.trim().replace(/\D/g, '') || '';
-    if (num.length < 10) {
+    if (!hasDeviceTargets && num.length < 10) {
       setError('Informe um número válido.');
       return;
     }
@@ -192,38 +226,49 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
       return;
     }
     setError(null);
+    setSendSummary(null);
+    setBackgroundInfo(null);
     setBatchSending(true);
-    try {
-      const res = await fetchOrThrow(`${TELECOM_BASE}/sms/send-batch`, {
+    const payload = {
+      numero: num ? (num.length >= 12 ? num : `55${num}`) : undefined,
+      deviceId: isSingleDeviceMode ? targetDeviceIds[0] : undefined,
+      deviceIds: targetDeviceIds.length > 1 ? targetDeviceIds : undefined,
+      batchTemplateId: parseInt(selectedBatchId, 10),
+    };
+    setBackgroundInfo('Configuração enviada em segundo plano. O processamento continuará mesmo se você fechar este modal.');
+    setBatchConfigOpen(false);
+    setSelectedBatchId('');
+    void fetchOrThrow(`${TELECOM_BASE}/sms/send-batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          numero: num.length >= 12 ? num : `55${num}`,
-          deviceId: deviceId || undefined,
-          batchTemplateId: parseInt(selectedBatchId, 10),
-        }),
-      });
+        body: JSON.stringify(payload),
+      }).then(async (res) => {
       const data = await res.json();
+      setSendSummary({
+        total: data.total ?? 0,
+        successCount: data.successCount ?? 0,
+        errorCount: data.errorCount ?? 0,
+        results: Array.isArray(data.results) ? data.results : [],
+      });
       if (data.errorCount === 0) {
         setError(null);
-        setBatchConfigOpen(false);
-        setSelectedBatchId('');
         fetchHistory();
       } else {
         const errDetails = data.results?.filter((r) => !r.success).map((r) => `${r.titulo}: ${r.message}`).join('; ') || '';
         setError(`Enviados: ${data.successCount}/${data.total}. Erros: ${data.errorCount}. ${errDetails}`);
       }
-    } catch (e) {
+    }).catch((e) => {
       let errMsg = e.message || 'Erro ao enviar configuração';
       try {
         const parsed = JSON.parse(errMsg);
         if (parsed?.error) errMsg = parsed.error;
       } catch { /* ignore */ }
       setError(errMsg);
-    } finally {
+      setBackgroundInfo(null);
+    }).finally(() => {
       setBatchSending(false);
-    }
+    });
   };
 
   const handleCreateTemplate = async () => {
@@ -268,7 +313,9 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
           <span>
             ENVIO DE SMS PARA:{' '}
             <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 'bold' }}>
-              {numero || '(selecione o dispositivo)'}
+              {hasDeviceTargets
+                ? `${targetDeviceIds.length} dispositivo(s)`
+                : (numero || '(selecione o dispositivo)')}
             </span>
           </span>
           {operadora && (
@@ -285,13 +332,23 @@ const SmsSendModal = ({ open, onClose, deviceId, phone: initialPhone, rootZIndex
               {error}
             </Alert>
           )}
+          {sendSummary && (
+            <Alert severity={sendSummary.errorCount > 0 ? 'warning' : 'success'}>
+              {`Enviados com sucesso: ${sendSummary.successCount}/${sendSummary.total}. Falhas: ${sendSummary.errorCount}.`}
+            </Alert>
+          )}
+          {backgroundInfo && (
+            <Alert severity="info" onClose={() => setBackgroundInfo(null)}>
+              {backgroundInfo}
+            </Alert>
+          )}
 
           <TextField
             label="Número"
             value={numero}
             onChange={(e) => setNumero(e.target.value)}
             fullWidth
-            disabled={!!deviceId}
+            helperText={hasDeviceTargets ? 'Opcional: usado como fallback quando algum device selecionado não tiver chip válido.' : ''}
           />
           <TextField
             label="Mensagem"

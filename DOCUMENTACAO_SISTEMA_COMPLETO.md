@@ -493,6 +493,7 @@ traccar-custom/
 ├── .vscode/                      # Configurações do VS Code
 ├── CLOUDINARY_SETUP.md           # Documentação do Cloudinary
 ├── dashcam_flutter_integration.md # Documentação de integração Dashcam
+├── CADASTRO_DASHCAM.md           # Guia: cadastrar dashcam no Traccar
 ├── DOCUMENTACAO_MOTORISTAS.md    # Documentação de motoristas
 ├── ecosystem.config.js           # Configuração do PM2
 ├── index.html                    # HTML principal
@@ -852,6 +853,7 @@ Múltiplas configurações disponíveis:
 - **TRANSLATION_GUIDE.md**: Guia de tradução
 - **CLOUDINARY_SETUP.md**: Setup do Cloudinary
 - **dashcam_flutter_integration.md**: Integração Dashcam Flutter
+- **CADASTRO_DASHCAM.md**: Guia de cadastro de dashcam no Traccar (categoria, atributo `iothub`)
 - **src/other/gestao/README.md**: Documentação do módulo de gestão
 - **src/addons/reseller/README-SETUP.md**: Setup do servidor de revendedores
 

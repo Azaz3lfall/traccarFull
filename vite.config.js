@@ -47,10 +47,13 @@ export default defineConfig(() => {
         '/api/fleet': 'http://localhost:4000', // Core Fleet Service
         '/api/clients': 'http://localhost:4000', // Core Fleet Service
         '/api/vehicles': 'http://localhost:4000', // Core Fleet Service
+        '/api/route-rules': 'http://localhost:4000', // Core Fleet Service
+        '/api/financial': 'http://localhost:4000', // Financial module on Core service
         '/os-api': 'http://localhost:3666',
         '/traccar-api': 'http://localhost:3666',
         '/os-uploads': 'http://localhost:3666',
         '/gestao': 'http://localhost:3666',
+        '/api/roles': 'http://localhost:3666',
         '/nominatim-proxy': {
           target: 'http://50.30.32.171:8080',
           changeOrigin: true,

@@ -14,6 +14,7 @@ import { handleNativeNotificationListeners, nativePostMessage } from './common/c
 import fetchOrThrow from './common/util/fetchOrThrow';
 
 const logoutCode = 4000;
+const J16_MODEL = 'J16+';
 
 const SocketController = () => {
   const dispatch = useDispatch();
@@ -21,9 +22,12 @@ const SocketController = () => {
 
   const authenticated = useSelector((state) => Boolean(state.session.user));
   const includeLogs = useSelector((state) => state.session.includeLogs);
+  const positions = useSelector((state) => state.session.positions);
+  const devices = useSelector((state) => state.devices.items);
 
   const socketRef = useRef();
   const handleEventsRef = useRef();
+  const j16DoorRef = useRef({}); // deviceId → last boolean state (true=open)
 
   const [notifications, setNotifications] = useState([]);
 
@@ -73,6 +77,55 @@ const SocketController = () => {
   useEffect(() => {
     handleEventsRef.current = handleEvents;
   }, [handleEvents]);
+
+  // Monitor door state for all J16+ devices and generate events via handleEvents
+  // Monitor J16+ door state and generate events via handleEvents() so they appear
+  // in the notification popup just like ignition/alarm events.
+  // IMPORTANT: GT06 sends two packet types:
+  //   - Status packet (0x94): carries door/io1 attributes → authoritative door state
+  //   - GPS packet (0x26):    carries coordinates only, NO door/io1 → must be ignored
+  // WebSocket delivers raw positions that bypass our fetch interceptor, so we must
+  // check for the presence of door/io1 before updating state.
+  useEffect(() => {
+    if (!authenticated || !positions || !devices) return;
+    Object.values(devices).forEach((device) => {
+      if (device.model !== J16_MODEL) return;
+      const position = positions[device.id];
+      if (!position) return;
+
+      const attrs = position.attributes || {};
+      const hasDoor = Object.prototype.hasOwnProperty.call(attrs, 'door');
+      const hasIo1 = Object.prototype.hasOwnProperty.call(attrs, 'io1');
+
+      // Skip GPS-only positions that carry no door/io1 data — they would cause
+      // a spurious "door closed" event every time a coordinate update arrives.
+      if (!hasDoor && !hasIo1) return;
+
+      const isOpen = hasDoor ? attrs.door === true : attrs.io1 === false;
+      const last = j16DoorRef.current[device.id];
+      if (last === undefined) {
+        j16DoorRef.current[device.id] = isOpen;
+        dispatch(sessionActions.updateDoorState({ deviceId: device.id, isOpen }));
+        return; // seed state on first authoritative packet, no event
+      }
+      if (last === isOpen) return;
+      j16DoorRef.current[device.id] = isOpen;
+      dispatch(sessionActions.updateDoorState({ deviceId: device.id, isOpen }));
+      const label = isOpen ? '🚨 Porta Aberta' : '✅ Porta Fechada';
+      const event = {
+        id: Date.now() + device.id,
+        deviceId: device.id,
+        type: 'alarm',
+        eventTime: new Date().toISOString(),
+        positionId: position.id,
+        attributes: {
+          alarm: isOpen ? 'door' : 'doorClosed',
+          label,
+        },
+      };
+      handleEventsRef.current([event]);
+    });
+  }, [positions, devices, authenticated]);
 
   const connectSocket = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

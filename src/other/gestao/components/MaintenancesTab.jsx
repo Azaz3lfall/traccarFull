@@ -6,6 +6,10 @@ import {
   Grid,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -24,7 +28,6 @@ import {
   AddCircleOutline as AddCircleOutlineIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  CloudUpload as CloudUploadIcon,
   Image as ImageIcon,
   Visibility as VisibilityIcon,
   DirectionsCar as CarIcon,
@@ -38,6 +41,7 @@ import {
 import { InputAdornment } from '@mui/material';
 import { Wrench } from 'lucide-react';
 import { formatDate, formatCurrency } from '../utils/formatters';
+import { MAINTENANCE_TYPES, DURABILITY_UNITS } from '../constants';
 import PhotoModal from './common/PhotoModal';
 
 const MaintenancesTab = ({
@@ -77,6 +81,50 @@ const MaintenancesTab = ({
   const handleViewPhoto = (photoPath) => {
     setSelectedPhotoPath(photoPath);
     setPhotoModalOpen(true);
+  };
+
+  const selectMenuProps = {
+    PaperProps: {
+      sx: {
+        zIndex: 20001,
+      },
+    },
+    sx: {
+      zIndex: 20001,
+    },
+  };
+
+  const getMaintenanceTypeLabel = (maintenanceType) => (
+    MAINTENANCE_TYPES.find((item) => item.value === maintenanceType)?.label || 'Outros'
+  );
+
+  const getNextMaintenanceText = (maintenance) => {
+    const durabilityValue = Number(maintenance?.durability_value);
+    if (!Number.isFinite(durabilityValue) || durabilityValue <= 0) {
+      return '-';
+    }
+
+    if (maintenance.durability_unit === 'km') {
+      const current = Number(maintenance.odometer);
+      if (!Number.isFinite(current)) return '-';
+      return `${(current + durabilityValue).toFixed(0)} km`;
+    }
+
+    if (maintenance.durability_unit === 'hours') {
+      const current = Number(maintenance.engine_hours);
+      if (!Number.isFinite(current)) return '-';
+      return `${(current + durabilityValue).toFixed(0)} h`;
+    }
+
+    if (maintenance.durability_unit === 'days') {
+      const baseDate = maintenance.maintenance_date ? new Date(maintenance.maintenance_date) : null;
+      if (!baseDate || Number.isNaN(baseDate.getTime())) return '-';
+      const nextDate = new Date(baseDate);
+      nextDate.setDate(nextDate.getDate() + durabilityValue);
+      return formatDate(nextDate.toISOString());
+    }
+
+    return '-';
   };
 
   return (
@@ -186,6 +234,50 @@ const MaintenancesTab = ({
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="maintenance-type-label">Tipo de Manutenção</InputLabel>
+                <Select
+                  labelId="maintenance-type-label"
+                  label="Tipo de Manutenção"
+                  value={newMaintenanceForm.maintenance_type || 'other'}
+                  onChange={(e) => setNewMaintenanceForm(prev => ({ ...prev, maintenance_type: e.target.value }))}
+                  MenuProps={selectMenuProps}
+                  required
+                >
+                  {MAINTENANCE_TYPES.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="durability-unit-label">Unidade de Durabilidade</InputLabel>
+                <Select
+                  labelId="durability-unit-label"
+                  label="Unidade de Durabilidade"
+                  value={newMaintenanceForm.durability_unit || 'km'}
+                  onChange={(e) => setNewMaintenanceForm(prev => ({ ...prev, durability_unit: e.target.value }))}
+                  MenuProps={selectMenuProps}
+                >
+                  {DURABILITY_UNITS.map((unit) => (
+                    <MenuItem key={unit.value} value={unit.value}>{unit.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label={`Durabilidade (${newMaintenanceForm.durability_unit || 'km'})`}
+                type="number"
+                value={newMaintenanceForm.durability_value}
+                onChange={(e) => setNewMaintenanceForm(prev => ({ ...prev, durability_value: e.target.value }))}
+                inputProps={{ min: 0, step: 1 }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -203,6 +295,19 @@ const MaintenancesTab = ({
                 }}
               />
             </Grid>
+            {(newMaintenanceForm.durability_unit || 'km') === 'hours' && (
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Horas atuais do motor"
+                  type="number"
+                  value={newMaintenanceForm.engine_hours}
+                  onChange={(e) => setNewMaintenanceForm(prev => ({ ...prev, engine_hours: e.target.value }))}
+                  inputProps={{ min: 0, step: 0.1 }}
+                />
+              </Grid>
+            )}
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
@@ -275,8 +380,10 @@ const MaintenancesTab = ({
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><CarIcon fontSize="small" /> Veículo</Box></TableCell>
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><CalendarIcon fontSize="small" /> Data</Box></TableCell>
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><DescriptionIcon fontSize="small" /> Descrição</Box></TableCell>
+                <TableCell>Tipo</TableCell>
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><MoneyIcon fontSize="small" /> Custo</Box></TableCell>
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><SpeedIcon fontSize="small" /> Odômetro</Box></TableCell>
+                <TableCell>Próxima troca</TableCell>
                 <TableCell><Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><StoreIcon fontSize="small" /> Fornecedor</Box></TableCell>
                 <TableCell align="center">Ações</TableCell>
               </TableRow>
@@ -289,8 +396,10 @@ const MaintenancesTab = ({
                   </TableCell>
                   <TableCell>{formatDate(maintenance.maintenance_date)}</TableCell>
                   <TableCell>{maintenance.description}</TableCell>
+                  <TableCell>{getMaintenanceTypeLabel(maintenance.maintenance_type)}</TableCell>
                   <TableCell>{formatCurrency(maintenance.cost)}</TableCell>
                   <TableCell>{maintenance.odometer ? `${maintenance.odometer} km` : '-'}</TableCell>
+                  <TableCell>{getNextMaintenanceText(maintenance)}</TableCell>
                   <TableCell>{maintenance.provider_name || '-'}</TableCell>
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -379,6 +488,50 @@ const MaintenancesTab = ({
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="edit-maintenance-type-label">Tipo de Manutenção</InputLabel>
+                <Select
+                  labelId="edit-maintenance-type-label"
+                  label="Tipo de Manutenção"
+                  value={selectedMaintenance?.maintenance_type || 'other'}
+                  onChange={(e) => setSelectedMaintenance(prev => ({ ...prev, maintenance_type: e.target.value }))}
+                  MenuProps={selectMenuProps}
+                  required
+                >
+                  {MAINTENANCE_TYPES.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="edit-durability-unit-label">Unidade de Durabilidade</InputLabel>
+                <Select
+                  labelId="edit-durability-unit-label"
+                  label="Unidade de Durabilidade"
+                  value={selectedMaintenance?.durability_unit || 'km'}
+                  onChange={(e) => setSelectedMaintenance(prev => ({ ...prev, durability_unit: e.target.value }))}
+                  MenuProps={selectMenuProps}
+                >
+                  {DURABILITY_UNITS.map((unit) => (
+                    <MenuItem key={unit.value} value={unit.value}>{unit.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                size="small"
+                label={`Durabilidade (${selectedMaintenance?.durability_unit || 'km'})`}
+                type="number"
+                value={selectedMaintenance?.durability_value || ''}
+                onChange={(e) => setSelectedMaintenance(prev => ({ ...prev, durability_value: e.target.value }))}
+                inputProps={{ min: 0, step: 1 }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 size="small"
@@ -434,6 +587,19 @@ const MaintenancesTab = ({
                 }}
               />
             </Grid>
+            {(selectedMaintenance?.durability_unit || 'km') === 'hours' && (
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Horas atuais do motor"
+                  type="number"
+                  value={selectedMaintenance?.engine_hours || ''}
+                  onChange={(e) => setSelectedMaintenance(prev => ({ ...prev, engine_hours: e.target.value }))}
+                  inputProps={{ min: 0, step: 0.1 }}
+                />
+              </Grid>
+            )}
             <Grid item xs={12}>
               <TextField
                 fullWidth

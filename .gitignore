@@ -71,3 +71,4 @@ src/addons/reseller/data/
 **/flutter_*.ico
 **/coverage/
 **/test/coverage_helper_test.dart
+.cursor/

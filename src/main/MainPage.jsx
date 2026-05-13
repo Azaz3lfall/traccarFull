@@ -32,6 +32,13 @@ import fallbackLogo from '../resources/images/image170.png?inline';
 import dayjs from 'dayjs';
 import { map } from '../map/core/MapView';
 import EventsDrawer from './EventsDrawer';
+import LogoutModal from './components/LogoutModal';
+import OcorrenciasModal from './components/OcorrenciasModal';
+import AnnouncementDrawer from './drawers/AnnouncementDrawer';
+import ServerDrawer from './drawers/ServerDrawer';
+import ResellerDrawer from './drawers/ResellerDrawer';
+import PreferencesDrawer from './drawers/PreferencesDrawer';
+import MobileDrawer from './drawers/MobileDrawer';
 import FloatingGeofencesPopover from '../components/FloatingGeofencesPopover';
 import FloatingReportsPopover from '../components/FloatingReportsPopover';
 import FloatingGestaoPopover from '../components/FloatingGestaoPopover';
@@ -40,6 +47,7 @@ import FloatingClientsPopover from '../components/FloatingClientsPopover';
 import FloatingVehiclesPopover from '../components/FloatingVehiclesPopover';
 import FloatingChipsPopover from '../components/FloatingChipsPopover';
 import FloatingSmsTemplatesPopover from '../components/FloatingSmsTemplatesPopover';
+import FloatingFinancialPopover from '../components/FloatingFinancialPopover';
 import useFilter from './useFilter';
 import MainMap from './MainMap';
 import { HEATMAP_FEATURE_ENABLED } from '../map/MapHeatmap';
@@ -52,10 +60,13 @@ import FloatingMaintenancePopover from '../components/FloatingMaintenancePopover
 import FloatingComputedAttributesPopover from '../components/FloatingComputedAttributesPopover';
 import FloatingCalendarsPopover from '../components/FloatingCalendarsPopover';
 import FloatingResellersPopover from '../components/FloatingResellersPopover';
+import FloatingDataAnalyticsPopover from '../components/FloatingDataAnalyticsPopover';
+import FloatingRolesPopover from '../components/FloatingRolesPopover';
 import FloatingDriversPopover from '../components/FloatingDriversPopover';
 import FloatingGroupsPopover from '../components/FloatingGroupsPopover';
 import FloatingDevicesPopover from '../components/FloatingDevicesPopover';
 import FloatingNotificationsPopover from '../components/FloatingNotificationsPopover';
+import UsersModal from './UsersModal';
 import { 
   Truck, 
   Cpu,
@@ -90,6 +101,7 @@ import {
   HiOutlineWrenchScrewdriver,
 } from "react-icons/hi2";
 import { LuShieldAlert } from "react-icons/lu";
+import { MdDataObject } from "react-icons/md";
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import SimCardIcon from '@mui/icons-material/SimCard';
 import MessageIcon from '@mui/icons-material/Message';
@@ -135,22 +147,22 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-  Dialog,
-  DialogContent
 } from '@mui/material';
-import { 
-  useAdministrator, 
-  useManager, 
-  useRestriction 
+import {
+  useAdministrator,
+  useManager,
+  useRestriction
 } from '../common/util/permissions';
 import useFeatures from '../common/util/useFeatures';
+import { usePermissions } from './hooks/usePermissions';
+import { useMapSearch } from './hooks/useMapSearch';
+import { useServerData } from './hooks/useServerData';
 import { formatTime, formatNotificationTitle } from '../common/util/formatter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { eventsActions } from '../store';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import CloseIcon from '@mui/icons-material/Close';
-import { useQuery, useMutation } from '@tanstack/react-query';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
 import useServerAttributes from '../common/attributes/useServerAttributes';
@@ -198,6 +210,17 @@ const MainPage = () => {
   const muiTheme = useTheme();
 
   const desktop = useMediaQuery(muiTheme.breakpoints.up('md'));
+
+  const {
+    showSearch, setShowSearch,
+    searchQuery,
+    searchResults,
+    isSearching,
+    searchRef, setSearchRef,
+    handleSearchChange,
+    handleSearchResultClick,
+  } = useMapSearch();
+
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [isDeviceListVisible, setIsDeviceListVisible] = useState(false);
   const [isFleetListVisible, setIsFleetListVisible] = useState(true);
@@ -206,11 +229,6 @@ const MainPage = () => {
   const [eventsButtonRef, setEventsButtonRef] = useState(null);
   const [showMapSwitcher, setShowMapSwitcher] = useState(false);
   const [mapSwitcherRef, setMapSwitcherRef] = useState(null);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchRef, setSearchRef] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [showUserPopover, setShowUserPopover] = useState(false);
   const [userRef, setUserRef] = useState(null);
   const [userPopoverRef, setUserPopoverRef] = useState(null);
@@ -251,47 +269,12 @@ const MainPage = () => {
   const [historyDeviceId, setHistoryDeviceId] = useState(null);
   const [showServerDrawer, setShowServerDrawer] = useState(false);
   const [showPreferencesDrawer, setShowPreferencesDrawer] = useState(false);
-  const [preferencesAttributes, setPreferencesAttributes] = useState({});
-  const [preferencesSaving, setPreferencesSaving] = useState(false);
-  const [token, setToken] = useState(null);
-  const [tokenExpiration, setTokenExpiration] = useState(dayjs().add(1, 'week').locale('en').format('YYYY-MM-DD'));
-  const [activeServerTab, setActiveServerTab] = useState(0);
-  const [activePreferencesTab, setActivePreferencesTab] = useState(0);
-  const [activeResellerTab, setActiveResellerTab] = useState(0);
-  const [popupInfoOpen, setPopupInfoOpen] = useState(false);
-  const [serverData, setServerData] = useState(null);
   const [showAnnouncementDrawer, setShowAnnouncementDrawer] = useState(false);
   const [showResellerDrawer, setShowResellerDrawer] = useState(false);
   const [showResellersPopover, setShowResellersPopover] = useState(false);
-  const [resellerData, setResellerData] = useState({
-    currentDomain: window.location.hostname,
-    parentUserId: '',
-    parentUser: '',
-    parentEmail: '',
-    resellerId: '',
-    resellerUser: '',
-    resellerEmail: '',
-    companyName: '',
-    logo: '',
-    url: '',
-    whatsapp: '',
-    billingEmail: '',
-    supportEmail: '',
-    resellerLimit: '',
-    deviceLimit: '',
-    userLimit: ''
-  });
-  const [resellerErrors, setResellerErrors] = useState([]);
-  const [announcementData, setAnnouncementData] = useState({
-    users: [],
-    notificator: '',
-    message: { subject: '', body: '' }
-  });
-  const [resellerUsers, setResellerUsers] = useState([]);
-  const [resellerUsersLoading, setResellerUsersLoading] = useState(false);
-  const [resellerUsersError, setResellerUsersError] = useState(null);
-  const [resellerUsersFetched, setResellerUsersFetched] = useState(false);
-  const [resellerAutocompleteOpen, setResellerAutocompleteOpen] = useState(false);
+  const [showDataAnalyticsPopover, setShowDataAnalyticsPopover] = useState(false);
+  const [showRolesPopover, setShowRolesPopover] = useState(false);
+  const [showUsersModal, setShowUsersModal] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showOcorrenciasModal, setShowOcorrenciasModal] = useState(false);
   const [ocorrenciaNumber, setOcorrenciaNumber] = useState(null);
@@ -324,15 +307,6 @@ const MainPage = () => {
     }
   }, [snackbar.deviceInfo, closestDeviceInfo]);
 
-  // Occurrence types for autocomplete
-  const ocorrenciaTypes = [
-    { value: 'emergencia_medica', label: 'Emergência Médica' },
-    { value: 'acidente', label: 'Acidente' },
-    { value: 'assalto', label: 'Assalto' },
-    { value: 'incendio', label: 'Incêndio' },
-    { value: 'violencia_domestica', label: 'Violência Doméstica' },
-    { value: 'outros', label: 'Outros' }
-  ];
 
   // Address search functionality using Mapbox for Ocorrências
   const searchOcorrenciaAddresses = useCallback(async (query) => {
@@ -463,19 +437,6 @@ const MainPage = () => {
   };
   
   
-  // Custom autocomplete states
-  const [usersItems, setUsersItems] = useState([]);
-  const [notificatorsItems, setNotificatorsItems] = useState([]);
-  const [notificationTypes, setNotificationTypes] = useState([]);
-  const [usersAutocompleteOpen, setUsersAutocompleteOpen] = useState(false);
-  const [notificatorsAutocompleteOpen, setNotificatorsAutocompleteOpen] = useState(false);
-  const [usersInputValue, setUsersInputValue] = useState('');
-  const [notificatorsInputValue, setNotificatorsInputValue] = useState('');
-  const [usersHighlightedIndex, setUsersHighlightedIndex] = useState(-1);
-  const [notificatorsHighlightedIndex, setNotificatorsHighlightedIndex] = useState(-1);
-  const usersInputRef = useRef(null);
-  const notificatorsInputRef = useRef(null);
-  
   // Logout handlers
   const confirmLogout = async () => {
     setShowLogoutModal(false);
@@ -542,225 +503,29 @@ const MainPage = () => {
   const user = useSelector((state) => state.session.user);
   const versionApp = import.meta.env.VITE_APP_VERSION;
   
-  // Check if user has mainMenu permission (always true - readonly)
   const hasMainMenuPermission = true;
-  
-  // Check if user has reports permission
-  const hasReportsPermission = useMemo(() => {
-    if (admin) return true;
-    if (!user || !user.attributes || !user.attributes.accessLevel) {
-      return true; // Default to true if no accessLevel attribute
-    }
-    try {
-      const accessLevel = JSON.parse(user.attributes.accessLevel);
-      return accessLevel.reports === true;
-    } catch (error) {
-      return true;
-    }
-  }, [user, admin]);
-  
-  // Check if user has geofences permission
-  const hasGeofencesPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.geofences !== false; // Only false if explicitly set to false
-      }
-    } catch (error) {}
-    return true; // Default to true
-  }, [user, admin]);
-  
-  // Check if user has settings permission
-  const hasSettingsPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.settings !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has notifications permission
-  const hasNotificationsPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.notifications !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has account permission
-  const hasAccountPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.account !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has devices permission
-  const hasDevicesPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.devices !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has groups permission
-  const hasGroupsPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.groups !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has drivers permission
-  const hasDriversPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.drivers !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has device list permission
-  const hasDeviceListPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.deviceList !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
 
-  const hasOcorrenciasPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.ocorrencias !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has calendars permission
-  const hasCalendarsPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.calendars !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has computed attributes permission
-  const hasComputedAttributesPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.computedAttributes !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has maintenance permission
-  const hasMaintenancePermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.maintenance !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has saved commands permission
-  const hasSavedCommandsPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.savedCommands !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has announcement permission
-  const hasAnnouncementPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.announcement !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has server permission
-  const hasServerPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.server !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has users permission
-  const hasUsersPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.users !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
-  
-  // Check if user has reseller panel permission
-  const hasResellerPanelPermission = useMemo(() => {
-    if (admin) return true;
-    try {
-      if (user?.attributes?.accessLevel) {
-        const accessLevel = JSON.parse(user.attributes.accessLevel);
-        return accessLevel.resellerPanel !== false;
-      }
-    } catch (error) {}
-    return true;
-  }, [user, admin]);
+  const {
+    hasReportsPermission,
+    hasGeofencesPermission,
+    hasSettingsPermission,
+    hasNotificationsPermission,
+    hasAccountPermission,
+    hasDevicesPermission,
+    hasGroupsPermission,
+    hasDriversPermission,
+    hasDeviceListPermission,
+    hasOcorrenciasPermission,
+    hasCalendarsPermission,
+    hasComputedAttributesPermission,
+    hasMaintenancePermission,
+    hasSavedCommandsPermission,
+    hasAnnouncementPermission,
+    hasDataAnalyticsPermission,
+    hasServerPermission,
+    hasUsersPermission,
+    hasResellerPanelPermission,
+  } = usePermissions();
   const versionServer = useSelector((state) => state.session.server.version);
   const isReseller = useSelector((state) => state.resellers.isReseller);
   const socket = useSelector((state) => state.session.socket);
@@ -845,81 +610,6 @@ const MainPage = () => {
     }
   };
 
-  // Search functionality
-  const searchAddresses = async (query) => {
-    if (!query.trim() || query.trim().length < 5) {
-      setSearchResults([]);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const request = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=geojson&polygon_geojson=1&addressdetails=1&limit=5`;
-      const response = await fetch(request);
-      const geojson = await response.json();
-      
-      const results = geojson.features.map((feature) => {
-        const center = [
-          feature.bbox[0] + (feature.bbox[2] - feature.bbox[0]) / 2,
-          feature.bbox[1] + (feature.bbox[3] - feature.bbox[1]) / 2,
-        ];
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: center,
-          },
-          place_name: feature.properties.display_name,
-          properties: feature.properties,
-          text: feature.properties.display_name,
-          place_type: ['place'],
-          center,
-        };
-      });
-      
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    
-    // Clear previous timeout
-    clearTimeout(window.searchTimeout);
-    
-    // Only search if query has at least 5 characters
-    if (query.trim().length >= 5) {
-      // Debounce search with 500ms delay
-      window.searchTimeout = setTimeout(() => {
-        searchAddresses(query);
-      }, 500);
-    } else {
-      // Clear results if less than 5 characters
-      setSearchResults([]);
-      setIsSearching(false);
-    }
-  };
-
-  // Handle search result selection
-  const handleSearchResultClick = (result) => {
-    if (map && result.center) {
-      map.easeTo({
-        center: result.center,
-        zoom: Math.max(map.getZoom(), 15),
-        duration: 1000
-      });
-    }
-    setShowSearch(false);
-    setSearchQuery('');
-    setSearchResults([]);
-  };
 
   
   // Server attributes hooks
@@ -927,368 +617,19 @@ const MainPage = () => {
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const serverAttributes = useServerAttributes(t);
   
-  // Server query and mutation
-  const { data: serverQueryData } = useQuery({
-    queryKey: ['server'],
-    queryFn: async () => {
-      const response = await fetch('/api/server');
-      return response.json();
-    },
-    enabled: showServerDrawer,
+  const {
+    serverData,
+    setServerData,
+    timezones,
+    updateServerMutation,
+    sendAnnouncementMutation,
+  } = useServerData({
+    showServerDrawer,
+    showAnnouncementDrawer,
+    onServerSaved: () => setShowServerDrawer(false),
+    onAnnouncementSent: () => setShowAnnouncementDrawer(false),
   });
 
-  // Timezones query
-  const { data: timezones = [] } = useQuery({
-    queryKey: ['timezones'],
-    queryFn: async () => {
-      const response = await fetchOrThrow('/api/server/timezones');
-      return response.json();
-    },
-    enabled: showServerDrawer,
-  });
-
-  // Update local server data when query data changes
-  useEffect(() => {
-    if (serverQueryData) {
-      setServerData(serverQueryData);
-    }
-  }, [serverQueryData]);
-
-  // Reset announcement data when drawer opens
-  useEffect(() => {
-    if (showAnnouncementDrawer) {
-      setAnnouncementData({
-        users: [],
-        notificator: '',
-        message: { subject: '', body: '' }
-      });
-    }
-  }, [showAnnouncementDrawer]);
-
-  // Update reseller data when drawer opens
-  useEffect(() => {
-    if (showResellerDrawer && user) {
-      setResellerData(prev => ({
-        ...prev,
-        currentDomain: window.location.hostname,
-        parentUserId: user.id || '',
-        parentUser: user.name || '',
-        parentEmail: user.email || ''
-      }));
-      setResellerErrors([]); // Clear errors when drawer opens
-    }
-  }, [showResellerDrawer, user]);
-
-  // Clear errors when user starts typing
-  const handleResellerFieldChange = (field, value) => {
-    setResellerData(prev => ({ ...prev, [field]: value }));
-    if (resellerErrors.length > 0) {
-      setResellerErrors([]);
-    }
-  };
-
-  // Debounced fetch users function for reseller form
-  const debouncedFetchResellerUsers = useCallback(() => {
-    const timeoutId = setTimeout(async () => {
-      if (resellerUsersFetched) return; // Only fetch once
-      
-      setResellerUsersLoading(true);
-      setResellerUsersError(null);
-      
-      try {
-        const response = await fetch('/api/users', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
-        }
-
-        const data = await response.json();
-        // Store all users for filtering, but show only first 10 initially
-        setResellerUsers(data || []);
-        setResellerUsersFetched(true);
-        
-        // Open autocomplete and focus after data loads
-        setTimeout(() => {
-          setResellerAutocompleteOpen(true);
-          setTimeout(() => {
-            const input = document.querySelector('input[aria-autocomplete="list"]');
-            if (input) {
-              input.focus();
-            }
-          }, 100);
-        }, 0);
-      } catch (error) {
-        console.error('Error fetching users for reseller:', error);
-        setResellerUsersError(error.message);
-      } finally {
-        setResellerUsersLoading(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [resellerUsersFetched]);
-
-  // Function to trigger debounced fetch
-  const fetchResellerUsers = () => {
-    if (!resellerUsersFetched) {
-      debouncedFetchResellerUsers();
-    }
-  };
-
-  // Fetch users data
-  useEffectAsync(async () => {
-    if (showAnnouncementDrawer) {
-      const response = await fetchOrThrow('/api/users');
-      setUsersItems(await response.json());
-    }
-  }, [showAnnouncementDrawer]);
-
-  // Fetch notificators data
-  useEffectAsync(async () => {
-    if (showAnnouncementDrawer) {
-      const response = await fetchOrThrow('/api/notifications/notificators?announcement=true');
-      setNotificatorsItems(await response.json());
-    }
-  }, [showAnnouncementDrawer]);
-
-  useEffectAsync(async () => {
-    if (showPreferencesDrawer && notificationTypes.length === 0) {
-      const response = await fetchOrThrow('/api/notifications/types');
-      setNotificationTypes(await response.json());
-    }
-  }, [showPreferencesDrawer]);
-
-  // Auto-link logic for Globalstar ignition
-  useEffectAsync(async () => {
-    if (user && admin) {
-      try {
-        const attrResponse = await fetch('/api/attributes/computed');
-        if (!attrResponse.ok) return;
-        const attributes = await attrResponse.json();
-
-        const expression = 'speed > 1.0 || (motion != null && motion) || (alarm != null && alarm.contains("vibration")) || (io2 != null && io2) || (in2 != null && in2)';
-        const description = 'Ignicao Virtual (Globalstar)';
-
-        let targetAttr = attributes.find(a => a.description === description);
-
-        if (!targetAttr || targetAttr.expression !== expression || targetAttr.priority !== 100) {
-          const method = targetAttr ? 'PUT' : 'POST';
-          const url = targetAttr ? `/api/attributes/computed/${targetAttr.id}` : '/api/attributes/computed';
-          const response = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...(targetAttr || {}),
-              description,
-              expression,
-              type: 'boolean',
-              attribute: 'ignition',
-              priority: 100,
-            }),
-          });
-          if (response.ok) {
-            targetAttr = method === 'POST' ? await response.json() : { ...targetAttr, expression, priority: 100 };
-          }
-        }
-
-        if (targetAttr) {
-          const devResponse = await fetch('/api/devices?all=true');
-          if (devResponse.ok) {
-            const devices = await devResponse.json();
-            const targetDevices = devices.filter(d => 
-              (d.model && d.model.toLowerCase().includes('atlastrax')) ||
-              (d.name && d.name.toLowerCase().includes('sat'))
-            );
-
-            for (const device of targetDevices) {
-              const linkedResponse = await fetch(`/api/attributes/computed?deviceId=${device.id}`);
-              if (linkedResponse.ok) {
-                const linkedAttrs = await linkedResponse.json();
-                const isLinked = linkedAttrs.some(a => a.id === targetAttr.id);
-
-                if (!isLinked) {
-                  await fetch('/api/permissions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      deviceId: device.id,
-                      attributeId: targetAttr.id,
-                    }),
-                  });
-                }
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Auto-link logic error:', error);
-      }
-    }
-  }, [user, admin]);
-
-  // Filtered options for custom autocomplete
-  const filteredUsersOptions = useMemo(() => {
-    if (!usersItems) return [];
-    if (!usersInputValue) return usersItems;
-    return usersItems.filter(item => 
-      item.name.toLowerCase().includes(usersInputValue.toLowerCase())
-    );
-  }, [usersItems, usersInputValue]);
-
-  const filteredNotificatorsOptions = useMemo(() => {
-    if (!notificatorsItems) return [];
-    if (!notificatorsInputValue) return notificatorsItems;
-    return notificatorsItems.filter(item => 
-      t(prefixString('notificator', item.type)).toLowerCase().includes(notificatorsInputValue.toLowerCase())
-    );
-  }, [notificatorsItems, notificatorsInputValue, t]);
-
-  // Users autocomplete handlers
-  const handleUsersInputChange = (event) => {
-    const value = event.target.value;
-    setUsersInputValue(value);
-    setUsersAutocompleteOpen(true);
-    setUsersHighlightedIndex(-1);
-  };
-
-  const handleUsersOptionSelect = (option) => {
-    const currentUsers = announcementData.users || [];
-    const isAlreadySelected = currentUsers.some(user => user.id === option.id);
-    
-    if (!isAlreadySelected) {
-      setAnnouncementData({
-        ...announcementData,
-        users: [...currentUsers, option]
-      });
-    }
-    
-    setUsersInputValue('');
-    setUsersAutocompleteOpen(false);
-    setUsersHighlightedIndex(-1);
-  };
-
-  const handleUsersRemove = (userToRemove) => {
-    const currentUsers = announcementData.users || [];
-    setAnnouncementData({
-      ...announcementData,
-      users: currentUsers.filter(user => user.id !== userToRemove.id)
-    });
-  };
-
-  const handleUsersFocus = () => {
-    setUsersInputValue('');
-    setUsersAutocompleteOpen(true);
-  };
-
-  const handleUsersBlur = () => {
-    setTimeout(() => {
-      setUsersAutocompleteOpen(false);
-      setUsersHighlightedIndex(-1);
-    }, 150);
-  };
-
-  // Notificators autocomplete handlers
-  const handleNotificatorsInputChange = (event) => {
-    const value = event.target.value;
-    setNotificatorsInputValue(value);
-    setNotificatorsAutocompleteOpen(true);
-    setNotificatorsHighlightedIndex(-1);
-  };
-
-  const handleNotificatorsOptionSelect = (option) => {
-    setAnnouncementData({
-      ...announcementData,
-      notificator: option.type
-    });
-    setNotificatorsInputValue(t(prefixString('notificator', option.type)));
-    setNotificatorsAutocompleteOpen(false);
-    setNotificatorsHighlightedIndex(-1);
-  };
-
-  const handleNotificatorsFocus = () => {
-    // Show current selection or clear for new search
-    if (announcementData.notificator) {
-      const selectedNotificator = notificatorsItems.find(item => item.type === announcementData.notificator);
-      if (selectedNotificator) {
-        setNotificatorsInputValue(t(prefixString('notificator', selectedNotificator.type)));
-      } else {
-        setNotificatorsInputValue('');
-      }
-    } else {
-      setNotificatorsInputValue('');
-    }
-    setNotificatorsAutocompleteOpen(true);
-  };
-
-  const handleNotificatorsBlur = () => {
-    setTimeout(() => {
-      setNotificatorsAutocompleteOpen(false);
-      setNotificatorsHighlightedIndex(-1);
-    }, 150);
-  };
-  
-  const updateServerMutation = useMutation({
-    mutationFn: async (data) => {
-      await fetchOrThrow('/api/server', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    },
-    onSuccess: () => {
-      setShowServerDrawer(false);
-    },
-  });
-
-  const sendAnnouncementMutation = useMutation({
-    mutationFn: async (data) => {
-      const query = new URLSearchParams();
-      data.users.forEach((user) => query.append('userId', user.id));
-      await fetchOrThrow(`/api/notifications/send/${data.notificator}?${query.toString()}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data.message),
-      });
-    },
-    onSuccess: () => {
-      setShowAnnouncementDrawer(false);
-    },
-  });
-
-  // Preferences functions
-  const generateToken = useCatch(async () => {
-    const expiration = dayjs(tokenExpiration, 'YYYY-MM-DD').toISOString();
-    const response = await fetchOrThrow('/api/session/token', {
-      method: 'POST',
-      body: new URLSearchParams(`expiration=${expiration}`),
-    });
-    setToken(await response.text());
-  });
-
-  const handlePreferencesSave = useCatch(async () => {
-    setPreferencesSaving(true);
-    try {
-      const response = await fetchOrThrow(`/api/users/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...user, attributes: preferencesAttributes }),
-      });
-      dispatch(sessionActions.updateUser(await response.json()));
-      setShowPreferencesDrawer(false);
-    } finally {
-      setPreferencesSaving(false);
-    }
-  });
-
-  const handleReboot = useCatch(async () => {
-    const response = await fetch('/api/server/reboot', { method: 'POST' });
-    throw Error(response.statusText);
-  });
 
   // User photo upload handler
   const handlePhotoUpload = useCatch(async (event) => {
@@ -1372,13 +713,6 @@ const MainPage = () => {
     }
   });
 
-  // Initialize preferences attributes when drawer opens
-  useEffect(() => {
-    if (showPreferencesDrawer && user) {
-      setPreferencesAttributes(user.attributes || {});
-    }
-  }, [showPreferencesDrawer, user]);
-
   // File upload handler
   const handleFileChange = useCallback(async (newFile) => {
     if (newFile) {
@@ -1394,41 +728,6 @@ const MainPage = () => {
     }
   }, []);
 
-  // Reseller file upload handler
-  const handleResellerFileUpload = useCallback(async (resellerData) => {
-    try {
-      // Create JSON string
-      const jsonString = JSON.stringify(resellerData, null, 2);
-      
-      // Create Blob with the JSON data
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      
-      // Create filename with appUrl_resellerId_parentUserId format
-      // Extract only domain from appUrl (remove http/https and slashes)
-      let appUrl = resellerData.appUrl || 'unknown';
-      if (appUrl !== 'unknown') {
-        appUrl = appUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-      }
-      const resellerId = resellerData.resellerId || 'unknown';
-      const parentUserId = resellerData.parentUserId || 'unknown';
-      const filename = `${appUrl}_${resellerId}_${parentUserId}.json`;
-      
-      // Create File object
-      const file = new File([blob], filename, { type: 'application/json' });
-      
-    
-      
-      // Upload to server
-      await fetchOrThrow(`/api/server/file/${filename}`, {
-        method: 'POST',
-        body: file,
-      });
-      
-      
-    } catch (error) {
-      console.error('Reseller file upload failed:', error);
-    }
-  }, []);
   const manager = useManager();
   const features = useFeatures();
   const disableReports = useRestriction('disableReports');
@@ -1555,7 +854,10 @@ const MainPage = () => {
   // Format event type using Traccar's formatter with custom sensor support
   const formatEventType = (event) => {
     const device = devices[event.deviceId];
-    
+
+    // Custom label takes priority (used by door sensor events)
+    if (event.attributes?.label) return event.attributes.label;
+
     // Check if this is a custom sensor event in attributes
     if (event.attributes) {
       const customSensorKeys = ['in1', 'in2', 'in3', 'in4', 'out1', 'out2', 'out3', 'out4', 'input', 'output'];
@@ -1650,22 +952,6 @@ const MainPage = () => {
       if (tooltip) tooltip.remove();
     });
   }, [isMenuExpanded]);
-
-  // Add CSS animation for loading spinner
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
 
   // Close events popover and map switcher when clicking outside
   useEffect(() => {
@@ -1848,6 +1134,7 @@ const MainPage = () => {
   const [vehiclesPopoverVisible, setVehiclesPopoverVisible] = useState(false);
   const [chipsPopoverVisible, setChipsPopoverVisible] = useState(false);
   const [smsTemplatesPopoverVisible, setSmsTemplatesPopoverVisible] = useState(false);
+  const [financialPopoverVisible, setFinancialPopoverVisible] = useState(false);
   const [routePlannerData, setRoutePlannerData] = useState(null);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [reportsPopoverVisible, setReportsPopoverVisible] = useState(false);
@@ -1870,6 +1157,7 @@ const MainPage = () => {
     setVehiclesPopoverVisible(false);
     setChipsPopoverVisible(false);
     setSmsTemplatesPopoverVisible(false);
+    setFinancialPopoverVisible(false);
     setReportsPopoverVisible(false);
     setShowServerDrawer(false);
     setShowPreferencesDrawer(false);
@@ -1967,12 +1255,15 @@ const MainPage = () => {
 
   // Fetch fleet map on mount and poll every 10 seconds
   useEffect(() => {
+    if (!admin && user?.clientBillingBlocked) {
+      return undefined;
+    }
     dispatch(fetchFleetMap());
     const interval = setInterval(() => {
       dispatch(fetchFleetMap());
     }, 10000); // 10 seconds
     return () => clearInterval(interval);
-  }, [dispatch]);
+  }, [dispatch, admin, user?.clientBillingBlocked]);
 
   return (
     <div className={classes.root}>
@@ -2069,6 +1360,12 @@ const MainPage = () => {
         isVisible={smsTemplatesPopoverVisible}
         onClose={() => setSmsTemplatesPopoverVisible(false)}
       />
+      <FloatingFinancialPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={financialPopoverVisible}
+        onClose={() => setFinancialPopoverVisible(false)}
+      />
       
       {/* Desktop Menu */}
       {desktop && hasMainMenuPermission && (
@@ -2079,7 +1376,7 @@ const MainPage = () => {
           width: isMenuExpanded ? '200px' : '55px',
           height: 'calc(100vh - 16px)',
           backgroundColor: colors.menuSurface,
-          borderRadius: (isDeviceListVisible || selectedDeviceId || isFleetListVisible || selectedPlate || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible || showReplayPopover || showResellersPopover || gestaoPopoverVisible || osPopoverVisible || clientsPopoverVisible || vehiclesPopoverVisible || chipsPopoverVisible || smsTemplatesPopoverVisible) ? '16px 0px 0px 16px' : '16px',
+          borderRadius: (isDeviceListVisible || selectedDeviceId || isFleetListVisible || selectedPlate || showUsersPopover || showCommandsPopover || showMaintenancePopover || showComputedAttributesPopover || showCalendarsPopover || showDriversPopover || showGroupsPopover || showDevicesPopover || showNotificationsPopover || geofencesPopoverVisible || reportsPopoverVisible || showReplayPopover || showResellersPopover || gestaoPopoverVisible || osPopoverVisible || clientsPopoverVisible || vehiclesPopoverVisible || chipsPopoverVisible || smsTemplatesPopoverVisible || financialPopoverVisible) ? '16px 0px 0px 16px' : '16px',
           zIndex: 10000,
           display: 'flex',
           flexDirection: 'column',
@@ -2394,6 +1691,74 @@ const MainPage = () => {
           </div>
           )}
           
+          {/* Data Analytics Icon */}
+          {hasDataAnalyticsPermission && (
+            <div style={{
+              width: '100%',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              borderRadius: '0px',
+              paddingLeft: isMenuExpanded ? '12px' : '0px',
+              transition: 'all 0.2s'
+            }}
+              onClick={() => {
+                const tooltip = document.getElementById('menu-tooltip-data-analytics');
+                if (tooltip) tooltip.remove();
+                setShowDataAnalyticsPopover(true);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.menuHover;
+                if (!isMenuExpanded) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const tooltip = document.createElement('div');
+                  tooltip.textContent = 'Data Analytics';
+                  tooltip.id = 'menu-tooltip-data-analytics';
+                  tooltip.style.cssText = `
+                  position: fixed;
+                  left: ${rect.right + 8}px;
+                  top: ${rect.top + rect.height / 2}px;
+                  transform: translateY(-50%);
+                  background: ${colors.menuText};
+                  color: ${colors.menuSurface};
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  white-space: nowrap;
+                  z-index: 10001;
+                  pointer-events: none;
+                  box-shadow: ${colors.menuShadow};
+                `;
+                  document.body.appendChild(tooltip);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                if (!isMenuExpanded) {
+                  const tooltip = document.getElementById('menu-tooltip-data-analytics');
+                  if (tooltip) tooltip.remove();
+                }
+              }}>
+              <MdDataObject style={{ fontSize: 18, color: colors.textSecondary }} />
+              {isMenuExpanded && (
+                <span style={{
+                  marginLeft: '12px',
+                  color: colors.textSecondary,
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '1.5'
+                }}>
+                  Data Analytics
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Geofences Icon */}
           {hasGeofencesPermission && (
           <div style={{
@@ -2873,6 +2238,74 @@ const MainPage = () => {
           </div>
           )}
 
+          {/* Roles Management */}
+          {manager && (
+            <div style={{
+              width: '100%',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              borderRadius: '0px',
+              paddingLeft: isMenuExpanded ? '12px' : '0px',
+              transition: 'all 0.2s'
+            }}
+              onClick={() => {
+                const tooltip = document.getElementById('menu-tooltip-roles');
+                if (tooltip) tooltip.remove();
+                setShowRolesPopover(true);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.menuHover;
+                if (!isMenuExpanded) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const tooltip = document.createElement('div');
+                  tooltip.textContent = t('rolesTitle');
+                  tooltip.id = 'menu-tooltip-roles';
+                  tooltip.style.cssText = `
+                  position: fixed;
+                  left: ${rect.right + 8}px;
+                  top: ${rect.top + rect.height / 2}px;
+                  transform: translateY(-50%);
+                  background: ${colors.menuText};
+                  color: ${colors.menuSurface};
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 500;
+                  white-space: nowrap;
+                  z-index: 10001;
+                  pointer-events: none;
+                  box-shadow: ${colors.menuShadow};
+                `;
+                  document.body.appendChild(tooltip);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                if (!isMenuExpanded) {
+                  const tooltip = document.getElementById('menu-tooltip-roles');
+                  if (tooltip) tooltip.remove();
+                }
+              }}>
+              <LuShieldAlert style={{ fontSize: 18, color: colors.textSecondary }} />
+              {isMenuExpanded && (
+                <span style={{
+                  marginLeft: '12px',
+                  color: colors.textSecondary,
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '1.5'
+                }}>
+                  {t('rolesTitle')}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Simcards Icon */}
           {!readonly && hasDevicesPermission && admin && (
           <div style={{
@@ -3011,6 +2444,141 @@ const MainPage = () => {
           </div>
           )}
           
+          {!readonly && hasDevicesPermission && admin && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-financial');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            setFinancialPopoverVisible(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Financeiro';
+              tooltip.id = 'menu-tooltip-financial';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-financial');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                Financeiro
+              </span>
+            )}
+          </div>
+          )}
+          {!readonly && !admin && (
+          <div style={{
+            width: '100%',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isMenuExpanded ? 'flex-start' : 'center',
+            cursor: 'pointer',
+            position: 'relative',
+            borderRadius: '0px',
+            paddingLeft: isMenuExpanded ? '12px' : '0px',
+            transition: 'all 0.2s'
+          }}
+          onClick={() => {
+            const tooltip = document.getElementById('menu-tooltip-my-financial');
+            if (tooltip) tooltip.remove();
+            closeAllPanels();
+            navigate('/meu-financeiro');
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.menuHover;
+            if (!isMenuExpanded) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const tooltip = document.createElement('div');
+              tooltip.textContent = 'Meu Financeiro';
+              tooltip.id = 'menu-tooltip-my-financial';
+              tooltip.style.cssText = `
+                position: fixed;
+                left: ${rect.right + 8}px;
+                top: ${rect.top + rect.height / 2}px;
+                transform: translateY(-50%);
+                background: ${colors.menuText};
+                color: ${colors.menuSurface};
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                z-index: 10001;
+                pointer-events: none;
+                box-shadow: ${colors.menuShadow};
+              `;
+              document.body.appendChild(tooltip);
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!isMenuExpanded) {
+              const tooltip = document.getElementById('menu-tooltip-my-financial');
+              if (tooltip) tooltip.remove();
+            }
+          }}>
+            <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary }} />
+            {isMenuExpanded && (
+              <span style={{
+                marginLeft: '12px',
+                color: colors.textSecondary,
+                fontSize: '14px',
+                fontWeight: '400',
+                whiteSpace: 'nowrap',
+                lineHeight: '1.5'
+              }}>
+                Meu Financeiro
+              </span>
+            )}
+          </div>
+          )}
+
           {/* Notifications Icon */}
           {!readonly && hasNotificationsPermission && (
           <div style={{
@@ -4002,7 +3570,7 @@ const MainPage = () => {
       <FloatingFleetList
         desktop={desktop}
         isMenuExpanded={isMenuExpanded}
-        isVisible={desktop ? (isFleetListVisible || selectedPlate) : false} // Desktop: visible if toggled OR vehicle selected, Mobile: hidden
+        isVisible={(desktop && (isFleetListVisible || selectedPlate)) || (!desktop && isFleetListVisible)}
         geofencesPopoverVisible={geofencesPopoverVisible}
         onDrawerOpen={() => setDrawerOpen(true)}
       />
@@ -5232,106 +4800,11 @@ const MainPage = () => {
       </AnimatePresence>
       
       {/* Logout Confirmation Modal */}
-      <AnimatePresence>
-        {showLogoutModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10000
-            }}
-            onClick={cancelLogout}
-          >
-            <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -50, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                backgroundColor: colors.surface,
-                borderRadius: '8px',
-                padding: '20px',
-                maxWidth: '400px',
-                width: '90%',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p style={{
-                margin: '0 0 20px 0',
-                fontSize: '16px',
-                color: colors.text,
-                lineHeight: '1.5'
-              }}>
-                {t('confirmQuit')}
-              </p>
-              <div style={{
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'space-between'
-              }}>
-                <button
-                  onClick={cancelLogout}
-                  style={{
-                    padding: '8px 16px',
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '6px',
-                    backgroundColor: colors.secondary,
-                    color: colors.text,
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = colors.hover;
-                    e.target.style.color = colors.text;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = colors.secondary;
-                    e.target.style.color = colors.text;
-                  }}
-                >
-                  {t('sharedCancel')}
-                </button>
-                <button
-                  onClick={confirmLogout}
-                  style={{
-                    padding: '8px 16px',
-                    border: '1px solid #FECACA',
-                    borderRadius: '6px',
-                    backgroundColor: '#FEF2F2',
-                    color: '#DC2626',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#FEE2E2';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#FEF2F2';
-                  }}
-                >
-                  {t('loginLogout')}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LogoutModal
+        open={showLogoutModal}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
       
       {/* Users Management Popover */}
       <FloatingUsersPopover
@@ -5412,6 +4885,28 @@ const MainPage = () => {
         onClose={() => setShowResellersPopover(false)}
       />
 
+      {/* Data Analytics Popover */}
+      <FloatingDataAnalyticsPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showDataAnalyticsPopover}
+        onClose={() => setShowDataAnalyticsPopover(false)}
+      />
+
+      {/* Roles Management Popover */}
+      <FloatingRolesPopover
+        desktop={desktop}
+        isMenuExpanded={isMenuExpanded}
+        isVisible={showRolesPopover}
+        onClose={() => setShowRolesPopover(false)}
+      />
+
+      {/* Users Management Modal */}
+      <UsersModal
+        open={showUsersModal}
+        onClose={() => setShowUsersModal(false)}
+      />
+
       {/* Notifications Management Popover */}
       <FloatingNotificationsPopover
         desktop={desktop}
@@ -5421,3272 +4916,74 @@ const MainPage = () => {
       />
       
       {/* Server Settings Drawer */}
-      <AnimatePresence>
-        {showServerDrawer && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowServerDrawer(false)}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 9999,
-              }}
-            />
-            
-            {/* Server Drawer */}
-            <motion.div
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: desktop ? '400px' : '100vw',
-                height: '100vh',
-                backgroundColor: colors.surface,
-                borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
-                zIndex: 10000,
-                boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {/* Drawer Header */}
-              <div style={{
-                padding: '16px 20px',
-                borderBottom: `1px solid ${colors.border}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <IconButton
-                    onClick={() => setShowServerDrawer(false)}
-                    size="small"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    <ChevronLeftIcon fontSize="small" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    {t('settingsServer')}
-                  </Typography>
-                </div>
-                <IconButton
-                  onClick={() => updateServerMutation.mutate(serverData)}
-                  disabled={updateServerMutation.isPending}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                    width: '40px',
-                    height: '40px',
-                  }}
-                  title={updateServerMutation.isPending ? t('sharedSaving') : t('sharedSave')}
-                >
-                  {updateServerMutation.isPending ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    <SaveIcon />
-                  )}
-                </IconButton>
-              </div>
-
-              {/* Drawer Content */}
-              <div style={{ 
-                flex: 1, 
-                overflow: 'auto', 
-                padding: '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                paddingBottom: '200px'
-              }}>
-                {serverData && (
-                  <>
-                    {/* Server Tabs */}
-                    <Tabs
-                      value={activeServerTab}
-                      onChange={(e, newValue) => setActiveServerTab(newValue)}
-                      variant="scrollable"
-                      scrollButtons="auto"
-                      style={{
-                        marginBottom: '16px',
-                      }}
-                      sx={{
-                        '& .MuiTab-root': {
-                          color: '#666666',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          textTransform: 'none',
-                          minHeight: '40px',
-                          padding: '8px 16px',
-                          '&.Mui-selected': {
-                            color: '#1976d2',
-                            fontWeight: '600',
-                            backgroundColor: 'transparent',
-                          },
-                          '&:hover': {
-                            color: '#1976d2',
-                            backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                          },
-                          '&.Mui-selected:hover': {
-                            color: '#1976d2',
-                            backgroundColor: 'rgba(25, 118, 210, 0.15)',
-                          },
-                        },
-                        '& .MuiTabs-indicator': {
-                          backgroundColor: '#1976d2',
-                          height: '2px',
-                        },
-                      }}
-                    >
-                      <Tab label={t('sharedPreferences')} />
-                      <Tab label={t('sharedLocation')} />
-                      <Tab label={t('sharedPermissions')} />
-                      <Tab label={t('sharedFile')} />
-                      <Tab label={t('sharedAttributes')} />
-                    </Tabs>
-
-                    {/* Preferences Tab */}
-                    {activeServerTab === 0 && (
-                      <Box sx={{ paddingTop: '16px' }}>
-                        <TextField
-                          fullWidth
-                          value={serverData.mapUrl || ''}
-                          onChange={(event) => setServerData({ ...serverData, mapUrl: event.target.value })}
-                          label={t('mapCustomLabel')}
-                          margin="normal"
-                        />
-                        <TextField
-                          fullWidth
-                          value={serverData.overlayUrl || ''}
-                          onChange={(event) => setServerData({ ...serverData, overlayUrl: event.target.value })}
-                          label={t('mapOverlayCustom')}
-                          margin="normal"
-                        />
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('mapDefault')}</InputLabel>
-                          <Select
-                            label={t('mapDefault')}
-                            value={serverData.map || 'locationIqStreets'}
-                            onChange={(e) => setServerData({ ...serverData, map: e.target.value })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 },
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': {
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          >
-                            {mapStyles.filter((style) => style.available).map((style) => (
-                              <MenuItem key={style.id} value={style.id}>
-                                <Typography component="span">{style.title}</Typography>
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('settingsCoordinateFormat')}</InputLabel>
-                          <Select
-                            label={t('settingsCoordinateFormat')}
-                            value={serverData.coordinateFormat || 'dd'}
-                            onChange={(event) => setServerData({ ...serverData, coordinateFormat: event.target.value })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 },
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': {
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          >
-                            <MenuItem value="dd">{t('sharedDecimalDegrees')}</MenuItem>
-                            <MenuItem value="ddm">{t('sharedDegreesDecimalMinutes')}</MenuItem>
-                            <MenuItem value="dms">{t('sharedDegreesMinutesSeconds')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('settingsSpeedUnit')}</InputLabel>
-                          <Select
-                            label={t('settingsSpeedUnit')}
-                            value={serverData.attributes?.speedUnit || 'kn'}
-                            onChange={(e) => setServerData({ 
-                              ...serverData, 
-                              attributes: { ...serverData.attributes, speedUnit: e.target.value } 
-                            })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 },
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': {
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          >
-                            <MenuItem value="kn">{t('sharedKn')}</MenuItem>
-                            <MenuItem value="kmh">{t('sharedKmh')}</MenuItem>
-                            <MenuItem value="mph">{t('sharedMph')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('settingsDistanceUnit')}</InputLabel>
-                          <Select
-                            label={t('settingsDistanceUnit')}
-                            value={serverData.attributes?.distanceUnit || 'km'}
-                            onChange={(e) => setServerData({ 
-                              ...serverData, 
-                              attributes: { ...serverData.attributes, distanceUnit: e.target.value } 
-                            })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 },
-                              PaperProps: {
-                                style: {
-                                  backgroundColor: colors.surface,
-                                  border: `1px solid ${colors.border}`,
-                                  zIndex: 10002,
-                                }
-                              }
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                backgroundColor: colors.secondary,
-                                '& fieldset': { borderColor: colors.border },
-                                '&:hover fieldset': { borderColor: colors.primary },
-                                '&.Mui-focused fieldset': { borderColor: colors.primary },
-                              },
-                              '& .MuiInputLabel-root': {
-                                color: colors.textSecondary,
-                                '&.Mui-focused': { color: colors.primary }
-                              },
-                            }}
-                          >
-                            <MenuItem value="km">{t('sharedKm')}</MenuItem>
-                            <MenuItem value="mi">{t('sharedMi')}</MenuItem>
-                            <MenuItem value="nmi">{t('sharedNmi')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('settingsAltitudeUnit')}</InputLabel>
-                          <Select
-                            label={t('settingsAltitudeUnit')}
-                            value={serverData.attributes?.altitudeUnit || 'm'}
-                            onChange={(e) => setServerData({ 
-                              ...serverData, 
-                              attributes: { ...serverData.attributes, altitudeUnit: e.target.value } 
-                            })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 }
-                            }}
-                          >
-                            <MenuItem value="m">{t('sharedMeters')}</MenuItem>
-                            <MenuItem value="ft">{t('sharedFeet')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('settingsVolumeUnit')}</InputLabel>
-                          <Select
-                            label={t('settingsVolumeUnit')}
-                            value={serverData.attributes?.volumeUnit || 'ltr'}
-                            onChange={(e) => setServerData({ 
-                              ...serverData, 
-                              attributes: { ...serverData.attributes, volumeUnit: e.target.value } 
-                            })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10002 }
-                            }}
-                          >
-                            <MenuItem value="ltr">{t('sharedLiter')}</MenuItem>
-                            <MenuItem value="usGal">{t('sharedUsGallon')}</MenuItem>
-                            <MenuItem value="impGal">{t('sharedImpGallon')}</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel>{t('sharedTimezone')}</InputLabel>
-                          <Select
-                            label={t('sharedTimezone')}
-                            value={serverData.attributes?.timezone || ''}
-                            onChange={(e) => setServerData({ 
-                              ...serverData, 
-                              attributes: { ...serverData.attributes, timezone: e.target.value } 
-                            })}
-                            MenuProps={{
-                              disablePortal: false,
-                              style: { zIndex: 10005 }
-                            }}
-                            style={{ width: '100%', minWidth: '100%' }}
-                            sx={{ width: '100% !important', minWidth: '100% !important' }}
-                          >
-                            {timezones.map((timezone) => (
-                              <MenuItem key={timezone} value={timezone}>
-                                {timezone}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        <TextField
-                          fullWidth
-                          value={serverData.poiLayer || ''}
-                          onChange={(event) => setServerData({ ...serverData, poiLayer: event.target.value })}
-                          label={t('mapPoiLayer')}
-                          margin="normal"
-                        />
-                        <TextField
-                          fullWidth
-                          value={serverData.announcement || ''}
-                          onChange={(event) => setServerData({ ...serverData, announcement: event.target.value })}
-                          label={t('serverAnnouncement')}
-                          margin="normal"
-                        />
-                        <FormGroup>
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.forceSettings} 
-                                onChange={(event) => setServerData({ ...serverData, forceSettings: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('serverForceSettings')}
-                          />
-                        </FormGroup>
-                      </Box>
-                    )}
-
-                    {/* Location Tab */}
-                    {activeServerTab === 1 && (
-                      <Box sx={{ paddingTop: '16px' }}>
-                        <TextField
-                          fullWidth
-                          type="number"
-                          value={serverData.latitude || 0}
-                          onChange={(event) => setServerData({ ...serverData, latitude: Number(event.target.value) })}
-                          label={t('positionLatitude')}
-                          margin="normal"
-                        />
-                        <TextField
-                          fullWidth
-                          type="number"
-                          value={serverData.longitude || 0}
-                          onChange={(event) => setServerData({ ...serverData, longitude: Number(event.target.value) })}
-                          label={t('positionLongitude')}
-                          margin="normal"
-                        />
-                        <TextField
-                          fullWidth
-                          type="number"
-                          value={serverData.zoom || 0}
-                          onChange={(event) => setServerData({ ...serverData, zoom: Number(event.target.value) })}
-                          label={t('serverZoom')}
-                          margin="normal"
-                        />
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => {
-                            const { lng, lat } = map.getCenter();
-                            setServerData({
-                              ...serverData,
-                              latitude: Number(lat.toFixed(6)),
-                              longitude: Number(lng.toFixed(6)),
-                              zoom: Number(map.getZoom().toFixed(1)),
-                            });
-                          }}
-                          style={{ marginTop: '16px' }}
-                        >
-                          {t('mapCurrentLocation')}
-                        </Button>
-                      </Box>
-                    )}
-
-                    {/* Permissions Tab */}
-                    {activeServerTab === 2 && (
-                      <Box sx={{ paddingTop: '16px' }}>
-                        <FormGroup>
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.registration} 
-                                onChange={(event) => setServerData({ ...serverData, registration: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('serverRegistration')}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.readonly} 
-                                onChange={(event) => setServerData({ ...serverData, readonly: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('serverReadonly')}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.deviceReadonly} 
-                                onChange={(event) => setServerData({ ...serverData, deviceReadonly: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('userDeviceReadonly')}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.limitCommands} 
-                                onChange={(event) => setServerData({ ...serverData, limitCommands: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('userLimitCommands')}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.disableReports} 
-                                onChange={(event) => setServerData({ ...serverData, disableReports: event.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('userDisableReports')}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={serverData.fixedEmail} 
-                                onChange={(e) => setServerData({ ...serverData, fixedEmail: e.target.checked })}
-                                sx={{
-                                  color: colors.textSecondary,
-                                  '&:hover': {
-                                    backgroundColor: `${colors.primary}20`,
-                                  },
-                                  '&.Mui-checked': {
-                                    color: colors.primary,
-                                    '&:hover': {
-                                      backgroundColor: `${colors.primary}30`,
-                                    },
-                                  },
-                                  '&.MuiCheckbox-root': {
-                                    color: colors.textSecondary,
-                                  },
-                                }}
-                              />
-                            }
-                            label={t('userFixedEmail')}
-                          />
-                        </FormGroup>
-                      </Box>
-                    )}
-
-                    {/* File Tab */}
-                    {activeServerTab === 3 && (
-                      <Box sx={{ paddingTop: '16px' }}>
-                        <MuiFileInput
-                          placeholder={t('sharedSelectFile')}
-                          value={null}
-                          onChange={handleFileChange}
-                          fullWidth
-                          margin="normal"
-                        />
-                        <Typography variant="body2" color="textSecondary" style={{ marginTop: '8px', fontSize: '12px' }}>
-                          {t('serverFileDescription')}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Attributes Tab */}
-                    {activeServerTab === 4 && (
-                      <Box sx={{ paddingTop: '16px' }}>
-                        <EditAttributesAccordion
-                          attributes={serverData.attributes}
-                          setAttributes={(attributes) => setServerData({ ...serverData, attributes })}
-                          definitions={{ ...commonUserAttributes, ...commonDeviceAttributes, ...serverAttributes }}
-                        />
-                      </Box>
-                    )}
-                  </>
-                )}
-              </div>
-
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ServerDrawer
+        open={showServerDrawer}
+        onClose={() => setShowServerDrawer(false)}
+        serverData={serverData}
+        setServerData={setServerData}
+        timezones={timezones}
+        mapStyles={mapStyles}
+        commonUserAttributes={commonUserAttributes}
+        commonDeviceAttributes={commonDeviceAttributes}
+        serverAttributes={serverAttributes}
+        updateServerMutation={updateServerMutation}
+        handleFileChange={handleFileChange}
+      />
 
       {/* Reseller Drawer */}
-      <AnimatePresence>
-        {showResellerDrawer && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowResellerDrawer(false)}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 9999,
-              }}
-            />
-            
-            {/* Reseller Drawer */}
-            <motion.div
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: desktop ? '400px' : '100vw',
-                height: '100vh',
-                backgroundColor: colors.surface,
-                borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
-                zIndex: 10000,
-                boxShadow: desktop ? '-4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {/* Drawer Header */}
-              <div style={{
-                padding: '16px 20px',
-                borderBottom: `1px solid ${colors.border}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <IconButton
-                    onClick={() => setShowResellerDrawer(false)}
-                    size="small"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    <ChevronLeftIcon fontSize="small" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    {t('resellerPanel')}
-                  </Typography>
-                </div>
-                <IconButton
-                  onClick={async () => {
-                    const errors = [];
-                    
-                    // Validate required fields
-                    const requiredFields = [
-                      { key: 'resellerId', label: t('resellerId') },
-                      { key: 'resellerUser', label: t('resellerUser') },
-                      { key: 'resellerEmail', label: t('resellerEmail') },
-                      { key: 'companyName', label: t('resellerCompanyName') },
-                      { key: 'logo', label: t('resellerLogotype') },
-                      { key: 'url', label: t('resellerAppUrl') },
-                      { key: 'whatsapp', label: t('resellerWhatsapp') },
-                      { key: 'billingEmail', label: t('resellerBillingEmail') },
-                      { key: 'supportEmail', label: t('resellerSupportEmail') },
-                      { key: 'resellerLimit', label: t('resellerLimit') },
-                      { key: 'deviceLimit', label: t('userDeviceLimit') },
-                      { key: 'userLimit', label: t('userUserLimit') }
-                    ];
-
-                    // Special validation for resellerId - must be a valid user ID
-                    if (!resellerData.resellerId || resellerData.resellerId === '' || isNaN(resellerData.resellerId)) {
-                      errors.push(t('resellerId') + ' (must select a valid user)');
-                    }
-
-                    requiredFields.forEach(field => {
-                      const value = resellerData[field.key];
-                      if (!value || (typeof value === 'string' && value.trim() === '')) {
-                        errors.push(field.label);
-                      }
-                    });
-
-                    // Validate email format
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (resellerData.resellerEmail && !emailRegex.test(resellerData.resellerEmail)) {
-                      errors.push(`${t('resellerEmail')} has invalid format`);
-                    }
-                    if (resellerData.billingEmail && !emailRegex.test(resellerData.billingEmail)) {
-                      errors.push(`${t('resellerBillingEmail')} has invalid format`);
-                    }
-                    if (resellerData.supportEmail && !emailRegex.test(resellerData.supportEmail)) {
-                      errors.push(`${t('resellerSupportEmail')} has invalid format`);
-                    }
-
-                    // Validate number fields are positive
-                    if (resellerData.resellerLimit) {
-                      const limit = parseInt(resellerData.resellerLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('resellerLimit')} must be a positive number`);
-                      }
-                    }
-                    if (resellerData.deviceLimit) {
-                      const limit = parseInt(resellerData.deviceLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('userDeviceLimit')} must be a positive number`);
-                      }
-                    }
-                    if (resellerData.userLimit) {
-                      const limit = parseInt(resellerData.userLimit);
-                      if (isNaN(limit) || limit < 1) {
-                        errors.push(`${t('userUserLimit')} must be a positive number`);
-                      }
-                    }
-
-                    // If there are errors, show them and stop
-                    if (errors.length > 0) {
-                      setResellerErrors(errors);
-                      return;
-                    }
-
-                    // Clear any previous errors
-                    setResellerErrors([]);
-
-                    // Create JSON object with all reseller fields
-                    const resellerJson = {
-                      currentDomain: resellerData.currentDomain,
-                      parentUserId: resellerData.parentUserId,
-                      parentUser: resellerData.parentUser,
-                      parentEmail: resellerData.parentEmail,
-                      resellerId: resellerData.resellerId.trim(),
-                      resellerUser: resellerData.resellerUser.trim(),
-                      resellerEmail: resellerData.resellerEmail.trim(),
-                      companyName: resellerData.companyName.trim(),
-                      logotype: resellerData.logo.trim(),
-                      appUrl: resellerData.url.trim(),
-                      whatsapp: resellerData.whatsapp.trim(),
-                      billingEmail: resellerData.billingEmail.trim(),
-                      supportEmail: resellerData.supportEmail.trim(),
-                      resellerLimit: parseInt(resellerData.resellerLimit) || 0,
-                      deviceLimit: parseInt(resellerData.deviceLimit) || 0,
-                      userLimit: parseInt(resellerData.userLimit) || 0,
-                      timestamp: new Date().toISOString(),
-                      createdBy: user?.name || 'Unknown',
-                      createdById: user?.id || null
-                    };
-                    
-                    // Upload file to server
-                    await handleResellerFileUpload(resellerJson);
-                    
-                    // Close drawer on success
-                    setShowResellerDrawer(false);
-                  }}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                    width: '40px',
-                    height: '40px',
-                  }}
-                  title={t('sharedSave')}
-                >
-                  <SaveIcon />
-                </IconButton>
-              </div>
-
-              {/* Drawer Content */}
-              <div style={{ 
-                flex: 1, 
-                overflow: 'auto', 
-                padding: '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-              }}>
-                {/* Hidden fields */}
-                <input type="hidden" value={resellerData.currentDomain} name="currentDomain" />
-                <input type="hidden" value={resellerData.parentUserId} name="parentUserId" />
-                <input type="hidden" value={resellerData.parentUser} name="parentUser" />
-                <input type="hidden" value={resellerData.parentEmail} name="parentEmail" />
-                
-                {/* Reseller Tabs */}
-                <Tabs
-                  value={activeResellerTab}
-                  onChange={(e, newValue) => setActiveResellerTab(newValue)}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                  style={{
-                    marginBottom: '16px',
-                  }}
-                  sx={{
-                    '& .MuiTab-root': {
-                      color: '#666666',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      textTransform: 'none',
-                      minHeight: '40px',
-                      padding: '8px 16px',
-                      '&.Mui-selected': {
-                        color: '#1976d2',
-                        fontWeight: '600',
-                        backgroundColor: 'transparent',
-                      },
-                      '&:hover': {
-                        color: '#1976d2',
-                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                      },
-                      '&.Mui-selected:hover': {
-                        color: '#1976d2',
-                        backgroundColor: 'rgba(25, 118, 210, 0.15)',
-                      },
-                    },
-                    '& .MuiTabs-indicator': {
-                      backgroundColor: '#1976d2',
-                      height: '2px',
-                    },
-                  }}
-                >
-                  <Tab label={t('resellerBranding')} />
-                  <Tab label={t('resellerContact')} />
-                  <Tab label={t('resellerPermissions')} />
-                </Tabs>
-
-                {/* Tab Content */}
-                <Box style={{ flex: 1, overflow: 'auto', paddingTop: '16px' }}>
-                  {/* Branding Tab */}
-                  {activeResellerTab === 0 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      
-                <Autocomplete
-                  fullWidth
-                  options={resellerUsers}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') return option;
-                    const name = option.name || option.email || `User ${option.id}`;
-                    return `${option.id} - ${name}`;
-                  }}
-                  value={resellerUsers.find(user => user.id === resellerData.resellerId) || null}
-                  onChange={(event, newValue) => {
-                    if (typeof newValue === 'string') {
-                      // User typed something, find matching user
-                      const matchingUser = resellerUsers.find(user => {
-                        const name = user.name || user.email || `User ${user.id}`;
-                        const displayName = `${user.id} - ${name}`;
-                        return displayName.toLowerCase() === newValue.toLowerCase();
-                      });
-                      if (matchingUser) {
-                        setResellerData(prev => ({
-                          ...prev,
-                          resellerId: matchingUser.id,
-                          resellerUser: matchingUser.login || matchingUser.email,
-                          resellerEmail: matchingUser.email
-                        }));
-                      } else {
-                        handleResellerFieldChange('resellerId', newValue);
-                      }
-                    } else if (newValue) {
-                      // User selected from dropdown
-                      setResellerData(prev => ({
-                        ...prev,
-                        resellerId: newValue.id,
-                        resellerUser: newValue.login || newValue.email,
-                        resellerEmail: newValue.email
-                      }));
-                    } else {
-                      // Cleared selection
-                      setResellerData(prev => ({
-                        ...prev,
-                        resellerId: '',
-                        resellerUser: '',
-                        resellerEmail: ''
-                      }));
-                    }
-                  }}
-                  onFocus={fetchResellerUsers}
-                  loading={resellerUsersLoading}
-                  disabled={resellerUsersLoading}
-                  open={resellerAutocompleteOpen}
-                  onOpen={() => setResellerAutocompleteOpen(true)}
-                  onClose={() => setTimeout(() => setResellerAutocompleteOpen(false), 0)}
-                  filterOptions={(options, { inputValue }) => {
-                    if (!inputValue) {
-                      // Show only first 10 users when no input
-                      return options.slice(0, 10);
-                    }
-                    // Filter from all users when typing
-                    return options.filter(option => {
-                      const id = option.id.toString().toLowerCase();
-                      const name = (option.name || '').toLowerCase();
-                      const email = (option.email || '').toLowerCase();
-                      const login = (option.login || '').toLowerCase();
-                      const searchValue = inputValue.toLowerCase();
-                      return id.includes(searchValue) || 
-                             name.includes(searchValue) || 
-                             email.includes(searchValue) || 
-                             login.includes(searchValue);
-                    });
-                  }}
-                  freeSolo={true}
-                  selectOnFocus={false}
-                  clearOnBlur={false}
-                  handleHomeEndKeys={true}
-                  autoSelect={false}
-                  autoComplete={false}
-                  disablePortal={true}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                  label={t('resellerId')}
-                  required
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {resellerUsersLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                      }}
-                    />
-                  )}
-                  renderOption={(props, option) => {
-                    const { key, ...otherProps } = props;
-                    return (
-                      <Box component="li" key={key} {...otherProps}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
-                          <Typography variant="body2" style={{ color: colors.text, fontWeight: '500' }}>
-                            {option.id} - {option.name || option.email || `User ${option.id}`}
-                          </Typography>
-                          <Typography variant="caption" style={{ color: colors.textSecondary, fontSize: '10px' }}>
-                            {option.login || option.email || 'No login/email'}
-                          </Typography>
-                        </div>
-                      </Box>
-                    );
-                  }}
-                  noOptionsText={resellerUsersError ? `${t('sharedError')}: ${resellerUsersError}` : t('sharedNoData')}
-                  PopperComponent={(props) => {
-                    const { disablePortal, anchorEl, ...filteredProps } = props;
-                    return (
-                      <div 
-                        {...filteredProps} 
-                        style={{ 
-                          ...props.style, 
-                          zIndex: 10001
-                        }} 
-                      />
-                    );
-                  }}
-                  sx={{
-                    '& .MuiAutocomplete-popper': {
-                      zIndex: '10001 !important',
-                    },
-                    '& .MuiAutocomplete-listbox': {
-                      zIndex: '10001 !important',
-                    },
-                    '& .MuiPaper-root': {
-                      zIndex: '10001 !important',
-                    }
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                        value={resellerData.companyName}
-                        onChange={(e) => handleResellerFieldChange('companyName', e.target.value)}
-                        label={t('resellerCompanyName')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                        value={resellerData.logo}
-                        onChange={(e) => handleResellerFieldChange('logo', e.target.value)}
-                        label={t('resellerLogotype')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                        value={resellerData.url}
-                        onChange={(e) => handleResellerFieldChange('url', e.target.value)}
-                        label={t('resellerAppUrl')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                    </div>
-                  )}
-
-                  {/* Contact Tab */}
-                  {activeResellerTab === 1 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                
-                <TextField
-                  fullWidth
-                        value={resellerData.resellerUser}
-                        label={t('resellerUser')}
-                  required
-                  InputProps={{
-                    readOnly: true
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                        value={resellerData.resellerEmail}
-                        label={t('resellerEmail')}
-                        type="email"
-                  required
-                  InputProps={{
-                    readOnly: true
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.whatsapp}
-                  onChange={(e) => handleResellerFieldChange('whatsapp', e.target.value)}
-                  label={t('resellerWhatsapp')}
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.billingEmail}
-                  onChange={(e) => handleResellerFieldChange('billingEmail', e.target.value)}
-                  label={t('resellerBillingEmail')}
-                  type="email"
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.supportEmail}
-                  onChange={(e) => handleResellerFieldChange('supportEmail', e.target.value)}
-                  label={t('resellerSupportEmail')}
-                  type="email"
-                  required
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                    </div>
-                  )}
-
-                  {/* Permissions Tab */}
-                  {activeResellerTab === 2 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.resellerLimit}
-                  onChange={(e) => handleResellerFieldChange('resellerLimit', e.target.value)}
-                  label={t('resellerLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.deviceLimit}
-                  onChange={(e) => handleResellerFieldChange('deviceLimit', e.target.value)}
-                  label={t('userDeviceLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                
-                <TextField
-                  fullWidth
-                  value={resellerData.userLimit}
-                  onChange={(e) => handleResellerFieldChange('userLimit', e.target.value)}
-                  label={t('userUserLimit')}
-                  type="number"
-                  required
-                  inputProps={{ min: 1 }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: colors.secondary,
-                      '& fieldset': { borderColor: colors.border },
-                      '&:hover fieldset': { borderColor: colors.primary },
-                      '&.Mui-focused fieldset': { borderColor: colors.primary },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: colors.textSecondary,
-                      '&.Mui-focused': { color: colors.primary }
-                    },
-                  }}
-                />
-                    </div>
-                  )}
-                </Box>
-                
-                {/* Error Messages - Below Form Fields */}
-                {resellerErrors.length > 0 && (
-                  <div style={{
-                    padding: '16px',
-                    border: `2px solid #f44336`,
-                    borderRadius: '8px',
-                    backgroundColor: '#ffebee',
-                    marginTop: '16px'
-                  }}>
-                    <Typography variant="body2" style={{ color: '#d32f2f', fontWeight: '600', marginBottom: '8px' }}>
-                      {t('sharedError')}: {t('sharedRequiredFields')}
-                    </Typography>
-                    {resellerErrors.map((error, index) => (
-                      <Typography key={`reseller-error-${index}-${error.slice(0, 20)}`} variant="body2" style={{ color: '#d32f2f', marginBottom: '4px' }}>
-                        • {error}
-                      </Typography>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ResellerDrawer
+        open={showResellerDrawer}
+        onClose={() => setShowResellerDrawer(false)}
+      />
 
       {/* Preferences Drawer */}
-      <AnimatePresence>
-        {showPreferencesDrawer && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowPreferencesDrawer(false)}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 9999,
-              }}
-            />
-            
-            {/* Preferences Drawer */}
-            <motion.div
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: desktop ? '400px' : '100vw',
-                height: '100vh',
-                backgroundColor: colors.surface,
-                borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
-                zIndex: 10000,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Header */}
-              <div style={{
-                padding: '16px 20px',
-                borderBottom: `1px solid ${colors.border}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}15)`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <IconButton
-                    onClick={() => setShowPreferencesDrawer(false)}
-                    size="small"
-                    style={{ color: colors.textSecondary }}
-                  >
-                    <ChevronLeftIcon fontSize="small" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ color: colors.text, fontWeight: '600', margin: 0, lineHeight: 1.8 }}>
-                    {activePreferencesTab === 0 && t('mapTitle')}
-                    {activePreferencesTab === 1 && t('deviceTitle')}
-                    {activePreferencesTab === 2 && t('sharedSound')}
-                    {activePreferencesTab === 3 && t('userToken')}
-                    {activePreferencesTab === 4 && t('sharedInfoTitle')}
-                    {activePreferencesTab === 5 && t('sharedNotification')}
-                  </Typography>
-                </div>
-                <IconButton
-                  onClick={handlePreferencesSave}
-                  disabled={preferencesSaving}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                    width: '40px',
-                    height: '40px',
-                  }}
-                  title={preferencesSaving ? t('sharedSaving') : t('sharedSave')}
-                >
-                  {preferencesSaving ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    <SaveIcon />
-                  )}
-                </IconButton>
-              </div>
+      <PreferencesDrawer
+        open={showPreferencesDrawer}
+        onClose={() => setShowPreferencesDrawer(false)}
+      />
 
-              {/* Content */}
-              <div style={{ 
-                flex: 1, 
-                overflow: 'auto', 
-                padding: '16px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                paddingBottom: '200px'
-              }}>
-                {/* Preferences Tabs */}
-                <Tabs
-                  value={activePreferencesTab}
-                  onChange={(e, newValue) => setActivePreferencesTab(newValue)}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                  style={{
-                    borderBottom: `1px solid ${colors.border}`,
-                    marginBottom: '16px',
-                  }}
-                  sx={{
-                    '& .MuiTab-root': {
-                      color: '#666666',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      textTransform: 'none',
-                      minHeight: '40px',
-                      padding: '8px 16px',
-                      '&.Mui-selected': {
-                        color: '#1976d2',
-                        fontWeight: '600',
-                        backgroundColor: 'transparent',
-                      },
-                      '&:hover': {
-                        color: '#1976d2',
-                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                      },
-                      '&.Mui-selected:hover': {
-                        color: '#1976d2',
-                        backgroundColor: 'rgba(25, 118, 210, 0.15)',
-                      },
-                    },
-                    '& .MuiTabs-indicator': {
-                      backgroundColor: '#1976d2',
-                      height: '2px',
-                    },
-                  }}
-                >
-                  <Tab label={t('mapTitle')} />
-                  <Tab label={t('deviceTitle')} />
-                  <Tab label={t('sharedSound')} />
-                  <Tab label={t('userToken')} />
-                  <Tab label={t('sharedInfoTitle')} />
-                  <Tab label={t('sharedNotification')} />
-                </Tabs>
-
-                {/* Map Tab */}
-                {activePreferencesTab === 0 && (
-                  <Box>
-                    {!readonly && (
-                      <>
-                        {/* Map Settings */}
-                        <div style={{ marginBottom: '24px' }}>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('mapActive')}</InputLabel>
-                    <Select
-                      label={t('mapActive')}
-                      value={(preferencesAttributes.activeMapStyles || DEFAULT_ACTIVE_MAP_STYLES).split(',').map((s) => s.trim()).filter(Boolean)}
-                      onChange={(e) => {
-                        setPreferencesAttributes({ ...preferencesAttributes, activeMapStyles: e.target.value.join(',') });
-                      }}
-                      multiple
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      {mapStyles.map((style) => (
-                        <MenuItem key={style.id} value={style.id}>
-                          <Typography component="span" color={style.available ? 'textPrimary' : 'error'}>{style.title}</Typography>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('mapOverlay')}</InputLabel>
-                    <Select
-                      label={t('mapOverlay')}
-                      value={preferencesAttributes.selectedMapOverlay || ''}
-                      onChange={(e) => {
-                        setPreferencesAttributes({ ...preferencesAttributes, selectedMapOverlay: e.target.value });
-                      }}
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      <MenuItem value="">{'\u00a0'}</MenuItem>
-                      {mapOverlays.map((overlay) => (
-                        <MenuItem key={overlay.id} value={overlay.id}>
-                          <Typography component="span" color={overlay.available ? 'textPrimary' : 'error'}>{overlay.title}</Typography>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    openOnFocus
-                    blurOnSelect={false}
-                    open={popupInfoOpen}
-                    onOpen={() => setPopupInfoOpen(true)}
-                    onClose={() => setPopupInfoOpen(false)}
-                    options={Object.keys(positionAttributes)}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'object' && option.inputValue) {
-                        return option.inputValue;
-                      }
-                      return positionAttributes[option]?.name || option;
-                    }}
-                    value={preferencesAttributes.positionItems?.split(',') || ['fixTime', 'address', 'speed', 'totalDistance']}
-                    onChange={(_, newValue) => {
-                      setPreferencesAttributes({ ...preferencesAttributes, positionItems: newValue.map((x) => (typeof x === 'string' ? x : x.inputValue)).join(','), });
-                    }}
-                    filterOptions={(options, params) => {
-                      const filtered = createFilter(options, params);
-                      if (params.inputValue && !options.includes(params.inputValue)) {
-                        filtered.push({ inputValue: params.inputValue, name: `${t('sharedAdd')} "${params.inputValue}"` });
-                      }
-                      return filtered;
-                    }}
-                    renderOption={(props, option) => (
-                      <li {...props}>{option.name ? option.name : (positionAttributes[option]?.name || option)}</li>
-                    )}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label={t('attributePopupInfo')} 
-                        margin="normal"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            backgroundColor: colors.secondary,
-                            '& fieldset': { borderColor: colors.border },
-                            '&:hover fieldset': { borderColor: colors.primary },
-                            '&.Mui-focused fieldset': { borderColor: colors.primary },
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: colors.textSecondary,
-                            '&.Mui-focused': { color: colors.primary }
-                          },
-                        }}
-                      />
-                    )}
-                    ListboxProps={{
-                      disablePortal: false,
-                      style: {
-                        backgroundColor: colors.surface,
-                        border: `1px solid ${colors.border}`,
-                        zIndex: 99999,
-                      }
-                    }}
-                    PopperComponent={(props) => {
-                      const { disablePortal, anchorEl, ...divProps } = props;
-                      return (
-                        <div {...divProps} style={{ ...props.style, zIndex: 99999 }} />
-                      );
-                    }}
-                  />
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('mapLiveRoutes')}</InputLabel>
-                    <Select
-                      label={t('mapLiveRoutes')}
-                      value={preferencesAttributes.mapLiveRoutes || 'none'}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapLiveRoutes: e.target.value })}
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      <MenuItem value="none">{t('sharedDisabled')}</MenuItem>
-                      <MenuItem value="selected">{t('deviceSelected')}</MenuItem>
-                      <MenuItem value="all">{t('notificationAlways')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('mapDirection')}</InputLabel>
-                    <Select
-                      label={t('mapDirection')}
-                      value={preferencesAttributes.mapDirection || 'selected'}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapDirection: e.target.value })}
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      <MenuItem value="none">{t('sharedDisabled')}</MenuItem>
-                      <MenuItem value="selected">{t('deviceSelected')}</MenuItem>
-                      <MenuItem value="all">{t('notificationAlways')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                  
-                  <FormGroup style={{ marginTop: '16px' }}>
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          checked={preferencesAttributes.hasOwnProperty('mapGeofences') ? preferencesAttributes.mapGeofences : true}
-                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapGeofences: e.target.checked })}
-                          sx={{
-                            color: colors.textSecondary,
-                            '&:hover': {
-                              backgroundColor: `${colors.primary}20`,
-                            },
-                            '&.Mui-checked': {
-                              color: colors.primary,
-                              '&:hover': {
-                                backgroundColor: `${colors.primary}30`,
-                              },
-                            },
-                            '&.MuiCheckbox-root': {
-                              color: colors.textSecondary,
-                            },
-                          }}
-                        />
-                      )}
-                      label={t('attributeShowGeofences')}
-                      style={{ color: colors.text }}
-                    />
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          checked={preferencesAttributes.hasOwnProperty('mapFollow') ? preferencesAttributes.mapFollow : false}
-                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapFollow: e.target.checked })}
-                          sx={{
-                            color: colors.textSecondary,
-                            '&:hover': {
-                              backgroundColor: `${colors.primary}20`,
-                            },
-                            '&.Mui-checked': {
-                              color: colors.primary,
-                              '&:hover': {
-                                backgroundColor: `${colors.primary}30`,
-                              },
-                            },
-                            '&.MuiCheckbox-root': {
-                              color: colors.textSecondary,
-                            },
-                          }}
-                        />
-                      )}
-                      label={t('deviceFollow')}
-                      style={{ color: colors.text }}
-                    />
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          checked={preferencesAttributes.hasOwnProperty('mapCluster') ? preferencesAttributes.mapCluster : true}
-                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapCluster: e.target.checked })}
-                          sx={{
-                            color: colors.textSecondary,
-                            '&:hover': {
-                              backgroundColor: `${colors.primary}20`,
-                            },
-                            '&.Mui-checked': {
-                              color: colors.primary,
-                              '&:hover': {
-                                backgroundColor: `${colors.primary}30`,
-                              },
-                            },
-                            '&.MuiCheckbox-root': {
-                              color: colors.textSecondary,
-                            },
-                          }}
-                        />
-                      )}
-                      label={t('mapClustering')}
-                      style={{ color: colors.text }}
-                    />
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          checked={preferencesAttributes.hasOwnProperty('mapOnSelect') ? preferencesAttributes.mapOnSelect : true}
-                          onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, mapOnSelect: e.target.checked })}
-                          sx={{
-                            color: colors.textSecondary,
-                            '&:hover': {
-                              backgroundColor: `${colors.primary}20`,
-                            },
-                            '&.Mui-checked': {
-                              color: colors.primary,
-                              '&:hover': {
-                                backgroundColor: `${colors.primary}30`,
-                              },
-                            },
-                            '&.MuiCheckbox-root': {
-                              color: colors.textSecondary,
-                            },
-                          }}
-                        />
-                      )}
-                      label={t('mapOnSelect')}
-                      style={{ color: colors.text }}
-                    />
-                  </FormGroup>
-                        </div>
-                      </>
-                    )}
-                  </Box>
-                )}
-
-                {/* Device Tab */}
-                {activePreferencesTab === 1 && (
-                  <Box>
-                    {!readonly && (
-                      <>
-                        {/* Device Settings */}
-                        <div style={{ marginBottom: '24px' }}>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('devicePrimaryInfo')}</InputLabel>
-                    <Select
-                      label={t('devicePrimaryInfo')}
-                      value={preferencesAttributes.devicePrimary || 'name'}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, devicePrimary: e.target.value })}
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      {deviceFields.map((field) => (
-                        <MenuItem key={field.id} value={field.id}>
-                          {t(field.name)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('deviceSecondaryInfo')}</InputLabel>
-                    <Select
-                      label={t('deviceSecondaryInfo')}
-                      value={preferencesAttributes.deviceSecondary || ''}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, deviceSecondary: e.target.value })}
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      <MenuItem value="">{'\u00a0'}</MenuItem>
-                      {deviceFields.map((field) => (
-                        <MenuItem key={field.id} value={field.id}>
-                          {t(field.name)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                        </div>
-                      </>
-                    )}
-                  </Box>
-                )}
-
-                {/* Sound Tab */}
-                {activePreferencesTab === 2 && (
-                  <Box>
-                    {!readonly && (
-                      <>
-                        {/* Sound Settings */}
-                        <div style={{ marginBottom: '24px' }}>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('eventsSoundEvents')}</InputLabel>
-                    <Select
-                      label={t('eventsSoundEvents')}
-                      value={preferencesAttributes.soundEvents?.split(',') || []}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundEvents: e.target.value.join(',') })}
-                      multiple
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      {/* Event types would be loaded from API */}
-                    </Select>
-                  </FormControl>
-                  
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>{t('eventsSoundAlarms')}</InputLabel>
-                    <Select
-                      label={t('eventsSoundAlarms')}
-                      value={preferencesAttributes.soundAlarms?.split(',') || ['sos']}
-                      onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, soundAlarms: e.target.value.join(',') })}
-                      multiple
-                      MenuProps={{
-                        disablePortal: false,
-                        style: { zIndex: 10010 },
-                        PaperProps: {
-                          style: {
-                            backgroundColor: colors.surface,
-                            border: `1px solid ${colors.border}`,
-                            zIndex: 10010,
-                          }
-                        }
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: colors.secondary,
-                          '& fieldset': { borderColor: colors.border },
-                          '&:hover fieldset': { borderColor: colors.primary },
-                          '&.Mui-focused fieldset': { borderColor: colors.primary },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: colors.textSecondary,
-                          '&.Mui-focused': { color: colors.primary }
-                        },
-                      }}
-                    >
-                      {alarms.map((alarm) => (
-                        <MenuItem key={alarm.key} value={alarm.key}>
-                          {alarm.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                        </div>
-                      </>
-                    )}
-                  </Box>
-                )}
-
-                {/* User Token Tab */}
-                {activePreferencesTab === 3 && (
-                  <Box>
-                    {/* User Token */}
-                    <div style={{ marginBottom: '24px' }}>
-                  
-                  <TextField
-                    fullWidth
-                    label={t('userExpirationTime')}
-                    type="date"
-                    value={tokenExpiration}
-                    onChange={(e) => {
-                      setTokenExpiration(e.target.value);
-                      setToken(null);
-                    }}
-                    margin="normal"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
-                      },
-                      '& .MuiInputLabel-root': {
-                        color: colors.textSecondary,
-                        '&.Mui-focused': { color: colors.primary }
-                      },
-                    }}
-                  />
-                  
-                  <FormControl fullWidth margin="normal">
-                    <OutlinedInput
-                      multiline
-                      rows={6}
-                      readOnly
-                      type="text"
-                      value={token || ''}
-                      endAdornment={(
-                        <InputAdornment position="end">
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <IconButton size="small" edge="end" onClick={generateToken} disabled={!!token}>
-                              <CachedIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton size="small" edge="end" onClick={() => navigator.clipboard.writeText(token)} disabled={!token}>
-                              <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                          </div>
-                        </InputAdornment>
-                      )}
-                      sx={{
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
-                      }}
-                    />
-                  </FormControl>
-                    </div>
-                  </Box>
-                )}
-
-                {/* System Info Tab */}
-                {activePreferencesTab === 4 && (
-                  <Box>
-                    {!readonly && (
-                      <>
-                        {/* System Info */}
-                        <div style={{ marginBottom: '24px' }}>
-                  
-                  <TextField
-                    fullWidth
-                    value={versionApp}
-                    label={t('settingsAppVersion')}
-                    disabled
-                    margin="normal"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                      },
-                      '& .MuiInputLabel-root': {
-                        color: colors.textSecondary,
-                      },
-                    }}
-                  />
-                  
-                  <TextField
-                    fullWidth
-                    value={versionServer || '-'}
-                    label={t('settingsServerVersion')}
-                    disabled
-                    margin="normal"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                      },
-                      '& .MuiInputLabel-root': {
-                        color: colors.textSecondary,
-                      },
-                    }}
-                  />
-                  
-                  <TextField
-                    fullWidth
-                    value={socket ? t('deviceStatusOnline') : t('deviceStatusOffline')}
-                    label={t('settingsConnection')}
-                    disabled
-                    margin="normal"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                      },
-                      '& .MuiInputLabel-root': {
-                        color: colors.textSecondary,
-                      },
-                    }}
-                  />
-                  
-                  <Button
-                    variant="outlined"
-                    onClick={() => window.location.href = '/emulator'}
-                    style={{
-                      borderColor: colors.border,
-                      color: colors.text,
-                      marginTop: '16px',
-                    }}
-                  >
-                    {t('sharedEmulator')}
-                  </Button>
-                  
-                  {admin && (
-                    <Button
-                      variant="outlined"
-                      onClick={handleReboot}
-                      style={{
-                        borderColor: '#f44336',
-                        color: '#f44336',
-                        marginTop: '16px',
-                        marginLeft: '12px',
-                      }}
-                    >
-                      {t('serverReboot')}
-                    </Button>
-                  )}
-                        </div>
-                      </>
-                    )}
-                  </Box>
-                )}
-
-                {activePreferencesTab === 5 && (
-                  <Box>
-                    {!readonly && (
-                      <>
-                        <div style={{ marginBottom: '24px' }}>
-                          <FormControl fullWidth margin="normal">
-                            <InputLabel>{t('eventsVisibleTypes')}</InputLabel>
-                            <Select
-                              label={t('eventsVisibleTypes')}
-                              value={preferencesAttributes.visibleEventTypes?.split(',').filter(Boolean) || []}
-                              onChange={(e) => setPreferencesAttributes({ ...preferencesAttributes, visibleEventTypes: e.target.value.join(',') })}
-                              multiple
-                              MenuProps={{
-                                disablePortal: false,
-                                style: { zIndex: 10010 },
-                                PaperProps: {
-                                  style: {
-                                    backgroundColor: colors.surface,
-                                    border: `1px solid ${colors.border}`,
-                                    zIndex: 10010,
-                                  },
-                                },
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  backgroundColor: colors.secondary,
-                                  '& fieldset': { borderColor: colors.border },
-                                  '&:hover fieldset': { borderColor: colors.primary },
-                                  '&.Mui-focused fieldset': { borderColor: colors.primary },
-                                },
-                                '& .MuiInputLabel-root': {
-                                  color: colors.textSecondary,
-                                  '&.Mui-focused': { color: colors.primary },
-                                },
-                              }}
-                            >
-                              {notificationTypes.map((nt) => (
-                                <MenuItem key={nt.type} value={nt.type}>
-                                  {t(prefixString('event', nt.type))}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                          <Typography variant="caption" style={{ color: colors.textSecondary, display: 'block', marginTop: '8px' }}>
-                            {t('eventsVisibleTypesDescription')}
-                          </Typography>
-                        </div>
-                      </>
-                    )}
-                  </Box>
-                )}
-
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Announcement Drawer - Slides in from right */}
-      <AnimatePresence>
-        {showAnnouncementDrawer && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 10000,
-              }}
-              onClick={() => setShowAnnouncementDrawer(false)}
-            />
-
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: desktop ? '400px' : '100vw',
-                height: '100vh',
-                backgroundColor: colors.surface,
-                borderLeft: desktop ? `1px solid ${colors.border}` : 'none',
-                zIndex: 10001,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {/* Header */}
-              <div style={{
-                padding: '20px',
-                borderBottom: `1px solid ${colors.border}`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-              }}>
-                <ChevronLeftIcon 
-                  style={{ 
-                    cursor: 'pointer', 
-                    color: colors.textSecondary,
-                    fontSize: '24px'
-                  }}
-                  onClick={() => setShowAnnouncementDrawer(false)}
-                />
-                <Typography variant="h6" style={{ color: colors.text, fontWeight: '600' }}>
-                  {t('serverAnnouncement')}
-                </Typography>
-              </div>
-
-              {/* Content */}
-              <div style={{
-                flex: 1,
-                padding: '20px',
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-              }}>
-                {/* Form Fields */}
-                    {/* Users Multi-Select */}
-                    <Box sx={{ position: 'relative', width: '100%' }}>
-                      <TextField
-                        ref={usersInputRef}
-                        label={t('settingsUsers')}
-                        value={usersInputValue}
-                        onChange={handleUsersInputChange}
-                        onFocus={handleUsersFocus}
-                        onBlur={handleUsersBlur}
-                        fullWidth
-                        autoComplete="off"
-                        placeholder={t('reportShow')}
-                      />
-                      {usersAutocompleteOpen && filteredUsersOptions.length > 0 && (
-                        <Paper
-                          sx={(theme) => ({
-                            position: 'fixed',
-                            zIndex: 10002,
-                            maxHeight: '200px',
-                            minWidth: '200px',
-                            overflow: 'auto',
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: theme.shape.borderRadius,
-                            boxShadow: theme.shadows[8],
-                            backgroundColor: theme.palette.background.paper,
-                            mt: 0.5,
-                            '&::-webkit-scrollbar': {
-                              display: 'none',
-                            },
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                          })}
-                          style={{
-                            left: usersInputRef.current?.getBoundingClientRect().left || 0,
-                            top: (usersInputRef.current?.getBoundingClientRect().bottom || 0) + 4,
-                            width: usersInputRef.current?.getBoundingClientRect().width || 200,
-                          }}
-                        >
-                          <List dense>
-                            {filteredUsersOptions.map((option, index) => (
-                              <ListItem
-                                key={option.id}
-                                onClick={() => handleUsersOptionSelect(option)}
-                                style={{
-                                  backgroundColor: index === usersHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
-                                  cursor: 'pointer',
-                                }}
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                  }
-                                }}
-                              >
-                                <ListItemText primary={option.name} />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Paper>
-                      )}
-                      {/* Selected Users Chips */}
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                        {announcementData.users?.map((user) => (
-                          <Chip
-                            key={user.id}
-                            label={user.name}
-                            onDelete={() => handleUsersRemove(user)}
-                            deleteIcon={<CloseIcon />}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-
-                    {/* Notificators Single-Select */}
-                    <Box sx={{ position: 'relative', width: '100%' }}>
-                      <TextField
-                        ref={notificatorsInputRef}
-                        label={t('notificationNotificators')}
-                        value={notificatorsInputValue}
-                        onChange={handleNotificatorsInputChange}
-                        onFocus={handleNotificatorsFocus}
-                        onBlur={handleNotificatorsBlur}
-                        fullWidth
-                        autoComplete="off"
-                        placeholder={t('reportShow')}
-                      />
-                      {notificatorsAutocompleteOpen && filteredNotificatorsOptions.length > 0 && (
-                        <Paper
-                          sx={(theme) => ({
-                            position: 'fixed',
-                            zIndex: 10002,
-                            maxHeight: '200px',
-                            minWidth: '200px',
-                            overflow: 'auto',
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: theme.shape.borderRadius,
-                            boxShadow: theme.shadows[8],
-                            backgroundColor: theme.palette.background.paper,
-                            mt: 0.5,
-                            '&::-webkit-scrollbar': {
-                              display: 'none',
-                            },
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                          })}
-                          style={{
-                            left: notificatorsInputRef.current?.getBoundingClientRect().left || 0,
-                            top: (notificatorsInputRef.current?.getBoundingClientRect().bottom || 0) + 4,
-                            width: notificatorsInputRef.current?.getBoundingClientRect().width || 200,
-                          }}
-                        >
-                          <List dense>
-                            {filteredNotificatorsOptions.map((option, index) => (
-                              <ListItem
-                                key={option.type}
-                                onClick={() => handleNotificatorsOptionSelect(option)}
-                                style={{
-                                  backgroundColor: index === notificatorsHighlightedIndex ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                  }
-                                }}
-                                sx={{
-                                  '&:hover': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                  }
-                                }}
-                              >
-                                <ListItemText primary={t(prefixString('notificator', option.type))} />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Paper>
-                      )}
-                      {/* Selected Notificator Chip */}
-                      {announcementData.notificator && (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                          <Chip
-                            label={t(prefixString('notificator', announcementData.notificator))}
-                            onDelete={() => setAnnouncementData({
-                              ...announcementData,
-                              notificator: ''
-                            })}
-                            deleteIcon={<CloseIcon />}
-                            size="small"
-                          />
-                        </Box>
-                      )}
-                    </Box>
-
-                {/* Message Fields */}
-                <TextField
-                      fullWidth
-                      value={announcementData.message.subject || ''}
-                      onChange={(e) => setAnnouncementData({ 
-                        ...announcementData, 
-                        message: { ...announcementData.message, subject: e.target.value }
-                      })}
-                      label={t('sharedSubject')}
-                      variant="outlined"
-                    />
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={4}
-                      value={announcementData.message.body || ''}
-                      onChange={(e) => setAnnouncementData({ 
-                        ...announcementData, 
-                        message: { ...announcementData.message, body: e.target.value }
-                      })}
-                      label={t('commandMessage')}
-                      variant="outlined"
-                    />
-              </div>
-
-              {/* Footer */}
-              <div style={{
-                padding: '20px',
-                borderTop: `1px solid ${colors.border}`,
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'flex-end',
-              }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowAnnouncementDrawer(false)}
-                  style={{
-                    borderColor: colors.border,
-                    color: colors.textSecondary,
-                  }}
-                >
-                  {t('sharedCancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => sendAnnouncementMutation.mutate(announcementData)}
-                  disabled={sendAnnouncementMutation.isPending || !announcementData.users?.length || !announcementData.notificator || !announcementData.message.subject || !announcementData.message.body}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.text,
-                  }}
-                >
-                  {sendAnnouncementMutation.isPending ? t('sharedSending') : t('commandSend')}
-                </Button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-      
-
+      {/* Announcement Drawer */}
+      <AnnouncementDrawer
+        open={showAnnouncementDrawer}
+        onClose={() => setShowAnnouncementDrawer(false)}
+        sendMutation={sendAnnouncementMutation}
+      />
       {/* Mobile Drawer Menu */}
       {!desktop && (
-        <AnimatePresence>
-          {drawerOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setDrawerOpen(false)}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 9999,
-              }}
-            />
-            
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '-100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '-100%', opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: desktop ? '320px' : '280px',
-                height: '100vh',
-                backgroundColor: colors.surface,
-                borderRight: `1px solid ${colors.border}`,
-                zIndex: 10000,
-                display: 'flex',
-                flexDirection: 'column',
-                boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
-              }}
-            >
-              {/* Drawer Header */}
-              <div style={{
-                padding: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}>
-                {domainLookupCompleted && (() => {
-                  // Priority: Reseller logo > Server logo > Server inverted logo > Fallback
-                  const logoUrl = getLogoUrl() || logo || logoInverted;
-                  
-                  // Only show logo if we have a valid URL
-                  if (!logoUrl) return null;
-                  
-                  return (
-                    <img 
-                      src={logoUrl} 
-                      alt="Server Logo" 
-                      style={{ 
-                        maxWidth: '100%',
-                        maxHeight: '36px',
-                        width: 'auto',
-                        height: 'auto',
-                        objectFit: 'contain'
-                      }}
-                      onError={(e) => {
-                        // Fallback to server logo or default
-                        const fallbackUrl = logo || logoInverted || fallbackLogo;
-                        e.target.src = fallbackUrl;
-                      }}
-                    />
-                  );
-                })()}
-              </div>
-
-              {/* Drawer Content */}
-              <div style={{ 
-                flex: 1, 
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden'
-              }}>
-                {/* Menu Items */}
-                <div style={{ 
-                  flex: 1,
-                  overflow: 'auto',
-                  padding: '0'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    gap: '0'
-                  }}>
-                  {/* Reports */}
-                  {!disableReports && hasReportsPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setReportsPopoverVisible(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <PieChart size={18} color={colors.textSecondary} style={{ marginRight: '12px' }} />
-                      {t('reportTitle')}
-                    </button>
-                  )}
-
-                  {/* Settings */}
-                  {hasSettingsPermission && (
-                  <button
-                    onClick={() => {
-                      closeAllPanels();
-                      setShowPreferencesDrawer(true);
-                      setDrawerOpen(false);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px 20px',
-                      background: 'none',
-                      border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                      margin: '0',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      width: '100%',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: colors.text,
-                      fontSize: '14px',
-                      fontWeight: '400',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.menuHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <AiOutlineSetting style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                    {t('settingsTitle')}
-                  </button>
-                  )}
-
-                  {/* Notifications */}
-                  {!readonly && hasNotificationsPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowNotificationsPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <NotificationsOutlinedIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedNotifications')}
-                    </button>
-                  )}
-
-                  {/* Devices Management */}
-                  {!readonly && hasDevicesPermission && admin && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowDevicesPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <PiMapPinAreaLight style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('deviceTitle')}
-                    </button>
-                  )}
-
-                  {/* Simcards */}
-                  {!readonly && hasDevicesPermission && admin && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setChipsPopoverVisible(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <SimCardIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      Simcards
-                    </button>
-                  )}
-
-                  {/* Painel SMS */}
-                  {!readonly && hasDevicesPermission && admin && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setSmsTemplatesPopoverVisible(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <MessageIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      Painel SMS
-                    </button>
-                  )}
-
-                  {/* Groups */}
-                  {!readonly && !features.disableGroups && hasGroupsPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowGroupsPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineTeam style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsGroups')}
-                    </button>
-                  )}
-
-                  {/* Drivers */}
-                  {!readonly && !features.disableDrivers && hasDriversPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowDriversPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <PiSteeringWheelLight style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedDrivers')}
-                    </button>
-                  )}
-
-                  {/* Calendars */}
-                  {!readonly && !features.disableCalendars && hasCalendarsPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowCalendarsPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineCalendar style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedCalendars')}
-                    </button>
-                  )}
-
-                  {/* Computed Attributes */}
-                  {!readonly && !features.disableComputedAttributes && hasComputedAttributesPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowComputedAttributesPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineDatabase style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedComputedAttributes')}
-                    </button>
-                  )}
-
-                  {/* Maintenance */}
-                  {!readonly && !features.disableMaintenance && hasMaintenancePermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowMaintenancePopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <HiOutlineWrenchScrewdriver style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedMaintenance')}
-                    </button>
-                  )}
-
-                  {/* Saved Commands */}
-                  {!readonly && !features.disableSavedCommands && hasSavedCommandsPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowCommandsPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineSend style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('sharedSavedCommands')}
-                    </button>
-                  )}
-
-                  {/* Billing Link */}
-                  {billingLink && (
-                    <button
-                      onClick={() => {
-                        window.open(billingLink, '_blank');
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <PaymentIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('userBilling')}
-                    </button>
-                  )}
-
-                  {/* Support Link */}
-                  {supportLink && (
-                    <button
-                      onClick={() => {
-                        window.open(supportLink, '_blank');
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <HelpIcon style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsSupport')}
-                    </button>
-                  )}
-
-                  {/* Manager Section - Server Announcement */}
-                  {manager && hasAnnouncementPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowAnnouncementDrawer(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineSound style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('serverAnnouncement')}
-                    </button>
-                  )}
-
-                  {/* Manager Section - Server Settings */}
-                  {manager && admin && hasServerPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowServerDrawer(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineCloudServer style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsServer')}
-                    </button>
-                  )}
-                  
-                  {/* Users Management */}
-                  {manager && hasUsersPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowUsersPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                        outline: 'none',
-                        boxShadow: 'none',
-                        borderRadius: '0',
-                        margin: '0',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <AiOutlineUsergroupAdd style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('settingsUsers')}
-                    </button>
-                  )}
-
-                  {/* Reseller Management */}
-                  {(admin || isReseller) && hasResellerPanelPermission && (
-                    <button
-                      onClick={() => {
-                        closeAllPanels();
-                        setShowResellersPopover(true);
-                        setDrawerOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 20px',
-                        background: 'none',
-                        border: 'none',
-                        outline: 'none',
-                        boxShadow: 'none',
-                        borderRadius: '0',
-                        margin: '0',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        color: colors.text,
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.menuHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <HiMiniCubeTransparent style={{ fontSize: 18, color: colors.textSecondary, marginRight: '12px' }} />
-                      {t('resellerPanel')}
-                    </button>
-                  )}
-
-                  </div>
-                </div>
-
-                {/* Logout Button - Fixed at Bottom */}
-                <div style={{
-                  padding: '0',
-                  borderTop: `1px solid ${colors.border}`
-                }}>
-                  <button
-                    onClick={() => {
-                      setShowLogoutModal(true);
-                      setDrawerOpen(false);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px 20px',
-                      background: 'none',
-                      border: 'none',
-                      outline: 'none',
-                      boxShadow: 'none',
-                      borderRadius: '0',
-                      margin: '0',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      width: '100%',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: '#EF4444',
-                      fontSize: '14px',
-                      fontWeight: '400',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.menuHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <ExitToAppIcon style={{ fontSize: 18, color: '#EF4444', marginRight: '12px' }} />
-                    {t('loginLogout')}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-          )}
-        </AnimatePresence>
+        <MobileDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          domainLookupCompleted={domainLookupCompleted}
+          handlers={{
+            showFleetList: () => { closeAllPanels(); setIsFleetListVisible(true); },
+            showDeviceList: () => { closeAllPanels(); setIsDeviceListVisible(true); },
+            showReports: () => { closeAllPanels(); setReportsPopoverVisible(true); },
+            showGeofences: () => { closeAllPanels(); setGeofencesPopoverVisible(true); },
+            showGestao: () => { closeAllPanels(); setGestaoPopoverVisible(true); },
+            showOs: () => { closeAllPanels(); setOsPopoverVisible(true); },
+            showClients: () => { closeAllPanels(); setClientsPopoverVisible(true); },
+            showVehicles: () => { closeAllPanels(); setVehiclesPopoverVisible(true); },
+            showDevices: () => { closeAllPanels(); setShowDevicesPopover(true); },
+            showUsers: () => { closeAllPanels(); setShowUsersPopover(true); },
+            showChips: () => { closeAllPanels(); setChipsPopoverVisible(true); },
+            showSmsTemplates: () => { closeAllPanels(); setSmsTemplatesPopoverVisible(true); },
+            showFinancial: () => { closeAllPanels(); setFinancialPopoverVisible(true); },
+            navigateFinanciero: () => closeAllPanels(),
+            showNotifications: () => { closeAllPanels(); setShowNotificationsPopover(true); },
+            showCalendars: () => { closeAllPanels(); setShowCalendarsPopover(true); },
+            showDrivers: () => { closeAllPanels(); setShowDriversPopover(true); },
+            showAttributes: () => { closeAllPanels(); setShowComputedAttributesPopover(true); },
+            showMaintenance: () => { closeAllPanels(); setShowMaintenancePopover(true); },
+            showGroups: () => { closeAllPanels(); setShowGroupsPopover(true); },
+            showAnnouncement: () => { closeAllPanels(); setShowAnnouncementDrawer(true); },
+            showPreferences: () => { closeAllPanels(); setShowPreferencesDrawer(true); },
+            showServer: () => { closeAllPanels(); setShowServerDrawer(true); },
+            showResellers: () => { closeAllPanels(); setShowResellersPopover(true); },
+            showCommands: () => { closeAllPanels(); setShowCommandsPopover(true); },
+            logout: () => setShowLogoutModal(true),
+          }}
+        />
       )}
-
-      
       {/* Hidden file input for user photo upload */}
       <input
         type="file"
@@ -8698,386 +4995,24 @@ const MainPage = () => {
       />
 
       {/* Ocorrências Modal */}
-      <AnimatePresence>
-        {showOcorrenciasModal && (
-          <motion.div
-            key="ocorrencias-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10005
-            }}
-            onClick={() => setShowOcorrenciasModal(false)}
-          >
-            <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -50, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                backgroundColor: colors.surface,
-                borderRadius: '12px',
-                width: '90vw',
-                maxWidth: '600px',
-                maxHeight: '90vh',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '20px',
-                borderBottom: `1px solid ${colors.border}`
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px'
-                }}>
-                  <button
-                    onClick={() => setShowOcorrenciasModal(false)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: colors.textSecondary,
-                      borderRadius: '4px',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.menuHover;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
-                  <h2 style={{
-                    margin: 0,
-                    fontSize: '20px',
-                    fontWeight: '600',
-                    color: colors.text
-                  }}>
-                    Triagem {ocorrenciaNumber}
-                  </h2>
-                </div>
-              </div>
-
-              {/* Modal Content */}
-              <div style={{
-                flex: 1,
-                overflow: 'auto',
-                padding: '20px'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px'
-                }}>
-                  {/* Número de Origem */}
-                  <TextField
-                    fullWidth
-                    label="Número de Origem"
-                    value={ocorrenciaData.numeroOrigem}
-                    onChange={(e) => setOcorrenciaData({
-                      ...ocorrenciaData,
-                      numeroOrigem: e.target.value
-                    })}
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInputRoot': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
-                      },
-                      '& .MuiInputLabelRoot': { 
-                        color: colors.textSecondary,
-                        '&.Mui-focused': { color: colors.primary }
-                      },
-                    }}
-                  />
-
-                  {/* Data/Hora da chamada */}
-                  <TextField
-                    fullWidth
-                    label="Data/Hora da chamada"
-                    value={ocorrenciaData.dataHoraChamada}
-                    onChange={(e) => setOcorrenciaData({
-                      ...ocorrenciaData,
-                      dataHoraChamada: e.target.value
-                    })}
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInputRoot': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
-                      },
-                      '& .MuiInputLabelRoot': { 
-                        color: colors.textSecondary,
-                        '&.Mui-focused': { color: colors.primary }
-                      },
-                    }}
-                  />
-
-                  {/* Nome */}
-                  <TextField
-                    fullWidth
-                    label="Nome"
-                    value={ocorrenciaData.nome}
-                    onChange={(e) => setOcorrenciaData({
-                      ...ocorrenciaData,
-                      nome: e.target.value
-                    })}
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInputRoot': {
-                        backgroundColor: colors.secondary,
-                        '& fieldset': { borderColor: colors.border },
-                        '&:hover fieldset': { borderColor: colors.primary },
-                        '&.Mui-focused fieldset': { borderColor: colors.primary },
-                      },
-                      '& .MuiInputLabelRoot': { 
-                        color: colors.textSecondary,
-                        '&.Mui-focused': { color: colors.primary }
-                      },
-                    }}
-                  />
-
-                  {/* Endereço da Ocorrência */}
-                  <Autocomplete
-                    freeSolo
-                    open={addressAutocompleteOpen}
-                    onOpen={() => {
-                      if (addressSearchResults.length > 0) {
-                        setAddressAutocompleteOpen(true);
-                      }
-                    }}
-                    onClose={() => setAddressAutocompleteOpen(false)}
-                    options={addressSearchResults}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') return option;
-                      return option.properties?.display_name || option.text || option.place_name || '';
-                    }}
-                    isOptionEqualToValue={(option, value) => {
-                      if (typeof option === 'string' || typeof value === 'string') return option === value;
-                      return option.place_name === value?.place_name;
-                    }}
-                    value={ocorrenciaData.endereco}
-                    onInputChange={(event, newInputValue, reason) => {
-                      if (reason === 'input') {
-                        handleAddressInputChange(newInputValue);
-                      }
-                    }}
-                    onChange={(event, newValue, reason) => {
-                      if (reason === 'selectOption' && newValue && typeof newValue !== 'string') {
-                        handleAddressSelect(newValue);
-                      } else if (reason === 'clear') {
-                        setOcorrenciaData(prev => ({ ...prev, endereco: '' }));
-                        setOcorrenciaAddress(null);
-                        setAddressSearchResults([]);
-                        setAddressAutocompleteOpen(false);
-                      }
-                    }}
-                    loading={isSearchingAddress}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Endereço da Ocorrência"
-                        placeholder="Digite pelo menos 5 caracteres para buscar"
-                        size="small"
-                        sx={{
-                          '& .MuiOutlinedInputRoot': {
-                            backgroundColor: colors.secondary,
-                            '& fieldset': { borderColor: colors.border },
-                            '&:hover fieldset': { borderColor: colors.primary },
-                            '&.Mui-focused fieldset': { borderColor: colors.primary },
-                          },
-                          '& .MuiInputLabelRoot': { 
-                            color: colors.textSecondary,
-                            '&.Mui-focused': { color: colors.primary }
-                          },
-                        }}
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <li {...props} key={option.place_name || option.text}>
-                        <div style={{ color: colors.text, fontSize: '14px' }}>
-                          {option.properties?.display_name || option.text || option.place_name}
-                        </div>
-                      </li>
-                    )}
-                    fullWidth
-                    size="small"
-                    disablePortal={false}
-                    ListboxProps={{
-                      style: {
-                        zIndex: 10006,
-                      },
-                    }}
-                    componentsProps={{
-                      popper: {
-                        style: {
-                          zIndex: 10006,
-                        },
-                      },
-                    }}
-                    PaperComponent={(props) => (
-                      <div 
-                        {...props} 
-                        style={{ 
-                          ...props.style, 
-                          zIndex: 10006,
-                          border: `1px solid ${colors.border}`,
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                          borderRadius: '8px',
-                          backgroundColor: colors.surface
-                        }} 
-                      />
-                    )}
-                    sx={{
-                      '& .MuiAutocomplete-popper': {
-                        zIndex: '10006 !important',
-                      },
-                    }}
-                  />
-
-                  {/* Tipo de ocorrência */}
-                  <Autocomplete
-                    options={ocorrenciaTypes}
-                    getOptionLabel={(option) => option.label || ''}
-                    isOptionEqualToValue={(option, value) => option.value === value?.value}
-                    value={ocorrenciaData.tipoOcorrencia 
-                      ? ocorrenciaTypes.find(opt => opt.value === ocorrenciaData.tipoOcorrencia) || null
-                      : null}
-                    onChange={(event, newValue) => {
-                      setOcorrenciaData({
-                        ...ocorrenciaData,
-                        tipoOcorrencia: newValue ? newValue.value : ''
-                      });
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Tipo de ocorrência"
-                        placeholder="Selecione um tipo"
-                        size="small"
-                        sx={{
-                          '& .MuiOutlinedInputRoot': {
-                            backgroundColor: colors.secondary,
-                            '& fieldset': { borderColor: colors.border },
-                            '&:hover fieldset': { borderColor: colors.primary },
-                            '&.Mui-focused fieldset': { borderColor: colors.primary },
-                          },
-                          '& .MuiInputLabelRoot': { 
-                            color: colors.textSecondary,
-                            '&.Mui-focused': { color: colors.primary }
-                          },
-                        }}
-                      />
-                    )}
-                    fullWidth
-                    size="small"
-                    disablePortal={false}
-                    ListboxProps={{
-                      style: {
-                        zIndex: 10006,
-                      },
-                    }}
-                    componentsProps={{
-                      popper: {
-                        style: {
-                          zIndex: 10006,
-                        },
-                      },
-                    }}
-                    PaperComponent={(props) => (
-                      <div 
-                        {...props} 
-                        style={{ 
-                          ...props.style, 
-                          zIndex: 10006,
-                          border: `1px solid ${colors.border}`,
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                          borderRadius: '8px',
-                          backgroundColor: colors.surface
-                        }} 
-                      />
-                    )}
-                    sx={{
-                      '& .MuiAutocomplete-popper': {
-                        zIndex: '10006 !important',
-                      },
-                    }}
-                  />
-                </div>
-
-                {/* Save Button */}
-                <div style={{
-                  padding: '20px',
-                  borderTop: `1px solid ${colors.border}`,
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '12px'
-                }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleSaveOcorrencia}
-                    disabled={isSavingOcorrencia || !ocorrenciaAddress}
-                    sx={{
-                      backgroundColor: muiTheme.palette.mode === 'dark' ? '#2563eb' : '#1d4ed8',
-                      color: '#ffffff',
-                      fontWeight: '600',
-                      '&:hover': {
-                        backgroundColor: muiTheme.palette.mode === 'dark' ? '#1d4ed8' : '#1e40af',
-                      },
-                      '&:disabled': {
-                        backgroundColor: colors.border,
-                        color: colors.textSecondary,
-                        opacity: 0.6
-                      }
-                    }}
-                  >
-                    {isSavingOcorrencia ? (
-                      <>
-                        <CircularProgress size={16} sx={{ marginRight: '8px', color: 'inherit' }} />
-                        Salvando...
-                      </>
-                    ) : (
-                      'Salvar'
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      <OcorrenciasModal
+        open={showOcorrenciasModal}
+        onClose={() => setShowOcorrenciasModal(false)}
+        ocorrenciaNumber={ocorrenciaNumber}
+        ocorrenciaData={ocorrenciaData}
+        setOcorrenciaData={setOcorrenciaData}
+        ocorrenciaAddress={ocorrenciaAddress}
+        setOcorrenciaAddress={setOcorrenciaAddress}
+        addressSearchResults={addressSearchResults}
+        setAddressSearchResults={setAddressSearchResults}
+        isSearchingAddress={isSearchingAddress}
+        addressAutocompleteOpen={addressAutocompleteOpen}
+        setAddressAutocompleteOpen={setAddressAutocompleteOpen}
+        handleAddressInputChange={handleAddressInputChange}
+        handleAddressSelect={handleAddressSelect}
+        handleSaveOcorrencia={handleSaveOcorrencia}
+        isSavingOcorrencia={isSavingOcorrencia}
+      />
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}

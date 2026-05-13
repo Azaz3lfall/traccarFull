@@ -25,6 +25,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon, Send as SendIcon, Add as AddIcon, Settings as SettingsIcon, VpnKey as VpnKeyIcon } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -68,6 +70,9 @@ export const SmsTemplatesContent = () => {
   const [smsAvulsoSending, setSmsAvulsoSending] = useState(false);
   const [smsAvulsoError, setSmsAvulsoError] = useState(null);
   const [smsAvulsoSuccess, setSmsAvulsoSuccess] = useState(false);
+  const [smsAvulsoDeviceIds, setSmsAvulsoDeviceIds] = useState([]);
+  const [smsAvulsoDeviceSearch, setSmsAvulsoDeviceSearch] = useState('');
+  const [deviceOptions, setDeviceOptions] = useState([]);
 
   // Histórico state
   const [history, setHistory] = useState({ data: [], total: 0 });
@@ -279,7 +284,7 @@ export const SmsTemplatesContent = () => {
 
   const handleSmsAvulsoSend = async () => {
     const num = smsAvulsoNumero?.trim().replace(/\D/g, '') || '';
-    if (num.length < 10) {
+    if (smsAvulsoDeviceIds.length === 0 && num.length < 10) {
       setSmsAvulsoError('Informe um número de chip válido (mínimo 10 dígitos).');
       return;
     }
@@ -290,17 +295,21 @@ export const SmsTemplatesContent = () => {
     setSmsAvulsoError(null);
     setSmsAvulsoSuccess(false);
     setSmsAvulsoSending(true);
-    try {
-      await fetchOrThrow(`${TELECOM_BASE}/sms/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ numero: num, mensagem: smsAvulsoMensagem.trim() }),
-      });
-      setSmsAvulsoMensagem('');
-      setSmsAvulsoSelectedTemplateId('');
-      setSmsAvulsoSuccess(true);
-    } catch (e) {
+    setSmsAvulsoMensagem('');
+    setSmsAvulsoSelectedTemplateId('');
+    setSmsAvulsoSuccess(true);
+    // Disparo em segundo plano: não bloqueia a tela.
+    void fetchOrThrow(`${TELECOM_BASE}/sms/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        numero: num || undefined,
+        mensagem: smsAvulsoMensagem.trim(),
+        deviceId: smsAvulsoDeviceIds.length === 1 ? smsAvulsoDeviceIds[0] : undefined,
+        deviceIds: smsAvulsoDeviceIds.length > 1 ? smsAvulsoDeviceIds : undefined,
+      }),
+    }).catch((e) => {
       let errMsg = e.message || 'Erro ao enviar SMS.';
       try {
         const parsed = typeof errMsg === 'string' ? JSON.parse(errMsg) : errMsg;
@@ -308,10 +317,25 @@ export const SmsTemplatesContent = () => {
         if (parsed?.hint) errMsg += ` ${parsed.hint}`;
       } catch { /* resposta não é JSON */ }
       setSmsAvulsoError(errMsg);
-    } finally {
+      setSmsAvulsoSuccess(false);
+    }).finally(() => {
       setSmsAvulsoSending(false);
-    }
+    });
   };
+
+  useEffect(() => {
+    if (activeTab !== 1) return;
+    fetchOrThrow('/api/devices?all=false', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((data) => {
+        const options = (Array.isArray(data) ? data : []).map((d) => ({
+          id: d.id,
+          label: `${d.name || 'Sem nome'} (${d.uniqueId || d.id})`,
+        }));
+        setDeviceOptions(options);
+      })
+      .catch(() => setDeviceOptions([]));
+  }, [activeTab]);
 
   const fetchHistory = useCallback(async () => {
     setHistoryLoading(true);
@@ -545,6 +569,29 @@ export const SmsTemplatesContent = () => {
                 onChange={(e) => setSmsAvulsoNumero(e.target.value)}
                 fullWidth
                 inputProps={{ maxLength: 20 }}
+                helperText={smsAvulsoDeviceIds.length > 0 ? 'Com dispositivos selecionados, este número vira fallback para devices sem chip vinculado.' : ''}
+              />
+              <Autocomplete
+                multiple
+                options={deviceOptions}
+                value={deviceOptions.filter((d) => smsAvulsoDeviceIds.includes(d.id))}
+                onChange={(_, values) => setSmsAvulsoDeviceIds(values.map((v) => v.id))}
+                inputValue={smsAvulsoDeviceSearch}
+                onInputChange={(_, value) => setSmsAvulsoDeviceSearch(value)}
+                getOptionLabel={(option) => option.label}
+                openOnFocus
+                disableCloseOnSelect
+                filterSelectedOptions
+                renderTags={(value, getTagProps) => value.map((option, index) => (
+                  <Chip label={option.label} {...getTagProps({ index })} key={option.id} size="small" />
+                ))}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Dispositivos (opcional)"
+                    placeholder="Selecione um ou mais dispositivos"
+                  />
+                )}
               />
               <FormControl fullWidth size="small">
                 <InputLabel>Usar template</InputLabel>

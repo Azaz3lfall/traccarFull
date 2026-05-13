@@ -15,6 +15,9 @@ import cors from 'cors';
 import fleetRoutes from '../../../routes/fleetRoutes.js';
 import clientsRoutes from '../../../routes/clientsRoutes.js';
 import vehiclesRoutes from '../../../routes/vehiclesRoutes.js';
+import financialRoutes from '../../../routes/financialRoutes.js';
+import routeRulesRoutes from '../../../routes/routeRulesRoutes.js';
+import { startFinancialScheduler } from '../../../services/financialScheduler.js';
 
 const app = express();
 
@@ -36,6 +39,8 @@ app.get('/', (req, res) => {
 app.use('/api/fleet', fleetRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/vehicles', vehiclesRoutes);
+app.use('/api/financial', financialRoutes);
+app.use('/api/route-rules', routeRulesRoutes);
 
 // Inicia o servidor
 app.listen(PORT, () => {
@@ -44,4 +49,6 @@ app.listen(PORT, () => {
   // Dica visual para saber se pegou as credenciais certas
   console.log(`🔧 Traccar Auth: ${process.env.TRACCAR_EMAIL ? 'Configurado ✅' : 'Faltando ❌'}`);
   console.log(`🗄️  Database URL: ${process.env.DATABASE_URL ? 'Configurado ✅' : 'Faltando ❌'}\n`);
+
+  startFinancialScheduler();
 });

@@ -8,7 +8,11 @@ export const useMaintenances = (allMaintenances, setAllMaintenances) => {
     maintenance_date: '', 
     description: '', 
     cost: '',
+    maintenance_type: 'oil',
+    durability_value: '',
+    durability_unit: 'km',
     odometer: '',
+    engine_hours: '',
     provider_name: '',
     foto: null
   });
@@ -49,7 +53,11 @@ export const useMaintenances = (allMaintenances, setAllMaintenances) => {
         maintenance_date: newMaintenanceForm.maintenance_date,
         description: newMaintenanceForm.description,
         cost: parseFloat(newMaintenanceForm.cost),
+        maintenance_type: newMaintenanceForm.maintenance_type || 'other',
+        durability_value: newMaintenanceForm.durability_value ? parseFloat(newMaintenanceForm.durability_value) : null,
+        durability_unit: newMaintenanceForm.durability_unit || null,
         odometer: newMaintenanceForm.odometer ? parseFloat(newMaintenanceForm.odometer) : null,
+        engine_hours: newMaintenanceForm.engine_hours ? parseFloat(newMaintenanceForm.engine_hours) : null,
         provider_name: newMaintenanceForm.provider_name || null,
         foto_path
       };
@@ -61,7 +69,11 @@ export const useMaintenances = (allMaintenances, setAllMaintenances) => {
         maintenance_date: '', 
         description: '', 
         cost: '',
+        maintenance_type: 'oil',
+        durability_value: '',
+        durability_unit: 'km',
         odometer: '',
+        engine_hours: '',
         provider_name: '',
         foto: null
       });
@@ -105,6 +117,11 @@ export const useMaintenances = (allMaintenances, setAllMaintenances) => {
       
       const maintenanceDataToSend = {
         ...updatedData,
+        maintenance_type: updatedData.maintenance_type || 'other',
+        durability_value: updatedData.durability_value ? parseFloat(updatedData.durability_value) : null,
+        durability_unit: updatedData.durability_unit || null,
+        odometer: updatedData.odometer ? parseFloat(updatedData.odometer) : null,
+        engine_hours: updatedData.engine_hours ? parseFloat(updatedData.engine_hours) : null,
         foto_path,
         foto: undefined // Remover o arquivo dos dados
       };

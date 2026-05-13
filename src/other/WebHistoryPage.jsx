@@ -236,7 +236,7 @@ const WebHistoryPage = () => {
   const altitudeUnit = useAttributePreference('altitudeUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
-  const positionItems = useAttributePreference('positionItems', 'fixTime,address,speed,totalDistance');
+  const positionItems = useAttributePreference('positionItems', 'serverTime,address,speed,totalDistance');
   const positionAttributes = usePositionAttributes(t);
   const mapStyles = useMapStyles();
   const activeMapStylesAttr = useAttributePreference('activeMapStyles', DEFAULT_ACTIVE_MAP_STYLES);

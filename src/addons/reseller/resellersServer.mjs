@@ -12,6 +12,9 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import dns from 'dns';
 import os from 'os';
+import formatXml from 'xml-formatter';
+
+const execPromise = promisify(exec);
 
 // Load environment variables
 dotenv.config();
@@ -125,6 +128,10 @@ const __dirname = path.dirname(__filename);
 // Define data directory paths
 const DATA_DIR = '/opt/addons/resellers/data';
 const IMAGES_DIR = path.join(DATA_DIR, 'images');
+const FIREBASE_DIR = path.join(DATA_DIR, 'firebase');
+
+// Configuration Access Password
+const CONFIG_PASSWORD = 'F@z3rF@z3r2025';
 
 const app = express();
 // Use environment PORT or default to 3333
@@ -631,6 +638,34 @@ const upload = multer({
   }
 });
 
+// Configure multer for Firebase config file uploads (google-services.json, GoogleService-Info.plist)
+const firebaseStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, FIREBASE_DIR);
+  },
+  filename: (req, file, cb) => {
+    // Temp filename, will be moved to reseller-specific directory
+    const tempFilename = `temp_firebase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.originalname}`;
+    cb(null, tempFilename);
+  }
+});
+
+const firebaseUpload = multer({
+  storage: firebaseStorage,
+  limits: {
+    fileSize: 512 * 1024, // 512KB limit - these files are small
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedNames = ['google-services.json', 'GoogleService-Info.plist'];
+    const originalName = file.originalname.toLowerCase();
+    if (originalName === 'google-services.json' || originalName === 'googleservice-info.plist') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only google-services.json and GoogleService-Info.plist files are allowed'), false);
+    }
+  }
+});
+
 // CORS configuration - Allow all origins (development and production)
 const corsOptions = {
   origin: '*', // Allow all origins everywhere
@@ -643,7 +678,8 @@ const corsOptions = {
     'Accept',
     'Origin',
     'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
+    'Access-Control-Request-Headers',
+    'X-Config-Password'
   ],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
   optionsSuccessStatus: 200 // Some legacy browsers choke on 204
@@ -656,7 +692,7 @@ app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-Config-Password');
   res.header('Access-Control-Allow-Credentials', 'false');
   
   // Handle preflight requests
@@ -687,6 +723,92 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         uptime: process.uptime()
     });
+});
+
+// Get backend configuration file
+app.get('/api/config', async (req, res) => {
+  console.log('--- Incoming /api/config request ---');
+  
+  // Verify password
+  const clientPassword = req.headers['x-config-password'];
+  if (clientPassword !== CONFIG_PASSWORD) {
+    console.warn(`❌ /api/config access denied: Invalid or missing password`);
+    return res.status(401).json({ error: 'Unauthorized: Invalid configuration password' });
+  }
+
+  try {
+    const configPath = '/opt/traccar/conf/traccar.xml';
+    console.log(`Attempting to read config at: ${configPath}`);
+    if (fs.existsSync(configPath)) {
+      console.log(`Success: File exists, reading contents...`);
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      
+      let formattedContent;
+      try {
+        formattedContent = formatXml(configContent, {
+          indentation: '    ', 
+          collapseContent: true, 
+          lineSeparator: '\n'
+        });
+      } catch (formatError) {
+        console.warn('⚠️ XML Formatting failed, possible malformed XML. Falling back to raw content.', formatError.message);
+        formattedContent = configContent;
+      }
+      
+      console.log(`Successfully read ${formattedContent === configContent ? 'raw' : 'formatted'} content (${formattedContent.length} bytes)`);
+      res.json({ content: formattedContent });
+    } else {
+      console.error(`Error: File does not exist at ${configPath}`);
+      res.status(404).json({ error: `Config file not found at ${configPath}` });
+    }
+  } catch (error) {
+    console.error('❌ Exception reading config file:', error);
+    res.status(500).json({ error: 'Unexpected error reading config file', details: error.message });
+  }
+});
+
+// Save backend configuration file
+app.post('/api/config', async (req, res) => {
+  console.log('--- Incoming POST /api/config request ---');
+
+  // Verify password
+  const clientPassword = req.headers['x-config-password'];
+  if (clientPassword !== CONFIG_PASSWORD) {
+    console.warn(`❌ POST /api/config access denied: Invalid or missing password`);
+    return res.status(401).json({ error: 'Unauthorized: Invalid configuration password' });
+  }
+
+  try {
+    const { content } = req.body;
+    const configPath = '/opt/traccar/conf/traccar.xml';
+    
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    console.log(`Attempting to save config to: ${configPath}`);
+    fs.writeFileSync(configPath, content, 'utf8');
+    console.log(`Successfully saved ${content.length} bytes to ${configPath}`);
+    
+    // Restart Traccar service
+    try {
+      console.log('🔄 Restarting Traccar service...');
+      const { stdout, stderr } = await execPromise('systemctl restart traccar');
+      if (stderr) console.warn(`⚠️ Traccar restart stderr: ${stderr}`);
+      console.log('✅ Traccar service restarted successfully');
+      res.json({ success: true, message: 'Configuration saved and Traccar service restarted successfully' });
+    } catch (restartError) {
+      console.error('❌ Error restarting Traccar service:', restartError.message);
+      res.json({ 
+        success: true, 
+        message: 'Configuration saved, but failed to restart Traccar service automatically',
+        details: restartError.message 
+      });
+    }
+  } catch (error) {
+    console.error('❌ Exception saving config file:', error);
+    res.status(500).json({ error: 'Failed to save config file', details: error.message });
+  }
 });
 
 // GET endpoint for listing resellers (filtered by currentUrl and parentUserId)
@@ -1735,6 +1857,95 @@ function removeBuildLock(resellerDirName, buildType) {
   }
 }
 
+/**
+ * Helper function to clear ALL build locks for a specific reseller.
+ * Also stops any active build processes and removes workspace directories.
+ * Used during app cleaning to cancel any "Build already in progress" state.
+ */
+async function clearBuildLocksForReseller(appUrl, resellerId) {
+  console.log(`🧹 Clearing build locks and workspace for ${appUrl} (ID: ${resellerId})...`);
+  let clearedCount = 0;
+
+  // 1. Clear in-memory locks
+  for (const buildKey of activeBuilds.keys()) {
+    // Both APK and AAB share the same directory/reseller identification
+    if (buildKey.includes(`_${appUrl}_`) && buildKey.includes(`_${resellerId}_`)) {
+      activeBuilds.delete(buildKey);
+      clearedCount++;
+      console.log(`🔓 Removed in-memory build lock for key: ${buildKey}`);
+    }
+  }
+
+  // 2. Clear file-system locks
+  try {
+    if (fs.existsSync(DATA_DIR)) {
+      const files = fs.readdirSync(DATA_DIR);
+      for (const file of files) {
+        if (file.startsWith('.build_lock_') && file.includes(`_${appUrl}_`) && file.includes(`_${resellerId}_`)) {
+          const lockFilePath = path.join(DATA_DIR, file);
+          fs.unlinkSync(lockFilePath);
+          clearedCount++;
+          console.log(`🔓 Removed file-system build lock: ${file}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Error clearing build lock files: ${error.message}`);
+  }
+
+  // 3. Kill any active build processes for this reseller
+  try {
+    // Both Flutter and Gradle processes will contain the workspace directory pattern in their command line
+    const searchPattern = `_${appUrl}_.*_${resellerId}`;
+    console.log(`🔫 Attempting to kill background processes matching: ${searchPattern}`);
+    
+    // -f matches full command line, -9 is SIGKILL
+    // We use try-catch because pkill returns non-zero if no processes matched
+    try {
+      await execAsync(`pkill -9 -f "${searchPattern}"`);
+      console.log(`✅ Killed active processes for ${appUrl}`);
+    } catch (pkillError) {
+      // Ignore if no processes found (pkill returns 1)
+      if (pkillError.code !== 1) {
+        console.warn(`⚠️ pkill warning (code ${pkillError.code}): ${pkillError.message}`);
+      }
+    }
+  } catch (killError) {
+    console.warn(`⚠️ Error while killing processes: ${killError.message}`);
+  }
+
+  // 4. Remove active workspace directories
+  try {
+    if (fs.existsSync(DATA_DIR)) {
+      const files = fs.readdirSync(DATA_DIR);
+      for (const file of files) {
+        // Workspace directories start with 'reseller_' and contain the identifying info
+        if (file.startsWith('reseller_') && file.includes(`_${appUrl}_`) && file.includes(`_${resellerId}`) && !file.endsWith('.json')) {
+          const workspacePath = path.join(DATA_DIR, file);
+          if (fs.existsSync(workspacePath) && fs.statSync(workspacePath).isDirectory()) {
+            console.log(`🗑️ Removing workspace directory: ${workspacePath}`);
+            try {
+              // Stop Gradle daemon for this directory first to release locks
+              if (fs.existsSync(path.join(workspacePath, 'android', 'gradlew'))) {
+                  await execAsync(`cd "${workspacePath}" && ./android/gradlew --stop`).catch(() => {});
+              }
+              // Force remove the directory
+              await execAsync(`rm -rf "${workspacePath}"`);
+              console.log(`✅ Workspace removed: ${file}`);
+            } catch (rmError) {
+              console.warn(`⚠️ Failed to remove workspace ${file}: ${rmError.message}`);
+            }
+          }
+        }
+      }
+    }
+  } catch (dirError) {
+    console.error(`❌ Error clearing workspace directories: ${dirError.message}`);
+  }
+
+  return clearedCount;
+}
+
 // Cleanup stale build lock files on startup
 function cleanupStaleBuildLocks() {
   try {
@@ -1782,15 +1993,11 @@ function cleanupStaleBuildLocks() {
 async function buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType = 'apk') {
   const buildKey = `${resellerDirName}_${buildType}`;
   
-  // Check if build is already in progress (check both memory and file system)
-  if (isBuildActive(resellerDirName, buildType)) {
-    console.log(`⚠️ Build already in progress for ${buildKey}, skipping...`);
-    throw new Error(`Build already in progress for ${resellerDirName} (${buildType})`);
+  // Ensure build is marked as active (lock should already be set by caller during setup phase)
+  if (!activeBuilds.has(buildKey)) {
+    activeBuilds.set(buildKey, true);
+    createBuildLock(resellerDirName, buildType);
   }
-  
-  // Mark build as active (both in memory and on disk)
-  activeBuilds.set(buildKey, true);
-  createBuildLock(resellerDirName, buildType);
   
   try {
     console.log(`🔨 Starting Flutter build process for ${buildType.toUpperCase()}...`);
@@ -2358,54 +2565,21 @@ app.post('/api/resellers/build', async (req, res) => {
       });
     }
 
-    // Remove existing reseller directory if it exists
-    if (fs.existsSync(resellerDirPath)) {
-      console.log('🗑️ Removing existing directory...');
-      try {
-        // Try multiple approaches for stubborn directories
-        await new Promise((resolve, reject) => {
-          exec(`rm -rf "${resellerDirPath}"`, (error, stdout, stderr) => {
-            if (error) {
-              console.log('⚠️ First rm -rf failed, trying with force...');
-              // Try with force flag
-              exec(`rm -rf -f "${resellerDirPath}"`, (error2, stdout2, stderr2) => {
-                if (error2) {
-                  console.log('⚠️ Force rm -rf failed, trying find + rm...');
-                  // Try find + rm approach
-                  exec(`find "${resellerDirPath}" -type f -delete && find "${resellerDirPath}" -type d -empty -delete && rmdir "${resellerDirPath}" 2>/dev/null || true`, (error3, stdout3, stderr3) => {
-                    if (error3) {
-                      console.log('⚠️ Find approach failed, trying chmod + rm...');
-                      // Try chmod + rm approach
-                      exec(`chmod -R 777 "${resellerDirPath}" 2>/dev/null && rm -rf "${resellerDirPath}" 2>/dev/null || true`, (error4, stdout4, stderr4) => {
-                        if (error4) {
-                          console.error('❌ All removal methods failed:', error4);
-                          reject(error4);
-                        } else {
-                          console.log('✅ Directory removed with chmod + rm');
-                          resolve();
-                        }
-                      });
-                    } else {
-                      console.log('✅ Directory removed with find approach');
-                      resolve();
-                    }
-                  });
-                } else {
-                  console.log('✅ Directory removed with force flag');
-                  resolve();
-                }
-              });
-            } else {
-              console.log('✅ Directory removed successfully');
-              resolve();
-            }
-          });
-        });
-      } catch (error) {
-        console.error('❌ Failed to remove directory:', error);
-        throw error;
-      }
+    // Check if ANY build is already in progress for this reseller
+    // (APK and AAB share the same directory, so only one can run at a time)
+    if (isBuildActive(resellerDirName, 'apk') || isBuildActive(resellerDirName, 'aab') || isBuildActive(resellerDirName, 'ios')) {
+      return res.status(409).json({
+        error: 'Build already in progress',
+        message: `A build is already running for ${resellerData.appUrl}. Wait for it to finish before starting another.`,
+        timestamp: new Date().toISOString()
+      });
     }
+
+    // NEW: Robust cleanup before starting (kills zombies, stops gradle, removes directory)
+    console.log('🧹 Performing robust pre-build cleanup...');
+    await clearBuildLocksForReseller(resellerData.appUrl, resellerData.resellerId);
+    // Give OS time to release file handles
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Create the reseller directory
     console.log('📁 Creating reseller directory...');
@@ -2415,6 +2589,23 @@ app.post('/api/resellers/build', async (req, res) => {
     // Get build type from request body (default to 'apk')
     const buildType = resellerData.buildType || 'apk';
     
+    // Check if ANY build is already in progress for this reseller
+    // (APK and AAB share the same directory, so only one can run at a time)
+    if (isBuildActive(resellerDirName, 'apk') || isBuildActive(resellerDirName, 'aab') || isBuildActive(resellerDirName, 'ios')) {
+      return res.status(409).json({
+        error: 'Build already in progress',
+        message: `A build is already running for ${resellerData.appUrl}. Wait for it to finish before starting another.`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Set build lock IMMEDIATELY (before responding, before background process)
+    // This prevents race conditions where status checks see no lock during setup
+    const buildKey = `${resellerDirName}_${buildType}`;
+    activeBuilds.set(buildKey, true);
+    createBuildLock(resellerDirName, buildType);
+    console.log(`🔒 Build lock set for ${buildKey}`);
+
     // Return immediately to frontend
     res.json({
       success: true,
@@ -2532,8 +2723,115 @@ app.post('/api/resellers/build', async (req, res) => {
           console.log('✅ ic_launcher.xml updated to use PNG foreground');
     }
 
-    // Note: google-services.json is already in source code, no need to copy
-    console.log('✅ Using existing google-services.json from source code');
+    // Check for reseller-specific google-services.json in firebase folder
+    const sanitizedAppUrl = resellerData.appUrl.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const customGoogleServicesPath = path.join(FIREBASE_DIR, sanitizedAppUrl, 'google-services.json');
+    const targetGoogleServicesPath = path.join(resellerDirPath, 'android', 'app', 'google-services.json');
+    
+    // Template's original package name (matching the neutralized template)
+    const TEMPLATE_PACKAGE_NAME = 'com.traccar.reseller';
+
+    if (fs.existsSync(customGoogleServicesPath)) {
+      fs.copyFileSync(customGoogleServicesPath, targetGoogleServicesPath);
+      const jsonData = JSON.parse(fs.readFileSync(customGoogleServicesPath, 'utf8'));
+      const projectId = jsonData.project_info?.project_id;
+      
+      // Get the package_name from the first client entry
+      const newPackageName = jsonData.client?.[0]?.client_info?.android_client_info?.package_name;
+      console.log(`✅ Custom google-services.json applied for ${resellerData.appUrl} (project: ${projectId}, package: ${newPackageName})`);
+
+      if (newPackageName && newPackageName !== TEMPLATE_PACKAGE_NAME) {
+        console.log(`🔄 Updating Android package name: ${TEMPLATE_PACKAGE_NAME} → ${newPackageName}`);
+
+        // 1. Update build.gradle.kts (namespace + applicationId)
+        const buildGradlePath = path.join(resellerDirPath, 'android', 'app', 'build.gradle.kts');
+        if (fs.existsSync(buildGradlePath)) {
+          let gradleContent = fs.readFileSync(buildGradlePath, 'utf8');
+          gradleContent = gradleContent.replace(
+            `namespace = "${TEMPLATE_PACKAGE_NAME}"`,
+            `namespace = "${newPackageName}"`
+          );
+          gradleContent = gradleContent.replace(
+            `applicationId = "${TEMPLATE_PACKAGE_NAME}"`,
+            `applicationId = "${newPackageName}"`
+          );
+          fs.writeFileSync(buildGradlePath, gradleContent);
+          console.log(`✅ build.gradle.kts updated (namespace + applicationId → ${newPackageName})`);
+        }
+
+        // 2. Update AndroidManifest.xml (deep link scheme)
+        const manifestPath = path.join(resellerDirPath, 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
+        if (fs.existsSync(manifestPath)) {
+          let manifestContent = fs.readFileSync(manifestPath, 'utf8');
+          manifestContent = manifestContent.replaceAll(TEMPLATE_PACKAGE_NAME, newPackageName);
+          fs.writeFileSync(manifestPath, manifestContent);
+          console.log(`✅ AndroidManifest.xml updated (package references → ${newPackageName})`);
+        }
+
+        // 3. Update Kotlin source directory and package declaration
+        const oldKotlinDir = path.join(resellerDirPath, 'android', 'app', 'src', 'main', 'kotlin', ...TEMPLATE_PACKAGE_NAME.split('.'));
+        const newKotlinDir = path.join(resellerDirPath, 'android', 'app', 'src', 'main', 'kotlin', ...newPackageName.split('.'));
+        
+        if (fs.existsSync(oldKotlinDir)) {
+          // Create new directory structure
+          fs.mkdirSync(newKotlinDir, { recursive: true });
+          
+          // Move and update all Kotlin files
+          const kotlinFiles = fs.readdirSync(oldKotlinDir);
+          for (const file of kotlinFiles) {
+            const oldFilePath = path.join(oldKotlinDir, file);
+            const newFilePath = path.join(newKotlinDir, file);
+            
+            if (file.endsWith('.kt')) {
+              // Read, update package declaration, write to new location
+              let kotlinContent = fs.readFileSync(oldFilePath, 'utf8');
+              kotlinContent = kotlinContent.replace(
+                `package ${TEMPLATE_PACKAGE_NAME}`,
+                `package ${newPackageName}`
+              );
+              fs.writeFileSync(newFilePath, kotlinContent);
+            } else {
+              // Copy non-Kotlin files as-is
+              fs.copyFileSync(oldFilePath, newFilePath);
+            }
+          }
+          
+          // Remove old directory tree safely (clean up only empty parent dirs)
+          try {
+            let currentOldDir = oldKotlinDir;
+            const templateParts = TEMPLATE_PACKAGE_NAME.split('.');
+            for (let i = 0; i < templateParts.length; i++) {
+              if (fs.existsSync(currentOldDir) && fs.readdirSync(currentOldDir).length === 0) {
+                fs.rmdirSync(currentOldDir);
+                currentOldDir = path.dirname(currentOldDir);
+              } else {
+                break;
+              }
+            }
+          } catch (e) {
+            console.warn('⚠️ Could not fully clean up old Kotlin directory:', e.message);
+          }
+          
+          console.log(`✅ Kotlin source moved: ${TEMPLATE_PACKAGE_NAME} → ${newPackageName}`);
+        }
+      }
+    } else {
+      console.log('ℹ️ No custom google-services.json found, using template default');
+    }
+
+    // Check for reseller-specific GoogleService-Info.plist in firebase folder
+    const customGoogleServicePlistPath = path.join(FIREBASE_DIR, sanitizedAppUrl, 'GoogleService-Info.plist');
+    const targetGoogleServicePlistPath = path.join(resellerDirPath, 'ios', 'Runner', 'GoogleService-Info.plist');
+
+    if (fs.existsSync(customGoogleServicePlistPath)) {
+      if (!fs.existsSync(path.dirname(targetGoogleServicePlistPath))) {
+        fs.mkdirSync(path.dirname(targetGoogleServicePlistPath), { recursive: true });
+      }
+      fs.copyFileSync(customGoogleServicePlistPath, targetGoogleServicePlistPath);
+      console.log(`✅ Custom GoogleService-Info.plist applied for ${resellerData.appUrl}`);
+    } else {
+      console.log('ℹ️ No custom GoogleService-Info.plist found, using template default');
+    }
 
     // Get complete reseller data from JSON file to access all image fields
     const resellerFilePath = path.join(DATA_DIR, `${resellerDirName}.json`);
@@ -2556,6 +2854,11 @@ app.post('/api/resellers/build', async (req, res) => {
         await buildFlutterApp(resellerDirPath, resellerData, resellerDirName, buildType);
       } catch (error) {
         console.error('❌ Error in background build process:', error);
+        // Clean up the build lock so the user can retry
+        const buildKey = `${resellerDirName}_${buildType}`;
+        activeBuilds.delete(buildKey);
+        removeBuildLock(resellerDirName, buildType);
+        console.log(`🧹 Cleaned up build lock after error: ${buildKey}`);
       }
     })();
 
@@ -2694,14 +2997,14 @@ app.get('/api/resellers/build/status/:appUrl', async (req, res) => {
         buildStatus = 'NOT_BUILDED';
         console.log(`❌ Status: NOT_BUILDED (APK not built, only AAB exists)`);
       } else {
-        // Build directory exists but no final file - might be building
-        buildStatus = 'BUILDING';
-        console.log(`🔨 Status: BUILDING (build dir exists but no final file yet)`);
+        // Build directory exists but no final file AND build is not active = failed build
+        buildStatus = 'BUILD_ERROR';
+        console.log(`❌ Status: BUILD_ERROR (build dir exists but build is not active and no output file - build likely failed)`);
       }
     } else if (resellerDirExists && !apkExists && !aabExists && !iosExists) {
-      // Reseller dir exists but no build files - might be mid-setup
-      buildStatus = 'BUILDING';
-      console.log(`🔨 Status: BUILDING (reseller dir exists without final files)`);
+      // Reseller dir exists but no build files and build not active = failed or stale
+      buildStatus = 'BUILD_ERROR';
+      console.log(`❌ Status: BUILD_ERROR (reseller dir exists but no build output and build not active)`);
     } else {
       buildStatus = 'NOT_BUILDED';
       console.log(`❌ Status: NOT_BUILDED (no build files or directories found)`);
@@ -2921,6 +3224,12 @@ app.post('/api/resellers/clean-apps', async (req, res) => {
     }
 
     console.log(`🧹 Cleaning ${cleanType} apps for reseller ${resellerId} (${appUrl})`);
+
+    // Cancel any active build locks and processes for this reseller
+    const clearedLocks = await clearBuildLocksForReseller(appUrl, resellerId);
+    if (clearedLocks > 0) {
+      console.log(`✅ Cleared ${clearedLocks} build lock(s) for ${appUrl}`);
+    }
 
     const cleanedFiles = [];
     const errors = [];
@@ -3217,12 +3526,17 @@ app.get('/api/reseller-logo', async (req, res) => {
       }
     }
 
-    // Return the logo and favicon as base64
+    // Return the logo and favicon as base64, along with contact info
     res.json({
       success: true,
       logo: logoBase64,
       favicon: faviconBase64,
       companyName: resellerData.companyName || null,
+      whatsapp: resellerData.whatsapp || null,
+      supportEmail: resellerData.supportEmail || null,
+      billingEmail: resellerData.billingEmail || null,
+      resellerEmail: resellerData.resellerEmail || null,
+      appUrl: resellerData.appUrl || null,
       timestamp: new Date().toISOString()
     });
     
@@ -3418,6 +3732,262 @@ app.post('/api/domain-lookup', async (req, res) => {
     }
 });
 
+// ============================================================
+// Firebase Config File Upload Endpoints (google-services.json / GoogleService-Info.plist)
+// ============================================================
+
+// POST endpoint for uploading Firebase config files
+app.post('/api/resellers/firebase/upload', firebaseUpload.single('firebaseFile'), async (req, res) => {
+  try {
+    console.log('🔥 Firebase config upload request received');
+    
+    const { appUrl, fileType } = req.body;
+    
+    if (!appUrl) {
+      // Clean up temp file if it was uploaded
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({
+        error: 'Missing required field',
+        message: 'appUrl is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!fileType || !['json', 'plist'].includes(fileType)) {
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(400).json({
+        error: 'Invalid fileType',
+        message: 'fileType must be "json" or "plist"',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No file uploaded',
+        message: 'Please provide a firebase config file',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Create reseller-specific firebase directory (named by appUrl)
+    const sanitizedAppUrl = appUrl.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const resellerFirebaseDir = path.join(FIREBASE_DIR, sanitizedAppUrl);
+    
+    if (!fs.existsSync(resellerFirebaseDir)) {
+      fs.mkdirSync(resellerFirebaseDir, { recursive: true });
+      console.log(`📁 Created firebase directory for reseller: ${resellerFirebaseDir}`);
+    }
+
+    // Read and validate file content
+    const fileContent = fs.readFileSync(req.file.path, 'utf8');
+    let parsedInfo = {};
+
+    if (fileType === 'json') {
+      // Validate google-services.json structure
+      try {
+        const jsonData = JSON.parse(fileContent);
+        
+        if (!jsonData.project_info || !jsonData.project_info.project_id) {
+          fs.unlinkSync(req.file.path);
+          return res.status(400).json({
+            error: 'Invalid google-services.json',
+            message: 'File must contain project_info.project_id',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        parsedInfo = {
+          projectId: jsonData.project_info.project_id,
+          projectNumber: jsonData.project_info.project_number,
+          storageBucket: jsonData.project_info.storage_bucket,
+          clientCount: jsonData.client ? jsonData.client.length : 0,
+          packageNames: jsonData.client ? jsonData.client.map(c => c.client_info?.android_client_info?.package_name).filter(Boolean) : []
+        };
+
+        console.log(`✅ Valid google-services.json - Project: ${parsedInfo.projectId}`);
+      } catch (parseError) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({
+          error: 'Invalid JSON',
+          message: `Failed to parse google-services.json: ${parseError.message}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Move file to final location (overwrite if exists)
+      const targetPath = path.join(resellerFirebaseDir, 'google-services.json');
+      fs.copyFileSync(req.file.path, targetPath);
+      fs.unlinkSync(req.file.path);
+      console.log(`✅ google-services.json saved for ${appUrl} at ${targetPath}`);
+
+    } else if (fileType === 'plist') {
+      // Validate GoogleService-Info.plist structure (basic XML/plist check)
+      try {
+        if (!fileContent.includes('<plist') || !fileContent.includes('</plist>')) {
+          fs.unlinkSync(req.file.path);
+          return res.status(400).json({
+            error: 'Invalid plist file',
+            message: 'File does not appear to be a valid plist format',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        // Extract key info from plist using simple regex
+        const extractPlistValue = (key) => {
+          const regex = new RegExp(`<key>${key}</key>\\s*<string>(.*?)</string>`);
+          const match = fileContent.match(regex);
+          return match ? match[1] : null;
+        };
+
+        parsedInfo = {
+          projectId: extractPlistValue('PROJECT_ID'),
+          gcmSenderId: extractPlistValue('GCM_SENDER_ID'),
+          bundleId: extractPlistValue('BUNDLE_ID'),
+          googleAppId: extractPlistValue('GOOGLE_APP_ID'),
+          apiKey: extractPlistValue('API_KEY') ? '***' + extractPlistValue('API_KEY').slice(-4) : null
+        };
+
+        if (!parsedInfo.projectId) {
+          fs.unlinkSync(req.file.path);
+          return res.status(400).json({
+            error: 'Invalid GoogleService-Info.plist',
+            message: 'File must contain PROJECT_ID key',
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        console.log(`✅ Valid GoogleService-Info.plist - Project: ${parsedInfo.projectId}`);
+      } catch (parseError) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({
+          error: 'Invalid plist',
+          message: `Failed to parse GoogleService-Info.plist: ${parseError.message}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Move file to final location (overwrite if exists)
+      const targetPath = path.join(resellerFirebaseDir, 'GoogleService-Info.plist');
+      fs.copyFileSync(req.file.path, targetPath);
+      fs.unlinkSync(req.file.path);
+      console.log(`✅ GoogleService-Info.plist saved for ${appUrl} at ${targetPath}`);
+    }
+
+    res.json({
+      success: true,
+      message: `Firebase ${fileType === 'json' ? 'google-services.json' : 'GoogleService-Info.plist'} uploaded successfully`,
+      data: {
+        appUrl,
+        fileType,
+        parsedInfo,
+        fileName: fileType === 'json' ? 'google-services.json' : 'GoogleService-Info.plist'
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error uploading Firebase config:', error);
+    // Clean up temp file on error
+    if (req.file && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+    }
+    res.status(500).json({
+      error: 'Upload failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// GET endpoint for checking Firebase config status for a reseller
+app.get('/api/resellers/firebase/status', async (req, res) => {
+  try {
+    const { appUrl } = req.query;
+
+    if (!appUrl) {
+      return res.status(400).json({
+        error: 'Missing required parameter',
+        message: 'appUrl is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const sanitizedAppUrl = appUrl.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const resellerFirebaseDir = path.join(FIREBASE_DIR, sanitizedAppUrl);
+
+    const googleServicesPath = path.join(resellerFirebaseDir, 'google-services.json');
+    const googleServiceInfoPath = path.join(resellerFirebaseDir, 'GoogleService-Info.plist');
+
+    const result = {
+      appUrl,
+      googleServicesJson: { exists: false, parsedInfo: null },
+      googleServiceInfoPlist: { exists: false, parsedInfo: null }
+    };
+
+    // Check google-services.json
+    if (fs.existsSync(googleServicesPath)) {
+      try {
+        const content = fs.readFileSync(googleServicesPath, 'utf8');
+        const jsonData = JSON.parse(content);
+        result.googleServicesJson = {
+          exists: true,
+          fileSize: fs.statSync(googleServicesPath).size,
+          parsedInfo: {
+            projectId: jsonData.project_info?.project_id,
+            projectNumber: jsonData.project_info?.project_number,
+            packageNames: jsonData.client ? jsonData.client.map(c => c.client_info?.android_client_info?.package_name).filter(Boolean) : []
+          }
+        };
+      } catch (e) {
+        result.googleServicesJson = { exists: true, error: 'Failed to parse file' };
+      }
+    }
+
+    // Check GoogleService-Info.plist
+    if (fs.existsSync(googleServiceInfoPath)) {
+      try {
+        const content = fs.readFileSync(googleServiceInfoPath, 'utf8');
+        const extractPlistValue = (key) => {
+          const regex = new RegExp(`<key>${key}</key>\\s*<string>(.*?)</string>`);
+          const match = content.match(regex);
+          return match ? match[1] : null;
+        };
+
+        result.googleServiceInfoPlist = {
+          exists: true,
+          fileSize: fs.statSync(googleServiceInfoPath).size,
+          parsedInfo: {
+            projectId: extractPlistValue('PROJECT_ID'),
+            gcmSenderId: extractPlistValue('GCM_SENDER_ID'),
+            bundleId: extractPlistValue('BUNDLE_ID')
+          }
+        };
+      } catch (e) {
+        result.googleServiceInfoPlist = { exists: true, error: 'Failed to parse file' };
+      }
+    }
+
+    res.json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Error checking Firebase config status:', error);
+    res.status(500).json({
+      error: 'Status check failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Generic JSON POST endpoint
 app.post('/api/data', (req, res) => {
     try {
@@ -3476,6 +4046,11 @@ const ensureDirectories = () => {
     // Create images directory
     if (!fs.existsSync(IMAGES_DIR)) {
       fs.mkdirSync(IMAGES_DIR, { recursive: true });
+    }
+    
+    // Create firebase config directory
+    if (!fs.existsSync(FIREBASE_DIR)) {
+      fs.mkdirSync(FIREBASE_DIR, { recursive: true });
     }
     
   } catch (error) {

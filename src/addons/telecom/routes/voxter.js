@@ -1,6 +1,13 @@
 import { listSimcards, sendSms, resetSimcard } from '../services/voxterApi.js';
 import { getGatewayConfig } from '../services/gatewayConfig.js';
 
+function voxterHttpStatus(err) {
+  if (err.message?.includes('obrigatórios')) return 503;
+  if (err.isVoxterDown) return 503;
+  if (err.voxterStatus >= 400 && err.voxterStatus < 500) return 401;
+  return 500;
+}
+
 export default function registerVoxterRoutes(app, { pool, requireAuthAndFilter }) {
   const base = '/gestao/telecom/voxter';
 
@@ -14,8 +21,8 @@ export default function registerVoxterRoutes(app, { pool, requireAuthAndFilter }
       const result = await listSimcards(page, search, voxterCreds);
       res.json(result);
     } catch (err) {
-      console.error('GET /gestao/telecom/voxter/simcards error:', err);
-      res.status(err.message?.includes('obrigatórios') ? 503 : 500).json({
+      console.error('GET /gestao/telecom/voxter/simcards error:', err.message);
+      res.status(voxterHttpStatus(err)).json({
         error: err.message || 'Erro ao listar simcards Voxter.',
       });
     }
@@ -39,8 +46,8 @@ export default function registerVoxterRoutes(app, { pool, requireAuthAndFilter }
       const result = await sendSms(fullLine, msg, voxterCreds);
       res.json({ success: result.success, message: result.message });
     } catch (err) {
-      console.error('POST /gestao/telecom/voxter/simcards/sms error:', err);
-      res.status(err.message?.includes('obrigatórios') ? 503 : 500).json({
+      console.error('POST /gestao/telecom/voxter/simcards/sms error:', err.message);
+      res.status(voxterHttpStatus(err)).json({
         error: err.message || 'Erro ao enviar SMS.',
       });
     }
@@ -58,8 +65,8 @@ export default function registerVoxterRoutes(app, { pool, requireAuthAndFilter }
       const result = await resetSimcard(id, voxterCreds);
       res.json({ success: result.success, message: result.message });
     } catch (err) {
-      console.error('POST /gestao/telecom/voxter/simcards/:id/reset error:', err);
-      res.status(err.message?.includes('obrigatórios') ? 503 : 500).json({
+      console.error('POST /gestao/telecom/voxter/simcards/:id/reset error:', err.message);
+      res.status(voxterHttpStatus(err)).json({
         error: err.message || 'Erro ao resetar linha.',
       });
     }

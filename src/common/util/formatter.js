@@ -46,21 +46,23 @@ export const formatConsumption = (value, t) => {
   return `${value.toFixed(2)} ${t('sharedLiterPerHourAbbreviation')}`;
 };
 
-export const formatTime = (value, format) => {
+export const formatTime = (value, format, timezone) => {
   if (value) {
     const d = dayjs(value).toDate();
     const dateConfig = { year: 'numeric', month: '2-digit', day: '2-digit' };
     const minuteConfig = { hour: '2-digit', minute: '2-digit' };
     const secondConfig = { ...minuteConfig, second: '2-digit' };
+    const configuredTimezone = timezone || window.__traccarTimezone;
+    const timeConfig = configuredTimezone ? { timeZone: configuredTimezone } : {};
     switch (format) {
       case 'date':
-        return d.toLocaleDateString(undefined, dateConfig);
+        return d.toLocaleDateString(undefined, { ...dateConfig, ...timeConfig });
       case 'time':
-        return d.toLocaleTimeString(undefined, secondConfig);
+        return d.toLocaleTimeString(undefined, { ...secondConfig, ...timeConfig });
       case 'minutes':
-        return d.toLocaleString(undefined, { ...dateConfig, ...minuteConfig });
+        return d.toLocaleString(undefined, { ...dateConfig, ...minuteConfig, ...timeConfig });
       default:
-        return d.toLocaleString(undefined, { ...dateConfig, ...secondConfig });
+        return d.toLocaleString(undefined, { ...dateConfig, ...secondConfig, ...timeConfig });
     }
   }
   return '';

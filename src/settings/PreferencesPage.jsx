@@ -147,14 +147,14 @@ const PreferencesPage = () => {
                 <Autocomplete
                   multiple
                   freeSolo
-                  options={Object.keys(positionAttributes)}
+                  options={Object.keys(positionAttributes).filter((key) => key !== 'fixTime')}
                   getOptionLabel={(option) => {
                     if (typeof option === 'object' && option.inputValue) {
                       return option.inputValue;
                     }
                     return positionAttributes[option]?.name || option;
                   }}
-                  value={attributes.positionItems?.split(',') || ['fixTime', 'address', 'speed', 'totalDistance']}
+                  value={attributes.positionItems?.split(',') || ['serverTime', 'address', 'speed', 'totalDistance']}
                   onChange={(_, newValue) => {
                     setAttributes({ ...attributes, positionItems: newValue.map((x) => (typeof x === 'string' ? x : x.inputValue)).join(','), });
                   }}

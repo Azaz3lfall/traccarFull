@@ -41,6 +41,8 @@ router.post('/', async (req, res) => {
     email,
     traccar_user_id,
     active,
+    billing_status,
+    billing_blocked,
   } = req.body ?? {};
 
   if (!type || !name) {
@@ -62,8 +64,8 @@ router.post('/', async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      `INSERT INTO clients (type, name, tax_id, address, cep, contact_phone, email, traccar_user_id, active)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO clients (type, name, tax_id, address, cep, contact_phone, email, traccar_user_id, active, billing_status, billing_blocked)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [
         type,
@@ -75,6 +77,8 @@ router.post('/', async (req, res) => {
         email ?? null,
         traccar_user_id ?? null,
         active !== undefined ? active : true,
+        billing_status === 'inadimplente' ? 'inadimplente' : 'ativo',
+        billing_blocked === true,
       ],
     );
     res.status(201).json(rows[0]);
@@ -107,6 +111,8 @@ router.put('/:id', async (req, res) => {
     email,
     traccar_user_id,
     active,
+    billing_status,
+    billing_blocked,
   } = req.body ?? {};
 
   if (!type || !name) {
@@ -138,8 +144,9 @@ router.put('/:id', async (req, res) => {
 
     const { rows } = await pool.query(
       `UPDATE clients 
-       SET type = $1, name = $2, tax_id = $3, address = $4, cep = $5, contact_phone = $6, email = $7, traccar_user_id = $8, active = $9
-       WHERE id = $10
+       SET type = $1, name = $2, tax_id = $3, address = $4, cep = $5, contact_phone = $6, email = $7, traccar_user_id = $8, active = $9,
+           billing_status = $10, billing_blocked = $11, updated_at = NOW()
+       WHERE id = $12
        RETURNING *`,
       [
         type,
@@ -151,6 +158,8 @@ router.put('/:id', async (req, res) => {
         email ?? null,
         traccar_user_id ?? null,
         active !== undefined ? active : true,
+        billing_status === 'inadimplente' ? 'inadimplente' : 'ativo',
+        billing_blocked === true,
         id,
       ],
     );

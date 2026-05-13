@@ -32,6 +32,8 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  Chip,
+  Switch,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -41,16 +43,49 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Settings as SettingsIcon,
+  AccountBalance as AccountBalanceIcon,
+  TaskAlt as SettleIcon,
 } from '@mui/icons-material';
 import { useThemeColors } from '../../common/components/ThemeProvider';
-import { fetchClients, updateClient, clientsActions } from '../../store';
+import { fetchClients, updateClient, clientsActions, fetchClientFinancialSummary, settleBillingCycleManually } from '../../store';
 import { fetchTraccarUsers } from '../../store';
 import { fetchVehicles } from '../../store';
 import { useDispatch, useSelector } from 'react-redux';
 import UserVehiclesAssociationModal from './UserVehiclesAssociationModal';
 import UserManagementPopover from '../../components/UserManagementPopover';
+import ManualSettlementDialog from './ManualSettlementDialog';
 
 const getCoreApiUrl = () => (import.meta.env.VITE_CORE_API_URL || '');
+
+const cycleStatusLabel = (value) => {
+  const map = {
+    pending: 'Pendente',
+    paid: 'Pago',
+    overdue: 'Vencido',
+    cancelled: 'Cancelado',
+  };
+  const key = String(value || '').toLowerCase();
+  return map[key] || value || '-';
+};
+
+const asaasStatusLabel = (status) => {
+  const map = {
+    PENDING: 'Pendente',
+    OVERDUE: 'Em atraso',
+    RECEIVED: 'Recebida',
+    CONFIRMED: 'Confirmada',
+  };
+  return map[String(status || '').toUpperCase()] || (status || '-');
+};
+
+const planIntervalLabel = (value) => {
+  const map = {
+    WEEKLY: 'Semanal',
+    MONTHLY: 'Mensal',
+    YEARLY: 'Anual',
+  };
+  return map[value] || value || '-';
+};
 
 const ClientDetailsModal = ({ open, onClose, client }) => {
   const navigate = useNavigate();
@@ -92,6 +127,13 @@ const ClientDetailsModal = ({ open, onClose, client }) => {
   const [associationUser, setAssociationUser] = useState(null);
   const [availableUsersForLinking, setAvailableUsersForLinking] = useState([]);
   const [allTraccarUsers, setAllTraccarUsers] = useState([]);
+  const [financeSummary, setFinanceSummary] = useState(null);
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeError, setFinanceError] = useState(null);
+  const [financeUiSuccess, setFinanceUiSuccess] = useState('');
+  const [billingBlockedDraft, setBillingBlockedDraft] = useState(false);
+  const [billingSaveStatus, setBillingSaveStatus] = useState('idle');
+  const [settlementDialog, setSettlementDialog] = useState({ open: false, charge: null });
 
   const baseUrl = CORE_API_URL || '';
 
@@ -166,10 +208,43 @@ const ClientDetailsModal = ({ open, onClose, client }) => {
   };
 
   useEffect(() => {
-    if (addUserModalOpen && id) {
-      fetchAvailableUsersForLinking();
+    if (!open) {
+      setActiveTab(0);
+      setFinanceSummary(null);
+      setFinanceError(null);
+      setFinanceUiSuccess('');
     }
-  }, [addUserModalOpen, id]);
+  }, [open]);
+
+  useEffect(() => {
+    if (client) {
+      setBillingBlockedDraft(Boolean(client.billing_blocked));
+    }
+  }, [client?.id, client?.billing_blocked]);
+
+  useEffect(() => {
+    if (!open || !id || activeTab !== 3) return;
+    let cancelled = false;
+    const load = async () => {
+      setFinanceLoading(true);
+      setFinanceError(null);
+      const result = await dispatch(fetchClientFinancialSummary(id));
+      if (cancelled) return;
+      setFinanceLoading(false);
+      if (fetchClientFinancialSummary.fulfilled.match(result)) {
+        setFinanceSummary(result.payload);
+        if (result.payload?.billing) {
+          setBillingBlockedDraft(Boolean(result.payload.billing.billing_blocked));
+        }
+      } else {
+        setFinanceError(result.payload || 'Erro ao carregar resumo financeiro.');
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, id, activeTab, dispatch]);
 
   const handleSaveClient = async () => {
     if (!client || !formData.name?.trim()) return;
@@ -184,6 +259,68 @@ const ClientDetailsModal = ({ open, onClose, client }) => {
     );
     if (updateClient.fulfilled.match(result)) {
       dispatch(fetchClients());
+    }
+  };
+
+  useEffect(() => {
+    if (addUserModalOpen && id) {
+      fetchAvailableUsersForLinking();
+    }
+  }, [addUserModalOpen, id]);
+
+  const resetSettlementDialog = () => setSettlementDialog({ open: false, charge: null });
+
+  const handleSettlementSubmit = async ({ paidAmount, paidAt, note }) => {
+    if (!settlementDialog.charge?.id) {
+      return { ok: false, message: 'Cobrança inválida.' };
+    }
+    const result = await dispatch(
+      settleBillingCycleManually({
+        cycleId: settlementDialog.charge.id,
+        paidAmount,
+        paidAt,
+        note,
+      })
+    );
+    if (settleBillingCycleManually.fulfilled.match(result)) {
+      setFinanceUiSuccess('Baixa manual registrada com sucesso.');
+      dispatch(fetchClients());
+      const sum = await dispatch(fetchClientFinancialSummary(id));
+      if (fetchClientFinancialSummary.fulfilled.match(sum)) {
+        setFinanceSummary(sum.payload);
+      }
+      return { ok: true };
+    }
+    return { ok: false, message: result.payload || 'Não foi possível registrar a baixa manual.' };
+  };
+
+  const handleSaveFinanceAccess = async () => {
+    if (!client || !id) return;
+    const row = clients.find((c) => c.id === id) || client;
+    setBillingSaveStatus('loading');
+    setFinanceUiSuccess('');
+    dispatch(clientsActions.clearError());
+    try {
+      const result = await dispatch(
+        updateClient({
+          id: client.id,
+          clientData: {
+            ...row,
+            ...formData,
+            billing_blocked: billingBlockedDraft,
+          },
+        })
+      );
+      if (updateClient.fulfilled.match(result)) {
+        dispatch(fetchClients());
+        const sum = await dispatch(fetchClientFinancialSummary(id));
+        if (fetchClientFinancialSummary.fulfilled.match(sum)) {
+          setFinanceSummary(sum.payload);
+        }
+        setFinanceUiSuccess('Acesso atualizado.');
+      }
+    } finally {
+      setBillingSaveStatus('idle');
     }
   };
 
@@ -382,6 +519,19 @@ const ClientDetailsModal = ({ open, onClose, client }) => {
                   </ListItemIcon>
                   <ListItemText primary="Usuários" />
                 </ListItemButton>
+                <ListItemButton
+                  selected={activeTab === 3}
+                  onClick={() => setActiveTab(3)}
+                  sx={{
+                    borderRadius: 1,
+                    '&.Mui-selected': { backgroundColor: `${safeColor(colorsRaw?.primary, '#3B82F6')}20` },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <AccountBalanceIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Financeiro" />
+                </ListItemButton>
               </List>
               <Button
                 fullWidth
@@ -547,10 +697,196 @@ const ClientDetailsModal = ({ open, onClose, client }) => {
                   </TableContainer>
                 </Paper>
               )}
+
+              {activeTab === 3 && (
+                <Paper sx={{ p: 3, backgroundColor: safeColor(colorsRaw?.surface, '#fff'), border: `1px solid ${safeColor(colorsRaw?.border, '#E5E7EB')}` }}>
+                  <Typography variant="subtitle1" sx={{ mb: 2, color: safeColor(colorsRaw?.text, '#111827') }}>
+                    Financeiro
+                  </Typography>
+                  {financeUiSuccess ? (
+                    <Alert severity="success" sx={{ mb: 2 }} onClose={() => setFinanceUiSuccess('')}>
+                      {financeUiSuccess}
+                    </Alert>
+                  ) : null}
+                  {error && activeTab === 3 ? (
+                    <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clientsActions.clearError())}>
+                      {error}
+                    </Alert>
+                  ) : null}
+                  {financeError ? (
+                    <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFinanceError(null)}>
+                      {financeError}
+                    </Alert>
+                  ) : null}
+                  {financeLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3, alignItems: 'flex-start' }}>
+                        <Box sx={{ flex: '1 1 280px', minWidth: 0 }}>
+                          <Typography variant="body2" sx={{ color: safeColor(colorsRaw?.textSecondary, '#9CA3AF'), mb: 0.5 }}>
+                            Plano
+                          </Typography>
+                          <Typography variant="body1" sx={{ color: safeColor(colorsRaw?.text, '#111827') }}>
+                            {financeSummary?.profile?.plan_name || 'Sem plano'}
+                          </Typography>
+                          {financeSummary?.profile?.plan_id ? (
+                            <Typography variant="caption" sx={{ color: safeColor(colorsRaw?.textSecondary, '#9CA3AF'), display: 'block', mt: 0.5 }}>
+                              Base: R$ {Number(financeSummary.profile.base_price || 0).toFixed(2)} · {planIntervalLabel(financeSummary.profile.recurring_interval)}
+                            </Typography>
+                          ) : null}
+                        </Box>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                          <Chip
+                            size="small"
+                            color={financeSummary?.billing?.billing_status === 'inadimplente' ? 'warning' : 'success'}
+                            label={financeSummary?.billing?.billing_status === 'inadimplente' ? 'Inadimplente' : 'Ativo'}
+                          />
+                          {financeSummary?.billing?.billing_blocked ? (
+                            <Chip size="small" color="error" label="Bloqueio administrativo" />
+                          ) : null}
+                        </Box>
+                      </Box>
+
+                      <Typography variant="body2" sx={{ color: safeColor(colorsRaw?.textSecondary, '#9CA3AF'), mb: 1.5 }}>
+                        Mesmo com o bloqueio desligado, clientes marcados como inadimplentes continuam sem acesso à frota até regularizarem as cobranças.
+                      </Typography>
+
+                      <FormControlLabel
+                        sx={{ mb: 2, alignItems: 'flex-start' }}
+                        control={(
+                          <Switch
+                            checked={billingBlockedDraft}
+                            onChange={(e) => setBillingBlockedDraft(e.target.checked)}
+                            color="primary"
+                          />
+                        )}
+                        label={(
+                          <Box>
+                            <Typography variant="body2" sx={{ color: safeColor(colorsRaw?.text, '#111827') }}>
+                              Bloquear acesso aos veículos (administrativo)
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: safeColor(colorsRaw?.textSecondary, '#9CA3AF') }}>
+                              Independente de plano financeiro. Útil para suspender o cliente manualmente.
+                            </Typography>
+                          </Box>
+                        )}
+                      />
+
+                      <Button
+                        variant="contained"
+                        onClick={handleSaveFinanceAccess}
+                        disabled={billingSaveStatus === 'loading' || status === 'loading'}
+                        startIcon={billingSaveStatus === 'loading' ? <CircularProgress size={20} /> : null}
+                        sx={{ mb: 3, backgroundColor: safeColor(colorsRaw?.primary, '#3B82F6') }}
+                      >
+                        {billingSaveStatus === 'loading' ? 'Salvando...' : 'Salvar bloqueio de acesso'}
+                      </Button>
+
+                      <Typography variant="subtitle2" sx={{ mb: 1, color: safeColor(colorsRaw?.text, '#111827') }}>
+                        Cobranças em aberto (internas)
+                      </Typography>
+                      <TableContainer sx={{ mb: 3 }}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Competência</TableCell>
+                              <TableCell>Vencimento</TableCell>
+                              <TableCell>Valor</TableCell>
+                              <TableCell>Status</TableCell>
+                              <TableCell align="right">Ações</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {(financeSummary?.openCycles || []).map((row) => (
+                              <TableRow key={row.id}>
+                                <TableCell>{row.cycle_reference || '-'}</TableCell>
+                                <TableCell>{row.due_date ? String(row.due_date).slice(0, 10) : '-'}</TableCell>
+                                <TableCell>R$ {Number(row.amount || 0).toFixed(2)}</TableCell>
+                                <TableCell>{cycleStatusLabel(row.status)}</TableCell>
+                                <TableCell align="right">
+                                  <Tooltip title="Dar baixa manual">
+                                    <IconButton
+                                      size="small"
+                                      color="success"
+                                      onClick={() => setSettlementDialog({
+                                        open: true,
+                                        charge: { ...row, client_name: client?.name },
+                                      })}
+                                    >
+                                      <SettleIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {(!financeSummary?.openCycles || financeSummary.openCycles.length === 0) && (
+                              <TableRow>
+                                <TableCell colSpan={5} align="center">
+                                  Nenhuma cobrança interna em aberto.
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+
+                      <Typography variant="subtitle2" sx={{ mb: 1, color: safeColor(colorsRaw?.text, '#111827') }}>
+                        Faturas em aberto (Asaas)
+                      </Typography>
+                      {!financeSummary?.asaasCustomerMapped ? (
+                        <Typography variant="body2" sx={{ color: safeColor(colorsRaw?.textSecondary, '#9CA3AF'), mb: 2 }}>
+                          Cliente sem vínculo com cliente Asaas ou integração indisponível.
+                        </Typography>
+                      ) : (
+                        <TableContainer>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Descrição</TableCell>
+                                <TableCell>Vencimento</TableCell>
+                                <TableCell>Valor</TableCell>
+                                <TableCell>Status</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {(financeSummary?.asaasOpenInvoices || []).map((inv) => (
+                                <TableRow key={inv.id}>
+                                  <TableCell>{inv.description || inv.id || '-'}</TableCell>
+                                  <TableCell>{inv.dueDate ? String(inv.dueDate).slice(0, 10) : '-'}</TableCell>
+                                  <TableCell>R$ {Number(inv.value || 0).toFixed(2)}</TableCell>
+                                  <TableCell>{asaasStatusLabel(inv.status)}</TableCell>
+                                </TableRow>
+                              ))}
+                              {(!financeSummary?.asaasOpenInvoices || financeSummary.asaasOpenInvoices.length === 0) && (
+                                <TableRow>
+                                  <TableCell colSpan={4} align="center">
+                                    Nenhuma fatura pendente no Asaas.
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </>
+                  )}
+                </Paper>
+              )}
             </Box>
           </Box>
         </DialogContent>
       </Dialog>
+
+      <ManualSettlementDialog
+        open={settlementDialog.open}
+        charge={settlementDialog.charge}
+        clientNameFallback={client?.name || ''}
+        onClose={resetSettlementDialog}
+        onSubmit={handleSettlementSubmit}
+      />
 
       <Dialog
         open={addUserModalOpen}

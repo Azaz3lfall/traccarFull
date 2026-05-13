@@ -27,6 +27,7 @@ const { reducer, actions } = createSlice({
     selectedId: null,
     allDevices: [], // Lista completa de dispositivos para dropdowns
     loading: false,
+    lastFetchedAt: 0,
     error: null,
   },
   reducers: {
@@ -58,6 +59,7 @@ const { reducer, actions } = createSlice({
       .addCase(fetchAllDevices.fulfilled, (state, action) => {
         state.loading = false;
         state.allDevices = action.payload || [];
+        state.lastFetchedAt = Date.now();
         state.error = null;
       })
       .addCase(fetchAllDevices.rejected, (state, action) => {

@@ -154,6 +154,7 @@ const clientsSlice = createSlice({
   initialState: {
     items: [],
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+    lastFetchedAt: 0,
     error: null,
   },
   reducers: {
@@ -174,6 +175,7 @@ const clientsSlice = createSlice({
       .addCase(fetchClients.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.items = action.payload || [];
+        state.lastFetchedAt = Date.now();
         state.error = null;
       })
       .addCase(fetchClients.rejected, (state, action) => {

@@ -951,7 +951,7 @@ const FloatingResellersPopover = ({
               temporary: false,
               attributes: {
                 activeMapStyles: DEFAULT_ACTIVE_MAP_STYLES,
-                positionItems: "fixTime,address,totalDistance,course,altitude,accuracy,protocol,deviceTime,serverTime,index,hdop,vdop,pdop,sat,satVisible,rssi,coolantTemp,engineTemp,gps,roaming,latitude,longitude,event,alarm,status,odometer,serviceOdometer,tripOdometer,hours,steps,heartRate,valid,blocked,speed,ignition",
+                positionItems: "serverTime,address,totalDistance,course,altitude,accuracy,protocol,deviceTime,index,hdop,vdop,pdop,sat,satVisible,rssi,coolantTemp,engineTemp,gps,roaming,latitude,longitude,event,alarm,status,odometer,serviceOdometer,tripOdometer,hours,steps,heartRate,valid,blocked,speed,ignition",
                 mapLiveRoutes: "selected",
                 mapFollow: true,
                 speedUnit: "kmh",

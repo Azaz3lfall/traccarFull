@@ -201,7 +201,11 @@ const fleetSlice = createSlice({
     vehicles: [], // Lista de veículos cadastrados (CRUD)
     selectedPlate: null,
     loading: false,
+    fleetMapLoading: false,
+    vehiclesLoading: false,
+    mutating: false,
     error: null,
+    vehiclesLastFetchedAt: 0,
     availableDevicesForVehicle: [], // Dispositivos livres para vincular (não usados por outros veículos)
     availableDevicesLoading: false,
   },
@@ -216,78 +220,97 @@ const fleetSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchFleetMap.pending, (state) => {
+        state.fleetMapLoading = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchFleetMap.fulfilled, (state, action) => {
-        state.loading = false;
+        state.fleetMapLoading = false;
+        state.loading = state.vehiclesLoading || state.mutating;
         state.items = action.payload || [];
         state.error = null;
       })
       .addCase(fetchFleetMap.rejected, (state, action) => {
-        state.loading = false;
+        state.fleetMapLoading = false;
+        state.loading = state.vehiclesLoading || state.mutating;
         state.error = action.payload || 'Erro desconhecido ao buscar mapa de frota';
       })
       // fetchVehicles
       .addCase(fetchVehicles.pending, (state) => {
+        state.vehiclesLoading = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchVehicles.fulfilled, (state, action) => {
-        state.loading = false;
+        state.vehiclesLoading = false;
+        state.loading = state.fleetMapLoading || state.mutating;
         state.vehicles = action.payload || [];
+        state.vehiclesLastFetchedAt = Date.now();
         state.error = null;
       })
       .addCase(fetchVehicles.rejected, (state, action) => {
-        state.loading = false;
+        state.vehiclesLoading = false;
+        state.loading = state.fleetMapLoading || state.mutating;
         state.error = action.payload || 'Erro desconhecido ao buscar veículos';
       })
       // addVehicle
       .addCase(addVehicle.pending, (state) => {
+        state.mutating = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(addVehicle.fulfilled, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = null;
         // Adicionar novo veículo ao início da lista
         state.vehicles.unshift(action.payload);
+        state.vehiclesLastFetchedAt = Date.now();
       })
       .addCase(addVehicle.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = action.payload || 'Erro desconhecido ao criar veículo';
       })
       // updateVehicle
       .addCase(updateVehicle.pending, (state) => {
+        state.mutating = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(updateVehicle.fulfilled, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = null;
         // Atualizar veículo na lista
         const index = state.vehicles.findIndex(v => v.id === action.payload.id);
         if (index !== -1) {
           state.vehicles[index] = action.payload;
         }
+        state.vehiclesLastFetchedAt = Date.now();
       })
       .addCase(updateVehicle.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = action.payload || 'Erro desconhecido ao atualizar veículo';
       })
       // deleteVehicle
       .addCase(deleteVehicle.pending, (state) => {
+        state.mutating = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteVehicle.fulfilled, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = null;
         // Remover veículo da lista usando o ID retornado
         state.vehicles = state.vehicles.filter(v => v.id !== action.payload);
+        state.vehiclesLastFetchedAt = Date.now();
       })
       .addCase(deleteVehicle.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
+        state.loading = state.fleetMapLoading || state.vehiclesLoading;
         state.error = action.payload || 'Erro desconhecido ao deletar veículo';
       })
       // fetchAvailableDevicesForVehicle

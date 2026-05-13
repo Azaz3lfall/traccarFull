@@ -307,6 +307,7 @@ O app em `src/addons/reseller/traccar-manager` é um app Flutter white-label par
 | `docs/FIX_UUID_GESTAO_BACKEND.md` | Correções UUID no backend |
 | `docs/CORRECAO_UUID_ROTAS_GESTAO.md` | Detalhes da correção aplicada |
 | `dashcam_flutter_integration.md` | Integração de câmeras dashcam no Flutter |
+| `CADASTRO_DASHCAM.md` | Guia de cadastro de dashcam no Traccar (utilizador) |
 | `nginx-gestao-proxy.conf` | Snippet nginx para gestão |
 | `nginx-resellers-proxy.conf` | Snippet nginx para resellers |
 

@@ -13,6 +13,7 @@ import telecomPool from '../telecom/db/index.js';
 import registerTelecomRoutes from '../telecom/routes/index.js';
 import registerOSRoutes from '../os_backend/routes/index.js';
 import { startCommandScheduler } from './schedulers/commandScheduler.js';
+import { startRouteBlockMonitor } from './schedulers/routeBlockMonitor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -83,6 +84,9 @@ app.listen(PORT, () => {
 
     startCommandScheduler().catch((e) => {
         console.error('Falha ao iniciar agendador de comandos:', e?.message);
+    });
+    startRouteBlockMonitor().catch((e) => {
+        console.error('Falha ao iniciar monitor de bloqueio por rota:', e?.message);
     });
 });
 

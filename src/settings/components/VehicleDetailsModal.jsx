@@ -30,7 +30,23 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  Checkbox,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControl,
+  InputLabel,
+  Select,
+  FormControlLabel,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tabs,
+  Tab,
+  Stack,
 } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import {
   ArrowBack as ArrowBackIcon,
   Devices as DevicesIcon,
@@ -46,6 +62,7 @@ import {
   History as HistoryIcon,
   Link as LinkIcon,
   Schedule as ScheduleIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useAdministrator, useDeviceReadonly, useManager } from '../../common/util/permissions';
@@ -57,6 +74,14 @@ import DeviceVehicleHistoryDialog from './DeviceVehicleHistoryDialog';
 import { devicesActions, fetchAllDevices, fetchVehicles } from '../../store';
 import fetchOrThrow from '../../common/util/fetchOrThrow';
 import { OS_STATUS_LABELS } from '../../other/os/constants';
+import {
+  mergeGroupsToSchedules,
+  clusterSchedulesToGroups,
+  createDefaultScheduleGroup,
+  expandRecurrence,
+  parseTimeInputWithMode,
+  formatTimeForDisplay,
+} from '../utils/scheduledCommandGroups';
 
 const TELECOM_BASE = '/gestao/telecom';
 
@@ -64,6 +89,16 @@ const TELECOM_BASE = '/gestao/telecom';
 const Z_VEHICLE_DETAILS = 100000;
 const Z_VEHICLE_DETAILS_MENU = 100002;
 const Z_ACTION_OVER_DETAILS = 110000;
+/** Menus do Select são portados no body com z-index baixo (~1300); o Dialog usa 100000, então o dropdown ficava invisível / sem clique. */
+const Z_VEHICLE_DETAILS_SELECT_MENU = Z_VEHICLE_DETAILS + 100;
+
+const COMMAND_SELECT_MENU_PROPS = {
+  disableScrollLock: true,
+  style: { zIndex: Z_VEHICLE_DETAILS_SELECT_MENU },
+  PaperProps: {
+    sx: { zIndex: Z_VEHICLE_DETAILS_SELECT_MENU },
+  },
+};
 
 const COMMAND_DAY_DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const COMMAND_DAY_LABELS = {
@@ -76,13 +111,53 @@ const COMMAND_DAY_LABELS = {
   6: 'Sábado',
 };
 
-function defaultCommandSchedules() {
-  return Array.from({ length: 7 }, (_, d) => ({
-    day_of_week: d,
-    lock_time: null,
-    unlock_time: null,
-    enabled: true,
-  }));
+const SCHEDULE_DAY_SHORT = {
+  0: 'Dom', 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sáb',
+};
+
+const SCHEDULE_RECURRENCE_OPTIONS = [
+  { value: 'weekdays', label: 'Segunda a sexta' },
+  { value: 'mon_sat', label: 'Segunda a sábado' },
+  { value: 'all_week', label: 'Segunda a domingo' },
+  { value: 'custom', label: 'Dias específicos' },
+];
+
+const SCHEDULE_TIME_FORMAT_STORAGE_KEY = 'vehicleScheduledCommandsTimeFormat';
+
+function readStoredScheduleTimeFormat() {
+  if (typeof window === 'undefined') return '24h';
+  try {
+    return window.localStorage.getItem(SCHEDULE_TIME_FORMAT_STORAGE_KEY) === '12h' ? '12h' : '24h';
+  } catch {
+    return '24h';
+  }
+}
+
+const COMMAND_TYPE_LABELS = {
+  engineStop: 'Bloqueio',
+  engineResume: 'Desbloqueio',
+};
+
+const COMMAND_STATUS_LABELS = {
+  sent: 'Enviado',
+  queued_offline: 'Aguardando online',
+  failed: 'Falhou',
+  retried: 'Reenviado',
+  expired: 'Expirado',
+  cancelled: 'Cancelado',
+};
+
+const COMMAND_STATUS_COLORS = {
+  sent: 'success',
+  queued_offline: 'warning',
+  failed: 'error',
+  retried: 'info',
+  expired: 'default',
+  cancelled: 'default',
+};
+
+function formatCommandDate(value) {
+  return value ? new Date(value).toLocaleString('pt-BR') : '—';
 }
 
 const ALERT_TYPES = [
@@ -97,8 +172,100 @@ const ALERT_TYPES = [
   { key: 'alarm_unlock', label: 'Desbloqueio' },
 ];
 
+/** Campos de horário com digitação livre; estado local até o blur para não perder caracteres ao digitar. */
+const ScheduledCommandTimeInputs = ({
+  groupId,
+  lockTime,
+  unlockTime,
+  disabled,
+  timeDisplayMode,
+  onPatch,
+}) => {
+  const [lockDraft, setLockDraft] = useState(() => (
+    timeDisplayMode === '12h' ? formatTimeForDisplay(lockTime, '12h') : (lockTime ?? '')
+  ));
+  const [unlockDraft, setUnlockDraft] = useState(() => (
+    timeDisplayMode === '12h' ? formatTimeForDisplay(unlockTime, '12h') : (unlockTime ?? '')
+  ));
+
+  useEffect(() => {
+    if (timeDisplayMode === '12h') {
+      setLockDraft(formatTimeForDisplay(lockTime, '12h'));
+      setUnlockDraft(formatTimeForDisplay(unlockTime, '12h'));
+    } else {
+      setLockDraft(lockTime ?? '');
+      setUnlockDraft(unlockTime ?? '');
+    }
+  }, [groupId, lockTime, unlockTime, timeDisplayMode]);
+
+  const placeholder = timeDisplayMode === '12h' ? 'ex: 9:30 PM' : 'HH:mm';
+  const inputMode = timeDisplayMode === '12h' ? 'text' : 'numeric';
+  const maxLen = timeDisplayMode === '12h' ? 12 : 5;
+
+  return (
+    <Box sx={{
+      display: 'flex',
+      flexDirection: { xs: 'column', sm: 'row' },
+      flexWrap: 'wrap',
+      gap: 2,
+      mt: 1.5,
+      alignItems: { xs: 'stretch', sm: 'center' },
+    }}
+    >
+      <TextField
+        type="text"
+        size="small"
+        label="Bloqueio"
+        placeholder={placeholder}
+        disabled={disabled}
+        value={lockDraft}
+        onChange={(e) => setLockDraft(e.target.value)}
+        onBlur={() => onPatch({ lock_time: parseTimeInputWithMode(lockDraft, timeDisplayMode) })}
+        inputProps={{
+          inputMode,
+          maxLength: maxLen,
+          'aria-label': timeDisplayMode === '12h'
+            ? 'Horário de bloqueio (12 horas com AM/PM)'
+            : 'Horário de bloqueio (24 horas)',
+        }}
+        InputLabelProps={{ shrink: true }}
+        sx={{
+          flex: { sm: '0 1 auto' },
+          width: { xs: '100%', sm: 'auto' },
+          minWidth: { sm: timeDisplayMode === '12h' ? 160 : 130 },
+        }}
+      />
+      <TextField
+        type="text"
+        size="small"
+        label="Desbloqueio"
+        placeholder={placeholder}
+        disabled={disabled}
+        value={unlockDraft}
+        onChange={(e) => setUnlockDraft(e.target.value)}
+        onBlur={() => onPatch({ unlock_time: parseTimeInputWithMode(unlockDraft, timeDisplayMode) })}
+        inputProps={{
+          inputMode,
+          maxLength: maxLen,
+          'aria-label': timeDisplayMode === '12h'
+            ? 'Horário de desbloqueio (12 horas com AM/PM)'
+            : 'Horário de desbloqueio (24 horas)',
+        }}
+        InputLabelProps={{ shrink: true }}
+        sx={{
+          flex: { sm: '0 1 auto' },
+          width: { xs: '100%', sm: 'auto' },
+          minWidth: { sm: timeDisplayMode === '12h' ? 160 : 130 },
+        }}
+      />
+    </Box>
+  );
+};
+
 const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const t = useTranslation();
+  const theme = useTheme();
+  const isCompactNav = useMediaQuery(theme.breakpoints.down('md'));
   const admin = useAdministrator();
   const manager = useManager();
   const deviceReadonly = useDeviceReadonly();
@@ -118,7 +285,9 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const [removeDeviceId, setRemoveDeviceId] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
   const [smsModalDeviceId, setSmsModalDeviceId] = useState(null);
+  const [smsModalDeviceIds, setSmsModalDeviceIds] = useState([]);
   const [smsModalPhone, setSmsModalPhone] = useState('');
+  const [selectedSmsDeviceIds, setSelectedSmsDeviceIds] = useState([]);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
   const [resetModalOpen, setResetModalOpen] = useState(false);
@@ -128,10 +297,34 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
   const [osOrders, setOsOrders] = useState([]);
   const [osLoading, setOsLoading] = useState(false);
   const [osFetchError, setOsFetchError] = useState(null);
-  const [commandSchedules, setCommandSchedules] = useState(() => defaultCommandSchedules());
+  const [scheduleGroups, setScheduleGroups] = useState(() => [createDefaultScheduleGroup()]);
+  const [weeklyPreviewExpanded, setWeeklyPreviewExpanded] = useState(false);
+  const [scheduleTimeDisplayMode, setScheduleTimeDisplayMode] = useState(readStoredScheduleTimeFormat);
+  const commandSchedules = useMemo(() => mergeGroupsToSchedules(scheduleGroups), [scheduleGroups]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SCHEDULE_TIME_FORMAT_STORAGE_KEY, scheduleTimeDisplayMode);
+    } catch {
+      /* ignore */
+    }
+  }, [scheduleTimeDisplayMode]);
+
   const [commandSchedulesLoading, setCommandSchedulesLoading] = useState(false);
   const [commandSchedulesSaving, setCommandSchedulesSaving] = useState(false);
   const [commandSchedulesError, setCommandSchedulesError] = useState(null);
+  const [pendingCommands, setPendingCommands] = useState([]);
+  const [pendingCommandsLoading, setPendingCommandsLoading] = useState(false);
+  const [commandHistory, setCommandHistory] = useState([]);
+  const [commandHistoryLoading, setCommandHistoryLoading] = useState(false);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [copyVehiclesLoading, setCopyVehiclesLoading] = useState(false);
+  const [copySubmitLoading, setCopySubmitLoading] = useState(false);
+  const [copyVehiclesError, setCopyVehiclesError] = useState(null);
+  const [copyFeedback, setCopyFeedback] = useState(null);
+  const [copyVehicleSearch, setCopyVehicleSearch] = useState('');
+  const [copyTargetVehicles, setCopyTargetVehicles] = useState([]);
+  const [copySelectedVehicleIds, setCopySelectedVehicleIds] = useState([]);
 
   const associatedDevices = useMemo(() => {
     const rawIds = (vehicle?.deviceIds && Array.isArray(vehicle.deviceIds) && vehicle.deviceIds.length > 0)
@@ -141,6 +334,42 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
         : (vehicle?.device_id != null ? [vehicle.device_id] : []);
     return rawIds.map((id) => allDevices.find((d) => d && d.id === id)).filter(Boolean);
   }, [vehicle, allDevices]);
+
+  const getDeviceLabel = useCallback((deviceId) => {
+    const device = allDevices.find((item) => item && item.id === deviceId);
+    return device?.name || device?.uniqueId || `Device ${deviceId}`;
+  }, [allDevices]);
+
+  const sourceVehicleId = vehicle?.id || null;
+  const sourceClientId = vehicle?.client_id || null;
+
+  const filteredCopyVehicles = useMemo(() => {
+    const term = copyVehicleSearch.trim().toLowerCase();
+    if (!term) return copyTargetVehicles;
+    return copyTargetVehicles.filter((item) => {
+      const plate = String(item?.plate || '').toLowerCase();
+      const nickname = String(item?.nickname || '').toLowerCase();
+      const make = String(item?.make || '').toLowerCase();
+      const model = String(item?.model || '').toLowerCase();
+      return plate.includes(term) || nickname.includes(term) || make.includes(term) || model.includes(term);
+    });
+  }, [copyTargetVehicles, copyVehicleSearch]);
+
+  const filteredCopyVehicleIds = useMemo(
+    () => filteredCopyVehicles.map((item) => item.id),
+    [filteredCopyVehicles],
+  );
+
+  const allFilteredSelected = useMemo(
+    () => filteredCopyVehicleIds.length > 0
+      && filteredCopyVehicleIds.every((id) => copySelectedVehicleIds.includes(id)),
+    [filteredCopyVehicleIds, copySelectedVehicleIds],
+  );
+
+  const selectedInFilterCount = useMemo(
+    () => filteredCopyVehicleIds.filter((id) => copySelectedVehicleIds.includes(id)).length,
+    [filteredCopyVehicleIds, copySelectedVehicleIds],
+  );
 
   const loadAlerts = useCallback(async () => {
     if (!vehicle?.id) return;
@@ -171,12 +400,6 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
     }
   }, [manager, activeSection]);
 
-  useEffect(() => {
-    if (!manager && activeSection === 'commands') {
-      setActiveSection('devices');
-    }
-  }, [manager, activeSection]);
-
   const loadCommandSchedules = useCallback(async () => {
     if (!vehicle?.id) return;
     setCommandSchedulesLoading(true);
@@ -188,31 +411,99 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       const data = await response.json();
       const list = Array.isArray(data?.schedules) ? data.schedules : [];
       if (list.length === 7) {
-        setCommandSchedules(list);
+        setScheduleGroups(clusterSchedulesToGroups(list));
       } else {
-        setCommandSchedules(defaultCommandSchedules());
+        setScheduleGroups([createDefaultScheduleGroup()]);
       }
     } catch (e) {
-      setCommandSchedules(defaultCommandSchedules());
+      setScheduleGroups([createDefaultScheduleGroup()]);
       setCommandSchedulesError(e?.message || 'Erro ao carregar agendamento.');
     } finally {
       setCommandSchedulesLoading(false);
     }
   }, [vehicle?.id]);
 
-  useEffect(() => {
-    if (open && manager && activeSection === 'commands') {
-      loadCommandSchedules();
+  const loadPendingCommands = useCallback(async () => {
+    if (!vehicle?.id) return;
+    setPendingCommandsLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/vehicles/${vehicle.id}/scheduled-commands/pending`, {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      setPendingCommands(Array.isArray(data?.pending) ? data.pending : []);
+    } catch {
+      setPendingCommands([]);
+    } finally {
+      setPendingCommandsLoading(false);
     }
-  }, [open, manager, activeSection, loadCommandSchedules]);
+  }, [vehicle?.id]);
 
-  const updateCommandScheduleRow = useCallback((dayOfWeek, patch) => {
-    setCommandSchedules((prev) => {
-      const base = prev.length === 7 ? prev : defaultCommandSchedules();
-      return base.map((row) => (
-        row.day_of_week === dayOfWeek ? { ...row, ...patch } : row
-      ));
-    });
+  const loadCommandHistory = useCallback(async () => {
+    if (!vehicle?.id) return;
+    setCommandHistoryLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/vehicles/${vehicle.id}/scheduled-commands/history?limit=50`, {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      setCommandHistory(Array.isArray(data?.history) ? data.history : []);
+    } catch {
+      setCommandHistory([]);
+    } finally {
+      setCommandHistoryLoading(false);
+    }
+  }, [vehicle?.id]);
+
+  useEffect(() => {
+    if (open && activeSection === 'commands') {
+      loadCommandSchedules();
+      loadPendingCommands();
+      loadCommandHistory();
+    }
+  }, [open, activeSection, loadCommandHistory, loadCommandSchedules, loadPendingCommands]);
+
+  const handleScheduleRecurrenceChange = useCallback((groupId, nextRecurrence) => {
+    setScheduleGroups((prev) => prev.map((g) => {
+      if (g.id !== groupId) return g;
+      if (nextRecurrence === 'custom') {
+        const seed = expandRecurrence(g.recurrence, g.customDays);
+        return {
+          ...g,
+          recurrence: 'custom',
+          customDays: seed.length ? seed : [],
+        };
+      }
+      return { ...g, recurrence: nextRecurrence, customDays: [] };
+    }));
+  }, []);
+
+  const toggleScheduleCustomDay = useCallback((groupId, dow) => {
+    setScheduleGroups((prev) => prev.map((g) => {
+      if (g.id !== groupId) return g;
+      const base = g.recurrence === 'custom'
+        ? [...(Array.isArray(g.customDays) ? g.customDays : [])]
+        : expandRecurrence(g.recurrence, g.customDays);
+      const next = new Set(base);
+      if (next.has(dow)) next.delete(dow);
+      else next.add(dow);
+      const sorted = [...next].sort((a, b) => a - b);
+      return { ...g, recurrence: 'custom', customDays: sorted };
+    }));
+  }, []);
+
+  const addScheduleGroup = useCallback(() => {
+    setScheduleGroups((prev) => [...prev, createDefaultScheduleGroup()]);
+  }, []);
+
+  const removeScheduleGroup = useCallback((groupId) => {
+    setScheduleGroups((prev) => (
+      prev.length <= 1 ? [createDefaultScheduleGroup()] : prev.filter((g) => g.id !== groupId)
+    ));
+  }, []);
+
+  const updateScheduleGroup = useCallback((groupId, patch) => {
+    setScheduleGroups((prev) => prev.map((g) => (g.id === groupId ? { ...g, ...patch } : g)));
   }, []);
 
   const handleSaveCommandSchedules = async () => {
@@ -220,7 +511,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
     setCommandSchedulesSaving(true);
     setCommandSchedulesError(null);
     try {
-      const schedules = commandSchedules.map((row) => ({
+      const schedules = mergeGroupsToSchedules(scheduleGroups).map((row) => ({
         day_of_week: row.day_of_week,
         lock_time: row.lock_time && String(row.lock_time).trim() ? String(row.lock_time).trim().slice(0, 5) : null,
         unlock_time: row.unlock_time && String(row.unlock_time).trim() ? String(row.unlock_time).trim().slice(0, 5) : null,
@@ -237,6 +528,8 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
         body: JSON.stringify({ schedules }),
       });
       await loadCommandSchedules();
+      await loadPendingCommands();
+      await loadCommandHistory();
     } catch (e) {
       setCommandSchedulesError(e?.message || 'Erro ao salvar.');
     } finally {
@@ -244,11 +537,119 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
     }
   };
 
+  const handleCancelPendingCommand = useCallback(async (pendingId) => {
+    if (!vehicle?.id || !pendingId) return;
+    const confirmed = window.confirm('Cancelar este comando pendente?');
+    if (!confirmed) return;
+    try {
+      await fetchOrThrow(`/api/vehicles/${vehicle.id}/scheduled-commands/pending/${pendingId}/cancel`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      await loadPendingCommands();
+      await loadCommandHistory();
+    } catch (e) {
+      setCommandSchedulesError(e?.message || 'Erro ao cancelar comando pendente.');
+    }
+  }, [loadCommandHistory, loadPendingCommands, vehicle?.id]);
+
+  const loadCopyTargetVehicles = useCallback(async () => {
+    if (!sourceVehicleId || !sourceClientId) {
+      setCopyTargetVehicles([]);
+      return;
+    }
+    setCopyVehiclesLoading(true);
+    setCopyVehiclesError(null);
+    try {
+      const response = await fetchOrThrow('/api/vehicles', { credentials: 'include' });
+      const data = await response.json();
+      const allVehicles = Array.isArray(data) ? data : [];
+      const eligibleVehicles = allVehicles.filter(
+        (item) => item?.id && item.id !== sourceVehicleId && item.client_id === sourceClientId,
+      );
+      setCopyTargetVehicles(eligibleVehicles);
+    } catch (e) {
+      setCopyVehiclesError(e?.message || 'Erro ao carregar veículos para cópia.');
+      setCopyTargetVehicles([]);
+    } finally {
+      setCopyVehiclesLoading(false);
+    }
+  }, [sourceVehicleId, sourceClientId]);
+
+  const handleToggleCopyTarget = useCallback((targetId) => {
+    setCopySelectedVehicleIds((prev) => (
+      prev.includes(targetId)
+        ? prev.filter((id) => id !== targetId)
+        : [...prev, targetId]
+    ));
+  }, []);
+
+  const handleToggleSelectAllFiltered = useCallback(() => {
+    if (!filteredCopyVehicleIds.length) return;
+    setCopySelectedVehicleIds((prev) => {
+      if (allFilteredSelected) {
+        return prev.filter((id) => !filteredCopyVehicleIds.includes(id));
+      }
+      const merged = new Set([...prev, ...filteredCopyVehicleIds]);
+      return [...merged];
+    });
+  }, [filteredCopyVehicleIds, allFilteredSelected]);
+
+  const handleOpenCopyModal = useCallback(async () => {
+    setCopyFeedback(null);
+    setCopyVehicleSearch('');
+    setCopySelectedVehicleIds([]);
+    setCopyModalOpen(true);
+    await loadCopyTargetVehicles();
+  }, [loadCopyTargetVehicles]);
+
+  const handleCopySchedulesToVehicles = useCallback(async () => {
+    if (!sourceVehicleId || copySelectedVehicleIds.length === 0) return;
+    const confirmed = window.confirm(
+      `Copiar programação para ${copySelectedVehicleIds.length} veículo(s)?`,
+    );
+    if (!confirmed) return;
+
+    setCopySubmitLoading(true);
+    setCopyVehiclesError(null);
+    try {
+      const response = await fetchOrThrow('/api/vehicles/scheduled-commands/batch-copy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          source_vehicle_id: sourceVehicleId,
+          target_vehicle_ids: copySelectedVehicleIds,
+        }),
+      });
+      const data = await response.json();
+      const results = Array.isArray(data?.results) ? data.results : [];
+      const updatedCount = results.filter((item) => item?.status === 'updated').length;
+      const deniedCount = results.filter((item) => item?.status === 'denied').length;
+      const notFoundCount = results.filter((item) => item?.status === 'not_found').length;
+      setCopyFeedback({
+        severity: deniedCount > 0 || notFoundCount > 0 ? 'warning' : 'success',
+        message: `Programação copiada para ${updatedCount} veículo(s).`
+          + (deniedCount > 0 ? ` Negados: ${deniedCount}.` : '')
+          + (notFoundCount > 0 ? ` Não encontrados: ${notFoundCount}.` : ''),
+      });
+      setCopyModalOpen(false);
+      setCopySelectedVehicleIds([]);
+      setCopyVehicleSearch('');
+    } catch (e) {
+      setCopyVehiclesError(e?.message || 'Erro ao copiar programação.');
+    } finally {
+      setCopySubmitLoading(false);
+    }
+  }, [copySelectedVehicleIds, sourceVehicleId]);
+
   useEffect(() => {
     if (!open) {
       setSmsModalOpen(false);
       setSmsModalDeviceId(null);
+      setSmsModalDeviceIds([]);
       setSmsModalPhone('');
+      setSelectedSmsDeviceIds([]);
       setHistoryDialogOpen(false);
       setHistoryDialogDeviceId(null);
       setResetModalOpen(false);
@@ -259,9 +660,18 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       setOsOrders([]);
       setOsFetchError(null);
       setOsLoading(false);
-      setCommandSchedules(defaultCommandSchedules());
+      setScheduleGroups([createDefaultScheduleGroup()]);
       setCommandSchedulesError(null);
       setCommandSchedulesLoading(false);
+      setCopyModalOpen(false);
+      setCopyVehiclesLoading(false);
+      setCopySubmitLoading(false);
+      setCopyVehiclesError(null);
+      setCopyVehicleSearch('');
+      setCopyTargetVehicles([]);
+      setCopySelectedVehicleIds([]);
+      setCopyFeedback(null);
+      setWeeklyPreviewExpanded(false);
     }
   }, [open]);
 
@@ -389,6 +799,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
       handler: (device) => {
         if (!device?.id) return;
         setSmsModalDeviceId(device.id);
+        setSmsModalDeviceIds([]);
         setSmsModalPhone(device.phone || '');
         setSmsModalOpen(true);
       },
@@ -443,34 +854,113 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
     },
   ], [t, admin, deviceReadonly, onClose, navigate, dispatch, positions]);
 
+  const allAssociatedSelected = associatedDevices.length > 0
+    && associatedDevices.every((d) => selectedSmsDeviceIds.includes(d.id));
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
       maxWidth="lg"
       fullWidth
+      fullScreen={isCompactNav}
       slotProps={{ root: { sx: { zIndex: Z_VEHICLE_DETAILS } } }}
       PaperProps={{
         sx: {
-          maxHeight: '90vh',
+          maxHeight: { xs: '100%', md: '90vh' },
+          height: { xs: '100%', md: 'auto' },
+          display: 'flex',
+          flexDirection: 'column',
+          m: { xs: 0, md: 2 },
           backgroundColor: colors.surface || '#fff',
           border: `1px solid ${colors.border || '#E5E7EB'}`,
-          borderRadius: '16px',
+          borderRadius: { xs: 0, md: '16px' },
         },
       }}
     >
-      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.border || '#E5E7EB'}`, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={onClose} sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+      <Box sx={{
+        p: { xs: 1.5, sm: 2 },
+        borderBottom: `1px solid ${colors.border || '#E5E7EB'}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        flexShrink: 0,
+        flexWrap: 'wrap',
+      }}
+      >
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={onClose}
+          sx={{
+            color: colors.textSecondary || '#9CA3AF',
+            minHeight: 44,
+            px: { xs: 1, sm: 2 },
+          }}
+        >
           Voltar
         </Button>
-        <Typography variant="h6" sx={{ color: colors.text || '#111827' }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: colors.text || '#111827',
+            flex: 1,
+            minWidth: 0,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+          }}
+          noWrap
+          title={vehicle?.plate ? `DETALHES DO VEÍCULO - ${vehicle.plate}` : undefined}
+        >
           DETALHES DO VEÍCULO - {vehicle?.plate || '...'}
         </Typography>
       </Box>
 
-      <DialogContent sx={{ p: 2, overflow: 'auto' }}>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Paper sx={{ flex: '1 1 200px', minWidth: 200, p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+      <DialogContent sx={{
+        p: { xs: 1.5, sm: 2 },
+        overflow: 'auto',
+        flex: '1 1 auto',
+        minHeight: 0,
+      }}>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 1.5, md: 2 },
+          alignItems: { xs: 'stretch', md: 'flex-start' },
+        }}
+        >
+          {isCompactNav && (
+            <Paper
+              sx={{
+                width: '100%',
+                flexShrink: 0,
+                border: `1px solid ${colors.border || '#E5E7EB'}`,
+                overflow: 'hidden',
+              }}
+            >
+              <Tabs
+                value={activeSection}
+                onChange={(e, v) => setActiveSection(v)}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{
+                  minHeight: 48,
+                  '& .MuiTab-root': {
+                    minHeight: 44,
+                    py: 1,
+                    px: 1.25,
+                    fontSize: '0.8rem',
+                  },
+                }}
+              >
+                <Tab label="Disp." value="devices" />
+                <Tab label="Alertas" value="alerts" />
+                <Tab label="Comandos" value="commands" />
+                {manager && <Tab label="Dados" value="data" />}
+              </Tabs>
+            </Paper>
+          )}
+          {!isCompactNav && (
+          <Paper sx={{ flex: '1 1 200px', minWidth: 200, maxWidth: 260, p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
             <List dense disablePadding>
               <ListItemButton selected={activeSection === 'devices'} onClick={() => setActiveSection('devices')}>
                 <ListItemIcon sx={{ minWidth: 36 }}><DevicesIcon fontSize="small" /></ListItemIcon>
@@ -480,12 +970,10 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                 <ListItemIcon sx={{ minWidth: 36 }}><NotificationsIcon fontSize="small" /></ListItemIcon>
                 <ListItemText primary="Alertas" />
               </ListItemButton>
-              {manager && (
-                <ListItemButton selected={activeSection === 'commands'} onClick={() => setActiveSection('commands')}>
-                  <ListItemIcon sx={{ minWidth: 36 }}><ScheduleIcon fontSize="small" /></ListItemIcon>
-                  <ListItemText primary="Comandos" />
-                </ListItemButton>
-              )}
+              <ListItemButton selected={activeSection === 'commands'} onClick={() => setActiveSection('commands')}>
+                <ListItemIcon sx={{ minWidth: 36 }}><ScheduleIcon fontSize="small" /></ListItemIcon>
+                <ListItemText primary="Comandos" />
+              </ListItemButton>
               {manager && (
                 <ListItemButton selected={activeSection === 'data'} onClick={() => setActiveSection('data')}>
                   <ListItemIcon sx={{ minWidth: 36 }}><InfoOutlinedIcon fontSize="small" /></ListItemIcon>
@@ -497,14 +985,51 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
               Voltar
             </Button>
           </Paper>
+          )}
 
-          <Box sx={{ flex: '2 1 400px', minWidth: 0 }}>
+          <Box sx={{ flex: '2 1 0', minWidth: 0, width: '100%' }}>
             {activeSection === 'devices' && (
-              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
-                <TableContainer>
+              <Paper sx={{ p: { xs: 1.5, sm: 2 }, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: { xs: 'stretch', sm: 'flex-end' },
+                  mb: 1,
+                }}
+                >
+                  <Button
+                    size="small"
+                    variant="contained"
+                    fullWidth={isCompactNav}
+                    startIcon={<SendIcon />}
+                    disabled={selectedSmsDeviceIds.length === 0}
+                    sx={{ minHeight: isCompactNav ? 44 : undefined }}
+                    onClick={() => {
+                      setSmsModalDeviceId(null);
+                      setSmsModalDeviceIds(selectedSmsDeviceIds);
+                      setSmsModalPhone('');
+                      setSmsModalOpen(true);
+                    }}
+                  >
+                    Enviar SMS selecionados ({selectedSmsDeviceIds.length})
+                  </Button>
+                </Box>
+                <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={allAssociatedSelected}
+                            indeterminate={!allAssociatedSelected && selectedSmsDeviceIds.length > 0}
+                            onChange={() => {
+                              if (allAssociatedSelected) {
+                                setSelectedSmsDeviceIds([]);
+                              } else {
+                                setSelectedSmsDeviceIds(associatedDevices.map((d) => d.id));
+                              }
+                            }}
+                          />
+                        </TableCell>
                         <TableCell>IMEI</TableCell>
                         <TableCell>Nome</TableCell>
                         <TableCell>Modelo</TableCell>
@@ -517,6 +1042,18 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                     <TableBody>
                       {associatedDevices.map((device) => (
                         <TableRow key={device.id}>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedSmsDeviceIds.includes(device.id)}
+                              onChange={() => {
+                                setSelectedSmsDeviceIds((prev) => (
+                                  prev.includes(device.id)
+                                    ? prev.filter((id) => id !== device.id)
+                                    : [...prev, device.id]
+                                ));
+                              }}
+                            />
+                          </TableCell>
                           <TableCell>{device.uniqueId || '-'}</TableCell>
                           <TableCell>{device.name || '-'}</TableCell>
                           <TableCell>{device.model || '-'}</TableCell>
@@ -526,7 +1063,8 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                           {admin && (
                             <TableCell align="right">
                               <IconButton
-                                size="small"
+                                size="medium"
+                                sx={{ minWidth: 44, minHeight: 44 }}
                                 onClick={(e) => {
                                   setSelectedDevice(device);
                                   setAnchorEl(e.currentTarget);
@@ -545,9 +1083,17 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
             )}
 
             {activeSection === 'alerts' && (
-              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+              <Paper sx={{ p: { xs: 1.5, sm: 2 }, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
                 {alertsLoading ? <CircularProgress size={20} /> : ALERT_TYPES.map((item) => (
-                  <Box key={item.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1 }}>
+                  <Box key={item.key} sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    gap: { xs: 1, sm: 0 },
+                    py: 1,
+                  }}
+                  >
                     <Typography>{item.label}</Typography>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       {item.hasSpeedConfig && (
@@ -563,7 +1109,7 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                               config: { ...(prev[item.key]?.config || {}), speedLimit: Number(e.target.value || 0) },
                             },
                           }))}
-                          sx={{ width: 140 }}
+                          sx={{ width: { xs: '100%', sm: 140 }, maxWidth: '100%' }}
                         />
                       )}
                       <Switch
@@ -579,102 +1125,334 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
                     </Box>
                   </Box>
                 ))}
-                <Button variant="contained" onClick={handleSaveAlerts} disabled={alertsSaving} sx={{ mt: 2 }}>
+                <Button variant="contained" fullWidth={isCompactNav} onClick={handleSaveAlerts} disabled={alertsSaving} sx={{ mt: 2, minHeight: isCompactNav ? 44 : undefined }}>
                   {alertsSaving ? 'Salvando...' : 'Salvar Alertas'}
                 </Button>
               </Paper>
             )}
 
-            {manager && activeSection === 'commands' && (
-              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+            {activeSection === 'commands' && (
+              <Paper sx={{ p: { xs: 1.5, sm: 2 }, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text || '#111827', mb: 1 }}>
                   Comandos programados
                 </Typography>
-                <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 2 }}>
+                <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 1 }}>
                   Bloqueio e desbloqueio automáticos do motor (Traccar: engineStop / engineResume), por dia da semana.
                   O horário segue o relógio do servidor (defina TZ no ambiente do backend se necessário).
                 </Typography>
+                <Typography variant="caption" sx={{ display: 'block', color: colors.textSecondary || '#9CA3AF', mb: 2 }}>
+                  Adicione um ou mais horários (estilo despertador). Se dois horários cobrirem o mesmo dia,
+                  prevalece o que está mais abaixo na lista.
+                </Typography>
                 {commandSchedulesError && (
                   <Alert severity="warning" sx={{ mb: 2 }}>{commandSchedulesError}</Alert>
+                )}
+                {copyFeedback && (
+                  <Alert
+                    severity={copyFeedback.severity}
+                    sx={{ mb: 2 }}
+                    onClose={() => setCopyFeedback(null)}
+                  >
+                    {copyFeedback.message}
+                  </Alert>
                 )}
                 {commandSchedulesLoading ? (
                   <CircularProgress size={24} />
                 ) : (
                   <>
-                    <TableContainer>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Dia</TableCell>
-                            <TableCell>Bloqueio</TableCell>
-                            <TableCell>Desbloqueio</TableCell>
-                            <TableCell align="center">Ativo</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {COMMAND_DAY_DISPLAY_ORDER.map((dow) => {
-                            const row = commandSchedules.find((r) => r.day_of_week === dow) || {
-                              day_of_week: dow,
-                              lock_time: null,
-                              unlock_time: null,
-                              enabled: true,
-                            };
-                            return (
-                              <TableRow key={dow}>
-                                <TableCell>{COMMAND_DAY_LABELS[dow]}</TableCell>
-                                <TableCell>
-                                  <TextField
-                                    type="time"
+                    <Box sx={{
+                      display: 'flex',
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      gap: 1,
+                      flexWrap: 'wrap',
+                      mb: 2,
+                      flexDirection: { xs: 'column', sm: 'row' },
+                    }}
+                    >
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                        Formato da hora:
+                      </Typography>
+                      <ToggleButtonGroup
+                        exclusive
+                        size="small"
+                        value={scheduleTimeDisplayMode}
+                        onChange={(_, v) => {
+                          if (v != null) setScheduleTimeDisplayMode(v);
+                        }}
+                        sx={{
+                          width: { xs: '100%', sm: 'auto' },
+                          '& .MuiToggleButton-root': {
+                            flex: { xs: 1, sm: 'unset' },
+                            py: 1,
+                          },
+                        }}
+                        aria-label="Formato do relógio (24 horas ou AM/PM)"
+                      >
+                        <ToggleButton value="24h">24 h</ToggleButton>
+                        <ToggleButton value="12h">AM/PM</ToggleButton>
+                      </ToggleButtonGroup>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary, width: { xs: '100%', sm: 'auto' } }}>
+                        (salvo neste navegador; o servidor usa 24 h)
+                      </Typography>
+                    </Box>
+                    {scheduleGroups.map((group) => (
+                      <Box
+                        key={group.id}
+                        sx={{
+                          mb: 2,
+                          p: { xs: 1.25, sm: 1.5 },
+                          borderRadius: 1,
+                          border: `1px solid ${colors.border || '#E5E7EB'}`,
+                        }}
+                      >
+                        <Box sx={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 1,
+                          alignItems: 'flex-start',
+                          justifyContent: 'space-between',
+                        }}
+                        >
+                          <FormControl size="small" sx={{
+                            width: { xs: '100%', sm: 'auto' },
+                            minWidth: { xs: 0, sm: 220 },
+                            flex: { xs: '1 1 100%', sm: '1 1 200px' },
+                          }}
+                          >
+                            <InputLabel id={`schedule-rec-${group.id}`}>Repetição</InputLabel>
+                            <Select
+                              labelId={`schedule-rec-${group.id}`}
+                              label="Repetição"
+                              value={group.recurrence}
+                              onChange={(e) => handleScheduleRecurrenceChange(group.id, e.target.value)}
+                              MenuProps={COMMAND_SELECT_MENU_PROPS}
+                            >
+                              {SCHEDULE_RECURRENCE_OPTIONS.map((opt) => (
+                                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            alignSelf: { xs: 'flex-end', sm: 'auto' },
+                          }}
+                          >
+                            <Typography variant="caption" sx={{ color: colors.textSecondary }}>Ativo</Typography>
+                            <Switch
+                              checked={group.enabled !== false}
+                              onChange={(e) => updateScheduleGroup(group.id, { enabled: e.target.checked })}
+                            />
+                            <IconButton
+                              size="medium"
+                              sx={{ minWidth: 44, minHeight: 44 }}
+                              aria-label="Remover horário"
+                              onClick={() => removeScheduleGroup(group.id)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        {group.recurrence === 'custom' && (
+                          <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: { xs: 0.5, sm: 0.25 },
+                            mt: 1.5,
+                            columnGap: 1,
+                          }}
+                          >
+                            {COMMAND_DAY_DISPLAY_ORDER.map((dow) => (
+                              <FormControlLabel
+                                key={`${group.id}-day-${dow}`}
+                                sx={{ mr: 0.75 }}
+                                control={(
+                                  <Checkbox
                                     size="small"
-                                    value={row.lock_time || ''}
-                                    onChange={(e) => updateCommandScheduleRow(dow, {
-                                      lock_time: e.target.value ? e.target.value.slice(0, 5) : null,
-                                    })}
-                                    InputLabelProps={{ shrink: true }}
-                                    inputProps={{ step: 60 }}
-                                    sx={{ minWidth: 130 }}
+                                    checked={(group.customDays || []).includes(dow)}
+                                    onChange={() => toggleScheduleCustomDay(group.id, dow)}
                                   />
-                                </TableCell>
-                                <TableCell>
-                                  <TextField
-                                    type="time"
-                                    size="small"
-                                    value={row.unlock_time || ''}
-                                    onChange={(e) => updateCommandScheduleRow(dow, {
-                                      unlock_time: e.target.value ? e.target.value.slice(0, 5) : null,
-                                    })}
-                                    InputLabelProps={{ shrink: true }}
-                                    inputProps={{ step: 60 }}
-                                    sx={{ minWidth: 130 }}
-                                  />
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Switch
-                                    checked={row.enabled !== false}
-                                    onChange={(e) => updateCommandScheduleRow(dow, { enabled: e.target.checked })}
-                                  />
+                                )}
+                                label={SCHEDULE_DAY_SHORT[dow]}
+                              />
+                            ))}
+                          </Box>
+                        )}
+                        <ScheduledCommandTimeInputs
+                          groupId={group.id}
+                          lockTime={group.lock_time}
+                          unlockTime={group.unlock_time}
+                          disabled={group.enabled === false}
+                          timeDisplayMode={scheduleTimeDisplayMode}
+                          onPatch={(patch) => updateScheduleGroup(group.id, patch)}
+                        />
+                      </Box>
+                    ))}
+                    <Button variant="outlined" size="medium" fullWidth={isCompactNav} onClick={addScheduleGroup} sx={{ mb: 2, minHeight: isCompactNav ? 44 : undefined }}>
+                      Adicionar horário
+                    </Button>
+
+                    <Accordion expanded={weeklyPreviewExpanded} onChange={(_, expanded) => setWeeklyPreviewExpanded(expanded)}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 52, '& .MuiAccordionSummary-content': { my: 1 } }}>
+                        <Typography variant="subtitle2">Grade semanal (resultado)</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails sx={{ px: { xs: 0.5, sm: 2 } }}>
+                        <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Dia</TableCell>
+                                <TableCell>Bloqueio</TableCell>
+                                <TableCell>Desbloqueio</TableCell>
+                                <TableCell align="center">Ativo</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {COMMAND_DAY_DISPLAY_ORDER.map((dow) => {
+                                const row = commandSchedules.find((r) => r.day_of_week === dow) || {
+                                  day_of_week: dow,
+                                  lock_time: null,
+                                  unlock_time: null,
+                                  enabled: false,
+                                };
+                                return (
+                                  <TableRow key={dow}>
+                                    <TableCell>{COMMAND_DAY_LABELS[dow]}</TableCell>
+                                    <TableCell>
+                                      {row.lock_time
+                                        ? formatTimeForDisplay(row.lock_time, scheduleTimeDisplayMode)
+                                        : '—'}
+                                    </TableCell>
+                                    <TableCell>
+                                      {row.unlock_time
+                                        ? formatTimeForDisplay(row.unlock_time, scheduleTimeDisplayMode)
+                                        : '—'}
+                                    </TableCell>
+                                    <TableCell align="center">{row.enabled !== false ? 'Sim' : 'Não'}</TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
+                      <Button
+                        variant="contained"
+                        fullWidth={isCompactNav}
+                        onClick={handleSaveCommandSchedules}
+                        disabled={commandSchedulesSaving}
+                        sx={{ minHeight: isCompactNav ? 44 : undefined }}
+                      >
+                        {commandSchedulesSaving ? 'Salvando...' : 'Salvar comandos'}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        fullWidth={isCompactNav}
+                        onClick={handleOpenCopyModal}
+                        disabled={commandSchedulesSaving}
+                        sx={{ minHeight: isCompactNav ? 44 : undefined }}
+                      >
+                        Copiar programação
+                      </Button>
+                    </Stack>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text || '#111827', mb: 1 }}>
+                      Pendentes (aguardando device online)
+                    </Typography>
+                    {pendingCommandsLoading ? (
+                      <CircularProgress size={20} />
+                    ) : pendingCommands.length === 0 ? (
+                      <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+                        Nenhum comando aguardando.
+                      </Typography>
+                    ) : (
+                      <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Agendado para</TableCell>
+                              <TableCell>Comando</TableCell>
+                              <TableCell>Device</TableCell>
+                              <TableCell>Expira em</TableCell>
+                              <TableCell align="center">Tentativas</TableCell>
+                              <TableCell align="right">Ações</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {pendingCommands.map((item) => (
+                              <TableRow key={item.id}>
+                                <TableCell>{formatCommandDate(item.scheduled_for)}</TableCell>
+                                <TableCell>{COMMAND_TYPE_LABELS[item.command_type] || item.command_type}</TableCell>
+                                <TableCell>{getDeviceLabel(item.device_id)}</TableCell>
+                                <TableCell>{formatCommandDate(item.expires_at)}</TableCell>
+                                <TableCell align="center">{item.attempts || 0}</TableCell>
+                                <TableCell align="right">
+                                  <Button size="small" color="warning" onClick={() => handleCancelPendingCommand(item.id)}>
+                                    Cancelar
+                                  </Button>
                                 </TableCell>
                               </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveCommandSchedules}
-                      disabled={commandSchedulesSaving || commandSchedules.length !== 7}
-                      sx={{ mt: 2 }}
-                    >
-                      {commandSchedulesSaving ? 'Salvando...' : 'Salvar comandos'}
-                    </Button>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text || '#111827', mb: 1 }}>
+                      Histórico recente
+                    </Typography>
+                    {commandHistoryLoading ? (
+                      <CircularProgress size={20} />
+                    ) : commandHistory.length === 0 ? (
+                      <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+                        Nenhum envio registrado.
+                      </Typography>
+                    ) : (
+                      <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Tentativa</TableCell>
+                              <TableCell>Comando</TableCell>
+                              <TableCell>Device</TableCell>
+                              <TableCell>Status</TableCell>
+                              <TableCell>Mensagem</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {commandHistory.map((item) => (
+                              <TableRow key={item.id}>
+                                <TableCell>{formatCommandDate(item.attempted_at)}</TableCell>
+                                <TableCell>{COMMAND_TYPE_LABELS[item.command_type] || item.command_type}</TableCell>
+                                <TableCell>{item.device_id ? getDeviceLabel(item.device_id) : '—'}</TableCell>
+                                <TableCell>
+                                  <Chip
+                                    size="small"
+                                    label={COMMAND_STATUS_LABELS[item.status] || item.status}
+                                    color={COMMAND_STATUS_COLORS[item.status] || 'default'}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  {item.error_message || (item.http_code ? `HTTP ${item.http_code}` : '—')}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
                   </>
                 )}
               </Paper>
             )}
 
             {manager && activeSection === 'data' && (
-              <Paper sx={{ p: 2, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
+              <Paper sx={{ p: { xs: 1.5, sm: 2 }, border: `1px solid ${colors.border || '#E5E7EB'}` }}>
                 <Typography variant="subtitle2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 0.5 }}>
                   Detalhes da instalação
                 </Typography>
@@ -802,9 +1580,11 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
         onClose={() => {
           setSmsModalOpen(false);
           setSmsModalDeviceId(null);
+          setSmsModalDeviceIds([]);
           setSmsModalPhone('');
         }}
         deviceId={smsModalDeviceId}
+        deviceIds={smsModalDeviceIds}
         phone={smsModalPhone}
         rootZIndex={Z_ACTION_OVER_DETAILS}
       />
@@ -818,13 +1598,132 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
         dialogZIndex={Z_ACTION_OVER_DETAILS}
       />
       <Dialog
-        open={resetModalOpen}
-        onClose={() => !resetLoading && setResetModalOpen(false)}
+        open={copyModalOpen}
+        onClose={() => !copySubmitLoading && setCopyModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isCompactNav}
         slotProps={{ root: { sx: { zIndex: Z_ACTION_OVER_DETAILS } } }}
         PaperProps={{
           sx: {
             backgroundColor: colors.surface || '#fff',
             border: `1px solid ${colors.border || '#E5E7EB'}`,
+            borderRadius: { xs: 0, sm: 1 },
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text || '#111827' }}>
+          Copiar programação
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF', mb: 2 }}>
+            Selecione os veículos do mesmo cliente que receberão a programação deste veículo.
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            label="Filtrar veículos"
+            placeholder="Placa, apelido, marca ou modelo"
+            value={copyVehicleSearch}
+            onChange={(e) => setCopyVehicleSearch(e.target.value)}
+            sx={{ mb: 1.5 }}
+          />
+          {copyVehiclesError && (
+            <Alert severity="warning" sx={{ mb: 1.5 }}>{copyVehiclesError}</Alert>
+          )}
+          {copyVehiclesLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'stretch', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 1,
+                mb: 1,
+              }}
+              >
+                <Button
+                  size="small"
+                  fullWidth={isCompactNav}
+                  sx={{ minHeight: isCompactNav ? 40 : undefined }}
+                  onClick={handleToggleSelectAllFiltered}
+                  disabled={filteredCopyVehicleIds.length === 0}
+                >
+                  {allFilteredSelected ? 'Desmarcar todos (filtro)' : 'Selecionar todos (filtro)'}
+                </Button>
+                <Typography variant="caption" sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+                  Selecionados: {copySelectedVehicleIds.length} (no filtro: {selectedInFilterCount})
+                </Typography>
+              </Box>
+              <Paper variant="outlined" sx={{ maxHeight: 280, overflow: 'auto' }}>
+                <List dense disablePadding>
+                  {filteredCopyVehicles.map((item) => (
+                    <ListItemButton key={item.id} onClick={() => handleToggleCopyTarget(item.id)}>
+                      <ListItemIcon sx={{ minWidth: 34 }}>
+                        <Checkbox
+                          edge="start"
+                          checked={copySelectedVehicleIds.includes(item.id)}
+                          tabIndex={-1}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.plate || 'Sem placa'}
+                        secondary={[item.nickname, item.make, item.model].filter(Boolean).join(' • ') || '—'}
+                      />
+                    </ListItemButton>
+                  ))}
+                  {!filteredCopyVehicles.length && (
+                    <Box sx={{ px: 2, py: 2 }}>
+                      <Typography variant="body2" sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+                        Nenhum veículo encontrado para este filtro.
+                      </Typography>
+                    </Box>
+                  )}
+                </List>
+              </Paper>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions sx={{
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          px: { xs: 2, sm: 3 },
+          pb: { xs: 2, sm: 1 },
+          gap: 1,
+        }}
+        >
+          <Button
+            fullWidth={isCompactNav}
+            onClick={() => !copySubmitLoading && setCopyModalOpen(false)}
+            disabled={copySubmitLoading}
+            sx={{ color: colors.textSecondary || '#9CA3AF', minHeight: isCompactNav ? 44 : undefined }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            fullWidth={isCompactNav}
+            onClick={handleCopySchedulesToVehicles}
+            disabled={copySubmitLoading || copySelectedVehicleIds.length === 0 || copyVehiclesLoading}
+            sx={{ minHeight: isCompactNav ? 44 : undefined }}
+          >
+            {copySubmitLoading ? 'Copiando...' : 'Copiar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={resetModalOpen}
+        onClose={() => !resetLoading && setResetModalOpen(false)}
+        fullScreen={isCompactNav}
+        slotProps={{ root: { sx: { zIndex: Z_ACTION_OVER_DETAILS } } }}
+        PaperProps={{
+          sx: {
+            backgroundColor: colors.surface || '#fff',
+            border: `1px solid ${colors.border || '#E5E7EB'}`,
+            borderRadius: { xs: 0, sm: 1 },
           },
         }}
       >
@@ -839,11 +1738,17 @@ const VehicleDetailsModal = ({ open, onClose, vehicle }) => {
             Deseja resetar o simcard deste dispositivo?
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => !resetLoading && setResetModalOpen(false)} disabled={resetLoading} sx={{ color: colors.textSecondary || '#9CA3AF' }}>
+        <DialogActions sx={{
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          px: { xs: 2, sm: 3 },
+          pb: { xs: 2, sm: 1 },
+          gap: 1,
+        }}
+        >
+          <Button fullWidth={isCompactNav} onClick={() => !resetLoading && setResetModalOpen(false)} disabled={resetLoading} sx={{ color: colors.textSecondary || '#9CA3AF', minHeight: isCompactNav ? 44 : undefined }}>
             Cancelar
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleResetConfirm} disabled={resetLoading}>
+          <Button fullWidth={isCompactNav} variant="contained" color="secondary" onClick={handleResetConfirm} disabled={resetLoading} sx={{ minHeight: isCompactNav ? 44 : undefined }}>
             {resetLoading ? <CircularProgress size={20} /> : t('deviceResetSimcard')}
           </Button>
         </DialogActions>

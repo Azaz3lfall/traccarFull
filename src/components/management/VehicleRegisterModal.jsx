@@ -41,7 +41,14 @@ const VehicleRegisterModal = ({ open, onClose, initialClientId, onSuccess }) => 
     hover: '#F3F4F6',
   };
   const { items: clients } = useSelector((state) => state.clients);
-  const { loading, error, availableDevicesForVehicle = [], availableDevicesLoading } = useSelector((state) => state.fleet);
+  const {
+    vehiclesLoading,
+    mutating,
+    error,
+    availableDevicesForVehicle = [],
+    availableDevicesLoading,
+  } = useSelector((state) => state.fleet);
+  const loading = vehiclesLoading || mutating;
 
   const [formData, setFormData] = useState({
     plate: '',

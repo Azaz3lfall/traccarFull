@@ -18,7 +18,7 @@ const DeviceVehicleHistoryDialog = ({ open, onClose, deviceId, dialogZIndex = DE
   const t = useTranslation();
   const dispatch = useDispatch();
   const vehicles = useSelector((state) => state.fleet.vehicles) || [];
-  const loading = useSelector((state) => state.fleet.loading);
+  const loading = useSelector((state) => state.fleet.vehiclesLoading);
 
   useEffect(() => {
     if (open) {

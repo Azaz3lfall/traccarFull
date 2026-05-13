@@ -80,6 +80,20 @@ const JIMI_IOT_DEFAULTS = {
   streamingServer: 'https://streaming.rastreadorautoram.com.br',
   midiaServer: 'https://midia.rastreadorautoram.com.br',
 };
+
+const GD14_DEFAULTS = {
+  iothubServer: 'https://jimi.rastreadorautoram.com.br',
+  jt808ServerUrl: 'http://50.30.32.171:7612',
+  ftpServerIp: '50.30.32.171',
+  ftpPort: '21',
+  fileUploadPath: '/',
+  token: '123',
+  streamingServer: 'https://streaming.rastreadorautoram.com.br',
+  midiaServer: 'https://midia.rastreadorautoram.com.br',
+  deviceModel: 'GD14',
+  channels: '4',
+  phone: '',
+};
 import { devicesActions, errorsActions, fetchVehicles } from '../store';
 import DeviceStatusIcons from '../settings/components/DeviceStatusIcons';
 import DeviceVehicleHistoryDialog from '../settings/components/DeviceVehicleHistoryDialog';
@@ -223,7 +237,9 @@ const FloatingDevicesPopover = ({
   const [historyDialogDeviceId, setHistoryDialogDeviceId] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
   const [smsModalDeviceId, setSmsModalDeviceId] = useState(null);
+  const [smsModalDeviceIds, setSmsModalDeviceIds] = useState([]);
   const [smsModalPhone, setSmsModalPhone] = useState('');
+  const [selectedSmsDeviceIds, setSelectedSmsDeviceIds] = useState([]);
   const [configPromptOpen, setConfigPromptOpen] = useState(false);
   const [configPromptDeviceId, setConfigPromptDeviceId] = useState(null);
   const [resetModalOpen, setResetModalOpen] = useState(false);
@@ -413,6 +429,8 @@ const FloatingDevicesPopover = ({
   // Pagination
   const totalPages = Math.ceil(displayedDevices.length / pageSize);
   const paginatedDevices = displayedDevices.slice((page - 1) * pageSize, page * pageSize);
+  const allDisplayedSelected = displayedDevices.length > 0
+    && displayedDevices.every((d) => selectedSmsDeviceIds.includes(d.id));
 
   // Create device mutation
   const createDeviceMutation = useMutation({
@@ -538,6 +556,7 @@ const FloatingDevicesPopover = ({
     const { iothub, ...deviceData } = editingDevice;
     const iothubData = {
       iothubServer: iothub?.iothubServer || '',
+      jt808ServerUrl: iothub?.jt808ServerUrl || '',
       ftpServerIp: iothub?.ftpServerIp || '',
       ftpPort: iothub?.ftpPort || '',
       ftpUser: iothub?.ftpUser || '',
@@ -548,6 +567,7 @@ const FloatingDevicesPopover = ({
       token: iothub?.token || '',
       streamingServer: iothub?.streamingServer || '',
       midiaServer: iothub?.midiaServer || '',
+      phone: iothub?.phone || '',
     };
     
     const finalDeviceData = {
@@ -589,6 +609,25 @@ const FloatingDevicesPopover = ({
     });
   }, [editDialog, editingDevice?.uniqueId, editingDevice?.model]);
 
+  // Keep JT808 phone in iothub config synced with device phone for GD14.
+  useEffect(() => {
+    if (!editDialog || !editingDevice || editingDevice.model !== 'GD14') return;
+    const devicePhone = editingDevice.phone || '';
+    if (editingDevice?.iothub?.phone === devicePhone) return;
+    setEditingDevice((prev) => {
+      if (!prev || prev.model !== 'GD14') return prev;
+      const nextPhone = prev.phone || '';
+      if (prev?.iothub?.phone === nextPhone) return prev;
+      return {
+        ...prev,
+        iothub: {
+          ...(prev?.iothub || {}),
+          phone: nextPhone,
+        },
+      };
+    });
+  }, [editDialog, editingDevice?.model, editingDevice?.phone, editingDevice?.iothub?.phone]);
+
   // Click outside handlers for dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -627,6 +666,7 @@ const FloatingDevicesPopover = ({
       attributes: {},
       iothub: {
         iothubServer: '',
+        jt808ServerUrl: '',
         ftpServerIp: '',
         ftpPort: '',
         ftpUser: '',
@@ -637,6 +677,7 @@ const FloatingDevicesPopover = ({
         token: '',
         streamingServer: '',
         midiaServer: '',
+        phone: '',
       },
     });
     setEditDialog(true);
@@ -647,6 +688,7 @@ const FloatingDevicesPopover = ({
     // Read iothub from attributes if it exists
     let iothub = {
       iothubServer: '',
+      jt808ServerUrl: '',
       ftpServerIp: '',
       ftpPort: '',
       ftpUser: '',
@@ -657,6 +699,7 @@ const FloatingDevicesPopover = ({
     token: '',
     streamingServer: '',
     midiaServer: '',
+    phone: '',
     };
     
     if (device.attributes?.iothub) {
@@ -788,6 +831,7 @@ const FloatingDevicesPopover = ({
       handler: (device) => {
         if (device?.id) {
           setSmsModalDeviceId(device.id);
+          setSmsModalDeviceIds([]);
           setSmsModalPhone(device.phone || '');
           setSmsModalOpen(true);
         }
@@ -1075,6 +1119,22 @@ const FloatingDevicesPopover = ({
                 </div>
                 </div>
                 
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<SendIcon />}
+                  disabled={selectedSmsDeviceIds.length === 0}
+                  onClick={() => {
+                    setSmsModalDeviceId(null);
+                    setSmsModalDeviceIds(selectedSmsDeviceIds);
+                    setSmsModalPhone('');
+                    setSmsModalOpen(true);
+                  }}
+                  sx={{ ml: 1 }}
+                >
+                  SMS selecionados ({selectedSmsDeviceIds.length})
+                </Button>
+
                 {/* XLSX Export Button */}
                 <IconButton
                   onClick={() => handleExport(displayedDevices)}
@@ -1136,6 +1196,20 @@ const FloatingDevicesPopover = ({
                     <Table size="small">
                       <TableHead>
                         <TableRow style={{ backgroundColor: colors.surface }}>
+                          <TableCell padding="checkbox" style={{ width: 36 }}>
+                            <Checkbox
+                              size="small"
+                              checked={allDisplayedSelected}
+                              indeterminate={!allDisplayedSelected && selectedSmsDeviceIds.length > 0}
+                              onChange={() => {
+                                if (allDisplayedSelected) {
+                                  setSelectedSmsDeviceIds((prev) => prev.filter((id) => !displayedDevices.some((d) => d.id === id)));
+                                } else {
+                                  setSelectedSmsDeviceIds((prev) => [...new Set([...prev, ...displayedDevices.map((d) => d.id)])]);
+                                }
+                              }}
+                            />
+                          </TableCell>
                           <TableCell style={{ color: colors.text, fontWeight: '600', padding: '6px 12px', fontSize: '12px' }}>
                             {t('deviceIdentifier')}
                           </TableCell>
@@ -1191,6 +1265,19 @@ const FloatingDevicesPopover = ({
                             }}
                             sx={{ '& .MuiTableCell-root': { padding: '9px 12px' } }}
                           >
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                size="small"
+                                checked={selectedSmsDeviceIds.includes(device.id)}
+                                onChange={() => {
+                                  setSelectedSmsDeviceIds((prev) => (
+                                    prev.includes(device.id)
+                                      ? prev.filter((id) => id !== device.id)
+                                      : [...prev, device.id]
+                                  ));
+                                }}
+                              />
+                            </TableCell>
                             <TableCell>
                               <Typography variant="body2" style={{ color: colors.textSecondary, lineHeight: 1.8, fontSize: '13px' }}>
                                 {device.uniqueId}
@@ -1674,6 +1761,16 @@ const FloatingDevicesPopover = ({
                                         channels,
                                       },
                                     });
+                                  } else if (model === 'GD14') {
+                                    const fallbackPhone = editingDevice?.phone || '';
+                                    setEditingDevice({
+                                      ...editingDevice,
+                                      model: model,
+                                      iothub: {
+                                        ...GD14_DEFAULTS,
+                                        phone: fallbackPhone,
+                                      },
+                                    });
                                   } else {
                                     setEditingDevice({ ...editingDevice, model: model });
                                   }
@@ -2009,6 +2106,56 @@ const FloatingDevicesPopover = ({
                             '& .MuiInputLabelRoot': { 
                               color: colors.textSecondary,
                               '&.Mui-focused': { color: colors.primary }
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="JT808 Server URL"
+                          value={editingDevice?.iothub?.jt808ServerUrl || ''}
+                          onChange={(e) => setEditingDevice({
+                            ...editingDevice,
+                            iothub: {
+                              ...(editingDevice?.iothub || {}),
+                              jt808ServerUrl: e.target.value,
+                            },
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': {
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary },
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="JT808 Phone"
+                          value={editingDevice?.iothub?.phone || ''}
+                          onChange={(e) => setEditingDevice({
+                            ...editingDevice,
+                            iothub: {
+                              ...(editingDevice?.iothub || {}),
+                              phone: e.target.value,
+                            },
+                          })}
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInputRoot': {
+                              backgroundColor: colors.secondary,
+                              '& fieldset': { borderColor: colors.border },
+                              '&:hover fieldset': { borderColor: colors.primary },
+                              '&.Mui-focused fieldset': { borderColor: colors.primary },
+                            },
+                            '& .MuiInputLabelRoot': {
+                              color: colors.textSecondary,
+                              '&.Mui-focused': { color: colors.primary },
                             },
                           }}
                         />
@@ -2525,6 +2672,7 @@ const FloatingDevicesPopover = ({
                   onClick={() => {
                     setConfigPromptOpen(false);
                     setSmsModalDeviceId(configPromptDeviceId);
+                    setSmsModalDeviceIds([]);
                     setSmsModalOpen(true);
                     setConfigPromptDeviceId(null);
                   }}
@@ -2537,8 +2685,14 @@ const FloatingDevicesPopover = ({
           )}
           <SmsSendModal
             open={smsModalOpen}
-            onClose={() => { setSmsModalOpen(false); setSmsModalDeviceId(null); setSmsModalPhone(''); }}
+            onClose={() => {
+              setSmsModalOpen(false);
+              setSmsModalDeviceId(null);
+              setSmsModalDeviceIds([]);
+              setSmsModalPhone('');
+            }}
             deviceId={smsModalDeviceId}
+            deviceIds={smsModalDeviceIds}
             phone={smsModalPhone}
           />
           <Dialog

@@ -267,9 +267,9 @@ const ClientsPage = () => {
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={client.active ? 'Ativo' : 'Inativo'}
+                            label={client.billing_status === 'inadimplente' ? 'Inadimplente' : 'Ativo'}
                             size="small"
-                            color={client.active ? 'success' : 'default'}
+                            color={client.billing_status === 'inadimplente' ? 'warning' : 'success'}
                           />
                         </TableCell>
                         <TableCell>
@@ -649,10 +649,10 @@ export const ClientsContent = () => {
                              : '-'}
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={client.active ? 'Ativo' : 'Inativo'} 
-                          size="small" 
-                          color={client.active ? 'success' : 'default'} 
+                        <Chip
+                          label={client.billing_status === 'inadimplente' ? 'Inadimplente' : 'Ativo'}
+                          size="small"
+                          color={client.billing_status === 'inadimplente' ? 'warning' : 'success'}
                         />
                       </TableCell>
                       <TableCell>

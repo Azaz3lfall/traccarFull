@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, memo, useEffect } from 'react';
+import { useMemo, useCallback, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 import {
@@ -26,92 +26,72 @@ const useStyles = makeStyles()((theme) => ({
     objectFit: 'contain',
     filter: 'brightness(0) invert(1)',
   },
-  batteryText: {
-    fontSize: '0.75rem',
-    fontWeight: 'normal',
-    lineHeight: '0.875rem',
-  },
-  success: {
-    color: theme.palette.success.main,
-  },
-  warning: {
-    color: theme.palette.warning.main,
-  },
-  error: {
-    color: theme.palette.error.main,
-  },
-  neutral: {
-    color: theme.palette.neutral.main,
-  },
   selected: {
     backgroundColor: theme.palette.action.selected,
   },
-  navigationButtons: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    marginLeft: '8px',
-  },
 }));
 
-const FleetDeviceCard = memo(({ item, index, desktop, style }) => {
+const FleetDeviceCard = memo(({ item, desktop, style }) => {
   const { classes } = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const selectedPlate = useSelector((state) => state.fleet.selectedPlate);
-  
+
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
 
-  // Obter primeiro dispositivo para exibição na lista
-  const currentDevice = useMemo(() => {
-    if (!item?.devices || item.devices.length === 0) return null;
-    const deviceId = item.devices[0]?.id;
-    if (!deviceId) return null;
-    return devices[deviceId];
-  }, [item, devices]);
+  // Pick the device with the most recent communication (same logic as FloatingFleetList)
+  const { currentDevice, currentPosition } = useMemo(() => {
+    const ids = item.deviceIds
+      || (item.devices?.map((d) => d.id))
+      || (item.device_id ? [item.device_id] : []);
 
-  // Obter posição atual
-  const currentPosition = useMemo(() => {
-    if (!currentDevice) return null;
-    return positions[currentDevice.id];
-  }, [currentDevice, positions]);
+    if (ids.length === 0) return { currentDevice: null, currentPosition: null };
 
-  const deviceCount = item?.devices?.length || 0;
+    const candidates = ids
+      .map((id) => ({ device: devices[id], position: positions[id] }))
+      .filter((c) => c.device);
+
+    if (candidates.length === 0) return { currentDevice: null, currentPosition: null };
+
+    // Sort by most recent communication
+    candidates.sort((a, b) => {
+      const getTime = ({ device, position }) => {
+        const ts = device?.lastUpdate || position?.serverTime || position?.deviceTime || position?.fixTime;
+        if (!ts) return 0;
+        const d = dayjs(ts);
+        return d.isValid() ? d.valueOf() : 0;
+      };
+      return getTime(b) - getTime(a);
+    });
+
+    return { currentDevice: candidates[0].device, currentPosition: candidates[0].position };
+  }, [item, devices, positions]);
+
+  const deviceCount = item?.devices?.length || (item.deviceIds?.length) || (item.device_id ? 1 : 0);
   const isSelected = item.plate === selectedPlate;
 
-  // Selecionar veículo ao clicar no card
   const handleCardClick = useCallback(() => {
     dispatch(fleetActions.setSelectedPlate(item.plate));
   }, [dispatch, item.plate]);
 
   const secondaryText = () => {
-    if (!currentDevice) {
-      return item.client_name || '';
-    }
-    
+    if (!currentDevice) return item.client_name || '';
+
     let status;
     if (currentDevice.status === 'online' || !currentDevice.lastUpdate) {
       status = formatStatus(currentDevice.status, t);
     } else {
       status = dayjs(currentDevice.lastUpdate).fromNow();
     }
-    
+
     const parts = [];
-    if (item.client_name) {
-      parts.push(item.client_name);
-    }
-    if (deviceCount > 1) {
-      parts.push(`${deviceCount} dispositivos`);
-    }
+    if (item.client_name) parts.push(item.client_name);
+    if (deviceCount > 1) parts.push(`${deviceCount} dispositivos`);
     parts.push(status);
-    
-    return (
-      <>
-        {parts.join(' • ')}
-      </>
-    );
+
+    return parts.join(' • ');
   };
 
   const primaryText = () => {
@@ -131,31 +111,17 @@ const FleetDeviceCard = memo(({ item, index, desktop, style }) => {
         <ListItemAvatar>
           <Avatar>
             {currentDevice ? (
-              <img 
-                className={classes.icon} 
-                src={mapIcons[mapIconKey(currentDevice.category)]} 
-                alt="" 
-              />
+              <img className={classes.icon} src={mapIcons[mapIconKey(currentDevice.category)]} alt="" />
             ) : (
-              <img 
-                className={classes.icon} 
-                src={mapIcons[mapIconKey('default')] || mapIcons[mapIconKey('car')]} 
-                alt="" 
-              />
+              <img className={classes.icon} src={mapIcons[mapIconKey('default')] || mapIcons[mapIconKey('car')]} alt="" />
             )}
           </Avatar>
         </ListItemAvatar>
         <ListItemText
           primary={primaryText()}
           secondary={secondaryText()}
-          slots={{
-            primary: Typography,
-            secondary: Typography,
-          }}
-          slotProps={{
-            primary: { noWrap: true },
-            secondary: { noWrap: true },
-          }}
+          slots={{ primary: Typography, secondary: Typography }}
+          slotProps={{ primary: { noWrap: true }, secondary: { noWrap: true } }}
         />
         {currentPosition && currentDevice && (
           <div style={{ display: 'flex', alignItems: 'center', marginLeft: 8, flexShrink: 0 }}>

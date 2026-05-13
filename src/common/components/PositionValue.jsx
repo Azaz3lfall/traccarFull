@@ -40,6 +40,7 @@ const PositionValue = ({ position, property, attribute }) => {
   const altitudeUnit = useAttributePreference('altitudeUnit');
   const speedUnit = useAttributePreference('speedUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
+  const timezone = useAttributePreference('timezone');
   const coordinateFormat = usePreference('coordinateFormat');
 
   const formatValue = () => {
@@ -47,7 +48,7 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'fixTime':
       case 'deviceTime':
       case 'serverTime':
-        return formatTime(value, 'seconds');
+        return formatTime(value, 'seconds', timezone);
       case 'latitude':
         return formatCoordinate('latitude', value, coordinateFormat);
       case 'longitude':

@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Card,
@@ -13,7 +14,9 @@ import {
   Button,
   TextField,
   Menu,
-  MenuItem
+  MenuItem,
+  Drawer,
+  Badge,
 } from '@mui/material';
 // Icons
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -25,7 +28,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import StreetviewIcon from '@mui/icons-material/Streetview';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { MdOutlineRoute } from "react-icons/md";
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import { TbBrandGoogleMaps } from "react-icons/tb";
 import { SiWaze } from "react-icons/si";
 import { FaApple } from "react-icons/fa6";
@@ -41,7 +44,8 @@ import {
   formatBoolean,
   formatNumber,
   formatPercentage,
-  reverseGeocode
+  reverseGeocode,
+  formatNotificationTitle,
 } from '../../common/util/formatter';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../../common/util/converter';
 import { useTranslation } from '../../common/components/LocalizationProvider';
@@ -69,6 +73,7 @@ dayjs.extend(relativeTime);
 
 const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const t = useTranslation();
   const colors = useThemeColors();
   const muiTheme = useMuiTheme();
@@ -79,6 +84,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
   const devices = useSelector((state) => state.devices.items);
   const positions = useSelector((state) => state.session.positions);
   const user = useSelector((state) => state.session.user);
+  const eventsItems = useSelector((state) => state.events.items);
 
   // Local State
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
@@ -92,6 +98,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [routeModalOpen, setRouteModalOpen] = useState(false);
+  const [vehicleEventsDrawerOpen, setVehicleEventsDrawerOpen] = useState(false);
   const [showLockPasswordDialog, setShowLockPasswordDialog] = useState(false);
   const [lockPasswordAction, setLockPasswordAction] = useState(null);
   const [lockPasswordInput, setLockPasswordInput] = useState('');
@@ -158,6 +165,42 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
     if (!currentDevice) return null;
     return positions[currentDevice.id];
   }, [currentDevice, positions]);
+
+  const deviceEvents = useMemo(() => {
+    if (!currentDevice?.id) return [];
+    return eventsItems
+      .filter((e) => e.deviceId === currentDevice.id)
+      .sort((a, b) => new Date(b.eventTime).getTime() - new Date(a.eventTime).getTime());
+  }, [eventsItems, currentDevice?.id]);
+
+  const formatVehicleEventType = useCallback((event) => {
+    const device = devices[event.deviceId];
+    const standardEvent = formatNotificationTitle(t, {
+      type: event.type,
+      attributes: {
+        alarms: event.attributes?.alarm,
+      },
+    });
+    if (device?.attributes?.customSensors) {
+      try {
+        const customSensors = JSON.parse(device.attributes.customSensors);
+        for (const [sensorKey, customName] of Object.entries(customSensors)) {
+          if (event.type.includes(sensorKey)) {
+            const regex = new RegExp(sensorKey, 'gi');
+            let customEvent = standardEvent.replace(regex, customName);
+            if (event.type.endsWith('On') || event.type.endsWith('Off')) {
+              const isOn = event.type.endsWith('On');
+              customEvent = `${customName}: ${isOn ? t('sharedYes') : t('sharedNo')}`;
+            }
+            return customEvent;
+          }
+        }
+      } catch (e) {
+        // ignore invalid customSensors JSON
+      }
+    }
+    return standardEvent;
+  }, [devices, t]);
 
   // Sync internal index with Redux selection
   // This ensures that if the map or another component changes the selectedId, the card updates
@@ -281,7 +324,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
   const speedUnit = useAttributePreference('speedUnit');
   const distanceUnit = useAttributePreference('distanceUnit');
   const coordinateFormat = usePreference('coordinateFormat');
-  const positionItems = useAttributePreference('positionItems', 'fixTime,address,speed,totalDistance');
+  const positionItems = useAttributePreference('positionItems', 'serverTime,address,speed,totalDistance');
   const positionAttributes = usePositionAttributes(t);
   const deviceReadonly = useDeviceReadonly();
 
@@ -601,6 +644,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
     <>
     <Card style={{
       height: '100%',
+      minHeight: 0,
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: colors.surface,
@@ -608,7 +652,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
       boxShadow: 'none',
       overflow: 'hidden',
       position: 'relative',
-      zIndex: 1000
+      zIndex: 1000,
     }}>
       {/* Header Buttons */}
       <button
@@ -636,18 +680,27 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
 
       {/* Top Right Action Buttons */}
       <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '8px', zIndex: 10 }}>
-         {/* History/Replay Button */}
-         <button 
-            onClick={() => onOpenReplay?.(currentDevice?.id)} 
-            style={{ 
-                background: 'none', border: 'none', cursor: 'pointer', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center' 
+         <button
+            type="button"
+            onClick={() => setVehicleEventsDrawerOpen(true)}
+            style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 0,
             }}
-            title={t('reportReplay')}
+            title={t('reportEvents')}
          >
-            <MdOutlineRoute size={24} color={colors.textSecondary} />
+            <Badge
+              color="error"
+              badgeContent={deviceEvents.length}
+              invisible={deviceEvents.length === 0}
+              overlap="circular"
+              max={99}
+            >
+              <NotificationsOutlinedIcon style={{ fontSize: '24px', color: colors.textSecondary }} />
+            </Badge>
          </button>
-         
+
          <button 
             onClick={() => onOpenDetails?.(currentDevice?.id, currentPosition)} 
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
@@ -657,7 +710,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
          </button>
       </div>
 
-      <div style={{ padding: '24px 20px 8px 20px', backgroundColor: colors.surface, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ padding: '24px 20px 8px 20px', backgroundColor: colors.surface, display: 'flex', flexDirection: 'column', gap: '16px', flexShrink: 0 }}>
         
         {/* --- DEVICE NAME (Centered) --- */}
         {/* AJUSTE AQUI: Adicionei margem superior para baixar o nome */}
@@ -795,8 +848,8 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
                 })()}
             </p>
             {currentPosition && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
-                <DeviceStatusIcons position={currentPosition} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '4px', width: '100%' }}>
+                <DeviceStatusIcons position={currentPosition} device={currentDevice} />
               </div>
             )}
         </div>
@@ -808,7 +861,8 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
             gap: '8px', padding: '16px 20px', 
             borderTop: `1px solid ${colors.border}`,
-            marginTop: 'auto'
+            marginTop: 'auto',
+            flexShrink: 0,
         }}>
             {(hasResumeEnginePermission || hasStopEnginePermission) && (
                 <>
@@ -934,14 +988,18 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
       {/* --- DETAILS LIST --- */}
       <div style={{
         flex: 1,
+        minHeight: 0,
         padding: '0 20px 20px 20px',
         overflow: 'auto',
-        borderTop: `1px solid ${colors.border}`
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        borderTop: `1px solid ${colors.border}`,
       }}>
         {currentPosition && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {positionItems.split(',').filter((key) => {
-              return key && key !== 'address' && (currentPosition.hasOwnProperty(key) || currentPosition.attributes?.hasOwnProperty(key));
+              return key && key !== 'address' && key !== 'fixTime'
+                && (currentPosition.hasOwnProperty(key) || currentPosition.attributes?.hasOwnProperty(key));
             }).map((key, index) => {
               const attributeName = positionAttributes[key]?.name || key;
               const value = currentPosition.hasOwnProperty(key) ? currentPosition[key] : currentPosition.attributes?.[key];
@@ -1032,6 +1090,97 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
       </Snackbar>
 
     </Card>
+
+    <Drawer
+      anchor="right"
+      open={vehicleEventsDrawerOpen}
+      onClose={() => setVehicleEventsDrawerOpen(false)}
+      PaperProps={{
+        sx: {
+          width: desktop ? 360 : '100%',
+          maxWidth: '100vw',
+          backgroundColor: colors.surface,
+          borderLeft: `1px solid ${colors.border}`,
+        },
+      }}
+    >
+      <div style={{
+        padding: '16px',
+        borderBottom: `1px solid ${colors.border}`,
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: '12px',
+      }}>
+        <div style={{ minWidth: 0 }}>
+          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: colors.text, lineHeight: 1.3 }}>
+            {t('reportEvents')}
+          </h3>
+          <p style={{
+            margin: '6px 0 0 0',
+            fontSize: '13px',
+            color: colors.textSecondary,
+            fontWeight: 500,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          >
+            {currentDevice[devicePrimary] || currentDevice.name || selectedGroup?.plate}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setVehicleEventsDrawerOpen(false)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', flexShrink: 0 }}
+        >
+          <X size={22} color={colors.textSecondary} />
+        </button>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', maxHeight: 'calc(100vh - 88px)' }}>
+        {deviceEvents.length === 0 ? (
+          <div style={{ padding: '24px', textAlign: 'center', color: colors.textSecondary, fontSize: '14px' }}>
+            {t('noEventsAvailable')}
+          </div>
+        ) : (
+          deviceEvents.map((event, index) => (
+            <div
+              key={event.id ?? `ev-${index}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                if (event.id) {
+                  navigate(`/event/${event.id}`);
+                }
+                setVehicleEventsDrawerOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (event.id) {
+                    navigate(`/event/${event.id}`);
+                  }
+                  setVehicleEventsDrawerOpen(false);
+                }
+              }}
+              style={{
+                padding: '12px 16px',
+                borderBottom: index < deviceEvents.length - 1 ? `1px solid ${colors.border}` : 'none',
+                cursor: event.id ? 'pointer' : 'default',
+                opacity: event.id ? 1 : 0.7,
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 600, color: colors.text, marginBottom: '4px', lineHeight: 1.35 }}>
+                {formatVehicleEventType(event)}
+              </div>
+              <div style={{ fontSize: '12px', color: colors.textSecondary }}>
+                {formatTime(event.eventTime, 'seconds')}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </Drawer>
 
     {/* --- ROUTE MODAL --- */}
     <AnimatePresence>

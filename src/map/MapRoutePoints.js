@@ -75,21 +75,31 @@ const MapRoutePoints = ({ positions, onClick, showSpeedControl }) => {
       map.addControl(control, theme.direction === 'rtl' ? 'bottom-right' : 'bottom-left');
     }
 
+    const features = [];
+    // Limit the number of markers to improve performance
+    const step = Math.max(1, Math.ceil(positions.length / 100));
+
+    positions.forEach((position, index) => {
+      if (index % step === 0 || index === positions.length - 1) {
+        features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [position.longitude, position.latitude],
+          },
+          properties: {
+            index,
+            id: position.id,
+            rotation: position.course,
+            color: getSpeedColor(position.speed, minSpeed, maxSpeed),
+          },
+        });
+      }
+    });
+
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
-      features: positions.map((position, index) => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [position.longitude, position.latitude],
-        },
-        properties: {
-          index,
-          id: position.id,
-          rotation: position.course,
-          color: getSpeedColor(position.speed, minSpeed, maxSpeed),
-        },
-      })),
+      features,
     });
     return () => map.removeControl(control);
   }, [onMarkerClick, positions, showSpeedControl]);

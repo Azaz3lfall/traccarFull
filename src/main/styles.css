@@ -124,6 +124,11 @@
   }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Added custom gradient utilities for the hero section */
 .gradient-hero {
   background: linear-gradient(135deg, oklch(0.65 0.25 240) 0%, oklch(0.7 0.3 280) 50%, oklch(0.75 0.25 30) 100%);

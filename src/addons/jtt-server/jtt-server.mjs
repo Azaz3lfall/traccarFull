@@ -55,6 +55,8 @@ app.use(bodyParser.text({ type: '*/*', limit: '50mb' }));
 // Pending file list requests - wait for pushresourcelist response
 // ──────────────────────────────────────────────────────────────────────
 const pendingFileListRequests = new Map(); // deviceImei -> { resolve, reject, timeout }
+const pendingJc400SdListRequests = new Map(); // deviceImei -> { resolve, reject, timeout }
+const jc400SdListCache = new Map(); // deviceImei -> { files, timestamp }
 
 // ──────────────────────────────────────────────────────────────────────
 // REQUEST LOGGING MIDDLEWARE
@@ -118,6 +120,65 @@ app.use((req, res, next) => {
 // ──────────────────────────────────────────────────────────────────────
 const fsExists = p => new Promise(r => fs.access(p, fs.constants.F_OK, e => r(!e)));
 const fsMkdir = p => new Promise(r => fs.mkdir(p, { recursive: true }, () => r()));
+
+const parseIncomingBody = (rawBody) => {
+  try {
+    if (!rawBody) return {};
+    if (typeof rawBody !== 'string') return rawBody;
+    const trimmed = rawBody.trim();
+    if (!trimmed) return {};
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      return JSON.parse(trimmed);
+    }
+    const qs = querystring.parse(trimmed);
+    for (const [k, v] of Object.entries(qs)) {
+      if (typeof v === 'string' && (v.startsWith('{') || v.startsWith('['))) {
+        try {
+          qs[k] = JSON.parse(v);
+        } catch (e) {
+          // Keep original string when it isn't valid JSON.
+        }
+      }
+    }
+    return qs;
+  } catch (e) {
+    return {};
+  }
+};
+
+const buildJimiApiUrl = (jimiServer) => {
+  const clean = (jimiServer || '').replace(/\/+$/, '');
+  if (!clean) {
+    throw new Error('jimiServer is required');
+  }
+  return clean.startsWith('http') ? `${clean}/api/device/sendInstruct` : `https://${clean}/api/device/sendInstruct`;
+};
+
+async function sendJimiInstruct({ deviceImei, cmdContent, token, jimiServer }) {
+  const apiUrl = buildJimiApiUrl(jimiServer);
+  const form = new URLSearchParams();
+  form.append('deviceImei', deviceImei);
+  form.append('cmdContent', cmdContent);
+  form.append('proNo', '128');
+  form.append('token', token);
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form,
+    redirect: 'follow',
+  });
+  const text = await response.text();
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch (e) {
+    parsed = null;
+  }
+  return { response, text, parsed };
+}
 // REMOVED: fsRename - no longer used (file moving operations disabled)
 
 // Wait for file to stabilize (not being written to)
@@ -837,6 +898,33 @@ function parseJC400Filename(filename) {
   // Map F/I to channel numbers: F = 1, I = 2
   const channelNumber = channel === 'F' ? 1 : (channel === 'I' ? 2 : null);
   return { imei, channel: channelNumber, channelLabel: channel, eventType: Number(eventType), beginTime, endTime: beginTime };
+}
+
+// Parse filename list items from FILELIST/TFFILELIST callback.
+// Known format examples:
+// - 2021_06_10_18_50_17_01.mp4
+// - 2021_06_10_18_50_17_02.mp4
+function parseJC400SdFileListName(fileName) {
+  if (!fileName || typeof fileName !== 'string') return null;
+  const trimmed = fileName.trim();
+  const noExt = trimmed.replace(/\.(mp4|ts)$/i, '');
+  const parts = noExt.split('_');
+  if (parts.length < 7) return null;
+  const [year, month, day, hour, minute, second, cameraPart] = parts;
+  if (!/^\d{4}$/.test(year) || !/^\d{2}$/.test(month) || !/^\d{2}$/.test(day)) return null;
+  if (!/^\d{2}$/.test(hour) || !/^\d{2}$/.test(minute) || !/^\d{2}$/.test(second)) return null;
+
+  let channel = 1;
+  if (cameraPart === '02' || cameraPart === '2') channel = 2;
+  if (cameraPart === '01' || cameraPart === '1') channel = 1;
+
+  const beginTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  return {
+    fileName: trimmed,
+    channel,
+    beginTime,
+    endTime: beginTime,
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -1921,6 +2009,113 @@ app.post('/ftpupload', async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────────────
+// JC400 FILELIST/TFFILELIST callback receiver
+// ──────────────────────────────────────────────────────────────────────
+const handleJc400FileListWebhook = async (req, res) => {
+  const body = parseIncomingBody(req.body);
+  const imei = body?.imei || body?.deviceImei;
+  const fileNameListRaw = body?.fileNameList;
+
+  if (!imei) {
+    return res.json({ code: 0, ok: true });
+  }
+
+  let files = [];
+  if (Array.isArray(fileNameListRaw)) {
+    files = fileNameListRaw.map((v) => String(v).trim()).filter(Boolean);
+  } else if (typeof fileNameListRaw === 'string') {
+    files = fileNameListRaw.split(',').map((v) => v.trim()).filter(Boolean);
+  }
+
+  jc400SdListCache.set(imei, {
+    files,
+    timestamp: Date.now(),
+  });
+
+  if (pendingJc400SdListRequests.has(imei)) {
+    const pending = pendingJc400SdListRequests.get(imei);
+    clearTimeout(pending.timeout);
+    pendingJc400SdListRequests.delete(imei);
+    pending.resolve(files);
+  }
+
+  return res.json({ code: 0, ok: true });
+};
+
+app.post('/pushURL/jc400filelist', handleJc400FileListWebhook);
+app.post('/pushURL/pushfilelist', handleJc400FileListWebhook);
+
+// ──────────────────────────────────────────────────────────────────────
+// JC400 start playback stream by filename (REPLAYLIST)
+// ──────────────────────────────────────────────────────────────────────
+app.post('/jc400/startReplay', async (req, res) => {
+  try {
+    const body = parseIncomingBody(req.body);
+    const { deviceImei, fileName, token, jimiServer } = body || {};
+    if (!deviceImei || !fileName || !token || !jimiServer) {
+      return res.status(400).json({
+        code: 1,
+        ok: false,
+        error: 'Missing required fields: deviceImei, fileName, token, jimiServer',
+      });
+    }
+
+    const replayResp = await sendJimiInstruct({
+      deviceImei,
+      cmdContent: `REPLAYLIST,${fileName}`,
+      token,
+      jimiServer,
+    });
+
+    return res.json({
+      code: replayResp?.parsed?.code ?? (replayResp.response.ok ? 0 : 1),
+      ok: replayResp.response.ok,
+      response: replayResp.parsed || replayResp.text,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      code: 1,
+      ok: false,
+      error: error.message,
+    });
+  }
+});
+
+// Compatibility endpoint used by existing integrations/docs.
+app.post('/replaylist', async (req, res) => {
+  try {
+    const body = parseIncomingBody(req.body);
+    const { deviceImei, fileName, token, jimiServer } = body || {};
+    if (!deviceImei || !fileName || !token || !jimiServer) {
+      return res.status(400).json({
+        code: 1,
+        ok: false,
+        error: 'Missing required fields: deviceImei, fileName, token, jimiServer',
+      });
+    }
+
+    const replayResp = await sendJimiInstruct({
+      deviceImei,
+      cmdContent: `REPLAYLIST,${fileName}`,
+      token,
+      jimiServer,
+    });
+
+    return res.json({
+      code: replayResp?.parsed?.code ?? (replayResp.response.ok ? 0 : 1),
+      ok: replayResp.response.ok,
+      response: replayResp.parsed || replayResp.text,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      code: 1,
+      ok: false,
+      error: error.message,
+    });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────
 // 4. getFileList
 // ──────────────────────────────────────────────────────────────────────
 app.post('/getFileList', async (req, res) => {
@@ -1931,8 +2126,104 @@ app.post('/getFileList', async (req, res) => {
     const deviceModelLower = (deviceModel || 'jc181').toLowerCase();
     
     if (deviceModelLower === 'jc400') {
-      // jc400: scan /iothub/dvr-upload/uploadFile and filter by IMEI
+      // jc400: scan upload folder and optionally query full SD card list.
       const report = await processDeviceJC400(deviceImei);
+
+      const body = parseIncomingBody(req.body);
+      const dateParam = body?.date;
+      const cameraParam = body?.camera;
+      const iothubUrl = body?.iothubUrl;
+
+      if (token && jimiServer) {
+        try {
+          const dateFilter = typeof dateParam === 'string' && /^\d{8}$/.test(dateParam)
+            ? dateParam
+            : (typeof beginTime === 'string' && /^\d{8}$/.test(beginTime)
+              ? beginTime
+              : new Date().toISOString().slice(0, 10).replace(/-/g, ''));
+          const cameraFilter = Number.isFinite(Number(cameraParam)) ? Number(cameraParam) : 0;
+          const callbackBase = typeof iothubUrl === 'string' && iothubUrl.trim()
+            ? iothubUrl.trim().replace(/\/+$/, '')
+            : MEDIA_SERVER.replace(/\/+$/, '');
+          const callbackUrl = `${callbackBase}/pushURL/pushfilelist`;
+
+          const waitForList = new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              pendingJc400SdListRequests.delete(deviceImei);
+              reject(new Error('Timeout waiting for JC400 file list callback'));
+            }, 30000);
+            pendingJc400SdListRequests.set(deviceImei, { resolve, reject, timeout });
+          });
+
+          await sendJimiInstruct({
+            deviceImei,
+            cmdContent: `FILELIST,${callbackUrl}`,
+            token,
+            jimiServer,
+          });
+
+          await sendJimiInstruct({
+            deviceImei,
+            cmdContent: `TFFILELIST,${dateFilter},${cameraFilter}`,
+            token,
+            jimiServer,
+          }).catch(() => {});
+
+          // Fallback trigger to improve compatibility.
+          await sendJimiInstruct({
+            deviceImei,
+            cmdContent: 'FILELIST',
+            token,
+            jimiServer,
+          }).catch(() => {});
+
+          let list = [];
+          try {
+            list = await waitForList;
+          } catch (e) {
+            const cached = jc400SdListCache.get(deviceImei);
+            if (cached && (Date.now() - cached.timestamp) < 60 * 60 * 1000) {
+              list = cached.files || [];
+            }
+          }
+
+          const sdVideos = list
+            .map(parseJC400SdFileListName)
+            .filter(Boolean)
+            .map((item) => ({
+              channel: item.channel,
+              beginTime: item.beginTime,
+              endTime: item.endTime,
+              expected_file: item.fileName,
+              file_exists: false,
+              file_size: 0,
+              status: 'on_device',
+              source: 'sd_card',
+              replay_file_name: item.fileName,
+              video_url: null,
+              thumbnail_url: null,
+            }));
+
+          // Merge uploaded/event files with full SD listing.
+          const merged = [...(report.videos || [])];
+          const keySet = new Set(merged.map((v) => v.expected_file));
+          sdVideos.forEach((video) => {
+            if (!keySet.has(video.expected_file)) {
+              merged.push(video);
+            }
+          });
+
+          return res.json({
+            ...report,
+            videos: merged,
+            resource_count: merged.length,
+            sd_card_count: sdVideos.length,
+          });
+        } catch (error) {
+          console.log(`[JC400 getFileList] SD list request failed: ${error.message}`);
+        }
+      }
+
       return res.json(report);
     } else {
       // jc181: check if we need to request file list from device

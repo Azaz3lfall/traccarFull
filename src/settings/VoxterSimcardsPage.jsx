@@ -134,6 +134,12 @@ export const VoxterSimcardsContent = ({ embedded }) => {
   const [resetConfirm, setResetConfirm] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
 
+  const parseApiError = (e, fallback) => {
+    const raw = e.message || '';
+    try { const p = JSON.parse(raw); return p.error || p.message || fallback; } catch (_) { /* not JSON */ }
+    return raw || fallback;
+  };
+
   const fetchSimcards = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -145,7 +151,7 @@ export const VoxterSimcardsContent = ({ embedded }) => {
       setPages(result.pages ?? 1);
       setRecords(result.records ?? 0);
     } catch (e) {
-      setError(e.message || 'Erro ao carregar chips Voxter');
+      setError(parseApiError(e, 'Erro ao carregar chips Voxter'));
       setData([]);
     } finally {
       setLoading(false);
@@ -194,7 +200,7 @@ export const VoxterSimcardsContent = ({ embedded }) => {
         setError(result.message || result.error || 'Erro ao enviar SMS');
       }
     } catch (e) {
-      setError(e.message || 'Erro ao enviar SMS');
+      setError(parseApiError(e, 'Erro ao enviar SMS'));
     } finally {
       setSmsLoading(false);
     }
@@ -220,7 +226,7 @@ export const VoxterSimcardsContent = ({ embedded }) => {
         setError(result.message || result.error || 'Erro ao resetar linha');
       }
     } catch (e) {
-      setError(e.message || 'Erro ao resetar linha');
+      setError(parseApiError(e, 'Erro ao resetar linha'));
     } finally {
       setResetLoading(false);
     }

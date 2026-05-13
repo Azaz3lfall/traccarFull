@@ -100,12 +100,21 @@ async function syncTraccarPermissions(clientId, vehicleId, deviceIds = []) {
 }
 
 /**
- * Sincroniza a categoria do device no Traccar com o vehicle_type do veículo
+ * Sincroniza campos dos devices no Traccar com dados do veículo.
  * @param {number[]} deviceIds - Array de IDs dos dispositivos
- * @param {string} category - Categoria (ex: car, truck, motorcycle)
+ * @param {{ plate?: string, category?: string | null }} options
  */
-async function syncTraccarDeviceCategory(deviceIds, category) {
-  if (!deviceIds || deviceIds.length === 0 || !category || typeof category !== 'string' || !category.trim()) {
+async function syncTraccarDeviceFields(deviceIds, options = {}) {
+  if (!Array.isArray(deviceIds) || deviceIds.length === 0) {
+    return;
+  }
+
+  const normalizedPlate = String(options.plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const trimmedCategory = typeof options.category === 'string' && options.category.trim()
+    ? options.category.trim()
+    : null;
+
+  if (!normalizedPlate && !trimmedCategory) {
     return;
   }
 
@@ -114,7 +123,7 @@ async function syncTraccarDeviceCategory(deviceIds, category) {
   const traccarPassword = process.env.TRACCAR_PASSWORD;
 
   if (!traccarApiUrl || !traccarEmail || !traccarPassword) {
-    console.warn('⚠️ Traccar API credentials not configured. Skipping device category sync.');
+    console.warn('⚠️ Traccar API credentials not configured. Skipping device sync.');
     return;
   }
 
@@ -127,14 +136,22 @@ async function syncTraccarDeviceCategory(deviceIds, category) {
       const device = getRes.data;
       if (!device) continue;
 
-      const updatedDevice = { ...device, category: category.trim() };
+      const modelOrName = String(device.model || device.name || '').trim();
+      const nextName = normalizedPlate && modelOrName ? `${normalizedPlate}-${modelOrName}` : device.name;
+      const nextCategory = trimmedCategory || device.category;
+
+      const updatedDevice = {
+        ...device,
+        name: nextName,
+        category: nextCategory,
+      };
       await axios.put(`${traccarApiUrl}/api/devices/${deviceId}`, updatedDevice, {
         auth,
         headers: { 'Content-Type': 'application/json' },
       });
-      console.log(`✅ Categoria do device ${deviceId} atualizada para: ${category}`);
+      console.log(`✅ Device ${deviceId} atualizado para nome "${nextName}" e categoria "${nextCategory}"`);
     } catch (err) {
-      console.error(`❌ Erro ao atualizar categoria do device ${deviceId}:`, err.response?.data || err.message);
+      console.error(`❌ Erro ao atualizar campos do device ${deviceId}:`, err.response?.data || err.message);
       // Não lançar - continuar com os demais
     }
   }
@@ -190,14 +207,25 @@ router.get('/', async (req, res) => {
       let clientIds = [];
       try {
         const cuResult = await pool.query(
-          'SELECT client_id FROM client_users WHERE traccar_user_id = $1',
+          `SELECT cu.client_id
+           FROM client_users cu
+           JOIN clients c ON c.id = cu.client_id
+           WHERE cu.traccar_user_id = $1
+             AND COALESCE(c.active, TRUE) = TRUE
+             AND COALESCE(c.billing_blocked, FALSE) = FALSE
+             AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         clientIds = cuResult.rows.map((r) => r.client_id);
       } catch (_) {}
       if (clientIds.length === 0) {
         const clientResult = await pool.query(
-          'SELECT id FROM clients WHERE traccar_user_id = $1',
+          `SELECT id
+           FROM clients
+           WHERE traccar_user_id = $1
+             AND COALESCE(active, TRUE) = TRUE
+             AND COALESCE(billing_blocked, FALSE) = FALSE
+             AND COALESCE(billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         clientIds = clientResult.rows.map((r) => r.id);
@@ -206,8 +234,11 @@ router.get('/', async (req, res) => {
         console.log(`No client found for user ID ${req.user.id}, returning empty array`);
         return res.json([]);
       }
-      query += ` WHERE v.client_id = ANY($1::uuid[]) AND
-        EXISTS (SELECT 1 FROM user_vehicles uv WHERE uv.traccar_user_id = $2 AND uv.vehicle_id = v.id)`;
+      query += ` WHERE v.client_id = ANY($1::uuid[])
+        AND COALESCE(c.active, TRUE) = TRUE
+        AND COALESCE(c.billing_blocked, FALSE) = FALSE
+        AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'
+        AND EXISTS (SELECT 1 FROM user_vehicles uv WHERE uv.traccar_user_id = $2 AND uv.vehicle_id = v.id)`;
       params.push(clientIds, req.user.id);
       console.log(`Client(s) found: ${clientIds.length} for user ${req.user.id}, filtering vehicles`);
     } else {
@@ -266,14 +297,25 @@ router.get('/available-devices', async (req, res) => {
       let clientIds = [];
       try {
         const cuResult = await pool.query(
-          'SELECT client_id FROM client_users WHERE traccar_user_id = $1',
+          `SELECT cu.client_id
+           FROM client_users cu
+           JOIN clients c ON c.id = cu.client_id
+           WHERE cu.traccar_user_id = $1
+             AND COALESCE(c.active, TRUE) = TRUE
+             AND COALESCE(c.billing_blocked, FALSE) = FALSE
+             AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         clientIds = cuResult.rows.map((r) => r.client_id);
       } catch (_) {}
       if (clientIds.length === 0) {
         const clientResult = await pool.query(
-          'SELECT id FROM clients WHERE traccar_user_id = $1',
+          `SELECT id
+           FROM clients
+           WHERE traccar_user_id = $1
+             AND COALESCE(active, TRUE) = TRUE
+             AND COALESCE(billing_blocked, FALSE) = FALSE
+             AND COALESCE(billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         clientIds = clientResult.rows.map((r) => r.id);
@@ -517,14 +559,12 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Sincronizar categoria dos devices no Traccar com o vehicle_type (não sincronizar se foto_veiculo definido)
+    // Sincronizar nome/categoria dos devices no Traccar com os dados do veículo
     if (deviceIdsArray && deviceIdsArray.length > 0) {
-      const catToSync = foto_veiculo ? null : (vehicle_type ? String(vehicle_type).trim() : null);
-      if (catToSync) {
-        syncTraccarDeviceCategory(deviceIdsArray, catToSync).catch((err) => {
-          console.error('Erro ao sincronizar categoria dos devices (background):', err.message);
-        });
-      }
+      const catToSync = vehicle_type ? String(vehicle_type).trim() : null;
+      syncTraccarDeviceFields(deviceIdsArray, { plate, category: catToSync }).catch((err) => {
+        console.error('Erro ao sincronizar campos dos devices (background):', err.message);
+      });
     }
 
     res.status(201).json(vehicleRows[0]);
@@ -715,14 +755,12 @@ router.put('/:id', async (req, res) => {
       });
     }
 
-    // Sincronizar categoria dos devices no Traccar com o vehicle_type (não sincronizar se foto_veiculo definido)
+    // Sincronizar nome/categoria dos devices no Traccar com os dados do veículo
     if (deviceIdsArray && deviceIdsArray.length > 0) {
-      const catToSync = foto_veiculo ? null : (vehicle_type ? String(vehicle_type).trim() : null);
-      if (catToSync) {
-        syncTraccarDeviceCategory(deviceIdsArray, catToSync).catch((err) => {
-          console.error('Erro ao sincronizar categoria dos devices (background):', err.message);
-        });
-      }
+      const catToSync = vehicle_type ? String(vehicle_type).trim() : null;
+      syncTraccarDeviceFields(deviceIdsArray, { plate, category: catToSync }).catch((err) => {
+        console.error('Erro ao sincronizar campos dos devices (background):', err.message);
+      });
     }
 
     res.status(200).json(vehicleRows[0]);
@@ -845,6 +883,43 @@ async function syncVehicleAlertsToTraccar(vehicleId, alerts) {
   }
 }
 
+async function ensureCommandResultNotificationToTraccar(vehicleId) {
+  const traccarApiUrl = process.env.TRACCAR_API_URL;
+  const traccarEmail = process.env.TRACCAR_EMAIL;
+  const traccarPassword = process.env.TRACCAR_PASSWORD;
+  if (!traccarApiUrl || !traccarEmail || !traccarPassword || !vehicleId) return;
+
+  const auth = { username: traccarEmail, password: traccarPassword };
+  const { rows } = await pool.query('SELECT device_id FROM vehicle_devices WHERE vehicle_id = $1::uuid', [vehicleId]);
+  const deviceIds = rows.map((row) => row.device_id).filter(Boolean);
+  if (!deviceIds.length) return;
+
+  const notificationName = `vehicle:${vehicleId}:commandResult`;
+  const notificationsRes = await axios.get(`${traccarApiUrl}/api/notifications`, { auth });
+  const allNotifications = Array.isArray(notificationsRes.data) ? notificationsRes.data : [];
+  let notificationId = allNotifications.find((item) => item?.name === notificationName)?.id;
+
+  if (!notificationId) {
+    const createRes = await axios.post(`${traccarApiUrl}/api/notifications`, {
+      name: notificationName,
+      type: 'commandResult',
+      always: true,
+      attributes: {},
+    }, { auth });
+    notificationId = createRes?.data?.id;
+  }
+
+  if (!notificationId) return;
+
+  for (const deviceId of deviceIds) {
+    try {
+      await axios.post(`${traccarApiUrl}/api/permissions`, { deviceId, notificationId }, { auth });
+    } catch {
+      // ignore existing link
+    }
+  }
+}
+
 router.get('/:id/alerts', async (req, res) => {
   const { id } = req.params;
   try {
@@ -936,6 +1011,52 @@ async function ensureVehicleScheduledCommandsTable(executor) {
   );
 }
 
+async function ensureVehicleScheduledCommandHistoryTable(executor) {
+  await executor.query(`
+    CREATE TABLE IF NOT EXISTS vehicle_scheduled_command_history (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+      device_id BIGINT,
+      command_type VARCHAR(32) NOT NULL,
+      scheduled_for TIMESTAMP NOT NULL,
+      attempted_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      status VARCHAR(24) NOT NULL,
+      http_code INT,
+      error_message TEXT,
+      pending_id UUID,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+  await executor.query(
+    'CREATE INDEX IF NOT EXISTS idx_vsch_vehicle_attempted ON vehicle_scheduled_command_history(vehicle_id, attempted_at DESC)',
+  );
+}
+
+async function ensureVehiclePendingCommandsTable(executor) {
+  await executor.query(`
+    CREATE TABLE IF NOT EXISTS vehicle_pending_commands (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+      device_id BIGINT NOT NULL,
+      command_type VARCHAR(32) NOT NULL,
+      scheduled_for TIMESTAMP NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      status VARCHAR(16) NOT NULL DEFAULT 'pending',
+      attempts INT NOT NULL DEFAULT 0,
+      last_attempt_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`);
+  await executor.query(
+    'CREATE INDEX IF NOT EXISTS idx_vpc_pending_lookup ON vehicle_pending_commands(status, device_id)',
+  );
+}
+
+async function ensureScheduledCommandRuntimeTables(executor) {
+  await ensureVehicleScheduledCommandsTable(executor);
+  await ensureVehicleScheduledCommandHistoryTable(executor);
+  await ensureVehiclePendingCommandsTable(executor);
+}
+
 function formatTimeForApi(value) {
   if (value == null) return null;
   const s = typeof value === 'string' ? value : String(value);
@@ -957,6 +1078,92 @@ function parseTimeInput(value) {
   return null;
 }
 
+function isSuperAdminUser(user) {
+  return !!(user && (
+    user.email === 'evangelista1908@gmail.com'
+    || user.administrator === true
+    || user.admin === true
+  ));
+}
+
+async function getAllowedClientIds(executor, userId) {
+  if (!userId) return [];
+
+  let clientIds = [];
+  try {
+    const linkedRes = await executor.query(
+      `SELECT cu.client_id
+       FROM client_users cu
+       JOIN clients c ON c.id = cu.client_id
+       WHERE cu.traccar_user_id = $1
+         AND COALESCE(c.active, TRUE) = TRUE
+         AND COALESCE(c.billing_blocked, FALSE) = FALSE
+         AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'`,
+      [userId],
+    );
+    clientIds = linkedRes.rows.map((row) => row.client_id).filter(Boolean);
+  } catch {
+    // ignore missing linking table
+  }
+
+  if (clientIds.length === 0) {
+    try {
+      const legacyRes = await executor.query(
+        `SELECT id
+         FROM clients
+         WHERE traccar_user_id = $1
+           AND COALESCE(active, TRUE) = TRUE
+           AND COALESCE(billing_blocked, FALSE) = FALSE
+           AND COALESCE(billing_status, 'ativo') <> 'inadimplente'`,
+        [userId],
+      );
+      clientIds = legacyRes.rows.map((row) => row.id).filter(Boolean);
+    } catch {
+      // ignore legacy mapping lookup errors
+    }
+  }
+
+  return clientIds;
+}
+
+async function getVehicleAccess(executor, user, vehicleId) {
+  const { rows } = await executor.query(
+    'SELECT id, client_id FROM vehicles WHERE id = $1::uuid LIMIT 1',
+    [vehicleId],
+  );
+  if (rows.length === 0) {
+    return { exists: false, allowed: false, vehicle: null };
+  }
+
+  const vehicle = rows[0];
+  if (isSuperAdminUser(user)) {
+    return { exists: true, allowed: true, vehicle };
+  }
+
+  if (!user?.id) {
+    return { exists: true, allowed: false, vehicle };
+  }
+
+  const clientIds = await getAllowedClientIds(executor, user.id);
+  if (!clientIds.length || !clientIds.includes(vehicle.client_id)) {
+    return { exists: true, allowed: false, vehicle };
+  }
+
+  try {
+    const permissionRes = await executor.query(
+      'SELECT 1 FROM user_vehicles WHERE traccar_user_id = $1 AND vehicle_id = $2::uuid LIMIT 1',
+      [user.id, vehicleId],
+    );
+    if (permissionRes.rows.length > 0) {
+      return { exists: true, allowed: true, vehicle };
+    }
+  } catch {
+    // Fallback quando tabela user_vehicles ainda não está disponível
+  }
+
+  return { exists: true, allowed: true, vehicle };
+}
+
 /** GET /:id/scheduled-commands — horários de bloqueio/desbloqueio por dia da semana */
 router.get('/:id/scheduled-commands', async (req, res) => {
   const { id } = req.params;
@@ -964,7 +1171,15 @@ router.get('/:id/scheduled-commands', async (req, res) => {
     return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
   }
   try {
-    await ensureVehicleScheduledCommandsTable(pool);
+    const access = await getVehicleAccess(pool, req.user, id);
+    if (!access.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Vehicle not found.' });
+    }
+    if (!access.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for this vehicle.' });
+    }
+
+    await ensureScheduledCommandRuntimeTables(pool);
     const { rows } = await pool.query(
       `SELECT day_of_week, lock_time, unlock_time, enabled
        FROM vehicle_scheduled_commands
@@ -986,6 +1201,130 @@ router.get('/:id/scheduled-commands', async (req, res) => {
   } catch (err) {
     console.error('GET /api/vehicles/:id/scheduled-commands error:', err?.message);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:id/scheduled-commands/history', async (req, res) => {
+  const { id } = req.params;
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+  try {
+    const access = await getVehicleAccess(pool, req.user, id);
+    if (!access.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Vehicle not found.' });
+    }
+    if (!access.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for this vehicle.' });
+    }
+
+    await ensureScheduledCommandRuntimeTables(pool);
+    const { rows } = await pool.query(
+      `SELECT id, vehicle_id::text, device_id, command_type, scheduled_for, attempted_at,
+              status, http_code, error_message, pending_id::text, created_at
+       FROM vehicle_scheduled_command_history
+       WHERE vehicle_id = $1::uuid
+       ORDER BY attempted_at DESC
+       LIMIT $2`,
+      [id, limit],
+    );
+    res.json({ history: rows });
+  } catch (err) {
+    console.error('GET /api/vehicles/:id/scheduled-commands/history error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:id/scheduled-commands/pending', async (req, res) => {
+  const { id } = req.params;
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+  try {
+    const access = await getVehicleAccess(pool, req.user, id);
+    if (!access.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Vehicle not found.' });
+    }
+    if (!access.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for this vehicle.' });
+    }
+
+    await ensureScheduledCommandRuntimeTables(pool);
+    const { rows } = await pool.query(
+      `SELECT id, vehicle_id::text, device_id, command_type, scheduled_for, expires_at,
+              status, attempts, last_attempt_at, created_at, updated_at
+       FROM vehicle_pending_commands
+       WHERE vehicle_id = $1::uuid
+         AND status = 'pending'
+       ORDER BY created_at ASC`,
+      [id],
+    );
+    res.json({ pending: rows });
+  } catch (err) {
+    console.error('GET /api/vehicles/:id/scheduled-commands/pending error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/:id/scheduled-commands/pending/:pendingId/cancel', async (req, res) => {
+  const { id, pendingId } = req.params;
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+  const client = await pool.connect();
+  try {
+    const access = await getVehicleAccess(client, req.user, id);
+    if (!access.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Vehicle not found.' });
+    }
+    if (!access.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for this vehicle.' });
+    }
+
+    await ensureScheduledCommandRuntimeTables(client);
+    await client.query('BEGIN');
+    const { rows } = await client.query(
+      `UPDATE vehicle_pending_commands
+       SET status = 'cancelled', updated_at = NOW()
+       WHERE id = $1::uuid
+         AND vehicle_id = $2::uuid
+         AND status = 'pending'
+       RETURNING id, vehicle_id::text, device_id, command_type, scheduled_for`,
+      [pendingId, id],
+    );
+
+    if (rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Not found', message: 'Pending command not found.' });
+    }
+
+    const pending = rows[0];
+    await client.query(
+      `INSERT INTO vehicle_scheduled_command_history
+         (vehicle_id, device_id, command_type, scheduled_for, status, pending_id, error_message)
+       VALUES ($1::uuid, $2, $3, $4, 'cancelled', $5::uuid, $6)`,
+      [
+        pending.vehicle_id,
+        pending.device_id,
+        pending.command_type,
+        pending.scheduled_for,
+        pending.id,
+        req.user?.id ? `Cancelado pelo usuário ${req.user.id}.` : 'Cancelado pelo usuário.',
+      ],
+    );
+    await client.query('COMMIT');
+    res.json({ message: 'Pending command cancelled.' });
+  } catch (err) {
+    try {
+      await client.query('ROLLBACK');
+    } catch {
+      // ignore rollback secondary errors
+    }
+    console.error('POST /api/vehicles/:id/scheduled-commands/pending/:pendingId/cancel error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
   }
 });
 
@@ -1018,7 +1357,15 @@ router.put('/:id/scheduled-commands', async (req, res) => {
 
   const client = await pool.connect();
   try {
-    await ensureVehicleScheduledCommandsTable(client);
+    const access = await getVehicleAccess(client, req.user, id);
+    if (!access.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Vehicle not found.' });
+    }
+    if (!access.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for this vehicle.' });
+    }
+
+    await ensureScheduledCommandRuntimeTables(client);
     await client.query('BEGIN');
     for (const s of schedules) {
       const dow = Number(s.day_of_week);
@@ -1037,10 +1384,155 @@ router.put('/:id/scheduled-commands', async (req, res) => {
       );
     }
     await client.query('COMMIT');
+    ensureCommandResultNotificationToTraccar(id).catch((err) => {
+      console.error('Error syncing commandResult notification:', err?.message);
+    });
     res.json({ message: 'Scheduled commands updated successfully' });
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('PUT /api/vehicles/:id/scheduled-commands error:', err?.message);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+});
+
+/** POST /scheduled-commands/batch-copy — body: { source_vehicle_id, target_vehicle_ids } */
+router.post('/scheduled-commands/batch-copy', async (req, res) => {
+  const body = req.body || {};
+  const sourceVehicleId = body.source_vehicle_id;
+  const targetVehicleIds = Array.isArray(body.target_vehicle_ids) ? body.target_vehicle_ids : [];
+  const maxTargets = 200;
+
+  if (!sourceVehicleId || typeof sourceVehicleId !== 'string') {
+    return res.status(400).json({ error: 'Validation error', message: 'source_vehicle_id is required.' });
+  }
+  if (!targetVehicleIds.length) {
+    return res.status(400).json({ error: 'Validation error', message: 'target_vehicle_ids must contain at least one vehicle.' });
+  }
+  if (targetVehicleIds.length > maxTargets) {
+    return res.status(400).json({ error: 'Validation error', message: `target_vehicle_ids limit is ${maxTargets}.` });
+  }
+  if (!pool) {
+    return res.status(503).json({ error: 'Database not available', message: 'DATABASE_URL not configured' });
+  }
+
+  const normalizedTargets = [...new Set(
+    targetVehicleIds
+      .filter((id) => typeof id === 'string' && id.trim())
+      .map((id) => id.trim()),
+  )];
+
+  if (!normalizedTargets.length) {
+    return res.status(400).json({ error: 'Validation error', message: 'target_vehicle_ids must contain valid UUID strings.' });
+  }
+  if (normalizedTargets.includes(sourceVehicleId)) {
+    return res.status(400).json({ error: 'Validation error', message: 'source_vehicle_id cannot be part of target_vehicle_ids.' });
+  }
+
+  const client = await pool.connect();
+  try {
+    const sourceAccess = await getVehicleAccess(client, req.user, sourceVehicleId);
+    if (!sourceAccess.exists) {
+      return res.status(404).json({ error: 'Not found', message: 'Source vehicle not found.' });
+    }
+    if (!sourceAccess.allowed) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Access denied for source vehicle.' });
+    }
+
+    await ensureVehicleScheduledCommandsTable(client);
+    const sourceSchedulesRes = await client.query(
+      `SELECT day_of_week, lock_time, unlock_time, enabled
+       FROM vehicle_scheduled_commands
+       WHERE vehicle_id = $1::uuid`,
+      [sourceVehicleId],
+    );
+    if (sourceSchedulesRes.rows.length !== 7) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: 'Source vehicle must have 7 scheduled entries (day_of_week 0–6).',
+      });
+    }
+
+    const sourceByDay = new Map(sourceSchedulesRes.rows.map((row) => [Number(row.day_of_week), row]));
+    if (sourceByDay.size !== 7) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: 'Source vehicle has duplicate or invalid day_of_week values.',
+      });
+    }
+
+    const targetsRes = await client.query(
+      `SELECT id, client_id
+       FROM vehicles
+       WHERE id = ANY($1::uuid[])`,
+      [normalizedTargets],
+    );
+    const targetMap = new Map(targetsRes.rows.map((row) => [row.id, row]));
+
+    const results = [];
+    const allowedTargets = [];
+    const sourceClientId = sourceAccess.vehicle.client_id;
+
+    for (const targetId of normalizedTargets) {
+      const targetVehicle = targetMap.get(targetId);
+      if (!targetVehicle) {
+        results.push({ vehicle_id: targetId, status: 'not_found' });
+        continue;
+      }
+      if (targetVehicle.client_id !== sourceClientId) {
+        results.push({ vehicle_id: targetId, status: 'denied' });
+        continue;
+      }
+
+      const targetAccess = await getVehicleAccess(client, req.user, targetId);
+      if (!targetAccess.allowed) {
+        results.push({ vehicle_id: targetId, status: 'denied' });
+        continue;
+      }
+      allowedTargets.push(targetId);
+    }
+
+    if (!allowedTargets.length) {
+      return res.status(200).json({
+        message: 'No target vehicles eligible for copy.',
+        source_vehicle_id: sourceVehicleId,
+        results,
+      });
+    }
+
+    await client.query('BEGIN');
+    for (const targetId of allowedTargets) {
+      for (let d = 0; d <= 6; d += 1) {
+        const daySchedule = sourceByDay.get(d);
+        await client.query(
+          `INSERT INTO vehicle_scheduled_commands (vehicle_id, day_of_week, lock_time, unlock_time, enabled)
+           VALUES ($1::uuid, $2, $3::time, $4::time, $5)
+           ON CONFLICT (vehicle_id, day_of_week) DO UPDATE SET
+             lock_time = EXCLUDED.lock_time,
+             unlock_time = EXCLUDED.unlock_time,
+             enabled = EXCLUDED.enabled,
+             updated_at = NOW()`,
+          [targetId, d, daySchedule?.lock_time || null, daySchedule?.unlock_time || null, daySchedule?.enabled !== false],
+        );
+      }
+      results.push({ vehicle_id: targetId, status: 'updated' });
+    }
+    await client.query('COMMIT');
+
+    res.status(200).json({
+      message: 'Scheduled commands copied successfully.',
+      source_vehicle_id: sourceVehicleId,
+      copied_count: allowedTargets.length,
+      results,
+    });
+  } catch (err) {
+    try {
+      await client.query('ROLLBACK');
+    } catch {
+      // ignore rollback secondary errors
+    }
+    console.error('POST /api/vehicles/scheduled-commands/batch-copy error:', err?.message);
     res.status(500).json({ error: 'Internal server error' });
   } finally {
     client.release();

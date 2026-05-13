@@ -72,7 +72,7 @@ const NativeInterface = () => {
           ...user,
           attributes: {
             ...user.attributes,
-            notificationTokens: [...tokens.slice(-2), notificationToken].join(','),
+            notificationTokens: [...tokens.slice(-4), notificationToken].join(','),
           },
         };
 

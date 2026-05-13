@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -8,6 +9,7 @@ import { useCatch, useEffectAsync } from './reactHelper';
 import { sessionActions } from './store';
 import UpdateController from './UpdateController';
 import TermsDialog from './common/components/TermsDialog';
+import ClientBillingGuard from './components/ClientBillingGuard';
 import getBuildStatusManager from './utils/simpleBuildStatusManager'; // Initialize global build status polling
 
 // Initialize the build status manager
@@ -35,6 +37,7 @@ const App = () => {
   const newServer = useSelector((state) => state.session.server.newServer);
   const termsUrl = useSelector((state) => state.session.server.attributes.termsUrl);
   const user = useSelector((state) => state.session.user);
+  const serverTimezone = useSelector((state) => state.session.server.attributes.timezone);
 
   const acceptTerms = useCatch(async () => {
     const response = await fetchOrThrow(`/api/users/${user.id}`, {
@@ -71,6 +74,11 @@ const App = () => {
     return null;
   }, []);
 
+  useEffect(() => {
+    // Make timezone available for shared date formatters used across the app.
+    window.__traccarTimezone = user?.attributes?.timezone || serverTimezone || undefined;
+  }, [user?.attributes?.timezone, serverTimezone]);
+
   if (user == null) {
     return (<Loader />);
   }
@@ -88,6 +96,7 @@ const App = () => {
       <SocketController />
       <CachingController />
       <UpdateController />
+      <ClientBillingGuard />
       <div className={classes.page}>
         <Outlet />
       </div>

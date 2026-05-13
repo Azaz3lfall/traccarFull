@@ -85,7 +85,10 @@ const CustomNotificationStack = ({ notifications, onRemove }) => {
 
   const formatEventType = (event) => {
     const device = devices[event.deviceId];
-    
+
+    // Custom label takes priority (used by door sensor events)
+    if (event.attributes?.label) return event.attributes.label;
+
     // Get standard event formatting first
     const standardEvent = formatNotificationTitle(t, {
       type: event.type,

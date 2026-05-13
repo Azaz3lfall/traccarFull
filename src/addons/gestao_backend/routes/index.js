@@ -11,6 +11,8 @@ import registerReportRoutes from './reports.js';
 import registerMotoristaRoutes from './motorista.js';
 import registerSyncRoutes from './sync.js';
 import registerMiscRoutes from './misc.js';
+import registerRouteRulesRoutes from './routeRules.js';
+import registerRolesRoutes from './roles.js';
 
 export { default as registerAuthRoutes } from './auth.js';
 
@@ -25,4 +27,6 @@ export default function registerAllRoutes(app, ctx) {
     registerMotoristaRoutes(app, ctx);
     registerSyncRoutes(app, ctx);
     registerMiscRoutes(app, ctx);
+    registerRouteRulesRoutes(app, ctx);
+    registerRolesRoutes(app, ctx);
 }

@@ -13,6 +13,7 @@ import { resellersReducer as resellers } from './resellers';
 import { fleetReducer as fleet } from './fleet';
 import { clientsReducer as clients } from './clients';
 import { usersReducer as users } from './users';
+import { financialReducer as financial } from './financial';
 import throttleMiddleware from './throttleMiddleware';
 
 const reducer = combineReducers({
@@ -29,6 +30,7 @@ const reducer = combineReducers({
   fleet,
   clients,
   users,
+  financial,
 });
 
 export { errorsActions } from './errors';
@@ -44,6 +46,30 @@ export { resellersActions } from './resellers';
 export { fleetActions, fetchFleetMap, fetchVehicles, fetchAvailableDevicesForVehicle, addVehicle, updateVehicle, deleteVehicle } from './fleet';
 export { clientsActions, fetchClients, addClient, updateClient, deleteClient } from './clients';
 export { usersActions, fetchTraccarUsers } from './users';
+export {
+  clearFinancialError,
+  fetchFinancialOverview,
+  fetchFinancialPlans,
+  saveFinancialPlan,
+  deleteFinancialPlan,
+  fetchAsaasSettings,
+  saveAsaasSettings,
+  testAsaasConnection,
+  fetchClientFinancialProfiles,
+  saveClientFinancialProfile,
+  syncClientSubscription,
+  importAsaasData,
+  fetchMyFinancialStatus,
+  fetchMyInvoices,
+  fetchInvoicePix,
+  fetchInvoiceBoleto,
+  setClientAccessOverride,
+  settleBillingCycleManually,
+  fetchClientFinancialSummary,
+  fetchClientBillingHistory,
+  bulkSyncAllClients,
+  syncClientSubscriptionWithOptions,
+} from './financial';
 
 export default configureStore({
   reducer,

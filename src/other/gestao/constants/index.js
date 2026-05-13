@@ -43,6 +43,23 @@ export const COST_TYPES = [
   'Comissão'
 ];
 
+export const MAINTENANCE_TYPES = [
+  { value: 'oil', label: 'Troca de Óleo' },
+  { value: 'tire', label: 'Troca de Pneu' },
+  { value: 'belt', label: 'Troca de Correia' },
+  { value: 'battery', label: 'Troca de Bateria' },
+  { value: 'filter', label: 'Troca de Filtro' },
+  { value: 'brake', label: 'Freio' },
+  { value: 'revision', label: 'Revisão' },
+  { value: 'other', label: 'Outros' },
+];
+
+export const DURABILITY_UNITS = [
+  { value: 'km', label: 'Quilômetros (km)' },
+  { value: 'hours', label: 'Horas de motor' },
+  { value: 'days', label: 'Dias' },
+];
+
 // Categorias de CNH
 export const CNH_CATEGORIES = [
   'A',

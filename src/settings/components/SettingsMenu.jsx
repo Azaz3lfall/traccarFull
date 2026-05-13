@@ -91,7 +91,21 @@ const SettingsMenu = () => {
                   icon={<MessageIcon />}
                   selected={location.pathname === '/settings/sms-templates'}
                 />
+                <MenuItem
+                  title="Financeiro"
+                  link="/settings/financial"
+                  icon={<PaymentIcon />}
+                  selected={location.pathname === '/settings/financial'}
+                />
               </>
+            )}
+            {!admin && (
+              <MenuItem
+                title="Meu Financeiro"
+                link="/meu-financeiro"
+                icon={<PaymentIcon />}
+                selected={location.pathname === '/meu-financeiro'}
+              />
             )}
             <MenuItem
               title={t('sharedGeofences')}

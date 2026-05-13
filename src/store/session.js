@@ -17,6 +17,7 @@ const { reducer, actions } = createSlice({
     selectedHistoryPointIndex: null,
     resellerBranding: null,
     resellerBrandingLoaded: false,
+    doorStates: {},
   },
   reducers: {
     updateServer(state, action) {
@@ -71,6 +72,10 @@ const { reducer, actions } = createSlice({
     updateResellerBranding(state, action) {
       state.resellerBranding = action.payload;
       state.resellerBrandingLoaded = true;
+    },
+    updateDoorState(state, action) {
+      const { deviceId, isOpen } = action.payload;
+      state.doorStates[deviceId] = isOpen;
     },
   },
 });

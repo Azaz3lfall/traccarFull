@@ -1,4 +1,5 @@
 import axios from 'axios';
+import pool from '../addons/traccar_wrapper/db/index.js';
 
 /**
  * Middleware de autenticação que valida a sessão do Traccar
@@ -17,45 +18,90 @@ export const authenticate = async (req, res, next) => {
       return next();
     }
 
-    // Verificar se as variáveis de ambiente estão configuradas
-    const traccarApiUrl = process.env.TRACCAR_API_URL;
-    
-    if (!traccarApiUrl) {
-      console.warn('⚠️ TRACCAR_API_URL not configured. Skipping authentication.');
+    const configuredApiUrl = process.env.TRACCAR_API_URL;
+    const forwardedProto = req.headers['x-forwarded-proto'];
+    const forwardedHost = req.headers['x-forwarded-host'] || req.headers.host;
+    const requestProto = req.protocol || 'https';
+    const candidates = [
+      configuredApiUrl,
+      forwardedHost ? `${forwardedProto || requestProto}://${forwardedHost}` : null,
+      forwardedHost ? `https://${forwardedHost}` : null,
+      forwardedHost ? `http://${forwardedHost}` : null,
+    ].filter(Boolean);
+
+    const traccarApiUrls = [...new Set(candidates)];
+    if (traccarApiUrls.length === 0) {
+      console.warn('⚠️ No Traccar API URL candidates. Skipping authentication.');
       return next();
     }
 
     // Validar a sessão diretamente na API do Traccar
     // IMPORTANTE: Traccar é muito estrito com headers - enviar APENAS o Cookie
-    try {
-      const response = await axios.get(`${traccarApiUrl}/api/session`, {
-        headers: {
-          Cookie: cookie // Apenas o cookie importa - NÃO enviar Content-Type, Accept, etc.
-        },
-        // Não lançar erro em 401/403, vamos tratar manualmente
-        validateStatus: (status) => status < 500
-      });
-
-      // Se a sessão for válida, popular req.user
-      if (response.status === 200 && response.data) {
-        req.user = response.data;
-        console.log('✅ User authenticated:', {
-          id: req.user.id,
-          email: req.user.email,
-          administrator: req.user.administrator
+    let response = null;
+    let lastError = null;
+    for (const baseUrl of traccarApiUrls) {
+      try {
+        const candidateResponse = await axios.get(`${baseUrl}/api/session`, {
+          headers: {
+            Cookie: cookie, // Apenas o cookie importa - NÃO enviar Content-Type, Accept, etc.
+          },
+          // Não lançar erro em 401/403, vamos tratar manualmente
+          validateStatus: (status) => status < 500,
         });
-      } else {
-        console.log(`⚠️ Session validation failed: ${response.status}`);
-        // Não popula req.user, mas continua (a rota decidirá)
+        if (candidateResponse.status === 200 && candidateResponse.data) {
+          response = candidateResponse;
+          break;
+        }
+        // 401/403 são respostas válidas da API; não adianta tentar outros hosts.
+        if (candidateResponse.status === 401 || candidateResponse.status === 403) {
+          response = candidateResponse;
+          break;
+        }
+      } catch (err) {
+        lastError = err;
       }
-    } catch (err) {
+    }
+
+    if (response?.status === 200 && response.data) {
+      req.user = response.data;
+      if (pool && req.user?.id) {
+        try {
+          const blockResult = await pool.query(
+            `SELECT c.id, c.name, c.billing_status, c.billing_blocked
+             FROM clients c
+             WHERE c.id IN (
+               SELECT client_id FROM client_users WHERE traccar_user_id = $1
+               UNION
+               SELECT id FROM clients WHERE traccar_user_id = $1
+             )
+             ORDER BY c.created_at DESC
+             LIMIT 1`,
+            [req.user.id]
+          );
+          const clientRow = blockResult.rows[0];
+          if (clientRow) {
+            req.user.clientBillingStatus = clientRow.billing_status || 'ativo';
+            req.user.clientBillingBlocked = Boolean(clientRow.billing_blocked);
+            req.user.clientId = clientRow.id;
+          }
+        } catch (dbErr) {
+          console.error('Financial status check failed:', dbErr.message);
+        }
+      }
+      console.log('✅ User authenticated:', {
+        id: req.user.id,
+        email: req.user.email,
+        administrator: req.user.administrator,
+      });
+    } else if (response) {
+      console.log(`⚠️ Session validation failed: ${response.status}`);
+    } else if (lastError) {
       // Erro de rede ou API indisponível
-      console.error('❌ Error validating session with Traccar:', err.message);
-      if (err.response) {
-        console.error('Response status:', err.response.status);
-        console.error('Response data:', err.response.data);
+      console.error('❌ Error validating session with Traccar:', lastError.message);
+      if (lastError.response) {
+        console.error('Response status:', lastError.response.status);
+        console.error('Response data:', lastError.response.data);
       }
-      // Não bloqueia a requisição, apenas não popula req.user
     }
 
     // Continuar para a próxima rota/middleware

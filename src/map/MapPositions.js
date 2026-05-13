@@ -15,7 +15,7 @@ import {
   getStatusColor,
   reverseGeocode,
 } from '../common/util/formatter';
-import { getDeviceStatusDescriptors } from '../common/util/deviceStatusFromAttributes';
+import { buildVehicleTelemetryPopupRowHtml } from '../common/util/vehicleTelemetrySnapshot';
 import { mapIconKey } from './core/preloadImages';
 import { useAttributePreference } from '../common/util/preferences';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -23,33 +23,50 @@ import { useCatchCallback } from '../reactHelper';
 import { findFonts } from './core/mapUtil';
 
 const markerAddressCache = new Map();
+const BRAZIL_BOUNDS = {
+  minLat: -35,
+  maxLat: 6,
+  minLon: -75,
+  maxLon: -30,
+};
 
-/** Safe string for HTML `title` / tooltips in marker popup HTML. */
-const escapeHtmlAttr = (str) => String(str ?? '')
-  .replace(/&/g, '&amp;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;')
-  .replace(/</g, '&lt;');
+const toFiniteNumber = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
 
-const markerPopupLucideSvg = (pathsInner) => `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${pathsInner}</svg>`;
+const isInsideBounds = (lat, lon, bounds) => lat >= bounds.minLat
+  && lat <= bounds.maxLat
+  && lon >= bounds.minLon
+  && lon <= bounds.maxLon;
 
-// Paths from Lucide (ISC) — keys aligned with getDeviceStatusDescriptors
-const MARKER_POPUP_ICONS = {
-  ignition: markerPopupLucideSvg(
-    '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/>',
-  ),
-  lock: markerPopupLucideSvg(
-    '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
-  ),
-  battery: markerPopupLucideSvg(
-    '<path d="M 22 14 L 22 10"/><rect x="2" y="6" width="16" height="12" rx="2"/>',
-  ),
-  power: markerPopupLucideSvg(
-    '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
-  ),
-  rssi: markerPopupLucideSvg(
-    '<path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>',
-  ),
+const normalizeMapCoordinates = (latitude, longitude, restrictToBrazil) => {
+  const lat = toFiniteNumber(latitude);
+  const lon = toFiniteNumber(longitude);
+  if (lat == null || lon == null) {
+    return null;
+  }
+  if (Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+    return null;
+  }
+  if (lat === 0 && lon === 0) {
+    return null;
+  }
+
+  if (!restrictToBrazil) {
+    return { latitude: lat, longitude: lon };
+  }
+
+  if (isInsideBounds(lat, lon, BRAZIL_BOUNDS)) {
+    return { latitude: lat, longitude: lon };
+  }
+
+  // Some trackers send latitude/longitude swapped. Recover automatically when swap fits Brazil.
+  if (Math.abs(lon) <= 90 && Math.abs(lat) <= 180 && isInsideBounds(lon, lat, BRAZIL_BOUNDS)) {
+    return { latitude: lon, longitude: lat };
+  }
+
+  return null;
 };
 
 const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, selectedPosition, titleField }) => {
@@ -85,6 +102,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
   const mapCluster = useAttributePreference('mapCluster', true);
   const directionType = useAttributePreference('mapDirection', 'selected');
+  const restrictToBrazil = useAttributePreference('web.restrictToBrazil', true);
   
   // Popup ref for cluster hover
   const popupRef = useRef(null);
@@ -222,27 +240,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     `;
   };
 
-  const createMarkerPopupHTML = (vehicleName, address, fixTime, attrs) => {
+  const createMarkerPopupHTML = (vehicleName, address, fixTime, attrs, device) => {
     const isDark = theme.palette.mode === 'dark';
     const bgColor = isDark ? '#1F2937' : '#FFFFFF';
     const borderColor = isDark ? '#374151' : '#E5E7EB';
     const secondaryColor = isDark ? '#9CA3AF' : '#6B7280';
-    const iconChip = (tooltip, svgMarkup, color, opacity = 1) => (
-      `<span style="display:inline-flex;align-items:center;justify-content:center;color:${color};opacity:${opacity};line-height:0;flex-shrink:0;" title="${escapeHtmlAttr(tooltip)}">${svgMarkup}</span>`
-    );
-    const sensorIcons = [];
     const a = attrs && typeof attrs === 'object' ? attrs : null;
-    if (a) {
-      const descriptors = getDeviceStatusDescriptors(a, t);
-      descriptors.forEach(({ key, title, color, opacity, value }) => {
-        const svg = MARKER_POPUP_ICONS[key];
-        if (!svg) return;
-        const tip = value != null ? `${title}: ${value}` : title;
-        sensorIcons.push(iconChip(tip, svg, color, opacity));
-      });
-    }
-    const sensorHtml = sensorIcons.length
-      ? `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;padding-top:6px;border-top:1px solid ${borderColor};">${sensorIcons.join('')}</div>`
+    const sensorHtml = a
+      ? buildVehicleTelemetryPopupRowHtml(a, device || {}, t, borderColor, secondaryColor)
       : '';
     return `
       <div style="
@@ -446,7 +451,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     });
     popup
       .setLngLat(feature.geometry.coordinates)
-      .setHTML(createMarkerPopupHTML(vehicleName, initialAddress, fixTime, positionAttrs))
+      .setHTML(createMarkerPopupHTML(vehicleName, initialAddress, fixTime, positionAttrs, device))
       .addTo(map);
     markerPopupRef.current = popup;
 
@@ -464,14 +469,14 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
           if (addr) markerAddressCache.set(cacheKey, addr);
           if (markerPopupRef.current === popup) {
             popup.setHTML(
-              createMarkerPopupHTML(vehicleName, addr || '-', fixTime, positionAttrs)
+              createMarkerPopupHTML(vehicleName, addr || '-', fixTime, positionAttrs, device)
             );
           }
         })
         .catch(() => {
           if (markerPopupRef.current === popup) {
             popup.setHTML(
-              createMarkerPopupHTML(vehicleName, `${lat.toFixed(6)}, ${lon.toFixed(6)}`, fixTime, positionAttrs)
+              createMarkerPopupHTML(vehicleName, `${lat.toFixed(6)}, ${lon.toFixed(6)}`, fixTime, positionAttrs, device)
             );
           }
         });
@@ -819,31 +824,41 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
 
       const features = positions.filter((it) => it.deviceId !== selectedDeviceId && allowedPositions(it))
         .map((position) => {
+          const normalizedCoordinates = normalizeMapCoordinates(position.latitude, position.longitude, restrictToBrazil);
+          if (!normalizedCoordinates) {
+            return null;
+          }
           const label = getMarkerLabel(position);
           const feature = createFeature(devices, position, selectedPosition && selectedPosition.id, label);
           return {
             type: 'Feature',
             geometry: {
               type: 'Point',
-              coordinates: [position.longitude, position.latitude],
+              coordinates: [normalizedCoordinates.longitude, normalizedCoordinates.latitude],
             },
             properties: feature,
           };
-        });
+        })
+        .filter(Boolean);
 
       const selectedFeatures = positions.filter((it) => it.deviceId === selectedDeviceId && allowedPositions(it))
         .map((position) => {
+          const normalizedCoordinates = normalizeMapCoordinates(position.latitude, position.longitude, restrictToBrazil);
+          if (!normalizedCoordinates) {
+            return null;
+          }
           const label = getMarkerLabel(position);
           const feature = createFeature(devices, position, selectedPosition && selectedPosition.id, label);
           return {
             type: 'Feature',
             geometry: {
               type: 'Point',
-              coordinates: [position.longitude, position.latitude],
+              coordinates: [normalizedCoordinates.longitude, normalizedCoordinates.latitude],
             },
             properties: feature,
           };
-        });
+        })
+        .filter(Boolean);
 
       // Load dynamic SVGs for all unique widths
       const uniqueWidths = [...new Set(features.concat(selectedFeatures).map(f => f.properties.svgWidth))];
@@ -862,12 +877,12 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
         features: selectedFeatures,
       });
 
-      // Re-add layers to ensure they're on top after data update
-      addLayers();
+      // Avoid re-creating layers on every data tick; it can race map placement/render internals.
+      // Keeping stable layers and only updating source data prevents intermittent MapLibre crashes.
     };
 
     updateData();
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers, primaryDeviceIds, vehicleByDeviceId, selectedDeviceId]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers, primaryDeviceIds, vehicleByDeviceId, selectedDeviceId, restrictToBrazil]);
 
   // Cleanup effect
   useEffect(() => {

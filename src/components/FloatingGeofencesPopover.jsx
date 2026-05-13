@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { useAttributePreference } from '../common/util/preferences';
 import maplibregl from 'maplibre-gl';
 import {
   TextField,
+  Autocomplete,
   Button,
   IconButton,
   Menu,
@@ -49,11 +50,18 @@ import {
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
   Close as CloseIcon2,
+  Place as PlaceIcon,
+  MyLocation as MyLocationIcon,
 } from '@mui/icons-material';
 import { useCatch } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useThemeColors } from '../common/components/ThemeProvider';
-import { geofencesActions, devicesActions, errorsActions } from '../store';
+import {
+  geofencesActions,
+  devicesActions,
+  errorsActions,
+  fetchVehicles,
+} from '../store';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
 import SelectField from '../common/components/SelectField';
@@ -61,6 +69,21 @@ import EditAttributesAccordion from '../settings/components/EditAttributesAccord
 import { map } from '../map/core/MapView';
 import { circle } from '@turf/turf';
 import { parse } from 'wellknown';
+
+const normalizeVehicleOption = (vehicle, index = 0) => {
+  if (!vehicle) {
+    return null;
+  }
+  const optionId = vehicle.id
+    || vehicle.uniqueId
+    || vehicle.vehicle_id
+    || (vehicle.plate ? `plate:${vehicle.plate}:${index}` : `vehicle:${index}`);
+  return {
+    ...vehicle,
+    optionId,
+    displayLabel: vehicle.nickname || vehicle.plate || vehicle.model || vehicle.name || String(optionId),
+  };
+};
 
 const FloatingGeofencesPopover = ({ 
   desktop, 
@@ -150,9 +173,68 @@ const FloatingGeofencesPopover = ({
     { id: 'end', type: 'end', value: '', searchResults: [], isSearching: false }
   ]);
   const [routeWaypoints, setRouteWaypoints] = useState([]);
-  
+  const [mapPickFieldId, setMapPickFieldId] = useState(null);
+  const [mapPickSequentialMode, setMapPickSequentialMode] = useState(false);
+  const [selectedVehicleId, setSelectedVehicleId] = useState('');
+  const [vehicleSearchText, setVehicleSearchText] = useState('');
+  const [blockOnExit, setBlockOnExit] = useState(false);
+  const [polylineToleranceMeters, setPolylineToleranceMeters] = useState(100);
+  const [routeRuleApiAvailable, setRouteRuleApiAvailable] = useState(true);
+
+  const vehicles = useSelector((state) => state.fleet?.vehicles || []);
+  const { data: plannerVehicles = [], isLoading: isPlannerVehiclesLoading } = useQuery({
+    queryKey: ['route-planner-vehicles'],
+    queryFn: async () => {
+      try {
+        const response = await fetchOrThrow('/api/vehicles');
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return data;
+        }
+      } catch (error) {
+        console.warn('Route planner vehicles via /api/vehicles failed:', error);
+      }
+
+      try {
+        const fallbackResponse = await fetch('/gestao/vehicles', {
+          credentials: 'include',
+        });
+        if (!fallbackResponse.ok) {
+          return [];
+        }
+        const fallbackData = await fallbackResponse.json();
+        return Array.isArray(fallbackData) ? fallbackData : [];
+      } catch (fallbackError) {
+        console.warn('Route planner vehicles via /gestao/vehicles failed:', fallbackError);
+        return [];
+      }
+    },
+    enabled: isVisible && activeTab === 1,
+    staleTime: 30000,
+  });
+
+  const vehicleOptions = useMemo(() => {
+    const byId = new Map();
+    [...vehicles, ...plannerVehicles]
+      .map((vehicle, index) => normalizeVehicleOption(vehicle, index))
+      .filter(Boolean)
+      .forEach((vehicle) => {
+        byId.set(vehicle.optionId, vehicle);
+      });
+    return Array.from(byId.values());
+  }, [vehicles, plannerVehicles]);
+
   // Get Mapbox access token from user session
   const mapboxToken = useSelector(state => state.session.user?.attributes?.mapboxAccessToken);
+
+  useEffect(() => {
+    if (!isVisible || activeTab !== 1) {
+      return;
+    }
+    if (!vehicles || vehicles.length === 0) {
+      dispatch(fetchVehicles());
+    }
+  }, [activeTab, dispatch, isVisible, vehicles]);
 
   // Fetch geofences with TanStack Query
   const { data: geofences = [], isLoading, error } = useQuery({
@@ -344,7 +426,6 @@ const FloatingGeofencesPopover = ({
   const handleDelete = (geofence) => {
     setGeofenceToDelete(geofence);
     setDeleteDialog(true);
-    setAnchorEl(null);
   };
 
   // Handle confirm delete
@@ -981,6 +1062,10 @@ const FloatingGeofencesPopover = ({
       console.error('No active route data to save');
       return;
     }
+    if (!selectedVehicleId) {
+      dispatch(errorsActions.push(t('sharedRequired')));
+      return;
+    }
 
     setIsSavingRoute(true);
     
@@ -999,10 +1084,6 @@ const FloatingGeofencesPopover = ({
       const coordinates = activeRoute.geometry.coordinates.map(coord => `${coord[1]} ${coord[0]}`).join(', ');
       const area = `LINESTRING (${coordinates})`;
 
-      // Calculate area size in KB
-      const areaSizeBytes = new Blob([area]).size;
-      const areaSizeKB = (areaSizeBytes / 1024).toFixed(2);
-
       // Create geofence data
       const routeGeofence = {
         name: `${t('routePlannerRouteName')} ${new Date().toLocaleString()}`,
@@ -1016,17 +1097,16 @@ const FloatingGeofencesPopover = ({
           mapLineWidth: 3,
           mapLineOpacity: 0.8,
           speedLimit: null,
-          polylineDistance: Math.round(activeRoute.distance / 1000), // Convert to km
+          polylineDistance: polylineToleranceMeters,
           hide: false,
         },
       };
 
 
-      // Use the existing createGeofenceMutation
-      await new Promise((resolve, reject) => {
+      const createdGeofence = await new Promise((resolve, reject) => {
         createGeofenceMutation.mutate(routeGeofence, {
-          onSuccess: () => {
-            resolve();
+          onSuccess: (data) => {
+            resolve(data);
           },
           onError: (error) => {
             console.error('Error saving route:', error);
@@ -1034,6 +1114,77 @@ const FloatingGeofencesPopover = ({
           }
         });
       });
+
+      const vehicleResponse = await fetchOrThrow(`/api/vehicles/${selectedVehicleId}`);
+      const vehicle = await vehicleResponse.json();
+      const deviceIds = Array.isArray(vehicle.devices) ? vehicle.devices.filter(Boolean) : [];
+
+      for (const deviceId of deviceIds) {
+        try {
+          await fetchOrThrow('/api/permissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deviceId, geofenceId: createdGeofence.id }),
+          });
+        } catch (permissionError) {
+          console.error('Error linking geofence to device:', permissionError);
+        }
+      }
+
+      const routeRulePayload = {
+        vehicleId: selectedVehicleId,
+        geofenceId: createdGeofence.id,
+        blockOnExit,
+        polylineDistance: polylineToleranceMeters,
+      };
+
+      let routeRuleSaved = false;
+      let limitationWarningShown = false;
+      if (blockOnExit && routeRuleApiAvailable) {
+        try {
+          const response = await fetch('/api/route-rules', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(routeRulePayload),
+            credentials: 'include',
+          });
+          if (response.ok) {
+            routeRuleSaved = true;
+          } else if (response.status === 404) {
+            // Backend runtime without route-rules published yet.
+            setRouteRuleApiAvailable(false);
+          }
+        } catch {
+          setRouteRuleApiAvailable(false);
+        }
+      }
+
+      if (blockOnExit && !routeRuleSaved) {
+        dispatch(errorsActions.push(t('routePlannerSavedWithLimitations')));
+        limitationWarningShown = true;
+      }
+
+      try {
+        const alertsResponse = await fetchOrThrow(`/api/vehicles/${selectedVehicleId}/alerts`);
+        const currentAlerts = await alertsResponse.json();
+        await fetchOrThrow(`/api/vehicles/${selectedVehicleId}/alerts`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...currentAlerts,
+            geofenceExit: {
+              enabled: true,
+              config: currentAlerts?.geofenceExit?.config || {},
+            },
+          }),
+        });
+      } catch (alertsError) {
+        console.warn('Vehicle alerts endpoint unavailable in this environment:', alertsError);
+        if (!limitationWarningShown) {
+          dispatch(errorsActions.push(t('routePlannerSavedWithLimitations')));
+          limitationWarningShown = true;
+        }
+      }
 
     } catch (error) {
       console.error('Error saving route:', error);
@@ -1185,21 +1336,24 @@ const FloatingGeofencesPopover = ({
   };
 
   // Handle field selection
-  const handleFieldSelect = (fieldId, result) => {
-    const address = result.properties?.display_name || result.text;
-    
+  const applyWaypointSelection = (fieldId, address, coordinates) => {
+    if (!coordinates || coordinates.length !== 2) {
+      return;
+    }
+
     setFields(prev => {
-      const updatedFields = prev.map(field => 
-        field.id === fieldId 
+      const updatedFields = prev.map(field =>
+        field.id === fieldId
           ? { ...field, value: address, searchResults: [] }
           : field
       );
-      
-      // Update route waypoints based on field position
-      const fieldIndex = updatedFields.findIndex(f => f.id === fieldId);
-      
-      setRouteWaypoints(prevWaypoints => {
-        // Ensure waypoints array matches fields array length
+
+      const fieldIndex = updatedFields.findIndex((f) => f.id === fieldId);
+      if (fieldIndex === -1) {
+        return prev;
+      }
+
+      setRouteWaypoints((prevWaypoints) => {
         const newWaypoints = [...prevWaypoints];
         while (newWaypoints.length < updatedFields.length) {
           newWaypoints.push(null);
@@ -1207,8 +1361,7 @@ const FloatingGeofencesPopover = ({
         if (newWaypoints.length > updatedFields.length) {
           newWaypoints.splice(updatedFields.length);
         }
-        
-        // Determine type based on position
+
         let type;
         if (fieldIndex === 0) {
           type = 'start';
@@ -1217,18 +1370,23 @@ const FloatingGeofencesPopover = ({
         } else {
           type = `waypoint_${fieldIndex}`;
         }
-        
+
         newWaypoints[fieldIndex] = {
           address,
-          coordinates: result.center,
-          type
+          coordinates,
+          type,
         };
-        
+
         return newWaypoints;
       });
-      
+
       return updatedFields;
     });
+  };
+
+  const handleFieldSelect = (fieldId, result) => {
+    const address = result.properties?.display_name || result.text;
+    applyWaypointSelection(fieldId, address, result.center);
   };
 
   // Handle field reordering
@@ -1343,6 +1501,83 @@ const FloatingGeofencesPopover = ({
     // Add null entry to routeWaypoints to maintain synchronization
     setRouteWaypoints(prev => [...prev, null]);
   };
+
+  const handleMapPickField = (fieldId) => {
+    resetDrawingTools();
+    setMapPickSequentialMode(false);
+    setMapPickFieldId((current) => (current === fieldId ? null : fieldId));
+  };
+
+  const handleToggleSequentialPickMode = () => {
+    resetDrawingTools();
+    setMapPickFieldId(null);
+    setMapPickSequentialMode((current) => !current);
+  };
+
+  useEffect(() => {
+    if (!map || (!mapPickFieldId && !mapPickSequentialMode) || !mapboxToken) {
+      return undefined;
+    }
+
+    const canvas = map.getCanvas();
+    const previousCursor = canvas.style.cursor;
+    canvas.style.cursor = 'crosshair';
+
+    const handleMapClick = async (e) => {
+      const { lng, lat } = e.lngLat;
+
+      try {
+        const request = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}&limit=1&language=pt`;
+        const response = await fetch(request);
+        const data = await response.json();
+        const feature = data?.features?.[0];
+        const address = feature?.place_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        const coordinates = feature?.center || [lng, lat];
+
+        if (mapPickFieldId) {
+          applyWaypointSelection(mapPickFieldId, address, coordinates);
+          setMapPickFieldId(null);
+          return;
+        }
+
+        if (mapPickSequentialMode) {
+          const insertIndex = Math.max(fields.length - 1, 1);
+          const dynamicFieldId = `dynamic_map_${Date.now()}`;
+          const isEndTargetEmpty = !fields[fields.length - 1]?.value?.trim();
+          let targetFieldId;
+
+          if (isEndTargetEmpty && insertIndex === 1) {
+            targetFieldId = fields[fields.length - 1].id;
+          } else {
+            setFields((prev) => {
+              const nextFields = [...prev];
+              nextFields.splice(insertIndex, 0, {
+                id: dynamicFieldId,
+                type: 'waypoint',
+                value: '',
+                searchResults: [],
+                isSearching: false,
+              });
+              return nextFields;
+            });
+            targetFieldId = dynamicFieldId;
+          }
+
+          setTimeout(() => {
+            applyWaypointSelection(targetFieldId, address, coordinates);
+          }, 0);
+        }
+      } catch (error) {
+        console.error('Map click reverse geocoding failed:', error);
+      }
+    };
+
+    map.on('click', handleMapClick);
+    return () => {
+      map.off('click', handleMapClick);
+      canvas.style.cursor = previousCursor;
+    };
+  }, [mapPickFieldId, mapPickSequentialMode, mapboxToken, fields]);
 
   // Helper function to check if a field has a corresponding waypoint
   const hasWaypointForField = (fieldId, fieldValue) => {
@@ -1694,6 +1929,129 @@ const FloatingGeofencesPopover = ({
 
           {activeTab === 1 && (
             <div style={{ flex: 1, overflow: 'auto', padding: '12px' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <Autocomplete
+                  size="small"
+                  options={vehicleOptions}
+                  loading={isPlannerVehiclesLoading}
+                  noOptionsText={isPlannerVehiclesLoading ? t('sharedLoading') : t('sharedNoData')}
+                  value={vehicleOptions.find((vehicle) => (
+                    (vehicle.id || vehicle.uniqueId || '') === selectedVehicleId
+                  )) || null}
+                  inputValue={vehicleSearchText}
+                  onInputChange={(_, value) => setVehicleSearchText(value)}
+                  onChange={(_, selectedVehicle) => {
+                    const nextValue = selectedVehicle?.id || selectedVehicle?.uniqueId || '';
+                    setSelectedVehicleId(nextValue);
+                    setVehicleSearchText(selectedVehicle?.displayLabel || '');
+                    if (!nextValue) {
+                      setBlockOnExit(false);
+                    }
+                  }}
+                  getOptionLabel={(option) => option?.displayLabel || ''}
+                  isOptionEqualToValue={(option, value) => option.optionId === value.optionId}
+                  filterOptions={(options, state) => {
+                    const search = state.inputValue?.trim().toLowerCase();
+                    if (!search) return options;
+                    return options.filter((option) => {
+                      const haystack = [
+                        option.displayLabel,
+                        option.nickname,
+                        option.plate,
+                        option.model,
+                        option.name,
+                      ].filter(Boolean).join(' ').toLowerCase();
+                      return haystack.includes(search);
+                    });
+                  }}
+                  slotProps={{
+                    popper: {
+                      sx: {
+                        zIndex: 25000,
+                        '& .MuiAutocomplete-paper': {
+                          marginTop: '4px',
+                          maxHeight: 280,
+                          backgroundColor: colors.surface,
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: '10px',
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)',
+                        },
+                        '& .MuiAutocomplete-listbox': {
+                          py: 0.5,
+                        },
+                      },
+                    },
+                  }}
+                  renderOption={(props, vehicle) => {
+                    const { key, ...optionProps } = props;
+                    return (
+                      <li
+                        {...optionProps}
+                        key={`vehicle-option-${vehicle.optionId || key}`}
+                        style={{
+                          fontSize: '14px',
+                          minHeight: '34px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                        title={vehicle.displayLabel}
+                      >
+                        {vehicle.displayLabel}
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      label={t('routePlannerSelectVehicle')}
+                      helperText={isPlannerVehiclesLoading ? t('sharedLoading') : ''}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: colors.secondary,
+                          borderRadius: '8px',
+                        },
+                        '& .MuiInputBase-input': {
+                          fontSize: '14px',
+                        },
+                        '& .MuiFormHelperText-root': {
+                          marginLeft: 0,
+                          marginRight: 0,
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <FormControlLabel
+                  control={(
+                    <Checkbox
+                      checked={blockOnExit}
+                      disabled={!selectedVehicleId}
+                      onChange={(event) => setBlockOnExit(event.target.checked)}
+                    />
+                  )}
+                  label={t('routePlannerBlockOnExit')}
+                />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <TextField
+                  type="number"
+                  fullWidth
+                  size="small"
+                  label={t('routePlannerToleranceMeters')}
+                  value={polylineToleranceMeters}
+                  onChange={(event) => {
+                    const numeric = Number(event.target.value);
+                    if (Number.isFinite(numeric)) {
+                      setPolylineToleranceMeters(Math.max(20, Math.round(numeric)));
+                    }
+                  }}
+                  inputProps={{ min: 20, step: 10 }}
+                />
+              </div>
               {/* Unified Field System */}
               {fields.map((field, index) => (
                 <div key={field.id} style={{ marginBottom: '16px' }}>
@@ -1714,6 +2072,29 @@ const FloatingGeofencesPopover = ({
                         outline: 'none'
                       }}
                     />
+                    <button
+                      onClick={() => handleMapPickField(field.id)}
+                      style={{
+                        position: 'absolute',
+                        right: '34px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '20px',
+                        height: '20px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: mapPickFieldId === field.id ? '#1976d2' : colors.textSecondary,
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                      }}
+                      title={t('routePlannerPickOnMap')}
+                    >
+                      <PlaceIcon style={{ fontSize: '14px' }} />
+                    </button>
                     
                     {/* Reorder buttons */}
                     <div style={{ 
@@ -1862,7 +2243,7 @@ const FloatingGeofencesPopover = ({
                       fontSize: '12px',
                       textAlign: 'center'
                     }}>
-                      Type at least 5 characters to search
+                      {t('sharedSearchPlaces')}
                     </div>
                   )}
                   
@@ -1892,6 +2273,29 @@ const FloatingGeofencesPopover = ({
               >
                 <span style={{ fontSize: '16px' }}>+</span>
                 {t('routePlannerAddAddress')}
+              </button>
+              <button
+                onClick={handleToggleSequentialPickMode}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: `1px solid ${mapPickSequentialMode ? '#1976d2' : colors.border}`,
+                  borderRadius: '8px',
+                  backgroundColor: mapPickSequentialMode ? 'rgba(25,118,210,0.12)' : 'transparent',
+                  color: mapPickSequentialMode ? '#1976d2' : colors.textSecondary,
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s ease',
+                  marginBottom: '16px',
+                }}
+              >
+                <MyLocationIcon style={{ fontSize: '16px' }} />
+                {t('routePlannerSequentialPickMode')}
               </button>
 
               {/* Waypoints Section with Tabs */}
@@ -2179,7 +2583,7 @@ const FloatingGeofencesPopover = ({
                                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                     <button
                                       onClick={handleSaveRoute}
-                                      disabled={isSavingRoute}
+                                      disabled={isSavingRoute || !selectedVehicleId}
                                       style={{
                                         padding: '8px 12px',
                                         borderRadius: '6px',
@@ -2188,7 +2592,7 @@ const FloatingGeofencesPopover = ({
                                         color: colors.text,
                                         fontSize: '12px',
                                         fontWeight: '600',
-                                        cursor: isSavingRoute ? 'not-allowed' : 'pointer',
+                                        cursor: (isSavingRoute || !selectedVehicleId) ? 'not-allowed' : 'pointer',
                                         boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -2197,10 +2601,10 @@ const FloatingGeofencesPopover = ({
                                         transition: 'all 0.2s ease',
                                         outline: 'none',
                                         minHeight: '36px',
-                                        opacity: isSavingRoute ? 0.7 : 1
+                                        opacity: (isSavingRoute || !selectedVehicleId) ? 0.7 : 1
                                       }}
                                       onMouseEnter={(e) => {
-                                        if (!isSavingRoute) {
+                                        if (!isSavingRoute && selectedVehicleId) {
                                           e.target.style.transform = 'translateY(-1px)';
                                           e.target.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
                                         }

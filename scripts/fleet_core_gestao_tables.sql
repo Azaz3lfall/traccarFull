@@ -95,11 +95,27 @@ CREATE TABLE IF NOT EXISTS maintenances (
     maintenance_date DATE NOT NULL,
     description TEXT NOT NULL,
     cost NUMERIC(12,2) NOT NULL,
+    maintenance_type VARCHAR(32),
+    durability_value NUMERIC(12,2),
+    durability_unit VARCHAR(8),
     odometer NUMERIC(12,2),
+    engine_hours NUMERIC(12,2),
     provider_name VARCHAR(255),
     foto_path VARCHAR(500),
+    traccar_maintenance_id INTEGER,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE maintenances
+    ADD COLUMN IF NOT EXISTS maintenance_type VARCHAR(32);
+ALTER TABLE maintenances
+    ADD COLUMN IF NOT EXISTS durability_value NUMERIC(12,2);
+ALTER TABLE maintenances
+    ADD COLUMN IF NOT EXISTS durability_unit VARCHAR(8);
+ALTER TABLE maintenances
+    ADD COLUMN IF NOT EXISTS engine_hours NUMERIC(12,2);
+ALTER TABLE maintenances
+    ADD COLUMN IF NOT EXISTS traccar_maintenance_id INTEGER;
 
 -- 8. Association history (Logs de troca de motorista)
 CREATE TABLE IF NOT EXISTS association_history (

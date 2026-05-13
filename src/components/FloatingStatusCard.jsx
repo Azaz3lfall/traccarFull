@@ -60,6 +60,7 @@ import localStorageAsync from '../common/util/localStorageAsync';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -827,6 +828,21 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const [videosError, setVideosError] = useState(null);
   const [videosCurrentPage, setVideosCurrentPage] = useState(1);
   const videosPerPage = 20;
+  const [gd14HistoryVideoUrl, setGd14HistoryVideoUrl] = useState(null);
+  const [gd14PlaybackError, setGd14PlaybackError] = useState(null);
+  const [gd14PlaybackLoading, setGd14PlaybackLoading] = useState(false);
+  const [gd14PlaybackControlLoading, setGd14PlaybackControlLoading] = useState(false);
+  const [gd14CurrentPlaybackTime, setGd14CurrentPlaybackTime] = useState(null);
+  const [gd14PlaybackSpeed, setGd14PlaybackSpeed] = useState(0);
+  const [gd14SelectedChannel, setGd14SelectedChannel] = useState(1);
+  const [gd14SelectedSegment, setGd14SelectedSegment] = useState(null);
+  const gd14VideoRef = useRef(null);
+  const gd14FlvPlayerRef = useRef(null);
+  const [timelineVideoUrl, setTimelineVideoUrl] = useState(null);
+  const [timelineVideoError, setTimelineVideoError] = useState(null);
+  const [jc400PlaybackRate, setJc400PlaybackRate] = useState(1);
+  const [jc400SelectedSegmentKey, setJc400SelectedSegmentKey] = useState(null);
+  const jc400VideoRef = useRef(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef(null);
@@ -867,10 +883,30 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   
   // Replay form states
   const [replayDeviceId, setReplayDeviceId] = useState(null);
+  const [mobileStatusSheetExpanded, setMobileStatusSheetExpanded] = useState(true);
   const [period, setPeriod] = useState('today');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [replayLoading, setReplayLoading] = useState(false);
+
+  useEffect(() => {
+    if (!desktop) {
+      setMobileStatusSheetExpanded(true);
+    }
+  }, [desktop, selectedDeviceId, selectedPlate, showReplayPopover, replayDeviceId]);
+
+  const onMobileSheetPanEnd = useCallback((_, info) => {
+    const { velocity, offset } = info;
+    if (Math.abs(offset.y) < 10 && Math.abs(velocity.y) < 80) {
+      setMobileStatusSheetExpanded((v) => !v);
+      return;
+    }
+    if (velocity.y > 280 || offset.y > 32) {
+      setMobileStatusSheetExpanded(false);
+    } else if (velocity.y < -280 || offset.y < -32) {
+      setMobileStatusSheetExpanded(true);
+    }
+  }, []);
   
   // Enhanced replay states
   const [isPlaying, setIsPlaying] = useState(false);
@@ -928,7 +964,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
   const altitudeUnit = useAttributePreference('altitudeUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
-  const positionItems = useAttributePreference('positionItems', 'fixTime,address,speed,totalDistance');
+  const positionItems = useAttributePreference('positionItems', 'serverTime,address,speed,totalDistance');
   const positionAttributes = usePositionAttributes(t);
   const deviceReadonly = useDeviceReadonly();
   
@@ -948,6 +984,9 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
   // For details modal: when opened from FleetVehicleCard, use the specified device
   const modalDevice = detailsModalDeviceId ? devices[detailsModalDeviceId] : device;
+
+  // Door state from Redux — written by SocketController on confirmed authoritative packets only.
+  const doorIsOpen = useSelector((state) => state.session.doorStates?.[device?.id]);
 
 
   // Helper function to generate video download URL from expected_file
@@ -1055,6 +1094,44 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     }
   }, [device]);
 
+  const getIoTHubConfig = useMemo(() => {
+    if (!device?.attributes?.iothub) return {};
+    try {
+      return JSON.parse(device.attributes.iothub) || {};
+    } catch (e) {
+      return {};
+    }
+  }, [device]);
+
+  const parseTimelineDate = useCallback((value) => {
+    if (!value) {
+      return dayjs.invalid();
+    }
+    if (dayjs.isDayjs(value)) {
+      return value;
+    }
+    if (value instanceof Date) {
+      return dayjs(value);
+    }
+    const stringValue = String(value).trim();
+    const direct = dayjs(stringValue);
+    if (direct.isValid()) {
+      return direct;
+    }
+    // Handle backend format "YYYY-MM-DD HH:mm:ss" on strict browsers.
+    const withT = dayjs(stringValue.replace(' ', 'T'));
+    if (withT.isValid()) {
+      return withT;
+    }
+    // Handle compact format "YYYYMMDDHHmmss".
+    if (/^\d{14}$/.test(stringValue)) {
+      return dayjs(
+        `${stringValue.slice(0, 4)}-${stringValue.slice(4, 6)}-${stringValue.slice(6, 8)}T${stringValue.slice(8, 10)}:${stringValue.slice(10, 12)}:${stringValue.slice(12, 14)}`,
+      );
+    }
+    return dayjs.invalid();
+  }, []);
+
   // API templates for different device models
   const getApiTemplate = useCallback((model) => {
     const normalizedModel = model?.toLowerCase().trim() || '';
@@ -1093,6 +1170,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           channelsStartAtZero: true,
           urlFormat: 'live' // Uses /live/{channelIndex}/ format
         }
+      };
+    }
+
+    if (normalizedModel === 'gd14') {
+      return {
+        videoList: 'jt808',
+        streaming: {
+          urlFormat: 'history',
+          channelsStartAtZero: false,
+        },
+        playbackControl: true,
       };
     }
     
@@ -1213,12 +1301,11 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     setVideosError(null);
 
     try {
+      const deviceModel = getDeviceModel;
       const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
-      if (!mediaServerUrl) {
+      if (deviceModel !== 'gd14' && !mediaServerUrl) {
         throw new Error('Media server URL not configured');
       }
-
-      const deviceModel = getDeviceModel;
       let requestBody;
       
       // For jc181, send request with beginTime, endTime, token, jimiServer
@@ -1254,11 +1341,95 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           jimiServer: iothubServer
         };
       } else if (deviceModel === 'jc400') {
-        // For jc400, send deviceModel to get file list from server
+        // For jc400, request both uploaded events and full SD card listing.
+        const iothub = JSON.parse(device.attributes.iothub);
+        const iothubServer = iothub?.iothubServer || '';
+        const token = iothub?.token || '';
+        const dateFilter = dayjs(videoListStartDate || dayjs()).format('YYYYMMDD');
         requestBody = {
           deviceImei: device.uniqueId,
-          deviceModel: 'jc400'
+          deviceModel: 'jc400',
+          beginTime: dateFilter,
+          endTime: dateFilter,
+          date: dateFilter,
+          camera: 0,
+          token,
+          jimiServer: iothubServer,
+          iothubUrl: mediaServerUrl,
         };
+      } else if (deviceModel === 'gd14') {
+        const jt808ServerUrl = getIoTHubConfig?.jt808ServerUrl || '';
+        const phone = getIoTHubConfig?.phone || device.phone || device.uniqueId;
+
+        if (!jt808ServerUrl) {
+          throw new Error('JT808 Server URL not configured');
+        }
+        if (!phone) {
+          throw new Error('JT808 phone not configured');
+        }
+
+        const normalizedBaseUrl = jt808ServerUrl.startsWith('http')
+          ? jt808ServerUrl.replace(/\/$/, '')
+          : `http://${jt808ServerUrl.replace(/\/$/, '')}`;
+
+        const startDate = videoListStartDate || dayjs().startOf('day').toISOString();
+        const endDate = videoListEndDate || dayjs().endOf('day').toISOString();
+
+        await fetch(`${normalizedBaseUrl}/api/jt1078/query-sd-files`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            channelId: 0xFF,
+            startTime: dayjs(startDate).toISOString(),
+            endTime: dayjs(endDate).toISOString(),
+          }),
+        });
+
+        // Poll for results after triggering query because device responds asynchronously.
+        let filesData = null;
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 1500 : 1000));
+          const filesResp = await fetch(
+            `${normalizedBaseUrl}/api/jt1078/sd-files?phone=${encodeURIComponent(phone)}`,
+          );
+          if (!filesResp.ok) {
+            continue;
+          }
+          const maybeData = await filesResp.json();
+          if (Array.isArray(maybeData?.files) && maybeData.files.length > 0) {
+            filesData = maybeData;
+            break;
+          }
+          if (Array.isArray(maybeData?.files) && maybeData.files.length === 0) {
+            filesData = maybeData;
+          }
+        }
+
+        const gd14Videos = (filesData?.files || []).map((file) => {
+          const channel = Number(file.channelId ?? file.channel ?? 1);
+          const begin = dayjs(file.startTime || file.beginTime || new Date());
+          const end = dayjs(file.endTime || file.stopTime || begin.add(1, 'minute'));
+          const beginTime = (begin.isValid() ? begin : dayjs()).toISOString();
+          const endTime = (end.isValid() && end.isAfter(begin) ? end : begin.add(1, 'minute')).toISOString();
+          return {
+            channel,
+            beginTime,
+            endTime,
+            expected_file: `${channel}_${beginTime}_${endTime}`,
+            file_size: file.fileSize || 0,
+            fileSize: file.fileSize || 0,
+            status: 'on_device',
+            source: 'sd_card',
+            thumbnail_url: null,
+            video_url: null,
+          };
+        });
+
+        setVideos(gd14Videos);
+        setVideosTotalCount(gd14Videos.length);
+        setVideosCurrentPage(1);
+        return;
       } else {
         // For other device models, use old format
         requestBody = {
@@ -1375,9 +1546,14 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setVideos(allVideos);
         setVideosTotalCount(allVideos.length);
       } else {
-        // Old format - videos array (used for jc400 and other models)
-        setVideos(data.videos || []);
-        setVideosTotalCount(data.resource_count || 0);
+        // Old/alternate formats - support videos, onServer, and onDevice payloads.
+        const mergedVideos = [
+          ...(Array.isArray(data.videos) ? data.videos : []),
+          ...(Array.isArray(data.onServer) ? data.onServer : []),
+          ...(Array.isArray(data.onDevice) ? data.onDevice : []),
+        ];
+        setVideos(mergedVideos);
+        setVideosTotalCount(data.resource_count || mergedVideos.length || 0);
       }
       
       setVideosCurrentPage(1); // Reset to first page when new data is fetched
@@ -1389,7 +1565,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     } finally {
       setVideosLoading(false);
     }
-  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage, showSnackbar]);
+  }, [device, getDeviceModel, videoListStartDate, videoListEndDate, logDeviceMessage, showSnackbar, getIoTHubConfig]);
 
   // Send RTMP,OFF command for jc400 (must be sent before starting any stream)
   const sendRtmpOffCommand = useCallback(async () => {
@@ -1475,7 +1651,59 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
       const apiTemplate = getApiTemplate(deviceModel);
       if (!apiTemplate || !apiTemplate.streaming) {
-        throw new Error(`Device model "${deviceModel}" is not supported. Currently only "jc181" and "jc400" are supported.`);
+        throw new Error(`Device model "${deviceModel}" is not supported. Currently "jc181", "jc400" and "gd14" are supported.`);
+      }
+
+      if (deviceModel === 'gd14') {
+        const jt808ServerUrl = getIoTHubConfig?.jt808ServerUrl || '';
+        const phone = getIoTHubConfig?.phone || device.phone || device.uniqueId;
+        const streamingServer = getIoTHubConfig?.streamingServer || '';
+        const serverIp =
+          getIoTHubConfig?.ftpServerIp ||
+          (streamingServer ? new URL(streamingServer).hostname : '');
+
+        if (!jt808ServerUrl) {
+          throw new Error('JT808 Server URL not configured');
+        }
+        if (!phone) {
+          throw new Error('JT808 phone not configured');
+        }
+        if (!serverIp) {
+          throw new Error('Streaming server host not configured');
+        }
+
+        const normalizedBaseUrl = jt808ServerUrl.startsWith('http')
+          ? jt808ServerUrl.replace(/\/$/, '')
+          : `http://${jt808ServerUrl.replace(/\/$/, '')}`;
+
+        const response = await fetch(`${normalizedBaseUrl}/api/jt1078/live`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            action: 'start',
+            channelId: channelNum,
+            serverIp,
+            tcpPort: 10002,
+            udpPort: 0,
+            dataType: 0,
+            streamType: 0,
+          }),
+        });
+        const parsed = await response.json();
+        const isSuccess = Boolean(parsed?.success);
+        logDeviceMessage(
+          'streaming',
+          `start_stream_channel_${channelNum}`,
+          { phone, channel: channelNum, serverIp },
+          parsed,
+          isSuccess,
+          isSuccess ? null : (parsed?.error || 'JT808 live request failed'),
+        );
+        if (!isSuccess) {
+          return { success: false, error: parsed?.error || 'JT808 live request failed', data: parsed };
+        }
+        return { success: true, data: parsed };
       }
 
       // For jc400, first send RTMP,OFF command, wait 500ms, then send streaming command
@@ -1651,7 +1879,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       console.error('Error sending streaming request:', error);
       throw error;
     }
-  }, [device, logDeviceMessage, getDeviceModel, getApiTemplate, sendRtmpOffCommand]);
+  }, [device, logDeviceMessage, getDeviceModel, getApiTemplate, sendRtmpOffCommand, getIoTHubConfig]);
 
   // Load video stream with retry logic using flv.js
   const loadVideoStream = useCallback((channelNum, retryCount = 0, isInitialLoad = false) => {
@@ -1686,7 +1914,17 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       let videoUrl;
       const cleanServer = streamingServer.replace(/\/$/, '');
       
-      if (apiTemplate?.streaming?.urlFormat === 'live') {
+      if (deviceModel === 'gd14') {
+        const phone = getIoTHubConfig?.phone || device.phone || device.uniqueId;
+        if (!phone) {
+          throw new Error('JT808 phone not configured');
+        }
+        if (cleanServer.startsWith('http://') || cleanServer.startsWith('https://')) {
+          videoUrl = `${cleanServer}/${channelNum}/${phone}.flv`;
+        } else {
+          videoUrl = `https://${cleanServer}/${channelNum}/${phone}.flv`;
+        }
+      } else if (apiTemplate?.streaming?.urlFormat === 'live') {
         // jc400 format: https://{streamingServer}/live/{channelIndex}/{deviceId}.flv
         // Channel mapping: Channel 1 → index 0, Channel 2 → index 1
         const channelIndex = channelNum - 1;
@@ -1740,7 +1978,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
         setStreamingLoading(false);
       }
     }
-  }, [device, selectedChannel, getDeviceModel, getApiTemplate]);
+  }, [device, selectedChannel, getDeviceModel, getApiTemplate, getIoTHubConfig]);
 
   // Refresh streaming for current channel
   const handleRefreshStreaming = useCallback(async () => {
@@ -2301,12 +2539,13 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
     
     // Filter videos
     let filtered = videos;
+    const isTimelineModel = getDeviceModel === 'gd14' || getDeviceModel === 'jc400';
     if (videoListSelectedChannels.length > 0 || videoListSelectedStatuses.length > 0) {
       filtered = videos.filter(video => {
         const channelMatch = videoListSelectedChannels.length === 0 || 
           videoListSelectedChannels.includes(String(video.channel)) ||
           videoListSelectedChannels.includes(video.channel?.toString());
-        const statusMatch = videoListSelectedStatuses.length === 0 || 
+        const statusMatch = isTimelineModel || videoListSelectedStatuses.length === 0 || 
           videoListSelectedStatuses.includes(video.status);
         return channelMatch && statusMatch;
       });
@@ -2317,17 +2556,353 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       if (!a.beginTime && !b.beginTime) return 0;
       if (!a.beginTime) return 1;
       if (!b.beginTime) return -1;
-      try {
-        const timeA = dayjs(a.beginTime, 'YYYY-MM-DD HH:mm:ss').valueOf();
-        const timeB = dayjs(b.beginTime, 'YYYY-MM-DD HH:mm:ss').valueOf();
-        return timeA - timeB;
-      } catch {
-        return a.beginTime.localeCompare(b.beginTime);
+      const timeA = parseTimelineDate(a.beginTime).valueOf();
+      const timeB = parseTimelineDate(b.beginTime).valueOf();
+      if (Number.isNaN(timeA) || Number.isNaN(timeB)) {
+        return String(a.beginTime).localeCompare(String(b.beginTime));
       }
+      return timeA - timeB;
     });
     
     return filtered;
-  }, [videos, videoListSelectedChannels, videoListSelectedStatuses]);
+  }, [videos, videoListSelectedChannels, videoListSelectedStatuses, getDeviceModel, parseTimelineDate]);
+
+  const isTimelinePlaybackModel = getDeviceModel === 'gd14' || getDeviceModel === 'jc400';
+
+  const gd14TimelineRange = useMemo(() => {
+    const start = dayjs(videoListStartDate);
+    const end = dayjs(videoListEndDate);
+    const safeStart = start.isValid() ? start : dayjs().startOf('day');
+    const safeEnd = end.isValid() && end.isAfter(safeStart) ? end : safeStart.add(24, 'hour');
+    return { start: safeStart, end: safeEnd };
+  }, [videoListStartDate, videoListEndDate]);
+
+  const gd14TimelineSegments = useMemo(() => {
+    if (!isTimelinePlaybackModel) {
+      return [];
+    }
+    const sourceVideos = videos || [];
+    return sourceVideos
+      .map((video) => {
+        const start = parseTimelineDate(video.beginTime);
+        let end = parseTimelineDate(video.endTime);
+        if (!start.isValid()) {
+          return null;
+        }
+        if (!end.isValid()) {
+          end = start.add(30, 'second');
+        }
+        // JC400 often reports beginTime === endTime for event clips.
+        // Render with a minimal duration so the segment is visible/clickable.
+        if (!end.isAfter(start)) {
+          end = start.add(30, 'second');
+        }
+        return {
+          ...video,
+          start,
+          end,
+          channel: Number(video.channel || 1),
+        };
+      })
+      .filter(Boolean);
+  }, [videos, isTimelinePlaybackModel, parseTimelineDate]);
+
+  const gd14Channels = useMemo(() => {
+    const channels = [...new Set(gd14TimelineSegments.map((item) => item.channel))]
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+    if (channels.length > 0) {
+      return channels;
+    }
+    return Array.from({ length: getIoTHubChannels || 4 }, (_, i) => i + 1);
+  }, [gd14TimelineSegments, getIoTHubChannels]);
+
+  const jc400SegmentsOrdered = useMemo(() => {
+    if (getDeviceModel !== 'jc400') {
+      return [];
+    }
+    return [...gd14TimelineSegments].sort((a, b) => {
+      if (a.channel !== b.channel) return a.channel - b.channel;
+      return a.start.valueOf() - b.start.valueOf();
+    });
+  }, [getDeviceModel, gd14TimelineSegments]);
+
+  const gd14PlaybackMarkerPercent = useMemo(() => {
+    if (!gd14CurrentPlaybackTime) {
+      return null;
+    }
+    const current = dayjs(gd14CurrentPlaybackTime);
+    if (!current.isValid()) {
+      return null;
+    }
+    const totalMs = gd14TimelineRange.end.valueOf() - gd14TimelineRange.start.valueOf();
+    if (totalMs <= 0) {
+      return null;
+    }
+    const pos = ((current.valueOf() - gd14TimelineRange.start.valueOf()) / totalMs) * 100;
+    return Math.max(0, Math.min(100, pos));
+  }, [gd14CurrentPlaybackTime, gd14TimelineRange]);
+
+  const sendGd14PlaybackControl = useCallback(async (action, extra = {}) => {
+    const jt808ServerUrl = getIoTHubConfig?.jt808ServerUrl || '';
+    const phone = getIoTHubConfig?.phone || device?.phone || device?.uniqueId;
+    if (!jt808ServerUrl || !phone) {
+      throw new Error('JT808 server URL or phone not configured');
+    }
+
+    const normalizedBaseUrl = jt808ServerUrl.startsWith('http')
+      ? jt808ServerUrl.replace(/\/$/, '')
+      : `http://${jt808ServerUrl.replace(/\/$/, '')}`;
+
+    const response = await fetch(`${normalizedBaseUrl}/api/jt1078/playback-ctrl`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone,
+        channelId: gd14SelectedChannel || 1,
+        action,
+        speed: gd14PlaybackSpeed,
+        ...extra,
+      }),
+    });
+
+    const payload = await response.json();
+    if (!response.ok || !payload?.success) {
+      throw new Error(payload?.error || 'Failed to control GD14 playback');
+    }
+    return payload;
+  }, [device, getIoTHubConfig, gd14SelectedChannel, gd14PlaybackSpeed]);
+
+  const startGd14Playback = useCallback(async (segment, jumpToTime = null) => {
+    const jt808ServerUrl = getIoTHubConfig?.jt808ServerUrl || '';
+    const phone = getIoTHubConfig?.phone || device?.phone || device?.uniqueId;
+    const streamingServer = getIoTHubConfig?.streamingServer || '';
+    const serverIp =
+      getIoTHubConfig?.ftpServerIp ||
+      (streamingServer ? (() => {
+        try {
+          return new URL(streamingServer).hostname;
+        } catch {
+          return '';
+        }
+      })() : '');
+
+    if (!jt808ServerUrl || !phone || !streamingServer || !serverIp) {
+      throw new Error('GD14 configuration incomplete (jt808ServerUrl, phone, streamingServer, ftpServerIp)');
+    }
+
+    const normalizedBaseUrl = jt808ServerUrl.startsWith('http')
+      ? jt808ServerUrl.replace(/\/$/, '')
+      : `http://${jt808ServerUrl.replace(/\/$/, '')}`;
+    const normalizedStreamingUrl = streamingServer.startsWith('http')
+      ? streamingServer.replace(/\/$/, '')
+      : `https://${streamingServer.replace(/\/$/, '')}`;
+
+    const playbackStart = jumpToTime ? dayjs(jumpToTime) : segment.start;
+    const playbackEnd = segment.end;
+
+    setGd14PlaybackLoading(true);
+    setGd14PlaybackError(null);
+    setGd14SelectedSegment(segment);
+    setGd14SelectedChannel(segment.channel);
+    setGd14CurrentPlaybackTime(playbackStart.toISOString());
+
+    try {
+      const response = await fetch(`${normalizedBaseUrl}/api/jt1078/playback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone,
+          channelId: segment.channel,
+          serverIp,
+          tcpPort: 10003,
+          udpPort: 0,
+          mediaType: 0,
+          storageType: 1,
+          playbackMode: 0,
+          playbackSpeed: gd14PlaybackSpeed,
+          startTime: playbackStart.toISOString(),
+          endTime: playbackEnd.toISOString(),
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || 'Failed to start GD14 playback');
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setGd14HistoryVideoUrl(`${normalizedStreamingUrl}/${segment.channel}/${phone}.history.flv`);
+    } finally {
+      setGd14PlaybackLoading(false);
+    }
+  }, [device, getIoTHubConfig, gd14PlaybackSpeed]);
+
+  const startJc400ReplayByFile = useCallback(async (segment) => {
+    const mediaServerUrl = import.meta.env.VITE_MEDIA_SERVER_URL;
+    if (!mediaServerUrl) {
+      throw new Error('Media server URL not configured');
+    }
+    if (!device?.attributes?.iothub || !device?.uniqueId) {
+      throw new Error('Device iothub configuration not found');
+    }
+
+    const iothub = JSON.parse(device.attributes.iothub);
+    const token = iothub?.token || '';
+    const jimiServer = iothub?.iothubServer || '';
+    const streamingServer = iothub?.streamingServer || '';
+    const replayFileName = segment.replay_file_name || segment.expected_file;
+
+    if (!replayFileName) {
+      throw new Error('Replay file name not available');
+    }
+    if (!token || !jimiServer || !streamingServer) {
+      throw new Error('JC400 iothub config incomplete (token/iothubServer/streamingServer)');
+    }
+
+    const normalizedMediaServer = mediaServerUrl.replace(/\/+$/, '');
+    const normalizedStreamingServer = streamingServer.startsWith('http')
+      ? streamingServer.replace(/\/+$/, '')
+      : `https://${streamingServer.replace(/\/+$/, '')}`;
+
+    const response = await fetch(`${normalizedMediaServer}/replaylist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        deviceImei: device.uniqueId,
+        fileName: replayFileName,
+        token,
+        jimiServer,
+      }),
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.ok === false) {
+      throw new Error(payload?.error || 'Failed to request JC400 replay stream');
+    }
+
+    // REPLAYLIST pull URL for JC400 uses IMEI directly (without channel path).
+    setTimelineVideoUrl(`${normalizedStreamingServer}/live/${device.uniqueId}.flv`);
+  }, [device]);
+
+  const playJc400Segment = useCallback(async (segment) => {
+    const directUrl = segment.video_url || segment.videoUrl || null;
+    setTimelineVideoError(null);
+    setJc400SelectedSegmentKey(`${segment.channel}-${segment.start?.toISOString?.() || segment.beginTime}`);
+    if (directUrl) {
+      setTimelineVideoUrl(directUrl);
+      return;
+    }
+    await startJc400ReplayByFile(segment);
+  }, [startJc400ReplayByFile]);
+
+  const handleGd14PlaybackControl = useCallback(async (action, extra = {}) => {
+    try {
+      setGd14PlaybackControlLoading(true);
+      await sendGd14PlaybackControl(action, extra);
+      if (action === 1) {
+        // pause
+        return;
+      }
+      if (action === 0) {
+        setGd14HistoryVideoUrl(null);
+      }
+      if (action === 5 && extra.jumpTo) {
+        setGd14CurrentPlaybackTime(extra.jumpTo);
+      }
+    } catch (error) {
+      setGd14PlaybackError(error.message);
+    } finally {
+      setGd14PlaybackControlLoading(false);
+    }
+  }, [sendGd14PlaybackControl]);
+
+  useEffect(() => {
+    // Reset timeline player state when switching model/device context.
+    setTimelineVideoUrl(null);
+    setTimelineVideoError(null);
+    setJc400PlaybackRate(1);
+    setJc400SelectedSegmentKey(null);
+    setGd14HistoryVideoUrl(null);
+    setGd14PlaybackError(null);
+    setGd14SelectedSegment(null);
+    setGd14CurrentPlaybackTime(null);
+  }, [device?.id, getDeviceModel]);
+
+  useEffect(() => {
+    if (getDeviceModel !== 'jc400') return;
+    const video = jc400VideoRef.current;
+    if (!video) return;
+    try {
+      video.playbackRate = jc400PlaybackRate;
+    } catch (e) {
+      // Some streams/browsers may reject playbackRate changes.
+    }
+  }, [jc400PlaybackRate, timelineVideoUrl, getDeviceModel]);
+
+  useEffect(() => {
+    if (!gd14HistoryVideoUrl || !gd14VideoRef.current) {
+      if (gd14FlvPlayerRef.current) {
+        gd14FlvPlayerRef.current.destroy();
+        gd14FlvPlayerRef.current = null;
+      }
+      return undefined;
+    }
+
+    if (!flvjs.isSupported()) {
+      setGd14PlaybackError('FLV playback is not supported in this browser');
+      return undefined;
+    }
+
+    if (gd14FlvPlayerRef.current) {
+      gd14FlvPlayerRef.current.destroy();
+      gd14FlvPlayerRef.current = null;
+    }
+
+    const player = flvjs.createPlayer({
+      type: 'flv',
+      url: gd14HistoryVideoUrl,
+      isLive: false,
+      hasAudio: true,
+      hasVideo: true,
+      enableWorker: false,
+      enableStashBuffer: true,
+      autoCleanupSourceBuffer: true,
+    });
+    player.attachMediaElement(gd14VideoRef.current);
+    player.on(flvjs.Events.ERROR, (_type, _detail, info) => {
+      setGd14PlaybackError(info?.msg || 'Failed to play GD14 history stream');
+    });
+    player.load();
+    player.play().catch(() => {});
+    gd14FlvPlayerRef.current = player;
+
+    return () => {
+      if (gd14FlvPlayerRef.current) {
+        gd14FlvPlayerRef.current.destroy();
+        gd14FlvPlayerRef.current = null;
+      }
+    };
+  }, [gd14HistoryVideoUrl]);
+
+  useEffect(() => {
+    const video = gd14VideoRef.current;
+    if (!video || !gd14SelectedSegment) {
+      return undefined;
+    }
+
+    const handleTimeUpdate = () => {
+      const base = dayjs(gd14SelectedSegment.start);
+      if (!base.isValid()) {
+        return;
+      }
+      const current = base.add(video.currentTime || 0, 'second');
+      setGd14CurrentPlaybackTime(current.toISOString());
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [gd14SelectedSegment, gd14HistoryVideoUrl]);
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -2964,24 +3539,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
       
       // Check if door status changed from closed to open
       if (lastStatus === false && doorStatus.isOpen === true) {
-        // Door just opened - create notification event
-        const event = {
-          id: Date.now(), // Temporary ID
-          deviceId: deviceId,
-          type: 'alarm',
-          eventTime: new Date().toISOString(),
-          positionId: currentPosition.id,
-          attributes: {
-            alarm: 'door',
-            message: `${device.name || t('deviceUnknown')}: ${t('positionDoorOpen')}`
-          }
-        };
-        
-        console.log('🚪 Door opened - creating notification:', event);
-        
-        // Dispatch event to trigger notification
-        dispatch(eventsActions.add([event]));
-        
+        // Event and notification are now handled by SocketController for all J16+ devices.
         // Play alarm sound if configured
         const soundAlarms = localStorage.getItem('soundAlarms') || 'sos';
         if (soundAlarms.includes('door')) {
@@ -4367,16 +4925,68 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           bottom: !desktop ? '0px' : 'auto',
           left: !desktop ? '0px' : (isDeviceListVisible || showReplayPopover ? (isMenuExpanded ? '510px' : '370px') : (isMenuExpanded ? '200px' : '63px')),
           width: !desktop ? '100vw' : '310px',
-          height: !desktop ? 'calc(47vh - 50px)' : 'calc(100vh - 16px)',
+          height: desktop ? 'calc(100vh - 16px)' : 'auto',
           zIndex: selectedPlate ? 10000 : 9998,
           pointerEvents: 'auto',
-          transition: 'left 0.3s ease'
+          transition: 'left 0.3s ease',
+          paddingBottom: !desktop ? 'env(safe-area-inset-bottom, 0px)' : undefined,
+          display: !desktop ? 'flex' : undefined,
+          flexDirection: !desktop ? 'column' : undefined,
         }}
       >
+        {!desktop && (
+          <motion.div
+            onPanEnd={onMobileSheetPanEnd}
+            style={{
+              padding: '10px 0 8px',
+              cursor: 'grab',
+              touchAction: 'none',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 5,
+                borderRadius: 3,
+                backgroundColor: colors.border,
+                margin: '0 auto',
+              }}
+            />
+          </motion.div>
+        )}
+        <motion.div
+          animate={{
+            height: desktop ? '100%' : (mobileStatusSheetExpanded ? 'calc(47vh - 50px)' : '136px'),
+          }}
+          transition={desktop ? { duration: 0 } : { type: 'spring', damping: 32, stiffness: 380 }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+            flex: desktop ? 1 : undefined,
+            height: desktop ? '100%' : undefined,
+            borderRadius: !desktop ? '16px 16px 0 0' : undefined,
+            boxShadow: !desktop ? '0 -10px 40px rgba(0, 0, 0, 0.14)' : undefined,
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflow: 'hidden',
+              WebkitOverflowScrolling: 'touch',
+              display: 'flex',
+              flexDirection: 'column',
+              height: desktop ? '100%' : undefined,
+            }}
+          >
         {selectedPlate && !showReplayPopover && replayPositions.length <= 1 ? (
           // Render FleetVehicleCard when a fleet vehicle is selected
           <div style={{
-            height: '100%',
+            flex: 1,
+            minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -5111,7 +5721,35 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 </button>
               )}
               
-              {/* Button 4 - Send Commands (Outlined) */}
+              {/* Button 4 - Live Stream (JT1078/JT808 dashcams) */}
+              {device?.category === 'dashcam' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/stream?deviceId=${selectedDeviceId}`);
+                  }}
+                  title="Vídeo ao vivo"
+                  style={{
+                    width: !desktop ? '58px' : '42px',
+                    height: !desktop ? '58px' : '42px',
+                    minWidth: !desktop ? '58px' : '42px',
+                    minHeight: !desktop ? '58px' : '42px',
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.textSecondary}`,
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <VideocamOutlinedIcon style={{ fontSize: '20px', color: colors.textSecondary }} />
+                </button>
+              )}
+
+              {/* Button 5 - Send Commands (Outlined) */}
               {hasSendCommandPermission && (
               <button
                 onClick={(e) => {
@@ -5305,17 +5943,45 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
               </div>
             )}
             
+            {/* J16+ Door Status Banner — reads from Redux doorStates (set by SocketController) */}
+            {position && device?.model === 'J16+' && doorIsOpen !== undefined && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                marginBottom: '6px',
+                borderRadius: '8px',
+                backgroundColor: doorIsOpen ? 'rgba(220,38,38,0.10)' : 'rgba(22,163,74,0.08)',
+                border: `1px solid ${doorIsOpen ? 'rgba(220,38,38,0.25)' : 'rgba(22,163,74,0.20)'}`,
+              }}>
+                <span style={{ fontSize: '20px', lineHeight: 1 }}>
+                  {doorIsOpen ? '🚨' : '✅'}
+                </span>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  letterSpacing: '0.3px',
+                  color: doorIsOpen ? '#dc2626' : '#16a34a',
+                  flex: 1,
+                }}>
+                  {doorIsOpen ? t('positionDoorOpen') : t('positionDoorClosed')}
+                </span>
+              </div>
+            )}
+
             {/* Position Attributes */}
             {position && (
               <div style={{ marginBottom: '4px' }}>
-                
+
                 {positionItems.split(',').filter((key) => {
                   // For door, always include if device has doorSensorMode configured
                   if (key === 'door') {
                     return device?.attributes?.doorSensorMode !== undefined;
                   }
                   // For other attributes, check if they exist
-                  return key && key !== 'address' && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key));
+                  return key && key !== 'address' && key !== 'fixTime'
+                    && (position.hasOwnProperty(key) || position.attributes.hasOwnProperty(key));
                 }).map((key, index) => {
                   const attributeName = getSensorDisplayName(key);
                   // Special handling for door attribute - get value or undefined if doesn't exist
@@ -5456,6 +6122,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
           ) : null}
         </Card>
         )}
+          </div>
+        </motion.div>
       </motion.div>
       )}
     </AnimatePresence>
@@ -5548,6 +6216,36 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                 maxHeight: 'calc(80vh - 80px)',
                 overflowY: 'auto'
               }}>
+                {/* Admin Device Info */}
+                {user?.administrator && modalDevice && (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '10px',
+                    marginBottom: '16px',
+                    padding: '14px 16px',
+                    backgroundColor: colors.secondary,
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.border}`,
+                  }}>
+                    {[
+                      { label: 'IMEI / ID', value: modalDevice.uniqueId },
+                      modalDevice.model ? { label: 'Modelo', value: modalDevice.model } : null,
+                      (modalDevice.phone || modalDevice.attributes?.phone || modalDevice.attributes?.simCard)
+                        ? { label: 'Chip / SIM', value: modalDevice.phone || modalDevice.attributes?.phone || modalDevice.attributes?.simCard }
+                        : null,
+                    ].filter(Boolean).map(({ label, value }) => (
+                      <div key={label}>
+                        <div style={{ fontSize: '10px', fontWeight: '600', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>
+                          {label}
+                        </div>
+                        <div style={{ fontSize: '13px', color: colors.text, fontWeight: '500', wordBreak: 'break-all' }}>
+                          {value || '—'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {isLoadingDetails ? (
                   <div style={{
                     display: 'flex',
@@ -8072,7 +8770,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               Device Model Not Supported
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: '13px' }}>
-                              Device model "{deviceModel}" is not currently supported. Currently "jc181" and "jc400" are supported. 
+                              Device model "{deviceModel}" is not currently supported. Currently "jc181", "jc400" and "gd14" are supported. 
                               Video playback and streaming features will not work for this device.
                             </Typography>
                           </Alert>
@@ -8165,6 +8863,384 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
 
                     {/* Playback Tab Content */}
                     {selectedChannel === 0 && (() => {
+                        if (isTimelinePlaybackModel) {
+                          const totalMs = gd14TimelineRange.end.valueOf() - gd14TimelineRange.start.valueOf();
+                          return (
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '12px',
+                              height: desktop ? '100%' : 'auto',
+                              overflow: desktop ? 'auto' : 'visible',
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: desktop ? 'row' : 'column',
+                                gap: '10px',
+                                alignItems: desktop ? 'center' : 'stretch',
+                              }}>
+                                <TextField
+                                  label="Start Date"
+                                  type="datetime-local"
+                                  value={videoListStartDate}
+                                  onChange={(e) => setVideoListStartDate(e.target.value)}
+                                  size="small"
+                                  InputLabelProps={{ shrink: true }}
+                                  sx={{
+                                    minWidth: desktop ? '210px' : '100%',
+                                    '& .MuiOutlinedInputRoot': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabelRoot': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary },
+                                    },
+                                    '& .MuiInputBase-input': {
+                                      color: colors.text,
+                                    },
+                                  }}
+                                />
+                                <TextField
+                                  label="End Date"
+                                  type="datetime-local"
+                                  value={videoListEndDate}
+                                  onChange={(e) => setVideoListEndDate(e.target.value)}
+                                  size="small"
+                                  InputLabelProps={{ shrink: true }}
+                                  sx={{
+                                    minWidth: desktop ? '210px' : '100%',
+                                    '& .MuiOutlinedInputRoot': {
+                                      backgroundColor: colors.secondary,
+                                      '& fieldset': { borderColor: colors.border },
+                                      '&:hover fieldset': { borderColor: colors.primary },
+                                      '&.Mui-focused fieldset': { borderColor: colors.primary },
+                                    },
+                                    '& .MuiInputLabelRoot': {
+                                      color: colors.textSecondary,
+                                      '&.Mui-focused': { color: colors.primary },
+                                    },
+                                    '& .MuiInputBase-input': {
+                                      color: colors.text,
+                                    },
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={fetchVideos}
+                                  disabled={videosLoading}
+                                  style={{
+                                    padding: '8px 12px',
+                                    borderRadius: '8px',
+                                    border: `1px solid #1976d2`,
+                                    backgroundColor: '#1976d220',
+                                    color: '#1976d2',
+                                    cursor: videosLoading ? 'not-allowed' : 'pointer',
+                                    fontWeight: 600,
+                                    opacity: videosLoading ? 0.7 : 1,
+                                  }}
+                                >
+                                  {videosLoading ? 'Loading...' : 'Reload'}
+                                </button>
+                              </div>
+                              <Typography variant="subtitle2" style={{
+                                color: colors.text,
+                                fontWeight: '600',
+                              }}>
+                                {getDeviceModel === 'gd14' ? 'GD14 SD Card Timeline' : 'JC400 SD Card Timeline'}
+                              </Typography>
+                              <Typography variant="caption" style={{ color: colors.textSecondary }}>
+                                Raw videos: {videos.length} | Segments loaded: {gd14TimelineSegments.length}
+                              </Typography>
+
+                              <div style={{
+                                width: '100%',
+                                maxWidth: '1024px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: colors.secondary,
+                                borderRadius: '8px',
+                                border: `1px solid ${colors.border}`,
+                                aspectRatio: '16/9',
+                                overflow: 'hidden',
+                                margin: '0 auto',
+                                position: 'relative',
+                              }}>
+                                {getDeviceModel === 'gd14' && gd14PlaybackLoading && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    background: 'rgba(0,0,0,0.5)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    zIndex: 5,
+                                  }}>
+                                    <CircularProgress size={28} />
+                                  </div>
+                                )}
+                                {getDeviceModel === 'gd14' && gd14HistoryVideoUrl ? (
+                                  <video
+                                    ref={gd14VideoRef}
+                                    controls
+                                    autoPlay
+                                    playsInline
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'contain',
+                                      backgroundColor: '#000',
+                                    }}
+                                  />
+                                ) : getDeviceModel === 'jc400' && timelineVideoUrl ? (
+                                  <video
+                                    ref={jc400VideoRef}
+                                    src={timelineVideoUrl}
+                                    controls
+                                    autoPlay
+                                    playsInline
+                                    onEnded={async () => {
+                                      if (!jc400SelectedSegmentKey) return;
+                                      const current = jc400SegmentsOrdered.find(
+                                        (segment) => `${segment.channel}-${segment.start.toISOString()}` === jc400SelectedSegmentKey,
+                                      );
+                                      if (!current) return;
+                                      const next = jc400SegmentsOrdered.find(
+                                        (segment) =>
+                                          segment.channel === current.channel
+                                          && segment.start.valueOf() > current.start.valueOf(),
+                                      );
+                                      if (!next) return;
+                                      try {
+                                        await playJc400Segment(next);
+                                      } catch (error) {
+                                        setTimelineVideoError(error.message);
+                                      }
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'contain',
+                                      backgroundColor: '#000',
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                                    Select a timeline segment to start playback
+                                  </Typography>
+                                )}
+                              </div>
+
+                              {(gd14PlaybackError || timelineVideoError) && (
+                                <Alert severity="warning">{gd14PlaybackError || timelineVideoError}</Alert>
+                              )}
+
+                              <div style={{
+                                border: `1px solid ${colors.border}`,
+                                borderRadius: '8px',
+                                backgroundColor: colors.secondary,
+                                padding: '12px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '10px',
+                              }}>
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  color: colors.textSecondary,
+                                  fontSize: '12px',
+                                }}>
+                                  <span>{gd14TimelineRange.start.format('DD/MM HH:mm')}</span>
+                                  <span>{gd14TimelineRange.end.format('DD/MM HH:mm')}</span>
+                                </div>
+
+                                {gd14Channels.map((channel) => (
+                                  <div key={channel} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{
+                                      width: '42px',
+                                      color: colors.textSecondary,
+                                      fontSize: '12px',
+                                      fontWeight: 600,
+                                    }}>
+                                      CH{channel}
+                                    </div>
+                                    <div
+                                      style={{
+                                        position: 'relative',
+                                        height: '24px',
+                                        flex: 1,
+                                        borderRadius: '6px',
+                                        backgroundColor: colors.surface,
+                                        border: `1px solid ${colors.border}`,
+                                        cursor: gd14SelectedSegment ? 'pointer' : 'default',
+                                      }}
+                                      onClick={async (e) => {
+                                        if (
+                                          getDeviceModel !== 'gd14'
+                                          || !gd14SelectedSegment
+                                          || gd14SelectedSegment.channel !== channel
+                                          || totalMs <= 0
+                                        ) {
+                                          return;
+                                        }
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                                        const jumpTo = gd14TimelineRange.start.add(Math.round(totalMs * ratio), 'millisecond').toISOString();
+                                        await handleGd14PlaybackControl(5, { jumpTo });
+                                      }}
+                                    >
+                                      {gd14TimelineSegments
+                                        .filter((segment) => segment.channel === channel)
+                                        .map((segment, idx) => {
+                                          if (totalMs <= 0) {
+                                            return null;
+                                          }
+                                          const left = ((segment.start.valueOf() - gd14TimelineRange.start.valueOf()) / totalMs) * 100;
+                                          const width = ((segment.end.valueOf() - segment.start.valueOf()) / totalMs) * 100;
+                                          const isSelected =
+                                            gd14SelectedSegment
+                                            && gd14SelectedSegment.channel === segment.channel
+                                            && gd14SelectedSegment.start?.valueOf?.() === segment.start.valueOf();
+                                          return (
+                                            <button
+                                              type="button"
+                                              key={`${channel}-${idx}-${segment.start.toISOString()}`}
+                                              onClick={async (ev) => {
+                                                ev.stopPropagation();
+                                                if (getDeviceModel === 'gd14') {
+                                                  try {
+                                                    await startGd14Playback(segment);
+                                                  } catch (error) {
+                                                    setGd14PlaybackLoading(false);
+                                                    setGd14PlaybackError(error.message);
+                                                  }
+                                                } else {
+                                                  try {
+                                                    await playJc400Segment(segment);
+                                                  } catch (error) {
+                                                    setTimelineVideoError(error.message);
+                                                  }
+                                                }
+                                              }}
+                                              style={{
+                                                position: 'absolute',
+                                                left: `${Math.max(0, Math.min(100, left))}%`,
+                                                width: `${Math.max(0.5, Math.min(100, width))}%`,
+                                                top: '3px',
+                                                bottom: '3px',
+                                                borderRadius: '4px',
+                                                border: isSelected ? '1px solid #1565c0' : '1px solid #2e7d32',
+                                                backgroundColor: isSelected ? '#90caf9' : '#81c784',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                              }}
+                                              title={`${segment.start.format('HH:mm:ss')} - ${segment.end.format('HH:mm:ss')}`}
+                                            />
+                                          );
+                                        })}
+                                      {getDeviceModel === 'gd14' && gd14PlaybackMarkerPercent != null && (
+                                        <div style={{
+                                          position: 'absolute',
+                                          left: `${gd14PlaybackMarkerPercent}%`,
+                                          top: 0,
+                                          bottom: 0,
+                                          width: '2px',
+                                          backgroundColor: '#ef4444',
+                                        }} />
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {getDeviceModel === 'gd14' ? (
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  gap: '8px',
+                                }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleGd14PlaybackControl(1)}
+                                    disabled={gd14PlaybackControlLoading || !gd14HistoryVideoUrl}
+                                    style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${colors.border}` }}
+                                  >
+                                    Pause
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleGd14PlaybackControl(2)}
+                                    disabled={gd14PlaybackControlLoading || !gd14HistoryVideoUrl}
+                                    style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${colors.border}` }}
+                                  >
+                                    Resume
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleGd14PlaybackControl(0)}
+                                    disabled={gd14PlaybackControlLoading || !gd14HistoryVideoUrl}
+                                    style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${colors.border}` }}
+                                  >
+                                    Stop
+                                  </button>
+                                  <select
+                                    value={gd14PlaybackSpeed}
+                                    onChange={(e) => setGd14PlaybackSpeed(Number(e.target.value))}
+                                    style={{ padding: '6px 8px', borderRadius: '6px', border: `1px solid ${colors.border}` }}
+                                  >
+                                    <option value={0}>1x</option>
+                                    <option value={1}>2x</option>
+                                    <option value={2}>4x</option>
+                                    <option value={3}>8x</option>
+                                    <option value={4}>16x</option>
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleGd14PlaybackControl(3, { speed: gd14PlaybackSpeed })}
+                                    disabled={gd14PlaybackControlLoading || !gd14HistoryVideoUrl}
+                                    style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${colors.border}` }}
+                                  >
+                                    Apply Speed
+                                  </button>
+                                </div>
+                              ) : (
+                                <div style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  flexWrap: 'wrap',
+                                }}>
+                                  <Typography variant="body2" style={{ color: colors.textSecondary }}>
+                                    JC400 timeline uses direct recordings when available and falls back to SD playback stream (REPLAYLIST).
+                                  </Typography>
+                                  {[1, 2, 4].map((rate) => (
+                                    <button
+                                      key={`jc400-rate-${rate}`}
+                                      type="button"
+                                      onClick={() => setJc400PlaybackRate(rate)}
+                                      style={{
+                                        padding: '6px 10px',
+                                        borderRadius: '6px',
+                                        border: `1px solid ${jc400PlaybackRate === rate ? '#1976d2' : colors.border}`,
+                                        backgroundColor: jc400PlaybackRate === rate ? '#1976d220' : colors.secondary,
+                                        color: jc400PlaybackRate === rate ? '#1976d2' : colors.text,
+                                        cursor: 'pointer',
+                                        fontWeight: 600,
+                                      }}
+                                      title={`Set playback speed to ${rate}x`}
+                                    >
+                                      {rate}x
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
                         return (
                         <div style={{
                           display: 'flex',
@@ -8290,8 +9366,8 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                                 const deviceModel = getDeviceModel;
                                 let channelsToShow = [];
                                 
-                                if (deviceModel === 'jc400') {
-                                  // For jc400, get unique channels from videos
+                                if (deviceModel === 'jc400' || deviceModel === 'gd14') {
+                                  // For jc400/gd14, get unique channels from videos
                                   const uniqueChannels = [...new Set(videos.map(v => v.channel).filter(Boolean))];
                                   channelsToShow = uniqueChannels.sort((a, b) => a - b);
                                 } else {
@@ -8336,7 +9412,7 @@ const FloatingStatusCard = ({ desktop, isMenuExpanded, isDeviceListVisible, show
                               })()}
                             </div>
                             {/* Hide status tag buttons for jc400 - event-based uploads don't need status filtering */}
-                            {getDeviceModel !== 'jc400' && (
+                            {getDeviceModel !== 'jc400' && getDeviceModel !== 'gd14' && (
                             <div style={{
                               display: 'flex',
                               flexDirection: 'row',

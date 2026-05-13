@@ -53,6 +53,90 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function normalizePhone(input) {
+  const digits = input ? String(input).trim().replace(/\D/g, '') : '';
+  if (!digits || digits.length < 10) return null;
+  return digits.length >= 12 ? digits : `55${digits}`;
+}
+
+function parseDeviceIds(body = {}) {
+  const ids = [];
+  let rawDeviceIds = body.deviceIds;
+  if (typeof rawDeviceIds === 'string') {
+    try {
+      const parsed = JSON.parse(rawDeviceIds);
+      rawDeviceIds = parsed;
+    } catch {
+      rawDeviceIds = rawDeviceIds.split(',');
+    }
+  }
+  if (!Array.isArray(rawDeviceIds) && rawDeviceIds != null) {
+    rawDeviceIds = [rawDeviceIds];
+  }
+  if (Array.isArray(rawDeviceIds)) {
+    rawDeviceIds.forEach((id) => {
+      const raw = (id && typeof id === 'object' && id.id != null) ? id.id : id;
+      const parsed = parseInt(raw, 10);
+      if (!Number.isNaN(parsed) && parsed > 0) ids.push(parsed);
+    });
+  }
+  if (body.deviceId != null) {
+    const parsed = parseInt(body.deviceId, 10);
+    if (!Number.isNaN(parsed) && parsed > 0) ids.push(parsed);
+  }
+  return [...new Set(ids)];
+}
+
+function hasDeviceIdsField(body = {}) {
+  return body.deviceIds !== undefined && body.deviceIds !== null && body.deviceIds !== '';
+}
+
+function validateDeviceIdsFromBody(body = {}) {
+  if (!hasDeviceIdsField(body)) return { valid: true };
+  const parsedIds = parseDeviceIds(body);
+  if (parsedIds.length === 0) {
+    return { valid: false, error: 'deviceIds deve conter ao menos um device válido.' };
+  }
+  let rawDeviceIds = body.deviceIds;
+  if (typeof rawDeviceIds === 'string') {
+    try {
+      rawDeviceIds = JSON.parse(rawDeviceIds);
+    } catch {
+      rawDeviceIds = rawDeviceIds.split(',');
+    }
+  }
+  if (!Array.isArray(rawDeviceIds) && rawDeviceIds != null) {
+    rawDeviceIds = [rawDeviceIds];
+  }
+  if (Array.isArray(rawDeviceIds)) {
+    const invalid = rawDeviceIds.some((id) => {
+      const raw = (id && typeof id === 'object' && id.id != null) ? id.id : id;
+      const parsed = parseInt(raw, 10);
+      return Number.isNaN(parsed) || parsed <= 0;
+    });
+    if (invalid) {
+      return { valid: false, error: 'deviceIds deve conter apenas inteiros positivos.' };
+    }
+  }
+  return { valid: true };
+}
+
+function getForbiddenDeviceIds(req, deviceIds) {
+  if (!Array.isArray(deviceIds) || deviceIds.length === 0) return [];
+  const allowed = Array.isArray(req.userDeviceIds) ? req.userDeviceIds : [];
+  const allowedSet = new Set(allowed.map((id) => parseInt(id, 10)));
+  return deviceIds.filter((id) => !allowedSet.has(parseInt(id, 10)));
+}
+
+async function getDeviceChipInfo(pool, deviceId) {
+  if (!pool || !deviceId) return null;
+  const chipRes = await pool.query(
+    'SELECT numero, operadora FROM chips WHERE traccar_device_id = $1 LIMIT 1',
+    [parseInt(deviceId, 10)]
+  );
+  return chipRes.rows[0] || null;
+}
+
 async function sendSingleSms(pool, fullNum, msg, deviceId, gatewayConfig = null) {
   const config = gatewayConfig || (pool ? await getGatewayConfig(pool) : null);
   const comteleApiKey = config?.comtele?.apiKey || process.env.COMTELE_API_KEY;
@@ -203,22 +287,97 @@ export default function registerSmsRoutes(app, { pool, requireAuthAndFilter }) {
   // POST /gestao/telecom/sms/send
   app.post(`${base}/send`, requireAuthAndFilter, async (req, res) => {
     try {
-      const { numero, mensagem, deviceId } = req.body;
-      const num = numero ? String(numero).trim().replace(/\D/g, '') : '';
-      if (!num || num.length < 10) {
-        return res.status(400).json({ error: 'Número de destino inválido.' });
+      const body = req.body || {};
+      const validation = validateDeviceIdsFromBody(body);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
       }
+      const { numero, mensagem } = body;
+      const deviceIds = parseDeviceIds(body);
       const msg = mensagem ? String(mensagem).trim() : '';
       if (!msg) {
         return res.status(400).json({ error: 'A mensagem é obrigatória.' });
       }
-      const fullNum = num.length >= 12 ? num : `55${num}`;
+      const normalizedInputPhone = normalizePhone(numero);
+      if (!normalizedInputPhone && deviceIds.length === 0) {
+        return res.status(400).json({ error: 'Número de destino inválido.' });
+      }
+      const forbiddenIds = getForbiddenDeviceIds(req, deviceIds);
+      if (forbiddenIds.length > 0) {
+        return res.status(403).json({ error: 'Você não tem acesso a um ou mais dispositivos informados.', forbiddenDeviceIds: forbiddenIds });
+      }
       const gatewayConfig = await getGatewayConfig(pool);
+      const targets = [];
 
-      const result = await sendSingleSms(pool, fullNum, msg, deviceId ? parseInt(deviceId, 10) : null, gatewayConfig);
+      if (deviceIds.length > 0) {
+        // Quando houver devices selecionados, priorizamos o chip associado de cada device.
+        for (const deviceId of deviceIds) {
+          const chip = await getDeviceChipInfo(pool, deviceId);
+          const resolvedPhone = normalizePhone(chip?.numero) || normalizedInputPhone;
+          if (!resolvedPhone) {
+            targets.push({
+              deviceId,
+              fullNum: null,
+              error: 'Número de destino inválido. O dispositivo não possui chip com número válido.',
+            });
+          } else {
+            targets.push({ deviceId, fullNum: resolvedPhone });
+          }
+        }
+      } else {
+        targets.push({ deviceId: null, fullNum: normalizedInputPhone });
+      }
+
+      const results = [];
+      for (const target of targets) {
+        if (target.error) {
+          results.push({
+            deviceId: target.deviceId,
+            number: null,
+            ok: false,
+            error: target.error,
+          });
+          continue;
+        }
+        try {
+          const result = await sendSingleSms(pool, target.fullNum, msg, target.deviceId, gatewayConfig);
+          results.push({
+            deviceId: target.deviceId,
+            number: target.fullNum,
+            ok: result.success,
+            message: result.message,
+            error: result.success ? null : result.message,
+          });
+        } catch (sendErr) {
+          results.push({
+            deviceId: target.deviceId,
+            number: target.fullNum,
+            ok: false,
+            error: sendErr.message || 'Erro ao enviar SMS.',
+          });
+        }
+      }
+      const successCount = results.filter((r) => r.ok).length;
+      const errorCount = results.length - successCount;
+      const singleMode = results.length === 1 && deviceIds.length <= 1;
+      const firstResult = results[0] || {};
+
+      if (singleMode) {
+        return res.json({
+          success: !!firstResult.ok,
+          message: firstResult.message || firstResult.error || null,
+          successCount,
+          errorCount,
+          total: results.length,
+          results,
+        });
+      }
       res.json({
-        success: result.success,
-        message: result.message,
+        success: errorCount === 0,
+        total: results.length,
+        successCount,
+        errorCount,
+        results,
       });
     } catch (err) {
       const msg = err.message || 'Erro ao enviar SMS.';
@@ -235,25 +394,21 @@ export default function registerSmsRoutes(app, { pool, requireAuthAndFilter }) {
   // POST /gestao/telecom/sms/send-batch - Envia sequência de SMS de uma configuração em lote
   app.post(`${base}/send-batch`, requireAuthAndFilter, async (req, res) => {
     try {
-      const { numero, deviceId, batchTemplateId } = req.body;
-      const num = numero ? String(numero).trim().replace(/\D/g, '') : '';
-      const devId = deviceId != null ? parseInt(deviceId, 10) : null;
-
-      let fullNum = num;
-      if (!fullNum && devId && pool) {
-        const chipRes = await pool.query(
-          'SELECT numero FROM chips WHERE traccar_device_id = $1 LIMIT 1',
-          [devId]
-        );
-        if (chipRes.rows[0]?.numero) {
-          fullNum = String(chipRes.rows[0].numero).replace(/\D/g, '');
-          if (fullNum.length < 12) fullNum = `55${fullNum}`;
-        }
+      const body = req.body || {};
+      const validation = validateDeviceIdsFromBody(body);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
       }
-      if (!fullNum || fullNum.length < 10) {
+      const { numero, batchTemplateId } = body;
+      const deviceIds = parseDeviceIds(body);
+      const normalizedInputPhone = normalizePhone(numero);
+      if (!normalizedInputPhone && deviceIds.length === 0) {
         return res.status(400).json({ error: 'Número de destino inválido. Informe numero ou deviceId com chip associado.' });
       }
-      if (fullNum.length < 12) fullNum = `55${fullNum}`;
+      const forbiddenIds = getForbiddenDeviceIds(req, deviceIds);
+      if (forbiddenIds.length > 0) {
+        return res.status(403).json({ error: 'Você não tem acesso a um ou mais dispositivos informados.', forbiddenDeviceIds: forbiddenIds });
+      }
 
       const batchId = parseInt(batchTemplateId, 10);
       if (Number.isNaN(batchId) || batchId < 1) {
@@ -295,16 +450,62 @@ export default function registerSmsRoutes(app, { pool, requireAuthAndFilter }) {
       const gatewayConfig = await getGatewayConfig(pool);
       const results = [];
 
-      for (let i = 0; i < messages.length; i++) {
-        const { titulo, mensagem } = messages[i];
-        try {
-          const r = await sendSingleSms(pool, fullNum, mensagem, devId, gatewayConfig);
-          results.push({ index: i + 1, titulo, success: r.success, message: r.message });
-        } catch (err) {
-          results.push({ index: i + 1, titulo, success: false, message: err.message || 'Erro ao enviar' });
+      const targets = [];
+      if (deviceIds.length > 0) {
+        for (const deviceId of deviceIds) {
+          const chip = await getDeviceChipInfo(pool, deviceId);
+          const resolvedPhone = normalizePhone(chip?.numero) || normalizedInputPhone;
+          if (!resolvedPhone) {
+            targets.push({
+              deviceId,
+              fullNum: null,
+              error: 'Número de destino inválido. O dispositivo não possui chip com número válido.',
+            });
+          } else {
+            targets.push({ deviceId, fullNum: resolvedPhone });
+          }
         }
-        if (i < messages.length - 1 && delayMs > 0) {
-          await sleep(delayMs);
+      } else {
+        targets.push({ deviceId: null, fullNum: normalizedInputPhone });
+      }
+
+      for (const target of targets) {
+        if (target.error) {
+          results.push({
+            deviceId: target.deviceId,
+            number: null,
+            index: 0,
+            titulo: 'Pré-validação',
+            success: false,
+            message: target.error,
+          });
+          continue;
+        }
+        for (let i = 0; i < messages.length; i++) {
+          const { titulo, mensagem: templateMessage } = messages[i];
+          try {
+            const r = await sendSingleSms(pool, target.fullNum, templateMessage, target.deviceId, gatewayConfig);
+            results.push({
+              deviceId: target.deviceId,
+              number: target.fullNum,
+              index: i + 1,
+              titulo,
+              success: r.success,
+              message: r.message,
+            });
+          } catch (err) {
+            results.push({
+              deviceId: target.deviceId,
+              number: target.fullNum,
+              index: i + 1,
+              titulo,
+              success: false,
+              message: err.message || 'Erro ao enviar',
+            });
+          }
+          if (i < messages.length - 1 && delayMs > 0) {
+            await sleep(delayMs);
+          }
         }
       }
 

@@ -20,6 +20,7 @@ import PositionPage from './other/PositionPage';
 import NetworkPage from './other/NetworkPage';
 import EventReportPage from './reports/EventReportPage';
 import ReplayPage from './other/ReplayPage';
+import StreamPage from './other/StreamPage';
 import WebHistoryPage from './other/WebHistoryPage';
 import TripReportPage from './reports/TripReportPage';
 import StopReportPage from './reports/StopReportPage';
@@ -54,6 +55,8 @@ import ChangeServerPage from './login/ChangeServerPage';
 import DevicesPage from './settings/DevicesPage';
 import ChipsPage from './settings/ChipsPage';
 import SmsTemplatesPage from './settings/SmsTemplatesPage';
+import FinancialPage from './settings/FinancialPage';
+import ClientFinancialPage from './settings/ClientFinancialPage';
 import ScheduledPage from './reports/ScheduledPage';
 import DeviceConnectionsPage from './settings/DeviceConnectionsPage';
 import GroupConnectionsPage from './settings/GroupConnectionsPage';
@@ -138,10 +141,12 @@ const Navigation = () => {
         <Route path="network/:positionId" element={<NetworkPage />} />
         <Route path="event/:id" element={<EventPage />} />
         <Route path="replay" element={<ReplayPage />} />
+        <Route path="stream" element={<StreamPage />} />
         <Route path="history" element={<WebHistoryPage />} />
         <Route path="geofences" element={<GeofencesPage />} />
         <Route path="emulator" element={<EmulatorPage />} />
         <Route path="os" element={<OSPage />} />
+        <Route path="meu-financeiro" element={<ClientFinancialPage />} />
 
         <Route path="settings">
           <Route path="accumulators/:deviceId" element={<AccumulatorsPage />} />
@@ -158,6 +163,7 @@ const Navigation = () => {
           <Route path="devices" element={<DevicesPage />} />
           <Route path="chips" element={<ChipsPage />} />
           <Route path="sms-templates" element={<SmsTemplatesPage />} />
+          <Route path="financial" element={<FinancialPage />} />
           <Route path="device/:id/connections" element={<DeviceConnectionsPage />} />
           <Route path="device/:id/command" element={<CommandDevicePage />} />
           <Route path="device/:id/share" element={<SharePage />} />

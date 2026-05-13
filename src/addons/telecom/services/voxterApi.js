@@ -29,22 +29,48 @@ async function authenticate(creds = null) {
   }
 
   const base = getBaseUrl(creds);
-  const params = new URLSearchParams({ email, password, platform: 1 });
-  const res = await fetch(`${base}/authenticate2?${params}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-access-token': accessToken,
-    },
-    body: JSON.stringify({ email, password, platform: 1 }),
-  });
 
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(data.message || data.error || `HTTP ${res.status}`);
+  let res;
+  try {
+    res = await fetch(`${base}/authenticate2`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': accessToken,
+      },
+      body: JSON.stringify({ email, password, platform: 1 }),
+    });
+  } catch (networkErr) {
+    const msg = `Voxter inacessível: ${networkErr.message}`;
+    console.error('[voxterApi] Network error on authenticate:', msg);
+    const err = new Error(msg);
+    err.isVoxterDown = true;
+    throw err;
   }
+
+  const rawBody = await res.text().catch(() => '');
+  let data = {};
+  try { data = JSON.parse(rawBody); } catch (_) { /* not JSON */ }
+
+  if (!res.ok) {
+    // Inclui o corpo real da resposta no log para facilitar diagnóstico
+    console.error(`[voxterApi] authenticate2 HTTP ${res.status}:`, rawBody.slice(0, 300));
+
+    // 5xx = problema na infraestrutura Voxter (banco fora do ar, etc.)
+    const isVoxterInfra = res.status >= 500;
+    const detail = data.message || data.error || rawBody.slice(0, 120) || `HTTP ${res.status}`;
+    const msg = isVoxterInfra
+      ? `Plataforma Voxter temporariamente indisponível (${res.status}): ${detail}`
+      : `Falha na autenticação Voxter (${res.status}): ${detail}`;
+
+    const err = new Error(msg);
+    err.isVoxterDown = isVoxterInfra;
+    err.voxterStatus = res.status;
+    throw err;
+  }
+
   if (data.error) {
-    throw new Error(data.message || 'Autenticação falhou.');
+    throw new Error(data.message || 'Autenticação Voxter falhou.');
   }
 
   const bearer = data.token?.token;
@@ -63,9 +89,13 @@ async function getBearerToken(creds = null) {
   if (cachedToken && tokenExpiresAt > now) {
     return cachedToken;
   }
-  cachedToken = await authenticate();
+  // Limpa o cache antes de tentar — se falhar não deixa token stale
+  cachedToken = null;
+  tokenExpiresAt = 0;
+  const token = await authenticate();
+  cachedToken = token;
   tokenExpiresAt = Date.now() + TOKEN_TTL_MS;
-  return cachedToken;
+  return token;
 }
 
 /**

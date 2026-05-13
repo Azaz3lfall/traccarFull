@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   FormControl, InputLabel, Select, MenuItem, useTheme,
 } from '@mui/material';
@@ -37,7 +37,13 @@ const ChartReportPage = () => {
   const [selectedTypes, setSelectedTypes] = useState(['speed']);
   const [timeType, setTimeType] = useState('fixTime');
 
-  const values = items.map((it) => selectedTypes.map((type) => it[type]).filter((value) => value != null));
+  // Deduplicate data points by timestamp to avoid recharts rendering ticks with duplicate keys.
+  const uniqueItems = useMemo(
+    () => Array.from(new Map(items.map((it) => [it[timeType], it])).values()),
+    [items, timeType],
+  );
+
+  const values = uniqueItems.map((it) => selectedTypes.map((type) => it[type]).filter((value) => value != null));
   const minValue = values.length ? Math.min(...values) : 0;
   const maxValue = values.length ? Math.max(...values) : 100;
   const valueRange = maxValue - minValue;
@@ -145,11 +151,11 @@ const ChartReportPage = () => {
           </FormControl>
         </div>
       </ReportFilter>
-      {items.length > 0 && (
+      {uniqueItems.length > 0 && (
         <div className={classes.chart}>
           <ResponsiveContainer>
             <LineChart
-              data={items}
+              data={uniqueItems}
               margin={{
                 top: 10, right: 40, left: 0, bottom: 10,
               }}
@@ -182,6 +188,7 @@ const ChartReportPage = () => {
               />
               {selectedTypes.map((type, index) => (
                 <Line
+                  key={type}
                   type="monotone"
                   dataKey={type}
                   stroke={colorPalette[index % colorPalette.length]}

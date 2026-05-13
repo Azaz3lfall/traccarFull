@@ -67,24 +67,64 @@ const MapRoutePath = ({ positions }) => {
     const minSpeed = positions.map((p) => p.speed).reduce((a, b) => Math.min(a, b), Infinity);
     const maxSpeed = positions.map((p) => p.speed).reduce((a, b) => Math.max(a, b), -Infinity);
     const features = [];
-    for (let i = 0; i < positions.length - 1; i += 1) {
-      features.push({
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [[positions[i].longitude, positions[i].latitude], [positions[i + 1].longitude, positions[i + 1].latitude]],
-        },
-        properties: {
-          color: reportColor || getSpeedColor(
-            positions[i + 1].speed,
-            minSpeed,
-            maxSpeed,
-          ),
-          width: mapLineWidth,
-          opacity: mapLineOpacity,
-        },
-      });
+
+    if (positions.length > 1) {
+      let currentCoordinates = [];
+      let currentColor = null;
+
+      for (let i = 0; i < positions.length - 1; i += 1) {
+        const p1 = positions[i];
+        const p2 = positions[i + 1];
+
+        let color = reportColor;
+        if (!color) {
+          const speed = p2.speed;
+          const range = maxSpeed - minSpeed;
+          const buckets = 20;
+          const step = range / buckets;
+          const quantizedSpeed = range > 0 ? Math.floor((speed - minSpeed) / step) * step + minSpeed : speed;
+          color = getSpeedColor(quantizedSpeed, minSpeed, maxSpeed);
+        }
+
+        if (currentColor === null) {
+          currentColor = color;
+          currentCoordinates = [[p1.longitude, p1.latitude], [p2.longitude, p2.latitude]];
+        } else if (currentColor !== color) {
+          features.push({
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: currentCoordinates,
+            },
+            properties: {
+              color: currentColor,
+              width: mapLineWidth,
+              opacity: mapLineOpacity,
+            },
+          });
+          currentColor = color;
+          currentCoordinates = [[p1.longitude, p1.latitude], [p2.longitude, p2.latitude]];
+        } else {
+          currentCoordinates.push([p2.longitude, p2.latitude]);
+        }
+      }
+
+      if (currentCoordinates.length > 0) {
+        features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: currentCoordinates,
+          },
+          properties: {
+            color: currentColor,
+            width: mapLineWidth,
+            opacity: mapLineOpacity,
+          },
+        });
+      }
     }
+
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
       features,

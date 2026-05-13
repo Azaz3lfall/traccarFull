@@ -61,14 +61,25 @@ router.get('/map', authenticate, async (req, res) => {
       let clientIds = [];
       try {
         const cuResult = await pool.query(
-          'SELECT client_id FROM client_users WHERE traccar_user_id = $1',
+          `SELECT cu.client_id
+           FROM client_users cu
+           JOIN clients c ON c.id = cu.client_id
+           WHERE cu.traccar_user_id = $1
+             AND COALESCE(c.active, TRUE) = TRUE
+             AND COALESCE(c.billing_blocked, FALSE) = FALSE
+             AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         clientIds = cuResult.rows.map((r) => r.client_id);
       } catch (_) {}
       if (clientIds.length === 0) {
         const clientResult = await pool.query(
-          'SELECT id FROM clients WHERE traccar_user_id = $1',
+          `SELECT id
+           FROM clients
+           WHERE traccar_user_id = $1
+             AND COALESCE(active, TRUE) = TRUE
+             AND COALESCE(billing_blocked, FALSE) = FALSE
+             AND COALESCE(billing_status, 'ativo') <> 'inadimplente'`,
           [req.user.id]
         );
         if (clientResult.rows.length > 0) {
@@ -79,8 +90,11 @@ router.get('/map', authenticate, async (req, res) => {
         console.log(`No client found for user ID ${req.user.id}, returning empty array`);
         return res.json([]);
       }
-      query += ` WHERE v.client_id = ANY($1::uuid[]) AND
-        EXISTS (SELECT 1 FROM user_vehicles uv WHERE uv.traccar_user_id = $2 AND uv.vehicle_id = v.id)`;
+      query += ` WHERE v.client_id = ANY($1::uuid[])
+        AND COALESCE(c.active, TRUE) = TRUE
+        AND COALESCE(c.billing_blocked, FALSE) = FALSE
+        AND COALESCE(c.billing_status, 'ativo') <> 'inadimplente'
+        AND EXISTS (SELECT 1 FROM user_vehicles uv WHERE uv.traccar_user_id = $2 AND uv.vehicle_id = v.id)`;
       params.push(clientIds, req.user.id);
       console.log(`Client(s) found: ${clientIds.length} for user ${req.user.id}, filtering vehicles`);
     } else {
