@@ -1,31 +1,4 @@
-// Removed unused theme imports
-import { loadImage, prepareIcon, prepareIconWithShadow } from './mapUtil';
-
-/* import directionSvg from '../../resources/images/direction.svg';
-import backgroundSvg from '../../resources/images/background.svg';
-import deviceNameBgSvg from '../../resources/images/device-name-bg.svg';
-import animalSvg from '../../resources/images/icon/animal.svg';
-import bicycleSvg from '../../resources/images/icon/bicycle.svg';
-import boatSvg from '../../resources/images/icon/boat.svg';
-import busSvg from '../../resources/images/icon/bus.svg';
-import carSvg from '../../resources/images/icon/car.svg';
-import camperSvg from '../../resources/images/icon/camper.svg';
-import craneSvg from '../../resources/images/icon/crane.svg';
-import defaultSvg from '../../resources/images/icon/default.svg';
-import startSvg from '../../resources/images/icon/start.svg';
-import finishSvg from '../../resources/images/icon/finish.svg';
-import helicopterSvg from '../../resources/images/icon/helicopter.svg';
-import motorcycleSvg from '../../resources/images/icon/motorcycle.svg';
-import personSvg from '../../resources/images/icon/person.svg';
-import planeSvg from '../../resources/images/icon/plane.svg';
-import scooterSvg from '../../resources/images/icon/scooter.svg';
-import shipSvg from '../../resources/images/icon/ship.svg';
-import tractorSvg from '../../resources/images/icon/tractor.svg';
-import trailerSvg from '../../resources/images/icon/trailer.svg';
-import trainSvg from '../../resources/images/icon/train.svg';
-import tramSvg from '../../resources/images/icon/tram.svg';
-import truckSvg from '../../resources/images/icon/truck.svg';
-import vanSvg from '../../resources/images/icon/van.svg'; */
+import { loadImage, prepareIcon, prepareIconWithShadow, prepareIconWithTint } from './mapUtil';
 
 import directionSvg from "../../resources/images/direction.svg";
 import startSvg from "../../resources/images/icon/start.svg";
@@ -89,21 +62,52 @@ export const mapIcons = {
 };
 
 export const mapIconKey = (category) => {
-  if (category === 'tag') return 'tag';
-  switch (category) {
-    case 'offroad':
-    case 'pickup':
-      return 'car';
-    case 'trolleybus':
-      return 'bus';
-    default:
-      return mapIcons.hasOwnProperty(category) ? category : 'default';
-  }
+  if (!category) return 'default';
+  return mapIcons.hasOwnProperty(category) ? category : 'default';
 };
 
 export const mapImages = {};
 
 let preloadPromise = null;
+
+// States available as marker image variants
+const MARKER_STATES = ['driving', 'online', 'idle', 'offline', 'static'];
+
+// Tint color applied per state (hex)
+const STATE_TINT = {
+  driving: '#16A34A',  // green
+  online:  '#2563EB',  // blue
+  idle:    '#CA8A04',  // yellow/amber
+  offline: '#DC2626',  // red
+  static:  '#6B7280',  // gray
+};
+
+// Which base marker image to load for each state
+const STATE_BASE_IMAGE = {
+  driving: 'driving',
+  online:  'online',
+  idle:    'online',   // no dedicated idle image → use online variant
+  offline: 'offline',
+  static:  'static',
+};
+
+// Old color name → new state name (backward compat)
+const COLOR_TO_STATE = {
+  success: 'driving',
+  info:    'online',
+  error:   'offline',
+  neutral: 'static',
+};
+
+// For categories that exist in mapIcons but have no public/markers files → use newIcons fallback
+const NO_MARKER_CATEGORIES = new Set(['camper', 'trailer', 'start', 'finish']);
+
+// Fallback to another state image when a specific one doesn't exist for a category
+const STATE_FALLBACK = {
+  train:      { driving: 'online', static: 'online' },
+  tram:       { driving: 'online' },
+  trolleybus: { driving: 'online' },
+};
 
 export default async () => {
   if (preloadPromise) return preloadPromise;
@@ -114,44 +118,61 @@ export default async () => {
       mapImages.background = await prepareIcon(background);
       mapImages.direction = await prepareIconWithShadow(await loadImage(directionSvg));
       mapImages['device-name-bg'] = await prepareIcon(background, await loadImage(deviceNameBgSvg));
-      
-      // Pre-carrega o ícone padrão para usar como fallback imediato
+
+      // Pre-load default icon as immediate fallback
       const defaultIconImg = await loadImage(mapIcons.default);
       const defaultData = prepareIconWithShadow(defaultIconImg);
-      
+
       Object.keys(mapIcons).forEach((category) => {
-        ['info', 'success', 'error', 'neutral'].forEach((color) => {
+        MARKER_STATES.forEach((state) => {
+          mapImages[`${category}-${state}`] = defaultData;
+        });
+        Object.keys(COLOR_TO_STATE).forEach((color) => {
           mapImages[`${category}-${color}`] = defaultData;
         });
       });
 
       await Promise.all(Object.keys(mapIcons).map(async (category) => {
         try {
-          const icon = await loadImage(mapIcons[category]);
-          let finalIcon = icon;
-          
           if (category === 'tag') {
-            // Removendo canvas manual para evitar perda de qualidade/tamanho
-            // Deixando o navegador/mapa lidar com a imagem original que é grande
-            finalIcon = icon;
+            const icon = await loadImage('/markers/marker_tag.png');
+            const rendered = prepareIconWithShadow(icon);
+            MARKER_STATES.forEach((state) => { mapImages[`${category}-${state}`] = rendered; });
+            Object.keys(COLOR_TO_STATE).forEach((color) => { mapImages[`${category}-${color}`] = rendered; });
+            return;
           }
-          
-          ['info', 'success', 'error', 'neutral'].forEach((color) => {
-            mapImages[`${category}-${color}`] = prepareIconWithShadow(finalIcon);
-          });
-        } catch (error) {
-          console.error(`Error loading icon for category ${category}:`, error);
-          // Fallback para não quebrar o mapa se um ícone falhar
-          try {
-            const defaultIcon = await loadImage(mapIcons.default);
-            ['info', 'success', 'error', 'neutral'].forEach((color) => {
-              if (!mapImages[`${category}-${color}`]) {
-                mapImages[`${category}-${color}`] = prepareIconWithShadow(defaultIcon);
-              }
+
+          if (NO_MARKER_CATEGORIES.has(category)) {
+            const icon = await loadImage(mapIcons[category]);
+            MARKER_STATES.forEach((state) => {
+              mapImages[`${category}-${state}`] = prepareIconWithTint(icon, STATE_TINT[state] || null);
             });
-          } catch (e) {
-            console.error('Critical failure: Could not even load default icon');
+            Object.keys(COLOR_TO_STATE).forEach((color) => {
+              const state = COLOR_TO_STATE[color];
+              mapImages[`${category}-${color}`] = mapImages[`${category}-${state}`];
+            });
+            return;
           }
+
+          const typeFallback = STATE_FALLBACK[category] || {};
+
+          await Promise.all(MARKER_STATES.map(async (state) => {
+            const baseVariant = STATE_BASE_IMAGE[state] || state;
+            const actualVariant = typeFallback[baseVariant] || baseVariant;
+            const url = `/markers/marker_${category}_${actualVariant}.png`;
+            let icon;
+            try {
+              icon = await loadImage(url);
+            } catch {
+              icon = await loadImage(mapIcons[category]);
+            }
+            mapImages[`${category}-${state}`] = prepareIconWithTint(icon, STATE_TINT[state] || null);
+            // Register old color alias
+            const colorAlias = Object.entries(COLOR_TO_STATE).find(([, v]) => v === state)?.[0];
+            if (colorAlias) mapImages[`${category}-${colorAlias}`] = mapImages[`${category}-${state}`];
+          }));
+        } catch (error) {
+          console.error(`Error loading icons for category ${category}:`, error);
         }
       }));
     } catch (globalError) {

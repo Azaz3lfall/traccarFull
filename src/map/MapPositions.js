@@ -12,7 +12,6 @@ import maplibregl from 'maplibre-gl';
 import { map } from './core/MapView';
 import {
   formatTime,
-  getStatusColor,
   reverseGeocode,
 } from '../common/util/formatter';
 import { buildVehicleTelemetryPopupRowHtml } from '../common/util/vehicleTelemetrySnapshot';
@@ -170,7 +169,20 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       svgWidth: svgWidth,
       fixTime: formatTime(position.fixTime, 'seconds'),
       category: mapIconKey(device.category),
-      color: showStatus ? position.attributes.color || getStatusColor(device.status) : 'neutral',
+      color: showStatus ? (() => {
+        if (position.attributes?.color) return position.attributes.color;
+        const status = device.status;
+        if (status === 'offline') return 'offline';
+        if (status === 'online') {
+          const isMoving = position.attributes?.motion === true
+            || (position.speed != null && position.speed > 0.5)
+            || position.course > 0;
+          if (isMoving) return 'driving';
+          if (position.attributes?.ignition === true) return 'idle';
+          return 'online';
+        }
+        return 'static';
+      })() : 'static',
       rotation: position.course,
       direction: showDirection,
     };

@@ -1,9 +1,10 @@
 import { parse, stringify } from 'wellknown';
 import circle from '@turf/circle';
 
-export const loadImage = (url) => new Promise((imageLoaded) => {
+export const loadImage = (url) => new Promise((resolve, reject) => {
   const image = new Image();
-  image.onload = () => imageLoaded(image);
+  image.onload = () => resolve(image);
+  image.onerror = () => reject(new Error(`Failed to load image: ${url}`));
   image.src = url;
 });
 
@@ -48,29 +49,44 @@ export const prepareIcon = (background, icon, color) => {
   return context.getImageData(0, 0, canvas.width, canvas.height);
 };
 
-export const prepareIconWithShadow = (icon) => {
-  const canvas = document.createElement('canvas');
+export const prepareIconWithShadow = (icon) => prepareIconWithTint(icon, null);
+
+export const prepareIconWithTint = (icon, tintColor) => {
   const shadowOffset = 5;
   const shadowBlur = 7;
-  
-  // Make canvas larger to accommodate shadow
+  const w = icon.width * devicePixelRatio;
+  const h = icon.height * devicePixelRatio;
+
+  // Step 1: tint the icon on a scratch canvas
+  const tintCanvas = document.createElement('canvas');
+  tintCanvas.width = w;
+  tintCanvas.height = h;
+  const tCtx = tintCanvas.getContext('2d');
+  tCtx.drawImage(icon, 0, 0, w, h);
+  if (tintColor) {
+    tCtx.globalCompositeOperation = 'source-atop';
+    tCtx.globalAlpha = 0.68;
+    tCtx.fillStyle = tintColor;
+    tCtx.fillRect(0, 0, w, h);
+    tCtx.globalAlpha = 1;
+    tCtx.globalCompositeOperation = 'source-over';
+  }
+
+  // Step 2: draw tinted icon with drop shadow on final canvas
+  const canvas = document.createElement('canvas');
   canvas.width = (icon.width + shadowOffset + shadowBlur) * devicePixelRatio;
   canvas.height = (icon.height + shadowOffset + shadowBlur) * devicePixelRatio;
   canvas.style.width = `${icon.width + shadowOffset + shadowBlur}px`;
   canvas.style.height = `${icon.height + shadowOffset + shadowBlur}px`;
 
-  const context = canvas.getContext('2d');
-  
-  // Shadow - bottom right
-  context.shadowColor = 'rgba(0, 0, 0, 0.99)';
-  context.shadowBlur = shadowBlur * devicePixelRatio;
-  context.shadowOffsetX = shadowOffset * devicePixelRatio;
-  context.shadowOffsetY = shadowOffset * devicePixelRatio;
-  
-  // Draw the icon with bottom right shadow
-  context.drawImage(icon, 0, 0, icon.width * devicePixelRatio, icon.height * devicePixelRatio);
+  const ctx = canvas.getContext('2d');
+  ctx.shadowColor = 'rgba(0,0,0,0.75)';
+  ctx.shadowBlur = shadowBlur * devicePixelRatio;
+  ctx.shadowOffsetX = shadowOffset * devicePixelRatio;
+  ctx.shadowOffsetY = shadowOffset * devicePixelRatio;
+  ctx.drawImage(tintCanvas, 0, 0);
 
-  return context.getImageData(0, 0, canvas.width, canvas.height);
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
 };
 
 export const reverseCoordinates = (it) => {
