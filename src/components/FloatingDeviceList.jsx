@@ -575,6 +575,33 @@ const FloatingDeviceList = ({
     return Object.values(devices).filter((d) => d.status === status).length;
   }, [devices]);
 
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const getDeviceState = useCallback((device, position) => {
+    if (!device || device.status === 'offline' || device.status === 'unknown') return 'offline';
+    if (device.status === 'online') {
+      if (!position) return 'online';
+      const isMoving = position.attributes?.motion === true
+        || (position.speed != null && position.speed > 0.5)
+        || position.course > 0;
+      if (isMoving) return 'driving';
+      if (position.attributes?.ignition === true) return 'idle';
+      return 'online';
+    }
+    return 'offline';
+  }, []);
+
+  const statusCounts = useMemo(() => {
+    const counts = { all: 0, driving: 0, online: 0, idle: 0, offline: 0 };
+    (filteredDevices || []).forEach((device) => {
+      const position = positions[device.id];
+      const state = getDeviceState(device, position);
+      counts[state] = (counts[state] || 0) + 1;
+      counts.all++;
+    });
+    return counts;
+  }, [filteredDevices, positions, getDeviceState]);
+
   // Multi-select helpers
   const toggleStatus = useCallback((status) => {
     setFilter(prev => ({
@@ -1403,9 +1430,18 @@ const FloatingDeviceList = ({
     );
   }
 
+  // Apply quick status filter on top of existing filters
+  const displayDevices = useMemo(() => {
+    if (statusFilter === 'all' || !filteredDevices) return filteredDevices;
+    return filteredDevices.filter((device) => {
+      const position = positions[device.id];
+      return getDeviceState(device, position) === statusFilter;
+    });
+  }, [filteredDevices, positions, statusFilter, getDeviceState]);
+
   // Determinar qual lista usar baseado no modo
-  const itemsToRender = viewMode === 'fleet' ? filteredFleetItems : filteredDevices;
-  const itemCount = viewMode === 'fleet' ? filteredFleetItems.length : filteredDevices.length;
+  const itemsToRender = viewMode === 'fleet' ? filteredFleetItems : displayDevices;
+  const itemCount = viewMode === 'fleet' ? filteredFleetItems.length : (displayDevices?.length ?? 0);
 
   // TanStack Virtual setup - simplified for better performance
   const virtualizer = useVirtualizer({
@@ -2171,8 +2207,87 @@ const FloatingDeviceList = ({
           )}
         </AnimatePresence>
         
+        {/* Quick status filter tabs — only in device mode */}
+        {viewMode === 'devices' && (
+          <div style={{
+            display: 'flex',
+            gap: '4px',
+            padding: '0 12px 8px 12px',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            flexShrink: 0,
+          }}>
+            {[
+              { key: 'all',     label: 'Todos',      color: null },
+              { key: 'driving', label: 'Movimento',  color: '#16A34A' },
+              { key: 'online',  label: 'Online',     color: '#2563EB' },
+              { key: 'idle',    label: 'Ignição',    color: '#CA8A04' },
+              { key: 'offline', label: 'Offline',    color: '#DC2626' },
+            ].map(({ key, label, color }) => {
+              const active = statusFilter === key;
+              const count = statusCounts[key] ?? 0;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setStatusFilter(key)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '3px 8px',
+                    borderRadius: '20px',
+                    border: `1px solid ${active
+                      ? (color || colors.primary)
+                      : colors.border}`,
+                    backgroundColor: active
+                      ? (color ? `${color}22` : `${colors.primary}18`)
+                      : colors.secondary,
+                    color: active ? (color || colors.text) : colors.textSecondary,
+                    fontSize: '11px',
+                    fontWeight: active ? '600' : '400',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease',
+                    lineHeight: 1,
+                  }}
+                >
+                  {color && (
+                    <span style={{
+                      width: '7px',
+                      height: '7px',
+                      borderRadius: '50%',
+                      backgroundColor: color,
+                      flexShrink: 0,
+                      display: 'inline-block',
+                    }} />
+                  )}
+                  {label}
+                  <span style={{
+                    backgroundColor: active
+                      ? (color || colors.primary)
+                      : colors.border,
+                    color: active ? '#fff' : colors.textSecondary,
+                    borderRadius: '10px',
+                    padding: '0 5px',
+                    fontSize: '10px',
+                    fontWeight: '600',
+                    lineHeight: '16px',
+                    minWidth: '18px',
+                    textAlign: 'center',
+                  }}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* Device List - Virtualized */}
-        <div 
+        <div
           style={{
             flex: 1,
             overflow: 'hidden',
