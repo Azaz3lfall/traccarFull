@@ -24,6 +24,7 @@ import MapDeviceRouteCircle from '../map/MapDeviceRouteCircle.js';
 import MapCamera from '../map/MapCamera';
 import MapReplayCamera from '../map/MapReplayCamera';
 import MapHeatmap from '../map/MapHeatmap';
+import MapStatusLegend from '../map/legend/MapStatusLegend';
 
 const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selectedMapStyle, currentReplayIndex = 0, routePlannerData, selectedRouteIndex = 0, onRouteChange, ocorrenciaDestination, deviceIdWithRoute }) => {
   const theme = useTheme();
@@ -150,6 +151,7 @@ const MainMap = memo(({ filteredPositions, selectedPosition, onMapClick, selecte
         )}
       </MapView>
       <MapScale />
+      {replayPositions.length === 0 && historyPositions.length === 0 && <MapStatusLegend />}
       {desktop && (
         <MapPadding start={parseInt(theme.dimensions.drawerWidthDesktop, 10) + parseInt(theme.spacing(1.5), 10)} />
       )}
