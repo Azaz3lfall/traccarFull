@@ -13,7 +13,7 @@ import { formatStatus } from '../../common/util/formatter';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { mapIconKey, mapIcons } from '../../map/core/preloadImages';
 import { useAttributePreference } from '../../common/util/preferences';
-import VehicleTelemetryStatusBar from '../../settings/components/VehicleTelemetryStatusBar';
+import DeviceStatusIcons from '../../settings/components/DeviceStatusIcons';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -125,7 +125,7 @@ const FleetDeviceCard = memo(({ item, desktop, style }) => {
         />
         {currentPosition && currentDevice && (
           <div style={{ display: 'flex', alignItems: 'center', marginLeft: 8, flexShrink: 0 }}>
-            <VehicleTelemetryStatusBar position={currentPosition} device={currentDevice} compact />
+            <DeviceStatusIcons position={currentPosition} />
           </div>
         )}
       </ListItemButton>

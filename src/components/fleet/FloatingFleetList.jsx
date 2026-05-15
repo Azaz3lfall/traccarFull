@@ -8,7 +8,7 @@ import { useTranslation } from '../../common/components/LocalizationProvider';
 import { Input } from '../ui/input';
 import { Card } from '../ui/card';
 import { Search, Menu, MapPin, Gauge, Loader2 } from 'lucide-react';
-import VehicleTelemetryStatusBar from '../../settings/components/VehicleTelemetryStatusBar';
+import DeviceStatusIcons from '../../settings/components/DeviceStatusIcons';
 import {
   formatSpeed,
   formatCoordinate,
@@ -262,7 +262,7 @@ const FleetRowItem = ({ item, style, onClick, devices, positions, t, isSelected 
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', paddingLeft: '2px', flexShrink: 0, minHeight: '22px' }}>
-              <VehicleTelemetryStatusBar position={position} device={device} compact />
+              <DeviceStatusIcons position={position} />
             </div>
           </div>
         )}

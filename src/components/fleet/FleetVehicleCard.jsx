@@ -62,7 +62,7 @@ import fetchOrThrow from '../../common/util/fetchOrThrow';
 // Dialogs
 import CommandDialog from '../CommandDialog';
 import ShareDialog from '../ShareDialog';
-import VehicleTelemetryStatusBar from '../../settings/components/VehicleTelemetryStatusBar';
+import DeviceStatusIcons from '../../settings/components/DeviceStatusIcons';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -849,7 +849,7 @@ const FleetVehicleCard = ({ onOpenReplay, onOpenDetails }) => {
             </p>
             {currentPosition && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '4px', width: '100%' }}>
-                <VehicleTelemetryStatusBar position={currentPosition} device={currentDevice} compact />
+                <DeviceStatusIcons position={currentPosition} device={currentDevice} />
               </div>
             )}
         </div>
