@@ -14,6 +14,8 @@ import registerTelecomRoutes from '../telecom/routes/index.js';
 import registerOSRoutes from '../os_backend/routes/index.js';
 import { startCommandScheduler } from './schedulers/commandScheduler.js';
 import { startRouteBlockMonitor } from './schedulers/routeBlockMonitor.js';
+import { startJ16DoorMonitor } from './schedulers/j16DoorMonitor.js';
+import { startCommandEventMonitor } from './schedulers/commandEventMonitor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -87,6 +89,12 @@ app.listen(PORT, () => {
     });
     startRouteBlockMonitor().catch((e) => {
         console.error('Falha ao iniciar monitor de bloqueio por rota:', e?.message);
+    });
+    startJ16DoorMonitor().catch((e) => {
+        console.error('Falha ao iniciar monitor de porta J16+:', e?.message);
+    });
+    startCommandEventMonitor().catch((e) => {
+        console.error('Falha ao iniciar monitor de comandos:', e?.message);
     });
 });
 

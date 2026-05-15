@@ -91,7 +91,9 @@ const EventReportPage = () => {
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
-    eventTypes.forEach((it) => query.append('type', it));
+    if (eventTypes[0] !== 'allEvents') {
+      eventTypes.forEach((it) => query.append('type', it));
+    }
     if (eventTypes[0] !== 'allEvents' && eventTypes.includes('alarm')) {
       alarmTypes.forEach((it) => query.append('alarm', it));
     }
@@ -110,7 +112,9 @@ const EventReportPage = () => {
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
-    eventTypes.forEach((it) => query.append('type', it));
+    if (eventTypes[0] !== 'allEvents') {
+      eventTypes.forEach((it) => query.append('type', it));
+    }
     if (eventTypes[0] !== 'allEvents' && eventTypes.includes('alarm')) {
       alarmTypes.forEach((it) => query.append('alarm', it));
     }
@@ -125,6 +129,19 @@ const EventReportPage = () => {
     await scheduleReport(deviceIds, groupIds, report);
     navigate('/reports/scheduled');
   });
+
+  const formatCommandResult = (result) => {
+    if (!result) return '';
+    if (result === 'DYD=Success!' || result === 'RELAY 1 OK' || result.startsWith('Cut off the fuel supply: Success')) return t('alarmEngineStop');
+    if (result === 'HFYD=Success!' || result === 'RELAY 0 OK' || result === 'Restore fuel supply: Success!') return t('alarmEngineResume');
+    if (result === 'DYD=Fail!') return t('alarmEngineStopFailed');
+    if (result === 'HFYD=Fail!') return t('alarmEngineResumeFailed');
+    if (result.includes('Speed exceed') && result.includes('Cut off')) return t('alarmEngineStopDelayed');
+    if (result === 'SET OK') return t('commandCustom');
+    if (result.includes('Already in the state of fuel supply cut off')) return `${t('alarmEngineStop')} (já estava)`;
+    if (result.includes('Already in the state of fuel supply to resume')) return `${t('alarmEngineResume')} (já estava)`;
+    return result;
+  };
 
   const formatValue = (item, key) => {
     const value = item[key];
@@ -154,7 +171,7 @@ const EventReportPage = () => {
           case 'media':
             return (<Link href={`/api/media/${devices[item.deviceId]?.uniqueId}/${item.attributes.file}`} target="_blank">{item.attributes.file}</Link>);
           case 'commandResult':
-            return item.attributes.result;
+            return formatCommandResult(item.attributes.result);
           default:
             return '';
         }
