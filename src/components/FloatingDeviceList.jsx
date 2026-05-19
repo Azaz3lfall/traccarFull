@@ -545,6 +545,7 @@ const FloatingDeviceList = ({
   });
   const [smartLinkActiveTab, setSmartLinkActiveTab] = useState('groups');
   const [showOnMobile, setShowOnMobile] = useState(true);
+  const [mobileListExpanded, setMobileListExpanded] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showGroupsDropdown, setShowGroupsDropdown] = useState(false);
@@ -753,9 +754,20 @@ const FloatingDeviceList = ({
       setShowOnMobile(false);
     } else if (!desktop && !selectedDeviceId) {
       setShowOnMobile(true);
+      setMobileListExpanded(false); // Reset to partial view when list reappears
       // Note: keyword clearing is handled in MainPage.jsx to avoid conflicts
     }
   }, [desktop, selectedDeviceId]);
+
+  // Mobile bottom-sheet drag handler
+  const onMobileListPanEnd = useCallback((_, info) => {
+    const { velocity, offset } = info;
+    if (velocity.y > 280 || offset.y > 60) {
+      setMobileListExpanded(false);
+    } else if (velocity.y < -280 || offset.y < -60) {
+      setMobileListExpanded(true);
+    }
+  }, []);
   
   // Helper function to get period name
   const getPeriodName = (index) => {
@@ -1462,19 +1474,57 @@ const FloatingDeviceList = ({
       {!(!desktop && !showOnMobile) && isVisible && (
         <motion.div
           key="floating-device-list"
-          initial={{ x: -400, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -400, opacity: 0 }}
-          transition={{ duration: 0.1, ease: "easeOut" }}
+          initial={{ x: !desktop ? 0 : -400, y: !desktop ? 400 : 0, opacity: 0 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          exit={{ x: !desktop ? 0 : -400, y: !desktop ? 400 : 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            top: !desktop ? '0px' : '8px',
+            top: !desktop ? 'auto' : '8px',
+            bottom: !desktop ? '0px' : 'auto',
             left: !desktop ? '0px' : (isMenuExpanded ? '200px' : '63px'),
             width: !desktop ? '100vw' : '310px',
-            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
+            height: !desktop ? 'auto' : 'calc(100vh - 16px)',
             zIndex: 9999,
             pointerEvents: 'auto',
-            transition: 'left 0.15s ease'
+            transition: 'left 0.15s ease',
+            display: !desktop ? 'flex' : undefined,
+            flexDirection: !desktop ? 'column' : undefined,
+          }}
+        >
+        {!desktop && (
+          <motion.div
+            onPanEnd={onMobileListPanEnd}
+            style={{
+              padding: '10px 0 4px',
+              cursor: 'grab',
+              touchAction: 'none',
+              flexShrink: 0,
+            }}
+            onClick={() => setMobileListExpanded((v) => !v)}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 5,
+                borderRadius: 3,
+                backgroundColor: colors.border,
+                margin: '0 auto',
+              }}
+            />
+          </motion.div>
+        )}
+        <motion.div
+          animate={{
+            height: !desktop ? (mobileListExpanded ? 'calc(92dvh - env(safe-area-inset-top, 0px))' : '56dvh') : '100%',
+          }}
+          transition={!desktop ? { type: 'spring', damping: 32, stiffness: 380 } : { duration: 0 }}
+          style={{
+            flex: !desktop ? undefined : 1,
+            minHeight: 0,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
       <Card style={{
@@ -1482,8 +1532,8 @@ const FloatingDeviceList = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: colors.surface,
-        borderRadius: !desktop ? '0px' : (selectedDeviceId || geofencesPopoverVisible ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
-        boxShadow: !desktop ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: !desktop ? '16px 16px 0 0' : (selectedDeviceId || geofencesPopoverVisible ? '0px 0px 0px 0px' : '0px 16px 16px 0px'),
+        boxShadow: !desktop ? '0 -10px 40px rgba(0, 0, 0, 0.14)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
         border: `1px solid ${colors.border}`
       }}>
         {/* Header */}
@@ -2390,6 +2440,7 @@ const FloatingDeviceList = ({
         
         {/* Removed Footer with Add Device Button */}
       </Card>
+        </motion.div>
     </motion.div>
       )}
     </AnimatePresence>

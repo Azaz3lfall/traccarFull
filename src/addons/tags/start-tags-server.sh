@@ -45,11 +45,16 @@ pm2 start src/addons/tags/cointag.mjs --name cointag --log-date-format "YYYY-MM-
 echo "🚀 Starting K-Tag polling service..."
 pm2 start src/addons/tags/tags.mjs --name ktag --log-date-format "YYYY-MM-DD HH:mm:ss Z"
 
+# nanoTAG - Polling service (fetches from nanoTAG API, reports to Traccar)
+echo "🚀 Starting nanoTAG polling service..."
+pm2 start src/addons/tags/nanotag.mjs --name nanotag --log-date-format "YYYY-MM-DD HH:mm:ss Z"
+
 pm2 save
 
 echo ""
 echo "✅ Tags services started!"
 echo "   COINTAG: pm2 logs cointag"
 echo "   K-Tag:   pm2 logs ktag"
+echo "   nanoTAG: pm2 logs nanotag"
 echo "   Status:  pm2 status"
 echo ""

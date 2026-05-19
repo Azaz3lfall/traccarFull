@@ -84,10 +84,16 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const vehicles = useSelector((state) => state.fleet.items) || [];
 
-  // Only primary vehicle trackers on map: IDs from fleet (vehicle.device_id = principal)
-  const primaryDeviceIds = useMemo(() => {
+  // All device IDs associated with any vehicle (primary + secondary like Nanotag tags)
+  const allowedVehicleDeviceIds = useMemo(() => {
     if (!Array.isArray(vehicles) || vehicles.length === 0) return null;
-    return new Set(vehicles.map((v) => v.device_id).filter(Boolean));
+    const ids = new Set();
+    vehicles.forEach((v) => {
+      if (v.device_id != null) ids.add(v.device_id);
+      const extra = v.deviceIds || (v.devices?.map((d) => d.id)) || [];
+      extra.forEach((id) => { if (id != null) ids.add(id); });
+    });
+    return ids;
   }, [vehicles]);
 
   const vehicleByDeviceId = useMemo(() => {
@@ -820,10 +826,10 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
       // Show marker if: device exists AND (is primary vehicle device OR is the currently selected device)
       const allowedPositions = (pos) => {
         if (!devices.hasOwnProperty(pos.deviceId)) return false;
-        if (primaryDeviceIds == null) return true;
-        const isVehiclePrimary = primaryDeviceIds.has(pos.deviceId);
+        if (allowedVehicleDeviceIds == null) return true;
+        const isVehicleDevice = allowedVehicleDeviceIds.has(pos.deviceId);
         const isCurrentlySelected = pos.deviceId === selectedDeviceId;
-        return isVehiclePrimary || isCurrentlySelected;
+        return isVehicleDevice || isCurrentlySelected;
       };
 
       const getMarkerLabel = (position) => {
@@ -894,7 +900,7 @@ const MapPositions = ({ positions, onMapClick, onMarkerClick, showStatus, select
     };
 
     updateData();
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers, primaryDeviceIds, vehicleByDeviceId, selectedDeviceId, restrictToBrazil]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, theme.palette.mode, addLayers, allowedVehicleDeviceIds, vehicleByDeviceId, selectedDeviceId, restrictToBrazil]);
 
   // Cleanup effect
   useEffect(() => {

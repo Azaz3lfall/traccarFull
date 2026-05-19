@@ -312,6 +312,16 @@ const FloatingFleetList = ({ desktop, isMenuExpanded, isVisible, onDrawerOpen })
 
   // ── Status filter ──
   const [statusFilter, setStatusFilter] = useState('all');
+  const [mobileFleetExpanded, setMobileFleetExpanded] = useState(false);
+
+  const onMobileFleetPanEnd = useCallback((_, info) => {
+    const { velocity, offset } = info;
+    if (velocity.y > 280 || offset.y > 60) {
+      setMobileFleetExpanded(false);
+    } else if (velocity.y < -280 || offset.y < -60) {
+      setMobileFleetExpanded(true);
+    }
+  }, []);
 
   // ── Fetch on open ──
   const parentRef = useRef(null);
@@ -416,26 +426,45 @@ const FloatingFleetList = ({ desktop, isMenuExpanded, isVisible, onDrawerOpen })
       {shouldShow && (
         <motion.div
           key="floating-fleet-list"
-          initial={{ x: -400, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -400, opacity: 0 }}
-          transition={{ duration: 0.1, ease: 'easeOut' }}
+          initial={{ x: !desktop ? 0 : -400, y: !desktop ? 400 : 0, opacity: 0 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          exit={{ x: !desktop ? 0 : -400, y: !desktop ? 400 : 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{
             position: 'fixed',
-            top: !desktop ? '0px' : '8px',
-            height: !desktop ? '100vh' : 'calc(100vh - 16px)',
+            top: !desktop ? 'auto' : '8px',
+            bottom: !desktop ? '0px' : 'auto',
+            height: !desktop ? 'auto' : 'calc(100vh - 16px)',
             left: !desktop ? '0px' : (isMenuExpanded ? '208px' : '63px'),
             width: !desktop ? '100vw' : '310px',
             zIndex: 9999,
             pointerEvents: 'auto',
             transition: 'left 0.15s ease',
+            display: !desktop ? 'flex' : undefined,
+            flexDirection: !desktop ? 'column' : undefined,
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          {!desktop && (
+            <motion.div
+              onPanEnd={onMobileFleetPanEnd}
+              style={{ padding: '10px 0 4px', cursor: 'grab', touchAction: 'none', flexShrink: 0 }}
+              onClick={() => setMobileFleetExpanded((v) => !v)}
+            >
+              <div style={{ width: 40, height: 5, borderRadius: 3, backgroundColor: borderColor, margin: '0 auto' }} />
+            </motion.div>
+          )}
+          <motion.div
+            animate={{
+              height: !desktop ? (mobileFleetExpanded ? 'calc(92dvh - env(safe-area-inset-top, 0px))' : '56dvh') : '100%',
+            }}
+            transition={!desktop ? { type: 'spring', damping: 32, stiffness: 380 } : { duration: 0 }}
+            style={{ flex: !desktop ? undefined : 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+          >
           <Card style={{
             height: '100%', display: 'flex', flexDirection: 'column',
-            backgroundColor: surface, borderRadius: '0px', boxShadow: 'none',
-            border: `1px solid ${borderColor}`, borderLeft: 'none', overflow: 'hidden',
+            backgroundColor: surface, borderRadius: !desktop ? '16px 16px 0 0' : '0px', boxShadow: !desktop ? '0 -10px 40px rgba(0,0,0,0.14)' : 'none',
+            border: `1px solid ${borderColor}`, borderLeft: !desktop ? `1px solid ${borderColor}` : 'none', overflow: 'hidden',
           }}>
             {/* ── Header ── */}
             <div style={{
@@ -531,6 +560,7 @@ const FloatingFleetList = ({ desktop, isMenuExpanded, isVisible, onDrawerOpen })
               )}
             </div>
           </Card>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

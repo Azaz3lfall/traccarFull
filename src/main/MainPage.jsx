@@ -3605,7 +3605,7 @@ const MainPage = () => {
       
       {/* Vertical Control Bar - Left of Device List */}
       <AnimatePresence>
-        {(desktop || selectedDeviceId) && (
+        {true && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -3614,7 +3614,7 @@ const MainPage = () => {
             style={{
         position: 'fixed',
               top: '8px',
-              right: '8px', // 8px from right edge
+              right: '8px',
               width: '50px',
               height: 'auto',
               backgroundColor: colors.menuSurface,

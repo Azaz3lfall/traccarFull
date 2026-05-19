@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 const NANOTAG_API_URL = 'http://nanotag.com.br:8082/api.php';
 const NANOTAG_TOKEN = 'e99b795bf5d94f0a4ab22e9b8d7bb8b5';
 const TRACCAR_API_URL = 'http://localhost:8082';
@@ -7,11 +11,35 @@ const TRACCAR_OSMAND_URL = 'http://localhost:5055';
 
 const POLLING_INTERVAL = 60 * 1000;
 const DEVICE_REFRESH_INTERVAL = 2 * 60 * 1000;
+const HEARTBEAT_INTERVAL_MS = 60 * 60 * 1000; // 1 hour heartbeat to keep device online
 const TARGET_DEVICE_MODEL = 'Nanotag';
 const NANOTAG_TIMEZONE_OFFSET = '-03:00';
 
+const STATE_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'nanotag-state.json');
+
+function loadState() {
+  try {
+    const raw = fs.readFileSync(STATE_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    return {
+      lastSentTimestamps: new Map(Object.entries(data.lastSentTimestamps || {})),
+      lastReportedState: new Map(Object.entries(data.lastReportedState || {})),
+    };
+  } catch {
+    return { lastSentTimestamps: new Map(), lastReportedState: new Map() };
+  }
+}
+
+function saveState() {
+  const data = {
+    lastSentTimestamps: Object.fromEntries(lastSentTimestamps),
+    lastReportedState: Object.fromEntries(lastReportedState),
+  };
+  fs.writeFileSync(STATE_FILE, JSON.stringify(data), 'utf8');
+}
+
 let allowedTagIds = new Set();
-const lastSentTimestamps = new Map();
+const { lastSentTimestamps, lastReportedState } = loadState();
 
 async function refreshRegisteredIds() {
   const authString = `${TRACCAR_USER}:${TRACCAR_PASS}`;
@@ -127,23 +155,28 @@ async function fetchLastPositions() {
 }
 
 async function sendToTraccar(position) {
+  // OsmAnd protocol uses GET with URI query params — POST body is ignored by Traccar
+  // Timestamp must be in seconds; divide by 1000 if milliseconds are detected
+  const tsSeconds = position.timestamp > 1e12
+    ? Math.floor(position.timestamp / 1000)
+    : position.timestamp;
+
   const params = new URLSearchParams();
   params.append('id', position.id);
   params.append('lat', position.lat.toFixed(6));
   params.append('lon', position.lon.toFixed(6));
-  params.append('timestamp', position.timestamp.toString());
+  params.append('timestamp', tsSeconds.toString());
   params.append('valid', 'true');
+
+  // Minimum speed bypasses filter.static=true in traccar.xml (which drops speed=0 static positions)
+  params.append('speed', '0.1');
 
   if (Number.isFinite(position.battery)) {
     params.append('batteryLevel', position.battery.toString());
   }
 
   try {
-    const response = await fetch(TRACCAR_OSMAND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
-    });
+    const response = await fetch(`${TRACCAR_OSMAND_URL}/?${params.toString()}`);
 
     if (!response.ok) {
       console.error(`[Traccar] Erro ao enviar ${position.id}: Status ${response.status}`);
@@ -171,13 +204,25 @@ async function processTags() {
   const positions = await fetchLastPositions();
   for (const position of positions) {
     const lastTimestamp = lastSentTimestamps.get(position.id) || 0;
-    if (position.timestamp <= lastTimestamp) {
+    const lastState = lastReportedState.get(position.id);
+    const timeSinceLastReport = lastState ? (Date.now() - lastState.reportedAt) : Infinity;
+
+    const isNew = position.timestamp > lastTimestamp;
+    const isHeartbeat = !isNew && timeSinceLastReport > HEARTBEAT_INTERVAL_MS;
+
+    if (!isNew && !isHeartbeat) {
       continue;
     }
 
-    const sent = await sendToTraccar(position);
+    // Heartbeats use current time: the tag is confirmed at this location right now
+    const sendPosition = isNew ? position : { ...position, timestamp: Date.now() };
+    const sent = await sendToTraccar(sendPosition);
     if (sent) {
-      lastSentTimestamps.set(position.id, position.timestamp);
+      if (isNew) {
+        lastSentTimestamps.set(position.id, position.timestamp);
+      }
+      lastReportedState.set(position.id, { reportedAt: Date.now() });
+      saveState();
     }
   }
 }
